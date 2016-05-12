@@ -1,0 +1,124 @@
+                   ============
+                      SYMMOL
+  A PROGRAM FOR THE SYMMETRIZATION OF GROUPS OF ATOMS
+        By Tullio Pilati and Alessandra Forni
+                Version November 4th 2002
+  ===================================================
+
+
+  INDWGH=1 ===> WEIGHTS AS ATOMIC MASS
+  INDTOL=1 ===> TOLERANCE=CONSTANT
+  CONSTANTS OF TOLERANCE=  0.500  0.900
+
+
+  CELL
+   1.00000   1.00000   1.00000    90.000    90.000    90.000    1.00000
+
+
+  ATOM GROUP  INPUT COORDINATES AND THEIR S.U.
+
+  S     1   0.00000  0.00000 -0.79700  0.00000  0.00000  0.00000
+  O     1   1.43596  0.00000 -0.97567  0.00000  0.00000  0.00000
+  O     1  -0.71798 -1.24357 -0.97567  0.00000  0.00000  0.00000
+  N     1   0.00000  0.00000  0.87288  0.00000  0.00000  0.00000
+  O     1  -0.71788  1.24357 -0.97577  0.00000  0.00000  0.00000
+
+
+           SYMMETRIZATION OF GROUP NR. 1
+
+
+ PRINCIPAL INERTIA MOMENTS and DEGENERATION DEGREE
+     98.97     87.74     87.74         2
+
+
+    ORTHOGONALIZATION MATRIX
+    0.500001   -0.866025    0.000181
+    0.866025    0.500001   -0.000041
+   -0.000054    0.000177    1.000000
+
+ ATOM      ORTHOGONAL COORDINATES      VECTORS TO MAKE SYMMETRICAL THE GROUP
+
+ S        -0.00004  -0.00001  -0.15746        0.00004   0.00001   0.00000
+ O         0.71791   1.24358  -0.33621        0.00006  -0.00002   0.00004
+ O         0.71790  -1.24358  -0.33631        0.00007   0.00002   0.00015
+ N         0.00026  -0.00008   1.51242       -0.00026   0.00008   0.00000
+ O        -1.43597   0.00008  -0.33597        0.00003  -0.00008  -0.00019
+
+     SYMMETRIZED ORTHOGONAL COORDINATES            ATOMIC R.M.S.
+ S     1  0.00000  0.00000 -0.15746    0.00003  0.00003  0.00000  *
+ O     1  0.71797  1.24356 -0.33616    0.00006  0.00004  0.00014  *
+ O     1  0.71797 -1.24356 -0.33616    0.00006  0.00004  0.00014   
+ N     1  0.00000  0.00000  1.51242    0.00020  0.00020  0.00000  *
+ O     1 -1.43594  0.00000 -0.33616    0.00002  0.00007  0.00014   
+
+ * Atom defining the asymmetric unit for the found symmetry group.
+
+
+ AVERAGE DIFFERENCE ON X,Y,Z,D   0.00009   0.00004   0.00008   0.00015
+
+ MAXIMUM DIFFERENCE ON X,Y,Z,D   0.00026   0.00008   0.00019   0.00028
+              DUE TO THE ATOMS     N         O         O         N    
+
+ Bond lengths and bond angles after symmetrization
+
+ S    - O     1.4470       S    - O     1.4470       S    - N     1.6699        
+ S    - O     1.4470       O    - S     1.4470       N    - S     1.6699        
+
+ O    - S    - O     118.498        O    - S    - N      97.094                 
+ O    - S    - O     118.498        O    - S    - N      97.094                 
+ O    - S    - O     118.498        N    - S    - O      97.094                 
+
+
+ Schoenflies symbol = C3v      CSM =  0.0000     Molecular RMS =  0.0002
+ CSM,see: Zabrodsky et al. (1993) JACS, 115, 8278-8298
+
+ SYMMETRY GROUP MATRICES
+
+
+  1 CSM =   0.00     MAX. DIFF. (Angstrom)=0.0000     TYPE E  
+     1.0000000000    0.0000000000    0.0000000000
+     0.0000000000    1.0000000000    0.0000000000
+     0.0000000000    0.0000000000    1.0000000000
+
+
+  2 CSM =   0.00     MAX. DIFF. (Angstrom)=0.0003     TYPE C3 
+    -0.5000000000   -0.8660254038    0.0000000000
+     0.8660254038   -0.5000000000    0.0000000000
+     0.0000000000    0.0000000000    1.0000000000
+
+
+  3 CSM =   0.00     MAX. DIFF. (Angstrom)=0.0001     TYPE Cs 
+     1.0000000000    0.0000000000    0.0000000000
+     0.0000000000   -1.0000000000    0.0000000000
+     0.0000000000    0.0000000000    1.0000000000
+
+
+  4 CSM =   0.00     MAX. DIFF. (Angstrom)=0.0003     TYPE C3 
+    -0.5000000000    0.8660254038    0.0000000000
+    -0.8660254038   -0.5000000000    0.0000000000
+     0.0000000000    0.0000000000    1.0000000000
+
+
+  5 CSM =   0.00     MAX. DIFF. (Angstrom)=0.0003     TYPE Cs 
+    -0.5000000000    0.8660254038    0.0000000000
+     0.8660254038    0.5000000000    0.0000000000
+     0.0000000000    0.0000000000    1.0000000000
+
+
+  6 CSM =   0.00     MAX. DIFF. (Angstrom)=0.0002     TYPE Cs 
+    -0.5000000000   -0.8660254038    0.0000000000
+    -0.8660254038    0.5000000000    0.0000000000
+     0.0000000000    0.0000000000    1.0000000000
+
+  SYMMETRY OPERATIONS IN HEXAGONAL COORDINATES
+ Symmetry element its CSM and Max.Diff.  Symmetry element its CSM and Max.Diff. 
+  1) [E  ]  x,y,z       0.0000  0.0000    2) [C3 ]  -y,x-y,z    0.0000  0.0003   
+  3) [Cs ]  x-y,-y,z    0.0000  0.0001    4) [C3 ]  -x+y,-x,z   0.0000  0.0003   
+  5) [Cs ]  y,x,z       0.0000  0.0003    6) [Cs ]  -x,-x+y,z   0.0000  0.0002   
+
+ OBLIQUE COORDINATES (HEXAGONAL SYSTEM)
+    S       0.00000   0.00000  -0.15746
+    O       1.43594   1.43594  -0.33616
+    O       0.00000  -1.43594  -0.33616
+    N       0.00000   0.00000   1.51242
+    O      -1.43594   0.00000  -0.33616

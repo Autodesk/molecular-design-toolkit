@@ -1,0 +1,9 @@
+#This will start a container with the latest version of buckyball that's been pushed
+#to artifactory
+buckyball-app:
+  image: moldesign/buckyball_notebook
+  ports:
+   - 8888:9999
+  volumes:
+   - /var/run/docker.sock:/var/run/docker.sock
+

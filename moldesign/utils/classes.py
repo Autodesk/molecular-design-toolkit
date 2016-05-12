@@ -1,0 +1,90 @@
+class Categorizer(dict):
+    """
+    Create a dict of lists from an iterable, with dict keys given by keyfn
+    """
+
+    def __init__(self, keyfn, iterable):
+        super(Categorizer, self).__init__()
+        self.keyfn = keyfn
+        for item in iterable:
+            self.add(item)
+
+    def add(self, item):
+        key = self.keyfn(item)
+        if key not in self:
+            self[key] = []
+        self[key].append(item)
+
+
+class DotDict(dict):
+    """Dict with items accessible as attributes"""
+    def __getstate__(self):
+        retval = dict(__dict__=self.__dict__.copy(),
+                      items=self.items())
+        return retval
+
+    def __setstate__(self, d):
+        self.__dict__.update(d['__dict__'])
+        self.update(d['items'])
+
+    def __getattr__(self, item):
+        try:
+            return self[item]
+        except KeyError:
+            raise AttributeError("'%s' object has no attribute '%s'"
+                                 % (self.__class__.__name__, item))
+
+    def __setattr__(self, item, val):
+        self[item] = val
+
+    def __dir__(self):
+        return dir(self.__class__) + self.keys()
+
+
+class Alias(object):
+    """
+    Descriptor that calls a child object's method.
+    e.g.
+    >>> class A(object):
+    >>>     childkeys = Alias('child.keys')
+    >>>     child = dict()
+    >>>
+    >>> a = A()
+    >>> a.child['key'] = 'value'
+    >>> a.childkeys() #calls a.child.keys(), returns ['key']
+    ['key']
+    """
+    def __init__(self, objmethod):
+        objname, methodname = objmethod.split('.')
+        self.objname = objname
+        self.methodname = methodname
+
+    def __get__(self, instance, owner):
+        proxied = getattr(instance, self.objname)
+        return getattr(proxied,self.methodname)
+
+
+class DictLike(object):
+    """
+    This just wraps normal dicts so that other classes don't have to inherit from a built-in class,
+    which apparently breaks pickle quite frequently.
+    """
+    def __getstate__(self):
+        retval = dict(__dict__=self.__dict__.copy())
+        return retval
+
+    def __setstate__(self, d):
+        self.__dict__.update(d['__dict__'])
+
+    def __init__(self, **kwargs):
+        self.children = {}
+        self.children.update(kwargs)
+
+    def __getattr__(self, k):
+        return getattr(self.children, k)
+
+    __setitem__ = Alias('children.__setitem__')
+    __getitem__ = Alias('children.__getitem__')
+
+    def __len__(self):
+        return len(self.children)

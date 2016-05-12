@@ -1,0 +1,10 @@
+bohr = 4.0 * pi * epsilon_0 * hbar**2 / (electron_mass * elementary_charge**2) = a0
+atomic_time = hbar / hartree = t0
+kcalpermol = kcal / 6.0221412927e23
+kjpermol = kJ / 6.0221412927e23
+gpermol = g / 6.0221412927e23
+fs = femtosecond = 1.0 * femtosecond
+ps = picosecond = 1.0 * piscosecond
+amu = 1.0 * atomic_mass_units
+ang = 1.0 * angstrom
+eV = electron_volt

@@ -1,0 +1,12 @@
+biopython
+fortranformat
+funcsigs
+ipywidgets >= 4.1
+markdown2
+numpy
+pint >= 0.7
+pyyaml
+pytest
+requests
+scipy
+webcolors
