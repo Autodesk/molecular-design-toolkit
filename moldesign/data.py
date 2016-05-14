@@ -14,7 +14,6 @@
 import json
 import os
 
-import moldesign.utils.databases
 from moldesign import utils
 import moldesign.units as u
 
@@ -157,3 +156,24 @@ except ImportError:
     color_rotation = CyclicList(COLOR_LIST)
 else:
     color_rotation = CyclicList(map(webcolors.name_to_hex, COLOR_LIST))
+
+def print_environment():
+    """For reporting bugs - spits out the user's environment"""
+    import sys
+    version = {}
+    for pkg in 'moldesign IPython ipywidgets jupyter matplotlib numpy docker pyccc ' \
+               'nbmolviz jupyter_client jupyter_core pint Bio openbabel simtk pyscf'.split():
+        try:
+            module = __import__(pkg)
+        except ImportError:
+            version[pkg] = 'FAILED'
+        else:
+            try:
+                version[pkg] = module.__version__
+            except AttributeError:
+                version[pkg] = '???'
+    env = {'platform': sys.platform,
+           'version': sys.version}
+
+    print json.dumps({'env': env,
+                      'versions': version})
