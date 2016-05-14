@@ -1,3 +1,8 @@
+#!/bin/bash
+
+for file in `grep -L "Copyright 2016 Autodesk Inc." *.py`; do
+    mv $file{.bak}
+    cat > $file <<EOF
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,9 +16,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from .callsigs import *
-from .classes import *
-from .databases import *
-from .utils import *
-
-
+EOF
+    cat $file.bak >> $file
+done

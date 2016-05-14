@@ -1,0 +1,10 @@
+*.pyc
+*.pyo
+*.pdf
+.idea
+.ipynb_checkpoints/
+*.delete
+pyquante.log
+_docker_make_tmp
+lastfailed
+_test.py
