@@ -314,7 +314,7 @@ class PySCFAOBasis(orbitals.AOBasis):
     def __setstate__(self, state):
         spec = state.pop('_pyscf_spec')
         if spec is not None:
-            state['pyscfmol'] = pyscf.gto.M(**spec)
+            state['pyscfmol'] = gto.M(**spec)
         self.__dict__.update(state)
 
     def calculate_orb_grid(self, mo_in_ao, **kwargs):
