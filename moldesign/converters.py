@@ -20,13 +20,14 @@ import functools
 
 import moldesign as mdt
 import moldesign.interfaces.openbabel as obabel
+from moldesign.interfaces.openbabel import mol_to_pybel
 from moldesign.interfaces.opsin_interface import name_to_smiles
 from moldesign.interfaces.openmm import amber_to_mol as read_amber
 import moldesign.interfaces.biopython_interface as biopy
 from moldesign.interfaces.ambertools import build_bdna
 
 __all__ = ('read from_smiles from_pdb from_name build_bdna write read_amber '
-           'build_assembly').split()
+           'build_assembly mol_to_openmm_sim mol_to_pybel').split()
 
 # TODO: if cpickle fails, retry with regular pickle to get a better traceback
 PICKLE_EXTENSIONS = set("p pkl pickle mdt".split())
@@ -76,6 +77,8 @@ def read(f, format=None):
             suffix = filename.split('.')[-2]
         if format is None:
             format = suffix
+    elif hasattr(f, 'open'):
+        fileobj = f.open('r')
     elif hasattr(f, 'read'):
         fileobj = f
     elif isinstance(f, str):
@@ -146,6 +149,11 @@ def write(obj, filename=None, format=None, mode='w'):
     else:
         fileobj.close()
 
+def mol_to_openmm_sim(mol):
+    try:
+        return mol.energy_model.get_openmm_simulation()
+    except AttributeError:
+        raise AttributeError("Can't create an OpenMM object - no OpenMM energy_model present")
 
 def from_pdb(pdbcode):
     """ Import the given molecular geometry from PDB.org
@@ -182,7 +190,6 @@ def from_name(name):
     smi = name_to_smiles(name)
     mol = from_smiles(smi, name)
     return mol
-
 
 def build_assembly(mol, assembly_name):
     """ Create biological assembly using a bioassembly specification.

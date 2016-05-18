@@ -48,7 +48,7 @@ def display(obj, title=None):
         obj = obj.get_display_object()
 
     if _current_tabs is None:  # just display the damn thing
-        IPython.display.display(obj.get_display_object())
+        IPython.display.display(obj)
         return
 
     _current_tabs.add_display(obj, title=title, display=True)
@@ -155,15 +155,23 @@ class Logger(ipy.Textarea):
         kwargs.setdefault('width', 400)
         kwargs.setdefault('height', 300)
         self.title = title
-        super(Logger, self).__init__(**kwargs)
+        try:  # try to intialize widget
+            super(Logger, self).__init__(**kwargs)
+        except traitlets.TraitError:  # PROBABLY because this isn't running under jupyter
+            self._is_widget = True
+        else:
+            self._is_widget = False
         self.active = False
         self.disabled = True  # so user can't overwrite
 
     def _write(self, string):
-        if not self.active:
-            display(self, self.title)
-            self.active = True
-        self.value += string.strip() + '\n'
+        if self._is_widget:
+            if not self.active:
+                display(self, self.title)
+                self.active = True
+            self.value += string.strip() + '\n'
+        else:
+            print string.strip()
 
     # temporary so that we can use this like a logging module later
     error = warning = info = handled = debug = status = _write

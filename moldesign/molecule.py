@@ -436,7 +436,7 @@ class Molecule(mdt.atoms.AtomContainer):
     def kinetic_energy(self):
         r""" u.Scalar[energy]: Classical kinetic energy :math:`\sum_{\text{atoms}} \frac{p^2}{2m}`
         """
-        return self.momenta.dot(self.momenta / (2.0 * self.dim_masses))
+        return mdt.helpers.kinetic_energy(self.momenta, self.dim_masses)
 
     @property
     def kinetic_temperature(self):
@@ -447,8 +447,8 @@ class Molecule(mdt.atoms.AtomContainer):
         where :math:`E_{\text{kin}}` is the kinetic energy and :math:`f` is the number of
         degrees of freedom (see :meth:`dynamic_dof <Molecule.dynamic_dof>`)
         """
-        t = (2.0 * self.kinetic_energy) / (u.k_b * self.dynamic_dof)
-        return t.defunits()
+        return mdt.helpers.kinetic_temperature(self.kinetic_energy,
+                                               self.dynamic_dof)
 
     @property
     def dynamic_dof(self):

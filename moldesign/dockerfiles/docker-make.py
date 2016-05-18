@@ -428,6 +428,7 @@ def make_arg_parser():
                     help='Always try to pull updated FROM images')
     ca.add_argument('--no-cache', action='store_true',
                     help="Rebuild every layer")
+    # TODO: add a way to invalidate a specific target
 
     rt = parser.add_argument_group('Repositories and tags')
     rt.add_argument('--repository', '-r', '-u',

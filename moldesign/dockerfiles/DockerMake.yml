@@ -1,7 +1,5 @@
 _ALL_:
  - ambertools14
- - nbo
- - chem_notebook
  - opsin
  - symmol
  - python_install
@@ -242,18 +240,18 @@ symmol:
 # Python-exposed tools
 openmm: # NEWFEATURE: add GPU support (opencl/cuda)
  description: Basic OpenMM install (CPU only) with python bindings
+ build_directory: openmm
  requires:
   - python_install
  build: |
-  RUN apt-get -y install clang
-  RUN mkdir -p /src/ && cd /src/ && \
-   git clone -b 'master' --single-branch --depth 1 https://github.com/pandegroup/openmm
-  RUN mkdir /src/openmm/build && cd /src/openmm/build && \
-   cmake /src/openmm -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang && \
-   make -j8 && \
-   make install && \
-   make PythonInstall
-  RUN rm -r /src
+  RUN apt-get -y install unzip \
+    && mkdir -p /src
+  ADD OpenMM-7.0.0-Linux.zip /src/OpenMM.zip
+  RUN cd /src \
+    && unzip OpenMM.zip \
+    && cd /src/OpenMM-7.*-Linux \
+    && cat < echo "\n\n" | ./install.sh
+
 
 
 pdbfixer:

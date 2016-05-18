@@ -67,8 +67,22 @@ class OpenMMBaseIntegrator(mdt.basemethods.IntegratorBase, OpenMMPickleMixin):
         self.reporter = self._attach_reporters()
         self._prepped = True
 
+    def run(self, run_for, wait=False):
+        # TODO: like model.minimize, this is a hacky wrapper that we need to replace with
+        # something more generalizable
+        try:
+            traj = self._run(run_for)
+        except pyccc.ProgramFailure:
+            raise pyccc.ProgramFailure('OpenMM crashed silently. Please examine the output. '
+                                       'This may be due to large forces from, for example, '
+                                       'an insufficiently minimized starting geometry.')
+        if force_remote or (not wait):
+            self.mol.energy_model._sync_remote(traj.mol)
+            traj.mol = self.mol
+        return traj
+
     @compute.runsremotely(remote=force_remote, is_imethod=True)
-    def run(self, run_for):
+    def _run(self, run_for):
         self.prep()
         nsteps = self.time_to_steps(run_for, self.params.timestep)
         self.mol.time = 0.0 * u.default.time
@@ -76,6 +90,9 @@ class OpenMMBaseIntegrator(mdt.basemethods.IntegratorBase, OpenMMPickleMixin):
         self.reporter.annotation = 'Langevin dynamics @ %s' % self.params.temperature
         self.reporter.report_from_mol()
         self.sim.step(nsteps)
+        if self.reporter.last_report_time != self.mol.time:
+            self.reporter.report_from_mol()
+        self.reporter.report_from_mol()
         self.model._sync_to_openmm()
         return self.reporter.trajectory
 
@@ -86,7 +103,7 @@ class OpenMMBaseIntegrator(mdt.basemethods.IntegratorBase, OpenMMPickleMixin):
         """
         report_interval = self.time_to_steps(self.params.frame_interval,
                                              self.params.timestep)
-        reporter = BuckyballReporter(self.mol, report_interval)
+        reporter = MdtReporter(self.mol, report_interval)
         self.sim.reporters = [reporter]
         return reporter
 
@@ -121,6 +138,14 @@ class OpenMMPotential(mdt.basemethods.MMBase, OpenMMPickleMixin):
     def __init__(self, **kwargs):
         super(OpenMMPotential, self).__init__(**kwargs)
         self.sim = None
+
+    def get_openmm_simulation(self):
+        if force_remote:
+            raise ImportError("Can't create an OpenMM object on this machine - OpenMM not "
+                              "installed")
+        else:
+            if not self._prepped: self.prep()
+            return self.sim
 
     @compute.runsremotely(remote=force_remote, is_imethod=True)
     def calculate(self, requests=None):
@@ -164,8 +189,28 @@ class OpenMMPotential(mdt.basemethods.MMBase, OpenMMPickleMixin):
         print 'Created OpenMM kernel (Platform: %s)' % self.sim.context.getPlatform().getName()
         self._prep_integrator = self.mol.integrator
 
+    def minimize(self, **kwargs):
+        traj = self._minimize(**kwargs)
+
+        if force_remote or (not kwargs.get('wait', False)):
+            self._sync_remote(traj.mol)
+            traj.mol = self.mol
+
+        return traj
+
+    def _sync_remote(self, mol):
+        # TODO: this is a hack to update the object after a minimization
+        #        We need a better pattern for this, ideally one that doesn't
+        #        require an explicit wrapper like this - we shouldn't have to copy
+        #        the properties over manually
+        self.mol.positions = mol.positions
+        self.mol.momenta = mol.momenta
+        self.mol.properties = mol.properties
+        self.mol.time = mol.time
+
+
     @compute.runsremotely(remote=force_remote, is_imethod=True)
-    def minimize(self, nsteps=500,
+    def _minimize(self, nsteps=500,
                  force_tolerance=None,
                  frame_interval=None,
                  wait=True):
@@ -274,7 +319,7 @@ class OpenMMPotential(mdt.basemethods.MMBase, OpenMMPickleMixin):
             print 'Parsing stored PRMTOP file: %s' % self.mol.ff.amber_params.prmtop
             self.mm_prmtop = from_filepath(self.mol.ff.amber_params.prmtop, app.AmberPrmtopFile)
 
-        # Create the OpenMM
+        # Create the OpenMM system
         system_params = self._get_system_params()
         if hasattr(self, 'mm_prmtop'):
             self.mm_system = self.mm_prmtop.createSystem(**system_params)
@@ -357,7 +402,7 @@ class OpenMMPotential(mdt.basemethods.MMBase, OpenMMPickleMixin):
 ### This class needs special treatment because it inherits from an
 ### openmm class, but OpenMM may not be present in the user's environment
 if not force_remote:
-    class BuckyballReporter(app.StateDataReporter):
+    class MdtReporter(app.StateDataReporter):
         """
         We'll use this class to capture all the information we need about a trajectory
         It's pretty basic - the assumption is that there will be more processing on the client side
@@ -371,6 +416,7 @@ if not force_remote:
             self.annotation = None
             self._row_format = ("{:<%d}" % 10) + 3*("{:>%d}" % self.LEN)
             self._printed_header = False
+            self.last_report_time = None
 
         def report_from_mol(self, **kwargs):
             self.mol.calculate()
@@ -406,6 +452,7 @@ if not force_remote:
                                           report['potential_energy'].defunits_value(),
                                           ke.defunits_value(),
                                           t.defunits_value())
+            self.last_report_time = self.mol.time
 
 
             self.trajectory.new_frame(properties=report)

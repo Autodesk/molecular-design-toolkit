@@ -44,7 +44,14 @@ def get_all_atoms(*objects):
     return mdt.AtomList(atoms.iterkeys())
 
 
+def kinetic_energy(momenta, masses):
+    return momenta.dot(momenta/(2.0*masses))
 
+
+def kinetic_temperature(ke, dof):
+    from moldesign.units import k_b
+    t = (2.0*ke)/(k_b*dof)
+    return t.defunits()
 
 
 # def get_residues(obj, **queries):

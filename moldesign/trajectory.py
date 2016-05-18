@@ -78,7 +78,7 @@ class Trajectory(object):
     # TODO: the current implementation does not support cases where the molecular topology changes
     # TODO: allow caching to disk for very large trajectories
 
-    MOL_ATTRIBUTES = ['positions', 'momenta', 'time', 'kinetic_energy']
+    MOL_ATTRIBUTES = ['positions', 'momenta', 'time']
     """List[str]: Always store these molecular attributes"""
 
     def __getstate__(self):
@@ -272,6 +272,40 @@ class Trajectory(object):
         else:
             return np.array(result)
 
+    @property
+    def kinetic_energy(self):
+        convert_units = True
+        energies = []
+        for frame in self.frames:
+            if 'momenta' in frame:
+                energies.append(mdt.helpers.kinetic_energy(frame.momenta, self.mol.dim_masses))
+            else:
+                convert_units = False
+                energies.append(None)
+        if convert_units:
+            arr = u.to_units_array(energies)
+            return u.default.convert(arr)
+        else:
+            return energies
+
+    @property
+    def kinetic_temperature(self):
+        convert_units = True
+        temps = []
+        energies = self.kinetic_energy
+        dof = self.mol.dynamic_dof
+        for energy, frame in zip(energies, self.frames):
+            if energy is not None:
+                temps.append(mdt.helpers.kinetic_temperature(energy, dof))
+            else:
+                convert_units = False
+                temps.append(None)
+        if convert_units:
+            arr = u.to_units_array(temps)
+            return u.default.convert(arr)
+        else:
+            return temps
+
     DONOTAPPLY = set(['kinetic_energy'])
 
     def apply_frame(self, frame):
@@ -404,6 +438,7 @@ class TrajectoryViz(ui.SelectionGroup):
 
     def make_viewer(self):
         viewer = self.traj._tempmol.draw3d(style='licorice')
+        viewer.show_unbonded()
         return viewer, viewer
 
     def make_controls(self):

@@ -116,8 +116,6 @@ def am1_bcc_charges(mol, minsteps=None, wait=True):
 def get_gaff_parameters(mol, charges='resp'): pass
 
 
-
-
 def build_bdna(sequence,
                image=IMAGE,
                engine=None):
@@ -132,16 +130,17 @@ def build_bdna(sequence,
     from moldesign import converters
 
     infile = 'molecule m;\nm = bdna( "%s" );\nputpdb( "helix.pdb", m, "-wwpdb");\n' % sequence.lower()
-    engine = if_not_none(engine, compute.config.default_engine)
+    engine = if_not_none(engine, compute.default_engine)
     imagename = compute.get_image_path(image, engine)
 
     job = engine.launch(image=imagename,
-                          command='nab -o buildbdna build.nab && ./buildbdna',
-                          inputs={'build.nab': infile},
-                          name='NAB_build_bdna')
+                        command='nab -o buildbdna build.nab && ./buildbdna',
+                        inputs={'build.nab': infile},
+                        name='NAB_build_bdna')
     moldesign.logs.display(job, job.name)
     job.wait()
     mol = converters.read(job.get_output('helix.pdb'), format='pdb')
+    mol.name = 'BDNA: %s' % sequence
     return mol
 
 
@@ -182,9 +181,9 @@ def run_tleap(mol, ff='ff14SB',
               'input.leap': '\n'.join(leapstr)}
 
     job = engine.launch(imagename,
-                          command,
-                          inputs=inputs,
-                          name="tleap, %s" % mol.name)
+                        command,
+                        inputs=inputs,
+                        name="tleap, %s"% mol.name)
     mdt.logs.display(job, "tleap, %s" % mol.name)
     job.wait()
 
