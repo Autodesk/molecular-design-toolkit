@@ -21,13 +21,12 @@ import subprocess
 from setuptools import find_packages, setup
 from setuptools.command.install import install
 
+import versioneer
+cmdclass = versioneer.get_cmdclass()
+
 assert sys.version_info[:2] == (2, 7), "Sorry, this package requires Python 2.7."
 
-########################
-__version__ = '0.3'
-VERSION = __version__
-ISRELEASED = False
-########################
+
 CLASSIFIERS = """\
 Development Status :: 4 - Beta
 Intended Audience :: Science/Research
@@ -60,9 +59,8 @@ def find_package_data():
                 files.append(relpath(join(root, fn), 'moldesign'))
     return files
 
-print 'printing works here'
 
-class PostInstall(install):
+class PostInstall(cmdclass['install']):
     def run(self):
         install.run(self)
         #self.protect_db()  # causes pip install to crash
@@ -83,15 +81,17 @@ class PostInstall(install):
         print '\nTo get started, please run:'
         print ' >>> python -m moldesign intro'
 
+cmdclass['install'] = PostInstall
+
 setup(
     name='Molecular Design Toolkit',
-    version='0.3',
+    version=versioneer.get_version(),
     classifiers=CLASSIFIERS.split('\n'),
     packages=find_packages(),
     package_data={'moldesign': find_package_data()},
     install_requires=requirements,
     url='http://autodeskresearch.com',
-    cmdclass={'install': PostInstall},
+    cmdclass=cmdclass,
     license='Apache 2.0',
     author='Aaron Virshup',
     author_email='aaron.virshup [at] autodesk [dot] com',

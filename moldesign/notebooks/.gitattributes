@@ -1,3 +1,2 @@
 *.ipynb filter=notebooks
-*.ipynb diff=histogram
 

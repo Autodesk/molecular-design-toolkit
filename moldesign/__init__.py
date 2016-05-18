@@ -36,6 +36,12 @@ from moldesign.molecule import *
 from moldesign.tools import *
 from moldesign.trajectory import *
 
+# package metadata
+from moldesign import _version
+__version__ = _version.get_versions()['version']
+__copyright__ = "Copyright 2016 Autodesk Inc."
+__license__ = "Apache 2.0"
+
 # This is here primarily for sphinx's benefit
 __all__ = (atoms.__all__ +
            biounits.__all__ +
@@ -53,9 +59,4 @@ import warnings as _warnings
 _np.seterr(all='raise')
 _warnings.simplefilter('error', _np.ComplexWarning)
 
-# Other package metadata
-__copyright__ = "Copyright 2016 Autodesk Inc."
-__license__ = "Apache 2.0"
-import os as _os
-with open(_os.path.join(PACKAGEPATH, 'VERSION')) as versionfile:
-    __version__ = versionfile.read().strip()
+
