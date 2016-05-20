@@ -25,6 +25,7 @@ import versioneer
 
 assert sys.version_info[:2] == (2, 7), "Sorry, this package requires Python 2.7."
 
+PACKAGE_NAME = 'moldesign'
 
 CLASSIFIERS = """\
 Development Status :: 4 - Beta
@@ -49,13 +50,17 @@ PYEXT = set('.py .pyc .pyo'.split())
 with open('requirements.txt', 'r') as reqfile:
     requirements = [x.strip() for x in reqfile if x.strip()]
 
-def find_package_data():
+
+def find_package_data(pkgdir):
+    """ Just include all files that won't be included as package modules.
+    """
     files = []
-    for root, dirnames, filenames in os.walk('moldesign'):
+    for root, dirnames, filenames in os.walk(pkgdir):
+        not_a_package = '__init__.py' not in filenames
         for fn in filenames:
             basename, fext = os.path.splitext(fn)
-            if fext not in PYEXT or ('static' in fn):
-                files.append(relpath(join(root, fn), 'moldesign'))
+            if not_a_package or (fext not in PYEXT) or ('static' in fn):
+                files.append(relpath(join(root, fn), pkgdir))
     return files
 
 
@@ -84,16 +89,17 @@ cmdclass = versioneer.get_cmdclass()
 cmdclass['install'] = PostInstall
 
 setup(
-    name='Molecular Design Toolkit',
+    name=PACKAGE_NAME,
     version=versioneer.get_version(),
     classifiers=CLASSIFIERS.split('\n'),
     packages=find_packages(),
-    package_data={'moldesign': find_package_data()},
+    package_data={PACKAGE_NAME: find_package_data(PACKAGE_NAME)},
     install_requires=requirements,
     url='http://autodeskresearch.com',
     cmdclass=cmdclass,
     license='Apache 2.0',
     author='Aaron Virshup',
     author_email='aaron.virshup [at] autodesk [dot] com',
-    description='Dead-simple chemical simulation, visualization, and cloud computing in a notebook'
+    description='The Molecular Design Toolkit: Dead-simple chemical simulation, visualization, '
+                'and cloud computing in a notebook'
 )

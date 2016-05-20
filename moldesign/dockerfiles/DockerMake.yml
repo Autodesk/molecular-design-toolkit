@@ -152,14 +152,17 @@ gamess:
   - base_install
  build_directory: gamess
  build: |
+  RUN apt-get install -y libatlas-base-dev
   ADD gamess-current.tar.gz /opt
   ADD config.tar /opt
-  RUN cd /opt/gamess/ddi && ./compddi | tee compddi.log \
-   && mv ddikick.x .. && cd /opt/gamess && ./compall | \
-   tee compall.log && ./lked gamess 00 | tee lked.log \
-   && mkdir -p /scr/root /root/scr && \
-   ln -s /opt/gamess/rungms /usr/local/bin/rungms
-
+  RUN cd /opt/gamess/ddi \
+   && ./compddi | tee compddi.log \
+   && mv ddikick.x .. \
+   && cd /opt/gamess \
+   && ./compall | tee compall.log \
+   && ./lked gamess 00 | tee lked.log \
+   && mkdir -p /scr/root /root/scr \
+   && ln -s /opt/gamess/rungms /usr/local/bin/rungms
 
 opsin:
  FROM: java
