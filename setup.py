@@ -22,7 +22,6 @@ from setuptools import find_packages, setup
 from setuptools.command.install import install
 
 import versioneer
-cmdclass = versioneer.get_cmdclass()
 
 assert sys.version_info[:2] == (2, 7), "Sorry, this package requires Python 2.7."
 
@@ -60,7 +59,7 @@ def find_package_data():
     return files
 
 
-class PostInstall(cmdclass['install']):
+class PostInstall(install):
     def run(self):
         install.run(self)
         #self.protect_db()  # causes pip install to crash
@@ -81,6 +80,7 @@ class PostInstall(cmdclass['install']):
         print '\nTo get started, please run:'
         print ' >>> python -m moldesign intro'
 
+cmdclass = versioneer.get_cmdclass()
 cmdclass['install'] = PostInstall
 
 setup(
