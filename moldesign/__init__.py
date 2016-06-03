@@ -23,10 +23,18 @@ from moldesign import basemethods, compute, data, helpers, integrators, interfac
 from moldesign import minimizers, models, orbitals, symmetry, ui, utils
 
 # Make objects from these modules accessible at the top level
-# (note that they all use __all__ to specify what gets exported)
-from moldesign import atoms, biounits, converters, forcefield, geometry
-from moldesign import molecule, tools, trajectory
+from moldesign import atoms
+from moldesign import biounits
+from moldesign import converters
+from moldesign import forcefield
+from moldesign import gaussians
+from moldesign import geometry
+from moldesign import molecule
+from moldesign import orbitals
+from moldesign import tools
+from moldesign import trajectory
 
+# (note that they all use __all__ to specify what gets exported)
 from moldesign.atoms import *
 from moldesign.biounits import *
 from moldesign.converters import *

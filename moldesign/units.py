@@ -96,16 +96,29 @@ class BuckyballQuantity(ureg.Quantity):
             else:  # case 3: attribute error is unrelated to this
                 raise
 
-
-
     def __eq__(self, other):
-        # override pint's implementation, which appears to give inconsistent results?
+        """ Bug fixes and behavior changes for pint's implementation
+        These get removed as they are fixed in pint
+
+        Notes:
+            - Allow equality test between compatible units
+            - Allow comparisons to 0 to ignore units
+        """
         if hasattr(other, 'value_in'):
             return self.magnitude == other.value_in(self.units)
-        elif self.dimensionless:  # they're both dimensionless
+        elif other == 0.0:  # ignore units
             return self.magnitude == other
-        else:  # only 'other' is dimensionless
-            return False
+        else:
+            return super(BuckyballQuantity, self).__eq__(other)
+
+    def compare(self, other, op):
+        """ Augments the :class:`pint._Quantity` method with the following features:
+          - Comparisons to 0 ignore units
+        """
+        if other == 0.0:
+            return op(self.magnitude, other)
+        else:
+            return super(BuckyballQuantity, self).compare(other, op)
 
     def get_units(self):
         """

@@ -1,0 +1,345 @@
+# Copyright 2016 Autodesk Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import numpy as np
+
+from moldesign.orbitals import Orbital, SHELLS, SPHERICALNAMES
+
+
+class CartesianGaussian(object):
+    r""" Stores an N-dimensional gaussian function of the form:
+
+    .. math::
+        G(\mathbf r) = C \times \left( \prod_{i=1}^N{{r_i}^{p_i} } \right)
+             e^{-a |\mathbf r - \mathbf{r}_0|^2}
+
+    For a three-dimensional gaussian, this is
+
+    ..math::
+        G(x,y,z) = C \times x^{p_1} y^{p_2} z^{p_3} e^{-a |\mathbf r - \mathbf{r}_0|^2}
+
+    where *C* is ``self.coeff``, *a* is ``self.exp``, *r0* is ``self.center``, and
+    :math:`p_1, p_2, ...` are given in the array ``self.powers``
+
+    References:
+        Levine, Ira N. Quantum Chemistry, 5th ed. Prentice Hall, 2000. 486-94.
+    """
+    def __init__(self, center, exp, powers, coeff=None):
+        """  Initialization:
+
+        Args:
+            center (Vector[length]): location of the gaussian's centroid
+            powers (List[int]): cartesian powers in each dimension (see
+                equations in :class:`CartesianGaussian` docs)
+            exp (Scalar[1/length**2]): gaussian width parameter
+            coeff (Scalar): multiplicative coefficient (if None, gaussian will be automatically
+                 normalized)
+
+        Note:
+            The dimensionality of the gaussian is determined by the dimensionality
+            of the centroid location vector and the power vector. So, if scalars are passed for the
+            ``center`` and ``powers``, it's 1-D. If length-3 vectors are passed for ``center``
+            and ``powers``, it's 3D.
+        """
+        assert len(powers) == len(center), "Inconsistent dimensionality - number of cartesian " \
+                                           "powers must match dimensionality of centroid vector"
+        self.center = center
+        self.exp = exp
+        self.powers = np.array(powers)
+        if coeff is None:
+            self.coeff = 1.0  # dummy value overwritten by self.normalize()
+            self.normalize()
+        else:
+            self.coeff = coeff
+
+        self._cartesian = (self.powers != 0).any()
+
+    def __repr__(self):
+        return ("<Gaussian (coeff: {coeff:4.2f}, "
+                "cartesian powers: {powers}, "
+                "exponent: {exp:4.2f}, "
+                "center: {center}>").format(
+                center=self.center, exp=self.exp,
+                powers=tuple(self.powers), coeff=self.coeff)
+
+    @property
+    def ndim(self):
+        return len(self.powers)
+    num_dimensions = ndims = ndim
+
+    @property
+    def angular(self):
+        """ Angular momentum of this function (sum of cartesian powers)
+        """
+        return self.powers.sum()
+
+    def __str__(self):
+        return "%d-D CartesianGaussian with norm %s" % (self.ndims, self.norm)
+
+    def __call__(self, coords, _include_cartesian=True):
+        """ Evaluate this function at the given coordinates.
+
+        Can be called either with a 1D column (e.g., ``[1,2,3]*u.angstrom ``) or
+        an ARRAY of coordinates (``[[0,0,0],[1,1,1]] * u.angstrom``)
+
+        Args:
+            _include_cartesian (bool): include the contribution from the cartesian components
+                (for computational efficiency, this can sometimes omited now and included later)
+
+        Example:
+            >>> g = CartesianGaussian([0,0,0]*u.angstrom, exp=1.0/u.angstrom**2, powers=(0,0,0))
+            >>> g([0,0,0] * u.angstrom)
+            1.0
+            >>> g[[0,0,0], [0,0,1], [0.5,0.5,0.5] * u.angstrom]
+            array([ 1.0,  0.36787944,  0.47236655])
+
+        Args:
+            coords (Vector[length]): Coordinates or list of coordinates
+
+        Returns:
+            Scalar: function value(s) at the passed coordinates
+        """
+        if len(coords.shape) > 1:
+            axis = 1
+        else:
+            axis = None
+
+        disp = coords - self.center
+        prd = disp*disp  # don't use np.dot - allow multiple coords at once
+        r2 = prd.sum(axis=axis)
+
+        result = self.coeff * np.exp(-self.exp * r2)
+        if self._cartesian and _include_cartesian:
+            result *= (np.product(disp.magnitude**self.powers, axis=axis)
+                      * disp.units**self.powers.sum() )
+        return result
+
+    def __mul__(self, other):
+        """ Returns product of two gaussian functions, which is also a gaussian
+
+        Args:
+            other (CartesianGaussian): other gaussian wavepacket
+
+        Returns:
+            CartesianGaussian: product gaussian
+        """
+
+        # convert widths to prefactor form
+        a = self.exp
+        b = other.exp
+        exp = a + b
+        center = (a*self.center + b*other.center)/(a+b)
+        powers = self.powers + other.powers
+        return CartesianGaussian(center=center, exp=exp,
+                                 powers=powers, coeff=self.coeff*other.coeff)
+
+    def normalize(self):
+        """ Give this CartesianGaussian unit norm by adjusting its coefficient
+        """
+        self.coeff /= np.sqrt(self.norm)
+
+    @property
+    def norm(self):
+        r""" The L2-Norm of this gaussian:
+
+        .. math::
+            \int \left| G(\mathbf r) \right|^2 d^N \mathbf r
+        """
+        return self.overlap(self)
+
+    @property
+    def integral(self):
+        r"""Integral of this this gaussian over all N-dimensional space.
+
+        This is implemented only for 0 and positive integer cartesian powers.
+        The integral is 0 if any of the powers are odd. Otherwise, the integral
+        is given by:
+        .. math::
+            \int G(\mathbf r) d^N \mathbf r & = c \int d^N e^{-a x^2} \mathbf r
+                    \prod_{i=1}^N{{r_i}^{p_i} }   \\
+               &= (2a)^{-\sum_i p_i} \left( \frac{\pi}{2 a} \right) ^ {N/2} \prod_{i=1}^N{(p_i-1)!!}
+
+        where *N* is the dimensionality of the gaussian, :math:`p_i` are the cartesian powers,
+        and _!!_ is the "odd factorial" (:math:`n!!=1\times 3\times 5 \times ... \times n`)
+
+        References:
+            Dwight, Herbert B. Tables of Integrals and other Mathematical Data, 3rd ed.
+                Macmillan 1957. 201.
+        """
+        integ = (np.pi/self.exp)**(self.ndim/2.0)
+        for p in self.powers:
+            if p == 0:  # no contribution
+                continue
+            elif p % 2 == 1:  # integral of odd function is exactly 0
+                return 0.0
+            elif p < 0:
+                raise ValueError('Powers must be positive or 0')
+            else:
+                integ *= _ODD_FACTORIAL[p-1]/(2 ** (p+1))
+        return self.coeff * integ
+
+    def overlap(self, other, normalized=False):
+        r""" Overlap of this gaussian with another:
+
+        .. math::
+            \int G_1(\mathbf r) G_2(\mathbf r) d^N \mathbf r
+
+        Args:
+            other (CartesianGaussian):
+            normalized (bool): If True, return the overlap of the two NORMALIZED gaussians.
+
+        Returns:
+            Scalar: value of the overlap
+        """
+        newgauss = self * other
+        integral = newgauss.integral
+        if normalized:
+            integral /= np.sqrt(self.norm*other.norm)
+        return integral
+
+
+def Gaussian(center, exp, coeff=1.0):
+    """ Constructor for a gaussian function.
+
+    Note:
+        This is just a special case of a cartesian gaussian where all the powers are 0.
+    """
+    return CartesianGaussian(center, exp,
+                             powers=[0 for x in center],
+                             coeff=coeff)
+
+
+class AtomicBasisFunction(Orbital):
+    def __init__(self, atom, n=None, l=None, m=None, cart=None, primitives=None):
+        """ Initialization:
+
+        Args:
+            atom (moldesign.Atom): The atom this basis function belongs to
+            index (int): the index of this basis function (it is stored as
+                ``wfn.basis[self.index]``)
+            n (int): principal quantum number (``n>=1``)
+            l (int): total angular momentum quantum number (``l<=n-1``)
+            m (int): z-angular momentum quantum number (optional -
+                 for spherical sets only; ``|m|<=l``)
+            cart (str): cartesian component (optional; for cartesian sets only)
+            primitives (List[PrimitiveBase]): List of primitives, if available
+        """
+        self.atom = atom
+        self.n = n
+        self.l = l
+        self.m = m
+        self.primitives = primitives
+        if cart is not None:
+            assert self.m is None, 'Both cartesian and spherical components passed!'
+            assert len(cart) == self.l, 'Angular momentum does not match specified component %s' % cart
+            for e in cart: assert e in 'xyz'
+            self.cart = ''.join(sorted(cart))
+
+        # These quantities can't be defined until we assemble the entire basis
+        self.coeffs = None
+        self.parent = atom.parent
+        self.basis = None
+        self.occupation = None
+        self.wfn = None
+
+    def __call__(self, coords):
+        """ Calculate this basis function's value at a position in space
+
+        Args:
+            coords (u.Vector[length]): Coordinates or list of coordinates
+
+        Returns:
+            u.Scalar[length**(-3/2)]: value(s) of the basis function at the coordinates
+        """
+        val = self.primitives[0](coords)
+        for prim in self.primitives[1:]:
+            val += prim(coords)
+        #TODO: angular momentum?
+        return val
+
+    @property
+    def num_primitives(self):
+        return len(self.primitives)
+
+    @property
+    def norm(self):
+        """ Calculate this orbital's norm
+
+        Returns:
+            float: norm :math:`<i|i>`
+        """
+        norm = 0.0
+        for p1 in self.primitives:
+            for p2 in self.primitives:
+                norm += p1.overlap(p2)
+        return norm
+
+    def normalize(self):
+        """ Scale primitive coefficients to normalize this basis function
+        """
+        prefactor = 1.0/np.sqrt(self.norm)
+        for primitive in self.primitives:
+            primitive *= prefactor
+
+    @property
+    def orbtype(self):
+        """ A string describing the orbital's angular momentum state.
+
+        Examples:
+            >>> AtomicBasisFunction(n=1, l=0).orbtype
+            's'
+            >>> AtomicBasisFunction(n=2, l=1, cart='y').orbtype
+            'py'
+            >>> AtomicBasisFunction(n=3, l=2, m=0).orbtype
+            'd(z^2)'
+        """
+        if self.l == 0: t = 's'
+        elif self.cart is not None: t = SHELLS[self.l] + self.cart
+        else: t = SPHERICALNAMES[self.l, self.m]
+        return t
+
+    @property
+    def aotype(self):
+        """ A string describing the orbital's state.
+
+        Examples:
+            >>> AtomicBasisFunction(n=1, l=0).aotype
+            '1s'
+            >>> AtomicBasisFunction(n=2, l=1, cart='y').aotype
+            '2py'
+            >>> AtomicBasisFunction(n=3, l=2, m=0).aotype
+            '3d(z^2)'
+        """
+        t = self.orbtype
+        if self.n: return '%s%s' % (self.n, t)
+        else: return t
+
+    def __str__(self):
+        return 'AO ' + self.name
+
+    @property
+    def name(self):
+        try:
+            return '%s on atom %s' % (self.aotype, self.atom.name)
+        except:
+            return 'Basis Fn'
+
+    def __repr__(self):
+        return '<%s %s>' % (self.__class__.__name__, self.name)
+
+# Precompute odd factorial values (N!!)
+_ODD_FACTORIAL = {0: 1}  #by convention
+_ofact = 1
+for _i in xrange(1, 20, 2):
+    _ofact *= _i
+    _ODD_FACTORIAL[_i] = float(_ofact)
