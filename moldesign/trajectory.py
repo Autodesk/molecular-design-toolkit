@@ -144,6 +144,11 @@ class Trajectory(object):
         except Exception:
             return '<Trajectory object @ %s (exception in repr)>' % hex(id(self))
 
+    def __add__(self, other):
+        newtraj = Trajectory(self, unit_system=self.unit_system)
+        newtraj.frames = self.frames + other.frames
+        return newtraj
+
     def new_frame(self, properties=None, **additional_data):
         """ Create a new frame, EITHER from the parent molecule or from a list of properties
 

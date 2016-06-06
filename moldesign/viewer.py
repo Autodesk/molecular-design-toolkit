@@ -296,7 +296,7 @@ class GeometryViewer(MolViz_3DMol):
             orbtype = 'canonical'
             orbidx = orbname
 
-        orbs = self.wfn.orbitals[orbtype]
+        orbs = self.wfn.orbitals[orbtype]  # this is the wfn for the current frame
         return orbs.calculate_orb_grid(orbidx, npoints=npts, padding=padding)
 
     def get_orbnames(self):

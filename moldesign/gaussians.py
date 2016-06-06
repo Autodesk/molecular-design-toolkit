@@ -16,7 +16,45 @@ import numpy as np
 from moldesign.orbitals import Orbital, SHELLS, SPHERICALNAMES
 
 
-class CartesianGaussian(object):
+class AbstractFunction(object):
+    def normalize(self):
+        """ Give this function unit norm by adjusting its coefficient
+        """
+        self.coeff /= np.sqrt(self.norm)
+
+    def overlap(self, other, normalized=False):
+        r""" Overlap of this function with another:
+
+        .. math::
+            \int f_1(\mathbf r) f_2(\mathbf r) d^N \mathbf r
+
+        Args:
+            other (AbstractFunction):
+            normalized (bool): If True, return the overlap of the two NORMALIZED functions.
+
+        Returns:
+            Scalar: value of the overlap
+        """
+        newfn = self * other
+        integral = newfn.integral
+        if normalized:
+            integral /= np.sqrt(self.norm*other.norm)
+        return integral
+
+    @property
+    def norm(self):
+        r""" The L2-Norm of this gaussian:
+
+        .. math::
+            \int \left| G(\mathbf r) \right|^2 d^N \mathbf r
+        """
+        return self.overlap(self)
+
+    def __str__(self):
+        return "%d-D %s with norm %s"%(self.ndims, self.__class__, self.norm)
+
+
+class CartesianGaussian(AbstractFunction):
     r""" Stores an N-dimensional gaussian function of the form:
 
     .. math::
@@ -83,9 +121,6 @@ class CartesianGaussian(object):
         """
         return self.powers.sum()
 
-    def __str__(self):
-        return "%d-D CartesianGaussian with norm %s" % (self.ndims, self.norm)
-
     def __call__(self, coords, _include_cartesian=True):
         """ Evaluate this function at the given coordinates.
 
@@ -143,20 +178,6 @@ class CartesianGaussian(object):
         return CartesianGaussian(center=center, exp=exp,
                                  powers=powers, coeff=self.coeff*other.coeff)
 
-    def normalize(self):
-        """ Give this CartesianGaussian unit norm by adjusting its coefficient
-        """
-        self.coeff /= np.sqrt(self.norm)
-
-    @property
-    def norm(self):
-        r""" The L2-Norm of this gaussian:
-
-        .. math::
-            \int \left| G(\mathbf r) \right|^2 d^N \mathbf r
-        """
-        return self.overlap(self)
-
     @property
     def integral(self):
         r"""Integral of this this gaussian over all N-dimensional space.
@@ -188,28 +209,15 @@ class CartesianGaussian(object):
                 integ *= _ODD_FACTORIAL[p-1]/(2 ** (p+1))
         return self.coeff * integ
 
-    def overlap(self, other, normalized=False):
-        r""" Overlap of this gaussian with another:
-
-        .. math::
-            \int G_1(\mathbf r) G_2(\mathbf r) d^N \mathbf r
-
-        Args:
-            other (CartesianGaussian):
-            normalized (bool): If True, return the overlap of the two NORMALIZED gaussians.
-
-        Returns:
-            Scalar: value of the overlap
-        """
-        newgauss = self * other
-        integral = newgauss.integral
-        if normalized:
-            integral /= np.sqrt(self.norm*other.norm)
-        return integral
-
 
 def Gaussian(center, exp, coeff=1.0):
-    """ Constructor for a gaussian function.
+    r""" Constructor for an N-dimensional gaussian function.
+
+    The function is given by:
+    .. math::
+        G(\mathbf r) = C e^{-a\left| \mathbf r - \mathbf r_0 \right|^2}
+
+    where *C* is ``self.coeff``, *a* is ``self.exp``, and :math:`\mathbf r_0` is ``self.center``.
 
     Note:
         This is just a special case of a cartesian gaussian where all the powers are 0.
@@ -217,6 +225,64 @@ def Gaussian(center, exp, coeff=1.0):
     return CartesianGaussian(center, exp,
                              powers=[0 for x in center],
                              coeff=coeff)
+
+
+class SphericalGaussian(AbstractFunction):
+    r""" Stores a 3-dimensional spherical gaussian function:
+
+    .. math::
+        G_{nlm}(\mathbf r) = C Y^l_m(\mathbf r - \mathbf r_0) r^n e^{-a\left| \mathbf r - \mathbf r_0 \right|^2}
+
+    where *C* is ``self.coeff``, *a* is ``self.exp``, and :math:`\mathbf r_0` is ``self.center``,
+    *(n,l,m)* are given by ``(self.n, self.l, self.m)``, and :math:`Y^l_m(\mathbf{r})` is a
+    spherical harmonic.
+
+    Note:
+        self.SPHERE_TO_CART stores expansion coefficients for spherical gaussians in terms of
+        cartesian gaussians. They are taken from the reference below.
+
+    References:
+        Schlegel and Frisch. Transformation between cartesian and pure spherical harmonic gaussians.
+            Int J Quantum Chem 54, 83-87 (1995). doi:10.1002/qua.560540202
+    """
+
+    def __init__(self, center, exp, n, l, m, coeff=None):
+        self.center = center
+        assert len(self.center) == 3
+        self.exp = exp
+        self.n = n
+        self.l = l
+        self.m = m
+
+        if self.coeff is None:
+            self.coeff = 1.0
+            self.normalize()
+
+    def __repr__(self):
+        return ("<Gaussian (coeff: {coeff:4.2f}, "
+                "exponent: {exp:4.2f}, "
+                "(n,l,m) = {qnums}").format(
+                center=self.center, exp=self.exp,
+                powers=tuple(self.powers), coeff=self.coeff,
+                qnums=(self.n, self.l, self.m))
+
+    def __call__(self, coords, _include_spherical=True):
+        """ Evaluate this function at the given coordinates.
+
+        Can be called either with a 1D column (e.g., ``[1,2,3]*u.angstrom ``) or
+        an ARRAY of coordinates (``[[0,0,0],[1,1,1]] * u.angstrom``)
+
+        Args:
+            _include_spherical (bool): include the contribution from the non-exponential parts
+                (for computational efficiency, this can sometimes omitted now and included later)
+
+        Args:
+            coords (Vector[length]): 3D Coordinates or list of 3D coordinates
+
+        Returns:
+            Scalar: function value(s) at the passed coordinates
+        """
+        raise NotImplementedError
 
 
 class AtomicBasisFunction(Orbital):
@@ -264,7 +330,6 @@ class AtomicBasisFunction(Orbital):
         val = self.primitives[0](coords)
         for prim in self.primitives[1:]:
             val += prim(coords)
-        #TODO: angular momentum?
         return val
 
     @property
@@ -343,3 +408,21 @@ _ofact = 1
 for _i in xrange(1, 20, 2):
     _ofact *= _i
     _ODD_FACTORIAL[_i] = float(_ofact)
+
+
+def cart_to_powers(s):
+    """ Convert a string to a list of cartesian powers
+
+    Examples:
+        >>> cart_to_powers('y')
+        [0, 1, 0]
+        >>> cart_to_powers('xxyz')
+        [2, 1, 1]
+    """
+    powers = [0, 0, 0]
+    for char in s:
+        powers[DIMLABELS[char]] += 1
+    return powers
+
+
+DIMLABELS = {'x': 0, 'y': 1, 'z': 2}

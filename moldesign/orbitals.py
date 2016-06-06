@@ -11,138 +11,140 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# NEW FEATURE: less nesting, more referencing
+
+""" Class definitions for atomic and molecular orbitals.
+
+Notes:
+    In this documentation, we use the following conventions for labeling orbitals:
+      - atomic orbitals using lower case greek labels and subscripts, e.g.,
+          :math:`\left| \mu \right \rangle, F_{\nu \lambda}, etc.
+      - molecular orbitals use lower case labels and subscripts, e.g.,
+          :math:`\left| i \right \rangle, F_{kl}, etc.
+      - adiabatic electronic states are indexed using capital letters, _N_, _L_, _M_, etc.
+
+"""
 import collections
+
 import ipywidgets as ipy
 import numpy as np
 
 from moldesign import units as u, ui
-from moldesign.utils import if_not_none, DotDict, Alias
+from moldesign.utils import DotDict, Alias
 from moldesign.viewer import GeometryViewer
-
 
 SHELLS = {0: 's', 1: 'p', 2: 'd', 3: 'f', 4: 'g', 5: 'h'}
 ANGMOM = {v: k for k, v in SHELLS.iteritems()}
 SPHERICALNAMES = {(0, 0): 's', (1, -1): 'p(x)', (1, 0): 'p(z)', (1, 1): 'p(y)',
-                  (2, 0): 'd(z2)', (2, -2): 'd(xy)', (2, -1): 'd(yz)', (2, 1): 'd(xz)', (2, 2): 'd(x2-y2)'}
+                  (2, 0): 'd(z^2)', (2, -2): 'd(xy)', (2, -1): 'd(yz)', (2, 1): 'd(xz)', (2, 2): 'd(x^2-y^2)'}
 
 
 class ConvergenceError(Exception): pass
 
 
-class AtomicBasisFunction(object):
-    def __init__(self, atom, n=None, l=None, m=None, cart=None):
-        self.atom = atom
-        self.n = n
-        self.l = l
-        self.m = m
-        if cart is not None:
-            assert self.m is None, 'Both cartesian and spherical components passed!'
-            assert len(cart) == self.l, 'Angular momentum does not match specified component %s' % cart
-            for e in cart: assert e in 'xyz'
-            self.cart = ''.join(sorted(cart))
+class PrimitiveBase(object):
+    def __init__(self, *args, **kwargs):
+        raise NotImplementedError()
+
+    def __call__(self, position):
+        raise NotImplementedError()
+
+    def overlap(self, other):
+        raise NotImplementedError()
 
     @property
-    def orbtype(self):
-        if self.l == 0: t = 's'
-        elif self.cart is not None: t = SHELLS[self.l] + self.cart
-        else: t = SPHERICALNAMES[self.l, self.m]
-        return t
-
-    @property
-    def aotype(self):
-        t = self.orbtype
-        if self.n: return '%s%s' % (self.n, t)
-        else: return t
-
-    def __str__(self):
-        return 'AO ' + self.name
-
-    @property
-    def name(self):
-        try: return '%s on atom %s' % (self.aotype, self.atom.name)
-        except: return 'Basis Fn'
-
-    def __repr__(self):
-        return '<%s %s>' % (self.__class__.__name__, self.name)
-
-
-class AOBasis(object):
-    """
-    Stores an AO wfn description.
-    RIGHT NOW, this has limited functionality, and should be subclassed to implement anything.
-    """
-    __len__ = Alias('basis_fns.__len__')
-    __getindex__ = Alias('basis_fns.__getindex__')
-    __setindex__ = Alias('basis_fns.__setindex__')
-    __getitem__ = Alias('basis_fns.__getitem__')
-    __setitem__ = Alias('basis_fns.__setitem__')
-
-    def __init__(self, mol, basis_fns=None, name=None, h1e=None, overlaps=None,
-                 **kwargs):
-        self.mol = mol
-        self.name = name
-        self.h1e = h1e
-        self.overlaps = overlaps
-        self.basis_fns = basis_fns
-        self.nbasis = len(self.basis_fns)
-        for kw, val in kwargs.iteritems():
-            setattr(self, kw, val)
-
-        self.on_atom = {}
-        if self.basis_fns is not None:
-            for fn in self.basis_fns:
-                self.on_atom.setdefault(fn.atom, []).append(fn)
-
-
-    def calculate_orb_grid(self, coeffs, padding=2.5*u.angstrom, npoints=30):
-        """Abstract method - subclasses need to implement this"""
-        raise NotImplementedError('WFN grids are not implemented for this wfn set')
-
-    def __repr__(self):
-        return '<%s (%s) of %s>' % (self.__class__.__name__, self.name, self.mol)
-
-    def as_mos(self, wfn=None):
-        if wfn is not None: assert wfn.aobasis == self
-        coeffs = np.identity(self.nbasis)
-        orbitals = []
-        for bsfn, c in zip(self.basis_fns, coeffs):
-            orb = Orbital(c,
-                          aobasis=self,
-                          name=bsfn.name)
-            orbitals.append(orb)
-        atomic_orbs = MolecularOrbitals(orbitals, wfn=wfn, orbtype='AO basis')
-        return atomic_orbs
+    def norm(self, other):
+        raise NotImplementedError()
 
 
 class Orbital(object):
-    """
+    r"""
     Stores a single orbital and its meta-data
     Generally wants to be part of a set of MolecularOrbitals
+
+    The orbital is defined as
+    .. math::
+        \left| i \right \rangle = \sum_\mu c_{i \mu} \left| \mu \right \rangle
+
+    where the coefficients :math:`c_{i \mu}` are stored in ``self.coeffs`` and the basis orbitals
+    :math:`\left| \mu \right \rangle` are stored at ``self.basis``
     """
-    def __init__(self, coeffs,
-                 wfn=None, aobasis=None, energy=None,
+    def __init__(self, coeffs, basis=None, wfn=None,
                  occupation=None, name='unnamed',
                  **kwargs):
+        """ Initialization:
+
+        Args:
+            coeffs (numpy.array): orbital coefficients
+            basis (BasisSet): basis for this orbital
+            wfn (ElectronicState): total electronic wavefunction that this orbital is a part of
+            occupation (float): occupation of this orbital
+            name (str): optional label for this orbital:
+        """
         self.coeffs = np.array(coeffs)
         self.name = name
-        self.energy = energy
         self.parent = None
-        self.aobasis = aobasis
+        self.basis = basis
         self.occupation = occupation
         self.wfn = wfn
+
+        # Assign the basis functions
         if wfn is not None and wfn.aobasis is not None:
-            if self.aobasis is not None:
-                assert wfn.aobasis == self.aobasis
+            if self.basis is not None:
+                assert wfn.aobasis is self.basis
             else:
-                self.aobasis = wfn.aobasis
-        if self.aobasis is not None:
-            assert len(self.coeffs) == len(self.aobasis)
+                self.basis = wfn.aobasis
+        if self.basis is not None:
+            assert len(self.coeffs) == len(self.basis)
+
+        # Assign arbitrary attributes
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
     def overlap(self, other):
-        return self.dot(self.aobasis.overlaps.dot(other))
+        """ Calculate overlap with another orbital
+
+        Args:
+            other (Orbital): calculate the overlap with this orbital
+
+        Returns:
+            float: orbital overlap
+        """
+        return self.dot(self.basis.overlaps.dot(other))
+
+
+    def fock_element(self, other):
+        """ Calculate fock matrix element with another orbital
+
+        Args:
+            other (Orbital): calculate the fock element with this orbital
+
+        Returns:
+            u.Scalar[energy]: fock matrix element
+        """
+        return self.coeffs.dot(self.wfn.fock_ao.dot(other.coeffs))
+
+    @property
+    def energy(self):
+        """ u.Scalar[energy]: This orbital's energy
+
+        Note:
+            This is equivalent to self.fock(self)
+        """
+        return self.fock(self)
+
+    def __call__(self, coords):
+        """ Calculate the orbital's value at a position in space
+
+        Args:
+            coords (u.Vector[length]): Coordinates
+
+        Returns:
+            u.Scalar[length**(-3/2)]: value of the orbital
+        """
+        val = 0.0
+        for c, fn in zip(self.coeffs, self.basis.orbitals):
+            val += c * fn(coords)
+        return val
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, self.name)
@@ -169,56 +171,88 @@ class MolecularOrbitals(object):
     Stores a wfn of molecular orbitals in an AO wfn
     Orbitals are accessed as orbs[orbital index, ao index]
     """
-    def __init__(self, orbitals, wfn=None,
+    def __init__(self, orbitals, wfn=None, basis=None,
                  canonical=False,
                  orbtype=None,
                  **kwargs):
+        """ Initialization:
+
+        Args:
+            orbitals (List[Orbital] OR numpy.array): EITHER a list of orbitals OR an
+               array of coefficients (indexed as coeffs[orbital_index, basis_index])
+            basis (BasisSet): orbital basis set
+            wfn (ElectronicState): total electronic wavefunction that this orbital is a part of
+            canonical (bool): designate these as the canonical orbitals
+            orbtype (str): description of these orbitals
         """
-        :param coeffs: orbital coefficients (indexed as coeffs[ orbital_index, AO_basis_index])
-        :param wfn: AOBasis-like object
-        :param energies: energies of the orbitals
-        :param orbtype: name of these orbitals (e.g. 'canonical' - the default, 'natural', 'nbo', etc.)
-        """
+        # Determine if these are the canonical orbitals
         if canonical:
             assert orbtype is None or orbtype == 'canonical'
             orbtype = 'canonical'
-        if orbtype == 'canonical': canonical = True
+        if orbtype == 'canonical':
+            canonical = True
+
+        if not hasattr(orbitals[0], 'basis'):
+            coeffs = orbitals
+            orbitals = []
+            for c in coeffs:
+                orbitals.append(Orbital(c, basis=basis, wfn=wfn))
+
         self.orbitals = orbitals
         self.coeffs = np.array([orb.coeffs for orb in self.orbitals])
         self.wfn = wfn
+        self.basis = basis
+        self.orbtype = orbtype
+
         if self.wfn is None:
             self.wfn = self.orbitals[0].wfn
-        self.orbtype = orbtype
-        self.num_orbs = len(self.orbitals)
-        if canonical: self._set_cmo_names()
+        if self.basis is None:
+            self.basis = self.orbitals[0].basis
 
-        energies = self.fock.diagonal()
-        for idx, orb in enumerate(self.orbitals):
-            if orb.energy is None:
-                orb.energy = energies[idx]
-            else:
-                # This is a loose check to make sure we're in the right ballpark
-                if not np.allclose(orb.energy.defunits_value(),
-                                   energies[idx].defunits_value(),
-                                   atol=4):
-                    raise ConvergenceError(
-                            "Orbitals are not self-consistent; the SCF procedure likely did not converge")
-            if orb.name is None:
-                orb.name = '%s orb %d' % (self.orbtype, idx)
+        for iorb, orbital in enumerate(self.orbitals):
+            orbital.index = iorb
+            assert orbital.basis == self.basis
+            assert orbital.wfn == self.wfn
+            orbital.coeffs = self.coeffs[iorb, :]
+
+        if canonical:
+            self._set_cmo_names()
+
+        self._check_orb_energies()
 
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
-    def align_phases(self, other, threshold = 0.5, assert_same_type=True):
+    def _check_orb_energies(self):
+        energies = self.energies
+
+        for idx, orb in enumerate(self.orbitals):
+            # This is a loose check to make sure we're in the right ballpark
+            if not np.allclose(orb.energy.defunits_value(),
+                               energies[idx].defunits_value(),
+                               atol=4):
+                raise ConvergenceError(
+                        "Orbitals are not self-consistent; the SCF procedure likely did not converge")
+        if orb.name is None:
+            orb.name = '%s orb %d'%(self.orbtype, idx)
+
+    def align_phases(self, other, threshold=0.5, assert_same_type=True):
+        """ Flip the signs of these orbitals to bring them into maximum coincidence
+        with another set of orbitals
+
+        Args:
+            other (MolecularOrbitals): the "reference" set of orbitals to match phases with
+            threshold (float): only flip orbital if the overlap is less than -1*threshold
+            assert_same_type (bool): require that ``self.orbtype == other.orbtype``
+
+        Note:
+            This function assumes that the overlap matrix is the same for both sets of
+            orbitals - this is a reasonable assumption if the two sets of orbitals were
+            calculated at very similar molecular geometries.
         """
-        Align the phases of these orbitals with those of the other
-        :type other: MolecularOrbitals
-        :param assert_same_type: require that both orbitals sets have the same orbtype
-        """
-        # TODO: we're using the wrong overlap matrix here, since the atoms have moved. Need to get overlaps
-        # between the two steps for this to work consistently
         if assert_same_type:
-            assert self.orbtype == other.orbtype, "Orbital type mismatch: %s vs. %s" % (self.orbtype, other.orbtype)
+            assert self.orbtype == other.orbtype, "Orbital type mismatch: %s vs. %s" % (
+                self.orbtype, other.orbtype)
         for thisorb, otherorb in zip(self, other):
             olap = thisorb.overlap(otherorb)
             if thisorb.overlap(otherorb) < -1.0 * threshold:
@@ -226,18 +260,28 @@ class MolecularOrbitals(object):
                 # TODO: print a warning if overlap is small?
 
     def overlap(self, other):
-        return self.dot(self.aobasis.overlaps.dot(other.T))
+        """ Calculate overlaps between this and another set of orbitals
 
-    def calculate_orb_grid(self, orbidx, **kwargs):
+        Args:
+            other (MolecularOrbitals):
+
+        Returns:
+            numpy.array: overlaps between the two sets of orbitals.
+
+        Example:
+            >>> canonical = mol.electronic_state.canonical
+            >>> atomic = mol.electronic_state.basis
+            >>> overlaps = canonical.overlap(atomic)
+            >>> overlaps[i, j] == canonical.orbitals[i].overlap(atomic.orbitals[j])
+            True
         """
-        :param orbidx: orbital index
-        :param kwargs: arguments to AOBasis
-        :return type: VolumetricGrid
-        """
-        return self.wfn.aobasis.calculate_orb_grid(self[orbidx], **kwargs)
+        return self.dot(self.aobasis.overlaps.dot(other.T))
 
     def __iter__(self):
         return iter(self.orbitals)
+
+    def __len__(self):
+        return len(self.orbitals)
 
     def __str__(self):
         return '%s orbitals' % self.orbtype
@@ -247,33 +291,82 @@ class MolecularOrbitals(object):
                                      self.__class__.__name__, str(self.wfn))
 
     @property
+    def energies(self):
+        """u.Vector[energy]: energies of the molecular orbitals
+
+        This is just the diagonal of the fock matrix"""
+        return self.fock.diagonal()
+
+    @property
     def fock(self):
+        """u.Array[energy]: Fock matrix for these orbitals"""
         return self.from_ao(self.wfn.fock_ao)
 
     @property
     def overlaps(self):
+        """np.array: overlap matrix for these orbitals"""
         return self.from_ao(self.wfn.aobasis.overlaps)
 
     @property
     def h1e(self):
+        """u.Array[energy]: 1-electron matrix elements for these orbitals"""
         return self.from_ao(self.wfn.aobasis.h1e)
 
     @property
     def h2e(self):
+        """u.Array[energy]: 2-electron matrix elements for these orbitals"""
         return self.fock - self.h1e
 
     def from_ao(self, ao_operator):
+        """ Transform an operator into this orbital basis from the ao basis
+
+        Given the matrix elements :math:`\hat O_{\mu \nu}` of an operator over AO basis indices
+        :math:`\mu,\nu`, returns the operator's matrix elements :math:`\hat O_{ij}` over
+        orbital indices :math:`i,j`:
+
+        ..math::
+            \hat O_{ij} =
+             \left \langle i \right| \hat O \left| j \right \rangle =
+              \sum_{\mu \nu}C_{i \mu} O_{\mu \nu} C_{j \nu}
+
+
+        where :math:`C_{i \mu}` is the expansion coefficient for AO basis function :math:`\mu` in
+        molecular orbital _i_.
+
+        Args:
+            ao_operator (u.Array): matrix elements of the operator in the ao basis
+
+        Returns:
+            u.Array: matrix elements of the operator in this orbital basis
+
+        Note:
+            Assumes that this set of orbitals is orthogonal
         """
-        Transform an operator from the AO basis
-        Dot doesn't place nice with units, so we need to pass them explicitly
-        """
+        # Dot doesn't place nice with units, so we need to pass them explicitly
         ao_units = u.get_units(ao_operator)
         return self.coeffs.dot(ao_operator.dot(self.coeffs.T)) * ao_units
 
     def to_ao(self, mo_operator):
-        """
-        Rotate an operator from mo basis to (generally non-orthogonal) ao basis
-        Dot doesn't place nice with units, so we need to pass them explicitly
+        """ Transform an operator from this orbital basis into the AO basis
+
+        Given the matrix elements :math:`\hat O_{ij}` of an operator over orbital basis indices
+        :math:`i,j`, returns the operator's matrix elements :math:`\hat O_{\mu \nu}` over
+        orbital indices :math:`\mu, \nu`:
+
+        ..math::
+           \hat O_{\mu \nu} =
+           \left \langle \mu \right| \hat O \left| \nu \right \rangle =
+           \sum_{i,j,\lambda,\kappa}S_{\mu \lambda} C_{i \lambda} O_{ij} C_{j \kappa} S_{\kappa \nu}
+
+        where :math:`S_{\mu \nu} = \left \langle \mu | \nu \right \rangle` is the AO overlap matrix
+        and :math:`C_{i \mu}` is the expansion coefficient for AO basis function :math:`\mu` in
+        molecular orbital _i_.
+
+        Args:
+            mo_operator (u.Array): matrix elements of the operator in this orbital basis
+
+        Returns:
+            u.Array: matrix elements of the operator in the AO basis
         """
         units = u.get_units(mo_operator)
         s = self.wfn.aobasis.overlaps
@@ -299,33 +392,65 @@ class MolecularOrbitals(object):
                 else:
                     orb.name = 'virt cmo %d' % i
 
-    # This allows it to behave like a normal numpy array
-    # Ideally we'd just subclass numpy.ndarray ... except that doesnt work
-    __getitem__ = Alias('orbitals.__getitem__')
-    __len__ = Alias('orbitals.__len__')
-    shape = Alias('coeffs.shape')
 
-    def __dir__(self):
-        attributes = set(self.__dict__.keys() + dir(self.__class__) +
-                         dir(self.coeffs) + dir(self.orbitals[0]))
-        return list(attributes)
+class Attribute(object):
+    """For overriding a property in a superclass - turns the attribute back
+    into a normal instance attribute"""
+    def __init__(self, name):
+        self.name = name
 
-    def __getattr__(self, item):
-        if 'coeffs' in self.__dict__:
-            try: return getattr(self.coeffs, item)
-            except AttributeError: pass
+    def __get__(self, instance, cls):
+        return getattr(instance, self.name)
 
-        if 'orbitals' in self.__dict__:
-            try:
-                orbprops = [getattr(orb, item) for orb in self.orbitals]
-            except AttributeError:
-                raise AttributeError('%s has no attribute %s' % (self, item))
+    def __set__(self, instance, value):
+        return setattr(instance, self.name, value)
 
-            try: return u.to_units_array(orbprops)
-            except TypeError: return orbprops
 
-        else:
-            raise AttributeError()
+class BasisSet(MolecularOrbitals):
+    """
+    Stores a basis, typically of atomic orbitals.
+
+    This is a special orbital type
+    """
+    overlaps = Attribute('_overlaps')
+    h1e = Attribute('_h1e')
+
+    def __init__(self, mol, orbitals, name=None,
+                 h1e=None, overlaps=None,
+                 angulartype=None,
+                 **kwargs):
+        self.mol = mol
+        self.orbitals = orbitals
+        self.coeffs = np.identity(len(self.orbitals))
+        self.basis = self
+        self.orbtype = 'aobasis'
+        self.angulartype = angulartype
+        assert self.angulartype in (None, 'spherical', 'cartesian')
+
+        self.wfn = None
+        for iorb, orbital in enumerate(self.orbitals):
+            orbital.index = iorb
+            orbital.coeffs = self.coeffs[iorb, :]
+
+        self.basisname = name
+        self.h1e = h1e
+        self.overlaps = overlaps
+        for kw, val in kwargs.iteritems():
+            setattr(self, kw, val)
+
+        self.on_atom = {}
+        for fn in self.orbitals:
+            self.on_atom.setdefault(fn.atom, []).append(fn)
+
+    def calculate_orb_grid(self, coeffs, padding=2.5*u.angstrom, npoints=30):
+        """Abstract method - subclasses need to implement this"""
+        raise NotImplementedError
+        # TODO - generic implementation here
+        # TODO: needs to go fast for gaussians - use numpy vectorization
+        # TODO: balance caching, precomputing with mem usage ...
+
+    def __repr__(self):
+        return '<%s (%s) of %s>' % (self.__class__.__name__, self.basisname, self.mol)
 
 
 class ElectronicState(object):
@@ -358,7 +483,7 @@ class ElectronicState(object):
         self._has_canonical = False
 
         if self.aobasis is not None:
-            self.orbitals['atomic'] = self.aobasis.as_mos(wfn=self)
+            self.orbitals['atomic'] = self.aobasis
 
         for arg, val in kwargs.iteritems():
             setattr(self, arg, val)
