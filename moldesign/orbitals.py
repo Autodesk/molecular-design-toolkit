@@ -34,8 +34,20 @@ from moldesign.viewer import GeometryViewer
 
 SHELLS = {0: 's', 1: 'p', 2: 'd', 3: 'f', 4: 'g', 5: 'h'}
 ANGMOM = {v: k for k, v in SHELLS.iteritems()}
+
+# See https://en.wikipedia.org/wiki/Table_of_spherical_harmonics#Real_spherical_harmonics
 SPHERICALNAMES = {(0, 0): 's', (1, -1): 'p(x)', (1, 0): 'p(z)', (1, 1): 'p(y)',
-                  (2, 0): 'd(z^2)', (2, -2): 'd(xy)', (2, -1): 'd(yz)', (2, 1): 'd(xz)', (2, 2): 'd(x^2-y^2)'}
+                  (2, 0): 'd(z^2)', (2, -2): 'd(xy)', (2, -1): 'd(yz)',
+                  (2, 1): 'd(xz)', (2, 2): 'd(x^2-y^2)',
+                  (3, -3): 'f(3yx^2-y^3)', (3, -2): 'f(xyz)', (3, -1): 'f(yz^2)',
+                  (3, 0): 'f(z^3)', (3, 1): 'f(xz^2)', (3, 2): 'f(zx^2-zy^2)',
+                  (3, 3): 'f(x^3-3xy^2)'}
+ANGULAR_NAME_TO_COMPONENT = {'': (0, 0), 'x': (1, -1), 'y': (1, 1), 'z': (1, 0),
+                             'z^2': (2, 0), 'xy': (2, -2), 'yz': (2, -1), 'xz': (2, 1),
+                             'x^2-y^2': (2, 2),
+                             'zx^2-zy^2': (3, 2), 'xyz': (3, -2), 'z^3': (3, 0),
+                             '3yx^2-y^3': (3, -3), 'x^3 - 3xy^2': (3, 3), 'xz^2': (3, 1),
+                             'yz^2': (3, -1)}
 
 
 class ConvergenceError(Exception): pass
@@ -86,6 +98,7 @@ class Orbital(object):
         self.basis = basis
         self.occupation = occupation
         self.wfn = wfn
+        self.index = None  # will be set by the containing MolecularOrbitals object
 
         # Assign the basis functions
         if wfn is not None and wfn.aobasis is not None:
@@ -100,6 +113,7 @@ class Orbital(object):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
+
     def overlap(self, other):
         """ Calculate overlap with another orbital
 
@@ -111,7 +125,6 @@ class Orbital(object):
         """
         return self.dot(self.basis.overlaps.dot(other))
 
-
     def fock_element(self, other):
         """ Calculate fock matrix element with another orbital
 
@@ -121,7 +134,7 @@ class Orbital(object):
         Returns:
             u.Scalar[energy]: fock matrix element
         """
-        return self.coeffs.dot(self.wfn.fock_ao.dot(other.coeffs))
+        return self.wfn.fock_ao.dot(other.coeffs).ldot(self.coeffs)  # use ldot to preserve units
 
     @property
     def energy(self):
@@ -130,40 +143,23 @@ class Orbital(object):
         Note:
             This is equivalent to self.fock(self)
         """
-        return self.fock(self)
+        return self.fock_element(self)
 
     def __call__(self, coords):
-        """ Calculate the orbital's value at a position in space
+        """ Calculate the orbital's value at a position (or list of positions)
 
         Args:
-            coords (u.Vector[length]): Coordinates
+            coords (u.Vector[length]): Coordinates (shape ``(len(coords), 3)``)
 
         Returns:
             u.Scalar[length**(-3/2)]: value of the orbital
         """
-        val = 0.0
-        for c, fn in zip(self.coeffs, self.basis.orbitals):
-            val += c * fn(coords)
-        return val
+        return self.basis(coords, coeffs=self.coeffs)
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, self.name)
 
-    # This allows it to behave like a normal numpy array
-    # Ideally we'd just subclass numpy.ndarray ... except that doesn't work
-    __getitem__ = Alias('coeffs.__getitem__')
     __len__ = Alias('coeffs.__len__')
-    shape = Alias('coeffs.shape')
-
-    def __dir__(self):
-        attributes = set(self.__dict__.keys() + dir(self.__class__) + dir(self.coeffs))
-        return list(attributes)
-
-    def __getattr__(self, item):
-        if hasattr(self, 'coeffs'):
-            return getattr(self.coeffs, item)
-        else:
-            raise AttributeError()
 
 
 class MolecularOrbitals(object):
@@ -218,23 +214,8 @@ class MolecularOrbitals(object):
         if canonical:
             self._set_cmo_names()
 
-        self._check_orb_energies()
-
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
-
-    def _check_orb_energies(self):
-        energies = self.energies
-
-        for idx, orb in enumerate(self.orbitals):
-            # This is a loose check to make sure we're in the right ballpark
-            if not np.allclose(orb.energy.defunits_value(),
-                               energies[idx].defunits_value(),
-                               atol=4):
-                raise ConvergenceError(
-                        "Orbitals are not self-consistent; the SCF procedure likely did not converge")
-        if orb.name is None:
-            orb.name = '%s orb %d'%(self.orbtype, idx)
 
     def align_phases(self, other, threshold=0.5, assert_same_type=True):
         """ Flip the signs of these orbitals to bring them into maximum coincidence
@@ -254,7 +235,6 @@ class MolecularOrbitals(object):
             assert self.orbtype == other.orbtype, "Orbital type mismatch: %s vs. %s" % (
                 self.orbtype, other.orbtype)
         for thisorb, otherorb in zip(self, other):
-            olap = thisorb.overlap(otherorb)
             if thisorb.overlap(otherorb) < -1.0 * threshold:
                 thisorb.coeffs *= -1.0
                 # TODO: print a warning if overlap is small?
@@ -287,8 +267,11 @@ class MolecularOrbitals(object):
         return '%s orbitals' % self.orbtype
 
     def __repr__(self):
-        return '<%d %s %s in %s>' % (self.num_orbs, self.orbtype,
+        return '<%d %s %s in %s>' % (len(self), self.orbtype,
                                      self.__class__.__name__, str(self.wfn))
+
+    def __getitem__(self, item):
+        return self.orbitals[item]
 
     @property
     def energies(self):
@@ -431,6 +414,7 @@ class BasisSet(MolecularOrbitals):
         for iorb, orbital in enumerate(self.orbitals):
             orbital.index = iorb
             orbital.coeffs = self.coeffs[iorb, :]
+            orbital.basis = self
 
         self.basisname = name
         self.h1e = h1e
@@ -442,15 +426,32 @@ class BasisSet(MolecularOrbitals):
         for fn in self.orbitals:
             self.on_atom.setdefault(fn.atom, []).append(fn)
 
-    def calculate_orb_grid(self, coeffs, padding=2.5*u.angstrom, npoints=30):
-        """Abstract method - subclasses need to implement this"""
-        raise NotImplementedError
-        # TODO - generic implementation here
-        # TODO: needs to go fast for gaussians - use numpy vectorization
-        # TODO: balance caching, precomputing with mem usage ...
+    def __call__(self, coords, coeffs=None):
+        """Calculate the value of each basis function at the specified coordinates.
+
+        Note:
+            This is just a pass-through to a specific implementation - PYSCF's eval_ao routine
+            for now.
+
+        Args:
+            coords (Array[length]): List of coordinates.
+            coeffs (Vector): List of ao coefficients (optional; if not passed, all basis fn
+                 values are returned)
+
+        Returns:
+            Array[length]: if ``coeffs`` is not passed, an array of basis fn values at each
+               coordinate. Otherwise, a list of orbital values at each coordinate
+        """
+        from moldesign.interfaces.pyscf_interface import basis_values
+        return basis_values(self.wfn.mol, self, coords, coeffs=coeffs,
+                            positions=self.wfn.positions)
 
     def __repr__(self):
         return '<%s (%s) of %s>' % (self.__class__.__name__, self.basisname, self.mol)
+
+    @property
+    def fock(self):
+        return self.wfn.fock_ao
 
 
 class ElectronicState(object):
@@ -463,6 +464,7 @@ class ElectronicState(object):
     def __init__(self, mol, num_electrons,
                  theory=None,
                  aobasis=None, fock_ao=None,
+                 positions=None,
                  civectors=None, **kwargs):
         """
         :param mol:
@@ -482,8 +484,19 @@ class ElectronicState(object):
         self.lumo = self.homo + 1
         self._has_canonical = False
 
+        if positions is None:
+            self.positions = mol.positions.copy()
+        else:
+            self.positions = positions.copy()
+
+        if len(self.positions.shape) == 1 or self.positions.shape[1] != 3:
+            self.positions.shape = (mol.numatoms, 3)
+
         if self.aobasis is not None:
             self.orbitals['atomic'] = self.aobasis
+            self.aobasis.wfn = self
+            for orb in self.aobasis.orbitals:
+                orb.wfn = self
 
         for arg, val in kwargs.iteritems():
             setattr(self, arg, val)
@@ -496,7 +509,7 @@ class ElectronicState(object):
 
     @property
     def description(self):
-        return '%s/%s' % (self.theory, self.aobasis.name)
+        return '%s/%s' % (self.theory, self.aobasis.basisname)
 
     def set_canonical_mos(self, orbs):
         if orbs.wfn is None: orbs.wfn = self

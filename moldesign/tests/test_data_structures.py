@@ -434,6 +434,7 @@ def test_molecule_atom_hierarchy(molkey, request):
     assert residues_from_atoms == all_residues
     assert chains_from_atoms == all_chains
 
+
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_residue_hierarchy(molkey, request):
     mol = request.getfuncargvalue(molkey)

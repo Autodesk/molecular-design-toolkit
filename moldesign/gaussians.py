@@ -254,9 +254,11 @@ class SphericalGaussian(AbstractFunction):
         self.l = l
         self.m = m
 
-        if self.coeff is None:
+        if coeff is None:
             self.coeff = 1.0
             self.normalize()
+        else:
+            self.coeff = coeff
 
     def __repr__(self):
         return ("<Gaussian (coeff: {coeff:4.2f}, "
@@ -310,6 +312,8 @@ class AtomicBasisFunction(Orbital):
             assert len(cart) == self.l, 'Angular momentum does not match specified component %s' % cart
             for e in cart: assert e in 'xyz'
             self.cart = ''.join(sorted(cart))
+        else:
+            self.cart = None
 
         # These quantities can't be defined until we assemble the entire basis
         self.coeffs = None
@@ -317,20 +321,6 @@ class AtomicBasisFunction(Orbital):
         self.basis = None
         self.occupation = None
         self.wfn = None
-
-    def __call__(self, coords):
-        """ Calculate this basis function's value at a position in space
-
-        Args:
-            coords (u.Vector[length]): Coordinates or list of coordinates
-
-        Returns:
-            u.Scalar[length**(-3/2)]: value(s) of the basis function at the coordinates
-        """
-        val = self.primitives[0](coords)
-        for prim in self.primitives[1:]:
-            val += prim(coords)
-        return val
 
     @property
     def num_primitives(self):
@@ -418,11 +408,45 @@ def cart_to_powers(s):
         [0, 1, 0]
         >>> cart_to_powers('xxyz')
         [2, 1, 1]
+        >>> cart_to_powers('zx^3')
+        [3,0,1]
     """
     powers = [0, 0, 0]
-    for char in s:
-        powers[DIMLABELS[char]] += 1
+    chars = iter(s)
+    lastchar = None
+    while True:
+        try:
+            char = chars.next()
+        except StopIteration:
+            break
+
+        if char == '^':
+            power = int(chars.next())
+            powers[DIMLABELS[lastchar]] += power - 1
+            lastchar = None
+        else:
+            powers[DIMLABELS[char]] += 1
+            lastchar = char
+
     return powers
 
 
 DIMLABELS = {'x': 0, 'y': 1, 'z': 2}
+
+
+class ERI4FoldTensor(object):
+    def __init__(self, mat, basis_orbitals):
+        self.mat = mat
+        self.basis_orbitals = basis_orbitals
+        nbasis = len(self.basis_orbitals)
+        mapping = np.zeros((nbasis, nbasis), dtype='int')
+        ij = 0
+        for i in xrange(nbasis):
+            for j in xrange(i + 1):
+                mapping[i, j] = mapping[j, i] = ij
+                ij += 1
+        self.mapping = mapping
+
+    def __getitem__(self, item):
+        i, j, k, l = item
+        return self.mat[self.mapping[i, j], self.mapping[k, l]]

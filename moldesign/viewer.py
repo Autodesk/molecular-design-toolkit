@@ -280,14 +280,20 @@ class GeometryViewer(MolViz_3DMol):
         return positions
 
     def calc_orb_grid(self, orbname, npts=30, padding=2.5 * u.angstrom):
+        """ Calculate orbitals on a grid
+
+        Args:
+            orbname: Either orbital index (for canonical orbitals) or a tuple ( [orbital type],
+               [orbital index] ) where [orbital type] is a keyword (e.g., canonical, natural, nbo,
+               ao, etc)
+            npts (int): number of points in each dimension of the grid
+            padding (u.Scalar[length]): extent of the grid beyond the furthest atom in each
+                dimension
+
+        Returns:
+            moldesign.orbitals.VolumetricGrid: orbital values on a grid
         """
-        Calculate orbitals
-        :param orbname: Either orbital index (for canonical orbitals) or a tuple ( [orbital type], [orbital index] ) \
-         where [orbital type] is a keyword (e.g., canonical, natural, nbo, ao, etc)
-        :param npts: number of points in each dimension of the grid
-        :param padding: extent of the grid beyond the furthest atom in each dimension
-        """
-        # TODO: why is orbname sometimes a np.int64 instead of an int?
+        # TODO: why is orbname sometimes an np.int64 instead of an int?
         # NEWFEATURE: limit bounding box based on the non-zero atomic centers. Useful for localized orbitals,
         #             which otherwise require high resolution
         try:
@@ -296,8 +302,15 @@ class GeometryViewer(MolViz_3DMol):
             orbtype = 'canonical'
             orbidx = orbname
 
-        orbs = self.wfn.orbitals[orbtype]  # this is the wfn for the current frame
-        return orbs.calculate_orb_grid(orbidx, npoints=npts, padding=padding)
+        # self.wfn should already be set to the wfn for the current frame
+        orbital = self.wfn.orbitals[orbtype][orbidx]
+        positions = self._frame_positions[self.current_frame] * u.angstrom
+        grid = mdt.orbitals.VolumetricGrid(positions,
+                                           padding=padding, npoints=npts)
+        coords = grid.xyzlist().reshape(3, grid.npoints ** 3).T
+        values = orbital(coords)
+        grid.fxyz = values.reshape(npts, npts, npts)
+        return grid
 
     def get_orbnames(self):
         """

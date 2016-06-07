@@ -111,6 +111,14 @@ class BuckyballQuantity(ureg.Quantity):
         else:
             return super(BuckyballQuantity, self).__eq__(other)
 
+    @property
+    def shape(self):
+        return self.magnitude.shape
+
+    @shape.setter
+    def shape(self, value):
+        self.magnitude.shape = value
+
     def compare(self, other, op):
         """ Augments the :class:`pint._Quantity` method with the following features:
           - Comparisons to 0 ignore units
