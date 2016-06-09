@@ -261,7 +261,6 @@ class GeometryViewer(MolViz_3DMol):
 
         self.set_colors(colors, render=render)
 
-
     def get_input_file(self):
         if len(self.mol.atoms) <= 250:
             fmt = 'sdf'

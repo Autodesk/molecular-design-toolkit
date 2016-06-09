@@ -37,6 +37,7 @@ import yaml
 URL_OPENERS = ['Open', 'xdg-open', 'sensible-browser', 'gnome-open', 'x-www-browser']
 JUPYTERPORT = 8888
 DOCKER_TOOLS = 'docker docker-machine docker-compose'.split()
+DOCKER_REPOSITORY = 'docker-hub.autodesk.com/virshua/moldesign:'
 HOME = os.environ['HOME']
 CONFIG_DIR = os.path.join(HOME, '.moldesign')
 EXAMPLE_DIR_TARGET = os.path.join(os.path.curdir, 'moldesign-examples')
@@ -56,21 +57,61 @@ CONFIG_PATH = os.path.join(CONFIG_DIR, 'moldesign.yml')
 
 
 def main():
+    global CONFIG_PATH
     parser = argparse.ArgumentParser('python -m moldesign')
-    parser.add_argument('command', choices=['intro', 'launch'])
+
+    subparsers = parser.add_subparsers(title='command', dest='command')
+    subparsers.add_parser('intro', help='copy examples into current directory and launch a '
+                                        'notebook')
+    subparsers.add_parser('launch', help='launch a notebook and open it in a browser '
+                                         '(equivalent to running "jupyter notebook")')
+    subparsers.add_parser('pull', help='download docker containers that MDT requires ('
+                                       'only when a docker client is configured)')
+    subparsers.add_parser('config', help='print configuration and exit')
+
+    parser.add_argument('-f', '--config-file', type=str,
+                        help='Path to config file')
 
     args = parser.parse_args()
+
+    print args
+    if args.config_file:
+        CONFIG_PATH = args.config_file
 
     if args.command == 'intro':
         copy_example_dir(use_existing=True)
         launch(cwd=EXAMPLE_DIR_TARGET,
                path='notebooks/index.ipynb')
 
+    elif args.command == 'pull':
+        pull()
+
     elif args.command == 'launch':
         launch()
 
+    elif args.command == 'config':
+        print 'Reading config file from: %s' % CONFIG_PATH
+        print '----------------------------'
+        with open(CONFIG_PATH, 'r') as cfgfile:
+            for key, value in yaml.load(cfgfile).iteritems():
+                print '%s: %s' % (key, value)
+
     else:
         assert False
+
+DOCKER_IMAGES = 'ambertools14 moldesign moldesign_notebook opsin symmol python_install'.split()
+def pull():
+    from moldesign import config, compute
+    assert config.config_yaml.default_engine == 'docker', 'Pull only works for docker engines'
+    assert config.config_yaml.default_repository, "Can't pull - no repository specified"
+    streams = []
+    for img in DOCKER_IMAGES:
+        imgurl = compute.get_image_path(img)
+        print 'Pulling %s' % imgurl
+        streams.append(compute.default_engine.client.pull(imgurl))
+    for s in streams:
+        for line in s.split('\n'):
+            print line
 
 
 def launch(cwd=None, path=''):

@@ -52,7 +52,8 @@ def print_configuration():
     print 'Image for python commands:', cfg.default_image
 
 
-def _get_config():  # TODO: refactor, allow runtime_ms changes, move host setup to PyCCC. see BBLL-64
+def _get_config():
+    # TODO: refactor, allow runtime_ms changes, move host setup to PyCCC. see BBLL-64
     # TODO: how to configure workers? (especially ones that don't need to launch any jobs themselves)
     """Called at import to configure this module"""
     global cfg, launchcmd, launchpy, config_yaml, _docker_client

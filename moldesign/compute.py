@@ -33,7 +33,7 @@ def get_image_path(image_name, engine=None):
     if not config.cfg.default_repository:
         name = image_name
     else:
-        name = '%s%s' % config.cfg.default_repository, image_name
+        name = '%s%s' % (config.cfg.default_repository, image_name)
 
     if not config.cfg.default_repository:
         img = name
