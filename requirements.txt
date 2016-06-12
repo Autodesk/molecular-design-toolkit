@@ -1,8 +1,12 @@
 biopython
+docker-py
 fortranformat
 funcsigs
-ipywidgets >= 4.1
+ipywidgets >= 5.1
+ipython >= 4.2
 markdown2
+matplotlib
+notebook >= 4.2
 numpy
 pint >= 0.7
 pyyaml

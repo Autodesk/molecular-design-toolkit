@@ -439,7 +439,8 @@ class GeometryViewer(MolViz_3DMol):
 
     @utils.doc_inherit
     def show_frame(self, framenum, _fire_event=True, **kwargs):
-        # override base method - we'll handle frames using self.set_positions instead of any built-in handlers
+        # override base method - we'll handle frames using self.set_positions
+        # instead of any built-in handlers
         if framenum != self.current_frame:
             self.set_positions(self._frame_positions[framenum])
             self.current_frame = framenum
