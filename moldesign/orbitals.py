@@ -610,7 +610,9 @@ class OrbitalUIPane(ui.Selector, ipy.Box):
         self.type_dropdown.value = initial_orb
         self.type_dropdown.observe(self.new_orb_type, 'value')
 
-        self.orblist = ipy.Select(width=kwargs['width'], height=int(kwargs['height']) - 75)
+        self.orblist = ipy.Select(options={None: None},
+                                  width=kwargs['width'],
+                                  height=int(kwargs['height']) - 75)
 
         self.isoval_selector = ui.create_value_selector(ipy.FloatSlider,
                                                         value_selects='orbital_isovalue',
@@ -645,6 +647,7 @@ class OrbitalUIPane(ui.Selector, ipy.Box):
         neworbs = wfn.orbitals[newtype]
         orblist = collections.OrderedDict()
 
+        orblist[None] = None
         for i, orb in enumerate(neworbs):
             if hasattr(orb, 'unicode_name'):
                 orbname = orb.unicode_name
@@ -662,6 +665,7 @@ class OrbitalUIPane(ui.Selector, ipy.Box):
             else:
                 desc = '%d. %s' % (i, orbname)
             orblist[desc] = i
+        self.orblist.value = None
         self.orblist.options = orblist
 
     def change_resolution(self, *args):

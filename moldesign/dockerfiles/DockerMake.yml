@@ -125,7 +125,7 @@ nbmolviz:
  build: |
   RUN mkdir -p /opt/pylib && git clone -b '0.2' --single-branch --depth 1 https://5f2c9ecad39c0dae106d50cc89dff276008e3fe3@git.autodesk.com/virshua/Py3DMol /opt/pylib/Py3DMol
   RUN ln -s /opt/pylib/Py3DMol/nbmolviz /opt/nbmolviz
-  RUN python -c "from nbmolviz import install; install.widgets()"
+  RUN jupyter nbextension enable --python --system nbmolviz widgetnbextensions
 
 moldesign_notebook:
  description: A production-ready, fully outfitted jupyter server container

@@ -115,49 +115,58 @@ def enable_logging_widgets(enable=True):
         ip.events.unregister('pre_run_cell', _capture_logging_displays)
         ip.events.unregister('post_run_cell', _finalize_logging_displays)
 
+# TODO: Remove this workaround for https://github.com/ipython/ipywidgets/issues/628
+# If ipywidgets#628 is a bug, then this can just be remoed
+# If this is the expected behavior, we should come up with something more elegant
+try:
+    ipy.Text()
+except traitlets.TraitError:
+    widgets_enabled = False
+else:
+    widgets_enabled = True
 
-class LoggingTabs(mdt.ui.StyledTab):
-    def __init__(self, objects, display=False, **kwargs):
-        """
-        :param objects: dict of form {TITLE: <display object>}
-        :param display: directly display the display collection
-        :param kwargs: kwargs to pass to ipywidgets initializers
-        """
-        self.objs = OrderedDict(objects)
-        super(LoggingTabs, self).__init__(objects.values(), **kwargs)
-        self.selected_index = -1
-        for ikey, key in enumerate(objects.iterkeys()):
-            self.set_title(ikey, key)
-        self._displayed = False
-        if display:
-            self._displayed = True
-            IPython.display.display(self)
+if widgets_enabled:
+    class LoggingTabs(mdt.ui.StyledTab):
+        def __init__(self, objects, display=False, **kwargs):
+            """
+            :param objects: dict of form {TITLE: <display object>}
+            :param display: directly display the display collection
+            :param kwargs: kwargs to pass to ipywidgets initializers
+            """
+            self.objs = OrderedDict(objects)
+            super(LoggingTabs, self).__init__(objects.values(), **kwargs)
+            self.selected_index = -1
+            for ikey, key in enumerate(objects.iterkeys()):
+                self.set_title(ikey, key)
+            self._displayed = False
+            if display:
+                self._displayed = True
+                IPython.display.display(self)
 
-    def add_display(self, obj, title=None, display=True):
-        title = mdt.utils.if_not_none(title, str(obj))
-        title = title[:40]
-        oldtitle = title
-        ititle = 0
-        while title in self.objs:
-            ititle += 1
-            title = '%s.%d' % (oldtitle, ititle)
-        self.objs[title] = obj
-        self.children += (obj,)  # ipywidgets requires a tuple for some reason
-        self.set_title(len(self.children) - 1, title)
-        if display and not self._displayed:
-            IPython.display.display(self)
-            self._displayed = True
+        def add_display(self, obj, title=None, display=True):
+            title = mdt.utils.if_not_none(title, str(obj))
+            title = title[:40]
+            oldtitle = title
+            ititle = 0
+            while title in self.objs:
+                ititle += 1
+                title = '%s.%d' % (oldtitle, ititle)
+            self.objs[title] = obj
+            self.children += (obj,)  # ipywidgets requires a tuple for some reason
+            self.set_title(len(self.children) - 1, title)
+            if display and not self._displayed:
+                IPython.display.display(self)
+                self._displayed = True
 
 
-class Logger(ipy.Textarea):
+class Logger(ipy.Textarea if widgets_enabled else object):
     # TODO: need a javascript-side widget that will accept a stream - string concatenation is bad
     def __init__(self, title='log', **kwargs):
         kwargs.setdefault('width', 400)
         kwargs.setdefault('height', 300)
         self.title = title
-        try:  # try to intialize widget
+        if widgets_enabled:  # try to intialize widget
             super(Logger, self).__init__(**kwargs)
-        except traitlets.TraitError:  # PROBABLY because this isn't running under jupyter
             self._is_widget = True
         else:
             self._is_widget = False
@@ -180,13 +189,12 @@ class Logger(ipy.Textarea):
 def _capture_logging_displays(display=False, **kwargs):
     global _current_tabs, _prev_tabs
     _prev_tabs = _current_tabs
-    try:
+    if widgets_enabled:
         _current_tabs = LoggingTabs(OrderedDict(x=ipy.Box()), display=display, **kwargs)
-    except traitlets.TraitError:
+    else:
         _current_tabs = None
         enable_logging_widgets(False)
         print 'Failed to create UI logging system. Logging widgets disabled'
-
 
 
 def _finalize_logging_displays(display=True, **kwargs):
