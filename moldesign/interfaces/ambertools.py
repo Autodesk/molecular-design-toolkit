@@ -26,16 +26,36 @@ from moldesign.utils import if_not_none, DotDict
 from moldesign import compute, basemethods
 from moldesign import ui
 
-IMAGE = 'ambertools14'
+IMAGE = 'ambertools'
 
 AmberParameters = collections.namedtuple('AmberParameters',
                                          'prmtop inpcrd job')
 GAFFParameters = collections.namedtuple('GAFFParameters',
                                         'lib frcmod job')
 
+DNA_FF = {ff: 'leaprc.DNA.%s'%ff for ff in ['OL15', 'bsc1']}
+RNA_FF = {ff: 'leaprc.RNA.%s'%ff for ff in ['OL3', 'YIL']}
+PROTEIN_FF = {ff: 'leaprc.protein.%s'%ff for ff in
+              ['ff14SB',
+               'ff14SBonlysc',
+               'ff14SB.redq',
+               'ff15ipq',
+               'ff15ipq-vac',
+               'ff03.r1',
+               'ff03ua',
+               'fb15']}
+LIPID_FF = {'lipid14': 'leaprc.lipid14'}
+WATER_FF = {ff: 'leaprc.water.%s'%ff for ff in
+            ['tip3p', 'tip4pew', 'spce', 'opc']}
+CARB_FF = {ff: 'leaprc.%s'%ff for ff in ['GLYCAM_06EPb', 'GLYCAM_06j-1']}
+ORGANIC_FF = {ff: 'leaprc.%s'%ff for ff in ['gaff', 'gaff2']}
+OTHER_FF = {ff: 'leaprc.%s'%ff for ff in ['phosaa10', 'modrna08', 'xFPchromophores']}
+LEAPRCFILES = {}
+for ffiles in (DNA_FF, RNA_FF, PROTEIN_FF, LIPID_FF, CARB_FF, WATER_FF, ORGANIC_FF, OTHER_FF):
+    LEAPRCFILES.update(ffiles)
+
 
 class ParameterizationError(Exception): pass
-
 
 
 class SQMPotential(basemethods.QMBase):
@@ -113,9 +133,6 @@ def am1_bcc_charges(mol, minsteps=None, wait=True):
     else: job.wait()
 
 
-def get_gaff_parameters(mol, charges='resp'): pass
-
-
 def build_bdna(sequence,
                image=IMAGE,
                engine=None):
@@ -144,24 +161,46 @@ def build_bdna(sequence,
     return mol
 
 
-def run_tleap(mol, ff='ff14SB',
+def run_tleap(mol,
+              protein='ff14SB',
+              dna='OL15',
+              rna='OL3',
+              carbohydrate='GLYCAM_06j-1',
+              lipid='lipid14',
+              water='tip3p',
+              organic='gaff2',
               off_files=(),
               frcmod_files=(),
               image=IMAGE,
               engine=None):
     """
-    Drives tleap to create a prmtop and inpcrd file
-    :type mol: moldesign.molecule.Molecule
-    :param ff: forcefield name
-    :param off_files: List of additional off_files to include
-    :param frcmod_files: List of additional frcmod files to include
-    :param image: docker image tag
-    :param engine: compute engine (if None, set to compute.default_engine)
-    :return: AmberParameters object (contains the files and the job object)
+    Drives tleap to create a prmtop and inpcrd file. Specifically uses the AmberTools 16
+    tleap distribution.
+
+    Defaults are as recommended in the ambertools manual.
+
+    Args:
+        mol (moldesign.Molecule): Molecule to set up
+        protein (str): protein forcefield name (default:ff14SB)
+        dna (str): dna forcefield name (default: OL15)
+        rna (str): rna forcefield name (default: OL3)
+        carbohydrate (str): carbohydrate forcefield name (default: GLYCAM_06j)
+        lipid (str): lipid forcefield name (default: lipid14)
+        water (str): water forcefield name (default: tip3p)
+        organic (str): organic forcefield name (default: gaff2)
+        off_files (List[batch.FileContainer]):
+        frcmod_files (List[batch.FileContainer]):
+        image (str): docker image to use
+        engine (batch.EngineBase): compute engine to run tleap on
+
+    References:
+        Ambertools Manual, http://ambermd.org/doc12/Amber16.pdf. See page 33 for forcefield
+        recommendations.
     """
     # Prepare input for tleap
-    leapstr = ["source leaprc.%s\n"
-               "source leaprc.gaff" % ff]
+    leapstr = ['source %s' % LEAPRCFILES[ff] for ff in
+               (protein, dna, rna, carbohydrate, lipid, water, organic)]
+
     for frcmod in frcmod_files:
         fname = frcmod.dumphere()
         leapstr.append('loadamberparam %s' % fname)
@@ -207,7 +246,8 @@ def assign_forcefield(mol, **kwargs):
         raise ParameterizationError('TLeap failed to assign force field parameters for %s' % mol, job)
 
 
-def get_gaff_parameters(mol, charges, ff='ff14sb', image=IMAGE, engine=None):
+
+def get_gaff_parameters(mol, charges, image=IMAGE, engine=None):
     inputs = {}
     cmds = []
     engine = if_not_none(engine, compute.default_engine)

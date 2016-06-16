@@ -15,6 +15,7 @@ import os
 import sys
 
 import yaml
+import warnings
 from pyccc import engines, job
 import pyccc.python as pycccpy
 
@@ -24,12 +25,12 @@ cfg = launchcmd = launchpy = config_yaml = _docker_client = None
 ENVVAR = "MOLDESIGN_CONFIG"
 DEFAULT_CONFIG_PATH = os.path.join(os.environ['HOME'], '.moldesign/moldesign.yml')
 DEF_CONFIG = DotDict(default_engine='docker',
-                     default_repository='',
-                     default_image='moldesign',
+                     default_repository='docker-hub.autodesk.com/virshua/moldesign:',
+                     default_image='moldesign_complete',
                      default_docker_url='unix://var/run/docker.sock',
                      default_docker_machine=None,
                      default_num_threads=4,
-                     version_tag='',
+                     version_tag='latest',
                      show_splash=True,
                      _splash_done=False)
 
@@ -40,8 +41,10 @@ def registry_login(client, login):
     try:
         client.login(**login)
     except Exception as exc:
-        print 'WARNING: docker registry login failed. Buckyball will continue, but some functions may time out.'
-    print 'done'
+        warnings.warn('Failed to connect to %s. ' % login['registry'] +
+                      'Some functions may time out.')
+    else:
+        print 'done'
 
 
 def print_configuration():
