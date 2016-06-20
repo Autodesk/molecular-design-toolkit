@@ -149,11 +149,13 @@ def write(obj, filename=None, format=None, mode='w'):
     else:
         fileobj.close()
 
+
 def mol_to_openmm_sim(mol):
     try:
         return mol.energy_model.get_openmm_simulation()
     except AttributeError:
         raise AttributeError("Can't create an OpenMM object - no OpenMM energy_model present")
+
 
 def from_pdb(pdbcode):
     """ Import the given molecular geometry from PDB.org
@@ -190,6 +192,7 @@ def from_name(name):
     smi = name_to_smiles(name)
     mol = from_smiles(smi, name)
     return mol
+
 
 def build_assembly(mol, assembly_name):
     """ Create biological assembly using a bioassembly specification.

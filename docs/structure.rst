@@ -16,7 +16,7 @@ Below, we describe some of the most relevant attributes of a :class:`Molecule <m
 
 Atoms
 """""
-Each :class:`Molecule` contains a list of :class:`Atoms <moldesign.Atom>`.
+Each :class:`Molecule <moldesign.Atom>` contains a list of :class:`Atoms <moldesign.Atom>`.
 
    >>> len(benzene.atoms)
    12
@@ -26,7 +26,8 @@ Each :class:`Molecule` contains a list of :class:`Atoms <moldesign.Atom>`.
 
 Coordinates
 """""""""""
-Coordinates for the entire :class:`Molecule` are stored as flat vectors of length `3*mol.num_atoms`.
+Coordinates for the entire :class:`Molecule <moldesign.Atom>`
+are stored as flat vectors of length `3*mol.num_atoms`.
 
     >>> len(benzene.positions)
     36
@@ -37,7 +38,7 @@ Coordinates for the entire :class:`Molecule` are stored as flat vectors of lengt
 Bonds
 """""
 Bonds between atoms are stored as a graph, accessible via
-:meth:`mol.bond_graph - see its documentation for details <moldesign.Molecule.bond_graph>`.
+:meth:`mol.bond_graph <moldesign.Molecule.bond_graph>`.
 
 Primary structure
 """""""""""""""""

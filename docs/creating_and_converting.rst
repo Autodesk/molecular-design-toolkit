@@ -1,6 +1,7 @@
 Creating and converting molecules
 ---------------------------------
 
+
 From other objects
 ==================
 You can create a new molecule from any collection of atoms.

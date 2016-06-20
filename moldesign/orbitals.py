@@ -113,7 +113,6 @@ class Orbital(object):
         for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
-
     def overlap(self, other):
         """ Calculate overlap with another orbital
 
@@ -123,7 +122,7 @@ class Orbital(object):
         Returns:
             float: orbital overlap
         """
-        return self.dot(self.basis.overlaps.dot(other))
+        return self.coeffs.dot(self.basis.overlaps.dot(other.coeffs))
 
     def fock_element(self, other):
         """ Calculate fock matrix element with another orbital

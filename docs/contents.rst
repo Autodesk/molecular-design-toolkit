@@ -4,6 +4,8 @@
    :name: mastertoc
 
    Introduction <index>
+   Installation <install>
+   How do I ...? <howdoi>
    Atoms, molecules, and biomolecules <structure>
    Energy models <energymodels>
    Integrators <integrators>
