@@ -13,9 +13,14 @@
 # limitations under the License.
 from collections import OrderedDict
 import logging
+
+import collections
 import ipywidgets as ipy
 import traitlets
 import IPython.display
+import base64
+import io
+import os
 
 import moldesign as mdt
 
@@ -32,6 +37,56 @@ root.setLevel(STANDARD)
 _prev_tabs = None
 _current_tabs = None
 _capture_enabled = False
+
+
+class NotebookHeader(ipy.Box):
+    def __init__(self):
+        super(NotebookHeader, self).__init__()
+        self.make_header()
+        self.header = self.make_header()
+        self.configuration = self.make_configurator()
+        self.children = [self.header, self.configuration]
+
+    def make_header(self):
+        img = io.open(os.path.join(mdt.PACKAGEPATH, 'notebooks/img/Top.png'), 'r+b').read()
+        encoded = base64.b64encode(img)
+        html = ['<img style="max-width:100%" src=data:image/png;base64,'+('%s>'%encoded)]
+        linkbar = [self._makelink(*args) for args in
+                   (("http://moldesign.bionano.autodesk.com/", 'About'),
+                    ("http://bionano.autodesk.com/MolecularDesignToolkit/explore.html",
+                     "Tutorials"),
+                    ('http://moldesign.readthedocs.io/', 'Documentation'),
+                    ("https://forum.bionano.autodesk.com/c/Molecular-Design-Toolkit", 'Forum'),
+                    ("https://github.com/autodesk/molecular-design-toolkit/issues", 'Issues'))]
+        html.append('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.join(linkbar))
+        return ipy.HTML('\n'.join(html))
+
+    def make_configurator(self):
+        self._engine = ipy.Dropdown(description='Compute engine',
+                                 options=['CloudComputeCannon',
+                                          'LocalComputeCannon',
+                                          'Docker',
+                                          'Local process'])
+        self._host = ipy.Text(description='Host')
+        self._repo= ipy.Text(description='Docker image repository')
+        self._version = ipy.Text(description='Docker version tag')
+        self._restore_default_button = ipy.Button(description='Restore defaults')
+        self._reset_config_button = ipy.Button(description='Reset', onclick=self.reset_config)
+        self._apply_changes_button = ipy.Button(description='Apply')
+
+        cfger = ipy.Box([self._host, self._repo, self._version,
+                         self._restore_default_button, self._reset_config_button,
+                         self._apply_changes_button],
+                        layout=ipy.Layout(display='flex', flex_flow='row wrap'))
+        return cfger
+
+    def reset_config(self): pass
+
+
+    @staticmethod
+    def _makelink(url, text):
+        return '<a href="{url}" target="_blank" title="{text}">{text}</a>'.format(url=url,
+                                                                                  text=text)
 
 
 def display(obj, title=None):

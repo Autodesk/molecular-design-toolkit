@@ -300,7 +300,7 @@ def get_units(q):
         y._magnitude = 1.0
         return y
     except AttributeError:
-        return 1.0
+        return 1.0 * ureg.dimensionless
 
 
 def to_units_array(qlist, baseunit=None):
