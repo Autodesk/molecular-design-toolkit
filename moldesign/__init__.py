@@ -11,8 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from __future__ import absolute_import
+
+import os as _os
+_building_docs = bool(_os.environ.get('SPHINX_IS_BUILDING_DOCS', ""))
 
 import moldesign.__main__
 

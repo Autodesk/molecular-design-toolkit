@@ -11,26 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import sys
 import copy
-import collections
 
 import numpy as np
 from scipy.spatial import distance as spd
 
 import moldesign as mdt
+import moldesign.utils
 import moldesign.utils.callsigs
 import moldesign.utils.classes
-from moldesign import units as u
+from moldesign import units as u, utils
 from moldesign import data, utils, viewer, ui
 from moldesign.external import transformations
 
-
-__all__ = 'Atom Bond AtomContainer AtomList'.split()
+__all__ = 'Atom AtomList Bond'.split()
 
 class AtomContainer(object):
-    """
-    Mixin functions for objects that have a ``self.atoms`` attribute with a list of atoms
+    """ Mixin functions for objects that have a ``self.atoms`` attribute with a list of atoms
 
     Attributes:
         atoms (List[Atom]): a list of atoms
@@ -85,8 +82,7 @@ class AtomContainer(object):
             other (AtomContainer): object to calculate distances to (default: self)
 
         Returns:
-            u.Array[length]: 2D array of pairwise distances between the
-               two objects
+            u.Array[length]: 2D array of pairwise distances between the two objects
 
         Example:
             >>> dists = self.calc_distance_array(other)
@@ -121,7 +117,7 @@ class AtomContainer(object):
             other (AtomContainer): object to calculate distance to
 
         Returns:
-            u.Scalar[length]: closest distance between the two objects
+            u.Scalar[length]: closest distance between self and other
 
         Example:
             >>> distance = self.distance(other)
@@ -231,7 +227,7 @@ class AtomContainer(object):
         deepcopy's memo function to stop anything else from being copied.
 
         Returns:
-            Tuple[AtomList, List[Bond]]: (list of copied atoms, list of copied bonds)
+            AtomList: list of copied atoms
         """
         oldatoms = self.atoms
         old_bond_graph = {a: {} for a in self.atoms}
@@ -289,7 +285,7 @@ class AtomContainer(object):
             atom.position = original.position
             atom.momentum = original.momentum
 
-        return newatoms
+        return AtomList(newatoms)
 
     ###########################################
     # Routines to modify the geometry
@@ -322,7 +318,7 @@ class AtomContainer(object):
         Args:
             matrix (numpy.ndarray): transformation matrix, shape=(4,4)
         """
-        # TODO: deal with units ...
+        # TODO: deal with units ... hard because the matrix has diff units for diff columns
         assert matrix.shape == (4, 4)
         positions = u.to_units_array(self.atoms.position)
         newpos = mdt.geometry._apply_4trans(matrix, positions)
@@ -333,6 +329,11 @@ class AtomContainer(object):
 class Bond(object):
     """
     A bond between two atoms.
+
+    Args:
+        a1 (Atom): First atom
+        a2 (Atom): Second atom (the order of atoms doesn't matter)
+        order (int): Order of the bond
 
     Notes:
         Comparisons and hashes involving bonds will return True if the atoms involved in the bonds
@@ -345,13 +346,6 @@ class Bond(object):
         order (int): bond order (can be ``None``); not used in comparisons
     """
     def __init__(self, a1, a2, order=None):
-        """ Initialization
-
-        Args:
-            a1 (Atom): First atom
-            a2 (Atom): Second atom
-            order (int): Order of the bond
-        """
         if a1.index > a2.index:
             a1, a2 = a2, a1
         self.a1 = a1
@@ -385,8 +379,10 @@ class Bond(object):
         return ff.bond_term[self]
 
     def __repr__(self):
-        try: return '<Bond: %s>' % str(self)
-        except: print '<Bond @ %s (error in __repr__)>' % id(self)
+        try:
+            return '<Bond: %s>'%str(self)
+        except:
+            print '<Bond @ %s (error in __repr__)>' % id(self)
 
     def __str__(self):
         return self.name
@@ -396,6 +392,9 @@ class ProtectedArray(object):
     """
     Descriptor for arrays that shouldn't be reassigned.
     Makes sure array attributes (specifically position and momentum) are modified in place
+
+    Args:
+        name (str): name of the instance attribute
     """
     def __init__(self, name):
         self.name = name
@@ -413,6 +412,10 @@ class AtomArray(ProtectedArray):
 
     Makes sure that the arrays and their references are maintained during both
     reassignment and copying/pickling
+
+    Args:
+        atomname (str): name of the attribute in the atom instance
+        parentname (str): name of the corresponding attribute in the molecule instance
     """
     def __init__(self, atomname, parentname):
         self.name = atomname
@@ -426,127 +429,130 @@ class AtomArray(ProtectedArray):
 
 
 class AtomCoordinate(object):
-    """
-    Descriptor for use with the ``Atom`` class.
+    """ Descriptor for use with the ``Atom`` class.
+
     Gives access to 3D coordinates as ``atom.x,atom.y,atom.z`` instead of
     ``atom.position[0],atom.position[1],atom.position[2]``
+
+    Args:
+        quantity (str): name of the attribute that this accesses
+        index (int): component of the attribute that this accesses
     """
-    def __init__(self, quantity, index):
-        self.quantity = quantity
+    def __init__(self, attrname, index):
+        self.attrname = attrname
         self.index = index
 
     def __get__(self, instance, cls):
-        array = getattr(instance, self.quantity)
+        array = getattr(instance, self.attrname)
         return array[self.index]
 
     def __set__(self, instance, value):
-        array = getattr(instance, self.quantity)
+        array = getattr(instance, self.attrname)
         array[self.index] = value
 
 
-class Atom(object):
+class AtomDrawingMixin(object):
+    """ Functions for creating atomic visualizations.
+
+    Note:
+        This is a mixin class designed only to be mixed into the :class:`Atom` class. Routines
+        are separated are here for code organization only - they could be included in the main
+        Atom class without changing any functionality
     """
-    Holds atomic info.
-    Once assigned to a Molecule, position and momentum are automatically linked to the molecule's
-    coordinates.
 
-    Attributes:
-        ndim (int): dimensionality of the atom (almost always 3, except for special model systems)
-        position (u.Vector[length]): atomic positions; len= ``self.ndim`` (almost always 3,
-            see self.ndims)
-        momentum (u.Vector[momentum]): atomic momenta, len= ``self.ndim``
-        element (str): IUPAC elemental symbol ('C', 'H', 'Cl', etc.)
-        atnum (int): atomic number (synonyms: atomic_num)
-        mass (u.Scalar[mass]): the atom's mass
-
-        residue (moldesign.Residue): biomolecular residue that this atom belongs to
-        chain (moldesign.Chain): biomolecular chain that this atom belongs to
-        parent (moldesign.Molecule): molecule that this atom belongs to
-        index (int): index in the parent molecule: ``atom is atom.parent.atoms[index]``
-
-        x,y,z (u.Scalar[length]): x, y, and z components of ``atom.position``
-        vx, vy, vz (u.Scalar[length/time]): x, y, of ``atom.velocity``
-        px, py, pz (u.Scalar[momentum]): x, y, and z of ``atom.momentum``
-        fx, fy, fz (u.Scalar[force]): x, y, and z ``atom.force``
-
-            Raises:
-                moldesign.molecule.NotCalculatedError: if forces are not calculated
-    """
-    x, y, z = (AtomCoordinate('position', i) for i in xrange(3))
-    vx, vy, vz = (AtomCoordinate('velocity', i) for i in xrange(3))
-    px, py, pz = (AtomCoordinate('momentum', i) for i in xrange(3))
-    fx, fy, fz = (AtomCoordinate('force', i) for i in xrange(3))
-    position = AtomArray('_position', 'positions')
-    momentum = AtomArray('_momentum', 'momenta')
-
-    #################################################################
-    # Methods for BUILDING the atom and indexing it in a molecule
-    def __init__(self, element=None, atnum=None, _ndim=3,
-                 mass=None, name=None, chain=None, residue=None,
-                 pdbname=None, pdbindex=None):
-        """Initialization: create an atom.
+    #@utils.args_from(mdt.molecule.Molecule.draw2d, allexcept=['highlight_atoms'])  # import order
+    def draw2d(self, **kwargs):
+        """ Draw a 2D viewer with this atom highlighted (Jupyter only).
+        In biomolecules, only draws the atom's residue.
 
         Args:
-            element (str): Elemental symbol (if not passed, determined from atnum if possible)
-            atnum (int): Atomic number (if not passed, determined from element if possible)
-            mass (u.Scalar[mass]): The atomic mass (if not passed, set to the abundant isotopic
-                mass)
-            name (str): The atom's name (if not passed, set to the element name + the atom's index
-            residue (moldesign.Residue): biomolecular residue that this atom belongs to
-            chain (moldesign.Chain): biomolecular chain that this atom belongs to
-            pdbname (str): name from PDB entry, if applicable
-            pdbindex (int): atom serial number in the PDB entry, if applicable
+            width (int): width of viewer in pixels
+            height (int): height of viewer in pixels
+
+        Returns:
+            mdt.ChemicalGraphViewer: viewer object
         """
+        if self.parent:
+            if self.parent.is_small_molecule:
+                return self.parent.draw2d(highlight_atoms=[self], **kwargs)
+            elif self.parent.is_biomolecule:
+                return self.residue.draw2d(highlight_atoms=[self], **kwargs)
+            else:
+                raise ValueError('No drawing routine specified')
+        else:
+            raise ValueError('No drawing routine specified')
 
-        if element: self.atnum = data.ATOMIC_NUMBERS[element]
-        else: self.atnum = atnum
+    #@utils.args_from(mdt.molecule.Molecule.draw2d, allexcept=['highlight_atoms'])  # import order
+    def draw3d(self, **kwargs):
+        """ Draw a 3D viewer with this atom highlighted (Jupyter only).
 
-        self.name = utils.if_not_none(name, self.elem)
-        self.pdbname = utils.if_not_none(pdbname, self.name)
-        self.pdbindex = pdbindex
+        Args:
+            width (int): width of viewer in pixels
+            height (int): height of viewer in pixels
 
-        if mass is None: self.mass = data.ATOMIC_MASSES[self.atnum]
-        else: self.mass = mass
+        Returns:
+            mdt.GeometryViewer: viewer object
+        """
+        return self.parent.draw3d(highlight_atoms=[self], **kwargs)
 
-        self.ndim = _ndim
-        self.residue = residue
-        self.chain = chain
-        self.parent = None
-        self.index = None
-        self.parent_slice = None
-        self._position = np.zeros(self.ndim) * u.default.length
-        self._momentum = np.zeros(self.ndim) * (u.default.length*
-                                                u.default.mass/u.default.time)
-        self._bond_graph = {}
+    def draw(self, width=300, height=300):
+        """ Draw a 2D and 3D viewer with this atom highlighted (notebook only)
 
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        if self.parent is not None:  # these don't belong to the atom anymore
-            state['_bond_graph'] = None
-            state['_position'] = self.position
-            state['_momentum'] = self.momentum
-        return state
+        Args:
+            width (int): width of viewer in pixels
+            height (int): height of viewer in pixels
+
+        Returns:
+            ipy.HBox: viewer object
+        """
+        import ipywidgets as ipy
+        viz2d = self.draw2d(width=width, height=height, display=False)
+        viz3d = self.draw3d(width=width, height=height, display=False)
+        return ipy.HBox([viz2d, viz3d])
+
+
+class AtomGeometryMixin(object):
+    """ Functions measuring distances between atoms and other things.
+
+    Note:
+        This is a mixin class designed only to be mixed into the :class:`Atom` class. Routines
+        are separated are here for code organization only - they could be included in the main
+        Atom class without changing any functionality
+    """
+    @moldesign.utils.callsigs.args_from(AtomContainer.distance)
+    def distance(self, *args, **kwargs):
+        return self._container.distance(*args, **kwargs)
+
+    @moldesign.utils.callsigs.args_from(AtomContainer.atoms_within)
+    def atoms_within(self, *args, **kwargs):
+        return self._container.atoms_within(*args, **kwargs)
+
+    @moldesign.utils.callsigs.args_from(AtomContainer.calc_distance_array)
+    def calc_distances(self, *args, **kwargs):
+        array = self._container.calc_distance_array(*args, **kwargs)
+        return array[0]
 
     @property
     def _container(self):
+        """ AtomContainer: a container with just this atom in it.
+
+        This is a convenience method for accessing to all of the :class:`AtomContainer`'s
+        useful methods for dealing with geometry
+        """
         return AtomList([self])
 
-    def copy(self):
-        return self._container.copy()[0]
 
-    @property
-    def properties(self):
-        """ moldesign.utils.DotDict: Returns any calculated properties for this atom
-        """
-        props = moldesign.utils.classes.DotDict()
-        for name, p in self.parent.properties.iteritems():
-            if hasattr(p, 'type') and p.type == 'atomic':
-                props[name] = p[self]
-        return props
+class AtomPropertyMixin(object):
+    """ Functions accessing computed atomic properties.
 
+    Note:
+        This is a mixin class designed only to be mixed into the :class:`Atom` class. Routines
+        are separated are here for code organization only - they could be included in the main
+        Atom class without changing any functionality
+    """
     @property
     def ff(self):
-        """ moldesign.utils.DotDict: This atom's force field parameters, if available ( ``None``
+        """ moldesign.utils.DotDict: This atom's force field parameters, if available (``None``
         otherwise)
         """
         try:
@@ -572,121 +578,25 @@ class Atom(object):
 
         return wfn.aobasis.on_atom.get(self, [])
 
-    def _set_parent(self, parent):
-        """ Permanently bind this atom to a parent molecule
-        """
-        if self.parent and (parent is not self.parent):
-            raise ValueError('Atom is already part of a molecule')
-        self.parent = parent
-
-    def _index_into_molecule(self, array_name, moleculearray, molslice):
-        """
-        Change the atom's position/momentum etc. arrays to be pointers into
-        the appropriate slices of the parent molecule's master array of positions/momenta
-
-        Args:
-            array_name: the private name of the array (assumes private name is '_'+array_name)
-            moleculearray: the molecule's master array
-            molslice: the python slice object
-        """
-        oldarray = getattr(self, array_name)
-        moleculearray[molslice] = oldarray
-        setattr(self, '_' + array_name, None)
-
-    def bond_to(self, other, order):
-        """ Create a bond to another atom
-
-        Args:
-            other (Atom): atom to bond to
-            order (int): bond order
-
-        Returns:
-            Bond: bond object
-        """
-        if self.parent is other.parent:
-            self.bond_graph[other] = other.bond_graph[self] = order
-            if self.parent is not None: self.parent.num_bonds += 1
-        else:  # allow unassigned atoms to be bonded to anything for building purposes
-            assert self.parent is None
-            self.bond_graph[other] = order
-        return Bond(self, other, order)
-
     @property
-    def bond_graph(self):
-        """ dict: a dictionary containing all other atoms this atom is bonded to, of the form
-           ``{nbr1: bond_order_1, nbr2: bond_order_2, ...}``
+    def properties(self):
+        """ moldesign.utils.DotDict: Returns any calculated properties for this atom
         """
-        if self.parent is None:
-            return self._bond_graph
-        else:
-            self._bond_graph = None
-            try:
-                return self.parent.bond_graph[self]
-            except KeyError:
-                self.parent.bond_graph[self] = {}
-                return self.parent.bond_graph[self]
+        props = moldesign.utils.classes.DotDict()
+        for name, p in self.parent.properties.iteritems():
+            if hasattr(p, 'type') and p.type == 'atomic':
+                props[name] = p[self]
+        return props
 
-    @bond_graph.setter
-    def bond_graph(self, value):
-        if self.parent is None:
-            self._bond_graph = value
-        else:
-            self._bond_graph = None
-            self.parent.bond_graph[self] = value
 
-    @property
-    def bonds(self):
-        """ List[Bond]: list of all bonds this atom is involved in
-        """
-        return [Bond(self, nbr, order) for nbr,order in self.bond_graph.iteritems()]
+class AtomReprMixin(object):
+    """ Functions for printing out various strings related to the atom.
 
-    @property
-    def force(self):
-        """ u.Vector[force]: force on this atom (len= ``self.ndims``)
-        """
-        f = self.parent.forces
-        return f[self.parent_slice]
-
-    @property
-    def velocity(self):
-        """ u.Vector[length/time]: atomic velocity, len= ``self.ndim``
-        """
-        return (self.momentum / self.mass).defunits()
-
-    #################################################################
-    # DISTANCE methods - these all reuse AtomContainer methods
-    @moldesign.utils.callsigs.args_from(AtomContainer.distance)  # TODO: make sure docstring is appropriate
-    def distance(self, *args, **kwargs):
-        return self._container.distance(*args, **kwargs)
-
-    @moldesign.utils.callsigs.args_from(AtomContainer.atoms_within)
-    def atoms_within(self, *args, **kwargs):
-        return self._container.atoms_within(*args, **kwargs)
-
-    @moldesign.utils.callsigs.args_from(AtomContainer.calc_distance_array)
-    def calc_distances(self, *args, **kwargs):
-        array = self._container.calc_distance_array(*args, **kwargs)
-        return array[0]
-
-    @moldesign.utils.callsigs.args_from(AtomContainer.copy)
-    def copy_topology(self, *args, **kwargs):
-        return self._container.copy()
-
-    #################################################################
-    # OUTPUT and visualization
-    @property
-    def num_bonds(self):
-        """ int: the number of other atoms this atom is bonded to
-        """
-        return len(self.bond_graph)
-
-    @property
-    def symbol(self):
-        """ str: elemental symbol
-        """
-        return data.ELEMENTS.get(self.atnum,'?')
-    elem = element = symbol
-
+    Note:
+        This is a mixin class designed only to be mixed into the :class:`Atom` class. Routines
+        are separated are here for code organization only - they could be included in the main
+        Atom class without changing any functionality
+    """
     def __str__(self):
         desc = '%s %s (elem %s)' % (self.__class__.__name__, self.name, self.elem)
         molstring = ''
@@ -705,59 +615,6 @@ class Atom(object):
                 return '<%s>' % self
         except:
             return '<%s at %s (exception in __repr__)>' % (self.__class__.__name__, id(self))
-
-
-    # notebook display functions below
-    def _repr_markdown_(self):
-        return self.markdown_summary()
-
-    def viewer_panes(self, width=300, height=300):
-        """ Draw a 2D and 3D viewer with this atom highlighted (Jupyter only)
-        Args:
-            width (int): width of viewer in pixels
-            height (int): height of viewer in pixels
-
-        Returns:
-            ipy.HBox: viewer object
-        """
-        import ipywidgets as ipy
-        viz2d = self.draw2d(width=width, height=height, display=False)
-        viz3d = self.draw3d(width=width, height=height, display=False)
-        return ipy.HBox([viz2d,
-                         viz3d])
-
-    def draw2d(self, **kwargs):
-        """ Draw a 2D viewer with this atom highlighted (Jupyter only).
-        In biomolecules, only draws the atom's residue.
-
-        Args:
-            width (int): width of viewer in pixels
-            height (int): height of viewer in pixels
-
-        Returns:
-            mdt.ChemicalGraphViewer: viewer object
-        """
-        if self.parent:
-            if self.parent.is_small_molecule:
-                return self.parent.draw2d(highlight_atoms=[self], **kwargs)
-            elif self.parent.is_biomolecule:
-                return self.residue.draw2d(highlight_atoms=[self], **kwargs)
-            else:
-                raise ValueError('No drawing routine specified')
-        else:
-            raise ValueError('No drawing routine specified')
-
-    def draw3d(self, **kwargs):
-        """ Draw a 3D viewer with this atom highlighted (Jupyter only).
-
-        Args:
-            width (int): width of viewer in pixels
-            height (int): height of viewer in pixels
-
-        Returns:
-            mdt.GeometryViewer: viewer object
-        """
-        return self.parent.draw3d(highlight_atoms=[self], **kwargs)
 
     def markdown_summary(self):
         """Return a markdown-formatted string describing this atom
@@ -815,6 +672,193 @@ class Atom(object):
 
         return '<br>'.join(lines)
 
+    def _repr_markdown_(self):
+        return self.markdown_summary()
+
+
+class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin):
+    """
+    Holds atomic info.
+    Once assigned to a Molecule, position and momentum are automatically linked to the molecule's
+    coordinates.
+
+    Args:
+        name (str): The atom's name (if not passed, set to the element name + the atom's index)
+        atnum (int): Atomic number (if not passed, determined from element if possible)
+        mass (u.Scalar[mass]): The atomic mass (if not passed, set to the most abundant isotopic
+            mass)
+        chain (moldesign.Chain): biomolecular chain that this atom belongs to
+        residue (moldesign.Residue): biomolecular residue that this atom belongs to
+        pdbname (str): name from PDB entry, if applicable
+        pdbindex (int): atom serial number in the PDB entry, if applicable
+        element (str): Elemental symbol (if not passed, determined from atnum if possible)
+
+    Attributes:
+        name (str): A descriptive name for this atom
+        element (str): IUPAC elemental symbol ('C', 'H', 'Cl', etc.)
+        index (int): the atom's current index in the molecule
+            (``self is self.parent.atoms[ self.index]``)
+
+        position (u.Vector[length, 3]): atomic positions
+        momentum (u.Vector[momentum, 3]): atomic momenta
+        atnum (int): atomic number (synonyms: atomic_num)
+        mass (u.Scalar[mass]): the atom's mass
+
+        residue (moldesign.Residue): biomolecular residue that this atom belongs to
+        chain (moldesign.Chain): biomolecular chain that this atom belongs to
+        parent (moldesign.Molecule): molecule that this atom belongs to
+        index (int): index in the parent molecule: ``atom is atom.parent.atoms[index]``
+
+        x,y,z (u.Scalar[length]): x, y, and z components of ``atom.position``
+        vx, vy, vz (u.Scalar[length/time]): x, y, of ``atom.velocity``
+        px, py, pz (u.Scalar[momentum]): x, y, and z of ``atom.momentum``
+        fx, fy, fz (u.Scalar[force]): x, y, and z ``atom.force``
+            Raises:
+                moldesign.molecule.NotCalculatedError: if forces are not calculated
+    """
+    x, y, z = (AtomCoordinate('position', i) for i in xrange(3))
+    vx, vy, vz = (AtomCoordinate('velocity', i) for i in xrange(3))
+    px, py, pz = (AtomCoordinate('momentum', i) for i in xrange(3))
+    fx, fy, fz = (AtomCoordinate('force', i) for i in xrange(3))
+    position = AtomArray('_position', 'positions')
+    momentum = AtomArray('_momentum', 'momenta')
+
+    #################################################################
+    # Methods for BUILDING the atom and indexing it in a molecule
+    def __init__(self, name=None, atnum=None, mass=None, chain=None, residue=None,
+                 pdbname=None, pdbindex=None, element=None):
+        if element: self.atnum = data.ATOMIC_NUMBERS[element]
+        else: self.atnum = atnum
+
+        self.name = utils.if_not_none(name, self.elem)
+        self.pdbname = utils.if_not_none(pdbname, self.name)
+        self.pdbindex = pdbindex
+
+        if mass is None: self.mass = data.ATOMIC_MASSES[self.atnum]
+        else: self.mass = mass
+
+        self.residue = residue
+        self.chain = chain
+        self.parent = None
+        self.index = None
+        self._parent_slice = None
+        self._position = np.zeros(self.ndim) * u.default.length
+        self._momentum = np.zeros(self.ndim) * (u.default.length*
+                                                u.default.mass/u.default.time)
+        self._bond_graph = {}
+
+    @moldesign.utils.callsigs.args_from(AtomContainer.copy)
+    def copy(self, *args, **kwargs):
+        return self._container.copy(*args, **kwargs)[0]
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        if self.parent is not None:  # these don't belong to the atom anymore
+            state['_bond_graph'] = None
+            state['_position'] = self.position
+            state['_momentum'] = self.momentum
+        return state
+
+    def _set_parent(self, parent):
+        """ Permanently bind this atom to a parent molecule
+
+        Args:
+            parent (moldesign.Molecule): the molecule that this atom will become a part of
+        """
+        if self.parent and (parent is not self.parent):
+            raise ValueError('Atom is already part of a molecule')
+        self.parent = parent
+
+    def _index_into_molecule(self, array_name, moleculearray, molslice):
+        """ Change the atom's position/momentum etc. arrays to be pointers into
+        the appropriate slices of the parent molecule's master array of positions/momenta
+
+        Args:
+            array_name: the private name of the array (assumes private name is '_'+array_name)
+            moleculearray: the molecule's master array
+            molslice: the python slice object
+
+        Note:
+            This will be called by the molecule's init method
+        """
+        oldarray = getattr(self, array_name)
+        moleculearray[molslice] = oldarray
+        setattr(self, '_' + array_name, None)
+
+    def bond_to(self, other, order):
+        """ Create a bond to another atom
+
+        Args:
+            other (Atom): atom to bond to
+            order (int): bond order
+
+        Returns:
+            Bond: bond object
+        """
+        if self.parent is other.parent:
+            self.bond_graph[other] = other.bond_graph[self] = order
+            if self.parent is not None: self.parent.num_bonds += 1
+        else:  # allow unassigned atoms to be bonded to anything for building purposes
+            assert self.parent is None
+            self.bond_graph[other] = order
+        return Bond(self, other, order)
+
+    @property
+    def bond_graph(self):
+        """ Mapping[Atom, int]: a dictionary containing all other atoms this atom is bonded to,
+        of the form
+           ``{nbr1: bond_order_1, nbr2: bond_order_2, ...}``
+        """
+        if self.parent is None:
+            return self._bond_graph
+        else:
+            self._bond_graph = None
+            try:
+                return self.parent.bond_graph[self]
+            except KeyError:
+                self.parent.bond_graph[self] = {}
+                return self.parent.bond_graph[self]
+
+    @bond_graph.setter
+    def bond_graph(self, value):
+        if self.parent is None:
+            self._bond_graph = value
+        else:
+            self._bond_graph = None
+            self.parent.bond_graph[self] = value
+
+    @property
+    def bonds(self):
+        """ List[Bond]: list of all bonds this atom is involved in
+        """
+        return [Bond(self, nbr, order) for nbr,order in self.bond_graph.iteritems()]
+
+    @property
+    def force(self):
+        """ u.Vector[force, 3]: force on this atom
+        """
+        f = self.parent.forces
+        return f[self._parent_slice]
+
+    @property
+    def velocity(self):
+        """ u.Vector[length/time, 3]: velocity of this atom
+        """
+        return (self.momentum / self.mass).defunits()
+
+    @property
+    def num_bonds(self):
+        """ int: the number of other atoms this atom is bonded to
+        """
+        return len(self.bond_graph)
+
+    @property
+    def symbol(self):
+        """ str: elemental symbol
+        """
+        return data.ELEMENTS.get(self.atnum,'?')
+    elem = element = symbol
+
 
 class AtomList(list, AtomContainer):
     """A list of atoms that allows attribute "slicing" - accessing an attribute of the
@@ -866,3 +910,9 @@ class AtomList(list, AtomContainer):
 
     def __getslice__(self, *args, **kwargs):
         return AtomList(super(AtomList, self).__getslice__(*args, **kwargs))
+
+
+# Hack for documentation only - sure these get picked up in the docs
+if mdt._building_docs:
+    __all__.extend(('AtomDrawingMixin AtomGeometryMixin AtomPropertyMixin AtomReprMixin '
+                    'AtomContainer').split())

@@ -214,7 +214,36 @@ ureg.Quantity = BuckyballQuantity
 ureg.Unit = MdtUnit
 
 # These synonyms are here solely so that we can write descriptive docstrings
-Scalar = Vector = Array = Tensor = BuckyballQuantity
+# TODO: use typing module to turn these into real abstract types
+class Scalar(BuckyballQuantity):
+    """ A scalar quantity (i.e., a single floating point number) with attached units
+    """
+    def __init__(self, *args):
+        raise NotImplementedError('This is an abstract class - use BuckyballQuantity instead')
+
+
+class Vector(BuckyballQuantity):
+    """ A vector quantity (i.e., a list of floats) with attached units, which behaves like a
+    1-dimensional numpy array
+    """
+    def __init__(self, *args):
+        raise NotImplementedError('This is an abstract class - use BuckyballQuantity instead')
+
+
+class Array(BuckyballQuantity):
+    """ A matrix quantity (i.e., a matrix of floats) with attached units, which behaves like a
+    2-dimensional numpy array
+    """
+    def __init__(self, *args):
+        raise NotImplementedError('This is an abstract class - use BuckyballQuantity instead')
+
+
+class Tensor(BuckyballQuantity):
+    """ A vector quantity (i.e., a list of floats) with attached units, which behaves like a
+    multidimensional numpy array
+    """
+    def __init__(self, *args):
+        raise NotImplementedError('This is an abstract class - use BuckyballQuantity instead')
 
 # Constants
 unity = ureg.angstrom / ureg.angstrom
