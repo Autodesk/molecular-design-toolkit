@@ -6,7 +6,6 @@ How do I ...?
   :depth: 2
 
 
-.. _create_small_mol:
 How do I create a small molecule?
 ---------------------------------
 You can use an IUPAC name:
@@ -46,7 +45,7 @@ a specific PDB code, you can use
 
 You can, of course, also read in files from a variety of formats:
 
-   >> mol = mdt.read('/path/to/3AID.pdb')
+   >>> mol = mdt.read('/path/to/3AID.pdb')
 
 Biomolecular assemblies
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -69,6 +68,23 @@ To create the full assembly, run
 Note:
    Only PDB-formatted files are currently supported for biomolecular assemblies - MMCif support
    is in progress.
+
+
+How do I measure bonds?
+-----------------------
+
+The :module:`moldesign.geometry` module contains a variety of methods for measuring (and
+manipulate geometry).
+
+You can get the distance between any two atoms with the
+:method:`atom.distance <moldesign.Atom.distance>` method.
+
+  >>> atom1.distance(atom2)
+  3.141592 angstrom
+
+
+
+
 
 
 
@@ -100,6 +116,7 @@ the molecule.
    <ElectronicState (rhf/6-31g) of Molecule: benzene>
 
 These properties are stored in a :class:`dict` at ``mol.properties``:
+
    >>> mol.properties.keys()
    ['electronic_state', 'positions', 'mulliken', 'potential_energy']
 
@@ -142,7 +159,6 @@ And you can visualize the minimization process using the trajectory object:
 
 How do I customize a 3D view?
 -----------------------------
-.. _api3d:
 First, create a viewer. It will be rendered in your notebook when it's the last object evaluated in a code cell.
 
    >>> import moldesign as mdt

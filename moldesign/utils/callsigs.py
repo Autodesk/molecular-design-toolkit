@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import functools
+import os
 from functools import wraps
 
 from .utils import if_not_none
@@ -19,7 +20,7 @@ from .utils import if_not_none
 
 def args_from(original_function,
               only=None, allexcept=None, inject_kwargs=None,
-              wrapper=None,
+              wraps=None,
               append_docstring_description=False, transfer_docstring_args=False):
     """
     Decorator to transfer call signatures - helps to hide ugly *args and **kwargs in delegated calls
@@ -31,7 +32,7 @@ def args_from(original_function,
     Args:
         original_function (callable): the function to take the call signature from
         only (List[str]): only transfer these arguments (incompatible with `allexcept`)
-        wrapper (bool): Transfer documentation and attributes from original_function to
+        wraps (bool): Transfer documentation and attributes from original_function to
             decorated_function, using functools.wraps (default: True if call signature is
             unchanged, False otherwise)
         allexcept (List[str]): transfer all except these arguments (incompatible with `only`)
@@ -45,9 +46,7 @@ def args_from(original_function,
         Decorator function
     """
     import funcsigs
-    # TODO - check 'self' behavior for instancemethods
-    # TODO - better integration with functools (esp. by using partial to mask arguments)
-    # TODO - deal with docstrings
+    # TODO - deal with docstrings - how does wraps interact with append/transfer_docstring?
     # NEWFEATURE - verify arguments?
 
     if append_docstring_description or transfer_docstring_args:
@@ -61,7 +60,7 @@ def args_from(original_function,
 
     # Modify the call signature if necessary
     if only or allexcept or inject_kwargs:
-        wrapper = if_not_none(wrapper, False)
+        wraps = if_not_none(wraps, False)
         newparams = []
         if only:
             for param in only:
@@ -76,12 +75,21 @@ def args_from(original_function,
                 newparams.append(newp)
         sig = sig.replace(parameters=newparams)
     else:
-        wrapper = if_not_none(wrapper, True)
+        wraps = if_not_none(wraps, True)
 
     def decorator(f):
         """Modify f's call signature (using the `__signature__` attribute)"""
-        if wrapper: f = functools.wraps(original_function)(f)
+        if wraps:
+            f = functools.wraps(original_function)(f)
         f.__signature__ = sig
+
+        # Modify docstring for documentation only
+        if os.environ.get('SPHINX_IS_BUILDING_DOCS', ""):
+            sigstring = '%s%s\n' % (f.__name__, sig)
+            if hasattr(f, '__doc__') and f.__doc__ is not None:
+                f.__doc__ = sigstring + f.__doc__
+            else:
+                f.__doc__ = sigstring
         return f
 
     return decorator

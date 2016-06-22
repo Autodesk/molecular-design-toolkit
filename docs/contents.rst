@@ -10,7 +10,7 @@
    Energy models <energymodels>
    Integrators <integrators>
    The top-level namespace <toplevel>
-   Complete API reference <moldesign_api/moldesign>
+   Complete API reference <_moldesign_api/moldesign>
 
 
 * :ref:`Alphabetical index <genindex>`
