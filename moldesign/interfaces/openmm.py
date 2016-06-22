@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import tempfile
 import itertools
+import tempfile
 from cStringIO import StringIO
 
 import numpy as np
@@ -31,11 +31,11 @@ else:
 from pyccc import LocalFile
 
 import moldesign as mdt
-from moldesign import forcefield as ff
+from moldesign.methods import forcefield as ff
 from moldesign import units as u
 from moldesign import compute
-from moldesign.molecule import Molecule, MolecularProperties
-from moldesign.trajectory import Trajectory
+from moldesign.structure.molecule import Molecule, MolecularProperties
+from moldesign.structure.trajectory import Trajectory
 
 
 class OpenMMPickleMixin(object):
@@ -55,7 +55,7 @@ class OpenMMPickleMixin(object):
         self.__dict__.update(state)
 
 
-class OpenMMBaseIntegrator(mdt.basemethods.IntegratorBase, OpenMMPickleMixin):
+class OpenMMBaseIntegrator(moldesign.methods.basemethods.IntegratorBase, OpenMMPickleMixin):
     _openmm_compatible = True
 
     def prep(self):
@@ -114,7 +114,7 @@ class OpenMMVerlet(OpenMMBaseIntegrator):
         return integrator
 
 
-class OpenMMLangevin(mdt.basemethods.LangevinBase, OpenMMBaseIntegrator):
+class OpenMMLangevin(moldesign.methods.basemethods.LangevinBase, OpenMMBaseIntegrator):
     def get_openmm_integrator(self):
         integrator = mm.LangevinIntegrator(
             pint2simtk(self.params.temperature),
@@ -123,7 +123,7 @@ class OpenMMLangevin(mdt.basemethods.LangevinBase, OpenMMBaseIntegrator):
         return integrator
 
 
-class OpenMMPotential(mdt.basemethods.MMBase, OpenMMPickleMixin):
+class OpenMMPotential(moldesign.methods.basemethods.MMBase, OpenMMPickleMixin):
     """Creates an OpenMM "context" to drive energy calculations.
     Note that, while a dummy integrator is assigned, a different context will
     be created for any MD calculations.

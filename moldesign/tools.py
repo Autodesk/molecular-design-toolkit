@@ -11,11 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import moldesign as mdt
-import moldesign.units as u
-
-from moldesign.interfaces.pdbfixer_interface import mutate, solvate
-from moldesign.interfaces.openbabel import add_hydrogen, guess_bond_orders
 
 
 __all__ = "add_hydrogen guess_bond_orders mutate solvate".split()

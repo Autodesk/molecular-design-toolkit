@@ -26,7 +26,7 @@ class MinimizerBase(object):
     constraint_restraints = True  # if True, add restraint penalties for both constraints and restraints
 
     def __init__(self, mol, nsteps=20,
-                 force_tolerance=mdt.data.DEFAULT_FORCE_TOLERANCE,
+                 force_tolerance=moldesign.core.data.DEFAULT_FORCE_TOLERANCE,
                  frame_interval=None,
                  restraint_multiplier=1.0):
         self.mol = mol

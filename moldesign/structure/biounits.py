@@ -14,8 +14,8 @@
 import moldesign as mdt
 import moldesign.utils.callsigs
 import moldesign.utils.classes
-from moldesign import utils, data
-from moldesign.atoms import AtomContainer, AtomList
+from moldesign import data
+from moldesign.structure.atoms import AtomContainer, AtomList
 
 
 __all__ = 'Chain Residue Instance'.split()
@@ -460,7 +460,7 @@ class Residue(Entity):
             lines.append("**Residue code**: %s" % self.resname)
         lines.append('**Type**: %s' % self.type)
         if self.resname in data.RESIDUE_DESCRIPTIONS:
-            lines.append('**Description**: %s' % data.RESIDUE_DESCRIPTIONS[self.resname])
+            lines.append('**Description**: %s'%data.RESIDUE_DESCRIPTIONS[self.resname])
 
         lines.append('**<p>Chain:** %s' % self.chain.name)
         lines.append('**Sequence number**: %d' % self.pdbindex)

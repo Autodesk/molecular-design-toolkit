@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import collections
+
+import ipywidgets as ipy
 import numpy as np
 import scipy.spatial.distance
-import ipywidgets as ipy
 
 import moldesign as mdt
 from moldesign import units as u
-from moldesign.interfaces import symmol_interface as smi
 from moldesign.external import transformations as trns
+from moldesign.interfaces import symmol_interface as smi
 
 get_symmetry = smi.run_symmol
 

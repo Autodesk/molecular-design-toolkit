@@ -20,8 +20,8 @@ import moldesign as mdt
 import moldesign.utils
 import moldesign.utils.callsigs
 import moldesign.utils.classes
-from moldesign import units as u, utils
 from moldesign import data, utils, viewer, ui
+from moldesign import units as u
 from moldesign.external import transformations
 
 __all__ = 'Atom AtomList Bond'.split()
@@ -321,7 +321,7 @@ class AtomContainer(object):
         # TODO: deal with units ... hard because the matrix has diff units for diff columns
         assert matrix.shape == (4, 4)
         positions = u.to_units_array(self.atoms.position)
-        newpos = mdt.geometry._apply_4trans(matrix, positions)
+        newpos = moldesign.geom.geometry._apply_4trans(matrix, positions)
         for atom, r in zip(self.atoms, newpos):
             atom.position = r
 
@@ -573,7 +573,7 @@ class AtomPropertyMixin(object):
             return None
         try:
             wfn = self.parent.electronic_state
-        except mdt.molecule.NotCalculatedError:
+        except moldesign.structure.molecule.NotCalculatedError:
             return None
 
         return wfn.aobasis.on_atom.get(self, [])
@@ -856,7 +856,7 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
     def symbol(self):
         """ str: elemental symbol
         """
-        return data.ELEMENTS.get(self.atnum,'?')
+        return data.ELEMENTS.get(self.atnum, '?')
     elem = element = symbol
 
 

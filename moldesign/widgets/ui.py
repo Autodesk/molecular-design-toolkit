@@ -18,8 +18,8 @@ import ipywidgets as ipy
 import traitlets
 
 import moldesign as mdt
-import moldesign.geometry as geo
-from moldesign import utils, viewer, units as u
+import moldesign.geom.geometry as geo
+from moldesign import utils, units as u
 
 
 class Selector(object):

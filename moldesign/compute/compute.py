@@ -11,14 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import functools
 import logging
 import types
 
-import moldesign as mdt
 import pyccc.python as bpy
-from moldesign.utils import DotDict, if_not_none
-from moldesign import config, utils
+from moldesign import utils
+from moldesign.compute import config
+from moldesign.utils import if_not_none
 
 
 class BuckyLog(logging.Logger):
@@ -131,7 +130,7 @@ class RunsRemotely(object):
                                 name=self.jobname,
                                 sendsource=self.sendsource)
             if self.display:
-                mdt.logs.display(job, title=f.__name__)
+                moldesign.widgets.logs.display(job, title=f.__name__)
 
             if wait:
                 job.wait()
@@ -144,6 +143,7 @@ class RunsRemotely(object):
 
 
 runsremotely = RunsRemotely  # because decorators should be lower case
+
 
 class DummyJob(object):
     """
@@ -166,3 +166,5 @@ class DummyJob(object):
         self.result = result
         if updated_object:
             self.updated_object = updated_object
+
+

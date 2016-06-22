@@ -11,20 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import numpy as np
 import cgi
 import collections
 import functools
 import re
 
 import ipywidgets as ipy
+import numpy as np
 
 import moldesign as mdt
+import moldesign.widgets.logs
+from moldesign import compute
 from moldesign import units as u
-import moldesign.logs
+from moldesign.methods import basemethods
 from moldesign.utils import if_not_none, DotDict
-from moldesign import compute, basemethods
-from moldesign import ui
 
 IMAGE = 'ambertools'
 
@@ -128,7 +128,7 @@ def am1_bcc_charges(mol, minsteps=None, wait=True):
                           name="am1-bcc, %s" % mol.name,
                           inputs={'mol.pdb': mol.write(format='pdb')},
                           when_finished=parse_mol2)
-    moldesign.logs.display(job, job.name)
+    moldesign.widgets.logs.display(job, job.name)
     if not wait: return job()
     else: job.wait()
 
@@ -144,7 +144,7 @@ def build_bdna(sequence,
     :param engine: compute engine
     :return: moldesign.molecule.Molecule
     """
-    from moldesign import converters
+    from moldesign.structure import converters
 
     infile = 'molecule m;\nm = bdna( "%s" );\nputpdb( "helix.pdb", m, "-wwpdb");\n' % sequence.lower()
     engine = if_not_none(engine, compute.default_engine)
@@ -154,7 +154,7 @@ def build_bdna(sequence,
                         command='nab -o buildbdna build.nab && ./buildbdna',
                         inputs={'build.nab': infile},
                         name='NAB_build_bdna')
-    moldesign.logs.display(job, job.name)
+    moldesign.widgets.logs.display(job, job.name)
     job.wait()
     mol = converters.read(job.get_output('helix.pdb'), format='pdb')
     mol.name = 'BDNA: %s' % sequence
@@ -223,7 +223,7 @@ def run_tleap(mol,
                         command,
                         inputs=inputs,
                         name="tleap, %s"% mol.name)
-    mdt.logs.display(job, "tleap, %s" % mol.name)
+    moldesign.widgets.logs.display(job, "tleap, %s"%mol.name)
     job.wait()
 
     return job
@@ -234,7 +234,7 @@ def assign_forcefield(mol, **kwargs):
     job = run_tleap(mol, **kwargs)
     report = ParamterizationDisplay(job, mol)
     if report.msg:
-        mdt.logs.display(report, title='ERRORS/WARNINGS')
+        moldesign.widgets.logs.display(report, title='ERRORS/WARNINGS')
     if 'output.inpcrd' in job.get_output():
         prmtop = job.get_output('output.prmtop')
         inpcrd = job.get_output('output.inpcrd')
@@ -279,7 +279,7 @@ def get_gaff_parameters(mol, charges, image=IMAGE, engine=None):
                           ' && '.join(cmds),
                           inputs=inputs,
                           name="GAFF assignments" % mol.name)
-    mdt.logs.display(job, "tleap, %s" % mol.name)
+    moldesign.widgets.logs.display(job, "tleap, %s"%mol.name)
     job.wait()
 
     param = GAFFParameters(job.get_output('mol.lib'),

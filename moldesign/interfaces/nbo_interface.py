@@ -13,12 +13,11 @@
 # limitations under the License.
 import numpy as np
 
-import moldesign.logs
-from moldesign.utils import DotDict
-
 import moldesign as mdt
+import moldesign.widgets.logs
 from moldesign import units as u
 from moldesign import utils
+from moldesign.utils import DotDict
 
 
 SIGMA_UTF = u"\u03C3"
@@ -37,7 +36,7 @@ def run_nbo(mol, requests=('nlmo', 'nbo'),
                           command,
                           inputs=inputs,
                           name="nbo, %s" % mol.name)
-    moldesign.logs.display(job, "nbo, %s" % mol.name)
+    moldesign.widgets.logs.display(job, "nbo, %s"%mol.name)
 
     job.wait()
     parsed_data = parse_nbo(job.get_output('FILE.10'),
@@ -90,13 +89,13 @@ def add_orbitals(mol, wfn, orbdata, orbtype):
                                            atoms[0].name, atoms[1].name)
         name = '%s %s' % (bname, orbtype)
 
-        orbs.append(mdt.orbitals.Orbital(orbdata.coeffs[i],
-                                        wfn=wfn, occupation=orbdata.occupations[i],
-                                        atoms=atoms, name=name,
-                                        nbotype=nbotype,
-                                        bond=bond,
-                                        unicode_name=utf_name,
-                                        _data=orbdata))
+        orbs.append(moldesign.methods.orbitals.Orbital(orbdata.coeffs[i],
+                                                       wfn=wfn, occupation=orbdata.occupations[i],
+                                                       atoms=atoms, name=name,
+                                                       nbotype=nbotype,
+                                                       bond=bond,
+                                                       unicode_name=utf_name,
+                                                       _data=orbdata))
     return wfn.add_orbitals(orbs, orbtype=orbtype)
 
 

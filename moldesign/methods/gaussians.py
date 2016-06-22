@@ -13,7 +13,7 @@
 # limitations under the License.
 import numpy as np
 
-from moldesign.orbitals import Orbital, SHELLS, SPHERICALNAMES
+from moldesign.methods.orbitals import Orbital, SHELLS, SPHERICALNAMES
 
 
 class AbstractFunction(object):

@@ -12,19 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
+import time
 from cStringIO import StringIO
-from collections import OrderedDict
 
 import ipywidgets as ipy
 import numpy as np
-import time
 
 import moldesign as mdt
-import moldesign.units as u
-from moldesign import ui
+from moldesign import units as u
 from moldesign.units import default
 from moldesign.utils import DotDict
-
+from moldesign.widgets import ui
 
 __all__ = 'Trajectory TrajectoryViz'.split()
 
@@ -58,7 +56,7 @@ class Frame(DotDict):
 
     Example:
         >>> mol = mdt.from_name('benzene')
-        >>> mol.set_potential_model(mdt.models.RHF(basis='3-21g'))
+        >>> mol.set_potential_model(moldesign.methods.models.RHF(basis='3-21g'))
         >>> traj = mol.minimize()
         >>> starting_frame = traj.frames[0]
         >>> assert starting_frame.potential_energy >= traj.frames[-1].potential_energy
@@ -283,7 +281,8 @@ class Trajectory(object):
         energies = []
         for frame in self.frames:
             if 'momenta' in frame:
-                energies.append(mdt.helpers.kinetic_energy(frame.momenta, self.mol.dim_masses))
+                energies.append(
+                    moldesign.core.helpers.kinetic_energy(frame.momenta, self.mol.dim_masses))
             else:
                 convert_units = False
                 energies.append(None)
@@ -301,7 +300,7 @@ class Trajectory(object):
         dof = self.mol.dynamic_dof
         for energy, frame in zip(energies, self.frames):
             if energy is not None:
-                temps.append(mdt.helpers.kinetic_temperature(energy, dof))
+                temps.append(moldesign.core.helpers.kinetic_temperature(energy, dof))
             else:
                 convert_units = False
                 temps.append(None)
@@ -326,7 +325,7 @@ class Trajectory(object):
                 continue
             if prop in frame:
                 setattr(m, prop, frame[prop])
-        m.properties = mdt.molecule.MolecularProperties(m)
+        m.properties = moldesign.structure.molecule.MolecularProperties(m)
         for attr in frame:
             m.properties[attr] = frame[attr]
 

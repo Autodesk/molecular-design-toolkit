@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import moldesign as mdt
-from moldesign import basemethods
-import moldesign.units as u
+from moldesign.methods import basemethods
+
 
 class NonbondedQMMM(basemethods.QMMMBase):
     """

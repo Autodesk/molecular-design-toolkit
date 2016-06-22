@@ -16,10 +16,10 @@ This module mostly contains potential energy classes for users to import.
 TODO: look into http://molmod.github.io/
 TODO: log errors rather than just printing them
 """
-import moldesign
 import numpy as np
-from moldesign.basemethods import EnergyModelBase
+
 from moldesign import units as u
+from moldesign.methods.basemethods import EnergyModelBase
 
 try:
     from moldesign.interfaces.openmm import OpenMMPotential

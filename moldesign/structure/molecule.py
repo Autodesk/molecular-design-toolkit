@@ -11,15 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import string
 
 import numpy as np
+from moldesign.data import RESTYPES
 
 import moldesign as mdt
-import moldesign.units as u
-from moldesign import ui, utils, biounits
+from moldesign import ui, utils
+from moldesign import units as u
 from moldesign.compute import DummyJob
-from moldesign.data import RESTYPES
+from moldesign.structure import biounits
 
 __all__ = 'Molecule NotCalculatedError NoConvergence MolecularProperties'.split()
 
@@ -55,7 +55,7 @@ class MolecularProperties(utils.DotDict):
         return np.array_equal(self.positions, mol.positions)
 
 
-class Molecule(mdt.atoms.AtomContainer):
+class Molecule(moldesign.structure.atoms.AtomContainer):
     """
     This is moldesign's principal object. It stores a list of atoms in 3D space
     and handles interfaces with energy and dynamics models.
@@ -110,8 +110,8 @@ class Molecule(mdt.atoms.AtomContainer):
     """
 
     # TODO: UML diagrams, describe structure
-    positions = mdt.atoms.ProtectedArray('_positions')
-    momenta = mdt.atoms.ProtectedArray('_momenta')
+    positions = moldesign.structure.atoms.ProtectedArray('_positions')
+    momenta = moldesign.structure.atoms.ProtectedArray('_momenta')
 
     def __init__(self, atomcontainer,
                  name=None, bond_graph=None,
@@ -125,7 +125,7 @@ class Molecule(mdt.atoms.AtomContainer):
         super(Molecule, self).__init__()
 
         # copy atoms from another object (i.e., a molecule)
-        oldatoms = mdt.helpers.get_all_atoms(atomcontainer)
+        oldatoms = moldesign.core.helpers.get_all_atoms(atomcontainer)
 
         if copy_atoms or (oldatoms[0].parent is not None):
             print 'INFO: Copying atoms into new molecule'
@@ -246,7 +246,7 @@ class Molecule(mdt.atoms.AtomContainer):
         Returns:
             moldesign.geometry.FixedPosition: constraint object
         """
-        self.constraints.append(mdt.geometry.FixedPosition(atom, value=pos))
+        self.constraints.append(moldesign.geom.geometry.FixedPosition(atom, value=pos))
         self._reset_methods()
         return self.constraints[-1]
 
@@ -261,7 +261,8 @@ class Molecule(mdt.atoms.AtomContainer):
         Returns:
             moldesign.geometry.DistanceConstraint: constraint object
         """
-        self.constraints.append(mdt.geometry.DistanceConstraint(atom1, atom2, value=dist))
+        self.constraints.append(
+            moldesign.geom.geometry.DistanceConstraint(atom1, atom2, value=dist))
         self._reset_methods()
         return self.constraints[-1]
 
@@ -277,7 +278,8 @@ class Molecule(mdt.atoms.AtomContainer):
         Returns:
             moldesign.geometry.AngleConstraint: constraint object
         """
-        self.constraints.append(mdt.geometry.AngleConstraint(atom1, atom2, atom3, value=angle))
+        self.constraints.append(
+            moldesign.geom.geometry.AngleConstraint(atom1, atom2, atom3, value=angle))
         self._reset_methods()
         return self.constraints[-1]
 
@@ -294,7 +296,8 @@ class Molecule(mdt.atoms.AtomContainer):
         Returns:
             moldesign.geometry.AngleConstraint: constraint object
         """
-        self.constraints.append(mdt.geometry.DihedralConstraint(atom1, atom2, atom3, atom4, value=angle))
+        self.constraints.append(
+            moldesign.geom.geometry.DihedralConstraint(atom1, atom2, atom3, atom4, value=angle))
         self._reset_methods()
         return self.constraints[-1]
 
@@ -438,7 +441,7 @@ class Molecule(mdt.atoms.AtomContainer):
     def kinetic_energy(self):
         r""" u.Scalar[energy]: Classical kinetic energy :math:`\sum_{\text{atoms}} \frac{p^2}{2m}`
         """
-        return mdt.helpers.kinetic_energy(self.momenta, self.dim_masses)
+        return moldesign.core.helpers.kinetic_energy(self.momenta, self.dim_masses)
 
     @property
     def kinetic_temperature(self):
@@ -449,8 +452,8 @@ class Molecule(mdt.atoms.AtomContainer):
         where :math:`E_{\text{kin}}` is the kinetic energy and :math:`f` is the number of
         degrees of freedom (see :meth:`dynamic_dof <Molecule.dynamic_dof>`)
         """
-        return mdt.helpers.kinetic_temperature(self.kinetic_energy,
-                                               self.dynamic_dof)
+        return moldesign.core.helpers.kinetic_temperature(self.kinetic_energy,
+                                                          self.dynamic_dof)
 
     @property
     def dynamic_dof(self):
@@ -750,7 +753,6 @@ class Molecule(mdt.atoms.AtomContainer):
         Returns:
             moldesign.ui.SelectionGroup
         """
-        import ipywidgets as ipy
         if self.is_small_molecule:
             return super(Molecule, self).draw(**kwargs)
         else:
@@ -762,7 +764,7 @@ class Molecule(mdt.atoms.AtomContainer):
         Returns:
             mdt.orbitals.OrbitalViz
         """
-        return mdt.orbitals.OrbitalViz(self, **kwargs)
+        return moldesign.methods.orbitals.OrbitalViz(self, **kwargs)
 
     def get_stoichiometry(self, html=False):
         """ Return this molecule's stoichiometry

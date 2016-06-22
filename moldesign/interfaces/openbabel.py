@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import
+
 import os
 import string
 
@@ -26,10 +27,9 @@ else:  # this should be configurable
 
 import moldesign as mdt
 from moldesign.compute import runsremotely
-import moldesign.atoms
+import moldesign.structure.atoms
 from moldesign.units import *
-from moldesign.molecule import Molecule
-from moldesign import biounits
+from moldesign.structure import biounits
 
 
 def read_file(filename, name=None, format=None):
@@ -240,7 +240,7 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
     newatom_map = {}
     newresidues = {}
     newchains = {}
-    newatoms = moldesign.atoms.AtomList([])
+    newatoms = moldesign.structure.atoms.AtomList([])
     backup_chain_names = list(string.ascii_uppercase)
 
     for pybatom in pbmol.atoms:
@@ -258,11 +258,11 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
         elif pybatom.atomicnum == 0:
             print "WARNING: openbabel failed to parse atom serial %d (name:%s); guessing %s. " % (
                 pybatom.OBAtom.GetIdx(), name, name[0])
-            atnum = mdt.data.ATOMIC_NUMBERS[name[0]]
+            atnum = moldesign.core.data.ATOMIC_NUMBERS[name[0]]
         else:
             atnum = pybatom.atomicnum
-        mdtatom = moldesign.atoms.Atom(atnum=atnum, name=name,
-                                      pdbname=name, pdbindex=pybatom.OBAtom.GetIdx())
+        mdtatom = moldesign.structure.atoms.Atom(atnum=atnum, name=name,
+                                                 pdbname=name, pdbindex=pybatom.OBAtom.GetIdx())
         newatom_map[pybatom.OBAtom.GetIdx()] = mdtatom
         mdtatom.position = pybatom.coords * angstrom
         obres = pybatom.OBAtom.GetResidue()

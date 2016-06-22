@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import math
-import numpy as np
-import moldesign as mdt
-import moldesign.geometry as geo
-import moldesign.units as u
 
+import numpy as np
+
+import moldesign as mdt
+import moldesign.geom.geometry as geo
+from moldesign import units as u
 from moldesign.interfaces.ambertools import assign_forcefield
 
 

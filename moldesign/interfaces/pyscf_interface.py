@@ -14,7 +14,6 @@
 from cStringIO import StringIO
 
 import numpy as np
-
 from moldesign.gaussians import ERI4FoldTensor
 
 try:
@@ -32,11 +31,12 @@ except OSError as exc:  # TODO: on OSX, this does ... something
 else:
     force_remote = False
 
-import moldesign.gaussians as gs
+import moldesign.methods.gaussians as gs
 from moldesign import compute
 from moldesign.utils import if_not_none, redirect_stderr, DotDict
-from moldesign import basemethods, orbitals, logs
-from moldesign import units as u
+from moldesign.widgets import logs
+from moldesign.methods import orbitals, basemethods
+from moldesign.core import units as u
 
 
 def mol_to_pyscf(mol, basis, symmetry=None, charge=0, positions=None):

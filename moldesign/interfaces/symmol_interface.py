@@ -17,7 +17,7 @@ import fortranformat as ff
 import numpy as np
 
 import moldesign as mdt
-import moldesign.logs
+import moldesign.widgets.logs
 from moldesign import units as u
 from moldesign import utils
 
@@ -50,7 +50,7 @@ def run_symmol(mol,
                           command,
                           inputs=inputs,
                           name="symmol, %s" % mol.name)
-    moldesign.logs.display(job, "symmol, %s" % mol.name)
+    moldesign.widgets.logs.display(job, "symmol, %s"%mol.name)
     job.wait()
 
     data = parse_output(job.get_output('symmol.out'))

@@ -11,11 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from moldesign.trajectory import Trajectory
-
 from moldesign import units as u
-from moldesign.basemethods import IntegratorBase
-from moldesign.interfaces.openmm import OpenMMLangevin, OpenMMVerlet, OpenMMBaseIntegrator
+from moldesign.methods.basemethods import IntegratorBase
+from moldesign.structure.trajectory import Trajectory
 
 
 class VelocityVerlet(IntegratorBase):

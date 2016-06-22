@@ -20,8 +20,8 @@ except ImportError:
 else:
     force_remote = False
 
-import moldesign.units as u
 import moldesign.interfaces.openmm as opm
+from moldesign import units as u
 
 
 def add_hydrogen(mol, pH=7.4):

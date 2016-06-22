@@ -27,10 +27,10 @@ import collections
 
 import ipywidgets as ipy
 import numpy as np
+from moldesign.viewer import GeometryViewer
 
 from moldesign import units as u, ui
 from moldesign.utils import DotDict, Alias
-from moldesign.viewer import GeometryViewer
 
 SHELLS = {0: 's', 1: 'p', 2: 'd', 3: 'f', 4: 'g', 5: 'h'}
 ANGMOM = {v: k for k, v in SHELLS.iteritems()}

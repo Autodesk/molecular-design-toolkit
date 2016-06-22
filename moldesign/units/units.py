@@ -22,7 +22,7 @@ from pint import UnitRegistry, set_application_registry, DimensionalityError
 
 # Set up pint's unit definitions
 ureg = UnitRegistry()
-unit_def_file = join(abspath(dirname(__file__)), 'static/pint_atomic_units.txt')
+unit_def_file = join(abspath(dirname(__file__)), '../static/pint_atomic_units.txt')
 ureg.load_definitions(unit_def_file)
 set_application_registry(ureg)
 
@@ -195,13 +195,13 @@ class BuckyballQuantity(ureg.Quantity):
     # defunits = ureg.Quantity.to_base_units  # replacing this with the new pint implementation
     def defunits(self):
         """Return this quantity in moldesign's default unit system (as specified in moldesign.units.default)"""
-        import moldesign.units as u
-        return u.default.convert(self)
+        #import moldesign.core.units as u
+        return default.convert(self)
 
     # defunits_inplace = ureg.Quantity.ito_base_units  # replacing this with the new pint implementation
     def defunits_inplace(self):
         """Internally convert quantity to default units"""
-        import moldesign.units as u
+        from moldesign import units as u
         newunit = u.default.get_baseunit(self)
         return self.ito(newunit)
 

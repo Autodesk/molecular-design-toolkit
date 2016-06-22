@@ -15,15 +15,15 @@
 This module contains abstract base classes for potential models, integrators, and various
 associated data types (force fields, orbitals, basis sets, etc.).
 """
-import sys
 
 import numpy as np
+
 import moldesign as mdt
 from moldesign import units as u
+from moldesign.keywords import integrator_parameters as ips
 from moldesign.keywords import mm_model_parameters as mmp
 from moldesign.keywords import qm_model_parameters as qmp
-from moldesign.keywords import integrator_parameters as ips
-from moldesign.utils import DotDict, if_not_none
+from moldesign.utils import DotDict
 
 
 def _make_method(cls, params, mol):

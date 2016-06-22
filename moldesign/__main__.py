@@ -22,17 +22,16 @@ won't be working with molecules or atoms in this module.
 """
 import argparse
 import distutils.spawn
+import errno
 import os
 import random
 import shutil
 import socket
 import subprocess
 import sys
-import errno
 import time
 
 import yaml
-
 
 URL_OPENERS = ['Open', 'xdg-open', 'sensible-browser', 'gnome-open', 'x-www-browser']
 JUPYTERPORT = 8888
@@ -101,7 +100,8 @@ def main():
 
 DOCKER_IMAGES = 'ambertools14 moldesign moldesign_notebook opsin symmol python_install'.split()
 def pull():
-    from moldesign import config, compute
+    from moldesign import compute
+    from moldesign.compute import config
     assert config.config_yaml.default_engine == 'docker', 'Pull only works for docker engines'
     assert config.config_yaml.default_repository, "Can't pull - no repository specified"
     streams = []

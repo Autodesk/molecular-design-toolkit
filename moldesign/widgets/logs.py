@@ -11,16 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from collections import OrderedDict
-import logging
-
-import collections
-import ipywidgets as ipy
-import traitlets
-import IPython.display
 import base64
 import io
+import logging
 import os
+from collections import OrderedDict
+
+import IPython.display
+import ipywidgets as ipy
+import traitlets
 
 import moldesign as mdt
 
@@ -181,7 +180,7 @@ else:
     widgets_enabled = True
 
 if widgets_enabled:
-    class LoggingTabs(mdt.ui.StyledTab):
+    class LoggingTabs(moldesign.widgets.ui.StyledTab):
         def __init__(self, objects, display=False, **kwargs):
             """
             :param objects: dict of form {TITLE: <display object>}

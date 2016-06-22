@@ -14,10 +14,11 @@
 import json
 import os
 
-from moldesign import utils
+import moldesign as mdt
 import moldesign.units as u
+from moldesign import utils
 
-PACKAGEPATH = os.path.abspath(os.path.dirname(__file__))
+PACKAGEPATH = os.path.abspath(os.path.dirname(mdt.__file__))
 
 ##### ATOM DATA
 ATOMIC_NUMBERS = {'Ac': 89, 'Ag': 47, 'Al': 13, 'Am': 95, 'Ar': 18, 'As': 33, 'At': 85, 'Au': 79,

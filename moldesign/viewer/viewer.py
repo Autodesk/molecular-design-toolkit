@@ -15,19 +15,17 @@ import collections
 import sys
 from itertools import product
 
-import numpy as np
 import IPython.display as dsp
+import numpy as np
 import webcolors
 
-from nbmolviz.drivers3d import MolViz_3DMol
-from nbmolviz.widget2d import MolViz2DBaseWidget
-
 import moldesign as mdt
-import moldesign.units as u
+from moldesign import units as u
 from moldesign import utils
 from moldesign.data import color_rotation
-
-from moldesign.geometry import perpendicular
+from moldesign.geom.geometry import perpendicular
+from nbmolviz.drivers3d import MolViz_3DMol
+from nbmolviz.widget2d import MolViz2DBaseWidget
 
 
 def is_color(s):
@@ -304,8 +302,8 @@ class GeometryViewer(MolViz_3DMol):
         # self.wfn should already be set to the wfn for the current frame
         orbital = self.wfn.orbitals[orbtype][orbidx]
         positions = self._frame_positions[self.current_frame] * u.angstrom
-        grid = mdt.orbitals.VolumetricGrid(positions,
-                                           padding=padding, npoints=npts)
+        grid = moldesign.methods.orbitals.VolumetricGrid(positions,
+                                                         padding=padding, npoints=npts)
         coords = grid.xyzlist().reshape(3, grid.npoints ** 3).T
         values = orbital(coords)
         grid.fxyz = values.reshape(npts, npts, npts)
@@ -680,7 +678,7 @@ def make_contact_view(entity, view_radius=5.0*u.ang,
     :param kwargs:
     :return:
     """
-    from moldesign.atoms import AtomList
+    from moldesign.structure.atoms import AtomList
 
     try:
         focus_atoms = AtomList(entity.atoms)

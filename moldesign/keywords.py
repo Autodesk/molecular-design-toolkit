@@ -20,11 +20,12 @@ Consistency is not, and may never be, enforced.
 TODO:
 """
 import collections
-import ipywidgets as ipy
-from traitlets import traitlets
 
-from moldesign.utils import if_not_none, DotDict
+import ipywidgets as ipy
+
 from moldesign import units as u
+from moldesign.utils import if_not_none, DotDict
+
 
 class ForceField(object):
     """Generalized force field type (blank for now)"""
