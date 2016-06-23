@@ -15,6 +15,8 @@ import threading
 from cStringIO import StringIO
 from uuid import uuid4
 
+import webcolors
+
 
 def make_none(): return None
 
@@ -233,3 +235,27 @@ class redirect_stderr(_RedirectStream):
 
 
 GETFLOAT = re.compile(r'-?\d+(\.\d+)?(e[-+]?\d+)')  # matches numbers, e.g. 1, -2.0, 3.5e50, 0.001e-10
+
+
+def is_color(s):
+    """ Do our best to determine if "s" is a color spec that can be converted to hex
+    :param s:
+    :return:
+    """
+    def in_range(i): return 0 <= i <= int('0xFFFFFF', 0)
+
+    try:
+        if type(s) == int:
+            return in_range(s)
+        elif type(s) not in (str, unicode):
+            return False
+        elif s in webcolors.css3_names_to_hex:
+            return True
+        elif s[0] == '#':
+            return in_range(int('0x' + s[1:], 0))
+        elif s[0:2] == '0x':
+            return in_range(int(s, 0))
+        elif len(s) == 6:
+            return in_range(int('0x' + s, 0))
+    except ValueError:
+        return False

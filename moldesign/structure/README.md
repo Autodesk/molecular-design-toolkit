@@ -1,6 +1,9 @@
-##Naming and indexing conventions
+## Structure subpackage
+The `moldesign.structure` subpackage contains class definitions for atomic, molecular, biomolecular, and trajectory data structures. 
 
-### Biomolecules
+### Naming and indexing conventions
+
+#### Biomolecules
 We run into a lot of cases where there's more than one way to name or index something. For instance, do we store a molecule's residues as a normal python list, indexed at 0? Or do we use the sequence numbers from the PDB file?
 
 In the end, buckyball makes both available. Biologically relevant objects - atoms, chains, and residues, will each have a:
@@ -29,7 +32,7 @@ atom.pdbindex |    |  |  residue.pdbindex                                 atom.e
    atom.name == atom.pdbname
 ```
 
-### Small molecules
+#### Small molecules
 Small molecules can come from a variety of sources with a variety of different metadata available. If a given molecule is provided with PDB-type metadata, we'll name and index it according to the biomolecule conventions above.
 
 Other formats (like XYZ files or SMILES strings) don't contain as much metadata. For molecules created from these formats, a chain ("Z") and residue ("UNL1") will be automatically created. If the atom names are just the names of the elements (e.g., all carbon atoms are named C), atom.name will be automatically assigned as `"%s%d" % (atom.elem, atom.index)`.

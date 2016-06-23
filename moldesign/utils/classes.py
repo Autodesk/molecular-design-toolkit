@@ -101,3 +101,16 @@ class DictLike(object):
 
     def __len__(self):
         return len(self.children)
+
+
+class Attribute(object):
+    """For overriding a property in a superclass - turns the attribute back
+    into a normal instance attribute"""
+    def __init__(self, name):
+        self.name = name
+
+    def __get__(self, instance, cls):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        return setattr(instance, self.name, value)

@@ -14,7 +14,9 @@
 from cStringIO import StringIO
 
 import numpy as np
-from moldesign.gaussians import ERI4FoldTensor
+
+import moldesign.orbitals.basis
+import moldesign.orbitals.wfn
 
 try:
     from pyscf import gto, scf, mp, mcscf, ao2mo
@@ -31,12 +33,12 @@ except OSError as exc:  # TODO: on OSX, this does ... something
 else:
     force_remote = False
 
-import moldesign.methods.gaussians as gs
+import moldesign.units as u
 from moldesign import compute
 from moldesign.utils import if_not_none, redirect_stderr, DotDict
 from moldesign.widgets import logs
-from moldesign.methods import orbitals, basemethods
-from moldesign.core import units as u
+from moldesign.models.base import QMBase
+from moldesign import orbitals
 
 
 def mol_to_pyscf(mol, basis, symmetry=None, charge=0, positions=None):
@@ -69,7 +71,7 @@ SPHERICAL_NAMES.update(orbitals.ANGULAR_NAME_TO_COMPONENT)
 
 # TODO: need to handle parameters for max iterations,
 # level shifts, requiring convergence, restarts, initial guesses
-class PySCFPotential(basemethods.QMBase):
+class PySCFPotential(QMBase):
     DEFAULT_PROPERTIES = ['potential_energy',
                           'electronic_state',
                           'mulliken']
@@ -141,19 +143,19 @@ class PySCFPotential(basemethods.QMBase):
         ao_pop, atom_pop = orb_calc.mulliken_pop(verbose=-1)
 
         # Build the electronic state object
-        basis = orbitals.BasisSet(self.mol,
-                                  orbitals=self._get_ao_basis_functions(),
-                                  h1e=ao_matrices.h1e.defunits(),
-                                  overlaps=ao_matrices.sao,
-                                  name=self.params.basis)
-        el_state = orbitals.ElectronicState(self.mol,
-                                            self.pyscfmol.nelectron,
-                                            theory=self.params.theory,
-                                            aobasis=basis,
-                                            ao_population=ao_pop,
-                                            nuclear_repulsion=(self.pyscfmol.energy_nuc() *
+        basis = moldesign.orbitals.basis.BasisSet(self.mol,
+                                                  orbitals=self._get_ao_basis_functions(),
+                                                  h1e=ao_matrices.h1e.defunits(),
+                                                  overlaps=ao_matrices.sao,
+                                                  name=self.params.basis)
+        el_state = moldesign.orbitals.wfn.ElectronicWfn(self.mol,
+                                                        self.pyscfmol.nelectron,
+                                                        theory=self.params.theory,
+                                                        aobasis=basis,
+                                                        ao_population=ao_pop,
+                                                        nuclear_repulsion=(self.pyscfmol.energy_nuc() *
                                                                u.hartree).defunits(),
-                                            **scf_matrices)
+                                                        **scf_matrices)
 
         # Build and store the canonical orbitals
         cmos = []
@@ -299,11 +301,11 @@ class PySCFPotential(basemethods.QMBase):
                     # TODO: This is not really the principal quantum number
                     n = int(''.join(x for x in label[2] if x.isdigit()))
 
-                    primitives = [gs.SphericalGaussian(atom.position.copy(),
+                    primitives = [orbitals.SphericalGaussian(atom.position.copy(),
                                                        exp, n, l, m,
                                                        coeff=coeff[ictr])
                                   for exp, coeff in zip(exps, coeffs)]
-                    bfs.append(gs.AtomicBasisFunction(atom, n=n, l=angular, m=m,
+                    bfs.append(orbitals.AtomicBasisFunction(atom, n=n, l=angular, m=m,
                                                       primitives=primitives))
 
         return bfs
@@ -360,7 +362,7 @@ def get_eris_in_basis(basis, orbs):
     pmol = mol_to_pyscf(basis.wfn.parent, basis=basis.basisname)
     eri = ao2mo.full(pmol, orbs.T, compact=True) * u.hartree
     eri.defunits_inplace()
-    return ERI4FoldTensor(eri, orbs)
+    return orbitals.ERI4FoldTensor(eri, orbs)
 
 
 @compute.runsremotely(remote=force_remote)

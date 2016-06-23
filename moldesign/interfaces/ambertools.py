@@ -23,7 +23,7 @@ import moldesign as mdt
 import moldesign.widgets.logs
 from moldesign import compute
 from moldesign import units as u
-from moldesign.methods import basemethods
+from moldesign.models.base import QMBase
 from moldesign.utils import if_not_none, DotDict
 
 IMAGE = 'ambertools'
@@ -58,7 +58,7 @@ for ffiles in (DNA_FF, RNA_FF, PROTEIN_FF, LIPID_FF, CARB_FF, WATER_FF, ORGANIC_
 class ParameterizationError(Exception): pass
 
 
-class SQMPotential(basemethods.QMBase):
+class SQMPotential(QMBase):
     DEFAULT_PROPERTIES = ['potential_energy',
                           'electronic_state',
                           'mulliken']

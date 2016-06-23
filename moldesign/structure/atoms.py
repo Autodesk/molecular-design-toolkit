@@ -17,14 +17,12 @@ import numpy as np
 from scipy.spatial import distance as spd
 
 import moldesign as mdt
-import moldesign.utils
-import moldesign.utils.callsigs
-import moldesign.utils.classes
-from moldesign import data, utils, viewer, ui
+import moldesign.widgets.components
 from moldesign import units as u
-from moldesign.external import transformations
+from moldesign import data, external, geom, utils, viewer
 
-__all__ = 'Atom AtomList Bond'.split()
+from . import toplevel, molecule
+
 
 class AtomContainer(object):
     """ Mixin functions for objects that have a ``self.atoms`` attribute with a list of atoms
@@ -186,7 +184,7 @@ class AtomContainer(object):
         viz3d = self.draw3d(width=width, height=height,
                             display=False)
         views = ipy.HBox([viz2d, viz3d])
-        return ui.SelectionGroup([views, ui.AtomInspector()])
+        return mdt.base.SelectionGroup([views, moldesign.widgets.components.AtomInspector()])
 
     def draw3d(self, highlight_atoms=None, **kwargs):
         """ Draw this object in 3D. Jupyter only.
@@ -300,7 +298,7 @@ class AtomContainer(object):
         center = utils.if_not_none(center, self.com)
 
         if hasattr(angle, 'units'): angle = angle.value_in(u.radians)
-        rotmat = transformations.rotation_matrix(angle, axis, point=center)
+        rotmat = external.transformations.rotation_matrix(angle, axis, point=center)
         self.transform(rotmat)
 
     def translate(self, vector):
@@ -321,11 +319,12 @@ class AtomContainer(object):
         # TODO: deal with units ... hard because the matrix has diff units for diff columns
         assert matrix.shape == (4, 4)
         positions = u.to_units_array(self.atoms.position)
-        newpos = moldesign.geom.geometry._apply_4trans(matrix, positions)
+        newpos = geom._apply_4trans(matrix, positions)
         for atom, r in zip(self.atoms, newpos):
             atom.position = r
 
 
+@toplevel
 class Bond(object):
     """
     A bond between two atoms.
@@ -519,15 +518,15 @@ class AtomGeometryMixin(object):
         are separated are here for code organization only - they could be included in the main
         Atom class without changing any functionality
     """
-    @moldesign.utils.callsigs.args_from(AtomContainer.distance)
+    @utils.args_from(AtomContainer.distance)
     def distance(self, *args, **kwargs):
         return self._container.distance(*args, **kwargs)
 
-    @moldesign.utils.callsigs.args_from(AtomContainer.atoms_within)
+    @utils.args_from(AtomContainer.atoms_within)
     def atoms_within(self, *args, **kwargs):
         return self._container.atoms_within(*args, **kwargs)
 
-    @moldesign.utils.callsigs.args_from(AtomContainer.calc_distance_array)
+    @utils.args_from(AtomContainer.calc_distance_array)
     def calc_distances(self, *args, **kwargs):
         array = self._container.calc_distance_array(*args, **kwargs)
         return array[0]
@@ -561,8 +560,8 @@ class AtomPropertyMixin(object):
             return None
         if ff is None: return None
 
-        return moldesign.utils.classes.DotDict(partialcharge=ff.partial_charges[self],
-                                               lj=ff.lennard_jones[self])
+        return utils.DotDict(partialcharge=ff.partial_charges[self],
+                             lj=ff.lennard_jones[self])
 
     @property
     def basis_functions(self):
@@ -573,7 +572,7 @@ class AtomPropertyMixin(object):
             return None
         try:
             wfn = self.parent.electronic_state
-        except moldesign.structure.molecule.NotCalculatedError:
+        except molecule.NotCalculatedError:
             return None
 
         return wfn.aobasis.on_atom.get(self, [])
@@ -582,7 +581,7 @@ class AtomPropertyMixin(object):
     def properties(self):
         """ moldesign.utils.DotDict: Returns any calculated properties for this atom
         """
-        props = moldesign.utils.classes.DotDict()
+        props = utils.DotDict()
         for name, p in self.parent.properties.iteritems():
             if hasattr(p, 'type') and p.type == 'atomic':
                 props[name] = p[self]
@@ -676,6 +675,7 @@ class AtomReprMixin(object):
         return self.markdown_summary()
 
 
+@toplevel
 class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin):
     """
     Holds atomic info.
@@ -747,7 +747,7 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
                                                 u.default.mass/u.default.time)
         self._bond_graph = {}
 
-    @moldesign.utils.callsigs.args_from(AtomContainer.copy)
+    @utils.args_from(AtomContainer.copy)
     def copy(self, *args, **kwargs):
         return self._container.copy(*args, **kwargs)[0]
 
@@ -860,6 +860,7 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
     elem = element = symbol
 
 
+@toplevel
 class AtomList(list, AtomContainer):
     """A list of atoms that allows attribute "slicing" - accessing an attribute of the
     list will return a list of atom attributes.
@@ -911,8 +912,3 @@ class AtomList(list, AtomContainer):
     def __getslice__(self, *args, **kwargs):
         return AtomList(super(AtomList, self).__getslice__(*args, **kwargs))
 
-
-# Hack for documentation only - sure these get picked up in the docs
-if mdt._building_docs:
-    __all__.extend(('AtomDrawingMixin AtomGeometryMixin AtomPropertyMixin AtomReprMixin '
-                    'AtomContainer').split())

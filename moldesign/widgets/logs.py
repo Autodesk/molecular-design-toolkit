@@ -23,6 +23,8 @@ import traitlets
 
 import moldesign as mdt
 
+from moldesign.widgets.components import StyledTab
+
 STANDARD = 25  # logging level between INFO and WARN
 
 # We'll use standard + extra logging levels:
@@ -180,7 +182,7 @@ else:
     widgets_enabled = True
 
 if widgets_enabled:
-    class LoggingTabs(moldesign.widgets.ui.StyledTab):
+    class LoggingTabs(StyledTab):
         def __init__(self, objects, display=False, **kwargs):
             """
             :param objects: dict of form {TITLE: <display object>}

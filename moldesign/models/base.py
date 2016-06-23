@@ -11,91 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-This module contains abstract base classes for potential models, integrators, and various
-associated data types (force fields, orbitals, basis sets, etc.).
-"""
-
 import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
-from moldesign.keywords import integrator_parameters as ips
 from moldesign.keywords import mm_model_parameters as mmp
-from moldesign.keywords import qm_model_parameters as qmp
-from moldesign.utils import DotDict
+from moldesign.method import Method
 
 
-def _make_method(cls, params, mol):
-    """
-    Helper for __reduce__ to use kwargs
-    """
-    obj = cls(**params)
-    obj.mol = mol
-    return obj
-
-
-class Method(object):
-    """Base class for energy models and integrators"""
-    PARAMETERS = DotDict()
-    """
-    A list of Parameter objects describing the keyword arguments that this class
-    recognizes.
-
-    Attributes:
-       mol (mdt.Molecule): the molecule this method is associated with
-    """
-
-    def __reduce__(self):
-        return _make_method, (self.__class__, self.params, self.mol)
-
-    def __init__(self, **params):
-        """
-        :param params:
-        :return:
-        """
-        # TODO: better documentation for the expected keywords
-
-        self._prepped = False
-        self.status = None
-        self.mol = None
-        self.params = DotDict(params)
-        # Set default parameter values
-        for param in self.PARAMETERS:
-            if param.name not in self.params:
-                self.params[param.name] = param.default
-
-    @classmethod
-    def get_parameters(cls):
-        """
-        This doesn't do anything right now except provide guidelines for programmers
-        """
-        return cls.PARAMETERS
-
-    def get_forcefield(self):
-        raise NotImplementedError()
-
-    @classmethod
-    def print_parameters(cls):
-        params = cls.PARAMETERS
-        lines = []
-        for obj in params:
-            description = ''
-            if obj.choices:
-                description = '%s' % obj.choices
-                if obj.types:
-                    description += ' or '
-            if obj.types:
-                description += 'Type %s' % obj.types
-
-            doc = '%s: %s (DEFAULT: %s)' % (obj.name, description, obj.default)
-            lines.append(doc)
-        return '\n'.join(lines)
-
-
-####################################
-# The first kind of Method is an "EnergyModel" - something that calculates
-# potential energy (and other properties, usually) as a function of atomic positions.
 class EnergyModelBase(Method):
     """
     Base class for all energy models
@@ -203,7 +126,7 @@ class EnergyModelBase(Method):
 class MMBase(EnergyModelBase):
     """Common interface for molecular mechanics"""
 
-    PARAMETERS = EnergyModelBase.PARAMETERS + [
+    PARAMETERS = EnergyModelBase.PARAMETERS+[
         mmp.forcefield, mmp.implicit_solvent,
         mmp.cutoff, mmp.nonbonded, mmp.constrain_hbonds,
         mmp.constrain_water,
@@ -245,53 +168,4 @@ class QMMMBase(EnergyModelBase):
 
     PARAMETERS = MMBase.PARAMETERS + QMBase.PARAMETERS
 
-
-
-#################################
-# Next are some base integrators
-class IntegratorBase(Method):
-    """Base class for all integrators"""
-
-    PARAMETERS = [ips.timestep, ips.frame_interval]
-
-    def run(self, run_for):
-        """
-        To be called by parent molecule
-        :param run_for: number of steps (if integer), or amount of time (if has units of time)
-        :return: trajectory
-        """
-        raise NotImplementedError('This is an abstract base class!')
-
-    def prep(self):
-        """
-        Prepare to run. Possibly do a test run.
-        This might need to call the mol.model.build. Make sure you don't have a
-        circular call here
-        :return:
-        """
-        raise NotImplementedError()
-
-    @staticmethod
-    def time_to_steps(time, timestep):
-        try:
-            dims = time.dimensionality
-            assert len(dims) == 1 and dims['[time]'] == 1.0
-        except (AttributeError, AssertionError):
-            assert type(time) == int, "argument to integrator.run must have units of time or be an int"
-            return time
-        else:
-            return int(time / timestep)
-
-
-class MDBase(IntegratorBase):
-    PARAMETERS = (IntegratorBase.PARAMETERS +
-                  [ips.remove_translation,ips.remove_rotation])
-
-
-class ConstantTemperatureBase(MDBase):
-    PARAMETERS = MDBase.PARAMETERS + [ips.temperature]
-
-
-class LangevinBase(ConstantTemperatureBase):
-    PARAMETERS = ConstantTemperatureBase.PARAMETERS + [ips.collision_rate]
 

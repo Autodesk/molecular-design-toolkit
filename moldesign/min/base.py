@@ -14,9 +14,9 @@
 import sys
 
 import numpy as np
-import scipy.optimize
 
 import moldesign as mdt
+from moldesign import data
 from moldesign import units as u
 
 
@@ -26,7 +26,7 @@ class MinimizerBase(object):
     constraint_restraints = True  # if True, add restraint penalties for both constraints and restraints
 
     def __init__(self, mol, nsteps=20,
-                 force_tolerance=moldesign.core.data.DEFAULT_FORCE_TOLERANCE,
+                 force_tolerance = data.DEFAULT_FORCE_TOLERANCE,
                  frame_interval=None,
                  restraint_multiplier=1.0):
         self.mol = mol
@@ -131,117 +131,3 @@ class MinimizerBase(object):
 
         print ', '.join(message)
         sys.stdout.flush()
-
-
-class BFGS(MinimizerBase):
-    _strip_units = True
-
-    def run(self):
-        print 'Starting geometry optimization: scipy.fmin_bfgs with %s gradients' % self.gradtype
-        options = {'disp': True}
-        if self.nsteps is not None:
-            options['maxiter'] = self.nsteps
-
-        if self.gradtype == 'analytical': grad = self.grad
-        else: grad = None
-
-        if self.force_tolerance is not None:
-            options['gtol'] = self.force_tolerance.defunits().magnitude
-
-        result = scipy.optimize.minimize(self.objective,
-                                         self.mol.positions.defunits().magnitude,
-                                         method='bfgs',
-                                         jac=grad,
-                                         callback=self.callback,
-                                         options=options)
-
-        options['maxiter'] = max(options['maxiter']/5, 2)  # reduce number of steps if we need to enforce constraints
-        for i in xrange(3):  # try to satisfy constraints
-            if all(c.satisfied() for c in self.mol.constraints): break
-            self.restraint_multiplier += 0.5
-            print 'Constraints not satisfied - new restraint multiplier %f ...' % \
-                  self.restraint_multiplier
-            result = scipy.optimize.minimize(self.objective,
-                                 self.mol.positions.defunits().magnitude,
-                                 method='bfgs',
-                                 jac=grad,
-                                 callback=self.callback,
-                                 options=options)
-        if not all(c.satisfied() for c in self.mol.constraints):
-            print 'WARNING! Constraints not satisfied'
-        self.traj.info = result
-
-
-class GradientDescent(MinimizerBase):
-    _strip_units = False
-
-    def __init__(self, mol, max_atom_move=0.075 * u.angstrom,
-                 gamma=0.05 * (u.angstrom ** 2) / u.eV,
-                 **kwargs):
-        """
-        :param max_atom_move: Maximum amount to move an atom
-        """
-        super(GradientDescent, self).__init__(mol, **kwargs)
-        assert 'forces' in self.request_list, 'Gradient descent built-in gradients'
-        self.max_atom_move = max_atom_move
-        self.gamma = gamma
-        self._last_energy = None
-
-    def run(self):
-        self.run_once()
-        self.nsteps = max(self.nsteps / 5, 2)
-        for i in xrange(3):  # try to satisfy constraints
-            if all(c.satisfied() for c in self.mol.constraints): break
-            self.restraint_multiplier += 0.5
-            print '\nWarning: constraints not satisfied - new restraint multiplier %f ...' % \
-                  self.restraint_multiplier
-            self.run_once()
-
-        if not all(c.satisfied() for c in self.mol.constraints):
-            print 'WARNING! Constraints not satisfied'
-
-    def run_once(self):
-        print 'Starting geometry optimization: built-in gradient descent'
-        laststep = self.mol.calculate()
-        lastenergy = self.objective(self.mol.positions)
-        for i in xrange(self.nsteps):
-            grad = self.grad(self.mol.positions)
-            if np.abs(grad.max()) < self.force_tolerance:
-                return
-            move = -self.gamma * grad
-            mmax = np.abs(move).max()
-            if mmax > self.max_atom_move:  # rescale the move
-                scale = self.max_atom_move / mmax
-                print 'Move too big: scaling by step by {scale.magnitude:.6f}'.format(scale=scale)
-                move *= scale
-            self.mol.positions += move
-            newenergy = self.objective(self.mol.positions)
-            if newenergy > lastenergy:
-                print 'Energy increased by {x.magnitude:.3e} {x.units}!'.format(x=(newenergy-lastenergy)) + \
-                      ' Reverting to previous step and reducing step size.'
-                self.gamma /= 2.0
-                self.max_atom_move /= 2.0
-                self.mol.positions = laststep['positions']
-                self.mol.properties = laststep
-            else:
-                laststep = self.mol.calculate(self.request_list)
-                lastenergy = newenergy
-            self.callback()
-
-
-
-def bfgs(*args, **kwargs):
-    """
-    The function version of BFGS
-    """
-    minobj = BFGS(*args, **kwargs)
-    return minobj()
-
-
-def gradient_descent(*args, **kwargs):
-    minobj = GradientDescent(*args, **kwargs)
-    return minobj()
-
-
-lookup = {'gradient descent': gradient_descent,
-          'bfgs': bfgs}

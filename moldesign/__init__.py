@@ -22,27 +22,28 @@ import moldesign.__main__
 from moldesign import data
 PACKAGEPATH = data.PACKAGEPATH
 
-from moldesign.widgets import logs
-from moldesign.methods import models, forcefield, basemethods, integrators
+# Expose subpackage routines - note that order is important here!
+from moldesign import structure
+from moldesign.structure import *
+
+
+from moldesign.geom import *
+from moldesign.methods import *
+from moldesign.widgets import *
+
+
 
 # expose these modules at the top level -- TODO: don't?
-from moldesign.structure import atoms, biounits, molecule, trajectory, converters
-from moldesign import biounits, units, tools, data
-from moldesign import converters
-from moldesign.methods import forcefield
-from moldesign.geom import geometry
-from moldesign.structure import molecule
-from moldesign import trajectory
+#from moldesign.structure import atoms, biounits, molecule, trajectory, converters
+#from moldesign import biounits, units, tools, data
+#from moldesign import converters
+#from moldesign.methods import forcefield
+#from moldesign.geom import geometry
+#from moldesign.structure import molecule
+#from moldesign import trajectory
 
-# (note that they all use __all__ to specify what gets exported)
-from moldesign.structure.atoms import *
-from moldesign.structure.biounits import *
-from moldesign.structure.converters import *
-from moldesign.methods.forcefield import *
-from moldesign.geom.geometry import *
-from moldesign.structure.molecule import *
-from moldesign.tools import *
-from moldesign.structure.trajectory import *
+#from moldesign.methods import models, forcefield, basemethods, integrators
+
 
 # package metadata
 from moldesign import _version
@@ -52,13 +53,13 @@ __license__ = "Apache 2.0"
 
 # This forces sphinx to document the top-level namespace
 if _building_docs:
-    __all__ = (atoms.__all__ +
-               biounits.__all__ +
-               converters.__all__ +
-               forcefield.__all__ +
-               geometry.__all__ +
-               molecule.__all__ +
-               tools.__all__ +
+    __all__ = (atoms.__all__+
+               biounits.__all__+
+               converters.__all__+
+               forcefield.__all__+
+               coords.__all__+
+               molecule.__all__+
+               tools.__all__+
                trajectory.__all__)
 
 # Set warnings appropriately

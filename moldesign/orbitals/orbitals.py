@@ -23,14 +23,10 @@ Notes:
       - adiabatic electronic states are indexed using capital letters, _N_, _L_, _M_, etc.
 
 """
-import collections
-
-import ipywidgets as ipy
 import numpy as np
-from moldesign.viewer import GeometryViewer
 
-from moldesign import units as u, ui
-from moldesign.utils import DotDict, Alias
+from moldesign import units as u
+from moldesign.utils import Alias
 
 SHELLS = {0: 's', 1: 'p', 2: 'd', 3: 'f', 4: 'g', 5: 'h'}
 ANGMOM = {v: k for k, v in SHELLS.iteritems()}
@@ -53,21 +49,6 @@ ANGULAR_NAME_TO_COMPONENT = {'': (0, 0), 'x': (1, -1), 'y': (1, 1), 'z': (1, 0),
 class ConvergenceError(Exception): pass
 
 
-class PrimitiveBase(object):
-    def __init__(self, *args, **kwargs):
-        raise NotImplementedError()
-
-    def __call__(self, position):
-        raise NotImplementedError()
-
-    def overlap(self, other):
-        raise NotImplementedError()
-
-    @property
-    def norm(self, other):
-        raise NotImplementedError()
-
-
 class Orbital(object):
     r"""
     Stores a single orbital and its meta-data
@@ -87,8 +68,8 @@ class Orbital(object):
 
         Args:
             coeffs (numpy.array): orbital coefficients
-            basis (BasisSet): basis for this orbital
-            wfn (ElectronicState): total electronic wavefunction that this orbital is a part of
+            basis (moldesign.orbitals.basis.BasisSet): basis for this orbital
+            wfn (moldesign.orbitals.wfn.ElectronicWfn): total electronic wavefunction that this orbital is a part of
             occupation (float): occupation of this orbital
             name (str): optional label for this orbital:
         """
@@ -175,8 +156,8 @@ class MolecularOrbitals(object):
         Args:
             orbitals (List[Orbital] OR numpy.array): EITHER a list of orbitals OR an
                array of coefficients (indexed as coeffs[orbital_index, basis_index])
-            basis (BasisSet): orbital basis set
-            wfn (ElectronicState): total electronic wavefunction that this orbital is a part of
+            basis (moldesign.orbitals.basis.BasisSet): orbital basis set
+            wfn (moldesign.orbitals.wfn.ElectronicWfn): total electronic wavefunction that this orbital is a part of
             canonical (bool): designate these as the canonical orbitals
             orbtype (str): description of these orbitals
         """
@@ -375,300 +356,3 @@ class MolecularOrbitals(object):
                     orb.name = 'virt cmo %d' % i
 
 
-class Attribute(object):
-    """For overriding a property in a superclass - turns the attribute back
-    into a normal instance attribute"""
-    def __init__(self, name):
-        self.name = name
-
-    def __get__(self, instance, cls):
-        return getattr(instance, self.name)
-
-    def __set__(self, instance, value):
-        return setattr(instance, self.name, value)
-
-
-class BasisSet(MolecularOrbitals):
-    """
-    Stores a basis, typically of atomic orbitals.
-
-    This is a special orbital type
-    """
-    overlaps = Attribute('_overlaps')
-    h1e = Attribute('_h1e')
-
-    def __init__(self, mol, orbitals, name=None,
-                 h1e=None, overlaps=None,
-                 angulartype=None,
-                 **kwargs):
-        self.mol = mol
-        self.orbitals = orbitals
-        self.coeffs = np.identity(len(self.orbitals))
-        self.basis = self
-        self.orbtype = 'aobasis'
-        self.angulartype = angulartype
-        assert self.angulartype in (None, 'spherical', 'cartesian')
-
-        self.wfn = None
-        for iorb, orbital in enumerate(self.orbitals):
-            orbital.index = iorb
-            orbital.coeffs = self.coeffs[iorb, :]
-            orbital.basis = self
-
-        self.basisname = name
-        self.h1e = h1e
-        self.overlaps = overlaps
-        for kw, val in kwargs.iteritems():
-            setattr(self, kw, val)
-
-        self.on_atom = {}
-        for fn in self.orbitals:
-            self.on_atom.setdefault(fn.atom, []).append(fn)
-
-    def __call__(self, coords, coeffs=None):
-        """Calculate the value of each basis function at the specified coordinates.
-
-        Note:
-            This is just a pass-through to a specific implementation - PYSCF's eval_ao routine
-            for now.
-
-        Args:
-            coords (Array[length]): List of coordinates.
-            coeffs (Vector): List of ao coefficients (optional; if not passed, all basis fn
-                 values are returned)
-
-        Returns:
-            Array[length]: if ``coeffs`` is not passed, an array of basis fn values at each
-               coordinate. Otherwise, a list of orbital values at each coordinate
-        """
-        from moldesign.interfaces.pyscf_interface import basis_values
-        return basis_values(self.wfn.mol, self, coords, coeffs=coeffs,
-                            positions=self.wfn.positions)
-
-    def __repr__(self):
-        return '<%s (%s) of %s>' % (self.__class__.__name__, self.basisname, self.mol)
-
-    @property
-    def fock(self):
-        return self.wfn.fock_ao
-
-
-class ElectronicState(object):
-    """
-    Stores the results of a quantum chemistry calculation.
-    This is necessarily pretty flexible, but generally stores an AO wfn and one or more sets of orbitals.
-    Can also store CI vectors, etc.
-    """
-
-    def __init__(self, mol, num_electrons,
-                 theory=None,
-                 aobasis=None, fock_ao=None,
-                 positions=None,
-                 civectors=None, **kwargs):
-        """
-        :param mol:
-        :param aobasis:
-        :param canonical_orbitals:
-        :param kwargs:
-        :return:
-        """
-        self.mol = mol
-        self.theory = theory
-        self.civectors = civectors
-        self.aobasis = aobasis
-        self.orbitals = DotDict()
-        self.fock_ao = fock_ao
-        self.num_electrons = num_electrons
-        self.homo = self.num_electrons/2 - 1
-        self.lumo = self.homo + 1
-        self._has_canonical = False
-
-        if positions is None:
-            self.positions = mol.positions.copy()
-        else:
-            self.positions = positions.copy()
-
-        if len(self.positions.shape) == 1 or self.positions.shape[1] != 3:
-            self.positions.shape = (mol.numatoms, 3)
-
-        if self.aobasis is not None:
-            self.orbitals['atomic'] = self.aobasis
-            self.aobasis.wfn = self
-            for orb in self.aobasis.orbitals:
-                orb.wfn = self
-
-        for arg, val in kwargs.iteritems():
-            setattr(self, arg, val)
-
-    def __repr__(self):
-        return '<ElectronicState (%s) of %s>' % (self.description, str(self.mol))
-
-    def __str__(self):
-        return '%s wfn' % self.description
-
-    @property
-    def description(self):
-        return '%s/%s' % (self.theory, self.aobasis.basisname)
-
-    def set_canonical_mos(self, orbs):
-        if orbs.wfn is None: orbs.wfn = self
-        if self.fock_ao is None and orbs.energy is not None:
-            fock_cmo = orbs.energy * np.identity(len(self.aobasis))
-            self.fock_ao = orbs.to_ao(fock_cmo)
-        self._has_canonical = True
-
-    def align_orbital_phases(self, other, assert_same=True):
-        """Align this wavefunction's orbitals to have the same phase as those in `other`.
-        :type other: ElectronicState
-        :param assert_same: raise an exception if the two wavefunctions do not have the same kinds of orbitals
-        """
-        for orbtype in self.orbitals:
-            if orbtype not in other.orbitals:
-                if assert_same: assert False, '%s has orbital type %s, but %s does not.' % (self, orbtype, other)
-                else: continue
-            self.orbitals[orbtype].align_phases(other.orbitals[orbtype])
-
-    def run_nbo(self, **kwargs):
-        from moldesign.interfaces import nbo_interface
-        nbo_interface.run_nbo(self.mol, **kwargs)
-
-    def add_orbitals(self, orbs, orbtype='canonical', **kwargs):
-        mo_object = MolecularOrbitals(orbs,
-                                      wfn=self,
-                                      orbtype=orbtype)
-        self.orbitals[orbtype] = mo_object
-        if orbtype == 'canonical' and not self._has_canonical:
-            self.set_canonical_mos(mo_object)
-        return mo_object
-
-    @property
-    def molecular_orbitals(self):
-        """A synonym for self.orbitals['canonical'], since this is usually what's wanted"""
-        return self.orbitals['canonical']
-
-    @molecular_orbitals.setter
-    def molecular_orbitals(self, val):
-        """A synonym for self.orbitals['canonical'], since this is usually what's wanted"""
-        self.orbitals['canonical'] = val
-
-
-class VolumetricGrid(object):
-    """
-    Helper object for preparing gaussian CUBE files
-    """
-    UNITS = u.angstrom
-    def __init__(self, positions, padding=2.5*u.angstrom, npoints=25):
-        mins = positions.min(axis=0) - padding
-        maxes = positions.max(axis=0) + padding
-        self.npoints = npoints
-        self.xr = (mins[0], maxes[0])
-        self.yr = (mins[1], maxes[1])
-        self.zr = (mins[2], maxes[2])
-        self._origin = mins.value_in(self.UNITS)
-        self.dx = (self.xr[1] - self.xr[0]).value_in(self.UNITS) / (float(npoints) - 1)
-        self.dy = (self.yr[1] - self.yr[0]).value_in(self.UNITS) / (float(npoints) - 1)
-        self.dz = (self.zr[1] - self.zr[0]).value_in(self.UNITS) / (float(npoints) - 1)
-        self.fxyz = None
-
-    def xyzlist(self):
-        stride = self.npoints * 1j
-        grids = np.mgrid[self.xr[0]:self.xr[1]:stride,
-                self.yr[0]:self.yr[1]:stride,
-                self.zr[0]:self.zr[1]:stride]
-        return grids * self.UNITS
-
-    def origin(self):
-        return tuple(self._origin)
-
-
-class OrbitalViz(ui.SelectionGroup):
-    def __init__(self, mol, **kwargs):
-        """
-        :param mol: a molecule with A) orbitals, and B) an energy model with calculate_orbital_grid
-        :param kwargs: kwargs for the viewer
-        :return:
-        """
-        self.viewer = GeometryViewer(mol=mol, **kwargs)
-        self.viewer.wfn = mol.electronic_state
-        self.uipane = OrbitalUIPane(self, height=int(self.viewer.height)-50)
-        hb = ipy.HBox([self.viewer, self.uipane])
-        super(OrbitalViz, self).__init__([hb])
-
-
-class OrbitalUIPane(ui.Selector, ipy.Box):
-    # TODO: deal with orbitals not present in all frames of a trajectory
-    # TODO: deal with orbital properties changing over a trajectory
-    def __init__(self, viz, **kwargs):
-        self.viz = viz
-        kwargs.setdefault('width', 325)
-
-        self.type_dropdown = ipy.Dropdown(options=self.viz.viewer.wfn.orbitals.keys())
-        initial_orb = 'canonical'
-        if initial_orb not in self.type_dropdown.options:
-            initial_orb = self.type_dropdown.options.iterkeys().next()
-        self.type_dropdown.value = initial_orb
-        self.type_dropdown.observe(self.new_orb_type, 'value')
-
-        self.orblist = ipy.Select(options={None: None},
-                                  width=kwargs['width'],
-                                  height=int(kwargs['height']) - 75)
-
-        self.isoval_selector = ui.create_value_selector(ipy.FloatSlider,
-                                                        value_selects='orbital_isovalue',
-                                                        min=0.0, max=0.05,
-                                                        value=0.01, step=0.0001,
-                                                        width=kwargs['width'],
-                                                        description='Isovalue')
-
-        self.orb_resolution = ipy.Text(description='Orbital resolution', width=75)
-        self.orb_resolution.value = '40'  # this is a string to enable the 'on_submit' method
-        self.change_resolution()
-        self.orb_resolution.on_submit(self.change_resolution)
-
-        children = [self.type_dropdown, self.orblist, self.isoval_selector, self.orb_resolution]
-        super(OrbitalUIPane, self).__init__(children, **kwargs)
-        self.new_orb_type()
-        self.orblist.observe(self.new_orbital_selection, 'value')
-
-
-    def new_orbital_selection(self, *args):
-        self.fire_selection_event({'orbname': (self.type_dropdown.value, self.orblist.value)})
-
-    def handle_selection_event(self, *args):
-        # TODO: update the selected orbitals if something actually else triggers this
-        pass
-
-    def new_orb_type(self, *args):
-        """Create list of available orbitals when user selects a new type
-        """
-        wfn = self.viz.viewer.wfn
-        newtype = self.type_dropdown.value
-        neworbs = wfn.orbitals[newtype]
-        orblist = collections.OrderedDict()
-
-        orblist[None] = None
-        for i, orb in enumerate(neworbs):
-            if hasattr(orb, 'unicode_name'):
-                orbname = orb.unicode_name
-            else:
-                orbname = orb.name
-
-            meta = ''
-            if orb.energy is not None:
-                meta = '{:.02fP}'.format(orb.energy.defunits())
-            if orb.occupation is not None:
-                if meta: meta += ', '
-                meta += 'occ %.2f' % orb.occupation
-            if meta:
-                desc = '%d. %s   (%s)' % (i, orbname, meta)
-            else:
-                desc = '%d. %s' % (i, orbname)
-            orblist[desc] = i
-        self.orblist.value = None
-        self.orblist.options = orblist
-
-    def change_resolution(self, *args):
-        viewer = self.viz.viewer
-        viewer._orbital_kwargs['npts'] = int(self.orb_resolution.value)
-        if viewer.current_orbital is not None:
-            viewer.draw_orbital(viewer.current_orbital, render=True, **viewer._orbital_kwargs)

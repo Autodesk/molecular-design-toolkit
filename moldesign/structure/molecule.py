@@ -13,15 +13,18 @@
 # limitations under the License.
 
 import numpy as np
+
+import moldesign.geom.constraints
+import moldesign.widgets.components
 from moldesign.data import RESTYPES
 
+
 import moldesign as mdt
-from moldesign import ui, utils
+from moldesign import helpers, base, utils
 from moldesign import units as u
 from moldesign.compute import DummyJob
-from moldesign.structure import biounits
 
-__all__ = 'Molecule NotCalculatedError NoConvergence MolecularProperties'.split()
+from . import atoms, biounits
 
 
 class NotCalculatedError(Exception):
@@ -55,7 +58,7 @@ class MolecularProperties(utils.DotDict):
         return np.array_equal(self.positions, mol.positions)
 
 
-class Molecule(moldesign.structure.atoms.AtomContainer):
+class Molecule(atoms.AtomContainer):
     """
     This is moldesign's principal object. It stores a list of atoms in 3D space
     and handles interfaces with energy and dynamics models.
@@ -70,9 +73,9 @@ class Molecule(moldesign.structure.atoms.AtomContainer):
             ``{atom1:{atom2:bond_order, atom3:bond_order}, atom2:...}``
             This structure must be symmetric; we require
             ``bond_graph[atom1][atom2] == bond_graph[atom2][atom1]``
-        energy_model (moldesign.basemethods.EnergyModelBase): Object that drives calculation of
+        energy_model (moldesign.models.base.EnergyModelBase): Object that drives calculation of
             molecular properties, driven by `mol.calculate()`
-        integrator (moldesign.basemethods.IntegratorBase): Object that drives movement of 3D
+        integrator (moldesign.integrators.base.IntegratorBase): Object that drives movement of 3D
             coordinates in time, driven by mol.run()
         copy_atoms (bool): Create the molecule with *copies* of the passed atoms
             (they will be copied automatically if they already belong to another molecule)
@@ -102,16 +105,16 @@ class Molecule(moldesign.structure.atoms.AtomContainer):
         positions (units.Vector[length]): flat array of atomic positions, len=`self.ndims` [length]
         momenta (units.Vector[momentum]): flat array of atomic momenta, len=`self.ndims`
         time (units.Scalar[time]): current time in dynamics
-        energy_model (moldesign.basemethods.EnergyModelBase): Object that calculates
+        energy_model (moldesign.models.base.EnergyModelBase): Object that calculates
             molecular properties - driven by `mol.calculate()`
-        integrator (moldesign.basemethods.IntegratorBase): Object that drives movement of 3D
+        integrator (moldesign.integrators.base.IntegratorBase): Object that drives movement of 3D
             coordinates in time, driven by mol.run()
         is_biomolecule (bool): True if this molecule contains at least 2 biochemical residues
     """
 
     # TODO: UML diagrams, describe structure
-    positions = moldesign.structure.atoms.ProtectedArray('_positions')
-    momenta = moldesign.structure.atoms.ProtectedArray('_momenta')
+    positions = atoms.ProtectedArray('_positions')
+    momenta = atoms.ProtectedArray('_momenta')
 
     def __init__(self, atomcontainer,
                  name=None, bond_graph=None,
@@ -125,7 +128,7 @@ class Molecule(moldesign.structure.atoms.AtomContainer):
         super(Molecule, self).__init__()
 
         # copy atoms from another object (i.e., a molecule)
-        oldatoms = moldesign.core.helpers.get_all_atoms(atomcontainer)
+        oldatoms = helpers.get_all_atoms(atomcontainer)
 
         if copy_atoms or (oldatoms[0].parent is not None):
             print 'INFO: Copying atoms into new molecule'
@@ -241,12 +244,12 @@ class Molecule(moldesign.structure.atoms.AtomContainer):
 
         Args:
             atom (moldesign.Atom): The atom to constrain
-            pos (moldesign.units.BuckyballQuantity): position to fix this atom at (default: atom.position) [length]
+            pos (moldesign.units.MdtQuantity): position to fix this atom at (default: atom.position) [length]
 
         Returns:
             moldesign.geometry.FixedPosition: constraint object
         """
-        self.constraints.append(moldesign.geom.geometry.FixedPosition(atom, value=pos))
+        self.constraints.append(moldesign.geom.constraints.FixedPosition(atom, value=pos))
         self._reset_methods()
         return self.constraints[-1]
 
@@ -262,7 +265,7 @@ class Molecule(moldesign.structure.atoms.AtomContainer):
             moldesign.geometry.DistanceConstraint: constraint object
         """
         self.constraints.append(
-            moldesign.geom.geometry.DistanceConstraint(atom1, atom2, value=dist))
+            moldesign.geom.constraints.DistanceConstraint(atom1, atom2, value=dist))
         self._reset_methods()
         return self.constraints[-1]
 
@@ -279,7 +282,7 @@ class Molecule(moldesign.structure.atoms.AtomContainer):
             moldesign.geometry.AngleConstraint: constraint object
         """
         self.constraints.append(
-            moldesign.geom.geometry.AngleConstraint(atom1, atom2, atom3, value=angle))
+            moldesign.geom.constraints.AngleConstraint(atom1, atom2, atom3, value=angle))
         self._reset_methods()
         return self.constraints[-1]
 
@@ -297,7 +300,7 @@ class Molecule(moldesign.structure.atoms.AtomContainer):
             moldesign.geometry.AngleConstraint: constraint object
         """
         self.constraints.append(
-            moldesign.geom.geometry.DihedralConstraint(atom1, atom2, atom3, atom4, value=angle))
+            moldesign.geom.constraints.DihedralConstraint(atom1, atom2, atom3, atom4, value=angle))
         self._reset_methods()
         return self.constraints[-1]
 
@@ -376,7 +379,7 @@ class Molecule(moldesign.structure.atoms.AtomContainer):
 
     @property
     def electronic_state(self):
-        """ moldesign.orbitals.ElectronicState: return the molecule's current electronic state,
+        """ moldesign.orbitals.ElectronicWfn: return the molecule's current electronic state,
         if calculated.
 
         Raises:
@@ -426,7 +429,7 @@ class Molecule(moldesign.structure.atoms.AtomContainer):
         """ Calculate forces and return them
 
         Returns:
-            moldesign.orbitals.ElectronicState: electronic wavefunction object
+            moldesign.orbitals.ElectronicWfn: electronic wavefunction object
         """
         return self.calc_property('electronic_state')
     calc_electronic_state = calculate_electronic_state
@@ -441,7 +444,7 @@ class Molecule(moldesign.structure.atoms.AtomContainer):
     def kinetic_energy(self):
         r""" u.Scalar[energy]: Classical kinetic energy :math:`\sum_{\text{atoms}} \frac{p^2}{2m}`
         """
-        return moldesign.core.helpers.kinetic_energy(self.momenta, self.dim_masses)
+        return helpers.kinetic_energy(self.momenta, self.dim_masses)
 
     @property
     def kinetic_temperature(self):
@@ -452,7 +455,7 @@ class Molecule(moldesign.structure.atoms.AtomContainer):
         where :math:`E_{\text{kin}}` is the kinetic energy and :math:`f` is the number of
         degrees of freedom (see :meth:`dynamic_dof <Molecule.dynamic_dof>`)
         """
-        return moldesign.core.helpers.kinetic_temperature(self.kinetic_energy,
+        return helpers.kinetic_temperature(self.kinetic_energy,
                                                           self.dynamic_dof)
 
     @property
@@ -756,15 +759,15 @@ class Molecule(moldesign.structure.atoms.AtomContainer):
         if self.is_small_molecule:
             return super(Molecule, self).draw(**kwargs)
         else:
-            return ui.SelectionGroup([self.draw3d(), ui.AtomInspector()])
+            return base.SelectionGroup([self.draw3d(), moldesign.widgets.components.AtomInspector()])
 
     def draw_orbitals(self, **kwargs):
         """ Visualize any calculated molecular orbitals (Jupyter only).
 
         Returns:
-            mdt.orbitals.OrbitalViz
+            mdt.orbitals.OrbitalViewer
         """
-        return moldesign.methods.orbitals.OrbitalViz(self, **kwargs)
+        return widgets.OrbitalViz(self, **kwargs)
 
     def get_stoichiometry(self, html=False):
         """ Return this molecule's stoichiometry

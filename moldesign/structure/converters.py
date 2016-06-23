@@ -26,8 +26,12 @@ from moldesign.interfaces.openmm import amber_to_mol as read_amber
 import moldesign.interfaces.biopython_interface as biopy
 from moldesign.interfaces.ambertools import build_bdna
 
-__all__ = ('read from_smiles from_pdb from_name build_bdna write read_amber '
-           'build_assembly mol_to_openmm_sim mol_to_pybel').split()
+from . import toplevel
+
+# expose these methods at the package's top level
+for mth in (mol_to_pybel, build_bdna, read_amber):
+    toplevel(mth)
+
 
 # TODO: if cpickle fails, retry with regular pickle to get a better traceback
 PICKLE_EXTENSIONS = set("p pkl pickle mdt".split())
@@ -45,6 +49,7 @@ for ext in PICKLE_EXTENSIONS:
 from_smiles = obabel.from_smiles
 
 
+@toplevel
 def read(f, format=None):
     """ Read in a molecule from a file, file-like object, or string.
     Will also depickle a pickled object.
@@ -105,6 +110,7 @@ def read(f, format=None):
     return mol
 
 
+@toplevel
 def write(obj, filename=None, format=None, mode='w'):
     """ Write a molecule to a file or string.
     Will also pickle arbitrary python objects.
@@ -150,6 +156,7 @@ def write(obj, filename=None, format=None, mode='w'):
         fileobj.close()
 
 
+@toplevel
 def mol_to_openmm_sim(mol):
     try:
         return mol.energy_model.get_openmm_simulation()
@@ -157,6 +164,7 @@ def mol_to_openmm_sim(mol):
         raise AttributeError("Can't create an OpenMM object - no OpenMM energy_model present")
 
 
+@toplevel
 def from_pdb(pdbcode):
     """ Import the given molecular geometry from PDB.org
         
@@ -179,6 +187,7 @@ def from_pdb(pdbcode):
     return mol
 
 
+@toplevel
 def from_name(name):
     """Attempt to convert an IUPAC or common name to a molecular geometry.
 
@@ -194,6 +203,7 @@ def from_name(name):
     return mol
 
 
+@toplevel
 def build_assembly(mol, assembly_name):
     """ Create biological assembly using a bioassembly specification.
 

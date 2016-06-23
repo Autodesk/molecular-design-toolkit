@@ -31,11 +31,14 @@ else:
 from pyccc import LocalFile
 
 import moldesign as mdt
-from moldesign.methods import forcefield as ff
 from moldesign import units as u
+
+from moldesign import forcefields as ff
 from moldesign import compute
-from moldesign.structure.molecule import Molecule, MolecularProperties
-from moldesign.structure.trajectory import Trajectory
+
+from moldesign.integrators.base import IntegratorBase, LangevinBase
+from moldesign.models.base import MMBase
+from moldesign.structure import Trajectory, MolecularProperties, Molecule
 
 
 class OpenMMPickleMixin(object):
@@ -55,7 +58,7 @@ class OpenMMPickleMixin(object):
         self.__dict__.update(state)
 
 
-class OpenMMBaseIntegrator(moldesign.methods.basemethods.IntegratorBase, OpenMMPickleMixin):
+class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
     _openmm_compatible = True
 
     def prep(self):
@@ -114,7 +117,7 @@ class OpenMMVerlet(OpenMMBaseIntegrator):
         return integrator
 
 
-class OpenMMLangevin(moldesign.methods.basemethods.LangevinBase, OpenMMBaseIntegrator):
+class OpenMMLangevin(LangevinBase, OpenMMBaseIntegrator):
     def get_openmm_integrator(self):
         integrator = mm.LangevinIntegrator(
             pint2simtk(self.params.temperature),
@@ -123,7 +126,7 @@ class OpenMMLangevin(moldesign.methods.basemethods.LangevinBase, OpenMMBaseInteg
         return integrator
 
 
-class OpenMMPotential(moldesign.methods.basemethods.MMBase, OpenMMPickleMixin):
+class OpenMMPotential(MMBase, OpenMMPickleMixin):
     """Creates an OpenMM "context" to drive energy calculations.
     Note that, while a dummy integrator is assigned, a different context will
     be created for any MD calculations.
@@ -220,7 +223,7 @@ class OpenMMPotential(moldesign.methods.basemethods.MMBase, OpenMMPickleMixin):
                 see https://github.com/pandegroup/openmm/issues/1155
         Args:
            nsteps(int): maximum number of steps
-           force_tolerance (moldesign.units.BuckyballQuantity): RMSD tolerance for convergence [energy/length]
+           force_tolerance (moldesign.units.MdtQuantity): RMSD tolerance for convergence [energy/length]
         """
 
         # NEWFEATURE: write/find an openmm "integrator" to do this minimization

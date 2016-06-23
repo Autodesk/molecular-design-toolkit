@@ -12,16 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import moldesign as mdt
-import moldesign.utils.callsigs
-import moldesign.utils.classes
-from moldesign import data
-from moldesign.structure.atoms import AtomContainer, AtomList
+from moldesign import data, utils
+
+from . import toplevel, AtomContainer, AtomList
 
 
-__all__ = 'Chain Residue Instance'.split()
-
-
-class Entity(AtomContainer, moldesign.utils.classes.DictLike):
+@toplevel
+class Entity(AtomContainer, utils.DictLike):
     """
     Generalized storage mechanism for hierarchical representation of biomolecules,
     e.g. by residue, chain, etc. Permits other groupings, provided that everything is
@@ -169,6 +166,7 @@ class Entity(AtomContainer, moldesign.utils.classes.DictLike):
     num_atoms = numatoms = natoms
 
 
+@toplevel
 class Instance(Entity):
     """ The singleton biomolecular container for each ``Molecule``. Its children are generally
     PDB chains. Users won't ever really see this object.
@@ -177,6 +175,7 @@ class Instance(Entity):
         return "biounit container (chains: %s) for molecule %s" % (', '.join(self.keys()), self.parent.name)
 
 
+@toplevel
 class Residue(Entity):
     """ A biomolecular residue - most often an amino acid, a nucleic base, or a solvent
     molecule. In PDB structures, also often refers to non-biochemical molecules.
@@ -193,7 +192,7 @@ class Residue(Entity):
         return newatoms[0].residue
     copy.__doc__ = Entity.copy.__doc__
 
-    @moldesign.utils.callsigs.args_from(Entity.__init__)
+    @utils.args_from(Entity.__init__)
     def __init__(self, **kwargs):
         """ Initialization
         Args:
@@ -477,6 +476,7 @@ class Residue(Entity):
         return '<br>'.join(lines)
 
 
+@toplevel
 class Chain(Entity):
     """ Biomolecular chain class - its children are almost always residues.
 
@@ -484,7 +484,7 @@ class Chain(Entity):
         parent (mdt.Molecule): the molecule this residue belongs to
         chain (Chain): the chain this residue belongs to
     """
-    @moldesign.utils.callsigs.args_from(Entity.__init__)
+    @utils.args_from(Entity.__init__)
     def __init__(self, pdbname=None, **kwargs):
         super(Chain, self).__init__(pdbname=pdbname, **kwargs)
         if self.name is None: self.name = self.pdbname
@@ -526,9 +526,11 @@ class Chain(Entity):
             r2 = residues[ires+1]
 
             # don't assign bonds unless these are contiguous bioresidues
-            if r1.pdbindex + 1 != r2.pdbindex: continue
+            if r1.pdbindex + 1 != r2.pdbindex:
+                continue
             restype = r1.type
-            if r2.type != restype: continue
+            if r2.type != restype:
+                continue
 
             # Create the bonds
             if restype == 'protein':

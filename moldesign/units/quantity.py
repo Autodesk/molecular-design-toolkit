@@ -32,14 +32,15 @@ class MdtUnit(ureg.Unit):
     Pickleable version of pint's Unit class.
     """
     def __reduce__(self):
-        return get_unit, (str(self),)
+        return _get_unit, (str(self),)
 
 
-def get_unit(unitname):
+def _get_unit(unitname):
+    """pickle helper for deserializing MdtUnit objects"""
     return getattr(ureg, unitname)
 
 
-class BuckyballQuantity(ureg.Quantity):
+class MdtQuantity(ureg.Quantity):
     """
     This is a 'patched' version of pint's quantities that can be pickled (slightly hacky)
     and supports more numpy operations.
@@ -61,11 +62,11 @@ class BuckyballQuantity(ureg.Quantity):
         if item == '__getnewargs__':
             raise AttributeError('__getnewargs__ not accessible in this class')
         else:
-            return super(BuckyballQuantity, self).__getattr__(item)
+            return super(MdtQuantity, self).__getattr__(item)
 
     def __reduce__(self):
-        replacer = list(super(BuckyballQuantity, self).__reduce__())
-        replacer[0] = BuckyballQuantity
+        replacer = list(super(MdtQuantity, self).__reduce__())
+        replacer[0] = MdtQuantity
         return tuple(replacer)
 
     def __deepcopy__(self, memo):
@@ -80,7 +81,7 @@ class BuckyballQuantity(ureg.Quantity):
     #        return fmtstring.format(m=self.magnitude,
     #                                u=self.units)
     #    except:
-    #        return super(BuckyballQuantity, self).__format__(fmt)
+    #        return super(MdtQuantity, self).__format__(fmt)
 
     def __setitem__(self, key, value):
         # Overrides pint's built-in version of this ... this is apparently way faster
@@ -109,7 +110,7 @@ class BuckyballQuantity(ureg.Quantity):
         elif other == 0.0:  # ignore units
             return self.magnitude == other
         else:
-            return super(BuckyballQuantity, self).__eq__(other)
+            return super(MdtQuantity, self).__eq__(other)
 
     @property
     def shape(self):
@@ -126,7 +127,7 @@ class BuckyballQuantity(ureg.Quantity):
         if other == 0.0:
             return op(self.magnitude, other)
         else:
-            return super(BuckyballQuantity, self).compare(other, op)
+            return super(MdtQuantity, self).compare(other, op)
 
     def get_units(self):
         """
@@ -151,7 +152,7 @@ class BuckyballQuantity(ureg.Quantity):
     def dot(self, other):
         """Compute norm but respect units
         Returns:
-            BuckyballQuantity
+            MdtQuantity
         """
         if hasattr(other, 'get_units'):
             units = self.get_units() * other.get_units()
@@ -210,243 +211,39 @@ class BuckyballQuantity(ureg.Quantity):
         return pint2simtk(self)
 
 # monkeypatch pint's unit registry to return BuckyballQuantities
-ureg.Quantity = BuckyballQuantity
+ureg.Quantity = MdtQuantity
 ureg.Unit = MdtUnit
 
 # These synonyms are here solely so that we can write descriptive docstrings
 # TODO: use typing module to turn these into real abstract types
-class Scalar(BuckyballQuantity):
+
+class Scalar(MdtQuantity):
     """ A scalar quantity (i.e., a single floating point number) with attached units
     """
     def __init__(self, *args):
-        raise NotImplementedError('This is an abstract class - use BuckyballQuantity instead')
+        raise NotImplementedError('This is an abstract class - use MdtQuantity instead')
 
 
-class Vector(BuckyballQuantity):
+class Vector(MdtQuantity):
     """ A vector quantity (i.e., a list of floats) with attached units, which behaves like a
     1-dimensional numpy array
     """
     def __init__(self, *args):
-        raise NotImplementedError('This is an abstract class - use BuckyballQuantity instead')
+        raise NotImplementedError('This is an abstract class - use MdtQuantity instead')
 
 
-class Array(BuckyballQuantity):
+class Array(MdtQuantity):
     """ A matrix quantity (i.e., a matrix of floats) with attached units, which behaves like a
     2-dimensional numpy array
     """
     def __init__(self, *args):
-        raise NotImplementedError('This is an abstract class - use BuckyballQuantity instead')
+        raise NotImplementedError('This is an abstract class - use MdtQuantity instead')
 
 
-class Tensor(BuckyballQuantity):
+class Tensor(MdtQuantity):
     """ A vector quantity (i.e., a list of floats) with attached units, which behaves like a
     multidimensional numpy array
     """
     def __init__(self, *args):
-        raise NotImplementedError('This is an abstract class - use BuckyballQuantity instead')
+        raise NotImplementedError('This is an abstract class - use MdtQuantity instead')
 
-# Constants
-unity = ureg.angstrom / ureg.angstrom
-imi = 1.0j
-pi = np.pi
-sqrtpi = np.sqrt(np.pi)
-sqrt2 = np.sqrt(2.0)
-epsilon_0 = ureg.epsilon_0
-c = ureg.speed_of_light
-alpha = ureg.fine_structure_constant
-hbar = ureg.hbar
-boltz = boltzmann_constant = k_b = ureg.boltzmann_constant
-avogadro = (1.0 * ureg.mole * ureg.avogadro_number).to(unity).magnitude
-
-# atomic units
-hartree = ureg.hartree
-a0 = bohr = ureg.bohr
-atomic_time = t0 = ureg.t0
-electron_mass = m_e = ureg.electron_mass
-electron_charge = q_e = ureg.elementary_charge
-
-# useful units
-fs = femtoseconds = ureg.fs
-ps = picoseconds = ureg.ps
-eV = electronvolts = ureg.eV
-kcalpermol = ureg.kcalpermol
-gpermol = ureg.gpermol
-kjpermol = ureg.kjpermol
-radians = rad = ureg.rad
-degrees = deg = ureg.degrees
-amu = da = dalton = ureg.amu
-kelvin = ureg.kelvin
-nm = ureg.nanometers
-ang = angstrom = ureg.ang
-
-# sets default unit systems
-def_length = angstrom
-def_time = fs
-def_vel = angstrom / fs
-def_mass = amu
-def_momentum = def_mass * def_vel
-def_force = def_momentum / def_time
-def_energy = eV
-
-
-def units_transfer(from_var, to_var, force=False):
-    """
-    Give the "to_var" object the same units as "from_var"
-    :param from_var:
-    :param to_var:
-    :param force: Transfer the units even if from_var and to_var have incompatible units
-    :return:
-    """
-
-    # If from_var is not a Quantity-like object, return a normal python scalar
-    if not hasattr(from_var, '_units'):
-        try:
-            if to_var.dimensionless or force: return to_var._magnitude
-            else: raise DimensionalityError(from_var, to_var)
-        except AttributeError:
-            return to_var
-
-    # If to_var is a quantity-like object, just perform in-place conversion
-    try:
-        return to_var.to(from_var.units)
-    except AttributeError:
-        pass
-
-    # If to_var has no units, return a Quantity object
-    return to_var * from_var.units
-
-
-def get_units(q):
-    """
-    Return the base unit system of an quantity
-    """
-    x = q
-    while True:
-        try: x = x.__iter__().next()
-        except (AttributeError, TypeError): break
-    try:
-        y = 1.0 * x
-        y._magnitude = 1.0
-        return y
-    except AttributeError:
-        return 1.0 * ureg.dimensionless
-
-
-def to_units_array(qlist, baseunit=None):
-    """
-    Facilitates creating a numpy array by standardizing units across the entire object
-    :param qlist: List-like object of quantity objects
-    :param baseunit: (optional) unit to standardize with
-    :return: Quantity object
-    """
-    if baseunit is None:
-        baseunit = get_units(qlist)
-        if baseunit == 1.0: return np.array(qlist)
-
-    try:
-        newlist = [to_units_array(item,baseunit=baseunit).magnitude
-                   for item in qlist]
-        return baseunit * newlist
-    except TypeError as exc:
-        return qlist.to(baseunit)
-
-
-class UnitSystem(object):
-    """
-    Class for standardizing units
-    Many methods will look for a unit system at moldesign.units.default
-    """
-    def __init__(self, length, mass, time, energy,
-                 temperature=kelvin,
-                 force=None, momentum=None,
-                 angle=radians,
-                 charge=q_e):
-        self.length = length
-        self.mass = mass
-        self.time = time
-        self.energy = energy
-        self.temperature = temperature
-        self.force = force
-        self.momentum = momentum
-        self.angle = angle
-        self.charge = charge
-
-    def __getitem__(self, item):
-        """ For convenience when using pint dimensionality descriptions.
-        This aliases self['item'] = self['[item]'] = self.item,
-        e.g. self['length'] = self['[length]'] = self.length
-        """
-        itemname = item.lstrip('[').rstrip(']')
-        return getattr(self, itemname)
-
-    @property
-    def force(self):
-        if self._force is None:
-            return self.energy / self.length
-        else:
-            return self._force
-
-    @force.setter
-    def force(self, f):
-        self._force = f
-
-    @property
-    def momentum(self):
-        if self._momentum is None:
-            return self.mass * self.length / self.time
-        else:
-            return self._momentum
-
-    @momentum.setter
-    def momentum(self, f):
-        self._momentum = f
-
-    def convert(self, quantity):
-        """
-        Convert a quantity into this unit system
-        @param quantity: moldesign.external.pint.Quantity
-        """
-        baseunit = self.get_baseunit(quantity)
-        result = quantity.to(baseunit)
-        return result
-
-    def get_baseunit(self, quantity):
-        # TODO: this needs to deal with angles
-        # if quantity.dimensionless: return 1.0 # don't call this - it's super-slow (Pint 0.6.1)
-
-        try:
-            dims = dict(quantity.dimensionality)
-        except AttributeError:
-            try: return self.get_baseunit(quantity[0])
-            except (IndexError, TypeError):  # Assume dimensionless
-                return 1
-        baseunit = 1
-
-        # Factor out energy units (this doesn't work for things like energy/length)
-        if '[length]' in dims and '[mass]' in dims and '[time]' in dims:
-            while dims['[length]'] >= 1 and dims['[mass]'] >= 1 and dims['[time]'] <= -2:
-                baseunit *= self['energy']
-                dims['[length]'] -= 2
-                dims['[mass]'] -= 1
-                dims['[time]'] += 2
-
-        if '[current]' in dims:
-            dims.setdefault('[charge]', 0)
-            dims.setdefault('[time]', 0)
-            dims['[charge]'] += dims['[current]']
-            dims['[time]'] -= dims['[current]']
-            dims.pop('[current]')
-
-        # Otherwise, just use the units
-        for unit in dims:
-            if dims[unit] == 0: continue
-            try:
-                baseunit *= self[unit]**dims[unit]
-            except AttributeError:
-                baseunit *= ureg[unit]**dims[unit]
-        return baseunit
-
-
-default = UnitSystem(length=angstrom, mass=amu, time=fs, energy=eV)
-atomic_units = UnitSystem(length=a0, mass=m_e, time=t0, energy=hartree)
-nano_si = UnitSystem(length=nm, mass=dalton, time=fs, energy=kjpermol)

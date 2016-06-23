@@ -77,7 +77,7 @@ Note:
 
 Electronic structure
 """"""""""""""""""""
-Quantum chemical :class:`EnergyModels <moldesign.models.EnergyModelBase>` will also create an object representing the electronic wavefunction, accessible at :class:`mol.electronic_state (see its documentation for more details) <moldesign.orbitals.ElectronicState>`.
+Quantum chemical :class:`EnergyModels <moldesign.models.EnergyModelBase>` will also create an object representing the electronic wavefunction, accessible at :class:`mol.electronic_state (see its documentation for more details) <moldesign.orbitals.ElectronicWfn>`.
 
     >>> wfn = benzene.electronic_state
     >>> wfn.aobasis

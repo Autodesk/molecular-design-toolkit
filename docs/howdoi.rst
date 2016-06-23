@@ -113,7 +113,7 @@ the molecule.
    >>> mol.potential_energy
    -6275.56597497 eV
    >>> mol.electronic_state
-   <ElectronicState (rhf/6-31g) of Molecule: benzene>
+   <ElectronicWfn (rhf/6-31g) of Molecule: benzene>
 
 These properties are stored in a :class:`dict` at ``mol.properties``:
 

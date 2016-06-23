@@ -15,17 +15,16 @@ import os
 import time
 from cStringIO import StringIO
 
-import ipywidgets as ipy
 import numpy as np
 
 import moldesign as mdt
+import moldesign.widgets.components
+from moldesign import helpers, utils
 from moldesign import units as u
-from moldesign.units import default
-from moldesign.utils import DotDict
-from moldesign.widgets import ui
+from moldesign.viewer.trajectory import TrajectoryViewer, TrajectoryOrbViewer, TrajObject
+from .molecule import MolecularProperties
 
-__all__ = 'Trajectory TrajectoryViz'.split()
-
+from . import toplevel
 
 class SubSelection(object):
     """
@@ -37,7 +36,7 @@ class SubSelection(object):
     """
 
 
-class Frame(DotDict):
+class Frame(utils.DotDict):
     """ A snapshot of a molecule during its motion. This is really just a dictionary of properties.
     These properties are those accessed as ``molecule.properties``, and can vary
     substantially depending on the origin of the trajectory. They also include relevant dynamical
@@ -65,6 +64,7 @@ class Frame(DotDict):
     pass
 
 
+@toplevel
 class Trajectory(object):
     """
     A ``Trajectory`` stores information about a molecule's motion and how its properties change as
@@ -85,7 +85,7 @@ class Trajectory(object):
     def __setstate__(self, d):
         self.__dict__.update(d)
 
-    def __init__(self, mol, unit_system=default):
+    def __init__(self, mol, unit_system=u.default):
         """ Initialization: create a new, empty trajectory based on the passed molecule
 
         Args:
@@ -122,15 +122,15 @@ class Trajectory(object):
         return len(self.frames)
 
     def draw3d(self):
-        """TrajectoryViz: create a trajectory visualization"""
-        self._viz = TrajectoryViz(self)
+        """TrajectoryViewer: create a trajectory visualization"""
+        self._viz = TrajectoryViewer(self)
         return self._viz
     draw = draw3d  # synonym for backwards compatibility
 
     def draw_orbitals(self, align=True):
-        """TrajectoryOrbViz: create a trajectory visualization"""
+        """TrajectoryOrbViewer: create a trajectory visualization"""
         if align: self.align_orbital_phases()
-        self._viz = TrajectoryOrbViz(self)
+        self._viz = TrajectoryOrbViewer(self)
         return self._viz
 
     def __str__(self):
@@ -266,7 +266,7 @@ class Trajectory(object):
         result = []
         for f in self.frames:
             val = f.get(key, None)
-            if not issubclass(type(val), u.BuckyballQuantity):
+            if not issubclass(type(val), u.MdtQuantity):
                 has_units = False
             result.append(val)
         if has_units:
@@ -282,7 +282,7 @@ class Trajectory(object):
         for frame in self.frames:
             if 'momenta' in frame:
                 energies.append(
-                    moldesign.core.helpers.kinetic_energy(frame.momenta, self.mol.dim_masses))
+                    helpers.kinetic_energy(frame.momenta, self.mol.dim_masses))
             else:
                 convert_units = False
                 energies.append(None)
@@ -300,7 +300,7 @@ class Trajectory(object):
         dof = self.mol.dynamic_dof
         for energy, frame in zip(energies, self.frames):
             if energy is not None:
-                temps.append(moldesign.core.helpers.kinetic_temperature(energy, dof))
+                temps.append(helpers.kinetic_temperature(energy, dof))
             else:
                 convert_units = False
                 temps.append(None)
@@ -325,7 +325,7 @@ class Trajectory(object):
                 continue
             if prop in frame:
                 setattr(m, prop, frame[prop])
-        m.properties = moldesign.structure.molecule.MolecularProperties(m)
+        m.properties = MolecularProperties(m)
         for attr in frame:
             m.properties[attr] = frame[attr]
 
@@ -418,115 +418,3 @@ class Trajectory(object):
         else:
             for frame in self.frames:
                 frame.electronic_state.align_orbital_phases(reference_frame.electronic_state)
-
-
-class TrajectoryViz(ui.SelectionGroup):
-    def __init__(self, trajectory, **kwargs):
-        """
-        :type trajectory: moldesign.trajectory.Trajectory
-        :param kwargs: kwargs for widget
-        :return:
-        """
-        self.default_fps = 10
-        self.traj = trajectory
-        self.pane = ipy.VBox()
-        trajectory.apply_frame(trajectory.frames[0])
-        self.viewer, self.view_container = self.make_viewer()
-        for frame in self.traj.frames[1:]:
-            self.viewer.append_frame(positions=frame.positions.reshape((trajectory.mol.num_atoms, 3)),
-                                     render=False)
-        self.make_controls()
-        self.pane.children = [self.view_container, self.controls]
-        super(TrajectoryViz, self).__init__([self.pane, ui.AtomInspector()], **kwargs)
-        self.update_selections('initialization', {'framenum': 0})
-
-    def make_viewer(self):
-        viewer = self.traj._tempmol.draw3d(style='licorice')
-        viewer.show_unbonded()
-        return viewer, viewer
-
-    def make_controls(self):
-        controls = []
-        self.play_button = ipy.Button(description=u"\u25B6")
-        self.text_view = FrameInspector(self.traj)
-        controls.append(self.text_view)
-        self.play_button.on_click(self._play)
-        self.slider = ui.create_value_selector(ipy.IntSlider, value_selects='framenum',
-                                               value=0, description='Frame:',
-                                               min=0, max=len(self.traj)-1)
-        self.playbox = ipy.HBox([self.play_button, self.slider])
-        controls.append(self.playbox)
-        self.controls = ipy.VBox(controls)
-
-    def _play(self, *args, **kwargs):
-        self.animate()
-
-    def animate(self, fps=None):
-        fps = mdt.utils.if_not_none(fps, self.default_fps)
-        self.slider.value = 0
-        spf = 1.0 / fps
-        for i in xrange(self.viewer.num_frames):
-            t0 = time.time()
-            self.slider.value = i
-            dt = time.time() - t0
-            if dt < spf:
-                time.sleep(spf-dt)
-
-    def __getattr__(self, item):
-        """Users can run viz commands directly on the trajectory,
-        e.g., trajectory.cpk(atoms=mol.chains['B'])"""
-        # TODO: modify __dir__ to match
-        return getattr(self.viewer, item)
-
-
-class TrajectoryOrbViz(TrajectoryViz):
-    def make_viewer(self):
-        viewframe = self.traj._tempmol.draw_orbitals()
-        viewframe.viewer.frame_change_callback = self.on_frame_change
-        return viewframe.viewer, viewframe
-
-    def on_frame_change(self, framenum):
-        self.traj.apply_frame(self.traj.frames[framenum])
-        self.viewer.wfn = self.traj._tempmol.electronic_state
-
-
-class FrameInspector(ipy.HTML, ui.Selector):
-    def __init__(self, traj, **kwargs):
-        self.traj = traj
-        super(FrameInspector, self).__init__(**kwargs)
-
-    def handle_selection_event(self, selection):
-        if 'framenum' not in selection:
-            return
-        else:
-            framenum = selection['framenum']
-
-        if hasattr(self.traj[framenum], 'time') and self.traj[framenum].time is not None:
-            result = 'Time: %s; ' % self.traj[framenum].time.defunits()
-        else:
-            result = ''
-
-        try:
-            result += self.traj[framenum].annotation
-        except (KeyError, AttributeError):
-            pass
-
-        self.value = result
-
-
-class TrajObject(object):  # under construction ...
-    def __init__(self, obj, traj):
-        """
-        :param obj:
-        :type traj: Trajectory
-        :return:
-        """
-        self.obj = obj
-        self.traj = traj
-
-    def distance(self, other):
-        retvals = []
-        for frame in self.traj.frames:
-            self.traj.apply_frame(frame)
-            retvals.append(self.obj.distance(other.obj))
-        return retvals

@@ -13,7 +13,11 @@
 # limitations under the License.
 import collections
 
+import numpy as np
+import webcolors
+
 import moldesign as mdt
+from moldesign import units as u
 
 
 def get_all_atoms(*objects):
@@ -67,3 +71,53 @@ def kinetic_temperature(ke, dof):
 #     for residue in obj.residues:
 #         pass
 #
+
+
+DEF_CATEGORICAL = 'Paired'
+DEF_SEQUENTIAL = None  # should be inferno, but that's only MPL >1.5
+
+
+def colormap(cats, mplmap='auto'):
+    # should make it easy to choose one for:
+    #  categorical data
+    #  sequential (low, high important)
+    #  diverging data (low, mid, high important)
+    # Can deal with numerical and categorical data
+    # we'll treat ints as categories for now
+    global DEF_SEQUENTIAL
+    from matplotlib import cm
+
+    if hasattr(cm, 'inferno'):
+        DEF_SEQUENTIAL = 'inferno'
+    else:
+        DEF_SEQUENTIAL = 'BrBG'
+
+    # strip units
+    units = None
+    if hasattr(cats[0], 'magnitude'):
+        arr = u.to_units_array(cats)
+        units = arr.units
+        cats = arr.magnitude
+
+    if not isinstance(cats, np.ndarray) and not isinstance(cats[0], float):  # treat as
+        # categorical
+        values = np.zeros(len(cats), dtype='float')
+        to_int = collections.OrderedDict()
+        for i, item in enumerate(cats):
+            if item not in to_int:
+                to_int[item] = len(to_int)
+            values[i] = to_int[item]
+        if mplmap == 'auto':
+            mplmap = DEF_CATEGORICAL
+    else:  # it's numerical
+        values = np.array(cats, dtype='float')
+        if mplmap == 'auto':
+            mplmap = DEF_SEQUENTIAL
+
+    cmap = getattr(cm, mplmap)
+    mx = values.max()
+    mn = values.min()
+    r = (values - mn) / (mx - mn)  # rescale to [0.0,1.0]
+    rgb = cmap(r)
+    hexcolors = [webcolors.rgb_to_hex(np.array(r[:3]) * 256) for r in rgb]
+    return hexcolors
