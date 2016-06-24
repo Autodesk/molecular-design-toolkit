@@ -15,14 +15,19 @@ import collections
 
 import ipywidgets as ipy
 
-import moldesign.viewer.bondclicker
-from . import toplevel
-from moldesign.widgets.components import SelBase
+from moldesign import viewer
+from moldesign.uibase.components import SelBase
 
 
-@toplevel
+def exports(o):
+    __all__.append(o.__name__)
+    return o
+__all__ = []
+
+
+@exports
 class BondSelector(SelBase):
-    VIEWERTYPE = moldesign.viewer.bondclicker.BondClicker
+    VIEWERTYPE = viewer.BondClicker
 
     def __init__(self, mol):
         super(BondSelector, self).__init__(mol)
@@ -101,7 +106,7 @@ class BondSelector(SelBase):
         super(BondSelector, self).clear_selections(*args)
 
 
-@toplevel
+@exports
 class ResidueSelector(SelBase):
     """
     Selections at the atom/residue/chain level.

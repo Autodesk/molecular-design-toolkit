@@ -14,7 +14,8 @@
 import numpy as np
 
 import moldesign as mdt
-import moldesign.widgets.logs
+import moldesign.structure.bonds
+import moldesign.uibase.logs
 from moldesign import units as u
 from moldesign import utils
 from moldesign.utils import DotDict
@@ -36,7 +37,7 @@ def run_nbo(mol, requests=('nlmo', 'nbo'),
                           command,
                           inputs=inputs,
                           name="nbo, %s" % mol.name)
-    moldesign.widgets.logs.display(job, "nbo, %s"%mol.name)
+    moldesign.uibase.logs.display(job, "nbo, %s"%mol.name)
 
     job.wait()
     parsed_data = parse_nbo(job.get_output('FILE.10'),
@@ -76,7 +77,7 @@ def add_orbitals(mol, wfn, orbdata, orbtype):
             utf_name = bname
         else:
             atoms.append(mol.atoms[orbdata.jatom[i] - 1])
-            bond = mdt.Bond(*atoms)
+            bond = moldesign.structure.bonds.Bond(*atoms)
             if orbdata.bondnums[i] == 1:  # THIS IS NOT CORRECT
                 nbotype = 'sigma'
                 utf_type = SIGMA_UTF

@@ -23,7 +23,7 @@ import traitlets
 
 import moldesign as mdt
 
-from moldesign.widgets.components import StyledTab
+from .components import StyledTab
 
 STANDARD = 25  # logging level between INFO and WARN
 

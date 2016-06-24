@@ -13,20 +13,24 @@
 # limitations under the License.
 import ipywidgets as ipy
 
-import moldesign as mdt
-import moldesign.geom.setcoord
-import moldesign.viewer.bondclicker
+from moldesign.geom import set_angle, set_dihedral, set_distance
+import moldesign.structure.bonds
+from moldesign.viewer import BondClicker
 from moldesign import units as u
 
 from moldesign import geom, utils
 
-from . import toplevel
-from moldesign.widgets.components import ViewerToolBase, ReadoutFloatSlider
+from moldesign.uibase import ViewerToolBase, ReadoutFloatSlider
+
+def exports(o):
+    __all__.append(o.__name__)
+    return o
+__all__ = []
 
 
-@toplevel
+@exports
 class GeometryBuilder(ViewerToolBase):
-    VIEWERTYPE = moldesign.viewer.bondclicker.BondClicker
+    VIEWERTYPE = BondClicker
 
     MAXDIST = 20.0  # TODO: we need to set this dynamically
     NBR2HIGHLIGHT = '#C5AED8'
@@ -103,21 +107,21 @@ class GeometryBuilder(ViewerToolBase):
         sel = self._selection
         assert sel.type == 'bond'
         dist_in_angstrom = self.length_slider.value
-        moldesign.geom.setcoord.set_distance(sel.a1, sel.a2, dist_in_angstrom*u.angstrom, adjustmol=self.adjust_button.value)
+        set_distance(sel.a1, sel.a2, dist_in_angstrom*u.angstrom, adjustmol=self.adjust_button.value)
         self.viewer.set_positions()
 
     def set_angle(self, *args):
         sel = self._selection
         assert sel.type == 'bond'
         angle = self.angle_slider.value
-        moldesign.geom.setcoord.set_angle(sel.a1, sel.a2, sel.nbr_a2, angle*u.pi/180.0, adjustmol=self.adjust_button.value)
+        set_angle(sel.a1, sel.a2, sel.nbr_a2, angle*u.pi/180.0, adjustmol=self.adjust_button.value)
         self.viewer.set_positions()
 
     def set_dihedral(self, *args):
         sel = self._selection
         assert sel.type == 'bond'
         angle = self.dihedral_slider.value
-        moldesign.geom.setcoord.set_dihedral(sel.nbr_a1, sel.a1, sel.a2, sel.nbr_a2, angle*u.pi/180.0,
+        set_dihedral(sel.nbr_a1, sel.a1, sel.a2, sel.nbr_a2, angle*u.pi/180.0,
                                              adjustmol=self.adjust_button.value)
         self.viewer.set_positions()
 
@@ -148,7 +152,7 @@ class GeometryBuilder(ViewerToolBase):
                 return self.clear_selection()
 
             elif atom in sel.atom.bond_graph:  # select the bond
-                return self.bond_click(mdt.Bond(sel.atom, atom))  # turn this into a bond selection
+                return self.bond_click(moldesign.structure.bonds.Bond(sel.atom, atom))  # turn this into a bond selection
             else:  # select a new atom
                 self.clear_selection(render=False)
                 sel = self._selection
@@ -300,12 +304,12 @@ class GeometryBuilder(ViewerToolBase):
             self._highlight_atoms([sel.a1, sel.a2], render=False)
 
             if sel.nbr_a1 is not None:
-                nmdtond = mdt.Bond(sel.a1, sel.nbr_a1)
+                nmdtond = moldesign.structure.bonds.Bond(sel.a1, sel.nbr_a1)
                 self._highlight_atoms([sel.nbr_a1], color=self.NBR1HIGHLIGHT, render=False)
                 self.viewer.set_bond_color(self.NBR1HIGHLIGHT, nmdtond, render=False)
                 self._highlighted_bonds.append(nmdtond)
             if sel.nbr_a2 is not None:
-                nmdtond = mdt.Bond(sel.a2, sel.nbr_a2)
+                nmdtond = moldesign.structure.bonds.Bond(sel.a2, sel.nbr_a2)
                 self._highlight_atoms([sel.nbr_a2], color=self.NBR2HIGHLIGHT, render=False)
                 self.viewer.set_bond_color(self.NBR2HIGHLIGHT, nmdtond, render=False)
                 self._highlighted_bonds.append(nmdtond)

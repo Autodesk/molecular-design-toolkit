@@ -11,14 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from moldesign.interfaces.openmm import OpenMMLangevin, OpenMMVerlet
+
+class NoConvergence(Exception):
+    """ Raised when an iterative property calculation fails to converge """
+    pass
 
 
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
-
-
-exports(OpenMMLangevin)
-exports(OpenMMVerlet)
+class NotCalculatedError(Exception):
+    """ Raised when a molecular property is requested that hasn't been calculated """
+    pass

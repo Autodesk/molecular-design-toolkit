@@ -20,8 +20,9 @@ except ImportError:
 else:
     force_remote = False
 
-import moldesign.interfaces.openmm as opm
 from moldesign import units as u
+
+from .  import openmm as opm
 
 
 def add_hydrogen(mol, pH=7.4):
@@ -42,12 +43,14 @@ def mutate(mol, mutationmap):
         fixer.applyMutations(mutations, chainid)
     return _get_mol(fixer)
 
+
 def solvate(mol, padding=10.0*u.angstrom, size=None, cation='Na+', anion='Cl-'):
     fixer = _get_fixer(mol)
     if size is not None: size = size.to_simtk()
     if padding is not None: padding = padding.to_simtk()
     fixer.addSolvent(padding=padding, boxSize=size, positiveIon=cation, negativeIon=anion)
     return _get_mol(fixer)
+
 
 def _get_fixer(mol):
     mol.write('/tmp/tmp.pdb', format='pdb')

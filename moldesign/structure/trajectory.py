@@ -18,13 +18,12 @@ from cStringIO import StringIO
 import numpy as np
 
 import moldesign as mdt
-import moldesign.widgets.components
 from moldesign import helpers, utils
 from moldesign import units as u
-from moldesign.viewer.trajectory import TrajectoryViewer, TrajectoryOrbViewer, TrajObject
-from .molecule import MolecularProperties
 
+from .molecule import MolecularProperties
 from . import toplevel
+
 
 class SubSelection(object):
     """
@@ -66,12 +65,35 @@ class Frame(utils.DotDict):
 
 @toplevel
 class Trajectory(object):
-    """
-    A ``Trajectory`` stores information about a molecule's motion and how its properties change as
-    it moves. A trajectory object contains 1) a reference to the :class:`Molecule` it describes, and
-    2) a list of :class:`Frame` objects, each one containing a snapshot of the molecule at a
+    """ A ``Trajectory`` stores information about a molecule's motion and how its properties
+    change as it moves.
+
+    A trajectory object contains
+      1. a reference to the :class:`moldesign.Molecule` it describes, and
+      2. a list of :class:`Frame` objects, each one containing a snapshot of the molecule at a
     particular point in its motion.
+
+    Args:
+        mol (moldesign.Molecule): the trajectory will describe the motion of this molecule
+        unit_system (u.UnitSystem): convert all attributes to this unit system (default:
+            ``moldesign.units.default``)
+
+    Attributes:
+        mol (moldesign.Molecule): the molecule object that this trajectory comes from
+        frames (List[Frame]): a list of the trajectory frames in the order they were created
+        info (str): text describing this trajectory
+        unit_system (u.UnitSystem): convert all attributes to this unit system
     """
+    def __init__(self, mol, unit_system=u.default):
+        self._init = True
+        self.info = "Trajectory"
+        self.frames = []
+        self.mol = mol
+        self.unit_system = unit_system
+        self._property_keys = None
+        self._tempmol = mdt.Molecule(self.mol.atoms, copy_atoms=True)
+        self._tempmol.dynamic_dof = self.mol.dynamic_dof
+        self._viz = None
 
     # TODO: the current implementation does not support cases where the molecular topology changes
     # TODO: allow caching to disk for very large trajectories
@@ -85,33 +107,6 @@ class Trajectory(object):
     def __setstate__(self, d):
         self.__dict__.update(d)
 
-    def __init__(self, mol, unit_system=u.default):
-        """ Initialization: create a new, empty trajectory based on the passed molecule
-
-        Args:
-            mol (moldesign.Molecule): the trajectory will describe the motion of this molecule
-            unit_system (u.UnitSystem): convert all attributes to this unit system
-        """
-        self._init = True
-        self.info = "Trajectory"
-        self.frames = []
-        self.mol = mol
-        self.unit_system = unit_system
-        self._property_keys = None
-        self._tempmol = mdt.Molecule(self.mol.atoms, copy_atoms=True)
-        self._tempmol.dynamic_dof = self.mol.dynamic_dof
-        self._viz = None
-        self.atoms = [TrajObject(a, self) for a in mol.atoms]
-        self.chains = [TrajObject(c, self) for c in mol.chains]
-        self.residues = [TrajObject(r, self) for r in mol.residues]
-
-    """ Attributes:
-        mol (moldesign.Molecule): the molecule object that this trajectory comes from
-        frames (List[Frame]): a list of the trajectory frames in the order they were created
-        info (str): text describing this trajectory
-        unit_system (u.UnitSystem): convert all attributes to this unit system
-    """
-
     @property
     def num_frames(self):
         """int: number of frames in this trajectory"""
@@ -123,14 +118,16 @@ class Trajectory(object):
 
     def draw3d(self):
         """TrajectoryViewer: create a trajectory visualization"""
-        self._viz = TrajectoryViewer(self)
+        from moldesign import widgets
+        self._viz = widgets.TrajectoryViewer(self)
         return self._viz
     draw = draw3d  # synonym for backwards compatibility
 
     def draw_orbitals(self, align=True):
         """TrajectoryOrbViewer: create a trajectory visualization"""
+        from moldesign import widgets
         if align: self.align_orbital_phases()
-        self._viz = TrajectoryOrbViewer(self)
+        self._viz = widgets.TrajectoryOrbViewer(self)
         return self._viz
 
     def __str__(self):

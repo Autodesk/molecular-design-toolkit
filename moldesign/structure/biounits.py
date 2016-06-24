@@ -14,7 +14,7 @@
 import moldesign as mdt
 from moldesign import data, utils
 
-from . import toplevel, AtomContainer, AtomList
+from . import toplevel, AtomList, AtomContainer
 
 
 @toplevel

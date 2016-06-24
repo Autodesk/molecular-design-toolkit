@@ -16,9 +16,8 @@ import collections
 import ipywidgets as ipy
 import traitlets
 
-import moldesign as mdt
-from moldesign import utils
-from . import Selector
+from moldesign import utils, viewer
+from .selector import Selector
 
 
 class StyledTab(ipy.Tab):
@@ -59,7 +58,7 @@ class ViewerToolBase(ipy.Box):
     The base for most viewer-based widgets - it consists of a viewer in the top-left,
     UI controls on the right, and some additional widgets underneath the viewer
     """
-    VIEWERTYPE = mdt.viewer.GeometryViewer
+    VIEWERTYPE = viewer.GeometryViewer
 
     def __init__(self, mol):
         self.mol = mol

@@ -1,13 +1,14 @@
-import os
 import pickle
 import random
 
 import numpy as np
 import pytest
+
 import moldesign as mdt
+import moldesign.exceptions
+import moldesign.structure.atomcollections
 import moldesign.utils.classes
 from moldesign import units as u
-
 
 registered_types = {}
 
@@ -127,8 +128,8 @@ def h2():
 def h2_harmonic():
     mol = h2()
     SPRING_CONSTANT = 1.0 * u.kcalpermol / (u.angstrom ** 2)
-    model = mdt.models.HarmonicOscillator(k=SPRING_CONSTANT)
-    integrator = mdt.integrators.VelocityVerlet(timestep=0.5 * u.fs, frame_interval=30)
+    model = moldesign.methods.models.HarmonicOscillator(k=SPRING_CONSTANT)
+    integrator = moldesign.methods.integrators.VelocityVerlet(timestep=0.5*u.fs, frame_interval=30)
     mol.set_energy_model(model)
     mol.set_integrator(integrator)
     return mol
@@ -255,7 +256,7 @@ def test_h2_harmonic_copy_loses_simulation(h2_harmonic_copy, h2_harmonic):
 
 def test_h2_calculation_caching(h2_harmonic):
     h2 = h2_harmonic
-    h2.properties = mdt.molecule.MolecularProperties(h2)
+    h2.properties = moldesign.structure.molecule.MolecularProperties(h2)
     true_energy = h2.calc_potential_energy()
     assert 'potential_energy' in h2.properties
     assert 'forces' in h2.properties
@@ -282,17 +283,17 @@ def test_h2_cache_flush(h2_harmonic):
 def test_h2_not_calculated_yet(h2_harmonic):
     h2_harmonic.calculate()
     h2_harmonic.atoms[1].x += 0.3*u.ang
-    with pytest.raises(mdt.molecule.NotCalculatedError):
+    with pytest.raises(moldesign.exceptions.NotCalculatedError):
         h2_harmonic.forces
-    with pytest.raises(mdt.molecule.NotCalculatedError):
+    with pytest.raises(moldesign.exceptions.NotCalculatedError):
         h2_harmonic.potential_energy
 
 def h2_properties_raises_not_calculated_yet(h2_harmonic):
     h2_harmonic.calculate()
     h2_harmonic.atoms[1].x += 0.3*u.ang
-    with pytest.raises(mdt.molecule.NotCalculatedError):
+    with pytest.raises(moldesign.exceptions.NotCalculatedError):
         h2_harmonic.properties.forces
-    with pytest.raises(mdt.molecule.NotCalculatedError):
+    with pytest.raises(moldesign.exceptions.NotCalculatedError):
         h2_harmonic.properties.potential_energy
 
 @typedfixture('submolecule')
@@ -377,7 +378,7 @@ def ligand3aid(ligand_residue_3aid):
 
 @pytest.fixture
 def random_atoms_from_3aid(pdb3aid):
-    atoms = mdt.AtomList(random.sample(pdb3aid.atoms, 10))
+    atoms = moldesign.structure.atomcollections.AtomList(random.sample(pdb3aid.atoms, 10))
     return atoms
 
 
@@ -499,7 +500,7 @@ def test_molecule_bonds(molkey, request):
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_types(molkey, request):
     mol = request.getfuncargvalue(molkey)
-    assert issubclass(type(mol.atoms), mdt.AtomList)
+    assert issubclass(type(mol.atoms), moldesign.structure.atomcollections.AtomList)
     for atom in mol.atoms:
         assert issubclass(type(atom), mdt.Atom)
     for residue in mol.residues:

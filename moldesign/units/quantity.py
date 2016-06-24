@@ -196,14 +196,14 @@ class MdtQuantity(ureg.Quantity):
     # defunits = ureg.Quantity.to_base_units  # replacing this with the new pint implementation
     def defunits(self):
         """Return this quantity in moldesign's default unit system (as specified in moldesign.units.default)"""
-        #import moldesign.core.units as u
+        from . import default
         return default.convert(self)
 
     # defunits_inplace = ureg.Quantity.ito_base_units  # replacing this with the new pint implementation
     def defunits_inplace(self):
         """Internally convert quantity to default units"""
-        from moldesign import units as u
-        newunit = u.default.get_baseunit(self)
+        from . import default
+        newunit = default.get_baseunit(self)
         return self.ito(newunit)
 
     def to_simtk(self):

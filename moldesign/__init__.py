@@ -11,39 +11,45 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import
-
 import os as _os
 
 _building_docs = bool(_os.environ.get('SPHINX_IS_BUILDING_DOCS', ""))
 
 import moldesign.__main__
 
-from moldesign import data
+from . import data
 PACKAGEPATH = data.PACKAGEPATH
 
-# Expose subpackage routines - note that order is important here!
-from moldesign import structure
-from moldesign.structure import *
+# Import all subpackages / submodules
+from . import compute
+from . import converters
+from . import exceptions
+from . import external
+from . import forcefields
+from . import geom
+from . import helpers
+from . import integrators
+from . import interfaces
+from . import keywords
+from . import mathutils
+from . import min
+from . import models
+from . import method
+from . import orbitals
+from . import structure
+from . import tools
+from . import uibase
+from . import units
+from . import utils
+from . import viewer
+from . import widgets
 
-
-from moldesign.geom import *
-from moldesign.methods import *
-from moldesign.widgets import *
-
-
-
-# expose these modules at the top level -- TODO: don't?
-#from moldesign.structure import atoms, biounits, molecule, trajectory, converters
-#from moldesign import biounits, units, tools, data
-#from moldesign import converters
-#from moldesign.methods import forcefield
-#from moldesign.geom import geometry
-#from moldesign.structure import molecule
-#from moldesign import trajectory
-
-#from moldesign.methods import models, forcefield, basemethods, integrators
-
+# Populate the top-level namespace
+from .converters import *
+from .geom import *
+from .orbitals import *
+from .structure import *
+from .viewer import *
 
 # package metadata
 from moldesign import _version
@@ -61,6 +67,7 @@ if _building_docs:
                molecule.__all__+
                tools.__all__+
                trajectory.__all__)
+
 
 # Set warnings appropriately
 # TODO: don't clobber user's or other package's settings!!!

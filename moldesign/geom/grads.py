@@ -1,8 +1,9 @@
 import numpy as np
 
 from moldesign import units as u
+from moldesign.mathutils import normalized
 
-from . import normalized, angle, toplevel
+from . import toplevel, angle
 
 
 @toplevel

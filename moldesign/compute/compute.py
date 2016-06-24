@@ -106,6 +106,7 @@ class RunsRemotely(object):
         @utils.args_from(func)  # TODO: should inject 'wait', deal with functools.wraps
         def wrapper(*args, **kwargs):
             """This documentation should be replaced with `func`'s by the decorator"""
+            from moldesign.uibase import logs
 
             f = func  # because we reassign instance methods
             if not wrapper.remote:
@@ -130,7 +131,7 @@ class RunsRemotely(object):
                                 name=self.jobname,
                                 sendsource=self.sendsource)
             if self.display:
-                moldesign.widgets.logs.display(job, title=f.__name__)
+                logs.display(job, title=f.__name__)
 
             if wait:
                 job.wait()

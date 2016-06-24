@@ -14,7 +14,9 @@
 import numpy as np
 
 from moldesign import units as u
-from . import normalized, safe_arccos, toplevel
+from moldesign.mathutils import normalized, safe_arccos
+
+from . import toplevel
 
 
 # NEWFEATURE: preliminary profiling indicates that, for interactive work, the UNITS LIBRARY is

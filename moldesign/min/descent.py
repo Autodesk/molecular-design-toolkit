@@ -14,7 +14,8 @@
 import numpy as np
 
 from moldesign import units as u
-from . import toplevel, MinimizerBase
+from .base import MinimizerBase
+from . import toplevel
 
 
 def exports(o):

@@ -16,6 +16,8 @@ from __future__ import absolute_import
 import os
 import string
 
+import moldesign.structure.atomcollections
+
 try:
     import pybel as pb
     import openbabel as ob  # WARNING: this is the real library, not our interface - this works because of absolute (ctd)
@@ -240,7 +242,7 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
     newatom_map = {}
     newresidues = {}
     newchains = {}
-    newatoms = moldesign.structure.atoms.AtomList([])
+    newatoms = moldesign.structure.atomcollections.AtomList([])
     backup_chain_names = list(string.ascii_uppercase)
 
     for pybatom in pbmol.atoms:

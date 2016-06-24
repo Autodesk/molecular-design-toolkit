@@ -197,7 +197,7 @@ def make_contact_view(entity, view_radius=5.0*u.ang,
     :param kwargs:
     :return:
     """
-    from moldesign.structure.atoms import AtomList
+    from moldesign.structure import AtomList
 
     try:
         focus_atoms = AtomList(entity.atoms)

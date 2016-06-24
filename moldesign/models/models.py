@@ -13,20 +13,12 @@
 # limitations under the License.
 # TODO: look into http://molmod.github.io/
 
-
-from moldesign.interfaces.openmm import OpenMMPotential
-from moldesign.interfaces.pyscf_interface import PySCFPotential
-
+from . import PySCFPotential
 
 def exports(o):
     __all__.append(o.__name__)
     return o
 __all__ = []
-
-
-exports(OpenMMPotential)
-exports(PySCFPotential)
-
 
 @exports
 def RHF(**kwargs):

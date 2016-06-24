@@ -5,4 +5,4 @@ def toplevel(o):
 
 from . import base
 from .verlet import *
-from .integrators import *
+from .openmm import *

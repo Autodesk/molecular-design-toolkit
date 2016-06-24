@@ -13,11 +13,11 @@
 # limitations under the License.
 
 import moldesign as mdt
+import moldesign.structure.atomcollections
 from moldesign import units as u
-
-from .grads import *
+from moldesign.mathutils import *
 from .coords import *
-from .math import *
+from .grads import *
 
 DIST_TOLERANCE = 1.0e-3 * u.angstrom
 DIST_FORCE_CONSTANT = 1000.0 * u.kcalpermol / (u.angstrom**2)
@@ -42,7 +42,7 @@ class GeometryConstraint(object):
             force_constant (u.Scalar[force]): optional, only for minimizations and/or use in
                restraints)
         """
-        self.atoms = mdt.AtomList(atoms)
+        self.atoms = moldesign.structure.atomcollections.AtomList(atoms)
         self.mol = self.atoms[0].parent
         self.tolerance = tolerance
         self.force_constant = force_constant

@@ -16,8 +16,36 @@ import collections
 import numpy as np
 import webcolors
 
-import moldesign as mdt
 from moldesign import units as u
+
+
+class VolumetricGrid(object):
+    """
+    Helper object for preparing gaussian CUBE files
+    """
+    UNITS = u.angstrom
+    def __init__(self, positions, padding=2.5*u.angstrom, npoints=25):
+        mins = positions.min(axis=0) - padding
+        maxes = positions.max(axis=0) + padding
+        self.npoints = npoints
+        self.xr = (mins[0], maxes[0])
+        self.yr = (mins[1], maxes[1])
+        self.zr = (mins[2], maxes[2])
+        self._origin = mins.value_in(self.UNITS)
+        self.dx = (self.xr[1] - self.xr[0]).value_in(self.UNITS) / (float(npoints) - 1)
+        self.dy = (self.yr[1] - self.yr[0]).value_in(self.UNITS) / (float(npoints) - 1)
+        self.dz = (self.zr[1] - self.zr[0]).value_in(self.UNITS) / (float(npoints) - 1)
+        self.fxyz = None
+
+    def xyzlist(self):
+        stride = self.npoints * 1j
+        grids = np.mgrid[self.xr[0]:self.xr[1]:stride,
+                self.yr[0]:self.yr[1]:stride,
+                self.zr[0]:self.zr[1]:stride]
+        return grids * self.UNITS
+
+    def origin(self):
+        return tuple(self._origin)
 
 
 def get_all_atoms(*objects):
@@ -31,21 +59,23 @@ def get_all_atoms(*objects):
             List[moldesign.AtomContainer]): objects to take atoms from
 
     """
+    from . import structure
+
     atoms = collections.OrderedDict()
 
     for obj in objects:
-        if isinstance(obj, mdt.Atom):
+        if isinstance(obj, structure.Atom):
             atoms[obj] = None
         elif hasattr(obj, 'atoms'):
             atoms.update((x,None) for x in obj.atoms)
         else:
             for item in obj:
-                if isinstance(item, mdt.Atom):
+                if isinstance(item, structure.Atom):
                     atoms[item] = None
                 elif hasattr(item, 'atoms'):
                     atoms.update((x, None) for x in item.atoms)
 
-    return mdt.AtomList(atoms.iterkeys())
+    return structure.AtomList(atoms.iterkeys())
 
 
 def kinetic_energy(momenta, masses):

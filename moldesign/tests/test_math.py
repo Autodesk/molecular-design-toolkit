@@ -1,11 +1,9 @@
 import random
 
-import pytest
 import numpy as np
-
 import numpy.testing as npt
+import pytest
 
-import moldesign as mdt
 from moldesign import units as u
 
 registered_types = {}
@@ -25,29 +23,29 @@ def typedfixture(*types, **kwargs):
 
 @typedfixture('gaussian')
 def std_1d_gaussian():
-    g = mdt.gaussians.Gaussian([0.0]*u.angstrom,
-                                        1.0/u.angstrom ** 2)
+    g = moldesign.methods.gaussians.Gaussian([0.0]*u.angstrom,
+                                             1.0/u.angstrom ** 2)
     return g
 
 
 @typedfixture('gaussian')
 def std_3d_gaussian():
-    g = mdt.gaussians.Gaussian([0.0, 0.0, 0.0]*u.angstrom,
-                                        1.0/u.angstrom ** 2)
+    g = moldesign.methods.gaussians.Gaussian([0.0, 0.0, 0.0]*u.angstrom,
+                                             1.0/u.angstrom ** 2)
     return g
 
 
 @typedfixture('gaussian')
 def std_10d_gaussian():
-    g = mdt.gaussians.Gaussian([0.0 for i in xrange(10)]*u.angstrom,
-                                        1.0/u.angstrom ** 2)
+    g = moldesign.methods.gaussians.Gaussian([0.0 for i in xrange(10)]*u.angstrom,
+                                             1.0/u.angstrom ** 2)
     return g
 
 @typedfixture('cartesiangaussian')
 def cart_10d_gaussian():
-    g = mdt.gaussians.CartesianGaussian(center=[random.random() for i in xrange(10)]*u.angstrom,
-                               powers=[random.choice([0, 1, 2, 3]) for i in xrange(10)],
-                               exp=1.1/u.angstrom ** 2)
+    g = moldesign.methods.gaussians.CartesianGaussian(center=[random.random() for i in xrange(10)]*u.angstrom,
+                                                      powers=[random.choice([0, 1, 2, 3]) for i in xrange(10)],
+                                                      exp=1.1/u.angstrom ** 2)
     return g
 
 
@@ -97,12 +95,12 @@ def test_vectorized_gaussian_function_evaluations(objkey, request):
 
 
 def test_gaussian_self_overlap_is_unity():
-    g1 = mdt.gaussians.Gaussian([0.0, 0.0, 0.0]*u.angstrom,
-                                1.0/u.angstrom ** 2,
-                                coeff=-1.0)
-    g2 = mdt.gaussians.Gaussian([0.0, 0.0, 0.0]*u.angstrom,
-                                1.0/u.angstrom ** 2,
-                                coeff=123.456)
+    g1 = moldesign.methods.gaussians.Gaussian([0.0, 0.0, 0.0]*u.angstrom,
+                                              1.0/u.angstrom ** 2,
+                                              coeff=-1.0)
+    g2 = moldesign.methods.gaussians.Gaussian([0.0, 0.0, 0.0]*u.angstrom,
+                                              1.0/u.angstrom ** 2,
+                                              coeff=123.456)
     npt.assert_almost_equal(-1.0,
                             g1.overlap(g2, normalized=True))
 

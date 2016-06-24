@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import moldesign as mdt
-import moldesign.widgets.logs
+import moldesign.uibase.logs
 from moldesign import utils
 
 def name_to_smiles(name,
@@ -28,6 +28,6 @@ def name_to_smiles(name,
                           command,
                           inputs={'input.txt': name + '\n'},
                           name="opsin, %s" % name)
-    moldesign.widgets.logs.display(job, "opsin, %s"%name)
+    moldesign.uibase.logs.display(job, "opsin, %s"%name)
     job.wait()
     return job.get_output('output.txt').read().strip()

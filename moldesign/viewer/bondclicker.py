@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from moldesign import units as u
-from moldesign.geom.math import perpendicular
+from moldesign.mathutils import perpendicular
 
 from . import GeometryViewer
 

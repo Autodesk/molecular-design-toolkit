@@ -19,9 +19,8 @@ import numpy as np
 import moldesign as mdt
 from moldesign import units as u
 from moldesign import utils
-from moldesign.helpers import colormap
+from moldesign.helpers import colormap, VolumetricGrid
 from moldesign.utils import is_color
-from moldesign.viewer.orbitals import VolumetricGrid
 from nbmolviz.drivers3d import MolViz_3DMol
 from . import toplevel
 
@@ -202,7 +201,7 @@ class GeometryViewer(MolViz_3DMol):
                      for atom in self.mol.atoms]
         return positions
 
-    def calc_orb_grid(self, orbname, npts=30, padding=2.5 * u.angstrom):
+    def calc_orb_grid(self, orbname, npts=30, padding=2.5*u.angstrom):
         """ Calculate orbitals on a grid
 
         Args:
@@ -236,9 +235,6 @@ class GeometryViewer(MolViz_3DMol):
         return grid
 
     def get_orbnames(self):
-        """
-        :return:
-        """
         raise NotImplementedError()
 
     def draw_atom_vectors(self, vecs, rescale_to=1.75,

@@ -15,7 +15,7 @@ import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
-from moldesign.keywords import mm_model_parameters as mmp
+from moldesign.keywords import mm_model_parameters as mmp, qm_model_parameters as qmp
 from moldesign.method import Method
 
 

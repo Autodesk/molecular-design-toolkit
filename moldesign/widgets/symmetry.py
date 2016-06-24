@@ -20,6 +20,13 @@ from moldesign import units as u
 from moldesign.geom.symmetry import get_symmetry
 
 
+def exports(o):
+    __all__.append(o.__name__)
+    return o
+__all__ = []
+
+
+@exports
 class Symmetrizer(ipy.Box):
     def __init__(self, mol):
         self._current_shapes = []

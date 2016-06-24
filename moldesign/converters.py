@@ -20,17 +20,18 @@ import functools
 
 import moldesign as mdt
 import moldesign.interfaces.openbabel as obabel
+import moldesign.structure.atomcollections
 from moldesign.interfaces.openbabel import mol_to_pybel
 from moldesign.interfaces.opsin_interface import name_to_smiles
 from moldesign.interfaces.openmm import amber_to_mol as read_amber
 import moldesign.interfaces.biopython_interface as biopy
 from moldesign.interfaces.ambertools import build_bdna
 
-from . import toplevel
 
-# expose these methods at the package's top level
-for mth in (mol_to_pybel, build_bdna, read_amber):
-    toplevel(mth)
+def exports(o, name=None):
+    __all__.append(o.__name__)
+    return o
+__all__ = ['read_amber', 'mol_to_pybel', 'build_bdna']
 
 
 # TODO: if cpickle fails, retry with regular pickle to get a better traceback
@@ -49,7 +50,7 @@ for ext in PICKLE_EXTENSIONS:
 from_smiles = obabel.from_smiles
 
 
-@toplevel
+@exports
 def read(f, format=None):
     """ Read in a molecule from a file, file-like object, or string.
     Will also depickle a pickled object.
@@ -110,7 +111,7 @@ def read(f, format=None):
     return mol
 
 
-@toplevel
+@exports
 def write(obj, filename=None, format=None, mode='w'):
     """ Write a molecule to a file or string.
     Will also pickle arbitrary python objects.
@@ -156,7 +157,7 @@ def write(obj, filename=None, format=None, mode='w'):
         fileobj.close()
 
 
-@toplevel
+@exports
 def mol_to_openmm_sim(mol):
     try:
         return mol.energy_model.get_openmm_simulation()
@@ -164,7 +165,7 @@ def mol_to_openmm_sim(mol):
         raise AttributeError("Can't create an OpenMM object - no OpenMM energy_model present")
 
 
-@toplevel
+@exports
 def from_pdb(pdbcode):
     """ Import the given molecular geometry from PDB.org
         
@@ -187,7 +188,7 @@ def from_pdb(pdbcode):
     return mol
 
 
-@toplevel
+@exports
 def from_name(name):
     """Attempt to convert an IUPAC or common name to a molecular geometry.
 
@@ -203,7 +204,7 @@ def from_name(name):
     return mol
 
 
-@toplevel
+@exports
 def build_assembly(mol, assembly_name):
     """ Create biological assembly using a bioassembly specification.
 
@@ -242,7 +243,7 @@ def build_assembly(mol, assembly_name):
     alpha = iter(string.ascii_uppercase)
 
     # Create the new molecule by copying, transforming, and renaming the original chains
-    all_atoms = mdt.AtomList()
+    all_atoms = moldesign.structure.atomcollections.AtomList()
     for i, t in enumerate(asm.transforms):
         for chain_name in asm.chains:
             chain = mol.chains[chain_name].copy()

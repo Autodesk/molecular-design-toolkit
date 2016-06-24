@@ -16,13 +16,12 @@ import time
 import ipywidgets as ipy
 
 import moldesign as mdt
-from moldesign import widgets
 
-from . import toplevel
+from moldesign.uibase.components import AtomInspector
+from moldesign.uibase import selector
 
 
-@toplevel
-class TrajectoryViewer(widgets.SelectionGroup):
+class TrajectoryViewer(selector.SelectionGroup):
     def __init__(self, trajectory, **kwargs):
         """
         :type trajectory: moldesign.trajectory.Trajectory
@@ -39,7 +38,7 @@ class TrajectoryViewer(widgets.SelectionGroup):
                                      render=False)
         self.make_controls()
         self.pane.children = [self.view_container, self.controls]
-        super(TrajectoryViewer, self).__init__([self.pane, moldesign.widgets.components.AtomInspector()], **kwargs)
+        super(TrajectoryViewer, self).__init__([self.pane, AtomInspector()], **kwargs)
         self.update_selections('initialization', {'framenum': 0})
 
     def make_viewer(self):
@@ -53,9 +52,9 @@ class TrajectoryViewer(widgets.SelectionGroup):
         self.text_view = FrameInspector(self.traj)
         controls.append(self.text_view)
         self.play_button.on_click(self._play)
-        self.slider = widgets.create_value_selector(ipy.IntSlider, value_selects='framenum',
-                                               value=0, description='Frame:',
-                                               min=0, max=len(self.traj)-1)
+        self.slider = selector.create_value_selector(ipy.IntSlider, value_selects='framenum',
+                                                     value=0, description='Frame:',
+                                                     min=0, max=len(self.traj)-1)
         self.playbox = ipy.HBox([self.play_button, self.slider])
         controls.append(self.playbox)
         self.controls = ipy.VBox(controls)
@@ -81,7 +80,6 @@ class TrajectoryViewer(widgets.SelectionGroup):
         return getattr(self.viewer, item)
 
 
-@toplevel
 class TrajectoryOrbViewer(TrajectoryViewer):
     def make_viewer(self):
         viewframe = self.traj._tempmol.draw_orbitals()
@@ -93,7 +91,7 @@ class TrajectoryOrbViewer(TrajectoryViewer):
         self.viewer.wfn = self.traj._tempmol.electronic_state
 
 
-class FrameInspector(ipy.HTML, widgets.Selector):
+class FrameInspector(ipy.HTML, selector.Selector):
     def __init__(self, traj, **kwargs):
         self.traj = traj
         super(FrameInspector, self).__init__(**kwargs)

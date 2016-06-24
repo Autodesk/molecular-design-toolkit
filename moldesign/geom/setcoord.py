@@ -13,9 +13,12 @@
 # limitations under the License.
 import numpy as np
 
-import moldesign as mdt
+import moldesign.structure.atomcollections
 from moldesign import external
-from . import toplevel, angle, dihedral, sub_angles, apply_4x4_transform
+from moldesign.mathutils import sub_angles, apply_4x4_transform
+
+from . import toplevel, angle, dihedral
+
 
 @toplevel
 def set_distance(a1, a2, newlength, adjustmol=True):
@@ -132,7 +135,7 @@ def _get_fragment(mol, a1, a2):
                 dfs_dive(nbr)
     dfs_dive(a1)
     visited.remove(a2)
-    result = mdt.AtomList(visited)
+    result = moldesign.structure.atomcollections.AtomList(visited)
     return result
 
 
