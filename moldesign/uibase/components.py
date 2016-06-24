@@ -42,7 +42,7 @@ class AtomInspector(ipy.HTML, Selector):
             res = atom.residue
             chain = res.chain
             self.value = (
-                "<b>Molecule</b>: %s<br>" % atom.parent.name +
+                "<b>Molecule</b>: %s<br>" % atom.molecule.name +
                 "<b>Chain</b> %s<br>" % chain.name +
                 "<b>Residue</b> %s, index %d<br>" % (res.name, res.index) +
                 "<b>Atom</b> %s (%s), index %d<br>" % (atom.name, atom.symbol, atom.index))

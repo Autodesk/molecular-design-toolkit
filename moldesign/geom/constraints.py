@@ -43,11 +43,11 @@ class GeometryConstraint(object):
                restraints)
         """
         self.atoms = moldesign.structure.atomcollections.AtomList(atoms)
-        self.mol = self.atoms[0].parent
+        self.mol = self.atoms[0].molecule
         self.tolerance = tolerance
         self.force_constant = force_constant
         for atom in self.atoms:
-            assert atom.parent is self.mol
+            assert atom.molecule is self.mol
         self.value = mdt.utils.if_not_none(value, self.current())
 
     def current(self):
@@ -69,7 +69,7 @@ class GeometryConstraint(object):
         assert len(atomvecs) == len(self.atoms)
         grad = grad * atomvecs[0].get_units()
         for v, a in zip(atomvecs, self.atoms):
-            grad[a.parent_slice] = v
+            grad[a.index] = v
         return grad
 
     def satisfied(self):

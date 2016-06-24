@@ -56,9 +56,6 @@ class ElectronicWfn(object):
         else:
             self.positions = positions.copy()
 
-        if len(self.positions.shape) == 1 or self.positions.shape[1] != 3:
-            self.positions.shape = (mol.numatoms, 3)
-
         if self.aobasis is not None:
             self.orbitals['atomic'] = self.aobasis
             self.aobasis.wfn = self

@@ -31,10 +31,10 @@ def set_distance(a1, a2, newlength, adjustmol=True):
         newlength (u.Scalar[length]): new length to set
         adjustmol (bool): Adjust all atoms on either side of this bond?
     """
-    #TODO: lots of room for optimization here
+    #T ODO: lots of room for optimization here
     if adjustmol:
-        assert a1.parent is not None
-        assert a1.parent == a2.parent
+        assert a1.molecule is not None
+        assert a1.molecule == a2.molecule
     vec = a1.position - a2.position
     dist = np.sqrt(vec.dot(vec))
     direction = vec / dist
@@ -44,9 +44,9 @@ def set_distance(a1, a2, newlength, adjustmol=True):
         a1.position += direction * delta / 2.0
         a2.position -= direction * delta / 2.0
     else:
-        mol = a1.parent
+        mol = a1.molecule
         indices, sign = _get_fragment_indices(mol, a1, a2)
-        mol.positions[indices] = mol.positions[indices] + delta * direction * sign
+        mol.positions[indices] += delta*direction*sign
 
 
 @toplevel
@@ -77,7 +77,7 @@ def set_angle(a1, a2, a3, theta, adjustmol=True):
         a3.position = apply_4x4_transform(rotmat_r, a3.position)
 
     else:
-        mol = a2.parent
+        mol = a2.molecule
         indices, sign = _get_fragment_indices(mol, a1, a2)
         rotmat = external.transformations.rotation_matrix(rotation, axis*sign, a2.position)
         mol.positions[indices] = apply_4x4_transform(rotmat, mol.positions[indices])
@@ -111,7 +111,7 @@ def set_dihedral(a1, a2, a3, a4, theta, adjustmol=True):
         a4.position = apply_4x4_transform(rotmat_r, a4.position)
 
     else:
-        mol = a2.parent
+        mol = a2.molecule
         indices, sign = _get_fragment_indices(mol, a3, a2)
         rotmat = external.transformations.rotation_matrix(rotation, axis*sign, a3.position)
         mol.positions[indices] = apply_4x4_transform(rotmat, mol.positions[indices])
@@ -163,9 +163,7 @@ def _get_fragment_indices(mol, a1, a2):
             frag = frag1
             sign = 1.0
 
-    indices = []
-    for atom in frag:
-        indices.append(range(atom.parent_slice.start, atom.parent_slice.stop))
+    indices = [atom.index for atom in frag]
     result = np.array(indices)
     _get_fragment_indices.cache[key] = (result, sign)
     return result, sign

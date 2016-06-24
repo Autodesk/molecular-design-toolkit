@@ -34,7 +34,7 @@ class TrajectoryViewer(selector.SelectionGroup):
         trajectory.apply_frame(trajectory.frames[0])
         self.viewer, self.view_container = self.make_viewer()
         for frame in self.traj.frames[1:]:
-            self.viewer.append_frame(positions=frame.positions.reshape((trajectory.mol.num_atoms, 3)),
+            self.viewer.append_frame(positions=frame.positions,
                                      render=False)
         self.make_controls()
         self.pane.children = [self.view_container, self.controls]

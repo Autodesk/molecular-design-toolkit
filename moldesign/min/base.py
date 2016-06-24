@@ -55,11 +55,22 @@ class MinimizerBase(object):
             assert len(mol.constraints) == 0, \
                 'Constrained minimization only available with analytical gradients'
 
-    def objective(self, coords):
+    def _sync_positions(self, vector):
+        c = vector.reshape((self.mol.num_atoms, 3))
         if self._strip_units:
-            self.mol.positions = coords * u.default.length
+            self.mol.positions = c*u.default.length
         else:
-            self.mol.positions = coords
+            self.mol.positions = c
+
+    def _coords_to_vector(self, coords):
+        vec = coords.reshape(self.mol.num_atoms, 3)
+        if self._strip_units:
+            return vec.magnitude
+        else:
+            return vec
+
+    def objective(self, vector):
+        self._sync_positions(vector)
         self.mol.calculate(requests=self.request_list)
         pot = self.mol.potential_energy
 
@@ -72,11 +83,8 @@ class MinimizerBase(object):
         if self._strip_units: return pot.defunits().magnitude
         else: return pot.defunits()
 
-    def grad(self, coords):
-        if self._strip_units:
-            self.mol.positions = coords * u.default.length
-        else:
-            self.mol.positions = coords
+    def grad(self, vector):
+        self._sync_positions(vector)
         self.mol.calculate(requests=self.request_list)
         grad = -self.mol.forces
 
@@ -84,6 +92,7 @@ class MinimizerBase(object):
             for constraint in self.mol.constraints:
                 grad -= self.restraint_multiplier * constraint.restraint_penalty_force()
 
+        grad = grad.reshape(self.mol.num_atoms * 3)
         self._last_grad = grad
         if self._strip_units: return grad.defunits().magnitude
         else: return grad.defunits()

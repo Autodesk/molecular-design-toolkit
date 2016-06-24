@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import itertools
 import numpy as np
 
 import moldesign as mdt
@@ -52,9 +53,9 @@ class EnergyModelBase(Method):
         Many energy methods will provide their own minimization scheme and will override this method
         """
         if method == 'bfgs':
-            return mdt.minimizers.bfgs(self.mol, **kwargs)
+            return mdt.bfgs(self.mol, **kwargs)
         elif method == 'gradient descent':
-            return mdt.minimizers.gradient_descent(self.mol, **kwargs)
+            return mdt.gradient_descent(self.mol, **kwargs)
         else:
             raise ValueError('Unknown minimization method %s' % method)
 
@@ -92,27 +93,29 @@ class EnergyModelBase(Method):
         else:
             assert direction == 0, 'Finite difference direction must be -1, 0, or 1'
 
-        for idim in xrange(self.mol.ndims):
-            print '\rFinite difference step %d/%d' % (idim + 1, self.mol.ndims),
+        for iatom, idim in itertools.product(xrange(self.mol.num_atoms), xrange(3)):
+            print '\rFinite differencing %s for atom %d/%d'%('xyz'[iatom],
+                                                             iatom+1,
+                                                             self.mol.num_atoms),
             if direction == 0:
-                self.mol.positions[idim] += stepsize / 2.0
+                self.mol.positions[iatom, idim] += stepsize / 2.0
                 eplus = self.mol.calc_potential_energy()
                 pplus = self.mol.properties
 
-                self.mol.positions[idim] -= stepsize
+                self.mol.positions[iatom, idim] -= stepsize
                 eminus = self.mol.calc_potential_energy()
                 pminus = self.mol.properties
 
-                self.mol.positions[idim] += stepsize / 2.0  # resets the position
+                self.mol.positions[iatom, idim] += stepsize / 2.0  # resets the position
                 properties.append((pminus, pplus))
-                forces[idim] = (eminus - eplus) / stepsize
+                forces[iatom, idim] = (eminus - eplus) / stepsize
 
             elif direction in (-1, 1):
-                self.mol.positions[idim] += direction * stepsize
+                self.mol.positions[iatom, idim] += direction * stepsize
                 enew = self.mol.calc_potential_energy()
                 properties.append(self.mol.properties)
-                forces[idim] = (e0 - enew) / (direction * stepsize)
-                self.mol.positions[idim] -= direction * stepsize
+                forces[iatom, idim] = (e0 - enew) / (direction * stepsize)
+                self.mol.positions[iatom, idim] -= direction * stepsize
 
         return forces, properties
 

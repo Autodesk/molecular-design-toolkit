@@ -41,10 +41,10 @@ class AtomDrawingMixin(object):
         Returns:
             mdt.ChemicalGraphViewer: viewer object
         """
-        if self.parent:
-            if self.parent.is_small_molecule:
-                return self.parent.draw2d(highlight_atoms=[self], **kwargs)
-            elif self.parent.is_biomolecule:
+        if self.molecule:
+            if self.molecule.is_small_molecule:
+                return self.molecule.draw2d(highlight_atoms=[self], **kwargs)
+            elif self.molecule.is_biomolecule:
                 return self.residue.draw2d(highlight_atoms=[self], **kwargs)
             else:
                 raise ValueError('No drawing routine specified')
@@ -62,7 +62,7 @@ class AtomDrawingMixin(object):
         Returns:
             mdt.GeometryViewer: viewer object
         """
-        return self.parent.draw3d(highlight_atoms=[self], **kwargs)
+        return self.molecule.draw3d(highlight_atoms=[self], **kwargs)
 
     def draw(self, width=300, height=300):
         """ Draw a 2D and 3D viewer with this atom highlighted (notebook only)
@@ -125,7 +125,7 @@ class AtomPropertyMixin(object):
         otherwise)
         """
         try:
-            ff = self.parent.energy_model.mdtforcefield
+            ff = self.molecule.energy_model.mdtforcefield
         except AttributeError:
             return None
         if ff is None: return None
@@ -138,10 +138,10 @@ class AtomPropertyMixin(object):
         """ List[mdt.orbitals.AtomicBasisFunction]: This atom's basis functions, if available (
         ``None`` otherwise)
         """
-        if self.parent is None:
+        if self.molecule is None:
             return None
         try:
-            wfn = self.parent.electronic_state
+            wfn = self.molecule.electronic_state
         except molecule.NotCalculatedError:
             return None
 
@@ -152,7 +152,7 @@ class AtomPropertyMixin(object):
         """ moldesign.utils.DotDict: Returns any calculated properties for this atom
         """
         props = utils.DotDict()
-        for name, p in self.parent.properties.iteritems():
+        for name, p in self.molecule.properties.iteritems():
             if hasattr(p, 'type') and p.type == 'atomic':
                 props[name] = p[self]
         return props
@@ -169,17 +169,17 @@ class AtomReprMixin(object):
     def __str__(self):
         desc = '%s %s (elem %s)' % (self.__class__.__name__, self.name, self.elem)
         molstring = ''
-        if self.parent:
+        if self.molecule:
             molstring = ', index %d' % self.index
-            if self.parent.is_biomolecule:
+            if self.molecule.is_biomolecule:
                 molstring += ' (res %s chain %s)' % (self.residue.name, self.chain.name)
         return '%s%s' % (desc, molstring)
 
     def __repr__(self):
         # TODO: rename parent to "molecule"
         try:
-            if self.parent:
-                return '<%s in molecule %s>' % (self, self.parent)
+            if self.molecule:
+                return '<%s in molecule %s>' % (self, self.molecule)
             else:
                 return '<%s>' % self
         except:
@@ -191,7 +191,7 @@ class AtomReprMixin(object):
         Returns:
             str: markdown-formatted string
             """
-        if self.parent is None:
+        if self.molecule is None:
             lines = ["<h3>Atom %s</h3>" % self.name]
         else:
             lines = ["<h3>Atom %s (index %d)</h3>" % (self.name, self.index)]
@@ -199,11 +199,11 @@ class AtomReprMixin(object):
         lines.append('**Atomic number**: %d' % self.atnum)
         lines.append("**Mass**: %s" % self.mass)
 
-        if self.parent is not None:
-            if self.parent.is_biomolecule:
+        if self.molecule is not None:
+            if self.molecule.is_biomolecule:
                 lines.append("\n\n**Residue**: %s (index %d)" % (self.residue.name, self.residue.index))
                 lines.append("**Chain**: %s" % self.chain.name)
-            lines.append("**Molecule**: %s" % self.parent.name)
+            lines.append("**Molecule**: %s" % self.molecule.name)
             for ibond, (nbr, order) in enumerate(self.bond_graph.iteritems()):
                 lines.append('**Bond %d** (order = %d): %s (index %s) in %s' % (
                     ibond + 1, order, nbr.name, nbr.index, nbr.residue.name))
@@ -307,9 +307,8 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
 
         self.residue = residue
         self.chain = chain
-        self.parent = None
+        self.molecule = None
         self.index = None
-        self._parent_slice = None
         self._position = np.zeros(3) * u.default.length
         self._momentum = np.zeros(3) * (u.default.length*
                                                 u.default.mass/u.default.time)
@@ -321,23 +320,23 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
 
     def __getstate__(self):
         state = self.__dict__.copy()
-        if self.parent is not None:  # these don't belong to the atom anymore
+        if self.molecule is not None:  # these don't belong to the atom anymore
             state['_bond_graph'] = None
             state['_position'] = self.position
             state['_momentum'] = self.momentum
         return state
 
-    def _set_parent(self, parent):
+    def _set_molecule(self, molecule):
         """ Permanently bind this atom to a parent molecule
 
         Args:
             parent (moldesign.Molecule): the molecule that this atom will become a part of
         """
-        if self.parent and (parent is not self.parent):
+        if self.molecule and (molecule is not self.molecule):
             raise ValueError('Atom is already part of a molecule')
-        self.parent = parent
+        self.molecule = molecule
 
-    def _index_into_molecule(self, array_name, moleculearray, molslice):
+    def _index_into_molecule(self, array_name, moleculearray, index):
         """ Change the atom's position/momentum etc. arrays to be pointers into
         the appropriate slices of the parent molecule's master array of positions/momenta
 
@@ -350,8 +349,8 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
             This will be called by the molecule's init method
         """
         oldarray = getattr(self, array_name)
-        moleculearray[molslice] = oldarray
-        setattr(self, '_' + array_name, None)
+        moleculearray[index, :] = oldarray
+        setattr(self, '_' + array_name, None)  # remove the internally stored version
 
     def bond_to(self, other, order):
         """ Create a bond to another atom
@@ -363,11 +362,11 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
         Returns:
             moldesign.structure.bonds.Bond: bond object
         """
-        if self.parent is other.parent:
+        if self.molecule is other.molecule:
             self.bond_graph[other] = other.bond_graph[self] = order
-            if self.parent is not None: self.parent.num_bonds += 1
+            if self.molecule is not None: self.molecule.num_bonds += 1
         else:  # allow unassigned atoms to be bonded to anything for building purposes
-            assert self.parent is None
+            assert self.molecule is None
             self.bond_graph[other] = order
         return Bond(self, other, order)
 
@@ -377,23 +376,23 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
         of the form
            ``{nbr1: bond_order_1, nbr2: bond_order_2, ...}``
         """
-        if self.parent is None:
+        if self.molecule is None:
             return self._bond_graph
         else:
             self._bond_graph = None
             try:
-                return self.parent.bond_graph[self]
+                return self.molecule.bond_graph[self]
             except KeyError:
-                self.parent.bond_graph[self] = {}
-                return self.parent.bond_graph[self]
+                self.molecule.bond_graph[self] = {}
+                return self.molecule.bond_graph[self]
 
     @bond_graph.setter
     def bond_graph(self, value):
-        if self.parent is None:
+        if self.molecule is None:
             self._bond_graph = value
         else:
             self._bond_graph = None
-            self.parent.bond_graph[self] = value
+            self.molecule.bond_graph[self] = value
 
     @property
     def bonds(self):
@@ -405,8 +404,8 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
     def force(self):
         """ u.Vector[force, 3]: force on this atom
         """
-        f = self.parent.forces
-        return f[self._parent_slice]
+        f = self.molecule.forces
+        return f[self.index]
 
     @property
     def velocity(self):

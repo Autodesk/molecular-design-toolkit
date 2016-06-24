@@ -317,7 +317,7 @@ class AtomicBasisFunction(Orbital):
 
         # These quantities can't be defined until we assemble the entire basis
         self.coeffs = None
-        self.parent = atom.parent
+        self.molecule = atom.molecule
         self.basis = None
         self.occupation = None
         self.wfn = None

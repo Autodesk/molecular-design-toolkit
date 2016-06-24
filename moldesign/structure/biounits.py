@@ -30,7 +30,7 @@ class Entity(AtomContainer, utils.DictLike):
     Yields:
         Entity or mdt.Atom: this entity's children, in order
     """
-    def __init__(self, name=None, parent=None, index=None, pdbname=None, pdbindex=None,
+    def __init__(self, name=None, molecule=None, index=None, pdbname=None, pdbindex=None,
                  **kwargs):
         """  Initialization:
 
@@ -42,7 +42,7 @@ class Entity(AtomContainer, utils.DictLike):
             pdbindex (str): Index of this entity in PDB format
         """
         super(Entity, self).__init__()
-        self.parent = parent
+        self.molecule = molecule
         self.name = name
         self.index = index
 
@@ -115,8 +115,8 @@ class Entity(AtomContainer, utils.DictLike):
 
     def __repr__(self):
         try:
-            if self.parent is not None:
-                return '<%s in %s>' % (self, self.parent)
+            if self.molecule is not None:
+                return '<%s in %s>' % (self, self.molecule)
             else:
                 return '<%s (no molecule)>' % self
         except:
@@ -172,7 +172,7 @@ class Instance(Entity):
     PDB chains. Users won't ever really see this object.
     """
     def __str__(self):
-        return "biounit container (chains: %s) for molecule %s" % (', '.join(self.keys()), self.parent.name)
+        return "biounit container (chains: %s) for molecule %s" % (', '.join(self.keys()), self.molecule.name)
 
 
 @toplevel
@@ -200,8 +200,8 @@ class Residue(Entity):
         """
         self.chain = kwargs.get('chain', None)
         super(Residue, self).__init__(**kwargs)
-        if self.index is None and self.parent is not None:
-            self.index = self.parent.residues.index(self)
+        if self.index is None and self.molecule is not None:
+            self.index = self.molecule.residues.index(self)
         self.chainindex = None
         self._backbone = None
         self._sidechain = None
@@ -277,7 +277,7 @@ class Residue(Entity):
     @property
     def _is_ending_residue(self):
         """bool: this is the last residue in the chain"""
-        for otherres in self.parent.residues[self.index+1:]:
+        for otherres in self.molecule.residues[self.index+1:]:
             if otherres.chain != self.chain:
                 return True
             elif otherres.type == self.type:
@@ -287,7 +287,7 @@ class Residue(Entity):
     @property
     def _is_starting_residue(self):
         """bool: this is the first residue of its type in the chain"""
-        for otherres in self.parent.residues[self.index-1::-1]:
+        for otherres in self.molecule.residues[self.index-1::-1]:
             if otherres.chain != self.chain:
                 return True
             elif otherres.type == self.type:
@@ -448,7 +448,7 @@ class Residue(Entity):
         Returns:
             str: markdown-formatted string
         """
-        if self.parent is None:
+        if self.molecule is None:
             lines = ["<h3>Residue %s</h3>" % self.name]
         else:
             lines = ["<h3>Residue %s (index %d)</h3>" % (self.name, self.index)]
@@ -463,8 +463,8 @@ class Residue(Entity):
 
         lines.append('**<p>Chain:** %s' % self.chain.name)
         lines.append('**Sequence number**: %d' % self.pdbindex)
-        if self.parent is not None:
-            lines.append("**Molecule**: %s" % self.parent.name)
+        if self.molecule is not None:
+            lines.append("**Molecule**: %s" % self.molecule.name)
 
         lines.append("**<p>Number of atoms**: %s" % self.num_atoms)
         if self.backbone:

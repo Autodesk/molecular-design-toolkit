@@ -1,10 +1,26 @@
+# Copyright 2016 Autodesk Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+from __future__ import absolute_import  # prevent clashes between this module and the "pyscf"
+# package
+
 from cStringIO import StringIO
 
-import moldesign.orbitals
+from moldesign import orbitals
 from moldesign import units as u, compute, orbitals
 from moldesign.interfaces.pyscf_interface import force_remote, mol_to_pyscf, \
     StatusLogger, SPHERICAL_NAMES
-from moldesign.models.base import QMBase
+from .base import QMBase
 from moldesign.uibase import logs
 from moldesign.utils import DotDict, if_not_none
 
@@ -94,19 +110,19 @@ class PySCFPotential(QMBase):
         ao_pop, atom_pop = orb_calc.mulliken_pop(verbose=-1)
 
         # Build the electronic state object
-        basis = moldesign.orbitals.basis.BasisSet(self.mol,
-                                                  orbitals=self._get_ao_basis_functions(),
-                                                  h1e=ao_matrices.h1e.defunits(),
-                                                  overlaps=ao_matrices.sao,
-                                                  name=self.params.basis)
-        el_state = moldesign.orbitals.wfn.ElectronicWfn(self.mol,
-                                                        self.pyscfmol.nelectron,
-                                                        theory=self.params.theory,
-                                                        aobasis=basis,
-                                                        ao_population=ao_pop,
-                                                        nuclear_repulsion=(self.pyscfmol.energy_nuc() *
-                                                               u.hartree).defunits(),
-                                                        **scf_matrices)
+        basis = orbitals.basis.BasisSet(self.mol,
+                                        orbitals=self._get_ao_basis_functions(),
+                                        h1e=ao_matrices.h1e.defunits(),
+                                        overlaps=ao_matrices.sao,
+                                        name=self.params.basis)
+        el_state = orbitals.wfn.ElectronicWfn(self.mol,
+                                              self.pyscfmol.nelectron,
+                                              theory=self.params.theory,
+                                              aobasis=basis,
+                                              ao_population=ao_pop,
+                                              nuclear_repulsion=(self.pyscfmol.energy_nuc()*
+                                                                 u.hartree).defunits(),
+                                              **scf_matrices)
 
         # Build and store the canonical orbitals
         cmos = []

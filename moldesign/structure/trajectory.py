@@ -119,7 +119,7 @@ class Trajectory(object):
     def draw3d(self):
         """TrajectoryViewer: create a trajectory visualization"""
         from moldesign import widgets
-        self._viz = widgets.TrajectoryViewer(self)
+        self._viz = widgets.trajectory.TrajectoryViewer(self)
         return self._viz
     draw = draw3d  # synonym for backwards compatibility
 
@@ -127,7 +127,7 @@ class Trajectory(object):
         """TrajectoryOrbViewer: create a trajectory visualization"""
         from moldesign import widgets
         if align: self.align_orbital_phases()
-        self._viz = widgets.TrajectoryOrbViewer(self)
+        self._viz = widgets.trajectory.TrajectoryOrbViewer(self)
         return self._viz
 
     def __str__(self):
@@ -236,15 +236,15 @@ class Trajectory(object):
         if reference is None: refpos = self.frames[0].positions
         else: refpos = reference.positions
 
+        shape = np.product(refpos.shape)  # the length of the flattened array
+        refpos = refpos.reshape(shape)  # flatten array
+
         atoms = mdt.utils.if_not_none(atoms, self.mol.atoms)
-        indices = []
-        for atom in atoms:
-            indices.extend(range(*atom.parent_slice.indices(self.mol.ndims)))
-        indices = np.array(indices)
+        indices = np.array([atom.index for atom in atoms])
 
         rmsds = []
         for f in self.frames:
-            diff = (refpos[indices] - f.positions[indices])
+            diff = (refpos[indices] - f.positions[indices].reshape(shape))
             rmsds.append(np.sqrt(diff.dot(diff)/len(atoms)))
         return u.to_units_array(rmsds).defunits()
 
@@ -279,7 +279,7 @@ class Trajectory(object):
         for frame in self.frames:
             if 'momenta' in frame:
                 energies.append(
-                    helpers.kinetic_energy(frame.momenta, self.mol.dim_masses))
+                    helpers.kinetic_energy(frame.momenta, self.mol.masses))
             else:
                 convert_units = False
                 energies.append(None)
@@ -326,38 +326,12 @@ class Trajectory(object):
         for attr in frame:
             m.properties[attr] = frame[attr]
 
-    def write_trajectory(self, filename=None, format=None, overwrite=True):
-        """
-        Write to a file (if filename provided) or file-like buffer
-
-        Args:
-            filename (str): name of file (return a file-like object if not passed)
-            format (str): file format (guessed from filename if None)
-            overwrite (bool): overwrite filename if it exists
-
-        Returns:
-            StringIO: file-like object (only if filename not passed)
-        """
-        tempmol = self._tempmol
-        if filename and (not overwrite) and os.path.exists(filename):
-            raise IOError('%s exists' % filename)
-        if not filename:
-            fileobj = StringIO()
-        else:
-            fileobj = open(filename, 'w')
-
-        if format is None:
-            format = filename.split('.')[-1]
-
-        for frame in self.frames:
-            self.apply_frame(frame)
-            fileobj.write(tempmol.write(format=format))
-
-        if filename is None:
-            fileobj.seek(0)
-            return fileobj
-        else:
-            fileobj.close()
+    # TODO: need to fix this - it creates import problems
+    #@utils.args_from(mdt.converters.write_trajectory,
+    #                 allexcept=['traj'],
+    #                 append_docstring_description=True)
+    def write(self, *args, **kwargs):
+        return mdt.converters.write_trajectory(self, *args, **kwargs)
 
     def plot(self, x, y, **kwargs):
         """ Create a matplotlib plot of property x against property y

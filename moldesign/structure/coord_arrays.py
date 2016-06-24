@@ -44,15 +44,15 @@ class AtomArray(ProtectedArray):
         atomname (str): name of the attribute in the atom instance
         parentname (str): name of the corresponding attribute in the molecule instance
     """
-    def __init__(self, atomname, parentname):
+    def __init__(self, atomname, moleculename):
         self.name = atomname
-        self.parentname = parentname
+        self.moleculename = moleculename
 
     def __get__(self, instance, cls=None):
-        if instance.parent is None:
+        if instance.molecule is None:
             return getattr(instance, self.name)
         else:
-            return getattr(instance.parent, self.parentname)[instance.parent_slice]
+            return getattr(instance.molecule, self.moleculename)[instance.index]
 
 
 class AtomCoordinate(object):

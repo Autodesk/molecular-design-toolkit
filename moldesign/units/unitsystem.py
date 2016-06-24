@@ -17,9 +17,10 @@ from .constants import *
 
 
 class UnitSystem(object):
-    """
-    Class for standardizing units
-    Many methods will look for a unit system at moldesign.units.default
+    """ Class for standardizing units - specifies preferred units for length, mass, energy etc.
+
+    In MDT, many methods will automatically convert output using the UnitSystem at
+    ``moldesign.units.default``
     """
     def __init__(self, length, mass, time, energy,
                  temperature=kelvin,

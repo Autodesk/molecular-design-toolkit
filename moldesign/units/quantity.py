@@ -45,10 +45,13 @@ class MdtQuantity(ureg.Quantity):
     This is a 'patched' version of pint's quantities that can be pickled (slightly hacky)
     and supports more numpy operations.
     Users should never need to instantiate this directly - instead, construct
-    BuckyBall quantities by multiplying numbers/arrays with the pre-defined units,
-    e.g. 5.0 * units.femtoseconds or [1.0,2.0,3.0] * units.electronvolts
+    BuckyBall quantities by multiplying numbers/arrays with the pre-defined units
+
+    Examples:
+        >>> 5.0 * units.femtoseconds
+        >>> [1.0,2.0,3.0] * units.eV
     """
-    # Patching some ufunc intercepts - __prod_units does not seem to work, however
+    # Patching some ufunc intercepts - these don't all necessarily work
     _Quantity__prod_units = ureg.Quantity._Quantity__prod_units.copy()
     _Quantity__prod_units['dot'] = 'mul'
     _Quantity__prod_units['cross'] = 'mul'

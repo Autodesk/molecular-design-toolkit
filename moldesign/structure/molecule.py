@@ -521,7 +521,7 @@ class MolTopologyMixin(object):
         if type(atom) is int:
             atom = self.mol.atoms[atom]
         else:
-            assert atom.parent is self, "Atom %s does not belong to %s" % (atom, self)
+            assert atom.molecule is self, "Atom %s does not belong to %s" % (atom, self)
         return atom
 
     def _rebuild_topology(self, bond_graph=None):
@@ -537,9 +537,9 @@ class MolTopologyMixin(object):
 
         self.is_biomolecule = False
         self.ndims = 3 * self.num_atoms
-        self._positions = np.zeros(self.ndims) * u.default.length
-        self._momenta = np.zeros(self.ndims) * u.default.momentum
-        self.dim_masses = np.zeros(self.ndims) * u.default.mass
+        self._positions = np.zeros((self.num_atoms, 3)) * u.default.length
+        self._momenta = np.zeros((self.num_atoms, 3)) * u.default.momentum
+        self.masses = np.zeros(self.num_atoms) * u.default.mass
         self._assign_atom_indices()
         self._assign_residue_indices()
         self._dof = None
@@ -583,15 +583,13 @@ class MolTopologyMixin(object):
         """
         idim = 0
         for idx, atom in enumerate(self.atoms):
-            atom._set_parent(self)
+            atom._set_molecule(self)
             atom.index = idx
-            atomslice = slice(idim, idim + 3)
-            atom.parent_slice = atomslice
             idim += 3
-            self.dim_masses[atomslice] = atom.mass
+            self.masses[idx] = atom.mass
             # Here, we index the atom arrays directly into the molecule
-            atom._index_into_molecule('_position', self.positions, atomslice)
-            atom._index_into_molecule('_momentum', self.momenta, atomslice)
+            atom._index_into_molecule('_position', self.positions, idx)
+            atom._index_into_molecule('_momentum', self.momenta, idx)
 
     def _assign_residue_indices(self):
         """
@@ -602,7 +600,7 @@ class MolTopologyMixin(object):
         if self._defchain is None:
             self._defchain = Chain(name='Z',
                                    index=99,
-                                   parent=None)
+                                   molecule=None)
 
         if self._defres is None:
             self._defres = Residue(name='UNK999',
@@ -610,7 +608,7 @@ class MolTopologyMixin(object):
                                    pdbindex=1,
                                    pdbname='UNK',
                                    chain=self._defchain,
-                                   parent=None)
+                                   molecule=None)
             self._defchain.add(self._defres)
 
         default_residue = self._defres
@@ -625,205 +623,37 @@ class MolTopologyMixin(object):
                 atom.residue.add(atom)
 
             # assign the chain to this molecule if necessary
-            if atom.chain.parent is None:
-                atom.chain.parent = self
+            if atom.chain.molecule is None:
+                atom.chain.molecule = self
                 atom.chain.index = len(self.chains)
 
                 assert atom.chain.name not in self.chains
                 self.chains.add(atom.chain)
             else:
-                assert atom.chain.parent is self
+                assert atom.chain.molecule is self
 
             # assign the residue to this molecule
-            if atom.residue.parent is None:
-                atom.residue.parent = self
+            if atom.residue.molecule is None:
+                atom.residue.molecule = self
                 atom.residue.index = len(self.residues)
                 self.residues.append(atom.residue)
                 if atom.residue.type in ('dna', 'rna', 'protein'): num_biores += 1
             else:
-                assert atom.chain.parent is self
+                assert atom.chain.molecule is self
 
         self.is_biomolecule = (num_biores >= 2)
         self.nchains = self.n_chains = self.num_chains = len(self.chains)
         self.nresidues = self.n_residues = self.num_residues = len(self.residues)
 
 
-@toplevel
-class Molecule(AtomContainer,
-               MolConstraintMixin,
-               MolPropertyMixin,
-               MolDrawingMixin,
-               MolReprMixin,
-               MolTopologyMixin):
+class MolSimulationMixin(object):
+    """ Functions calculating energies, running dynamics, and minimizing geometry.
+
+    Note:
+        This is a mixin class designed only to be mixed into the :class:`Molecule` class. Routines
+        are separated are here for code organization only - they could be included in the main
+        Atom class without changing any functionality
     """
-    This is moldesign's principal object. It stores a list of atoms in 3D space
-    and handles interfaces with energy and dynamics models.
-
-
-    Args:
-        atomcontainer (AtomContainer or AtomList or List[moldesign.Atom]): atoms that make up
-            this molecule.
-
-            Note:
-                If the passed atoms don't already belong to a molecule, they will be assigned
-                to this one. If they DO already belong to a molecule, they will be copied,
-                leaving the original molecule untouched.
-
-        name (str): name of the molecule (automatically generated if not provided)
-        bond_graph (dict): dictionary specifying bonds between the atoms - of the form
-            ``{atom1:{atom2:bond_order, atom3:bond_order}, atom2:...}``
-            This structure must be symmetric; we require
-            ``bond_graph[atom1][atom2] == bond_graph[atom2][atom1]``
-        energy_model (moldesign.models.base.EnergyModelBase): Object that drives calculation of
-            molecular properties, driven by `mol.calculate()`
-        integrator (moldesign.integrators.base.IntegratorBase): Object that drives movement of 3D
-            coordinates in time, driven by mol.run()
-        copy_atoms (bool): Create the molecule with *copies* of the passed atoms
-            (they will be copied automatically if they already belong to another molecule)
-        pdbname (str): Name of the PDB file
-        charge (units.Scalar[charge]): molecule's formal charge
-
-
-
-    Attributes:
-        atoms
-        bond_graph (dict): symmetric dictionary specifying bonds between the
-           atoms:
-
-               ``bond_graph = {atom1:{atom2:bond_order, atom3:bond_order}, atom2:...}``
-
-               ``bond_graph[atom1][atom2] == bond_graph[atom2][atom1]``
-        residues (List[moldesign.Residue]): flat list of all biomolecular residues in this molecule
-        chains (Dict[moldesign.Chain]): Biomolecular chains - individual chains can be
-            accessed as ``mol.chains[list_index]`` or ``mol.chains[chain_name]``
-        name (str): A descriptive name for molecule
-        charge (units.Scalar[charge]): molecule's formal charge
-        ndims (int): length of the positions, momenta, and forces arrays (usually 3*self.num_atoms)
-        num_atoms (int): number of atoms (synonyms: num_atoms, numatoms)
-        positions (units.Vector[length]): flat array of atomic positions, len=`self.ndims` [length]
-        momenta (units.Vector[momentum]): flat array of atomic momenta, len=`self.ndims`
-        time (units.Scalar[time]): current time in dynamics
-        energy_model (moldesign.models.base.EnergyModelBase): Object that calculates
-            molecular properties - driven by `mol.calculate()`
-        integrator (moldesign.integrators.base.IntegratorBase): Object that drives movement of 3D
-            coordinates in time, driven by mol.run()
-        is_biomolecule (bool): True if this molecule contains at least 2 biochemical residues
-    """
-
-    # TODO: UML diagrams, describe structure
-    positions = ProtectedArray('_positions')
-    momenta = ProtectedArray('_momenta')
-
-    def __init__(self, atomcontainer,
-                 name=None, bond_graph=None,
-                 energy_model=None,
-                 integrator=None,
-                 copy_atoms=False,
-                 pdbname=None,
-                 charge=0):
-        # NEW_FEATURE: deal with random number generators per-geometry
-        # NEW_FEATURE: per-geometry output logging
-        super(Molecule, self).__init__()
-
-        # copy atoms from another object (i.e., a molecule)
-        oldatoms = helpers.get_all_atoms(atomcontainer)
-
-        if copy_atoms or (oldatoms[0].parent is not None):
-            print 'INFO: Copying atoms into new molecule'
-            atoms = oldatoms.copy()
-            if name is None:  # Figure out a reasonable name
-                if oldatoms[0].parent is not None:
-                    name = oldatoms[0].parent.name + ' copy'
-                elif hasattr(atomcontainer, 'name') and isinstance(atomcontainer.name, str):
-                    name = utils.if_not_none(name, atomcontainer.name + ' copy')
-                else:
-                    name = 'unnamed'
-        else:
-            atoms = oldatoms
-
-        self.atoms = atoms
-        self.time = None
-        self.name = 'uninitialized molecule'
-        self._defres = None
-        self._defchain = None
-        self.pdbname = pdbname
-        self.charge = charge
-        self.constraints = []
-
-        # Builds the internal memory structures
-        self.chains = Instance(parent=self)
-        self.residues = []
-        self._rebuild_topology(bond_graph=bond_graph)
-
-        if name is not None:
-            self.name = name
-        elif not self.is_small_molecule:
-            self.name = 'unnamed macromolecule'
-        else:
-            self.name = self.get_stoichiometry()
-        if energy_model:
-            self.set_energy_model(energy_model)
-        else:
-            self.energy_model = None
-        if integrator:
-            self.set_integrator(integrator)
-        else:
-            self.integrator = None
-        self._properties = MolecularProperties(self)
-        self.ff = utils.DotDict()
-
-
-    # TODO: underscores or not? Buckyball needs a global rule
-    def newbond(self, a1, a2, order):
-        """ Create a new bond
-
-        Args:
-            a1 (moldesign.Atom): First atom in the bond
-            a2 (moldesign.Atom): Second atom in the bond
-            order (int): order of the bond
-
-        Returns:
-            moldesign.Bond
-        """
-        # TODO: this should signal to the energy model that the bond structure has changed
-        assert a1.parent == a2.parent == self
-        return a1.bond_to(a2, order)
-
-    def addatom(self, newatom):
-        """  Add a new atom to the molecule
-
-        Args:
-            newatom (moldesign.Atom): The atom to add (it will be copied if it already belongs to a molecule
-        """
-        self.addatoms([newatom])
-
-    def addatoms(self, newatoms):
-        """Add new atoms to this molecule.
-        For now, we really just rebuild the entire molecule in place.
-
-        Args:
-           newatoms (List[moldesign.Atom]))
-        """
-        self._reset_methods()
-
-        for atom in newatoms: assert atom.parent is None
-        self.atoms.extend(newatoms)
-
-        # symmetrize bonds between the new atoms and the pre-existing molecule
-        bonds = self._build_bonds(self.atoms)
-        for newatom in newatoms:
-            for nbr in bonds[newatom]:
-                if nbr in self.bond_graph:  # i.e., it's part of the original molecule
-                    bonds[nbr][newatom] = bonds[newatom][nbr]
-
-        self._rebuild_topology(bonds)
-
-    def deletebond(self, bond):
-        """ Remove this bond from the molecule's topology
-        """
-        self.bond_graph[bond.a1].pop(bond.a2)
-        self.bond_graph[bond.a2].pop(bond.a1)
-
     def run(self, run_for):
         """ Starts the integrator's default integration
 
@@ -920,6 +750,203 @@ class Molecule(AtomContainer,
 
         return trajectory
 
+    def set_integrator(self, integrator):
+        """ Associate an integrator with this molecule
+
+        Args:
+            integrator (moldesign.methods.IntegratorBase):
+        """
+        self.integrator = integrator
+        integrator.mol = self
+        integrator._prepped = False
+
+    def _reset_methods(self):
+        """
+        Called whenever a property is changed that the energy model and/or integrator need to know about
+        """
+        # TODO: what should this do with the property object?
+        if self.energy_model is not None:
+            self.energy_model._prepped = False
+        if self.integrator is not None:
+            self.integrator._prepped = False
+
+
+@toplevel
+class Molecule(AtomContainer,
+               MolConstraintMixin,
+               MolPropertyMixin,
+               MolDrawingMixin,
+               MolReprMixin,
+               MolTopologyMixin, MolSimulationMixin):
+    """
+    This is moldesign's principal object. It stores a list of atoms in 3D space
+    and handles interfaces with energy and dynamics models.
+
+
+    Args:
+        atomcontainer (AtomContainer or AtomList or List[moldesign.Atom]): atoms that make up
+            this molecule.
+
+            Note:
+                If the passed atoms don't already belong to a molecule, they will be assigned
+                to this one. If they DO already belong to a molecule, they will be copied,
+                leaving the original molecule untouched.
+
+        name (str): name of the molecule (automatically generated if not provided)
+        bond_graph (dict): dictionary specifying bonds between the atoms - of the form
+            ``{atom1:{atom2:bond_order, atom3:bond_order}, atom2:...}``
+            This structure must be symmetric; we require
+            ``bond_graph[atom1][atom2] == bond_graph[atom2][atom1]``
+        energy_model (moldesign.models.base.EnergyModelBase): Object that drives calculation of
+            molecular properties, driven by `mol.calculate()`
+        integrator (moldesign.integrators.base.IntegratorBase): Object that drives movement of 3D
+            coordinates in time, driven by mol.run()
+        copy_atoms (bool): Create the molecule with *copies* of the passed atoms
+            (they will be copied automatically if they already belong to another molecule)
+        pdbname (str): Name of the PDB file
+        charge (units.Scalar[charge]): molecule's formal charge
+
+
+
+    Attributes:
+        atoms
+        bond_graph (dict): symmetric dictionary specifying bonds between the
+           atoms:
+
+               ``bond_graph = {atom1:{atom2:bond_order, atom3:bond_order}, atom2:...}``
+
+               ``bond_graph[atom1][atom2] == bond_graph[atom2][atom1]``
+        residues (List[moldesign.Residue]): flat list of all biomolecular residues in this molecule
+        chains (Dict[moldesign.Chain]): Biomolecular chains - individual chains can be
+            accessed as ``mol.chains[list_index]`` or ``mol.chains[chain_name]``
+        name (str): A descriptive name for molecule
+        charge (units.Scalar[charge]): molecule's formal charge
+        ndims (int): length of the positions, momenta, and forces arrays (usually 3*self.num_atoms)
+        num_atoms (int): number of atoms (synonyms: num_atoms, numatoms)
+        positions (units.Vector[length]): flat array of atomic positions, len=`self.ndims` [length]
+        momenta (units.Vector[momentum]): flat array of atomic momenta, len=`self.ndims`
+        time (units.Scalar[time]): current time in dynamics
+        energy_model (moldesign.models.base.EnergyModelBase): Object that calculates
+            molecular properties - driven by `mol.calculate()`
+        integrator (moldesign.integrators.base.IntegratorBase): Object that drives movement of 3D
+            coordinates in time, driven by mol.run()
+        is_biomolecule (bool): True if this molecule contains at least 2 biochemical residues
+    """
+
+    # TODO: UML diagrams, describe structure
+    positions = ProtectedArray('_positions')
+    momenta = ProtectedArray('_momenta')
+
+    def __init__(self, atomcontainer,
+                 name=None, bond_graph=None,
+                 energy_model=None,
+                 integrator=None,
+                 copy_atoms=False,
+                 pdbname=None,
+                 charge=0):
+        # NEW_FEATURE: deal with random number generators per-geometry
+        # NEW_FEATURE: per-geometry output logging
+        super(Molecule, self).__init__()
+
+        # copy atoms from another object (i.e., a molecule)
+        oldatoms = helpers.get_all_atoms(atomcontainer)
+
+        if copy_atoms or (oldatoms[0].molecule is not None):
+            print 'INFO: Copying atoms into new molecule'
+            atoms = oldatoms.copy()
+            if name is None:  # Figure out a reasonable name
+                if oldatoms[0].molecule is not None:
+                    name = oldatoms[0].molecule.name + ' copy'
+                elif hasattr(atomcontainer, 'name') and isinstance(atomcontainer.name, str):
+                    name = utils.if_not_none(name, atomcontainer.name + ' copy')
+                else:
+                    name = 'unnamed'
+        else:
+            atoms = oldatoms
+
+        self.atoms = atoms
+        self.time = None
+        self.name = 'uninitialized molecule'
+        self._defres = None
+        self._defchain = None
+        self.pdbname = pdbname
+        self.charge = charge
+        self.constraints = []
+
+        # Builds the internal memory structures
+        self.chains = Instance(molecule=self)
+        self.residues = []
+        self._rebuild_topology(bond_graph=bond_graph)
+
+        if name is not None:
+            self.name = name
+        elif not self.is_small_molecule:
+            self.name = 'unnamed macromolecule'
+        else:
+            self.name = self.get_stoichiometry()
+        if energy_model:
+            self.set_energy_model(energy_model)
+        else:
+            self.energy_model = None
+        if integrator:
+            self.set_integrator(integrator)
+        else:
+            self.integrator = None
+        self._properties = MolecularProperties(self)
+        self.ff = utils.DotDict()
+
+
+    # TODO: underscores or not? Buckyball needs a global rule
+    def newbond(self, a1, a2, order):
+        """ Create a new bond
+
+        Args:
+            a1 (moldesign.Atom): First atom in the bond
+            a2 (moldesign.Atom): Second atom in the bond
+            order (int): order of the bond
+
+        Returns:
+            moldesign.Bond
+        """
+        # TODO: this should signal to the energy model that the bond structure has changed
+        assert a1.molecule == a2.molecule == self
+        return a1.bond_to(a2, order)
+
+    def addatom(self, newatom):
+        """  Add a new atom to the molecule
+
+        Args:
+            newatom (moldesign.Atom): The atom to add (it will be copied if it already belongs to a molecule
+        """
+        self.addatoms([newatom])
+
+    def addatoms(self, newatoms):
+        """Add new atoms to this molecule.
+        For now, we really just rebuild the entire molecule in place.
+
+        Args:
+           newatoms (List[moldesign.Atom]))
+        """
+        self._reset_methods()
+
+        for atom in newatoms: assert atom.molecule is None
+        self.atoms.extend(newatoms)
+
+        # symmetrize bonds between the new atoms and the pre-existing molecule
+        bonds = self._build_bonds(self.atoms)
+        for newatom in newatoms:
+            for nbr in bonds[newatom]:
+                if nbr in self.bond_graph:  # i.e., it's part of the original molecule
+                    bonds[nbr][newatom] = bonds[newatom][nbr]
+
+        self._rebuild_topology(bonds)
+
+    def deletebond(self, bond):
+        """ Remove this bond from the molecule's topology
+        """
+        self.bond_graph[bond.a1].pop(bond.a2)
+        self.bond_graph[bond.a2].pop(bond.a1)
+
     def _force_converged(self, tolerance):
         """ Return True if the forces on this molecule:
         1) Are less than tolerance in every dimension
@@ -936,16 +963,6 @@ class Molecule(AtomContainer,
         rmsd2 = forces.dot(forces) / self.ndims
         if rmsd2 > tolerance * tolerance / 3.0: return False
         return True
-
-    def set_integrator(self, integrator):
-        """ Associate an integrator with this molecule
-
-        Args:
-            integrator (moldesign.methods.IntegratorBase):
-        """
-        self.integrator = integrator
-        integrator.mol = self
-        integrator._prepped = False
 
     def write(self, filename=None, **kwargs):
         """ Write this molecule to a string or file.
@@ -977,15 +994,5 @@ class Molecule(AtomContainer,
             for nbr in self.bond_graph[atom]:
                 if atom.index > nbr.index: continue  # don't double count
                 yield Bond(atom, nbr)
-
-    def _reset_methods(self):
-        """
-        Called whenever a property is changed that the energy model and/or integrator need to know about
-        """
-        # TODO: what should this do with the property object?
-        if self.energy_model is not None:
-            self.energy_model._prepped = False
-        if self.integrator is not None:
-            self.integrator._prepped = False
 
 

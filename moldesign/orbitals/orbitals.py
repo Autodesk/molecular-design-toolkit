@@ -75,7 +75,7 @@ class Orbital(object):
         """
         self.coeffs = np.array(coeffs)
         self.name = name
-        self.parent = None
+        self.molecule = None
         self.basis = basis
         self.occupation = occupation
         self.wfn = wfn

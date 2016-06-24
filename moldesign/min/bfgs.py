@@ -40,7 +40,7 @@ class BFGS(MinimizerBase):
             options['gtol'] = self.force_tolerance.defunits().magnitude
 
         result = scipy.optimize.minimize(self.objective,
-                                         self.mol.positions.defunits().magnitude,
+                                         self._coords_to_vector(self.mol.positions),
                                          method='bfgs',
                                          jac=grad,
                                          callback=self.callback,
@@ -53,7 +53,7 @@ class BFGS(MinimizerBase):
             print 'Constraints not satisfied - new restraint multiplier %f ...' % \
                   self.restraint_multiplier
             result = scipy.optimize.minimize(self.objective,
-                                 self.mol.positions.defunits().magnitude,
+                                 self._coords_to_vector(self.mol.positions),
                                  method='bfgs',
                                  jac=grad,
                                  callback=self.callback,
@@ -63,6 +63,7 @@ class BFGS(MinimizerBase):
         self.traj.info = result
 
 
+@exports
 @toplevel
 def bfgs(*args, **kwargs):
     """

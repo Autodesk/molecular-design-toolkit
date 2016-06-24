@@ -39,12 +39,12 @@ class NonbondedQMMM(basemethods.QMMMBase):
         # Set up the QM system
         self.qmmol = mdt.Molecule(self.mol)
         for atom, subatom in zip(self.mol.atoms, self.qmmol.atoms):
-            subatom.parent_atom = atom
+            subatom.molecule_atom = atom
             atom.props.qm_child = subatom
 
         # Make the MM atoms point charges
         point_charges = {atom: atom.props.mm_child.ff.charge for atom in self.qmmol.atoms
-                         if atom.parent_atom.params.subsystem == 'mm'}
+                         if atom.molecule_atom.params.subsystem == 'mm'}
         self.qm_model.params.point_charges = point_charges
         self.qmmol.set_energy_model(self.qm_model)
         self._subatoms = self.qmmol.atoms + self.mmol.atoms
@@ -55,7 +55,7 @@ class NonbondedQMMM(basemethods.QMMMBase):
         # but we remove all FF terms except LJ
         self.mmmol = mdt.Molecule(self.mol)
         for atom, subatom in zip(self.mol.atoms, self.mmmol.atoms):
-            subatom.parent_atom = atom
+            subatom.molecule_atom = atom
             atom.props.mm_child = subatom
         self.mmmol.set_energy_model(self.mm_model)
         # Remove charges and bonds for QM atoms
@@ -66,7 +66,7 @@ class NonbondedQMMM(basemethods.QMMMBase):
             # TODO: what about LJ forces???
             newterms = []
             for term in termlist:
-                subsystems = set([atom.parent_atom.props.subsystem for atom in termlist.atom])
+                subsystems = set([atom.molecule_atom.props.subsystem for atom in termlist.atom])
                 subsystems = list(subsystems)
                 if len(subsystems) == 1 and subsystems[0] == 'mm':
                     newterms.append(subsystems)
@@ -80,7 +80,7 @@ class NonbondedQMMM(basemethods.QMMMBase):
 
     def calculate(self, requests=None):
         for atom in self._subatoms:
-            atom.position = atom.parent_atom.position
+            atom.position = atom.molecule_atom.position
 
         qmprops = self.qm_model.calculate()
         mmprops = self.mm_model.calculate()

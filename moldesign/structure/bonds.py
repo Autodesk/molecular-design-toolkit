@@ -64,7 +64,7 @@ class Bond(object):
         """mdt.forcefield.BondTerm: the force-field term for this bond (or ``None`` if no
             forcefield is present)
         """
-        try: ff = self.a1.parent.energy_model.get_forcefield()
+        try: ff = self.a1.molecule.energy_model.get_forcefield()
         except (NotImplementedError, AttributeError): return None
         return ff.bond_term[self]
 

@@ -79,8 +79,10 @@ def args_from(original_function,
 
     def decorator(f):
         """Modify f's call signature (using the `__signature__` attribute)"""
+        fname = f.__name__
         if wraps:
             f = functools.wraps(original_function)(f)
+            f.__name__ = fname  # revert name change
         f.__signature__ = sig
 
         # Modify docstring for documentation only

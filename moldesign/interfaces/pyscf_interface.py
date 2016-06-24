@@ -91,7 +91,7 @@ class StatusLogger(object):
 def get_eris_in_basis(basis, orbs):
     """ Get electron repulsion integrals transformed in (in form eri[i,j,k,l] = (ij|kl))
     """
-    pmol = mol_to_pyscf(basis.wfn.parent, basis=basis.basisname)
+    pmol = mol_to_pyscf(basis.wfn.molecule, basis=basis.basisname)
     eri = ao2mo.full(pmol, orbs.T, compact=True) * u.hartree
     eri.defunits_inplace()
     return orbitals.ERI4FoldTensor(eri, orbs)

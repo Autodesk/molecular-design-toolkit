@@ -60,12 +60,11 @@ MDT relies on several open source packages to provide various functionality. It'
 OpenBabel
 ^^^^^^^^^
 MDT makes heavy use of `OpenBabel's <https://openbabel.org/>`_ file i/o routines. While powerful,
-OpenBabel and its Python bindings can be challenging to compile. They can be installed from a
-package manager in Debian and Ubuntu with the command
-``apt-get install openbabel python-openbabel``
+OpenBabel and its Python bindings can be challenging to compile. It's highly recommended to use
+a package manager:
 
-For MacOS X, you can try installing the shared binaries using Homebrew (
-``brew install open-babel`` and installing the python bindings with ``pip install openbabel``.
+ * For Debian and Ubuntu, use ``apt-get install openbabel python-openbabel``
+ * For MacOS X, use ``brew install --with-python open-babel``.
 
 See `the OpenBabel docs <https://openbabel.org/docs/dev/Installation/install.html>`_ for more
 information.

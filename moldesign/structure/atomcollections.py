@@ -19,7 +19,7 @@ from scipy.spatial import distance as spd
 
 import moldesign as mdt
 from moldesign import units as u
-from moldesign import utils, external
+from moldesign import utils, external, mathutils
 from . import toplevel
 
 
@@ -29,6 +29,19 @@ class AtomContainer(object):
     Attributes:
         atoms (List[Atom]): a list of atoms
     """
+
+    @property
+    def positions(self):
+        """ u.Array[length]: (Nx3) array of atomic positions
+        """
+        return self.atoms.position
+
+    @positions.setter
+    def positions(self, val):
+        assert len(val) == self.num_atoms
+        for atom, p in zip(self.atoms, val):
+            atom.position = p
+
     def __init__(self, *args, **kwargs):
         """ This should never be called directly - it will be called by the `super` methods
         of its subclasses """
@@ -87,11 +100,11 @@ class AtomContainer(object):
         """
         other = utils.if_not_none(other, self)
         try:
-            other_positions = other.atoms.position.value_in(u.ang)
+            other_positions = other.positions.value_in(u.ang)
         except AttributeError:
             other_positions = np.array([other.position.value_in(u.ang)])
 
-        distances = spd.cdist(self.atoms.position.value_in(u.ang), other_positions)
+        distances = spd.cdist(self.position.value_in(u.ang), other_positions)
         return distances * u.ang
 
     def calc_displacements(self):
@@ -105,7 +118,7 @@ class AtomContainer(object):
             >>> displacements[i, j] == (self.atoms[i].position - self.atoms[j].position)
         """
         # TODO: allow other, similar to calc_distance array
-        return utils.pairwise_displacements(self.atoms.position)
+        return utils.pairwise_displacements(self.positions)
 
     def distance(self, other):
         """Returns closest distance between this and the other entity
@@ -136,7 +149,7 @@ class AtomContainer(object):
             AtomList: list of the atoms within ``radius`` of this object
         """
         if other is None:
-            other = self.atoms[0].parent
+            other = self.atoms[0].molecule
         if not include_self:
             myatoms = set(self.atoms)
 
@@ -177,14 +190,13 @@ class AtomContainer(object):
             moldesign.ui.SelectionGroup
         """
         import ipywidgets as ipy
-        from moldesign import widgets
         viz2d = self.draw2d(width=width, height=height,
                             display=False,
                             show_hydrogens=show_2dhydrogens)
         viz3d = self.draw3d(width=width, height=height,
                             display=False)
         views = ipy.HBox([viz2d, viz3d])
-        return mdt.base.SelectionGroup([views, uibase.components.AtomInspector()])
+        return mdt.uibase.SelectionGroup([views, mdt.uibase.components.AtomInspector()])
 
     def draw3d(self, highlight_atoms=None, **kwargs):
         """ Draw this object in 3D. Jupyter only.
@@ -242,13 +254,13 @@ class AtomContainer(object):
         temp_bond_graph = {a: {} for a in tempatoms}
         replaced = {}
         for atom, oldatom in zip(tempatoms, oldatoms):
-            atom.parent = None
+            atom.molecule = None
             atom.bond_graph = {}
 
             if atom.chain is not None:
                 if atom.chain not in replaced:
                     chain = copy.copy(atom.chain)
-                    chain.parent = None
+                    chain.molecule = None
                     chain.children = {}
                     replaced[atom.chain] = chain
                 else:
@@ -259,7 +271,7 @@ class AtomContainer(object):
             if atom.residue is not None:
                 if atom.residue not in replaced:
                     res = copy.copy(atom.residue)
-                    res.parent = None
+                    res.molecule = None
                     res.chain = atom.chain
                     res.children = {}
 
@@ -321,7 +333,7 @@ class AtomContainer(object):
         # TODO: deal with units ... hard because the matrix has diff units for diff columns
         assert matrix.shape == (4, 4)
         positions = u.to_units_array(self.atoms.position)
-        newpos = moldesign.math.apply_4x4_transform(matrix, positions)
+        newpos = mathutils.apply_4x4_transform(matrix, positions)
         for atom, r in zip(self.atoms, newpos):
             atom.position = r
 

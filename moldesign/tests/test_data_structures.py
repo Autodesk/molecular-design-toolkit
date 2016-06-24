@@ -156,10 +156,10 @@ def test_h2_trajectory(h2_trajectory):
         period_progress = (frame.time % period) / period
         if period_progress < 0.1 or period_progress > 0.9:
             # check for expected peaks of sine wave
-            assert frame.positions[0] > 0.1 * u.angstrom
+            assert frame.positions[0, 0] > 0.1 * u.angstrom
         elif 0.4 < period_progress < 0.6:
             # check for expected troughs of sine wave
-            assert frame.positions[0] < -0.1 * u.angstrom
+            assert frame.positions[0, 0] < -0.1 * u.angstrom
 
 
 @typedfixture('molecule')
@@ -197,17 +197,17 @@ def test_h2_hierarchy(h2):
     chain = h2.chains.__iter__().next()
     res = h2.residues.__iter__().next()
     atom1, atom2 = h2.atoms
-    assert h2 == atom1.parent == atom2.parent == chain.parent == res.parent
+    assert h2 == atom1.molecule == atom2.molecule == chain.molecule == res.molecule
     assert chain == atom1.chain == atom2.chain
     assert res == atom1.residue == atom2.residue
 
 def test_h2_array_link(h2):
     atom1, atom2 = h2.atoms
-    atom2.momentum[1] = 3.0 * u.default.momentum
-    h2.positions[1] = 0.1 * u.angstrom
+    atom2.momentum[0, 1] = 3.0 * u.default.momentum
+    h2.positions[0, 1] = 0.1 * u.angstrom
     assert atom1.index == 0 and atom2.index == 1
     assert atom1.y == 0.1 * u.angstrom
-    assert h2.momenta[4] == 3.0 * u.default.momentum
+    assert h2.momenta[0, 1] == 3.0 * u.default.momentum
     assert h2.atoms[1].py == 3.0 * u.default.momentum
 
 
@@ -217,12 +217,12 @@ def test_copy_breaks_link(h2):
     assert h2copy.atoms[0].y == 0.0 * u.angstrom
     np.testing.assert_almost_equal(h2.positions[1].value_in(u.bohr),
                                    4.0, 7)
-    assert h2copy.positions[1] == 0.0 * u.bohr
+    assert h2copy.positions[0, 1] == 0.0 * u.bohr
 
-    h2copy.momenta[3] = 2.0 * u.default.momentum
+    h2copy.momenta[1, 0] = 2.0 * u.default.momentum
     np.testing.assert_almost_equal(h2copy.atoms[1].px.value_in(u.default.momentum),
                                    2.0, 7)
-    assert h2.momenta[3] == 0.0 * u.default.momentum
+    assert h2.momenta[1, 0] == 0.0 * u.default.momentum
     assert h2.atoms[1].px == 0.0 * u.default.momentum
 
 
@@ -325,7 +325,7 @@ def test_copying_doesnt_corrupt_original_h2_harmonic(h2_harmonic):
 def test_atoms_copied_from_h2_harmonic(copy_atoms_from_h2_harmonic, h2_harmonic):
     atoms = copy_atoms_from_h2_harmonic
     atom = atoms[0]
-    assert atom.parent is None
+    assert atom.molecule is None
     assert atom.residue is not h2_harmonic.atoms[0].residue
     assert atom.chain is not h2_harmonic.atoms[0].chain
     assert atoms[0].residue is atoms[1].residue
@@ -339,7 +339,7 @@ def h2_harmonic_atoms(h2_harmonic):
 
 def test_h2_traj_energies(h2_trajectory):
     traj = h2_trajectory
-    assert (np.abs(traj.positions[0]) <= 1.0 * u.angstrom).all()
+    assert (np.abs(traj.positions[0,0]) <= 1.0 * u.angstrom).all()
     assert (traj.potential_energy <= 4.0 * u.kcalpermol).all()
 
 
@@ -427,7 +427,7 @@ def test_molecule_atom_hierarchy(molkey, request):
     chains_from_atoms = set()
     for iatom, atom in enumerate(mol.atoms):
         assert atom.index == iatom
-        assert atom.parent is mol
+        assert atom.molecule is mol
         assert atom.residue in all_residues
         assert atom.chain in all_chains
         residues_from_atoms.add(atom.residue)
@@ -449,7 +449,7 @@ def test_molecule_residue_hierarchy(molkey, request):
     assert len(all_atoms) == mol.num_atoms == len(mol.atoms)
 
     for residue in mol.residues:
-        assert residue.parent is mol
+        assert residue.molecule is mol
         chains_from_residues.add(residue.chain)
         for atom in residue.iteratoms():
             assert atom not in atoms_in_residues, 'Atom in more than 1 residue'
@@ -472,12 +472,12 @@ def test_molecule_chain_hierarchy(molkey, request):
     residues_from_chains = set()
 
     for chain in mol.chains:
-        assert chain.parent is mol
+        assert chain.molecule is mol
         for residue in chain:
             assert residue not in residues_from_chains, 'Residue in more than 1 chain'
             residues_from_chains.add(residue)
             assert residue in all_residues
-            assert residue.parent is mol
+            assert residue.molecule is mol
             assert residue.chain is chain
 
     assert residues_from_chains == all_residues
@@ -533,6 +533,7 @@ def test_markdown_repr(fixture_name, request):
     obj = request.getfuncargvalue(fixture_name)
     result = obj._repr_markdown_()
     assert bool(result)
+
 
 @pytest.mark.parametrize('fixture_key', ['h2_harmonic_atoms',
                                          'ligand_3aid_atoms',

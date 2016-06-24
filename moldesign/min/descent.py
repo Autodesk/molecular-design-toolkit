@@ -56,9 +56,10 @@ class GradientDescent(MinimizerBase):
     def run_once(self):
         print 'Starting geometry optimization: built-in gradient descent'
         laststep = self.mol.calculate()
-        lastenergy = self.objective(self.mol.positions)
+        lastenergy = self.objective(self._coords_to_vector(self.mol.positions))
+        current = self._coords_to_vector(self.mol.positions)
         for i in xrange(self.nsteps):
-            grad = self.grad(self.mol.positions)
+            grad = self.grad(current)
             if np.abs(grad.max()) < self.force_tolerance:
                 return
             move = -self.gamma * grad
@@ -67,21 +68,23 @@ class GradientDescent(MinimizerBase):
                 scale = self.max_atom_move / mmax
                 print 'Move too big: scaling by step by {scale.magnitude:.6f}'.format(scale=scale)
                 move *= scale
-            self.mol.positions += move
-            newenergy = self.objective(self.mol.positions)
+            current += move
+            newenergy = self.objective(current)
             if newenergy > lastenergy:
-                print 'Energy increased by {x.magnitude:.3e} {x.units}!'.format(x=(newenergy-lastenergy)) + \
+                print 'Energy increased by {x.magnitude:.3e} {x.units}!'.format(
+                        x=(newenergy-lastenergy)) + \
                       ' Reverting to previous step and reducing step size.'
                 self.gamma /= 2.0
                 self.max_atom_move /= 2.0
-                self.mol.positions = laststep['positions']
+                current = self._coords_to_vector(['positions'])
                 self.mol.properties = laststep
             else:
+                self._sync_positions(current)
                 laststep = self.mol.calculate(self.request_list)
                 lastenergy = newenergy
             self.callback()
 
-
+@exports
 @toplevel
 def gradient_descent(*args, **kwargs):
     minobj = GradientDescent(*args, **kwargs)
