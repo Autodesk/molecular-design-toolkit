@@ -332,7 +332,7 @@ class AtomContainer(object):
         """
         # TODO: deal with units ... hard because the matrix has diff units for diff columns
         assert matrix.shape == (4, 4)
-        positions = u.to_units_array(self.atoms.position)
+        positions = u.array(self.atoms.position)
         newpos = mathutils.apply_4x4_transform(matrix, positions)
         for atom, r in zip(self.atoms, newpos):
             atom.position = r
@@ -370,7 +370,7 @@ class AtomList(list, AtomContainer):
             raise AttributeError
         atom_attrs = [getattr(atom, item) for atom in self.atoms]
         try:
-            return u.to_units_array(atom_attrs)
+            return u.array(atom_attrs)
         except (TypeError, StopIteration):
             return atom_attrs
 

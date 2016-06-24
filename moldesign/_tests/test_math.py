@@ -89,7 +89,7 @@ def test_vectorized_gaussian_function_evaluations(objkey, request):
         coords[i, idim] += randoffset
 
     vector_results = g(coords)
-    expected = u.to_units_array([g(c) for c in coords])
+    expected = u.array([g(c) for c in coords])
 
     _assert_almost_equal(vector_results, expected, decimal=8)
 

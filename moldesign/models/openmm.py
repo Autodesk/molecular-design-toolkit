@@ -73,7 +73,6 @@ class OpenMMPotential(MMBase, OpenMMPickleMixin):
         props = MolecularProperties(self.mol,
                                     potential_energy=simtk2pint(state.getPotentialEnergy()),
                                     forces=simtk2pint(state.getForces(), flat=True))
-        props['forces'].shape = (self.mol.ndims,)
         return props
 
     def prep(self, force=False):

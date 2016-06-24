@@ -77,6 +77,8 @@ class Trajectory(object):
         mol (moldesign.Molecule): the trajectory will describe the motion of this molecule
         unit_system (u.UnitSystem): convert all attributes to this unit system (default:
             ``moldesign.units.default``)
+        first_frame(bool): Create the trajectory's first :class:`Frame` from the molecule's
+            current position
 
     Attributes:
         mol (moldesign.Molecule): the molecule object that this trajectory comes from
@@ -84,16 +86,17 @@ class Trajectory(object):
         info (str): text describing this trajectory
         unit_system (u.UnitSystem): convert all attributes to this unit system
     """
-    def __init__(self, mol, unit_system=u.default):
+    def __init__(self, mol, unit_system=None, first_frame=False):
         self._init = True
         self.info = "Trajectory"
         self.frames = []
         self.mol = mol
-        self.unit_system = unit_system
+        self.unit_system = utils.if_not_none(unit_system, mdt.units.default)
         self._property_keys = None
         self._tempmol = mdt.Molecule(self.mol.atoms, copy_atoms=True)
         self._tempmol.dynamic_dof = self.mol.dynamic_dof
         self._viz = None
+        if first_frame: self.new_frame()
 
     # TODO: the current implementation does not support cases where the molecular topology changes
     # TODO: allow caching to disk for very large trajectories
@@ -246,7 +249,7 @@ class Trajectory(object):
         for f in self.frames:
             diff = (refpos[indices] - f.positions[indices].reshape(shape))
             rmsds.append(np.sqrt(diff.dot(diff)/len(atoms)))
-        return u.to_units_array(rmsds).defunits()
+        return u.array(rmsds).defunits()
 
     def slice_frames(self, key, missing=None):
         """ Return an array of giving the value of ``key`` at each frame.
@@ -267,7 +270,7 @@ class Trajectory(object):
                 has_units = False
             result.append(val)
         if has_units:
-            result = u.to_units_array([frame.get(key, None) for frame in self.frames])
+            result = u.array([frame.get(key, None) for frame in self.frames])
             return u.default.convert(result)
         else:
             return np.array(result)
@@ -284,7 +287,7 @@ class Trajectory(object):
                 convert_units = False
                 energies.append(None)
         if convert_units:
-            arr = u.to_units_array(energies)
+            arr = u.array(energies)
             return u.default.convert(arr)
         else:
             return energies
@@ -302,7 +305,7 @@ class Trajectory(object):
                 convert_units = False
                 temps.append(None)
         if convert_units:
-            arr = u.to_units_array(temps)
+            arr = u.array(temps)
             return u.default.convert(arr)
         else:
             return temps

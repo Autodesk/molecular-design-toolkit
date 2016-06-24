@@ -125,7 +125,7 @@ def colormap(cats, mplmap='auto'):
     # strip units
     units = None
     if hasattr(cats[0], 'magnitude'):
-        arr = u.to_units_array(cats)
+        arr = u.array(cats)
         units = arr.units
         cats = arr.magnitude
 

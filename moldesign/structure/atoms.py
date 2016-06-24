@@ -295,6 +295,14 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
     # Methods for BUILDING the atom and indexing it in a molecule
     def __init__(self, name=None, atnum=None, mass=None, chain=None, residue=None,
                  pdbname=None, pdbindex=None, element=None):
+
+        # Allow user to instantiate an atom as Atom(6) or Atom('C')
+        if atnum is None and element is None:
+            if isinstance(name, int):
+                atnum = name
+                name = None
+            else: element = name
+
         if element: self.atnum = data.ATOMIC_NUMBERS[element]
         else: self.atnum = atnum
 

@@ -65,7 +65,7 @@ def test_units():
 
 def test_default_unit_conversions():
     my_list = [1.0*u.angstrom, 1.0*u.nm, 1.0*u.a0]
-    my_array = u.to_units_array(my_list).defunits()
+    my_array = u.array(my_list).defunits()
     assert my_array.get_units() == u.default.convert(my_array).get_units()
     result = my_array.value_in(u.nm)
     np.testing.assert_almost_equal(result[0], 0.1, 9)
@@ -128,8 +128,8 @@ def h2():
 def h2_harmonic():
     mol = h2()
     SPRING_CONSTANT = 1.0 * u.kcalpermol / (u.angstrom ** 2)
-    model = moldesign.methods.models.HarmonicOscillator(k=SPRING_CONSTANT)
-    integrator = moldesign.methods.integrators.VelocityVerlet(timestep=0.5*u.fs, frame_interval=30)
+    model = moldesign.models.HarmonicOscillator(k=SPRING_CONSTANT)
+    integrator = moldesign.integrators.VelocityVerlet(timestep=0.5*u.fs, frame_interval=30)
     mol.set_energy_model(model)
     mol.set_integrator(integrator)
     return mol
@@ -203,11 +203,11 @@ def test_h2_hierarchy(h2):
 
 def test_h2_array_link(h2):
     atom1, atom2 = h2.atoms
-    atom2.momentum[0, 1] = 3.0 * u.default.momentum
+    atom2.momentum[1] = 3.0 * u.default.momentum
     h2.positions[0, 1] = 0.1 * u.angstrom
     assert atom1.index == 0 and atom2.index == 1
     assert atom1.y == 0.1 * u.angstrom
-    assert h2.momenta[0, 1] == 3.0 * u.default.momentum
+    assert h2.momenta[1, 1] == 3.0 * u.default.momentum
     assert h2.atoms[1].py == 3.0 * u.default.momentum
 
 
@@ -215,7 +215,7 @@ def test_copy_breaks_link(h2):
     h2copy = mdt.Molecule(h2)
     h2.atoms[0].y = 4.0 * u.bohr
     assert h2copy.atoms[0].y == 0.0 * u.angstrom
-    np.testing.assert_almost_equal(h2.positions[1].value_in(u.bohr),
+    np.testing.assert_almost_equal(h2.positions[0,1].value_in(u.bohr),
                                    4.0, 7)
     assert h2copy.positions[0, 1] == 0.0 * u.bohr
 

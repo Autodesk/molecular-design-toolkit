@@ -40,21 +40,23 @@ class Spring(EnergyModelBase):
         dist = np.sqrt(dvec.dot(dvec))
         pe = 0.5 * self.k * (dist - self.d0)**2
         f = self.k * dvec * (dist - self.d0) / dist
-        forcearray = u.to_units_array(f.tolist() + (-f).tolist())
+        forcearray = u.array([f, -f])
         return {'potential_energy': pe,
                 'forces': forcearray}
 
 
 @exports
 class HarmonicOscillator(EnergyModelBase):
+    """ Applies a harmonic potential (centered at 0) to the x-component of every atom
+    """
     def __init__(self, k):
         self.k = k
-        assert k.dimensionality == {'[mass]':1,'[time]':-2}
+        assert k.dimensionality == {'[mass]': 1,
+                                    '[time]': -2}
         super(EnergyModelBase,self).__init__()
 
     def calculate(self, requests):
-        x = self.mol.atoms[0].x
-        energy = 0.5 * self.k * (x**2)
-        forces = np.zeros(self.mol.ndims) * u.hartree / u.bohr
-        forces[0] = - self.k * x
+        energy = 0.5 * self.k * np.sum(self.mol.positions[:, 0]**2)
+        forces = np.zeros((self.mol.num_atoms, 3)) * u.hartree / u.bohr
+        forces[:, 0] = - self.k * self.mol.positions[:, 0]
         return dict(potential_energy=energy, forces=forces)

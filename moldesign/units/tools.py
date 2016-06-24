@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from moldesign import utils
 
 from .quantity import *
 
@@ -58,9 +59,10 @@ def get_units(q):
         return 1.0 * ureg.dimensionless
 
 
-def to_units_array(qlist, baseunit=None):
-    """
-    Facilitates creating a numpy array by standardizing units across the entire object
+def array(qlist, baseunit=None):
+    """ Facilitates creating an array with units - like numpy.array, but it also checks
+     units for all components of the array
+
     :param qlist: List-like object of quantity objects
     :param baseunit: (optional) unit to standardize with
     :return: Quantity object
@@ -70,8 +72,17 @@ def to_units_array(qlist, baseunit=None):
         if baseunit == 1.0: return np.array(qlist)
 
     try:
-        newlist = [to_units_array(item,baseunit=baseunit).magnitude
+        newlist = [array(item, baseunit=baseunit).magnitude
                    for item in qlist]
         return baseunit * newlist
     except TypeError as exc:
         return qlist.to(baseunit)
+
+
+@utils.args_from(np.broadcast_to)
+def broadcast_to(arr, *args, **kwargs):
+    units = arr.units
+    newarr = np.zeros(2) * units
+    tmp = np.broadcast_to(arr, *args, **kwargs)
+    newarr._magnitude = tmp
+    return newarr

@@ -515,6 +515,26 @@ class MolTopologyMixin(object):
         are separated are here for code organization only - they could be included in the main
         Atom class without changing any functionality
     """
+    def copy(self, name=None):
+        """ Create a copy of the molecule and all of its substructures
+
+        Returns:
+            Molecule: copied molecule
+
+        Note:
+            Assigned energy models and integrators are not currently copied, although properties are
+        """
+        if name is None:
+            name = self.name + ' copy'
+        newmol = Molecule(self.atoms,
+                          name=name,
+                          pdbname=self.pdbname,
+                          charge=self.charge)
+        newmol.properties = self.properties.copy()
+        return newmol
+
+
+
     def assert_atom(self, atom):
         """If passed an integer, just return self.atoms[atom].
          Otherwise, assert that the atom belongs to this molecule"""
@@ -540,6 +560,7 @@ class MolTopologyMixin(object):
         self._positions = np.zeros((self.num_atoms, 3)) * u.default.length
         self._momenta = np.zeros((self.num_atoms, 3)) * u.default.momentum
         self.masses = np.zeros(self.num_atoms) * u.default.mass
+        self.dim_masses = u.broadcast_to(self.masses, (3, self.num_atoms)).T
         self._assign_atom_indices()
         self._assign_residue_indices()
         self._dof = None
@@ -823,8 +844,12 @@ class Molecule(AtomContainer,
         charge (units.Scalar[charge]): molecule's formal charge
         ndims (int): length of the positions, momenta, and forces arrays (usually 3*self.num_atoms)
         num_atoms (int): number of atoms (synonyms: num_atoms, numatoms)
-        positions (units.Vector[length]): flat array of atomic positions, len=`self.ndims` [length]
-        momenta (units.Vector[momentum]): flat array of atomic momenta, len=`self.ndims`
+        positions (units.Array[length]): Nx3 array of atomic positions
+        momenta (units.Array[momentum]): Nx3 array of atomic momenta
+        masses (units.Vector[mass]): vector of atomic masses
+        dim_masses (units.Array[mass]): Nx3 array of atomic masses (for numerical convenience -
+           allows you to calculate velocity, for instance, as
+           ``velocity = mol.momenta/mol.dim_masses``
         time (units.Scalar[time]): current time in dynamics
         energy_model (moldesign.models.base.EnergyModelBase): Object that calculates
             molecular properties - driven by `mol.calculate()`

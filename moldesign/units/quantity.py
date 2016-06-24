@@ -22,7 +22,7 @@ from pint import UnitRegistry, set_application_registry, DimensionalityError
 
 # Set up pint's unit definitions
 ureg = UnitRegistry()
-unit_def_file = join(abspath(dirname(__file__)), '../static/pint_atomic_units.txt')
+unit_def_file = join(abspath(dirname(__file__)), '../_static_data/pint_atomic_units.txt')
 ureg.load_definitions(unit_def_file)
 set_application_registry(ureg)
 
@@ -57,7 +57,7 @@ class MdtQuantity(ureg.Quantity):
     _Quantity__prod_units['cross'] = 'mul'
 
     _Quantity__copy_units = ureg.Quantity._Quantity__copy_units[:]
-    _Quantity__copy_units.extend(('diagonal', 'append'))
+    _Quantity__copy_units.extend(('diagonal', 'append', '_broadcast_to'))
     _Quantity__handled = ureg.Quantity._Quantity__handled + ('diagonal', 'append', 'dot')
 
     # For pickling - prevent delegation to the built-in types' __getnewargs__ methods:

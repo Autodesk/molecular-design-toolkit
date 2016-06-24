@@ -135,8 +135,8 @@ class PySCFPotential(QMBase):
         # Calculate the forces
         if do_forces:
             g = force_calculator(self.kernel)
-            f_e = -1.0 * g.grad_elec().reshape(self.mol.ndims) * self.FORCE_UNITS
-            f_n = -1.0 * g.grad_nuc().reshape(self.mol.ndims) * self.FORCE_UNITS
+            f_e = -1.0 * g.grad_elec() * self.FORCE_UNITS
+            f_n = -1.0 * g.grad_nuc() * self.FORCE_UNITS
             result['electronic_forces'] = f_e.defunits()
             result['nuclear_forces'] = f_n.defunits()
             result['forces'] = result['electronic_forces'] + result['nuclear_forces']
