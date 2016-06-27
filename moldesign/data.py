@@ -87,7 +87,7 @@ RESIDUE_ONE_LETTER = dict(ALA="A", ASX="B", CYS="C", ASP="D",
 
 # This is a very big dict, so we load it as a compressed database
 _bondfilename = os.path.join(PACKAGEPATH, '_static_data/residue_bonds')
-RESIDUE_BONDS = utils.CompressedJsonDbm(_bondfilename, 'r')
+RESIDUE_BONDS = utils.CompressedJsonDbm(_bondfilename, 'r', dbm=utils.ReadOnlyDumb)
 
 AMINO_NAMES = {
     "ALA": "Alanine",

@@ -16,16 +16,16 @@ import dumbdbm
 import json
 import zlib
 
+
 class CompressedJsonDbm(object):
     """ Quick-and-dirty interface to a DBM file
     """
     def __init__(self, filename, flag='r', dbm=dumbdbm):
         self.dbm = dbm
-        if dbm is dumbdbm:  # dumbdbm corrupts databases even with 'r' flag, so make it read-only
-            # TODO: this is bad and non-portable, needs to change before release
-            os.system('chmod a-w {0}.dir {0}.dat'.format(filename))
-
-        self.db = self.dbm.open(filename, flag)
+        if hasattr(dbm, 'open'):
+            self.db = self.dbm.open(filename, flag)
+        else:
+            self.db = self.dbm(filename, flag)
 
     def __getattr__(self, item):
         return getattr(self.db, item)
@@ -45,6 +45,26 @@ class CompressedJsonDbm(object):
         self.db[key] = gzvalue
 
 
+class ReadOnlyDumb(dumbdbm._Database):
+    """ A read-only subclass of dumbdbm
+
+    All possible operations that could result in a disk write have been turned into no-ops or raise
+    exceptions
+    """
+    def _commit(self):
+        # Does nothing!
+        pass
+
+    def __setitem__(self, key, value):
+        raise NotImplementedError('This is a read-only database')
+
+    def __delitem__(self, key):
+        raise NotImplementedError('This is a read-only database')
+
+    def _addkey(self, *args):
+        assert False, 'Should never be here - this is a read-only database'
+
+
 class Hdf5Dbm(object):
     """ A simplified DBM interface backed by HDF5.
 
@@ -55,7 +75,7 @@ class Hdf5Dbm(object):
 
     This was written only because dumbdbm has a tendency to get corrupted (because it doesn't
     support read-only mode), none of the other standard library DBMs are portable, and other
-    alternatives (like semidbm) play nice with git.
+    alternatives (like semidbm) don't play nice with git.
     """
     def __init__(self, filename, mode='r', compression=10):
         """Initialization:

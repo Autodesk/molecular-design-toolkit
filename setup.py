@@ -67,21 +67,12 @@ def find_package_data(pkgdir):
 class PostInstall(install):
     def run(self):
         install.run(self)
-        #self.protect_db()  # causes pip install to crash
-        print 'hi'
         self.prompt_intro()
-
-    def protect_db(self):
-        # Prevent residue dictionary from getting corrupted
-        print 'heyhey'
-        modpath = imp.find_module('moldesign')[1]
-        dbpath = os.path.join(modpath, 'static/residue_bonds')
-        subprocess.check_call('chmod a-w {0}.dir {0}.dat'.format(dbpath))
 
     def prompt_intro(self):  # this doesn't actually display - print statements don't work?
         print 'Thank you for installing the Molecular Design Toolkit!!!'
         print 'For help, documentation, and any questions, visit us at '
-        print '    http://bionanoresearch.com/moldesign'
+        print '    http://moldesign.bionano.autodesk.com.com/'
         print '\nTo get started, please run:'
         print ' >>> python -m moldesign intro'
 
