@@ -177,7 +177,7 @@ class AtomContainer(object):
         return com
     com = center_of_mass  # synonym
 
-    def draw(self, width=500, height=500, show_2dhydrogens=False):
+    def draw(self, width=500, height=500, show_2dhydrogens=None):
         """ Visualize this molecule (Jupyter only).
 
         Creates a 3D viewer, and, for small molecules, a 2D viewer).
@@ -185,6 +185,8 @@ class AtomContainer(object):
         Args:
             width (int): width of the viewer in pixels
             height (int): height of the viewer in pixels
+            show_2dhydrogens (bool): whether to show the hydrogens in 2d (default: True if there
+                   are 10 or less heavy atoms, false otherwise)
 
         Returns:
             moldesign.ui.SelectionGroup
@@ -213,17 +215,21 @@ class AtomContainer(object):
             self.viz3d.highlight_atoms(highlight_atoms)
         return self.viz3d
 
-    def draw2d(self, highlight_atoms=None, show_hydrogens=False, **kwargs):
+    def draw2d(self, highlight_atoms=None, show_hydrogens=None, **kwargs):
         """
         Draw this object in 2D. Jupyter only.
 
         Args:
             highlight_atoms (List[Atom]): atoms to highlight when the structure is drawn
+            show_hydrogens (bool): whether to draw the hydrogens or not (default: True if there
+                   are 10 or less heavy atoms, false otherwise)
 
         Returns:
             mdt.ChemicalGraphViewer: 2D viewer object
         """
         from moldesign import viewer
+        if show_hydrogens is None:
+            show_hydrogens = len(self.heavy_atoms) <= 10
         if not show_hydrogens:
             alist = [atom for atom in self.atoms if atom.atnum > 1]
         else:

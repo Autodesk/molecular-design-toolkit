@@ -53,6 +53,25 @@ class Bond(object):
         """Has this object using the atoms involved in its bond"""
         return hash((self.a1, self.a2))
 
+    def partner(self, atom):
+        """ Return this atom's *partner* in the bond -- i.e., the other atom in the bond
+
+        Args:
+            atom (mdt.Atom): return the atom that this one is bonded to
+
+        Returns:
+            mdt.Atom: the passed atom's partner
+
+        Raises:
+            ValueError: if the passed atom is not part of this bond
+        """
+        if atom is self.a1:
+            return self.a2
+        elif atom is self.a2:
+            return self.a1
+        else:
+            raise ValueError('%s is not part of this bond' % atom)
+
     @property
     def name(self):
         """ str: name of the bond """

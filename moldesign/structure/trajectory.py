@@ -63,6 +63,37 @@ class Frame(utils.DotDict):
     pass
 
 
+class _TrajAtom(object):
+    """ A helper class for querying individual atoms' dynamics
+    """
+
+    ATOMIC_ARRAYS = {'position': 'positions',
+                     'momentum': 'momenta',
+                     'force': 'forces'}
+
+    def __init__(self, traj, index):
+        self.traj = traj
+        self.index = index
+        self.real_atom = self.traj.mol.atoms[self.index]
+
+    def __getattr__(self, item):
+        if item in self.ATOMIC_ARRAYS:
+            is_array = True
+            item = self.ATOMIC_ARRAYS[item]
+        else:
+            is_array = False
+
+        trajslice = getattr(self.traj, item)
+
+        if is_array:
+            return trajslice[:, self.index, :]
+        else:
+            if trajslice[0]['type'] != 'atomic':
+                raise ValueError('%s is not an atomic quantity' % item)
+            else:
+                return u.array([f[self.real_atom] for f in trajslice])
+
+
 @toplevel
 class Trajectory(object):
     """ A ``Trajectory`` stores information about a molecule's motion and how its properties
@@ -96,6 +127,7 @@ class Trajectory(object):
         self._tempmol = mdt.Molecule(self.mol.atoms, copy_atoms=True)
         self._tempmol.dynamic_dof = self.mol.dynamic_dof
         self._viz = None
+        self.atoms = [_TrajAtom(self, i) for i in xrange(self.mol.num_atoms)]
         if first_frame: self.new_frame()
 
     # TODO: the current implementation does not support cases where the molecular topology changes
@@ -200,12 +232,7 @@ class Trajectory(object):
         return self.frames[item]
 
     def __getattr__(self, item):
-        """
-        Two possibilities here:
-        If "item" is one of the stored properties, return an frame slice
-        If "item" is a molecular entity, return a trajectory with positions, momenta, and forces that
-        just refer to that entity.
-        """
+        # TODO: move slicing to frames, so that this will work with __getitem__ as well
         # TODO: prevent identical recursion (so __getattr__(foo) can't call __getattr__(foo))
         if self._property_keys is None:
             self._update_property_keys()

@@ -55,9 +55,10 @@ class GradientDescent(MinimizerBase):
 
     def run_once(self):
         print 'Starting geometry optimization: built-in gradient descent'
-        laststep = self.mol.calculate()
+        lastproperties = self.mol.calculate()
         lastenergy = self.objective(self._coords_to_vector(self.mol.positions))
         current = self._coords_to_vector(self.mol.positions)
+
         for i in xrange(self.nsteps):
             grad = self.grad(current)
             if np.abs(grad.max()) < self.force_tolerance:
@@ -76,13 +77,14 @@ class GradientDescent(MinimizerBase):
                       ' Reverting to previous step and reducing step size.'
                 self.gamma /= 2.0
                 self.max_atom_move /= 2.0
-                current = self._coords_to_vector(['positions'])
-                self.mol.properties = laststep
-            else:
+                self.mol.positions = lastproperties.positions
+                self.mol.properties = lastproperties
+            else:  # update with new positions
                 self._sync_positions(current)
-                laststep = self.mol.calculate(self.request_list)
+                lastproperties = self.mol.calculate(self.request_list)
                 lastenergy = newenergy
             self.callback()
+
 
 @exports
 @toplevel

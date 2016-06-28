@@ -560,7 +560,7 @@ class MolTopologyMixin(object):
         self._positions = np.zeros((self.num_atoms, 3)) * u.default.length
         self._momenta = np.zeros((self.num_atoms, 3)) * u.default.momentum
         self.masses = np.zeros(self.num_atoms) * u.default.mass
-        self.dim_masses = u.broadcast_to(self.masses, (3, self.num_atoms)).T
+        self.dim_masses = u.broadcast_to(self.masses, (3, self.num_atoms)).T  # TODO: pickling
         self._assign_atom_indices()
         self._assign_residue_indices()
         self._dof = None
@@ -731,15 +731,27 @@ class MolSimulationMixin(object):
             else:
                 return DummyJob(job)
 
-    def set_energy_model(self, model):
+    def set_energy_model(self, model, **params):
         """ Associate an energy model with this molecule
 
         Args:
-            model (moldesign.methods.EnergyModelBase):
+            model (moldesign.methods.EnergyModelBase): The energy model to associate with this
+                molecule
+            **params (dict): a dictionary of parameters for the model
+
+        Note:
+            For convenience, ``model`` can be an instance, a class, or a constructor (with
+            call signature ``model(**params) -> model instance)``
         """
+        # If passed the class or constructor, create an instance of the energy model
+        if not issubclass(type(model), mdt.models.base.EnergyModelBase) and callable(model):
+            model = model()
+
         self.energy_model = model
         self.properties = MolecularProperties(self)
         model.mol = self
+        model.params.update(params)
+
         if 'charge' in model.params:
             if model.params.charge is None:
                model.params.charge = self.charge
@@ -748,6 +760,10 @@ class MolSimulationMixin(object):
                     self.charge, model.params.charge)
         model._prepped = False
 
+# TODO: decorate in a way to prevent circular imports -- delay resolving?
+#    @utils.args_from(mdt.min.base.MinimizerBase.__init__,
+#                     allexcept=['self'],
+#                     inject_kwargs={'assert_converged':False})
     def minimize(self, assert_converged=False, **kwargs):
         """ Run a minimization based on the potential model.
         If force_tolerance is not specified, the program defaults are used.

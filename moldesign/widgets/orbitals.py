@@ -37,7 +37,7 @@ class OrbitalViewer(SelectionGroup):
 
 class OrbitalUIPane(Selector, ipy.Box):
     # TODO: deal with orbitals not present in all frames of a trajectory
-    # TODO: deal with orbital properties changing over a trajectory
+    # TODO: deal with orbital properties (occupation and energy) changing over a trajectory
     def __init__(self, viz, **kwargs):
         self.viz = viz
         kwargs.setdefault('width', 325)

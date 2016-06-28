@@ -142,7 +142,7 @@ class AtomPropertyMixin(object):
             return None
         try:
             wfn = self.molecule.electronic_state
-        except molecule.NotCalculatedError:
+        except mdt.exceptions.NotCalculatedError:
             return None
 
         return wfn.aobasis.on_atom.get(self, [])
@@ -407,6 +407,19 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
         """ List[Bond]: list of all bonds this atom is involved in
         """
         return [Bond(self, nbr, order) for nbr, order in self.bond_graph.iteritems()]
+
+    @property
+    def heavy_bonds(self):
+        """ List[Bond]: list of all heavy atom bonds (where BOTH atoms are not hydrogen)
+
+        Note: this returns an empty list if called on a hydrogen atom
+        """
+        if self.atnum == 1:
+            return []
+        else:
+            return [Bond(self, nbr, order)
+                    for nbr, order in self.bond_graph.iteritems()
+                    if nbr.atnum > 1]
 
     @property
     def force(self):

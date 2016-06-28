@@ -383,12 +383,14 @@ class GeometryViewer(MolViz_3DMol):
 
             # If user is going to scrub through a trajectory with orbitals,
             # they need to be cached first to avoid locking up the interpreter
-            if (self.current_orbital is not None) and (
-                self.current_orbital not in self._cached_orbitals):
+            # TODO: parallelize this, also add a "cache" button or something
+            if ((self.current_orbital is not None) and
+                    (self.current_orbital[1] is not None) and
+                    (self.current_orbital not in self._cached_orbitals)):
                 self._cache_orb_trajectory(self.current_orbital)
+
             orb_changed = True
             self.show_frame(selection['framenum'], _fire_event=False, render=False)
-
 
         if ('orbname' in selection) and (selection['orbname'] != self.current_orbital):
             orb_changed = True
@@ -399,8 +401,12 @@ class GeometryViewer(MolViz_3DMol):
             orb_changed = True
             self._orbital_kwargs['isoval'] = selection['orbital_isovalue']
 
-        if self.current_orbital is not None and orb_changed:
-            self.draw_orbital(self.current_orbital, render=False, **self._orbital_kwargs)
+        # redraw the orbital if necessary
+        if orb_changed:
+            if self.current_orbital is None or self.current_orbital[1] is None:
+                self.remove_orbitals()
+            else:
+                self.draw_orbital(self.current_orbital, render=False, **self._orbital_kwargs)
 
         self.render()
 

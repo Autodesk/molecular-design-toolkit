@@ -12,17 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+This module contains various utility functions that are exposed to API users
+"""
+
 from moldesign.interfaces.openbabel import add_hydrogen, guess_bond_orders
 from moldesign.interfaces.pdbfixer_interface import mutate, solvate
 
 
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
+__all__ = 'add_hydrogen guess_bond_orders mutate solvate'.split()
 
-exports(add_hydrogen)
-exports(guess_bond_orders)
-exports(mutate)
-exports(solvate)
 

@@ -32,7 +32,7 @@ from . import geom
 from . import helpers
 from . import integrators
 from . import interfaces
-from . import keywords
+from . import parameters
 from . import mathutils
 from . import min
 from . import models
@@ -46,12 +46,13 @@ from . import utils
 from . import viewer
 from . import widgets
 
-# Populate the top-level namespace (uses the __all__ attribute in each of these packages)
+# Populate the top-level namespace (imports everything from each <submodule>.__all__ variable)
 from .converters import *
 from .geom import *
 from .min import *
 from .orbitals import *
 from .structure import *
+from .tools import *
 from .viewer import *
 
 
@@ -73,6 +74,9 @@ _warnings.simplefilter('error', _np.ComplexWarning)
 if _building_docs:
     __all__ = converters.__all__ + \
               geom.__all__ + \
+              min.__all__ + \
               orbitals.__all__ + \
               structure.__all__ + \
+              tools.__all__ + \
               viewer.__all__
+

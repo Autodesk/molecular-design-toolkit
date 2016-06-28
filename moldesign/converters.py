@@ -34,7 +34,7 @@ from moldesign.interfaces.ambertools import build_bdna
 def exports(o, name=None):
     __all__.append(o.__name__)
     return o
-__all__ = ['read_amber', 'mol_to_pybel', 'build_bdna']
+__all__ = ['read_amber', 'mol_to_pybel', 'build_bdna', 'from_smiles']
 
 
 
