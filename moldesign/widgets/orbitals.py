@@ -50,8 +50,8 @@ class OrbitalUIPane(Selector, ipy.Box):
         self.type_dropdown.observe(self.new_orb_type, 'value')
 
         self.orblist = ipy.Select(options={None: None},
-                                  width=kwargs['width'],
-                                  height=int(kwargs['height']) - 75)
+                                  width=str(kwargs['width'])+'px',
+                                  height=str(int(kwargs['height']) - 75)+'px')
 
         self.isoval_selector = create_value_selector(ipy.FloatSlider,
                                                      value_selects='orbital_isovalue',

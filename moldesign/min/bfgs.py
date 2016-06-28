@@ -15,6 +15,7 @@ import scipy.optimize
 
 from .base import MinimizerBase
 from . import toplevel
+from moldesign import utils
 
 
 def exports(o):
@@ -25,6 +26,14 @@ __all__ = []
 
 @exports
 class BFGS(MinimizerBase):
+    """ SciPy's implementation of the BFGS method, with gradients if available.
+
+    Args:
+        bfgs_threshold (u.Scalar[force]): Maximum force on a single atom
+
+    Note:
+        This implementation will fail rapidly if large forces are present (>> 1 eV/angstrom).
+    """
     _strip_units = True
 
     def run(self):
@@ -63,11 +72,6 @@ class BFGS(MinimizerBase):
         self.traj.info = result
 
 
-@exports
-@toplevel
-def bfgs(*args, **kwargs):
-    """
-    The function version of BFGS
-    """
-    minobj = BFGS(*args, **kwargs)
-    return minobj()
+bfgs = BFGS._as_function('bfgs')
+exports(bfgs)
+toplevel(bfgs)

@@ -40,7 +40,7 @@ class Symmetrizer(ipy.Box):
 
         self.description = ipy.HTML()
         self.symm_selector = ipy.Select()
-        self.symm_selector.observe(self.show_symmetry, name='value')
+        self.symm_selector.observe(self.show_symmetry, names='value')
 
         self.apply_button = ipy.Button(description='Symmetrize')
         self.apply_button.on_click(self.apply_selected_symmetry)

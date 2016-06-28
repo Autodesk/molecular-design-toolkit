@@ -175,7 +175,7 @@ class Trajectory(object):
             return '<Trajectory object @ %s (exception in repr)>' % hex(id(self))
 
     def __add__(self, other):
-        newtraj = Trajectory(self, unit_system=self.unit_system)
+        newtraj = Trajectory(self.mol, unit_system=self.unit_system)
         newtraj.frames = self.frames + other.frames
         return newtraj
 

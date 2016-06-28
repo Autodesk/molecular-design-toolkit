@@ -13,6 +13,7 @@
 # limitations under the License.
 import numpy as np
 
+from moldesign import utils
 from moldesign import units as u
 from .base import MinimizerBase
 from . import toplevel
@@ -26,10 +27,25 @@ __all__ = []
 
 @exports
 class GradientDescent(MinimizerBase):
+    """ A careful (perhaps overly careful) gradient descent implementation designed to relax
+    structures far from equilibrium.
+
+    The structure is adjusted along the force direction, but the step size is capped by
+        ``max_atom_move`` (.075 angstrom by default). If the energy increases after a move,
+        the move is repeated with half the step size.
+
+    Note:
+        This algorithm is good at stably removing large forces, but it's very poorly suited to
+           locating any type of critical point.
+    """
+
     _strip_units = False
 
-    def __init__(self, mol, max_atom_move=0.075 * u.angstrom,
-                 gamma=0.05 * (u.angstrom ** 2) / u.eV,
+    @utils.args_from(MinimizerBase.__init__,
+                       inject_kwargs={'max_atom_move': 0.075*u.angstrom,
+                                      'gamma': 0.05*(u.angstrom**2)/u.eV})
+    def __init__(self, mol, max_atom_move=0.075*u.angstrom,
+                 gamma=0.05*(u.angstrom ** 2)/u.eV,
                  **kwargs):
         """
         :param max_atom_move: Maximum amount to move an atom
@@ -67,7 +83,7 @@ class GradientDescent(MinimizerBase):
             mmax = np.abs(move).max()
             if mmax > self.max_atom_move:  # rescale the move
                 scale = self.max_atom_move / mmax
-                print 'Move too big: scaling by step by {scale.magnitude:.6f}'.format(scale=scale)
+                #print 'Move too big: scaling step by {scale.magnitude:.6f}'.format(scale=scale)
                 move *= scale
             current += move
             newenergy = self.objective(current)
@@ -86,8 +102,7 @@ class GradientDescent(MinimizerBase):
             self.callback()
 
 
-@exports
-@toplevel
-def gradient_descent(*args, **kwargs):
-    minobj = GradientDescent(*args, **kwargs)
-    return minobj()
+gradient_descent = GradientDescent._as_function('gradient_descent')
+exports(gradient_descent)
+toplevel(gradient_descent)
+

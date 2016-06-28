@@ -56,7 +56,10 @@ def args_from(original_function,
         raise ValueError('Error in keyword arguments - '
                          'pass *either* "only" or "allexcept", not both')
 
-    sig = funcsigs.signature(original_function)
+    if hasattr(original_function, '__signature__'):
+        sig = original_function.__signature__.replace()
+    else:
+        sig = funcsigs.signature(original_function)
 
     # Modify the call signature if necessary
     if only or allexcept or inject_kwargs:
@@ -69,11 +72,15 @@ def args_from(original_function,
             for name, param in sig.parameters.iteritems():
                 if name not in allexcept:
                     newparams.append(param)
+        else:
+            newparams = sig.parameters.values()
         if inject_kwargs:
             for name, default in inject_kwargs.iteritems():
                 newp = funcsigs.Parameter(name, funcsigs.Parameter.KEYWORD_ONLY, default=default)
                 newparams.append(newp)
+
         sig = sig.replace(parameters=newparams)
+
     else:
         wraps = if_not_none(wraps, True)
 

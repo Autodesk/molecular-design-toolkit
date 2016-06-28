@@ -6,3 +6,4 @@ __all__ = []
 from . import base
 from .bfgs import *
 from .descent import *
+from .smart import *

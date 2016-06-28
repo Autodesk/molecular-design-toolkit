@@ -28,19 +28,24 @@ class MinimizerBase(object):
     def __init__(self, mol, nsteps=20,
                  force_tolerance=data.DEFAULT_FORCE_TOLERANCE,
                  frame_interval=None,
-                 restraint_multiplier=1.0):
+                 restraint_multiplier=1.0,
+                 _restart_from=0,
+                 _restart_energy=None):
         self.mol = mol
-        self.nsteps = nsteps
+        self.nsteps = nsteps - _restart_from
         self.force_tolerance = force_tolerance
-        self.frame_interval = mdt.utils.if_not_none(frame_interval, nsteps/10)
+        self.frame_interval = mdt.utils.if_not_none(frame_interval,
+                                                    max(nsteps/10, 1))
+        self._restart_from = _restart_from
 
         # Set up the trajectory to track the minimization
         self.traj = mdt.Trajectory(mol)
-        self.current_step = 0
-        self.traj.new_frame(minimization_step=0,
-                            annotation='minimization steps:%d (energy=%s)' %
-                                       (0, mol.calc_potential_energy()))
-        self._initial_energy = None
+        self.current_step = _restart_from
+        if _restart_energy is None:
+            self.traj.new_frame(minimization_step=0,
+                                annotation='minimization steps:%d (energy=%s)' %
+                                           (0, mol.calc_potential_energy()))
+        self._initial_energy = _restart_energy
         self._last_energy = None
         self._last_grad = None
 
@@ -56,6 +61,8 @@ class MinimizerBase(object):
                 'Constrained minimization only available with analytical gradients'
 
     def _sync_positions(self, vector):
+        """ Set the molecule's position
+        """
         c = vector.reshape((self.mol.num_atoms, 3))
         if self._strip_units:
             self.mol.positions = c*u.default.length
@@ -63,6 +70,8 @@ class MinimizerBase(object):
             self.mol.positions = c
 
     def _coords_to_vector(self, coords):
+        """ Convert position array to a flat vector
+        """
         vec = coords.reshape(self.mol.num_atoms * 3)
         if self._strip_units:
             return vec.magnitude
@@ -70,6 +79,8 @@ class MinimizerBase(object):
             return vec
 
     def objective(self, vector):
+        """ Callback function to calculate the objective function
+        """
         self._sync_positions(vector)
         self.mol.calculate(requests=self.request_list)
         pot = self.mol.potential_energy
@@ -84,6 +95,8 @@ class MinimizerBase(object):
         else: return pot.defunits()
 
     def grad(self, vector):
+        """ Callback function to calculate the objective's gradient
+        """
         self._sync_positions(vector)
         self.mol.calculate(requests=self.request_list)
         grad = -self.mol.forces
@@ -98,16 +111,27 @@ class MinimizerBase(object):
         else: return grad.defunits()
 
     def __call__(self):
+        """ Run the minimization
+
+        Returns:
+            moldesign.Trajectory: the minimization trajectory
+        """
         self.run()
-        self.traj.new_frame(minimization_step=self.current_step,
-               annotation='minimization result (%d steps) (energy=%s)' %
-                          (self.current_step, self.mol.potential_energy))
+        if self.traj.num_frames == 0 or self.traj[-1].minimization_step != self.current_step:
+            self.traj.new_frame(minimization_step=self.current_step,
+                                annotation='minimization result (%d steps) (energy=%s)'%
+                                           (self.current_step, self.mol.potential_energy))
         return self.traj
 
     def run(self):
         raise NotImplementedError('This is an abstract base class')
 
     def callback(self, *args):
+        """ To be called after each minimization step
+
+        Args:
+            *args: ignored
+        """
         self.current_step += 1
         if self.current_step % self.frame_interval != 0: return
 
@@ -118,7 +142,7 @@ class MinimizerBase(object):
         if self.nsteps is None:
             message = ['Minimization step %d' % self.current_step]
         else:
-            message = ['Step %d/%d' % (self.current_step, self.nsteps)]
+            message = ['Step %d/%d' % (self.current_step, self.nsteps + self._restart_from)]
 
         if self._last_energy is not None:
             message.append(u'\u0394E={x.magnitude:.3e} {x.units}'.format(
@@ -140,3 +164,20 @@ class MinimizerBase(object):
 
         print ', '.join(message)
         sys.stdout.flush()
+
+    @classmethod
+    def _as_function(cls, newname):
+        """ Create a function that runs this minimization
+        """
+        @mdt.utils.args_from(cls.__init__, allexcept=['self'])
+        def asfn(*args, **kwargs):
+            obj = cls(*args, **kwargs)
+            return obj()
+        asfn.__name__ = newname
+        asfn.__doc__ = cls.__doc__
+
+        return asfn
+
+
+
+

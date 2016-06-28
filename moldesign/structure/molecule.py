@@ -19,6 +19,7 @@ from moldesign import helpers, utils, data
 from moldesign.exceptions import NotCalculatedError
 from moldesign import units as u
 from moldesign.compute import DummyJob
+from moldesign.min.base import MinimizerBase
 
 from . import toplevel, Residue, Chain, Instance, AtomContainer, Bond
 from .coord_arrays import *
@@ -395,7 +396,7 @@ class MolDrawingMixin(object):
             return super(Molecule, self).draw(**kwargs)
         else:
             return widgets.base.SelectionGroup([self.draw3d(),
-                                         uibase.components.AtomInspector()])
+                                         mdt.uibase.components.AtomInspector()])
 
     def draw_orbitals(self, **kwargs):
         """ Visualize any calculated molecular orbitals (Jupyter only).
@@ -760,26 +761,26 @@ class MolSimulationMixin(object):
                     self.charge, model.params.charge)
         model._prepped = False
 
-# TODO: decorate in a way to prevent circular imports -- delay resolving?
-#    @utils.args_from(mdt.min.base.MinimizerBase.__init__,
-#                     allexcept=['self'],
-#                     inject_kwargs={'assert_converged':False})
+    @utils.args_from(MinimizerBase.__init__,
+                     allexcept=['self'],
+                     inject_kwargs={'assert_converged': False})
     def minimize(self, assert_converged=False, **kwargs):
         """ Run a minimization based on the potential model.
+
         If force_tolerance is not specified, the program defaults are used.
         If specified, the largest force component must be less than force_tolerance
         and the RMSD must be less than 1/3 of it. (based on GAMESS OPTTOL keyword)
 
         Args:
-            nsteps (int): max number of steps before exiting
-            frame_interval (int): Number of steps per frame of minimization trajectory
-            force_tolerance ([force]): Force threshold for convergence as described above.
             assert_converged (bool): Raise an exception if the minimization does not converged.
 
         Returns:
             moldesign.trajectory.Trajectory
         """
-        trajectory = self.energy_model.minimize(**kwargs)
+        try:
+            trajectory = self.energy_model.minimize(**kwargs)
+        except NotImplementedError:
+            trajectory = mdt.minimize(self, **kwargs)
         print 'Reduced energy from %s to %s' % (trajectory.potential_energy[0],
                                                 trajectory.potential_energy[-1])
         if assert_converged:
@@ -843,8 +844,6 @@ class Molecule(AtomContainer,
         pdbname (str): Name of the PDB file
         charge (units.Scalar[charge]): molecule's formal charge
 
-
-
     Attributes:
         atoms
         bond_graph (dict): symmetric dictionary specifying bonds between the
@@ -893,7 +892,7 @@ class Molecule(AtomContainer,
         oldatoms = helpers.get_all_atoms(atomcontainer)
 
         if copy_atoms or (oldatoms[0].molecule is not None):
-            print 'INFO: Copying atoms into new molecule'
+            #print 'INFO: Copying atoms into new molecule'
             atoms = oldatoms.copy()
             if name is None:  # Figure out a reasonable name
                 if oldatoms[0].molecule is not None:
