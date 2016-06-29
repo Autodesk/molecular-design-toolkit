@@ -123,12 +123,7 @@ class EnergyModelBase(Method):
 class MMBase(EnergyModelBase):
     """Common interface for molecular mechanics"""
 
-    PARAMETERS = EnergyModelBase.PARAMETERS+[
-        mmp.implicit_solvent,
-        mmp.cutoff, mmp.nonbonded, mmp.constrain_hbonds,
-        mmp.constrain_water,
-        mmp.solute_dielectric, mmp.solvent_dielectric,
-        mmp.ewald_error, mmp.periodic]
+    PARAMETERS = EnergyModelBase.PARAMETERS + mmp.values()
 
     def __init__(self, *args, **kwargs):
         super(MMBase, self).__init__(*args, **kwargs)
@@ -146,8 +141,7 @@ class QMBase(EnergyModelBase):
     ALL_PROPERTIES = DEFAULT_PROPERTIES
     # properties will be a pretty long list for most packages
 
-    PARAMETERS = [qmp.theory, qmp.charge, qmp.multiplicity,
-                  qmp.basis_set, qmp.symmetry, qmp.wfn_guess]
+    PARAMETERS = qmp.values()
 
     def set_wfn_guess(self):
         raise NotImplementedError

@@ -24,6 +24,7 @@ DIST_FORCE_CONSTANT = 1000.0 * u.kcalpermol / (u.angstrom**2)
 ANGLE_TOLERANCE = 0.75 * u.degrees
 ANGLE_FORCE_CONSTANT = 1500.0 * u.kcalpermol / (u.radians**2)
 
+
 class GeometryConstraint(object):
     """
     Base class - Keeps track of a 3D geometry constraint.

@@ -43,7 +43,9 @@ class Configurator(ipy.Box):
     def __init__(self, paramlist, paramdefs, title=None):
         super(Configurator, self).__init__(layout=ipy.Layout(display='flex',
                                                              flex_flow='column',
-                                                             align_self='flex-start'))
+                                                             align_self='flex-start',
+                                                             align_items='stretch',
+                                                             max_width='100%'))
         self.paramlist = paramlist
         self.paramdefs = paramdefs
 
@@ -59,9 +61,15 @@ class Configurator(ipy.Box):
         self.reset_values()
 
         title = utils.if_not_none(title, 'Configuration')
-        self.title = ipy.HTML('<center><h3>%s</center></h3>' % title)
+        self.title = ipy.HTML('<center><h4>%s</h4></center><hr>' % title,
+                              align_self='center')
 
-        self.children = [self.title] + self.selectors.values() + [self.buttons]
+        self.currentconfig = ipy.Textarea(description='Current params:',
+                                          disabled=True,
+                                          value=str(paramlist).replace(', ', ',\n   '),
+                                          width='350px')
+        self.middle = ipy.HBox([ipy.VBox(self.selectors.values()), self.currentconfig])
+        self.children = [self.title, self.middle, self.buttons]
 
     def reset_values(self, *args):
         reset_params = set()
@@ -76,6 +84,7 @@ class Configurator(ipy.Box):
     def apply_values(self, *args):
         for paramname, selector in self.selectors.iteritems():
             self.paramlist[paramname] = selector.selector.value
+        self.currentconfig.value = str(self.paramlist).replace(', ', ',\n   ')
 
 
 class ParamSelector(ipy.Box):
@@ -84,14 +93,14 @@ class ParamSelector(ipy.Box):
 
     def __init__(self, param):
         super(ParamSelector, self).__init__(layout=ipy.Layout(display='flex',
-                                                              flex_flow='row wrap',
+                                                              flex_flow='nowrap',
                                                               align_content='baseline'))
 
         self.param = param
 
         children = []
-        self.name = ipy.HTML("<p style='text-align:right'>%s:</p>" % param.name,
-                             width='150px')
+        self.name = ipy.HTML("<p style='text-align:right'>%s:</p>" % param.displayname,
+                             width='200px')
         children.append(self.name)
 
         if param.choices:

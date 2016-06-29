@@ -52,11 +52,14 @@ class Parameter(object):
         :return:
         """
         self.name = name
+        self.displayname = if_not_none(short_description, name)
         self.value = None
         self.default = default
         self.choices = if_not_none(choices, [])
         self.type = type
         self.help_url = help_url
+        if isinstance(type, u.MdtQuantity):
+            type = type.units
         if isinstance(type, u.MdtUnit):
             self.type = float
             self.units = type
@@ -80,41 +83,51 @@ BASISSETS = []
 
 mm_model_parameters = named_dict([
     Parameter('cutoff', 'Cutoff for nonbonded interactions', default=1.0*u.nm, type=u.nm),
-    Parameter('nonbonded', 'Method to calculate nonbonded interactions', default='cutoff', type=str,
+    Parameter('nonbonded', 'Nonbonded interaction method', default='cutoff', type=str,
               choices=['cutoff', 'pme', 'ewald']),
     Parameter('implicit_solvent',
               'Implicit solvent method',
               type=str,
               choices=['gbsa', 'obc', 'pbsa', None]),
-    Parameter('constrain_hbonds', 'Constrain covalent hydrogen bonds',
-              default=True, type=bool),
-    Parameter('constrain_water', 'Constrain water geometries',
-              default=True, type=bool),
     Parameter('solute_dielectric', 'Solute dielectric constant',
               default=1.0, type=float),
     Parameter('solvent_dielectric', 'Solvent dielectric constant',
               default=78.5, type=float),
-    Parameter('ewald_error', default=0.0005, type=float),
-    Parameter('periodic', default=False, choices=PERIODICITIES)
+    Parameter('ewald_error', 'Ewald error tolerance', default=0.0005, type=float),
+    Parameter('periodic', 'Periodicity', default=False, choices=PERIODICITIES)
 ])
 
 qm_model_parameters = named_dict([
-    Parameter('theory', choices=QMTHEORIES),
-    Parameter('charge', default=None, type=int),  # not sure if this should be here or in mol
-    Parameter('multiplicity', default=1, type=int),
-    Parameter('basis_set', choices=BASISSETS),
-    Parameter('symmetry', default=None, choices=[None, 'Auto', 'Loose']),
-    Parameter('wfn_guess', default='huckel',
+    Parameter('theory', 'QM theory', choices=QMTHEORIES),
+    Parameter('multiplicity', 'Spin multiplicity', default=1, type=int),
+    Parameter('basis_set', 'Basis set', choices=BASISSETS),
+    Parameter('symmetry',  default=None, choices=[None, 'Auto', 'Loose']),
+    Parameter('wfn_guess', 'Starting guess method:', default='huckel',
               choices=['huckel', 'guess']
               )])
 
 integrator_parameters = named_dict([
-    Parameter('timestep', default=1.0*u.fs, type=u.default.time),
-    Parameter('remove_translation', default=True, type=bool),
-    Parameter('remove_rotation', default=False, type=bool),
-    Parameter('temperature', default=298 * u.kelvin, type=u.default.temperature),
-    Parameter('collision_rate', default=1.0 / u.ps, type=[1.0 / u.ps]),
-    Parameter('frame_interval', default=500, type=int)
+    Parameter('timestep', 'Dynamics timestep', default=1.0*u.fs, type=u.default.time),
+    Parameter('frame_interval', 'Time between frames', default=1.0*u.ps, type=u.fs)
+])
+
+md_parameters = named_dict([
+    Parameter('remove_translation', 'Remove global translations', default=True,
+              type=bool),
+    Parameter('constrain_hbonds', 'Constrain covalent hydrogen bonds',
+              default=True, type=bool),
+    Parameter('constrain_water', 'Constrain water geometries',
+              default=True, type=bool),
+    Parameter('remove_rotation', 'Remove global rotations', default=False, type=bool),
+
+])
+
+constant_temp_parameters = named_dict([
+    Parameter('temperature', 'Thermostat temperature', default=298 * u.kelvin,
+              type=u.default.temperature)])
+
+langevin_parameters = named_dict([
+    Parameter('collision_rate', 'Thermal collision rate', default=1.0/u.ps, type=1/u.ps)
 ])
 
 ground_state_properties = ['potential_energy',

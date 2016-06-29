@@ -169,8 +169,12 @@ class MolPropertyMixin(object):
 
     @property
     def dynamic_dof(self):
-        """ int: Number of degrees of dynamic freedom
-        This can be explicitly set; if not, it will be estimated from the number of constraints on the system
+        """ int: Count the number of spatial degrees of freedom of the system,
+        taking into account any constraints
+
+        Note:
+            If there are other DOFs not taken into account here, this quantity can be
+            set explicitly
         """
         if self._dof is not None:
             return self._dof
@@ -181,21 +185,29 @@ class MolPropertyMixin(object):
             if self.integrator.params.get('remove_rotation', False):
                 if self.num_atoms > 2:
                     df -= 2
-            if 'constraints' in self.integrator.params:
-                hbonds = False
-                if 'hbonds' in self.integrator.params.constraints:
-                    hbonds = True
-                    for atom in self.atoms:
-                        if atom.atnum == 1: df -= 1
-                if 'water' in self.integrator.params.constraints:
-                    for residue in self.residues:
-                        if residue.type == 'water':
-                            if hbonds:
-                                df -= 7
-                            else:
-                                df -= 9
 
-        for constraint in self.constraints:
+        const_hbonds = const_water = False
+        if self.integrator is not None:
+            const_hbonds = self.integrator.params.get('constrain_hbonds', False)
+            const_water = self.integrator.params.get('constrain_water', False)
+
+        if const_hbonds:  # TODO: deal with molecular hydrogen
+            for atom in self.atoms:
+                if atom.atnum == 1: df -= 1
+
+        if const_water:
+            for residue in self.residues:
+                if residue.type == 'water':  # constrained water has 6 degrees of freedom
+                    if const_hbonds:  # two are already accounted for
+                        df -= 1
+                    else:
+                        df -= 3
+
+        for constraint in self.constraints:  # TODO: deal with more double-counting cases
+            if const_hbonds:
+                if isinstance(constraint, mdt.DistanceConstraint):
+                    # don't double-count constrained hbonds
+                    if constraint.a1.atnum == 1 or constraint.a2.atnum == 1: continue
             df -= constraint.dof
         return df
 
@@ -223,7 +235,6 @@ class MolPropertyMixin(object):
         Note:
             This assumes a closed shell ground state! """
         return self.num_electrons/2
-
 
     @property
     def electronic_state(self):
@@ -795,13 +806,31 @@ class MolSimulationMixin(object):
 
     def _reset_methods(self):
         """
-        Called whenever a property is changed that the energy model and/or integrator need to know about
+        Called whenever a property is changed that the energy model and/or integrator
+        need to know about
         """
         # TODO: what should this do with the property object?
         if self.energy_model is not None:
             self.energy_model._prepped = False
         if self.integrator is not None:
             self.integrator._prepped = False
+
+    def configure_methods(self):
+        """ Interactively configure this molecule's simulation methods (notebooks only)
+
+        Returns:
+            ipywidgets.Box: configuration widget
+        """
+        import ipywidgets as ipy
+
+        children = []
+        if self.energy_model:
+            children.append(self.energy_model.configure())
+
+        if self.integrator:
+            children.append(self.integrator.configure())
+
+        return ipy.VBox(children)
 
 
 @toplevel
@@ -930,7 +959,6 @@ class Molecule(AtomContainer,
         self._properties = MolecularProperties(self)
         self.ff = utils.DotDict()
 
-
     # TODO: underscores or not? Buckyball needs a global rule
     def newbond(self, a1, a2, order):
         """ Create a new bond
@@ -946,6 +974,16 @@ class Molecule(AtomContainer,
         # TODO: this should signal to the energy model that the bond structure has changed
         assert a1.molecule == a2.molecule == self
         return a1.bond_to(a2, order)
+
+    @property
+    def velocities(self):
+        """ u.Vector[length/time]: Nx3 array of atomic velocities
+        """
+        return (self.momenta/self.dim_masses).defunits()
+
+    @velocities.setter
+    def velocities(self, value):
+        self.momenta = value * self.dim_masses
 
     def addatom(self, newatom):
         """  Add a new atom to the molecule

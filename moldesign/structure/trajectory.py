@@ -266,16 +266,13 @@ class Trajectory(object):
         if reference is None: refpos = self.frames[0].positions
         else: refpos = reference.positions
 
-        shape = np.product(refpos.shape)  # the length of the flattened array
-        refpos = refpos.reshape(shape)  # flatten array
-
         atoms = mdt.utils.if_not_none(atoms, self.mol.atoms)
         indices = np.array([atom.index for atom in atoms])
 
         rmsds = []
         for f in self.frames:
-            diff = (refpos[indices] - f.positions[indices].reshape(shape))
-            rmsds.append(np.sqrt(diff.dot(diff)/len(atoms)))
+            diff = (refpos[indices] - f.positions[indices])
+            rmsds.append(np.sqrt((diff*diff).sum()/len(atoms)))
         return u.array(rmsds).defunits()
 
     def slice_frames(self, key, missing=None):
@@ -309,7 +306,7 @@ class Trajectory(object):
         for frame in self.frames:
             if 'momenta' in frame:
                 energies.append(
-                    helpers.kinetic_energy(frame.momenta, self.mol.masses))
+                    helpers.kinetic_energy(frame.momenta, self.mol.dim_masses))
             else:
                 convert_units = False
                 energies.append(None)

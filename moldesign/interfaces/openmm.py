@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import itertools
-import tempfile
 
 import numpy as np
 
 import pyccc
+from moldesign.utils import from_filepath
 
 try:
     import simtk.openmm as mm
@@ -55,8 +55,8 @@ class OpenMMPickleMixin(object):
         self.__dict__.update(state)
 
 
-### This class needs special treatment because it inherits from an
-### openmm class, but OpenMM may not be present in the user's environment
+# This class needs special treatment because it inherits from an
+# openmm class, but OpenMM may not be present in the user's environment
 if force_remote:
     MdtReporter = None
 else:
@@ -88,10 +88,12 @@ else:
             :type simulation: simtk.openmm.app.Simulation
             :type state: simtk.openmm.State
             """
+
+            # TODO: make sure openmm masses are the same as MDT masses
             report = dict(
-                positions=simtk2pint(state.getPositions(), flat=True),
-                momenta=simtk2pint(state.getVelocities(), flat=True)*self.mol.dim_masses,
-                forces=simtk2pint(state.getForces(), flat=True),
+                positions=simtk2pint(state.getPositions()),
+                momenta=simtk2pint(state.getVelocities())*self.mol.dim_masses,
+                forces=simtk2pint(state.getForces()),
                 time=simtk2pint(state.getTime()),
                 vectors=simtk2pint(state.getPeriodicBoxVectors()),
                 potential_energy=simtk2pint(state.getPotentialEnergy()))
@@ -104,7 +106,7 @@ else:
                 temperatureheader = 'T / {units}'.format(units=u.default.temperature)
                 print self._row_format.format(timeheader, peheader, keheader, temperatureheader)
                 self._printed_header = True
-            ke = (report['momenta'] / (2*self.mol.dim_masses)).dot(report['momenta'])
+            ke = mdt.helpers.kinetic_energy(report['momenta'], self.mol.dim_masses)
             t = (2.0 * ke) / (u.k_b * self.mol.dynamic_dof)
             print self._row_format.format(report['time'].defunits_value(),
                                           report['potential_energy'].defunits_value(),
@@ -180,22 +182,10 @@ def pint2simtk(quantity):
     return newvar
 
 
-def from_filepath(filelike, func):
-    """Run on func on a temporary *path* assigned to filelike"""
-    if type(filelike) == str:
-        return func(filelike)
-    else:
-        with tempfile.NamedTemporaryFile() as outfile:
-            outfile.write(filelike.read())
-            outfile.flush()
-            result = func(outfile.name)
-        return result
-
-
 @compute.runsremotely(remote=force_remote)
 def _amber_to_mol(prmtop_file, inpcrd_file):
-    prmtop = from_filepath(prmtop_file, app.AmberPrmtopFile)
-    inpcrd = from_filepath(inpcrd_file, app.AmberInpcrdFile)
+    prmtop = from_filepath(app.AmberPrmtopFile, prmtop_file)
+    inpcrd = from_filepath(app.AmberInpcrdFile, inpcrd_file)
 
     mol = topology_to_mol(prmtop.topology,
                           positions=inpcrd.positions,

@@ -434,6 +434,10 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
         """
         return (self.momentum / self.mass).defunits()
 
+    @velocity.setter
+    def velocity(self, value):
+        self.momentum = value * self.mass
+
     @property
     def num_bonds(self):
         """ int: the number of other atoms this atom is bonded to

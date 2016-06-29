@@ -259,3 +259,15 @@ def is_color(s):
             return in_range(int('0x' + s, 0))
     except ValueError:
         return False
+
+
+def from_filepath(func, filelike):
+    """Run func on a temporary *path* assigned to filelike"""
+    if type(filelike) == str:
+        return func(filelike)
+    else:
+        with tempfile.NamedTemporaryFile() as outfile:
+            outfile.write(filelike.read())
+            outfile.flush()
+            result = func(outfile.name)
+        return result

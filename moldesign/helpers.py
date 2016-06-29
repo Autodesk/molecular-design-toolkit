@@ -84,7 +84,7 @@ def get_all_atoms(*objects):
 
 
 def kinetic_energy(momenta, masses):
-    return momenta.dot(momenta/(2.0*masses))
+    return 0.5 * (momenta*momenta/masses).sum()
 
 
 def kinetic_temperature(ke, dof):

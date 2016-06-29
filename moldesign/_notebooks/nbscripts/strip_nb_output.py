@@ -11,15 +11,14 @@ Adapted from rom https://gist.github.com/minrk/6176788 to work with
 git filter driver
 FROM https://github.com/cfriedline/ipynb_template/blob/master/nbstripout
 """
-import sys, os, shutil
-
-#You may need to do this for your script to work with GitX or Tower:
-#sys.path.append("/Users/chris/anaconda/envs/conda/lib/python2.7/site-packages")
+import sys
 
 from nbformat import v4
 
 def strip_output(nb):
     """strip the outputs from a notebook object"""
+    nb.metadata.pop('widgets', None)
+
     for cell in nb.cells:
         if 'outputs' in cell:
             cell['outputs'] = []

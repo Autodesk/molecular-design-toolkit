@@ -35,7 +35,6 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
         self.model = self.mol.energy_model
         self.model.prep()
         self.sim = self.model.sim
-        self.reporter = self._attach_reporters()
         self._prepped = True
 
     def run(self, run_for, wait=False):
@@ -58,13 +57,17 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
         nsteps = self.time_to_steps(run_for, self.params.timestep)
         self.mol.time = 0.0 * u.default.time
         self.model._set_openmm_state()
+
+        self.reporter = self._attach_reporters()
         self.reporter.annotation = 'Langevin dynamics @ %s' % self.params.temperature
         self.reporter.report_from_mol()
-        self.sim.step(nsteps)
+
+        self.sim.step(nsteps)  # this is the actual dynamics loop
+
+        self.model._sync_to_openmm()
         if self.reporter.last_report_time != self.mol.time:
             self.reporter.report_from_mol()
         self.reporter.report_from_mol()
-        self.model._sync_to_openmm()
         return self.reporter.trajectory
 
     def _attach_reporters(self):

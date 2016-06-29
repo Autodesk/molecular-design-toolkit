@@ -11,14 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from moldesign.parameters import integrator_parameters as ips
+from moldesign import parameters
 from moldesign.method import Method
 
 
 class IntegratorBase(Method):
     """Base class for all integrators"""
 
-    PARAMETERS = [ips.timestep, ips.frame_interval]
+    PARAMETERS = parameters.integrator_parameters.values()
 
     def run(self, run_for):
         """
@@ -50,13 +50,12 @@ class IntegratorBase(Method):
 
 
 class MDBase(IntegratorBase):
-    PARAMETERS = (IntegratorBase.PARAMETERS +
-                  [ips.remove_translation,ips.remove_rotation])
+    PARAMETERS = IntegratorBase.PARAMETERS + parameters.md_parameters.values()
 
 
 class ConstantTemperatureBase(MDBase):
-    PARAMETERS = MDBase.PARAMETERS + [ips.temperature]
+    PARAMETERS = MDBase.PARAMETERS + parameters.constant_temp_parameters.values()
 
 
 class LangevinBase(ConstantTemperatureBase):
-    PARAMETERS = ConstantTemperatureBase.PARAMETERS + [ips.collision_rate]
+    PARAMETERS = ConstantTemperatureBase.PARAMETERS + parameters.langevin_parameters.values()
