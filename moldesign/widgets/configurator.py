@@ -1,10 +1,32 @@
+# Copyright 2016 Autodesk Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import collections
 
 import ipywidgets as ipy
 
 from moldesign.uibase import UnitText
+from moldesign import utils
 
 
+def exports(o):
+    __all__.append(o.__name__)
+    return o
+__all__ = []
+
+
+@exports
 class Configurator(ipy.Box):
     """ Interactive configuration widget for a list of parameters
 
@@ -16,53 +38,74 @@ class Configurator(ipy.Box):
         selectors (Mapping[str,ParamSelector]): Mapping of parameters names to their selector
            widgets
     """
+    # TODO: help text. Use javascript to show/hide? http://stackoverflow.com/a/1313353/1958900
 
-    def __init__(self, paramlist, paramdefs):
-        super(Configurator, self).__init__(layout=ipy.Layout(display='flex', flex_flow='column'))
+    def __init__(self, paramlist, paramdefs, title=None):
+        super(Configurator, self).__init__(layout=ipy.Layout(display='flex',
+                                                             flex_flow='column',
+                                                             align_self='flex-start'))
         self.paramlist = paramlist
+        self.paramdefs = paramdefs
+
+        self.apply_button = ipy.Button(description='Apply')
+        self.apply_button.on_click(self.apply_values)
+
+        self.reset_button = ipy.Button(description='Reset')
+        self.reset_button.on_click(self.reset_values)
+        self.buttons = ipy.Box([self.reset_button, self.apply_button],
+                               layout=ipy.Layout(align_self='center'))
 
         self.selectors = collections.OrderedDict([(p.name, ParamSelector(p)) for p in paramdefs])
         self.reset_values()
 
-        self.children = self.selectors
+        title = utils.if_not_none(title, 'Configuration')
+        self.title = ipy.HTML('<center><h3>%s</center></h3>' % title)
 
-    def reset_values(self):
+        self.children = [self.title] + self.selectors.values() + [self.buttons]
+
+    def reset_values(self, *args):
         reset_params = set()
         for name, value in self.paramlist.iteritems():
             self.selectors[name].selector.value = value
             reset_params.add(name)
 
-        for name, paramdef in self.paramdefs.iteritems():
-            if name not in reset_params:  # if it's not set already, make it the default
-                self.selectors[name].default()
+        for paramdef in self.paramdefs:
+            if paramdef.name not in reset_params:  # if it's not set already, make it the default
+                self.selectors[paramdef.name].default()
 
-    def apply_values(self):
+    def apply_values(self, *args):
         for paramname, selector in self.selectors.iteritems():
             self.paramlist[paramname] = selector.selector.value
 
 
 class ParamSelector(ipy.Box):
+
+    WIDGETKWARGS = {'width':'200px'}
+
     def __init__(self, param):
-        super(ParamSelector, self).__init__(layout=ipy.Layout(display='flex', flex_flow='row wrap'))
+        super(ParamSelector, self).__init__(layout=ipy.Layout(display='flex',
+                                                              flex_flow='row wrap',
+                                                              align_content='baseline'))
 
         self.param = param
 
         children = []
-        self.name = ipy.HTML(param.name)
+        self.name = ipy.HTML("<p style='text-align:right'>%s:</p>" % param.name,
+                             width='150px')
         children.append(self.name)
 
         if param.choices:
-            self.selector = ipy.Dropdown(options=param.choices)
+            self.selector = ipy.Dropdown(options=param.choices, **self.WIDGETKWARGS)
         elif param.type == bool:
-            self.selector = ipy.ToggleButtons(options=[True, False])
+            self.selector = ipy.ToggleButtons(options=[True, False], **self.WIDGETKWARGS)
         elif param.units:
-            self.selector = UnitText(units=param.units)
+            self.selector = UnitText(units=param.units, **self.WIDGETKWARGS)
         elif param.type == float:
-            self.selector = ipy.FloatText()
+            self.selector = ipy.FloatText(**self.WIDGETKWARGS)
         elif param.type == int:
-            self.selector = ipy.IntText()
+            self.selector = ipy.IntText(**self.WIDGETKWARGS)
         elif param.type == str:
-            self.selector = ipy.Text()
+            self.selector = ipy.Text(**self.WIDGETKWARGS)
         else:
             self.selector = ipy.HTML('<i>unknown datatype</i>')
         children.append(self.selector)
@@ -72,7 +115,7 @@ class ParamSelector(ipy.Box):
         self.default_button = None
         if param.default:
             self.default_button = ipy.Button(description='Default',
-                                             tooltip='Reset to: %s' % self.param.default,
+                                             tooltip='Set to default: %s' % self.param.default,
                                              width='75px')
             self.default_button.on_click(self.default)
             children.append(self.default_button)

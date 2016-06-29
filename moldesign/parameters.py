@@ -11,13 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """
-This is where we store lists of keywords that should be consistent
-across moldesign.
+This module stores definitions of common parameters for common techniques.
 
-Consistency is not, and may never be, enforced.
-
-TODO:
+These are used to standardize our interfaces to other codes, and automatically generate interactive
+notebook interfaces to configure various techniques.
 """
 
 from moldesign import units as u
@@ -66,6 +65,7 @@ class Parameter(object):
         self.select_multiple = select_multiple
 
 
+# TODO - make this ordered as well as dotted
 def named_dict(l):
     return DotDict({i.name: i for i in l})
 
@@ -74,7 +74,7 @@ model_parameters = named_dict([
 ])
 
 FORCEFIELDS = []
-PERIODICITIES = [None, 'box']
+PERIODICITIES = [False, 'box']
 QMTHEORIES = []
 BASISSETS = []
 
@@ -95,9 +95,6 @@ mm_model_parameters = named_dict([
     Parameter('solvent_dielectric', 'Solvent dielectric constant',
               default=78.5, type=float),
     Parameter('ewald_error', default=0.0005, type=float),
-    Parameter('forcefield', type=ForceField,
-              choices=FORCEFIELDS,
-              select_multiple=True),
     Parameter('periodic', default=False, choices=PERIODICITIES)
 ])
 

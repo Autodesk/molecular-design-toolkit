@@ -181,7 +181,7 @@ def run_tleap(mol,
     return job
 
 
-@functools.wraps(run_tleap)
+@mdt.utils.args_from(run_tleap)
 def assign_forcefield(mol, **kwargs):
     from moldesign.widgets.parameterization import ParameterizationDisplay
 

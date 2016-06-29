@@ -192,12 +192,18 @@ class AtomContainer(object):
             moldesign.ui.SelectionGroup
         """
         import ipywidgets as ipy
-        viz2d = self.draw2d(width=width, height=height,
-                            display=False,
-                            show_hydrogens=show_2dhydrogens)
-        viz3d = self.draw3d(width=width, height=height,
-                            display=False)
-        views = ipy.HBox([viz2d, viz3d])
+
+        if self.num_atoms < 40:
+
+            viz2d = self.draw2d(width=width, height=height,
+                                display=False,
+                                show_hydrogens=show_2dhydrogens)
+            viz3d = self.draw3d(width=width, height=height,
+                                display=False)
+            views = ipy.HBox([viz2d, viz3d])
+        else:
+            views = self.draw3d(display=False)
+
         return mdt.uibase.SelectionGroup([views, mdt.uibase.components.AtomInspector()])
 
     def draw3d(self, highlight_atoms=None, **kwargs):

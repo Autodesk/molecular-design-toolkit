@@ -16,7 +16,7 @@ import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
-from moldesign.keywords import mm_model_parameters as mmp, qm_model_parameters as qmp
+from moldesign.parameters import mm_model_parameters as mmp, qm_model_parameters as qmp
 from moldesign.method import Method
 
 
@@ -49,15 +49,9 @@ class EnergyModelBase(Method):
 
     def minimize(self, method='bfgs', **kwargs):
         """
-        Relax the parent molecule's energy a built-in minimization scheme.
-        Many energy methods will provide their own minimization scheme and will override this method
+        If the energy model provides its own minimizer, it should be hooked up here
         """
-        if method == 'bfgs':
-            return mdt.bfgs(self.mol, **kwargs)
-        elif method == 'gradient descent':
-            return mdt.gradient_descent(self.mol, **kwargs)
-        else:
-            raise ValueError('Unknown minimization method %s' % method)
+        raise NotImplementedError()
 
     def get_formal_charge(self):
         """Determine the formal charge of the molecular system.
@@ -130,7 +124,7 @@ class MMBase(EnergyModelBase):
     """Common interface for molecular mechanics"""
 
     PARAMETERS = EnergyModelBase.PARAMETERS+[
-        mmp.forcefield, mmp.implicit_solvent,
+        mmp.implicit_solvent,
         mmp.cutoff, mmp.nonbonded, mmp.constrain_hbonds,
         mmp.constrain_water,
         mmp.solute_dielectric, mmp.solvent_dielectric,

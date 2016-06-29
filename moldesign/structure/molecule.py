@@ -379,24 +379,6 @@ class MolDrawingMixin(object):
         are separated are here for code organization only - they could be included in the main
         Molecule class without changing any functionality
     """
-    def draw(self, **kwargs):
-        """ Visualize this molecule (Jupyter only).
-
-        Creates a 3D viewer, and, for small molecules, a 2D viewer).
-
-        Args:
-            width (int): width of the viewer in pixels
-            height (int): height of the viewer in pixels
-
-        Returns:
-            moldesign.ui.SelectionGroup
-        """
-        from moldesign import widgets
-        if self.is_small_molecule:
-            return super(Molecule, self).draw(**kwargs)
-        else:
-            return widgets.base.SelectionGroup([self.draw3d(),
-                                         mdt.uibase.components.AtomInspector()])
 
     def draw_orbitals(self, **kwargs):
         """ Visualize any calculated molecular orbitals (Jupyter only).
@@ -761,6 +743,28 @@ class MolSimulationMixin(object):
                     self.charge, model.params.charge)
         model._prepped = False
 
+    def set_integrator(self, integrator, **params):
+        """ Associate an integrator with this molecule
+
+        Args:
+            integrator (moldesign.integrators.IntegratorBase): The integrator to associate with this
+                molecule
+            **params (dict): a dictionary of parameters for the integrator
+
+        Note:
+            For convenience, ``integrator`` can be an instance, a class, or a constructor (with
+            call signature ``integrator(**params) -> integrator instance)``
+        """
+        # If passed the class or constructor, create an instance of the integrator
+        if (not issubclass(type(integrator), mdt.integrators.base.IntegratorBase) and
+                callable(integrator)):
+            integrator = integrator()
+
+        self.integrator = integrator
+        integrator.mol = self
+        integrator.params.update(params)
+        integrator._prepped = False
+
     @utils.args_from(MinimizerBase.__init__,
                      allexcept=['self'],
                      inject_kwargs={'assert_converged': False})
@@ -788,15 +792,6 @@ class MolSimulationMixin(object):
 
         return trajectory
 
-    def set_integrator(self, integrator):
-        """ Associate an integrator with this molecule
-
-        Args:
-            integrator (moldesign.methods.IntegratorBase):
-        """
-        self.integrator = integrator
-        integrator.mol = self
-        integrator._prepped = False
 
     def _reset_methods(self):
         """

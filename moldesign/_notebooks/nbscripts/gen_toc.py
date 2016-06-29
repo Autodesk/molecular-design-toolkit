@@ -30,8 +30,6 @@ if __name__ == '__main__':
 
                 ilevel, name = header
                 print '  '*(ilevel-1) + ' - [%s](#%s)'%(name, name.replace(' ','-'))
-    print '___'
-
 
 
 

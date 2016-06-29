@@ -166,6 +166,8 @@ ambertools:
          g++ \
          libbz2-dev \
          libnetcdf-dev \
+         libfftw3-dev \
+         libnetcdf-dev \
          make \
          patch \
          python-dev \
@@ -183,8 +185,6 @@ ambertools:
      && apt-get -y remove --purge \
          gfortran \
          g++ \
-         libnetcdf-dev \
-         libbz2-dev \
          python-dev \
          wget \
      && apt-get -y clean \

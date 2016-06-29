@@ -24,14 +24,13 @@ class Method(object):
 
     Args:
         **kwargs (dict): list of parameters for the method.
-    """
-
-    PARAMETERS = DotDict()
-    """ DotDict: list of Parameter objects describing the keyword arguments that this class
-    recognizes.
 
     Attributes:
        mol (mdt.Molecule): the molecule this method is associated with
+    """
+
+    PARAMETERS = []
+    """ list: list of Parameters that can be used to configure this method
     """
 
     def __reduce__(self):
@@ -52,6 +51,11 @@ class Method(object):
         for param in self.PARAMETERS:
             if param.name not in self.params:
                 self.params[param.name] = param.default
+
+    def configure(self):
+        from moldesign.widgets.configurator import Configurator
+        return Configurator(self.params, self.PARAMETERS,
+                            title='Configuration for %s' % self.__class__.__name__)
 
     @classmethod
     def get_parameters(cls):
