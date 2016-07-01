@@ -15,6 +15,7 @@ import sys
 
 from nbformat import v4
 
+
 def strip_output(nb):
     """strip the outputs from a notebook object"""
     nb.metadata.pop('widgets', None)
