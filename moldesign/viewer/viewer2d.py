@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import collections
+
 from itertools import product
 from IPython import display as dsp
 
@@ -20,12 +20,25 @@ from nbmolviz.widget2d import MolViz2DBaseWidget
 from moldesign import utils
 import moldesign.units as u
 from moldesign.data import color_rotation
+from moldesign.structure import AtomList
 
-from . import toplevel
+from . import toplevel, ColorMixin
 
 
 @toplevel
-class ChemicalGraphViewer(MolViz2DBaseWidget):
+class ChemicalGraphViewer(MolViz2DBaseWidget, ColorMixin):
+    """ Create a JSON-format graph representing the chemical structure and draw it using the
+    NBMolViz 2D widget.
+
+    Args:
+        mol (moldesign.structure.AtomContainer): A collection of atoms (eg a list of atoms,
+            a residue, a molecule. etc)
+        carbon_labels (bool): If True, draw atom names for carbons
+        names (List[str]): (optional) a list of strings to label the atoms in the drawing
+            (default: ``[atom.name for atom in mol.atoms]``)
+        display (bool): immediately display this drawing
+    """
+
     MAXATOMS = 200
 
     def __init__(self, mol,
@@ -39,7 +52,8 @@ class ChemicalGraphViewer(MolViz2DBaseWidget):
         try:
             self.atoms = mol.atoms
         except AttributeError:
-            self.atoms = mol
+            self.atoms = AtomList(mol)
+            self.mol = self.atoms
         else:
             self.mol = mol
 
@@ -80,7 +94,12 @@ class ChemicalGraphViewer(MolViz2DBaseWidget):
         return graph
 
     def get_atom_index(self, atom):
+        """ Return the atom's index in this object's storage
+        """
         return self.atom_indices[atom]
+
+    def unset_color(self, atoms=None, render=None):
+        self.set_color('white', atoms)
 
     def handle_click(self, trait_name, old, new):
         clicked_atoms = [self.atoms[new]]
@@ -88,10 +107,10 @@ class ChemicalGraphViewer(MolViz2DBaseWidget):
             self.selection_group.update_selections(self, {'atoms': clicked_atoms})
 
     def handle_selection_event(self, selection):
-        """
-        Deals with an external selection event
-        :param selection:
-        :return:
+        """ Highlight atoms in response to a selection event
+
+        Args:
+            selection (dict): Selection event from :module:`moldesign.uibase.selectors`
         """
         if 'atoms' in selection:
             self.highlight_atoms(
@@ -100,22 +119,35 @@ class ChemicalGraphViewer(MolViz2DBaseWidget):
 
 @toplevel
 class DistanceGraphViewer(ChemicalGraphViewer):
+    """ Create a 2D graph that includes edges with 3D information. This gives a 2D chemical that
+    shows contacts from 3D space.
+
+    Args:
+        mol (moldesign.structure.AtomContainer): A collection of atoms (eg a list of atoms,
+            a residue, a molecule. etc)
+        distance_sensitivity (Tuple[u.Scalar[length]]): a tuple containing the minimum and
+            maximum 3D distances to create edges for (default: ``(3.0*u.ang, 7.0*u.ang)``)
+        bond_edge_weight (float): edge weight for covalent bonds
+        nonbond_weight_factor (float): scale non-covalent edge weights by this factor
+        angstrom_to_px (int): number of pixels per angstrom
+        charge (int): the force-directed layout repulsive "charge"
+    """
     def __init__(self, atoms,
                  distance_sensitivity=(3.0 * u.ang, 7.0 * u.ang),
-                 bond_strength=1.0,
+                 bond_edge_weight=1.0,
+                 minimum_edge_weight=0.2,
+                 nonbond_weight_factor=0.66,
                  angstrom_to_px=22.0,
-                 minimum_bond_strength=0.2,
-                 nonbond_strength=0.66,
                  charge=-300,
                  **kwargs):
         dmin, dmax = distance_sensitivity
-        self.minimum_bond_strength = minimum_bond_strength
+        self.minimum_bond_strength = minimum_edge_weight
         self.dmin = dmin.value_in(u.angstrom)
         self.dmax = dmax.value_in(u.angstrom)
         self.drange = self.dmax - self.dmin
-        self.bond_strength = bond_strength
+        self.bond_strength = bond_edge_weight
         self.angstrom_to_px = angstrom_to_px
-        self.nonbond_strength = nonbond_strength
+        self.nonbond_strength = nonbond_weight_factor
         self.colored_residues = {}
         kwargs['charge'] = charge
         super(DistanceGraphViewer, self).__init__(atoms,**kwargs)
@@ -152,21 +184,6 @@ class DistanceGraphViewer(ChemicalGraphViewer):
                 graph['links'].append(link)
 
         return graph
-
-    def color_by_residue(self, black_residue=None):
-        # Color by residue
-        residues = {}
-        for atom in self.atoms:
-            if atom.residue in residues:
-                residues[atom.residue].append(atom)
-            else:
-                residues[atom.residue] = [atom]
-        if black_residue:
-            black_atoms = residues.pop(black_residue)
-            self.set_atom_style(outline_color='black', atoms=black_atoms)
-        for ires, res in enumerate(residues):
-            self.set_atom_style(fill_color=color_rotation[ires], atoms=residues[res])
-            self.colored_residues[res] = color_rotation[ires]
 
     def draw_contacts(self, group1, group2, radius=2.25 * u.angstrom,
                       label=True):

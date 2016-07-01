@@ -19,16 +19,15 @@ import numpy as np
 import moldesign as mdt
 from moldesign import units as u
 from moldesign import utils
-from moldesign.helpers import colormap, VolumetricGrid
-from moldesign.utils import is_color
+from moldesign.helpers import VolumetricGrid, colormap
 from nbmolviz.drivers3d import MolViz_3DMol
-from . import toplevel
+from . import toplevel, ColorMixin
 
 
 # Right now hard-coded to use 3DMol driver - will need to be configurable when there's more than one
 # In theory, the only tie to the specific driver should be the class that we inherit from
 @toplevel
-class GeometryViewer(MolViz_3DMol):
+class GeometryViewer(MolViz_3DMol, ColorMixin):
     """
     Viewer for static and multiple-frame geometries
 
@@ -66,6 +65,7 @@ class GeometryViewer(MolViz_3DMol):
         self._callbacks = set()
         self._axis_objects = None
         self._frame_positions = []
+        self._colored_as = {}
         if mol:
             self.add_molecule(mol, render=False)
             self._frame_positions.append(self.get_positions())
@@ -146,43 +146,31 @@ class GeometryViewer(MolViz_3DMol):
                           'order': [atom.bond_graph[n] for n in nbrs]})
         self.viewer('setBonds', [bonds])
 
-    def color_by(self, atom_callback, atoms=None, mplmap='auto', render=True):
-        """
-        Color atoms according to either:
-          * an atomic attribute (e.g., 'chain', 'residue', 'mass')
-          * a callback function that accepts an atom and returns a color or a category
-        :param atom_callback: callable f(atom) returns color or category
-        :returns: dict of categories
-        """
-        atoms = utils.if_not_none(atoms, self.mol.atoms)
-        if isinstance(atom_callback, str):  # shortcut to use strings to access atom attributes, i.e. "ff.partial_charge"
-            attrs = atom_callback.split('.')
+    @utils.doc_inherit
+    def set_color(self, color, atoms=None, render=True, _store=True):
+        if _store:
+            for atom in utils.if_not_none(atoms, self.mol.atoms):
+                self._colored_as[atom] = color
+        return super(GeometryViewer, self).set_color(color, atoms=atoms, render=render)
 
-            def atom_callback(atom):
-                obj = atom
-                for attr in attrs:
-                    obj = getattr(obj, attr)
-                return obj
+    @utils.doc_inherit
+    def set_colors(self, colormap, render=True, _store=True):
+        if _store:
+            for color, atoms in colormap.iteritems():
+                for atom in atoms:
+                    self._colored_as[atom] = color
+        return super(GeometryViewer, self).set_colors(colormap, render=True)
 
-        if callable(atom_callback):
-            colors = utils.Categorizer(atom_callback, atoms)
+    @utils.doc_inherit
+    def unset_color(self, atoms=None, render=True, _store=True):
+        if _store:
+            for atom in utils.if_not_none(atoms, self.mol.atoms):
+                self._colored_as.pop(atom, None)
 
-        name_is_color = map(is_color, colors.keys())
-        if len(colors) <= 1:
-            colors = {'gray': atoms}
-
-        elif not all(name_is_color):
-            assert not any(name_is_color),\
-                "callback function returned a mix of colors and categories"
-            categories = colors
-            cats = categories.keys()
-            # If there are >256 categories, this is a many-to-one mapping
-            colornames = colormap(cats, mplmap=mplmap)
-            colors = {c: [] for c in colornames}
-            for cat, color in zip(cats, colornames):
-                colors[color].extend(categories[cat])
-
-        self.set_colors(colors, render=render)
+        result = super(GeometryViewer, self).unset_color(atoms=atoms, render=False)
+        if self.atom_highlights: self._redraw_highlights(render=False)
+        if render: self.render()
+        return result
 
     def get_input_file(self):
         if len(self.mol.atoms) <= 250:
@@ -308,13 +296,35 @@ class GeometryViewer(MolViz_3DMol):
     def draw_momenta(self, **kwargs):
         return self.draw_atom_vectors(self.mol.momenta, **kwargs)
 
-    def highlight_atoms(self, atoms, render=True):
+    def highlight_atoms(self, atoms=None, render=True):
+        """
+
+        Args:
+            atoms (list[Atoms]): list of atoms to highlight. If None, remove all highlights
+            render (bool): render this change immediately
+        """
         # TODO: Need to handle style changes
+        if self.atom_highlights:  # first, unhighlight old highlights
+            to_unset = []
+            for atom in self.atom_highlights:
+                if atom in self._colored_as: self.set_color(atoms=[atom],
+                                                            color=self._colored_as[atom],
+                                                            _store=False,
+                                                            render=False)
+                else:
+                    to_unset.append(atom)
+
+            if to_unset:
+                self.atom_highlights = []
+                self.unset_color(to_unset, _store=False, render=False)
+
+        self.atom_highlights = utils.if_not_none(atoms, [])
+        self._redraw_highlights(render=render)
+
+    def _redraw_highlights(self, render=True):
         if self.atom_highlights:
-            self.unset_color(self.atom_highlights)
-        self.atom_highlights = []
-        self.set_color(self.HIGHLIGHT_COLOR, atoms)
-        self.atom_highlights.extend(atoms)
+            self.set_color(self.HIGHLIGHT_COLOR, self.atom_highlights, render=False, _store=False)
+
         if render: self.render()
 
     def label_atoms(self, atoms=None, render=True, **kwargs):

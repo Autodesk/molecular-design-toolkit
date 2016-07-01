@@ -15,7 +15,7 @@
 import ipywidgets as ipy
 
 import moldesign as mdt
-from moldesign import utils
+from moldesign import utils, viewer
 
 
 class Selector(object):
@@ -54,6 +54,7 @@ class SelectionGroup(ipy.Box):
         self.num_listeners = 0
         self.selection = {}
         self.viewer = None
+        self.graphviewer = None
         self.register_selection_listeners()
 
     def update_selections(self, event_source, selection):
@@ -73,6 +74,8 @@ class SelectionGroup(ipy.Box):
             element.selection_id = self.num_listeners
             if issubclass(element.__class__, mdt.viewer.GeometryViewer):
                 self.viewer = element
+            if issubclass(element.__class__, mdt.viewer.ChemicalGraphViewer):
+                self.graphviewer = element
         else:
             listeners = []
 
@@ -80,6 +83,26 @@ class SelectionGroup(ipy.Box):
             for child in element.children:
                 listeners.extend(self.get_child_listeners(child))
         return listeners
+
+    @utils.args_from(viewer.GeometryViewer.set_color)
+    def set_color(self, *args, **kwargs):
+        if self.graphviewer: self.graphviewer.set_color(*args, **kwargs)
+        if self.viewer: self.viewer.set_color(*args, **kwargs)
+
+    @utils.args_from(viewer.GeometryViewer.set_color)
+    def color_by(self, *args, **kwargs):
+        if self.graphviewer: self.graphviewer.color_by(*args, **kwargs)
+        if self.viewer: self.viewer.color_by(*args, **kwargs)
+
+    @utils.args_from(viewer.GeometryViewer.set_color)
+    def set_colors(self, *args, **kwargs):
+        if self.graphviewer: self.graphviewer.set_colors(*args, **kwargs)
+        if self.viewer: self.viewer.set_colors(*args, **kwargs)
+
+    @utils.args_from(viewer.GeometryViewer.unset_color)
+    def unset_color(self, *args, **kwargs):
+        if self.graphviewer: self.graphviewer.unset_color(*args, **kwargs)
+        if self.viewer: self.viewer.unset_color(*args, **kwargs)
 
     def __getattr__(self, item):
         if self.viewer is not None: return getattr(self.viewer, item)

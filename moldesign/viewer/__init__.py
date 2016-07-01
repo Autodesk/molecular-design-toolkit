@@ -3,6 +3,7 @@ def toplevel(o):
     return o
 __all__ = []
 
+from .common import *
 from .viewer2d import *
 from .viewer3d import *
 from .bondclicker import *
