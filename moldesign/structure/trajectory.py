@@ -77,6 +77,8 @@ class _TrajAtom(object):
         self.real_atom = self.traj.mol.atoms[self.index]
 
     def __getattr__(self, item):
+        if item == 'traj': raise AttributeError('_TrajAtom.traj not assigned (pickle issue?)')
+
         if item in self.ATOMIC_ARRAYS:
             is_array = True
             item = self.ATOMIC_ARRAYS[item]

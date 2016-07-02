@@ -55,10 +55,11 @@ class OrbitalUIPane(Selector, ipy.Box):
 
         self.isoval_selector = create_value_selector(ipy.FloatSlider,
                                                      value_selects='orbital_isovalue',
-                                                     min=0.0, max=0.05,
-                                                     value=0.01, step=0.0001,
+                                                     min=0.0, max=0.075,
+                                                     value=0.01, step=0.00075,
                                                      width=kwargs['width'],
-                                                     description='Isovalue')
+                                                     description='Isovalue',
+                                                     readout_format='.4f')
 
         self.orb_resolution = ipy.Text(description='Orbital resolution', width=75)
         self.orb_resolution.value = '40'  # this is a string to enable the 'on_submit' method

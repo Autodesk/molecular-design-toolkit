@@ -14,6 +14,7 @@
 import time
 
 import ipywidgets as ipy
+import sys
 
 import moldesign as mdt
 
@@ -83,12 +84,21 @@ class TrajectoryViewer(selector.SelectionGroup):
 class TrajectoryOrbViewer(TrajectoryViewer):
     def make_viewer(self):
         viewframe = self.traj._tempmol.draw_orbitals()
-        viewframe.viewer.frame_change_callback = self.on_frame_change
         return viewframe.viewer, viewframe
 
-    def on_frame_change(self, framenum):
-        self.traj.apply_frame(self.traj.frames[framenum])
-        self.viewer.wfn = self.traj._tempmol.electronic_state
+    def handle_selection_event(self, selection):
+        if 'framenum' in selection:
+            framenum = selection['framenum']
+            self.traj.apply_frame(self.traj.frames[framenum])
+            self.viewer.wfn = self.traj._tempmol.electronic_state
+            if self.viewer.orbital_is_selected:
+                valsave = self.slider.value
+                with self.slider.hold_trait_notifications():
+                    self.viewer.redraw_orbs(render=True)
+                    self.slider.value = valsave
+
+            else:
+                self.viewer.remove_orbitals(render=True)
 
 
 class FrameInspector(ipy.HTML, selector.Selector):

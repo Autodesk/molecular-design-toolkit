@@ -189,7 +189,7 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
                      for atom in self.mol.atoms]
         return positions
 
-    def calc_orb_grid(self, orbname, npts=30, padding=2.5*u.angstrom):
+    def calc_orb_grid(self, orbname, npts=35, padding=3.0*u.angstrom):
         """ Calculate orbitals on a grid
 
         Args:
@@ -220,6 +220,10 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
         coords = grid.xyzlist().reshape(3, grid.npoints ** 3).T
         values = orbital(coords)
         grid.fxyz = values.reshape(npts, npts, npts)
+        maxrange = max(r[1]-r[0] for r in (grid.xr, grid.yr, grid.zr))
+
+        self.viewer('adjustClipping', [0.6* maxrange.value_in(u.angstrom)])
+            # try not to clip the orbitals
         return grid
 
     def get_orbnames(self):
@@ -390,16 +394,6 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
         if 'framenum' in selection:
             if self.frame_change_callback is not None:
                 self.frame_change_callback(selection['framenum'])
-
-            # If user is going to scrub through a trajectory with orbitals,
-            # they need to be cached first to avoid locking up the interpreter
-            # TODO: parallelize this, also add a "cache" button or something
-            if ((self.current_orbital is not None) and
-                    (self.current_orbital[1] is not None) and
-                    (self.current_orbital not in self._cached_orbitals)):
-                self._cache_orb_trajectory(self.current_orbital)
-
-            orb_changed = True
             self.show_frame(selection['framenum'], _fire_event=False, render=False)
 
         if ('orbname' in selection) and (selection['orbname'] != self.current_orbital):
@@ -413,23 +407,18 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
 
         # redraw the orbital if necessary
         if orb_changed:
-            if self.current_orbital is None or self.current_orbital[1] is None:
-                self.remove_orbitals()
-            else:
-                self.draw_orbital(self.current_orbital, render=False, **self._orbital_kwargs)
+            self.redraw_orbs()
 
         self.render()
 
-    def _cache_orb_trajectory(self, orbital):
-        print 'Computing wavefunction trajectory for orbital %s ...' % str(orbital),
-        sys.stdout.flush()
-        for iframe in xrange(self.num_frames):
-            self.frame_change_callback(iframe)
-            temp = self.get_voldata(orbital,
-                                    npts=self._orbital_kwargs.get('npts', None),
-                                    _framenum=iframe)
-        self._cached_orbitals.add(orbital)
-        print 'done.'
+    def redraw_orbs(self, render=True):
+        if self.orbital_is_selected:
+            self.draw_orbital(self.current_orbital, render=False, **self._orbital_kwargs)
+        if render: self.render()
+
+    @property
+    def orbital_is_selected(self):
+        return self.current_orbital is not None and self.current_orbital[1] is not None
 
     def _convert_units(self, obj):
         try:

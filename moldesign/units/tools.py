@@ -78,11 +78,50 @@ def array(qlist, baseunit=None):
     except TypeError as exc:
         return qlist.to(baseunit)
 
-
-@utils.args_from(np.broadcast_to)
+#@utils.args_from(np.broadcast_to)
 def broadcast_to(arr, *args, **kwargs):
     units = arr.units
     newarr = np.zeros(2) * units
-    tmp = np.broadcast_to(arr, *args, **kwargs)
+    # TODO: replace with np.broadcast_to once numpy 1.10 is available in most package managers
+    tmp = _from_np_broadcast_to(arr, *args, **kwargs)
     newarr._magnitude = tmp
     return newarr
+
+
+# TODO: remove once numpy 1.10 is available in most package managers
+def _from_np_broadcast_to(array, shape, subok=False, readonly=True):
+    """ Temporary copy of a new NumPy function in 1.10, which isn't available in pkg managers yet
+    """
+    shape = tuple(shape) if np.iterable(shape) else (shape,)
+    array = np.array(array, copy=False, subok=subok)
+    if not shape and array.shape:
+        raise ValueError('cannot broadcast a non-scalar to a scalar array')
+    if any(size < 0 for size in shape):
+        raise ValueError('all elements of broadcast shape must be non-'
+                         'negative')
+    needs_writeable = not readonly and array.flags.writeable
+    extras = ['reduce_ok'] if needs_writeable else []
+    op_flag = 'readwrite' if needs_writeable else 'readonly'
+    broadcast = np.nditer(
+        (array,), flags=['multi_index', 'refs_ok', 'zerosize_ok'] + extras,
+        op_flags=[op_flag], itershape=shape, order='C').itviews[0]
+    result = _maybe_view_as_subclass(array, broadcast)
+    if needs_writeable and not result.flags.writeable:
+        result.flags.writeable = True
+    return result
+
+
+# TODO: remove once numpy 1.10 is available in most package managers
+def _maybe_view_as_subclass(original_array, new_array):
+    """ Temporary copy of a new NumPy function in 1.10, which isn't available in pkg managers yet
+    """
+    if type(original_array) is not type(new_array):
+        # if input was an ndarray subclass and subclasses were OK,
+        # then view the result as that subclass.
+        new_array = new_array.view(type=type(original_array))
+        # Since we have done something akin to a view from original_array, we
+        # should let the subclass finalize (if it has it implemented, i.e., is
+        # not None).
+        if new_array.__array_finalize__:
+            new_array.__array_finalize__(original_array)
+    return new_array
