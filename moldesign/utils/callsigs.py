@@ -19,18 +19,21 @@ import collections
 import funcsigs
 
 from .utils import if_not_none
-
+from .docparsers import GoogleDocArgumentInjector
 
 def args_from(original_function,
-              only=None, allexcept=None, inject_kwargs=None,
+              only=None,
+              allexcept=None,
+              inject_kwargs=None,
               wraps=None,
-              append_docstring_description=False, transfer_docstring_args=False):
+              append_docstring_description=False,
+              transfer_docstring_args=False):
     """
     Decorator to transfer call signatures - helps to hide ugly *args and **kwargs in delegated calls
 
     Note:
         Docstring modification is not implemented. It will be intended to work with google-style
-        dosctrings only.
+        docstrings only.
 
     Args:
         original_function (callable): the function to take the call signature from
@@ -78,7 +81,8 @@ def args_from(original_function,
             newparams = sig.parameters.values()
         if inject_kwargs:
             for name, default in inject_kwargs.iteritems():
-                newp = funcsigs.Parameter(name, funcsigs.Parameter.KEYWORD_ONLY, default=default)
+                newp = funcsigs.Parameter(name, funcsigs.Parameter.POSITIONAL_OR_KEYWORD,
+                                          default=default)
                 newparams.append(newp)
 
         sig = sig.replace(parameters=newparams)
@@ -106,27 +110,36 @@ def args_from(original_function,
     return decorator
 
 
-def kwargs_from(oldfunc):
+def kwargs_from(reference_function, mod_docs=True):
     """ Replaces ``**kwargs`` in a call signature with keyword arguments from another function.
+
+    Args:
+        reference_function (function): function to get kwargs from
+        mod_docs (bool): whether to modify the decorated function's docstring
+
+    Note:
+        ``mod_docs`` works ONLY for google-style docstrings
     """
-    oldsig = funcsigs.signature(oldfunc)
+    refsig = funcsigs.signature(reference_function)
 
     kwparams = []
-    for name, param in oldsig.parameters.iteritems():
-
+    for name, param in refsig.parameters.iteritems():
         if param.default != param.empty or param.kind in (param.VAR_KEYWORD, param.KEYWORD_ONLY):
             kwparams.append(param)
+
+    if mod_docs:
+        refdocs = GoogleDocArgumentInjector(reference_function.__doc__)
 
     def decorator(f):
         sig = funcsigs.signature(f)
 
         fparams = []
-        found_varkeyword = False
+        found_varkeyword = None
 
         for name, param in sig.parameters.iteritems():
             if param.kind == param.VAR_KEYWORD:
                 fparams.extend(kwparams)
-                found_varkeyword = True
+                found_varkeyword = name
             else:
                 fparams.append(param)
 
@@ -134,6 +147,18 @@ def kwargs_from(oldfunc):
             raise TypeError("Function has no **kwargs wildcard.")
 
         f.__signature__ = sig.replace(parameters=fparams)
+
+        if mod_docs:
+            docs = GoogleDocArgumentInjector(f.__doc__)
+            new_args = collections.OrderedDict()
+            for argname, doc in docs.args.iteritems():
+                if argname == found_varkeyword:
+                    for name in kwparams:
+                        new_args[name] = refdocs.args[name]
+                else:
+                    new_args[argname] = doc
+
+            f.__doc__ = docs.new_docstring()
         return f
 
     return decorator

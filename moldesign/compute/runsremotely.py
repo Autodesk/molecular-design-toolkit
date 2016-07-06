@@ -66,6 +66,7 @@ class RunsRemotely(object):
             self.jobname = func.__name__
 
         @utils.args_from(func,
+                         wraps=True,
                          inject_kwargs={'wait': True})
         def wrapper(*args, **kwargs):
             """ Wraps a python function so that it will be executed remotely using a compute engine

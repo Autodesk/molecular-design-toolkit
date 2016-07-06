@@ -57,7 +57,7 @@ from_smiles = obabel.from_smiles
 
 @exports
 def read(f, format=None):
-    """ Read in a molecule from a file, file-like object, or string.
+    """Read in a molecule from a file, file-like object, or string.
     Will also depickle a pickled object.
 
     Note:
