@@ -41,7 +41,7 @@ class GradientDescent(MinimizerBase):
 
     _strip_units = False
 
-    @utils.args_from(MinimizerBase.__init__,
+    @utils.args_from(MinimizerBase,
                        inject_kwargs={'max_atom_move': 0.075*u.angstrom,
                                       'gamma': 0.05*(u.angstrom**2)/u.eV})
     def __init__(self, mol, max_atom_move=0.075*u.angstrom,

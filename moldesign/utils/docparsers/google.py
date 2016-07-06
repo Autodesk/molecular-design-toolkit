@@ -7,8 +7,8 @@
     private functions which have already changed in the dev branch.
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    :copyright: Copyright 2007-2016 by the Sphinx team, see sphinx/AUTHORS.
-    :license: BSD, see sphinx/LICENSE for details.
+    :copyright: Copyright 2007-2016 by the Sphinx team, see sphinxlicense/AUTHORS.
+    :license: BSD, see sphinxlicense/LICENSE for details.
 """
 
 import collections
@@ -35,7 +35,10 @@ class GoogleDocArgumentInjector(object):
         # this routine has been modified - it's been streamlined for the current purpose
 
         if prepare:
-            self.docstring = prepare_docstring(docstring)
+            if docstring is None:
+                self.docstring = []
+            else:
+                self.docstring = prepare_docstring(docstring)
 
         elif isinstance(docstring, basestring):
             self.docstring = docstring.splitlines()
@@ -45,8 +48,11 @@ class GoogleDocArgumentInjector(object):
 
         self.lines_before_args = []
         self.arg_section = []
-        self.args = collections.OrderedDict()
         self.lines_after_args = []
+        self.args = collections.OrderedDict()
+        self.arg_indent = None
+        self.arg_section_name = 'Args'  # default, can be overwritten by the actual section name
+
 
         self._what = 'function'
         self._lines = list(self.docstring)
@@ -89,11 +95,13 @@ class GoogleDocArgumentInjector(object):
         Returns:
             str: docstring with modified argument list
         """
-        newlines = (self.lines_before_args +
-                    [' '*self.arg_indent + self.arg_section_name + ':']+
-                    self._indent(self.args.values(), self.arg_indent+4) +
-                    [''] +
-                    self.lines_after_args)
+        newlines = list(self.lines_before_args)
+        if self.args:
+            newlines.append(' '*self.arg_indent + self.arg_section_name + ':')
+            newlines.extend(self._indent(self.args.values(), self.arg_indent+4))
+            newlines.append('')
+        newlines.extend(self.lines_after_args)
+
         return '\n'.join(newlines)
 
     def parse(self):
@@ -137,6 +145,9 @@ class GoogleDocArgumentInjector(object):
                 self.lines_before_args.extend(lines)
 
             self._parsed_lines.extend(lines)
+            if self.arg_indent is None:
+                self.arg_indent = self._get_current_indent()
+
 
     def _parse_parameters_section(self, section):
         """ This method was heavily modified to store information instead of formatting it for rst
@@ -151,8 +162,12 @@ class GoogleDocArgumentInjector(object):
             _desc = self._strip_empty(_desc)
             if isinstance(_desc, list):
                 _desc = '\n    '.join(_desc)
-            line = '%s (%s): %s' % (_name, _type, _desc)
-            self.args[_name] = line
+
+            if _type:
+                line = '%s (%s): %s' % (_name, _type, _desc)
+            else:
+                line = '%s: %s' % (_name, _desc)
+            self.args[_name.lstrip('\*')] = line
 
             lines.append(line)
 

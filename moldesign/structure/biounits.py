@@ -192,7 +192,7 @@ class Residue(Entity):
         return newatoms[0].residue
     copy.__doc__ = Entity.copy.__doc__
 
-    @utils.args_from(Entity.__init__)
+    @utils.args_from(Entity)
     def __init__(self, **kwargs):
         """ Initialization
         Args:
@@ -484,7 +484,7 @@ class Chain(Entity):
         parent (mdt.Molecule): the molecule this residue belongs to
         chain (Chain): the chain this residue belongs to
     """
-    @utils.args_from(Entity.__init__)
+    @utils.args_from(Entity)
     def __init__(self, pdbname=None, **kwargs):
         super(Chain, self).__init__(pdbname=pdbname, **kwargs)
         if self.name is None: self.name = self.pdbname

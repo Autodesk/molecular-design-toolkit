@@ -1,1 +1,1 @@
-from .docparse import GoogleDocArgumentInjector
+from .google import GoogleDocArgumentInjector

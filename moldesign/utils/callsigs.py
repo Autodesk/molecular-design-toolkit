@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import functools
+import inspect
 import os
 from functools import wraps
 
@@ -21,19 +22,16 @@ import funcsigs
 from .utils import if_not_none
 from .docparsers import GoogleDocArgumentInjector
 
+
 def args_from(original_function,
               only=None,
               allexcept=None,
               inject_kwargs=None,
+              inject_docs=None,
               wraps=None,
-              append_docstring_description=False,
-              transfer_docstring_args=False):
+              update_docstring_args=False):
     """
     Decorator to transfer call signatures - helps to hide ugly *args and **kwargs in delegated calls
-
-    Note:
-        Docstring modification is not implemented. It will be intended to work with google-style
-        docstrings only.
 
     Args:
         original_function (callable): the function to take the call signature from
@@ -43,23 +41,26 @@ def args_from(original_function,
             unchanged, False otherwise)
         allexcept (List[str]): transfer all except these arguments (incompatible with `only`)
         inject_kwargs (dict): Inject new kwargs into the call signature
-            (of the form `{argname: defaultvalue}`)
-        transfer_docstring_args (bool): Update the 'Args:' section of the docstring with the
-            previous function's docs
-        append_docstring_description (bool): Update all sections of the docstring (other than args)
+            (of the form ``{argname: defaultvalue}``)
+        inject_docs (dict): Add or modifies argument documentation (requires google-style
+            docstrings) with a dict of the form `{argname: "(type): description"}`
+        update_docstring_args (bool): Update "arguments" section of the docstring using the
+           original function's documentation (requires google-style docstrings and wraps=False)
+
+    Note:
+        To use arguments from a classes' __init__ method, pass the class itself as
+        ``original_function`` - this will also allow us to inject the documentation
 
     Returns:
         Decorator function
     """
-    # TODO - deal with docstrings - how does wraps interact with append/transfer_docstring?
     # NEWFEATURE - verify arguments?
-
-    if append_docstring_description or transfer_docstring_args:
-        raise NotImplementedError()
 
     if only and allexcept:
         raise ValueError('Error in keyword arguments - '
                          'pass *either* "only" or "allexcept", not both')
+
+    origname = get_qualified_name(original_function)
 
     if hasattr(original_function, '__signature__'):
         sig = original_function.__signature__.replace()
@@ -90,15 +91,34 @@ def args_from(original_function,
     else:
         wraps = if_not_none(wraps, True)
 
+    # Get the docstring arguments
+    if update_docstring_args:
+        original_docs = GoogleDocArgumentInjector(original_function.__doc__)
+        argument_docstrings = collections.OrderedDict((p.name, original_docs.args[p.name])
+                                                      for p in newparams)
+
     def decorator(f):
         """Modify f's call signature (using the `__signature__` attribute)"""
+        decorated = f
         fname = f.__name__
         if wraps:
             f = functools.wraps(original_function)(f)
             f.__name__ = fname  # revert name change
         f.__signature__ = sig
 
-        # Modify docstring for documentation only
+        if update_docstring_args or inject_kwargs:
+            if not update_docstring_args:
+                argument_docstrings = GoogleDocArgumentInjector(f.__doc__).args
+            docs = GoogleDocArgumentInjector(f.__doc__)
+            docs.args = argument_docstrings
+
+            if not hasattr(f, '__orig_docs'):
+                f.__orig_docs = []
+            f.__orig_docs.append(f.__doc__)
+
+            f.__doc__ = docs.new_docstring()
+
+        # Only for building sphinx documentation:
         if os.environ.get('SPHINX_IS_BUILDING_DOCS', ""):
             sigstring = '%s%s\n' % (f.__name__, sig)
             if hasattr(f, '__doc__') and f.__doc__ is not None:
@@ -122,10 +142,13 @@ def kwargs_from(reference_function, mod_docs=True):
     """
     refsig = funcsigs.signature(reference_function)
 
+    origname = get_qualified_name(reference_function)
+
     kwparams = []
     for name, param in refsig.parameters.iteritems():
         if param.default != param.empty or param.kind in (param.VAR_KEYWORD, param.KEYWORD_ONLY):
-            kwparams.append(param)
+            if param.name[0] != '_':
+                kwparams.append(param)
 
     if mod_docs:
         refdocs = GoogleDocArgumentInjector(reference_function.__doc__)
@@ -153,15 +176,33 @@ def kwargs_from(reference_function, mod_docs=True):
             new_args = collections.OrderedDict()
             for argname, doc in docs.args.iteritems():
                 if argname == found_varkeyword:
-                    for name in kwparams:
-                        new_args[name] = refdocs.args[name]
+                    for param in kwparams:
+                        default_argdoc = '%s: argument for %s' % (param.name, origname)
+                        new_args[param.name] = refdocs.args.get(param.name, default_argdoc)
                 else:
                     new_args[argname] = doc
+            docs.args = new_args
+
+            if not hasattr(f, '__orig_docs'):
+                f.__orig_docs = []
+            f.__orig_docs.append(f.__doc__)
 
             f.__doc__ = docs.new_docstring()
         return f
 
     return decorator
+
+
+
+def get_qualified_name(original_function):
+    if inspect.ismethod(original_function):
+        origname = '.'.join([original_function.__module__,
+                             original_function.im_class.__name__,
+                             original_function.__name__])
+        return ':method:`%s`' % origname
+    else:
+        origname = original_function.__module__+'.'+original_function.__name__
+        return ':function:`%s`' % origname
 
 
 class DocInherit(object):

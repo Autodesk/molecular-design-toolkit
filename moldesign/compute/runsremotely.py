@@ -14,10 +14,10 @@
 
 import types
 
-from . import configuration
-from moldesign import utils
 from pyccc import python as bpy
 
+from moldesign import utils
+from . import configuration, compute
 
 class RunsRemotely(object):
     def __init__(self, enable=True,
@@ -90,7 +90,7 @@ class RunsRemotely(object):
             # Submit job to remote engine
             python_call = bpy.PythonCall(f, args, kwargs)
             image = utils.if_not_none(self.image, configuration.config.default_python_image)
-            engine = utils.if_not_none(self.engine, configuration.default_engine)
+            engine = utils.if_not_none(self.engine, compute.default_engine)
             job = bpy.PythonJob(engine,
                                 image,
                                 python_call,

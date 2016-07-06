@@ -14,7 +14,7 @@
 import moldesign as mdt
 from moldesign import utils
 
-from . import config, default_engine
+default_engine = None
 
 
 def get_image_path(image_name):
@@ -34,6 +34,8 @@ def get_image_path(image_name):
         >>> get_image_path('someimage')
         'docker.io/myorg/someimage:0.2
     """
+    from . import config
+
     if not config.default_repository:
         name = image_name
     else:
@@ -74,7 +76,8 @@ class DummyJob(object):
             self.updated_object = updated_object
 
 
-def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True):
+def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True,
+            _return_result=False):
     """ Helper for running jobs.
 
     Args:
@@ -92,16 +95,23 @@ def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True)
 
     engine = utils.if_not_none(engine, default_engine)
 
-    if display:
-        mdt.uibase.logs.display(job, jobname)
+    if engine is None:
+        raise ValueError('No compute engine configured! Configure MDT using '
+                         'moldesign.compute.config')
 
     engine.submit(job)
 
-    if not wait:
-        return job
-    else:
+    if display:
+        mdt.uibase.logs.display(job, jobname)
+
+    if wait:
         job.wait()
-        return job.result
+
+        if _return_result: return job.result
+
+    return job
+
+
 
 
 

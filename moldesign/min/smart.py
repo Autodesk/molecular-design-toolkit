@@ -40,7 +40,7 @@ class SmartMin(MinimizerBase):
 
     _strip_units = True
 
-    @utils.args_from(MinimizerBase.__init__,
+    @utils.args_from(MinimizerBase,
                      inject_kwargs={'bfgs_threshold': BFGSTHRESH})
     def __init__(self, *args, **kwargs):
         self.args = args

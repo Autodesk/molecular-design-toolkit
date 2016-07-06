@@ -169,7 +169,7 @@ class MinimizerBase(object):
     def _as_function(cls, newname):
         """ Create a function that runs this minimization
         """
-        @mdt.utils.args_from(cls.__init__, allexcept=['self'])
+        @mdt.utils.args_from(cls, allexcept=['self'])
         def asfn(*args, **kwargs):
             obj = cls(*args, **kwargs)
             return obj()

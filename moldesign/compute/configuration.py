@@ -13,19 +13,18 @@
 # limitations under the License.
 import os
 import sys
-
 import subprocess
 import yaml
 import warnings
-from pyccc import engines, job
-import pyccc.python as pycccpy
 
-from moldesign.utils.classes import DotDict
+from pyccc import engines
+
+from moldesign import utils
 
 
 # TODO: *write* configuration plus initial install default; sensible defaults
 
-config = DotDict()
+config = utils.DotDict()
 """ dict: dictionary of parameters (read from user's moldesign.yml at startup)
 
 This dictionary configures how MDT interacts with "computational engines" - the systems that run
@@ -70,15 +69,13 @@ If this variable is not set, ``$HOME/.moldesign/moldesign.yml`` will be used by 
 DEFAULT_CONFIG_PATH = os.path.join(os.environ['HOME'], '.moldesign/moldesign.yml')
 """ str: default search path for moldesign.yml."""
 
-default_engine = None
-""" pyccc.Engine: the computational engine for running jobs"""
 
-CONFIG_DEFAULTS = DotDict(engine_type='docker',
-                          default_repository='docker-hub.autodesk.com/virshua/moldesign:',
-                          default_python_image='moldesign_complete',
-                          default_docker_url='unix://var/run/docker.sock',
-                          default_docker_machine='default',
-                          default_version_tag='latest')
+CONFIG_DEFAULTS = utils.DotDict(engine_type='docker',
+                                default_repository='docker-hub.autodesk.com/virshua/moldesign:',
+                                default_python_image='moldesign_complete',
+                                default_docker_url='unix://var/run/docker.sock',
+                                default_docker_machine='default',
+                                default_version_tag='latest')
 
 DEF_CONFIG = CONFIG_DEFAULTS.copy()
 """ dict: default configuration to be written to moldesign.yml if it doesn't exist
@@ -99,13 +96,13 @@ def registry_login(client, login):
 
 
 def print_configuration():
-    from moldesign import compute
+    from . import compute
     print 'Computing platform:', compute.default_engine.name
-    print 'Computing platform type:', compute.config.engine_type
-    print 'Platform URL:', compute.default_engine.baseurl
-    print 'Default Docker image repository:', compute.config.default_repository
-    print 'Image tag:', compute.config.version_tag
-    print 'Image for python commands:', compute.config.default_python_image
+    print 'Computing platform type:', config.engine_type
+    print 'Compute host:', compute.default_engine.hostname
+    print 'Default Docker image repository:', config.default_repository
+    print 'Image tag:', config.default_version_tag
+    print 'Image for python commands:', config.default_python_image
 
 
 def _get_config():
@@ -136,13 +133,13 @@ def reset_from_config():
     Returns:
         dict: copy of the config dictionary (for posterity)
     """
-    global default_engine
+    from . import compute
 
     if config.default_engine == 'docker':
-        default_engine = _setup_docker()
+        compute.default_engine = _setup_docker()
 
     elif config.default_engine == 'subprocess':
-        default_engine = engines.Subprocess
+        compute.default_engine = engines.Subprocess
     else:
         raise ValueError('Unrecognized engine %s' % config.default_engine)
 
@@ -153,16 +150,34 @@ def _setup_docker():
     import docker
     from pyccc import docker_utils
     if config.get('default_docker_machine', None) is not None:
+        dm = config.default_docker_machine
+        success = False
         try:
-            dockerclient = docker_utils.docker_machine_client(config.default_docker_machine)
-        except subprocess.CalledProcessError as e:
-            print 'WARNING: could not connect to docker-machine "%s"'% \
-                  config.default_docker_machine
-            print 'Change the configuration (moldesign.config) or start the machine.' \
-                  ' then run moldesign.compute.reset_from_config()'
-            return
+            status = subprocess.check_output(['docker-machine', 'status', dm]).strip()
+        except subprocess.CalledProcessError:
+            print 'WARNING: could not find docker-machine named "%s"' % dm
+        else:
+            if status != 'Running':
+                print 'WARNING: docker-machine %s returned status: "%s"' % (dm, status)
+            else:
+                try:
+                    with utils.textnotify('Connecting to docker-machine "%s"' % dm):
+                        dockerclient = docker_utils.docker_machine_client(dm)
+                except subprocess.CalledProcessError as e:
+                    print 'WARNING: error connecting to docker-machine "%s": %s' % (dm, e)
+                else:
+                    success = True
+
+        if not success:
+            print 'WARNING: failed to connect to docker machine - cannot run jobs.'
+            print 'After changing the configuration (moldesign.config.default_docker_machine) ' \
+                  'and/or starting the docker-machine, run ' \
+                  'moldesign.compute.reset_from_config() to try again.'
+            return None
+
     else:
-        dockerclient = docker.Client(base_url=config.default_docker_url)
+        with utils.textnotify('Connecting to docker at ' % config.default_docker_url):
+            dockerclient = docker.Client(base_url=config.default_docker_url)
 
     if 'docker_registry_login' in config:
         registry_login(dockerclient, config.docker_registry_login)

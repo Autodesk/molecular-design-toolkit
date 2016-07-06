@@ -92,6 +92,7 @@ def build_bdna(sequence, **kwargs):
     Args:
         sequence (str): DNA sequence for one of the strands (a complementary sequence will
             automatically be created)
+        **kwargs: arguments for :function:`compute.run_job`
 
     Returns:
         moldesign.Molecule: B-DNA double helix
@@ -99,12 +100,18 @@ def build_bdna(sequence, **kwargs):
     infile = 'molecule m;\nm = bdna( "%s" );\nputpdb( "helix.pdb", m, "-wwpdb");\n'% \
              sequence.lower()
 
+    def finish_job(job):
+        mol = mdt.read(job.get_output('helix.pdb'), format='pdb')
+        mol.name = 'BDNA: %s' % sequence
+        return mol
+
     job = pyccc.Job(command='nab -o buildbdna build.nab && ./buildbdna',
                     image=mdt.compute.get_image_path(IMAGE),
                     inputs={'build.nab': infile},
-                    name='NAB_build_bdna')
+                    name='NAB_build_bdna',
+                    when_finished=finish_job)
 
-    return mdt.compute.run_job(job, **kwargs)
+    return mdt.compute.run_job(job, _return_result=True, **kwargs)
 
 
 # TODO: use a single force field specification object rather than 20 kwargs
@@ -137,8 +144,7 @@ def run_tleap(mol,
         organic (str): organic forcefield name (default: gaff2)
         off_files (List[batch.FileContainer]):
         frcmod_files (List[batch.FileContainer]):
-        image (str): docker image to use
-        engine (batch.EngineBase): compute engine to run tleap on
+        **kwargs: keyword arguments to :function:`compute.run_job`
 
     References:
         Ambertools Manual, http://ambermd.org/doc12/Amber16.pdf. See page 33 for forcefield

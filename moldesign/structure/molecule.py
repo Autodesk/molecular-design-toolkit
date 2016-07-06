@@ -776,7 +776,7 @@ class MolSimulationMixin(object):
         integrator.params.update(params)
         integrator._prepped = False
 
-    @utils.args_from(MinimizerBase.__init__,
+    @utils.args_from(MinimizerBase,
                      allexcept=['self'],
                      inject_kwargs={'assert_converged': False})
     def minimize(self, assert_converged=False, **kwargs):
