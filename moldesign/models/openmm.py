@@ -55,7 +55,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
             if not self._prepped: self.prep()
             return self.sim
 
-    @compute.runsremotely(remote=opm.force_remote, is_imethod=True)
+    @compute.runsremotely(enable=opm.force_remote, is_imethod=True)
     def calculate(self, requests=None):
         """
         Drive a calculation and, when finished, update the parent molecule with the results.
@@ -116,19 +116,18 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         self.mol.properties = mol.properties
         self.mol.time = mol.time
 
-
-    @compute.runsremotely(remote=opm.force_remote, is_imethod=True)
+    @compute.runsremotely(enable=opm.force_remote, is_imethod=True)
     def _minimize(self, nsteps=500,
                  force_tolerance=None,
-                 frame_interval=None,
-                 wait=True):
+                 frame_interval=None):
         """ Run an OpenMM minimization.
         Note:
             We're not able to support `frame_interval` for this method;
                 see https://github.com/pandegroup/openmm/issues/1155
         Args:
            nsteps(int): maximum number of steps
-           force_tolerance (moldesign.units.MdtQuantity): RMSD tolerance for convergence [energy/length]
+           force_tolerance (moldesign.units.MdtQuantity): RMSD tolerance for convergence
+               [energy/length]
         """
 
         # NEWFEATURE: write/find an openmm "integrator" to do this minimization
@@ -151,7 +150,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
 
         return trajectory
 
-    @compute.runsremotely(remote=opm.force_remote, is_imethod=True)
+    @compute.runsremotely(enable=opm.force_remote, is_imethod=True)
     def get_forcefield(self):
         """ Get the force field parameters for this molecule.
 

@@ -87,7 +87,7 @@ class StatusLogger(object):
         self.logger.status(self._row_format.format(*[info.get(c, 'n/a') for c in self.columns]))
 
 
-@compute.runsremotely(remote=force_remote)
+@compute.runsremotely(enable=force_remote)
 def get_eris_in_basis(basis, orbs):
     """ Get electron repulsion integrals transformed in (in form eri[i,j,k,l] = (ij|kl))
     """
@@ -97,7 +97,7 @@ def get_eris_in_basis(basis, orbs):
     return orbitals.ERI4FoldTensor(eri, orbs)
 
 
-@compute.runsremotely(remote=force_remote)
+@compute.runsremotely(enable=force_remote)
 def basis_values(mol, basis, coords, coeffs=None, positions=None):
     """ Calculate the orbital's value at a position in space
 

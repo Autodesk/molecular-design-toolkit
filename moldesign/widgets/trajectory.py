@@ -14,7 +14,6 @@
 import time
 
 import ipywidgets as ipy
-import sys
 
 import moldesign as mdt
 
@@ -23,12 +22,12 @@ from moldesign.uibase import selector
 
 
 class TrajectoryViewer(selector.SelectionGroup):
+    """ 3D representation, with animation controls, for a trajectory.
+
+    Users will typically instantiate this using ``trajectory.draw()``
+    """
+
     def __init__(self, trajectory, **kwargs):
-        """
-        :type trajectory: moldesign.trajectory.Trajectory
-        :param kwargs: kwargs for widget
-        :return:
-        """
         self.default_fps = 10
         self.traj = trajectory
         self.pane = ipy.VBox()

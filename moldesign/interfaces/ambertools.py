@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import collections
-import functools
 
 import moldesign as mdt
-from moldesign import compute, uibase
+import pyccc
+from moldesign import compute, uibase, utils
 from moldesign import units as u
-from moldesign.utils import if_not_none, DotDict
 
 IMAGE = 'ambertools'
 
@@ -52,7 +51,8 @@ class ParameterizationError(Exception): pass
 
 
 def am1_bcc_charges(mol, minsteps=None, wait=True):
-    charge = if_not_none(mol.charge, 0)
+    """ Doesn't work yet ..."""
+    charge = utils.if_not_none(mol.charge, 0)
 
     engine = mdt.compute.default_engine
     image = compute.get_image_path(IMAGE, engine)
@@ -62,7 +62,7 @@ def am1_bcc_charges(mol, minsteps=None, wait=True):
 
     def parse_mol2(job):
         """Callback to complete the job"""
-        atom_info = DotDict(job=job)
+        atom_info = utils.DotDict(job=job)
         lines = iter(job.get_output('out.mol2').read().split('\n'))
         while True:
             line = lines.next()
@@ -71,48 +71,44 @@ def am1_bcc_charges(mol, minsteps=None, wait=True):
                 idx = int(fields[1]) - 1
                 name = fields[2]
                 assert mol.atoms[idx].name == name
-                atom_info[mol.atoms[idx]] = DotDict(partialcharge=u.q_e * float(fields[-2]),
+                atom_info[mol.atoms[idx]] = utils.DotDict(partialcharge=u.q_e * float(fields[-2]),
                                                     atomtype=fields[-1])
         return atom_info
 
     job = engine.launch(image,
-                          command=command,
-                          name="am1-bcc, %s" % mol.name,
-                          inputs={'mol.pdb': mol.write(format='pdb')},
-                          when_finished=parse_mol2)
+                        command=command,
+                        name="am1-bcc, %s" % mol.name,
+                        inputs={'mol.pdb': mol.write(format='pdb')},
+                        when_finished=parse_mol2)
     uibase.logs.display(job, job.name)
     if not wait: return job()
     else: job.wait()
 
 
-def build_bdna(sequence,
-               image=IMAGE,
-               engine=None):
+@utils.kwargs_from(mdt.compute.run_job)
+def build_bdna(sequence, **kwargs):
+    """ Uses Ambertools' Nucleic Acid Builder to build a 3D double-helix B-DNA structure.
+
+    Args:
+        sequence (str): DNA sequence for one of the strands (a complementary sequence will
+            automatically be created)
+
+    Returns:
+        moldesign.Molecule: B-DNA double helix
     """
-    Uses nucleic acid builder to build a bdna structure.
-    This uses very little of NAB's functionality.
-    :param sequence: e.g., 'actgaac...'
-    :param image: docker image name
-    :param engine: compute engine
-    :return: moldesign.molecule.Molecule
-    """
-    from moldesign import converters
+    infile = 'molecule m;\nm = bdna( "%s" );\nputpdb( "helix.pdb", m, "-wwpdb");\n'% \
+             sequence.lower()
 
-    infile = 'molecule m;\nm = bdna( "%s" );\nputpdb( "helix.pdb", m, "-wwpdb");\n' % sequence.lower()
-    engine = if_not_none(engine, compute.default_engine)
-    imagename = compute.get_image_path(image, engine)
+    job = pyccc.Job(command='nab -o buildbdna build.nab && ./buildbdna',
+                    image=mdt.compute.get_image_path(IMAGE),
+                    inputs={'build.nab': infile},
+                    name='NAB_build_bdna')
 
-    job = engine.launch(image=imagename,
-                        command='nab -o buildbdna build.nab && ./buildbdna',
-                        inputs={'build.nab': infile},
-                        name='NAB_build_bdna')
-    uibase.logs.display(job, job.name)
-    job.wait()
-    mol = converters.read(job.get_output('helix.pdb'), format='pdb')
-    mol.name = 'BDNA: %s' % sequence
-    return mol
+    return mdt.compute.run_job(job, **kwargs)
 
 
+# TODO: use a single force field specification object rather than 20 kwargs
+@utils.kwargs_from(compute.run_job)
 def run_tleap(mol,
               protein='ff14SB',
               dna='OL15',
@@ -123,8 +119,7 @@ def run_tleap(mol,
               organic='gaff2',
               off_files=(),
               frcmod_files=(),
-              image=IMAGE,
-              engine=None):
+              **kwargs):
     """
     Drives tleap to create a prmtop and inpcrd file. Specifically uses the AmberTools 16
     tleap distribution.
@@ -165,24 +160,20 @@ def run_tleap(mol,
                    "quit\n")
 
     # Launch the job
-    engine = if_not_none(engine, compute.default_engine)
-    imagename = compute.get_image_path(image, engine)
-    command = 'tleap -f input.leap'
     inputs = {'input.pdb': mol.write(format='pdb'),
               'input.leap': '\n'.join(leapstr)}
 
-    job = engine.launch(imagename,
-                        command,
-                        inputs=inputs,
-                        name="tleap, %s"% mol.name)
-    uibase.logs.display(job, "tleap, %s"%mol.name)
-    job.wait()
+    job = pyccc.Job(image=compute.get_image_path(IMAGE),
+                    command='tleap -f input.leap',
+                    inputs=inputs,
+                    name="tleap, %s" % mol.name)
 
-    return job
+    return compute.run_job(job, **kwargs)
 
 
 @mdt.utils.args_from(run_tleap)
 def assign_forcefield(mol, **kwargs):
+    """ see run_tleap docstring """
     from moldesign.widgets.parameterization import ParameterizationDisplay
 
     job = run_tleap(mol, **kwargs)
@@ -201,10 +192,8 @@ def assign_forcefield(mol, **kwargs):
 
 
 def get_gaff_parameters(mol, charges, image=IMAGE, engine=None):
+    """ Doesn't work yet"""
     inputs = {}
-    cmds = []
-    engine = if_not_none(engine, compute.default_engine)
-    imagename = compute.get_image_path(image, engine)
 
     # Add charges to molecule
     inputs['mol.charges'] = '\n'.join(map(str, charges))

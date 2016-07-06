@@ -15,6 +15,9 @@ import functools
 import os
 from functools import wraps
 
+import collections
+import funcsigs
+
 from .utils import if_not_none
 
 
@@ -45,7 +48,6 @@ def args_from(original_function,
     Returns:
         Decorator function
     """
-    import funcsigs
     # TODO - deal with docstrings - how does wraps interact with append/transfer_docstring?
     # NEWFEATURE - verify arguments?
 
@@ -104,6 +106,39 @@ def args_from(original_function,
     return decorator
 
 
+def kwargs_from(oldfunc):
+    """ Replaces ``**kwargs`` in a call signature with keyword arguments from another function.
+    """
+    oldsig = funcsigs.signature(oldfunc)
+
+    kwparams = []
+    for name, param in oldsig.parameters.iteritems():
+
+        if param.default != param.empty or param.kind in (param.VAR_KEYWORD, param.KEYWORD_ONLY):
+            kwparams.append(param)
+
+    def decorator(f):
+        sig = funcsigs.signature(f)
+
+        fparams = []
+        found_varkeyword = False
+
+        for name, param in sig.parameters.iteritems():
+            if param.kind == param.VAR_KEYWORD:
+                fparams.extend(kwparams)
+                found_varkeyword = True
+            else:
+                fparams.append(param)
+
+        if not found_varkeyword:
+            raise TypeError("Function has no **kwargs wildcard.")
+
+        f.__signature__ = sig.replace(parameters=fparams)
+        return f
+
+    return decorator
+
+
 class DocInherit(object):
     """
     Allows methods to inherit docstrings from their superclasses
@@ -149,29 +184,3 @@ class DocInherit(object):
 
 #idiomatic decorator name
 doc_inherit = DocInherit
-
-
-def replace_wildcard_args(args_from=None, kwargs_from=None):
-    """ Decorator factory to replace *args and **kwargs with more useful call signatures.
-
-    Note:
-        Docstring modification is not implemented. It will be intended to work with google-style
-        dosctrings only.
-
-    Args:
-        original_function (callable): the function to take the call signature from
-        only (List[str]): only transfer these arguments (incompatible with `allexcept`)
-        wrapper (bool): Transfer documentation and attributes from original_function to
-            decorated_function, using functools.wraps (default: True if call signature is
-            unchanged, False otherwise)
-        allexcept (List[str]): transfer all except these arguments (incompatible with `only`)
-        inject_kwargs (dict): Inject new kwargs into the call signature
-            (of the form `{argname: defaultvalue}`)
-        transfer_docstring_args (bool): Update the 'Args:' section of the docstring with the
-            previous function's docs
-        append_docstring_description (bool): Update all sections of the docstring (other than args)
-
-    Returns:
-        callable: Decorator function
-    """
-    raise NotImplementedError()

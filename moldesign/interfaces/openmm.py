@@ -182,7 +182,7 @@ def pint2simtk(quantity):
     return newvar
 
 
-@compute.runsremotely(remote=force_remote)
+@compute.runsremotely(enable=force_remote)
 def _amber_to_mol(prmtop_file, inpcrd_file):
     prmtop = from_filepath(app.AmberPrmtopFile, prmtop_file)
     inpcrd = from_filepath(app.AmberInpcrdFile, inpcrd_file)

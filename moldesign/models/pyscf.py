@@ -68,7 +68,7 @@ class PySCFPotential(QMBase):
         self.last_el_state = None
         self.logger = logs.Logger('PySCF interface')  # eventually, this be a child of the parent molecule
 
-    @compute.runsremotely(remote=force_remote, is_imethod=True)
+    @compute.runsremotely(enable=force_remote, is_imethod=True)
     def calculate(self, requests=None, guess=None):
         self.logger = logs.Logger('PySCF calc')  # eventually, this be a child of the parent molecule
         do_forces = 'forces' in requests

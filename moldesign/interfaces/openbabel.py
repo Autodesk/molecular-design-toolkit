@@ -28,7 +28,7 @@ else:  # this should be configurable
     force_remote = False  # debugging
 
 import moldesign as mdt
-from moldesign.compute import runsremotely
+from moldesign.compute.runsremotely import runsremotely
 import moldesign.structure.atoms
 from moldesign.units import *
 from moldesign.structure import biounits
@@ -82,7 +82,7 @@ def read_stream(filelike, format, name=None):
     return read_string(molstring, format, name=name)
 
 
-@runsremotely(remote=force_remote)
+@runsremotely(enable=force_remote)
 def read_string(molstring, format, name=None):
     """ Read a molecule from a file-like object
 
@@ -102,7 +102,7 @@ def read_string(molstring, format, name=None):
     return mol
 
 
-@runsremotely(remote=force_remote)
+@runsremotely(enable=force_remote)
 def write_string(mol, format):
     """ Create a file from the passed molecule
 
@@ -137,7 +137,7 @@ def write_file(mol, filename=None, mode='w', format=None):
             print >> wrf, outstr
 
 
-@runsremotely(remote=force_remote)
+@runsremotely(enable=force_remote)
 def guess_bond_orders(mol):
     """Use OpenBabel to guess bond orders using geometry and functional group templates.
 
@@ -154,7 +154,7 @@ def guess_bond_orders(mol):
     return newmol
 
 
-@runsremotely(remote=force_remote)
+@runsremotely(enable=force_remote)
 def add_hydrogen(mol):
     """Add hydrogens to saturate atomic valences. (Does not assign formal charges or correct
         for pH).
@@ -319,7 +319,7 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
                         **kwargs)
 
 
-@runsremotely(remote=force_remote)
+@runsremotely(enable=force_remote)
 def from_smiles(smi, name=None):
     """ Translate a smiles string to a 3D structure.
     This method uses OpenBabel to generate a plausible 3D conformation of the 2D SMILES topology.

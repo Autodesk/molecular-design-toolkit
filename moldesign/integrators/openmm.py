@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import pyccc
+
 from moldesign import units as u
 from moldesign import compute
 from moldesign.interfaces.openmm import OpenMMPickleMixin, force_remote, MdtReporter, pint2simtk, mm
@@ -51,7 +51,7 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
             traj.mol = self.mol
         return traj
 
-    @compute.runsremotely(remote=force_remote, is_imethod=True)
+    @compute.runsremotely(enable=force_remote, is_imethod=True)
     def _run(self, run_for):
         self.prep()
         nsteps = self.time_to_steps(run_for, self.params.timestep)

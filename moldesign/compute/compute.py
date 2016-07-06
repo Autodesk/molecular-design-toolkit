@@ -11,139 +11,44 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import logging
-import types
-
-import pyccc.python as bpy
+import moldesign as mdt
 from moldesign import utils
-from moldesign.compute import config
-from moldesign.utils import if_not_none
+
+from . import config, default_engine
 
 
-class BuckyLog(logging.Logger):
-    pass
+def get_image_path(image_name):
+    """ Returns a fully qualified tag that points to the correct registry
 
+    Args:
+        image_name (str): name of the image (without tags, repository, etc.)
 
-def get_image_path(image_name, engine=None):
+    Examples:
+        >>> config.update({'default_repository':'my.docker.registry/orgname/myrepo:',
+                           'default_version_tag':'latest'})
+        >>> get_image_path('myimage')
+        'my.docker.registry/orgname/myrepo:myimage-latest'
+
+        >>> config.update({'default_repository':'docker.io/myorg',
+                           'default_version_tag':'0.2'})
+        >>> get_image_path('someimage')
+        'docker.io/myorg/someimage:0.2
     """
-    Returns a fully qualified tag that points to the correct registry
-    (eventually)
-    """
-    if not config.cfg.default_repository:
+    if not config.default_repository:
         name = image_name
     else:
-        name = '%s%s' % (config.cfg.default_repository, image_name)
+        name = '%s%s' % (config.default_repository, image_name)
 
-    if not config.cfg.default_repository:
+    if not config.default_repository:
         img = name
-    elif config.cfg.default_repository[-1] == ':':
-        img = '%s-%s' % (name, config.cfg.version_tag)
-    elif config.cfg.version_tag:
-        img = '%s:%s' % (name, config.cfg.version_tag)
+    elif config.default_repository[-1] == ':':
+        img = '%s-%s' % (name, config.default_version_tag)
+    elif config.version_tag:
+        img = '%s:%s' % (name, config.default_version_tag)
+    else:
+        raise ValueError('Faulty docker repository configuration not recognized')
 
-    # TODO: what happens if the engine also offers a "get_image_tag" (change that name) method?
     return img
-
-
-launch = config.cfg.default_engine.launch  # this won't get updated, but it keeps the call signature
-default_engine = config.cfg.default_engine
-default_image = config.cfg.default_image
-
-
-class RunsRemotely(object):
-    def __init__(self, remote=True, display=True,
-                 jobname=None,
-                 sendsource=False,
-                 engine=None,
-                 image=None,
-                 outputs=None,
-                 cfg=None,
-                 is_imethod=False):
-        """Function decorator to run a job remotely.
-
-        Note:
-         This ONLY works for pure functions - where you're interested in the
-           return value only. Side effects won't be visible to the user.
-
-        Args:
-            remote (bool): Whether or not to run the job remotely (for toggling remote functionality)
-            display (bool): Create a jupyter logging display for the remote job
-            jobname (str): Name metadata - defaults to the __name__ of the function
-            sendsource (bool): if False (default), call this function directly on the remote worker;
-               if True, send the function's source code (for debugging, mostly)
-            engine (pyccc.engine.EngineBase): engine to send the job to
-            image (str): name of the docker image (including registry, repository, and tags)
-            is_imethod (bool): This is an instancemethod (we can't determine this during decoration - see, e.g.,
-                http://stackoverflow.com/questions/2366713/ )
-            outputs (list or None): NOT IMPLEMENTED. optional; a list of output files to retrieve from remote worker.
-            cfg (dict): NOT IMPLEMENTED. Configuration to use on remote worker.
-        """
-        # If the wrapped function doesn't ALWAYS run remotely,
-        # then it has to return its standard return value
-        self.outputs = outputs
-
-        cfg = if_not_none(cfg, config.cfg)
-
-        self.remote = remote
-        self.display = display
-        self.sendsource = sendsource
-        self.image = if_not_none(image, cfg.default_image)
-        self.engine = if_not_none(engine, cfg.default_engine)
-        self.job_config = if_not_none(config.cfg, {})
-        self.jobname = jobname
-        self.is_imethod = is_imethod
-
-    def __call__(self, func):
-        """
-        This gets called with the function we wish to wrap
-        """
-
-        assert callable(func)
-
-        if self.jobname is None:
-            self.jobname = func.__name__
-
-        @utils.args_from(func)  # TODO: should inject 'wait', deal with functools.wraps
-        def wrapper(*args, **kwargs):
-            """This documentation should be replaced with `func`'s by the decorator"""
-            from moldesign.uibase import logs
-
-            f = func  # because we reassign instance methods
-            if not wrapper.remote:
-                return f(*args, **kwargs)
-
-            # TODO: this doesn't work because the decorator gives wrapper f's signature
-            wait = kwargs.get('wait', True)
-
-            # Bind methods to their objects
-            if self.is_imethod:
-                # We can't call this function like normal, because the decorators can't identify instance methods
-                # Instead, we'll create another bound copy of the instancemethod (probably only need to do this once)
-                fn_self = args[0]
-                f = types.MethodType(f, fn_self, fn_self.__class__)
-                args = args[1:]
-
-            # Submit job to remote engine
-            python_call = bpy.PythonCall(f, args, kwargs)
-            job = bpy.PythonJob(self.engine,
-                                self.image,
-                                python_call,
-                                name=self.jobname,
-                                sendsource=self.sendsource)
-            if self.display:
-                logs.display(job, title=f.__name__)
-
-            if wait:
-                job.wait()
-                return job.finish()
-            else:
-                return job
-
-        wrapper.remote = self.remote
-        return wrapper
-
-
-runsremotely = RunsRemotely  # because decorators should be lower case
 
 
 class DummyJob(object):
@@ -167,5 +72,37 @@ class DummyJob(object):
         self.result = result
         if updated_object:
             self.updated_object = updated_object
+
+
+def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True):
+    """ Helper for running jobs.
+
+    Args:
+        job (pyccc.Job): The job to run
+        engine (pyccc.Engine): Engine to run this job on (default:
+            ``moldesign.compute.default_engine``)
+        image (str): URL for the docker image
+        wait (bool): if True, block until this function completes and return the function's
+            return value. Otherwise, return a job object immediately that can be queried later.
+        display (bool): if True, show logging output for this job
+
+    Returns:
+        pyccc job object OR function's return value
+    """
+
+    engine = utils.if_not_none(engine, default_engine)
+
+    if display:
+        mdt.uibase.logs.display(job, jobname)
+
+    engine.submit(job)
+
+    if not wait:
+        return job
+    else:
+        job.wait()
+        return job.result
+
+
 
 
