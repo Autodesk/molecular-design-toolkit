@@ -21,6 +21,7 @@ from pyccc import engines
 
 from moldesign import utils
 
+FREE_COMPUTE_CANNON = 'compute.bionano.autodesk.com:8000'
 
 # TODO: *write* configuration plus initial install default; sensible defaults
 
@@ -70,10 +71,11 @@ DEFAULT_CONFIG_PATH = os.path.join(os.environ['HOME'], '.moldesign/moldesign.yml
 """ str: default search path for moldesign.yml."""
 
 
-CONFIG_DEFAULTS = utils.DotDict(engine_type='docker',
+CONFIG_DEFAULTS = utils.DotDict(engine_type='docker-machine',
                                 default_repository='docker-hub.autodesk.com/virshua/moldesign:',
+                                default_ccc_host=FREE_COMPUTE_CANNON,
                                 default_python_image='moldesign_complete',
-                                default_docker_url='unix://var/run/docker.sock',
+                                default_docker_host='unix://var/run/docker.sock',
                                 default_docker_machine='default',
                                 default_version_tag='latest')
 
@@ -93,16 +95,6 @@ def registry_login(client, login):
                       'Some functions may time out.')
     else:
         print 'done'
-
-
-def print_configuration():
-    from . import compute
-    print 'Computing platform:', compute.default_engine.name
-    print 'Computing platform type:', config.engine_type
-    print 'Compute host:', compute.default_engine.hostname
-    print 'Default Docker image repository:', config.default_repository
-    print 'Image tag:', config.default_version_tag
-    print 'Image for python commands:', config.default_python_image
 
 
 def _get_config():
@@ -135,11 +127,12 @@ def reset_from_config():
     """
     from . import compute
 
-    if config.default_engine == 'docker':
+    if config.engine_type in ('docker', 'docker-machine'):
         compute.default_engine = _setup_docker()
 
-    elif config.default_engine == 'subprocess':
+    elif config.engine_type == 'subprocess':
         compute.default_engine = engines.Subprocess
+
     else:
         raise ValueError('Unrecognized engine %s' % config.default_engine)
 
@@ -149,12 +142,12 @@ def _setup_docker():
     """
     import docker
     from pyccc import docker_utils
-    if config.get('default_docker_machine', None) is not None:
+    if config.engine_type == 'docker-machine':
         dm = config.default_docker_machine
         success = False
         try:
             status = subprocess.check_output(['docker-machine', 'status', dm]).strip()
-        except subprocess.CalledProcessError:
+        except (subprocess.CalledProcessError, OSError):
             print 'WARNING: could not find docker-machine named "%s"' % dm
         else:
             if status != 'Running':
@@ -163,7 +156,7 @@ def _setup_docker():
                 try:
                     with utils.textnotify('Connecting to docker-machine "%s"' % dm):
                         dockerclient = docker_utils.docker_machine_client(dm)
-                except subprocess.CalledProcessError as e:
+                except (subprocess.CalledProcessError, OSError) as e:
                     print 'WARNING: error connecting to docker-machine "%s": %s' % (dm, e)
                 else:
                     success = True
@@ -175,7 +168,7 @@ def _setup_docker():
                   'moldesign.compute.reset_from_config() to try again.'
             return None
 
-    else:
+    elif config.engine_type == 'docker':
         with utils.textnotify('Connecting to docker at ' % config.default_docker_url):
             dockerclient = docker.Client(base_url=config.default_docker_url)
 

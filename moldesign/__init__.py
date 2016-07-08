@@ -55,6 +55,7 @@ from .orbitals import *
 from .structure import *
 from .tools import *
 from .viewer import *
+from .widgets import *
 
 
 # package metadata
