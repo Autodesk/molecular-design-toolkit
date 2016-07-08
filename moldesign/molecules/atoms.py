@@ -141,7 +141,7 @@ class AtomPropertyMixin(object):
         if self.molecule is None:
             return None
         try:
-            wfn = self.molecule.electronic_state
+            wfn = self.molecule.wfn
         except mdt.exceptions.NotCalculatedError:
             return None
 

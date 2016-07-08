@@ -40,7 +40,7 @@ __all__ = []
 @exports
 class PySCFPotential(QMBase):
     DEFAULT_PROPERTIES = ['potential_energy',
-                          'electronic_state',
+                          'wfn',
                           'mulliken']
     ALL_PROPERTIES = DEFAULT_PROPERTIES + ['eri_tensor',
                                            'forces',
@@ -142,7 +142,7 @@ class PySCFPotential(QMBase):
             result['forces'] = result['electronic_forces'] + result['nuclear_forces']
 
         # Return the result
-        result['electronic_state'] = el_state
+        result['wfn'] = el_state
         self.last_el_state = el_state
         result['mulliken'] = DotDict({a: p for a, p in zip(self.mol.atoms, atom_pop)})
         result['mulliken'].type = 'atomic'

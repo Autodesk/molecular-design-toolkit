@@ -6,7 +6,7 @@ import pytest
 
 import moldesign as mdt
 import moldesign.exceptions
-import moldesign.structure.atomcollections
+import moldesign.molecules.atomcollections
 import moldesign.utils.classes
 from moldesign import units as u
 
@@ -256,7 +256,7 @@ def test_h2_harmonic_copy_loses_simulation(h2_harmonic_copy, h2_harmonic):
 
 def test_h2_calculation_caching(h2_harmonic):
     h2 = h2_harmonic
-    h2.properties = moldesign.structure.molecule.MolecularProperties(h2)
+    h2.properties = moldesign.molecules.molecule.MolecularProperties(h2)
     true_energy = h2.calc_potential_energy()
     assert 'potential_energy' in h2.properties
     assert 'forces' in h2.properties
@@ -378,7 +378,7 @@ def ligand3aid(ligand_residue_3aid):
 
 @pytest.fixture
 def random_atoms_from_3aid(pdb3aid):
-    atoms = moldesign.structure.atomcollections.AtomList(random.sample(pdb3aid.atoms, 10))
+    atoms = moldesign.molecules.atomcollections.AtomList(random.sample(pdb3aid.atoms, 10))
     return atoms
 
 
@@ -500,7 +500,7 @@ def test_molecule_bonds(molkey, request):
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_types(molkey, request):
     mol = request.getfuncargvalue(molkey)
-    assert issubclass(type(mol.atoms), moldesign.structure.atomcollections.AtomList)
+    assert issubclass(type(mol.atoms), moldesign.molecules.atomcollections.AtomList)
     for atom in mol.atoms:
         assert issubclass(type(atom), mdt.Atom)
     for residue in mol.residues:

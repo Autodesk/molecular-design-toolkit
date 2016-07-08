@@ -21,7 +21,7 @@ from .base import QMBase
 
 class SQMPotential(QMBase):
     DEFAULT_PROPERTIES = ['potential_energy',
-                          'electronic_state',
+                          'wfn',
                           'mulliken']
     ALL_PROPERTIES = DEFAULT_PROPERTIES
     THEORIES = ('MNDO MNDO/d AM1 AM1/d PM3 PDDG PDDG/MNDO PDDG/PM3 RM1 '

@@ -410,11 +410,11 @@ class Trajectory(object):
 
         if relative_alignment:
             for i in xrange(iframe+1, self.num_frames):
-                self.frames[i].electronic_state.align_orbital_phases(
-                    self.frames[i-1].electronic_state)
+                self.frames[i].wfn.align_orbital_phases(
+                    self.frames[i-1].wfn)
             for i in xrange(iframe-1, -1, -1):
-                self.frames[i].electronic_state.align_orbital_phases(
-                    self.frames[i+1].electronic_state)
+                self.frames[i].wfn.align_orbital_phases(
+                    self.frames[i+1].wfn)
         else:
             for frame in self.frames:
-                frame.electronic_state.align_orbital_phases(reference_frame.electronic_state)
+                frame.wfn.align_orbital_phases(reference_frame.wfn)

@@ -35,7 +35,7 @@ from moldesign import units as u
 
 from moldesign import compute
 
-from moldesign.structure import Trajectory, Molecule
+from moldesign.molecules import Trajectory, Molecule
 
 
 class OpenMMPickleMixin(object):

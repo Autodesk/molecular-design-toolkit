@@ -13,7 +13,7 @@
 # limitations under the License.
 import moldesign as mdt
 from moldesign import units as u
-from moldesign.structure import Trajectory
+from moldesign.molecules import Trajectory
 
 from .base import IntegratorBase
 

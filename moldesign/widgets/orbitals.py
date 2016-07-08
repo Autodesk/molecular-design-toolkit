@@ -28,7 +28,7 @@ class OrbitalViewer(SelectionGroup):
         :return:
         """
         self.viewer = GeometryViewer(mol=mol, **kwargs)
-        self.viewer.wfn = mol.electronic_state
+        self.viewer.wfn = mol.wfn
         self.uipane = OrbitalUIPane(self, height=int(self.viewer.height)-50)
         hb = ipy.HBox([self.viewer, self.uipane])
         super(OrbitalViewer, self).__init__([hb])

@@ -16,7 +16,7 @@ from __future__ import absolute_import
 import os
 import string
 
-import moldesign.structure.atomcollections
+import moldesign.molecules.atomcollections
 
 try:
     import pybel as pb
@@ -29,9 +29,9 @@ else:  # this should be configurable
 
 import moldesign as mdt
 from moldesign.compute.runsremotely import runsremotely
-import moldesign.structure.atoms
+import moldesign.molecules.atoms
 from moldesign.units import *
-from moldesign.structure import biounits
+from moldesign.molecules import biounits
 
 
 def read_file(filename, name=None, format=None):
@@ -242,7 +242,7 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
     newatom_map = {}
     newresidues = {}
     newchains = {}
-    newatoms = moldesign.structure.atomcollections.AtomList([])
+    newatoms = moldesign.molecules.atomcollections.AtomList([])
     backup_chain_names = list(string.ascii_uppercase)
 
     for pybatom in pbmol.atoms:
@@ -263,7 +263,7 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
             atnum = moldesign.core.data.ATOMIC_NUMBERS[name[0]]
         else:
             atnum = pybatom.atomicnum
-        mdtatom = moldesign.structure.atoms.Atom(atnum=atnum, name=name,
+        mdtatom = moldesign.molecules.atoms.Atom(atnum=atnum, name=name,
                                                  pdbname=name, pdbindex=pybatom.OBAtom.GetIdx())
         newatom_map[pybatom.OBAtom.GetIdx()] = mdtatom
         mdtatom.position = pybatom.coords * angstrom

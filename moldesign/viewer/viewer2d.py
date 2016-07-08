@@ -20,7 +20,7 @@ from nbmolviz.widget2d import MolViz2DBaseWidget
 from moldesign import utils
 import moldesign.units as u
 from moldesign.data import color_rotation
-from moldesign.structure import AtomList
+from moldesign.molecules import AtomList
 
 from . import toplevel, ColorMixin
 
@@ -214,7 +214,7 @@ def make_contact_view(entity, view_radius=5.0*u.ang,
     :param kwargs:
     :return:
     """
-    from moldesign.structure import AtomList
+    from moldesign.molecules import AtomList
 
     try:
         focus_atoms = AtomList(entity.atoms)

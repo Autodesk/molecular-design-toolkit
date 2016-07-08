@@ -14,10 +14,10 @@
 
 from cStringIO import StringIO
 
-import moldesign.structure
+import moldesign.molecules
 from moldesign import compute
 from moldesign import forcefields as ff
-from moldesign.structure import Trajectory, MolecularProperties
+from moldesign.molecules import Trajectory, MolecularProperties
 from moldesign.utils import from_filepath
 
 import moldesign.interfaces.openmm as opm
@@ -212,7 +212,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                     num_constraints -= 1
                 elif (ai in fixed_atoms) or (aj in fixed_atoms):  #only one is fixed
                     raise ValueError('In OpenMM, fixed atoms cannot be part of a constrained '
-                                     'bond (%s)'%moldesign.structure.bonds.Bond(ai, aj))
+                                     'bond (%s)'%moldesign.molecules.bonds.Bond(ai, aj))
                 else:
                     ic += 1
 

@@ -64,23 +64,23 @@ def get_all_atoms(*objects):
             List[moldesign.AtomContainer]): objects to take atoms from
 
     """
-    from . import structure
+    from . import molecules
 
     atoms = collections.OrderedDict()
 
     for obj in objects:
-        if isinstance(obj, structure.Atom):
+        if isinstance(obj, molecules.Atom):
             atoms[obj] = None
         elif hasattr(obj, 'atoms'):
             atoms.update((x,None) for x in obj.atoms)
         else:
             for item in obj:
-                if isinstance(item, structure.Atom):
+                if isinstance(item, molecules.Atom):
                     atoms[item] = None
                 elif hasattr(item, 'atoms'):
                     atoms.update((x, None) for x in item.atoms)
 
-    return structure.AtomList(atoms.iterkeys())
+    return molecules.AtomList(atoms.iterkeys())
 
 
 def kinetic_energy(momenta, masses):

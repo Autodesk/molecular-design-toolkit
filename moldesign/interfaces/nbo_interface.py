@@ -14,7 +14,7 @@
 import numpy as np
 
 import moldesign as mdt
-import moldesign.structure.bonds
+import moldesign.molecules.bonds
 import moldesign.uibase.logs
 from moldesign import units as u
 from moldesign import utils
@@ -28,7 +28,7 @@ PI_UTF = u"\u03C0"
 def run_nbo(mol, requests=('nlmo', 'nbo'),
             image='nbo',
             engine=None):
-    wfn = mol.electronic_state
+    wfn = mol.wfn
     inputs = {'in.47': make_nbo_input_file(mol, requests)}
     command = 'gennbo.i4.exe in.47'
     engine = utils.if_not_none(engine, mdt.compute.config.default_engine)
@@ -41,7 +41,7 @@ def run_nbo(mol, requests=('nlmo', 'nbo'),
 
     job.wait()
     parsed_data = parse_nbo(job.get_output('FILE.10'),
-                            len(mol.electronic_state.aobasis))
+                            len(mol.wfn.aobasis))
 
     for orbtype, data in parsed_data.iteritems():
         if orbtype[0] == 'P':  # copy data from the orthogonal orbitals
@@ -77,7 +77,7 @@ def add_orbitals(mol, wfn, orbdata, orbtype):
             utf_name = bname
         else:
             atoms.append(mol.atoms[orbdata.jatom[i] - 1])
-            bond = moldesign.structure.bonds.Bond(*atoms)
+            bond = moldesign.molecules.bonds.Bond(*atoms)
             if orbdata.bondnums[i] == 1:  # THIS IS NOT CORRECT
                 nbotype = 'sigma'
                 utf_type = SIGMA_UTF
@@ -107,7 +107,7 @@ def make_nbo_input_file(mol, requests):
     :return:
     """
     # Units: angstroms, hartrees
-    wfn = mol.electronic_state
+    wfn = mol.wfn
     orbs = wfn.molecular_orbitals
     nbofile = []
     # TODO: check for open shell wfn (OPEN keyword)

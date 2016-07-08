@@ -229,8 +229,8 @@ class MolecularOrbitals(object):
             numpy.array: overlaps between the two sets of orbitals.
 
         Example:
-            >>> canonical = mol.electronic_state.canonical
-            >>> atomic = mol.electronic_state.basis
+            >>> canonical = mol.wfn.canonical
+            >>> atomic = mol.wfn.basis
             >>> overlaps = canonical.overlap(atomic)
             >>> overlaps[i, j] == canonical.orbitals[i].overlap(atomic.orbitals[j])
             True

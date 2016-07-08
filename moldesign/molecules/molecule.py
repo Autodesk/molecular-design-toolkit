@@ -237,7 +237,7 @@ class MolPropertyMixin(object):
         return self.num_electrons/2
 
     @property
-    def electronic_state(self):
+    def wfn(self):
         """ moldesign.orbitals.ElectronicWfn: return the molecule's current electronic state,
         if calculated.
 
@@ -245,7 +245,7 @@ class MolPropertyMixin(object):
             NotCalculatedError: If the electronic state has not yet been calculated at this
                 geometry
         """
-        return self.get_property('electronic_state')
+        return self.get_property('wfn')
 
     def calc_property(self, name, **kwargs):
         """ Calculate the given property if necessary and return it
@@ -303,13 +303,13 @@ class MolPropertyMixin(object):
         """
         return self.calc_property('dipole')
 
-    def calculate_electronic_state(self, **kwargs):
+    def calculate_wfn(self, **kwargs):
         """ Calculate forces and return them
 
         Returns:
             moldesign.orbitals.ElectronicWfn: electronic wavefunction object
         """
-        return self.calc_property('electronic_state')
+        return self.calc_property('wfn')
 
     def update_properties(self, properties):
         """
@@ -373,7 +373,7 @@ class MolPropertyMixin(object):
         self._properties = val
 
     # synonyms for backwards compatibility
-    calc_electronic_state = calculate_electronic_state
+    calc_wfn = calculate_wfn
     calc_dipole = calculate_dipole
     calc_potential_energy = calculate_potential_energy
     calc_forces = calculate_forces
@@ -1067,5 +1067,15 @@ class Molecule(AtomContainer,
             for nbr in self.bond_graph[atom]:
                 if atom.index > nbr.index: continue  # don't double count
                 yield Bond(atom, nbr)
+
+    def _update_from(self, other):
+        """ Update this molecule's data, including all substructures, from another molecule.
+
+        This is mainly for use in cloud computing.
+
+        Args:
+            other (Molecule):
+        """
+
 
 

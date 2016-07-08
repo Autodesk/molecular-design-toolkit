@@ -38,7 +38,7 @@ from . import min
 from . import models
 from . import method
 from . import orbitals
-from . import structure
+from . import molecules
 from . import tools
 from . import uibase
 from . import units
@@ -52,7 +52,7 @@ from .forcefields import *
 from .geom import *
 from .min import *
 from .orbitals import *
-from .structure import *
+from .molecules import *
 from .tools import *
 from .viewer import *
 from .widgets import *
@@ -77,8 +77,8 @@ if _building_docs:
     __all__ = converters.__all__ + \
               geom.__all__ + \
               min.__all__ + \
-              orbitals.__all__ + \
-              structure.__all__ + \
+              orbitals.__all__+ \
+              molecules.__all__+ \
               tools.__all__ + \
               viewer.__all__
 

@@ -14,7 +14,7 @@
 import ipywidgets as ipy
 
 from moldesign.geom import set_angle, set_dihedral, set_distance
-import moldesign.structure.bonds
+import moldesign.molecules.bonds
 from moldesign.viewer import BondClicker
 from moldesign import units as u
 
@@ -152,7 +152,7 @@ class GeometryBuilder(ViewerToolBase):
                 return self.clear_selection()
 
             elif atom in sel.atom.bond_graph:  # select the bond
-                return self.bond_click(moldesign.structure.bonds.Bond(sel.atom, atom))  # turn this into a bond selection
+                return self.bond_click(moldesign.molecules.bonds.Bond(sel.atom, atom))  # turn this into a bond selection
             else:  # select a new atom
                 self.clear_selection(render=False)
                 sel = self._selection
@@ -304,12 +304,12 @@ class GeometryBuilder(ViewerToolBase):
             self._highlight_atoms([sel.a1, sel.a2], render=False)
 
             if sel.nbr_a1 is not None:
-                nmdtond = moldesign.structure.bonds.Bond(sel.a1, sel.nbr_a1)
+                nmdtond = moldesign.molecules.bonds.Bond(sel.a1, sel.nbr_a1)
                 self._highlight_atoms([sel.nbr_a1], color=self.NBR1HIGHLIGHT, render=False)
                 self.viewer.set_bond_color(self.NBR1HIGHLIGHT, nmdtond, render=False)
                 self._highlighted_bonds.append(nmdtond)
             if sel.nbr_a2 is not None:
-                nmdtond = moldesign.structure.bonds.Bond(sel.a2, sel.nbr_a2)
+                nmdtond = moldesign.molecules.bonds.Bond(sel.a2, sel.nbr_a2)
                 self._highlight_atoms([sel.nbr_a2], color=self.NBR2HIGHLIGHT, render=False)
                 self.viewer.set_bond_color(self.NBR2HIGHLIGHT, nmdtond, render=False)
                 self._highlighted_bonds.append(nmdtond)

@@ -89,7 +89,7 @@ class TrajectoryOrbViewer(TrajectoryViewer):
         if 'framenum' in selection:
             framenum = selection['framenum']
             self.traj.apply_frame(self.traj.frames[framenum])
-            self.viewer.wfn = self.traj._tempmol.electronic_state
+            self.viewer.wfn = self.traj._tempmol.wfn
             if self.viewer.orbital_is_selected:
                 valsave = self.slider.value
                 with self.slider.hold_trait_notifications():

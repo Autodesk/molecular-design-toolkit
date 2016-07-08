@@ -13,7 +13,7 @@
 # limitations under the License.
 import numpy as np
 
-import moldesign.structure.atomcollections
+import moldesign.molecules.atomcollections
 from moldesign import external
 from moldesign.mathutils import sub_angles, apply_4x4_transform
 
@@ -135,7 +135,7 @@ def _get_fragment(mol, a1, a2):
                 dfs_dive(nbr)
     dfs_dive(a1)
     visited.remove(a2)
-    result = moldesign.structure.atomcollections.AtomList(visited)
+    result = moldesign.molecules.atomcollections.AtomList(visited)
     return result
 
 

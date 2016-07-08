@@ -21,7 +21,7 @@ import functools
 
 import moldesign as mdt
 import moldesign.interfaces.openbabel as obabel
-import moldesign.structure.atomcollections
+import moldesign.molecules.atomcollections
 from moldesign.interfaces.opsin_interface import name_to_smiles
 import moldesign.interfaces.biopython_interface as biopy
 
@@ -275,7 +275,7 @@ def build_assembly(mol, assembly_name):
     alpha = iter(string.ascii_uppercase)
 
     # Create the new molecule by copying, transforming, and renaming the original chains
-    all_atoms = moldesign.structure.atomcollections.AtomList()
+    all_atoms = moldesign.molecules.atomcollections.AtomList()
     for i, t in enumerate(asm.transforms):
         for chain_name in asm.chains:
             chain = mol.chains[chain_name].copy()

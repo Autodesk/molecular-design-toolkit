@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import moldesign as mdt
-import moldesign.structure.atomcollections
+import moldesign.molecules.atomcollections
 from moldesign import units as u
 from moldesign.mathutils import *
 from .coords import *
@@ -43,7 +43,7 @@ class GeometryConstraint(object):
             force_constant (u.Scalar[force]): optional, only for minimizations and/or use in
                restraints)
         """
-        self.atoms = moldesign.structure.atomcollections.AtomList(atoms)
+        self.atoms = moldesign.molecules.atomcollections.AtomList(atoms)
         self.mol = self.atoms[0].molecule
         self.tolerance = tolerance
         self.force_constant = force_constant
