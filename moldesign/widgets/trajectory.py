@@ -35,6 +35,7 @@ class TrajectoryViewer(selector.SelectionGroup):
         self.viewer, self.view_container = self.make_viewer()
         for frame in self.traj.frames[1:]:
             self.viewer.append_frame(positions=frame.positions,
+                                     wfn=frame.get('wfn',None),
                                      render=False)
         self.make_controls()
         self.pane.children = [self.view_container, self.controls]
@@ -52,7 +53,8 @@ class TrajectoryViewer(selector.SelectionGroup):
         self.text_view = FrameInspector(self.traj)
         controls.append(self.text_view)
         self.play_button.on_click(self._play)
-        self.slider = selector.create_value_selector(ipy.IntSlider, value_selects='framenum',
+        self.slider = selector.create_value_selector(ipy.IntSlider,
+                                                     value_selects='framenum',
                                                      value=0, description='Frame:',
                                                      min=0, max=len(self.traj)-1)
         self.playbox = ipy.HBox([self.play_button, self.slider])
@@ -85,19 +87,6 @@ class TrajectoryOrbViewer(TrajectoryViewer):
         viewframe = self.traj._tempmol.draw_orbitals()
         return viewframe.viewer, viewframe
 
-    def handle_selection_event(self, selection):
-        if 'framenum' in selection:
-            framenum = selection['framenum']
-            self.traj.apply_frame(self.traj.frames[framenum])
-            self.viewer.wfn = self.traj._tempmol.wfn
-            if self.viewer.orbital_is_selected:
-                valsave = self.slider.value
-                with self.slider.hold_trait_notifications():
-                    self.viewer.redraw_orbs(render=True)
-                    self.slider.value = valsave
-
-            else:
-                self.viewer.remove_orbitals(render=True)
 
 
 class FrameInspector(ipy.HTML, selector.Selector):

@@ -98,6 +98,8 @@ def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True,
 
     engine.submit(job)
 
+    jobname = utils.if_not_none(jobname, job.name)
+
     if display:
         mdt.uibase.display_log(job.get_display_object(), jobname)
 

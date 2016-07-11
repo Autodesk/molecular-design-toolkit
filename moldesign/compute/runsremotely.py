@@ -16,8 +16,9 @@ import types
 
 from pyccc import python as bpy
 
+import moldesign as mdt
 from moldesign import utils, uibase
-from . import configuration, compute
+from . import configuration
 
 class RunsRemotely(object):
     def __init__(self, enable=True,
@@ -74,8 +75,6 @@ class RunsRemotely(object):
             Note:
                 At runtime, this documentation should be replaced with that of the wrapped function
             """
-            from moldesign.uibase import logs
-
             # If the wrapper is not enabled, just run the wrapped function as normal.
             f = func  # keeps a reference to the original function in this closure
             if not wrapper.enabled:
@@ -88,9 +87,9 @@ class RunsRemotely(object):
                 f, args = _bind_instance_method(f, args)
 
             # Submit job to remote engine
-            python_call = bpy.PythonCall(f, args, kwargs)
+            python_call = bpy.PythonCall(f, *args, **kwargs)
             image = utils.if_not_none(self.image, configuration.config.default_python_image)
-            engine = utils.if_not_none(self.engine, compute.default_engine)
+            engine = utils.if_not_none(self.engine, mdt.compute.default_engine)
             job = bpy.PythonJob(engine,
                                 image,
                                 python_call,

@@ -39,6 +39,7 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
     DEFAULT_COLOR_MAP = colormap
     DEFAULT_WIDTH = 625
     DEFAULT_HEIGHT = 400
+    DEF_PADDING = 1.75 * u.angstrom
 
     def __reduce__(self):
         """prevent these from being pickled for now"""
@@ -60,7 +61,7 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
         self.selection_id = None
         self.atom_highlights = []
         self.frame_change_callback = None
-        self.wfn = None
+        self.wfns = []
         self._cached_orbitals = set()
         self._callbacks = set()
         self._axis_objects = None
@@ -74,6 +75,10 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
             else:
                 self.set_style(style, render=render)
         if display: dsp.display(self)
+
+    @property
+    def wfn(self):
+        return self.wfns[self.current_frame]
 
     def autostyle(self, render=True):
         if self.mol.mass <= 500.0 * u.dalton:
@@ -189,23 +194,21 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
                      for atom in self.mol.atoms]
         return positions
 
-    def calc_orb_grid(self, orbname, npts=35, padding=3.0*u.angstrom):
+    def calc_orb_grid(self, orbname, npts, framenum):
         """ Calculate orbitals on a grid
 
         Args:
             orbname: Either orbital index (for canonical orbitals) or a tuple ( [orbital type],
                [orbital index] ) where [orbital type] is a keyword (e.g., canonical, natural, nbo,
                ao, etc)
-            npts (int): number of points in each dimension of the grid
-            padding (u.Scalar[length]): extent of the grid beyond the furthest atom in each
-                dimension
+            npts (int): resolution in each dimension of the grid
+            framenum (int): wavefunction for which frame number?
 
         Returns:
             moldesign.viewer.VolumetricGrid: orbital values on a grid
         """
-        # TODO: why is orbname sometimes an np.int64 instead of an int?
-        # NEWFEATURE: limit bounding box based on the non-zero atomic centers. Useful for localized orbitals,
-        #             which otherwise require high resolution
+        # NEWFEATURE: limit grid size based on the non-zero atomic centers. Useful for localized
+        #    orbitals, which otherwise require high resolution
         try:
             orbtype, orbidx = orbname
         except TypeError:
@@ -213,17 +216,18 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
             orbidx = orbname
 
         # self.wfn should already be set to the wfn for the current frame
-        orbital = self.wfn.orbitals[orbtype][orbidx]
-        positions = self._frame_positions[self.current_frame]*u.angstrom
+        orbital = self.wfns[framenum].orbitals[orbtype][orbidx]
+        positions = self._frame_positions[framenum]*u.angstrom
         grid = VolumetricGrid(positions,
-                              padding=padding, npoints=npts)
+                              padding=self.DEF_PADDING,
+                              npoints=npts)
         coords = grid.xyzlist().reshape(3, grid.npoints ** 3).T
         values = orbital(coords)
         grid.fxyz = values.reshape(npts, npts, npts)
         maxrange = max(r[1]-r[0] for r in (grid.xr, grid.yr, grid.zr))
 
+        # try not to clip the orbitals
         self.viewer('adjustClipping', [0.6* maxrange.value_in(u.angstrom)])
-            # try not to clip the orbitals
         return grid
 
     def get_orbnames(self):
@@ -354,7 +358,7 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
         for callback in self._callbacks:
             callback(atom)
 
-    def append_frame(self, positions=None, render=True):
+    def append_frame(self, positions=None, wfn=None, render=True):
         # override base method - we'll handle frames entirely in python
         # this is copied verbatim from molviz, except for the line noted
         if positions is None:
@@ -368,18 +372,22 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
 
         self.num_frames += 1
         self._frame_positions.append(positions)  # only modification from molviz
+        self.wfns.append(wfn)
         self.show_frame(self.num_frames - 1)
         if render: self.render()
 
     @utils.doc_inherit
-    def show_frame(self, framenum, _fire_event=True, **kwargs):
+    def show_frame(self, framenum, _fire_event=True, update_orbitals=True, render=True):
         # override base method - we'll handle frames using self.set_positions
         # instead of any built-in handlers
         if framenum != self.current_frame:
-            self.set_positions(self._frame_positions[framenum])
+            self.set_positions(self._frame_positions[framenum], render=False)
             self.current_frame = framenum
             if _fire_event and self.selection_group:
                 self.selection_group.update_selections(self, {'framenum': framenum})
+            if update_orbitals:
+                self.redraw_orbs(render=False)
+        if render: self.render()
 
     def handle_selection_event(self, selection):
         """
@@ -394,16 +402,20 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
         if 'framenum' in selection:
             if self.frame_change_callback is not None:
                 self.frame_change_callback(selection['framenum'])
-            self.show_frame(selection['framenum'], _fire_event=False, render=False)
+            self.show_frame(selection['framenum'],
+                            _fire_event=False,
+                            update_orbitals=False,
+                            render=False)
+            orb_changed = True
 
         if ('orbname' in selection) and (selection['orbname'] != self.current_orbital):
             orb_changed = True
             self.current_orbital = selection['orbname']
 
         if ('orbital_isovalue' in selection) and (
-                    selection['orbital_isovalue'] != self._orbital_kwargs['isoval']):
+                    selection['orbital_isovalue'] != self.orbital_spec['isoval']):
             orb_changed = True
-            self._orbital_kwargs['isoval'] = selection['orbital_isovalue']
+            self.orbital_spec['isoval'] = selection['orbital_isovalue']
 
         # redraw the orbital if necessary
         if orb_changed:
@@ -413,7 +425,7 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
 
     def redraw_orbs(self, render=True):
         if self.orbital_is_selected:
-            self.draw_orbital(self.current_orbital, render=False, **self._orbital_kwargs)
+            self.draw_orbital(self.current_orbital, render=False, **self.orbital_spec)
         if render: self.render()
 
     @property

@@ -28,11 +28,10 @@ class OrbitalViewer(SelectionGroup):
         :return:
         """
         self.viewer = GeometryViewer(mol=mol, **kwargs)
-        self.viewer.wfn = mol.wfn
+        self.viewer.wfns = [mol.wfn]
         self.uipane = OrbitalUIPane(self, height=int(self.viewer.height)-50)
         hb = ipy.HBox([self.viewer, self.uipane])
         super(OrbitalViewer, self).__init__([hb])
-
 
 
 class OrbitalUIPane(Selector, ipy.Box):
@@ -62,7 +61,7 @@ class OrbitalUIPane(Selector, ipy.Box):
                                                      readout_format='.4f')
 
         self.orb_resolution = ipy.Text(description='Orbital resolution', width=75)
-        self.orb_resolution.value = '40'  # this is a string to enable the 'on_submit' method
+        self.orb_resolution.value = '40'  # string because it's required for the 'on_submit' method
         self.change_resolution()
         self.orb_resolution.on_submit(self.change_resolution)
 
@@ -110,8 +109,8 @@ class OrbitalUIPane(Selector, ipy.Box):
 
     def change_resolution(self, *args):
         viewer = self.viz.viewer
-        viewer._orbital_kwargs['npts'] = int(self.orb_resolution.value)
+        viewer.orbital_spec['npts'] = int(self.orb_resolution.value)
         if viewer.current_orbital is not None:
-            viewer.draw_orbital(viewer.current_orbital, render=True, **viewer._orbital_kwargs)
+            viewer.draw_orbital(viewer.current_orbital, render=True, **viewer.orbital_spec)
 
 

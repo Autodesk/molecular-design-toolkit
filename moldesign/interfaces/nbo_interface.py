@@ -15,7 +15,6 @@ import numpy as np
 
 import moldesign as mdt
 import moldesign.molecules.bonds
-import moldesign.uibase.logs
 from moldesign import units as u
 from moldesign import utils
 from moldesign.utils import DotDict

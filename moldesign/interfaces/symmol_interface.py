@@ -17,7 +17,6 @@ import fortranformat as ff
 import numpy as np
 
 import moldesign as mdt
-import moldesign.uibase.logs
 from moldesign import units as u
 from moldesign import utils
 
@@ -50,7 +49,7 @@ def run_symmol(mol,
                           command,
                           inputs=inputs,
                           name="symmol, %s" % mol.name)
-    moldesign.uibase.display_log(job.get_display_object(), "symmol, %s"%mol.name)
+    mdt.uibase.display_log(job.get_display_object(), "symmol, %s"%mol.name)
     job.wait()
 
     data = parse_output(job.get_output('symmol.out'))
@@ -72,7 +71,7 @@ MATRIXPARSER = re.compile('(\d+)\s+CSM =\s+([\d\.]+)\s+MAX. DIFF. \(Angstrom\)=(
 # this parses '  4 CSM =   0.06     MAX. DIFF. (Angstrom)=0.0545     TYPE C3' -> [4, 0.06, 0.545, C3]
 def parse_output(outfile):
     lines = iter(outfile)
-    data = moldesign.utils.classes.DotDict()
+    data = mdt.utils.classes.DotDict()
     while True:
         l = lines.next()
         fields = l.split()
