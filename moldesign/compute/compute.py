@@ -102,11 +102,10 @@ def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True,
     engine.submit(job)
 
     if display:
-        mdt.uibase.logs.display(job, jobname)
+        mdt.uibase.display_log(job.get_display_object(), jobname)
 
     if wait:
         job.wait()
-
         if _return_result: return job.result
 
     return job

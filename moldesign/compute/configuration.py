@@ -21,7 +21,10 @@ from pyccc import engines
 
 from moldesign import utils
 
-FREE_COMPUTE_CANNON = 'compute.bionano.autodesk.com:8000'
+FREE_COMPUTE_CANNON = 'cloudcomputecannon.bionano.autodesk.com:9000'
+
+RUNNING_ON_WORKER = (os.environ.get('IS_PYCCC_JOB', '0') == '1')
+
 
 # TODO: *write* configuration plus initial install default; sensible defaults
 

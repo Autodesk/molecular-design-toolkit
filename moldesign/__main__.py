@@ -230,49 +230,6 @@ def wait_net_service(server, port, timeout=None):
         time.sleep(0.1)
 
 
-def make_config_dir(overwrite=False):
-    composefile = {
-        "mdt": {"image": image_name('moldesign_notebook'),
-               "ports":
-                   ["8899:8888"],
-               "environment":
-                   {"BUCKYBALL_CONFIG": "%s/.moldesign/moldesign.yml" % HOME},
-               "volumes": ["/var/run/docker.sock:/var/run/docker.sock",
-                           "/Users:/Users",
-                           "%s/mdtnotebooks:/notebooks/saved" % HOME]}}
-
-    configfile = dict(default_engine='docker',
-                      default_repository=args.repository,
-                      default_docker_url='unix://var/run/docker.sock',
-                      default_image=image_name("moldesign"),
-                      version_tag=args.version_tag)
-
-    if not os.path.exists(CONFIG_DIR):
-        print 'Creating %s' % CONFIG_DIR
-        os.makedirs(CONFIG_DIR)
-
-    if overwrite or (not os.path.exists(DOCKER_COMPOSE_PATH)):
-        print 'Creating default %s' % DOCKER_COMPOSE_PATH
-        with open(DOCKER_COMPOSE_PATH, 'w') as outfile:
-            yaml_dumper(composefile, outfile)
-
-    if overwrite or (not os.path.exists(CONFIG_PATH)):
-        print 'Creating default %s' % CONFIG_PATH
-        with open(CONFIG_PATH, 'w') as outfile:
-            yaml_dumper(configfile, outfile)
-
-
-def image_name(base):
-    if args.repository[-1] == ':':
-        fmt = "{repo}{base}-{version}"
-    elif args.repository[-1] == '/':
-        fmt = "{repo}{base}:{version}"
-    else:
-        fmt = "{repo}/{base}:{version}"
-
-    return fmt.format(repo=args.repository, version=args.version_tag, base=base)
-
-
 def check_path(exes):
     return {c: distutils.spawn.find_executable(c) for c in exes}
 

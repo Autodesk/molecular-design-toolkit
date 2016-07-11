@@ -16,7 +16,7 @@ import types
 
 from pyccc import python as bpy
 
-from moldesign import utils
+from moldesign import utils, uibase
 from . import configuration, compute
 
 class RunsRemotely(object):
@@ -98,11 +98,11 @@ class RunsRemotely(object):
                                 sendsource=self.sendsource)
 
             if self.display:
-                logs.display(job, title=f.__name__)
+                uibase.display_log(job.get_display_object, title=f.__name__)
 
             if wait:
                 job.wait()
-                return job.finish()
+                return job.result
             else:
                 return job
 
