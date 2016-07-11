@@ -45,16 +45,16 @@ def run_symmol(mol,
 
     # TODO: this boilerplate has to go
     engine = utils.if_not_none(engine, mdt.compute.default_engine)
-    imagename = mdt.compute.get_image_path(image, engine)
+    imagename = mdt.compute.get_image_path(image)
     job = engine.launch(imagename,
                           command,
                           inputs=inputs,
                           name="symmol, %s" % mol.name)
-    moldesign.uibase.logs.display(job, "symmol, %s"%mol.name)
+    moldesign.uibase.display_log(job.get_display_object(), "symmol, %s"%mol.name)
     job.wait()
 
     data = parse_output(job.get_output('symmol.out'))
-    symm = mdt.symmetry.MolecularSymmetry(
+    symm = mdt.geom.MolecularSymmetry(
             mol, data.symbol, data.rms,
             orientation=get_aligned_coords(mol, data),
             elems=data.elems,
@@ -103,7 +103,7 @@ def parse_output(outfile):
                 if l.strip() == '': break
                 parsed = ELEMPARSER.findall(l)
                 for p in parsed:
-                    elem = mdt.symmetry.SymmetryElement(
+                    elem = mdt.geom.SymmetryElement(
                             idx=int(p[0])-1,
                             symbol=p[1].strip(),
                             matrix=_string_to_matrix(p[2]),
@@ -133,7 +133,7 @@ def parse_output(outfile):
                     l = lines.next()
                     matrix[i, :] = map(float, l.split())
 
-                e = mdt.symmetry.SymmetryElement(
+                e = mdt.geom.SymmetryElement(
                         matrix=matrix,
                         idx=int(info[0])-1,
                         csm=float(info[1]) * u.angstrom,

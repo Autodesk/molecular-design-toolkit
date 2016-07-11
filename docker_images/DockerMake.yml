@@ -121,7 +121,7 @@ moldesign_notebook:
   - notebook
   - moldesign
  build: |
-  RUN cp -r /src/molecular-design-toolkit/moldesign/notebooks /notebooks/moldesign_examples
+  RUN cp -r /src/molecular-design-toolkit/moldesign/_notebooks /notebooks/moldesign_examples
   RUN jupyter nbextension install --python --system widgetsnbextension \
    && jupyter nbextension enable --python --system widgetsnbextension \
    && jupyter nbextension install --python --system nbmolviz \
@@ -203,7 +203,7 @@ symmol:
   ADD symmol.f /src/symmol/symmol.f
   RUN apt-get update \
    && apt-get install -y --no-install-recommends \
-         gfortran \
+         gfortran libgfortran3\
    && cd /src/symmol \
    && gfortran symmol.f -o symmol \
    && apt-get -y remove --purge \

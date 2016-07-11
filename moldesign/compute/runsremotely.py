@@ -98,7 +98,7 @@ class RunsRemotely(object):
                                 sendsource=self.sendsource)
 
             if self.display:
-                uibase.display_log(job.get_display_object, title=f.__name__)
+                uibase.display_log(job.get_display_object(), title=f.__name__)
 
             if wait:
                 job.wait()

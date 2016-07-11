@@ -40,7 +40,7 @@ _current_tabs = None
 _capture_enabled = False
 
 
-def display(obj, title=None):
+def display_log(obj, title=None):
     """
     Registers a new view. This is mostly so that we can
     display all views from a cell in a LoggingTabs object.
@@ -49,15 +49,13 @@ def display(obj, title=None):
     :param title: A name for the object (otherwise, str(obj) is used)
     :return:
     """
-    # for compatibility with earlier versions
-    if hasattr(obj, 'get_display_object'):
-        obj = obj.get_display_object()
+
+    if not widgets_enabled: return
 
     if _current_tabs is None:  # just display the damn thing
         IPython.display.display(obj)
-        return
-
-    _current_tabs.add_display(obj, title=title, display=True)
+    else:
+        _current_tabs.add_display(obj, title=title, display=True)
 
 
 class WidgetValueHandler(logging.Handler):
@@ -168,8 +166,9 @@ if widgets_enabled:
 class Logger(ipy.Textarea if widgets_enabled else object):
     # TODO: need a javascript-side widget that will accept a stream - string concatenation is bad
     def __init__(self, title='log', **kwargs):
-        kwargs.setdefault('width', 400)
-        kwargs.setdefault('height', 300)
+        kwargs.setdefault('width', '75%')
+        kwargs.setdefault('height', '300px')
+        kwargs.setdefault('font_family', 'monospace')
         self.title = title
         if widgets_enabled:  # try to intialize widget
             super(Logger, self).__init__(**kwargs)
@@ -182,7 +181,7 @@ class Logger(ipy.Textarea if widgets_enabled else object):
     def _write(self, string):
         if self._is_widget:
             if not self.active:
-                display(self, self.title)
+                display_log(self, self.title)
                 self.active = True
             self.value += string.strip() + '\n'
         else:

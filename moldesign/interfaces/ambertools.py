@@ -80,7 +80,7 @@ def am1_bcc_charges(mol, minsteps=None, wait=True):
                         name="am1-bcc, %s" % mol.name,
                         inputs={'mol.pdb': mol.write(format='pdb')},
                         when_finished=parse_mol2)
-    uibase.logs.display(job, job.name)
+    uibase.display_log(job.get_display_object(), job.name)
     if not wait: return job()
     else: job.wait()
 
@@ -185,7 +185,7 @@ def assign_forcefield(mol, **kwargs):
     job = run_tleap(mol, **kwargs)
     report = ParameterizationDisplay(job, mol)
     if report.msg:
-        uibase.logs.display(report, title='ERRORS/WARNINGS')
+        uibase.display_log(report, title='ERRORS/WARNINGS')
     if 'output.inpcrd' in job.get_output():
         prmtop = job.get_output('output.prmtop')
         inpcrd = job.get_output('output.inpcrd')
@@ -227,7 +227,7 @@ def get_gaff_parameters(mol, charges, image=IMAGE, engine=None):
                           ' && '.join(cmds),
                           inputs=inputs,
                           name="GAFF assignments" % mol.name)
-    uibase.logs.display(job, "tleap, %s"%mol.name)
+    uibase.display_log(job.get_display_object(), "tleap, %s"%mol.name)
     job.wait()
 
     param = GAFFParameters(job.get_output('mol.lib'),

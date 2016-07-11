@@ -32,12 +32,12 @@ def run_nbo(mol, requests=('nlmo', 'nbo'),
     inputs = {'in.47': make_nbo_input_file(mol, requests)}
     command = 'gennbo.i4.exe in.47'
     engine = utils.if_not_none(engine, mdt.compute.config.default_engine)
-    imagename = mdt.compute.get_image_path(image, engine)
+    imagename = mdt.compute.get_image_path(image)
     job = engine.launch(imagename,
                           command,
                           inputs=inputs,
                           name="nbo, %s" % mol.name)
-    moldesign.uibase.logs.display(job, "nbo, %s"%mol.name)
+    moldesign.uibase.display_log(job.get_display_object(), "nbo, %s"%mol.name)
 
     job.wait()
     parsed_data = parse_nbo(job.get_output('FILE.10'),

@@ -77,7 +77,8 @@ class Symmetrizer(ipy.Box):
         self.coords_changed()
 
     def coords_changed(self, *args):
-        self.symm_selector.options = {}
+        with self.symm_selector.hold_trait_notifications():
+            self.symm_selector.options = {}
         self.description.value = 'Finding symmetries ...'
         self.tolerance = self.tolerance_chooser.value * u.angstrom
         self.symmetry = get_symmetry(self.mol, tolerance=self.tolerance)
@@ -88,7 +89,8 @@ class Symmetrizer(ipy.Box):
             else:
                 key = '{0}) {1} (exact)'.format(elem.idx, elem.symbol, elem.max_diff)
             options[key] = elem
-        self.symm_selector.options = options
+        with self.symm_selector.hold_trait_notifications():
+            self.symm_selector.options = options
         descrip = 'Highest symmetry group: <b>%s</b><br>' % self.symmetry.symbol
         if self.symmetry.rms.magnitude == 0.0:
             descrip += '(Exact)'

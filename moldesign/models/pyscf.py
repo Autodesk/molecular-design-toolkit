@@ -21,7 +21,7 @@ from moldesign import units as u, compute, orbitals
 from moldesign.interfaces.pyscf_interface import force_remote, mol_to_pyscf, \
     StatusLogger, SPHERICAL_NAMES
 from .base import QMBase
-from moldesign.uibase import logs
+from moldesign import uibase
 from moldesign.utils import DotDict, if_not_none
 
 if not force_remote:
@@ -66,11 +66,11 @@ class PySCFPotential(QMBase):
         self.kernel = None
         self.logs = StringIO()
         self.last_el_state = None
-        self.logger = logs.Logger('PySCF interface')  # eventually, this be a child of the parent molecule
+        self.logger = uibase.Logger('PySCF interface')  # eventually, this be a child of the parent molecule
 
     @compute.runsremotely(enable=force_remote, is_imethod=True)
     def calculate(self, requests=None, guess=None):
-        self.logger = logs.Logger('PySCF calc')  # eventually, this be a child of the parent molecule
+        self.logger = uibase.Logger('PySCF calc')  # eventually, this be a child of the parent molecule
         do_forces = 'forces' in requests
         if do_forces and self.params.theory not in self.FORCE_CALCULATORS:
             raise ValueError('Forces are only available for the following theories:'

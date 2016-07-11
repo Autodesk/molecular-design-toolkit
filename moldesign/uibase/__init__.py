@@ -6,7 +6,6 @@ __all__ = []
 from .selector import *
 from .components import *
 from .plotting import *
-
-from . import logs
+from .logwidget import *
 
 

@@ -21,6 +21,8 @@ from pyccc import engines
 
 from moldesign import utils
 
+default_engine = None
+
 FREE_COMPUTE_CANNON = 'cloudcomputecannon.bionano.autodesk.com:9000'
 
 RUNNING_ON_WORKER = (os.environ.get('IS_PYCCC_JOB', '0') == '1')
@@ -100,8 +102,8 @@ def registry_login(client, login):
         print 'done'
 
 
-def _get_config():
-    """Called at import to read the configuration and do initial setup
+def init_config():
+    """Called at the end of package import to read initial configuration and setup cloud computing.
 
     At runtime, call :function:`reset_from_config` to change the configuration
     """
@@ -128,7 +130,7 @@ def reset_from_config():
     Returns:
         dict: copy of the config dictionary (for posterity)
     """
-    from . import compute
+    from moldesign import compute
 
     if config.engine_type in ('docker', 'docker-machine'):
         compute.default_engine = _setup_docker()
@@ -179,6 +181,3 @@ def _setup_docker():
         registry_login(dockerclient, config.docker_registry_login)
 
     return engines.Docker(client=dockerclient)
-
-
-_get_config()

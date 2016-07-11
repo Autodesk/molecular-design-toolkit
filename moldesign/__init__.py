@@ -57,6 +57,9 @@ from .tools import *
 from .viewer import *
 from .widgets import *
 
+# Set up cloud computing
+compute.init_config()
+
 
 # package metadata
 from moldesign import _version

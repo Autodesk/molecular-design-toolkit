@@ -14,9 +14,6 @@
 import moldesign as mdt
 from moldesign import utils
 
-default_engine = None
-
-
 def get_image_path(image_name):
     """ Returns a fully qualified tag that points to the correct registry
 
@@ -93,7 +90,7 @@ def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True,
         pyccc job object OR function's return value
     """
 
-    engine = utils.if_not_none(engine, default_engine)
+    engine = utils.if_not_none(engine, mdt.compute.default_engine)
 
     if engine is None:
         raise ValueError('No compute engine configured! Configure MDT using '
