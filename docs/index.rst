@@ -11,38 +11,44 @@ walkthroughs <http://bionano.autodesk.com/MolecularDesignToolkit/explore.html>`_
 Quick install
 -------------
 Get the latest stable version:
-::
-   pip install moldesign
+
+.. code-block:: bash
+
+   $ pip install moldesign
 
 Or get the source code on github:
-::
-   git clone github.com/autodesk/molecular-design-toolkit
+
+.. code-block:: bash
+
+   $ git clone github.com/autodesk/molecular-design-toolkit
 
 
 Get started
 -----------
-We recommend jumping right into a notebook.
+At the command line, run
+
+.. code-block:: bash
+
+   $ python -m moldesign intro
 
 
+Explore the API
+---------------
+The Jupyter online documentation system is a powerful tool for discovering functionality.
 
-How do I ...
-------------
-| ... :ref:`create a small molecule? <create_small_mol>`
-| ... :ref:`download a PDB file? <download_pdb_file>`
-| ... :ref:`perform an energy minimization? <energy_minimization>`
-| ... :ref:`customize a 3D view? <3d_api>`
+To get a list of all members of a module or class, type ``modulename.``, then hit `tab`.
 
+.. image:: img/tab_autocomplete.png
 
+To get online documentation about a function or method, type the method's name, then hit `shift+tab`
 
-Contact
--------
-Found a bug? File in issue on github <link>
+.. image:: img/shifttab_online.png
 
-Have a question? Post on our forums <link>
+To get the complete docstring for any object, type its name then a question mark.
 
-Email MDT's maintainer: aaron [dot] virshup [at] autodesk.com
+.. image:: questiondoc.png
 
 
-* :doc:`Table of contents <contents>`
-* :ref:`Alphabetical index <genindex>`
-* :ref:`Search <search>`
+Get help
+--------
+Click a link in the navigation menu (to your left) for in-depth documentation.

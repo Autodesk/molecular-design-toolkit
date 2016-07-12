@@ -33,6 +33,7 @@ needs_sphinx = '1.3'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.autosummary',
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
@@ -53,7 +54,7 @@ extensions = [
 #     app.connect("autodoc-skip-member", skip)
 
 autoclass_content = 'class'
-autodoc_member_order = 'groupwise'
+autodoc_member_order = 'alphabetical'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

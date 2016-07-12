@@ -306,6 +306,8 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
     position = AtomArray('_position', 'positions')
     momentum = AtomArray('_momentum', 'momenta')
 
+    atomic_number = utils.Synonym('atnum')
+
     #################################################################
     # Methods for BUILDING the atom and indexing it in a molecule
     def __init__(self, name=None, atnum=None, mass=None, chain=None, residue=None,
@@ -385,7 +387,7 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
             order (int): bond order
 
         Returns:
-            moldesign.structure.bonds.Bond: bond object
+            moldesign.molecules.bonds.Bond: bond object
         """
         if self.molecule is other.molecule:
             self.bond_graph[other] = other.bond_graph[self] = order

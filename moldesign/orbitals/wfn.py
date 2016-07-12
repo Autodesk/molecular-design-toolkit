@@ -19,15 +19,17 @@ from . import MolecularOrbitals
 
 
 class ElectronicWfn(object):
-    """
-    Stores the results of a quantum chemistry calculation.
-    This is necessarily pretty flexible, but generally stores an AO wfn and one or more sets of orbitals.
-    Can also store CI vectors, etc.
+    """ Stores the results of a quantum chemistry calculation.
+
+    This is necessarily pretty flexible, but generally stores an LCAO wfn and one or more sets of
+    orbitals. Can also store CI vectors, etc.
+
+    These objects will usually be created by quantum chemical energy models.
 
     Args:
         mol (moldesign.Molecule): Molecule this wavefunction belongs to
         num_electrons (int): number of electrons in this wavefunction
-        theory (moldesign.models.EnergyModel): The model this wavefunction was created with
+        theory (moldesign.models.base.EnergyModelBase): The model this wavefunction was created with
         aobasis (moldesign.orbitals.BasisSet): The basis functions for the enclosed orbitals
         fock_ao (moldesign.units.Array[energy]): fock matrix in the AO basis
         positions (moldesign.units.Array[length]): positions of the nuclei for this wfn

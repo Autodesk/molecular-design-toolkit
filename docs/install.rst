@@ -6,21 +6,6 @@ Installing MDT
   :depth: 2
 
 
-Quick install
-=============
-If you have a reasonable Python2.7 installation, just run this command in your terminal:
-
-
-.. code-block:: bash
-
-    pip install moldesign
-
-To get started, run this command in your terminal to immediately launch a notebook with examples:
-
-.. code-block:: bash
-
-    python -m moldesign intro
-
 
 Basic installation
 ==================
@@ -51,11 +36,11 @@ MDT will automatically install and enable the ``nbmolviz`` and ``widgetsnbextens
     jupyter nbextension list
 
 
-
-
 Optional python installs
 ========================
-MDT relies on several open source packages to provide various functionality. It's not necessary to have any of them installed on your own machine, but it can be convenient to have them locally.
+MDT relies on several open source python packages to provide various functions.
+It's not necessary to have any of them installed on your own machine, but it can be convenient to
+have them locally, especially for development
 
 OpenBabel
 ^^^^^^^^^
@@ -96,19 +81,26 @@ By default, MDT is configured to use a free cloud-based docker cluster provided 
 Research. If you'd like to run jobs on your local machine, you'll need to install a couple more
 things.
 
+
 Running jobs locally
 --------------------
 
-Docker Toolbox
-^^^^^^^^^^^^^^
-You'll need to have docker running locally. A recent version of Docker (>1.11) is required.
-
+Using a docker-machine
+^^^^^^^^^^^^^^^^^^^^^^
+A recent version of Docker (>1.11) is required.
 
 *Mac or Windows*: Download and install the `Docker Toolbox <https://www.docker
 .com/products/docker-toolbox>`_.
 
 *Linux*: `Follow the instructions for your distribution <https://docs.docker
 .com/engine/installation/linux/>`_.
+
+Next, create a docker-machine (ideally, it should have at least 4 GB of RAM and 40 GB of disk
+space):
+
+.. code-block:: bash
+
+    $ docker-machine create --driver virtualbox --virtualbox-memory "4096" --virtualbox-disk-size "40000"
 
 
 Running jobs on AWS
@@ -150,5 +142,5 @@ Red Hat / Fedora / CentOS
 
 Windows
 ^^^^^^^
-Windows is not supported at this time, although if the Python dependencies can be installed, MDT should work fine. We highly recommend running your notebooks in Chrome or Firefox. We're working on Windows support - if you have any problems, please `open an issue on GitHub <http://github.com/autodesk/mol
+Windows is not supported at this time, although if the Python dependencies can be installed, MDT should work fine. We highly recommend running your notebooks in Chrome or Firefox. We're working on Windows support - if you have any problems, please `open an issue on GitHub <https://github.com/autodesk/mol
 design/issues>`_.

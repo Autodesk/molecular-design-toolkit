@@ -66,6 +66,8 @@ class RunsRemotely(object):
         if self.jobname is None:
             self.jobname = func.__name__
 
+        if func.__name__ == 'wrapper': assert False
+
         @utils.args_from(func,
                          wraps=True,
                          inject_kwargs={'wait': True})
@@ -105,6 +107,7 @@ class RunsRemotely(object):
             else:
                 return job
 
+        wrapper.__name__ = func.__name__
         wrapper.enabled = self.enabled
         return wrapper
 

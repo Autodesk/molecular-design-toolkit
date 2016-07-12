@@ -1,5 +1,5 @@
 ## Structure subpackage
-The `moldesign.structure` subpackage contains class definitions for atomic, molecular, biomolecular, and trajectory data structures. 
+The `moldesign.molecule` subpackage contains class definitions for atomic, molecular, biomolecular, and trajectory data structures. 
 
 ### Naming and indexing conventions
 

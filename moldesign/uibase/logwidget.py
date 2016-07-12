@@ -58,7 +58,9 @@ def display_log(obj, title=None, show=False):
     :return:
     """
 
-    if not widgets_enabled: return
+    if not widgets_enabled:
+        print obj
+        return
 
     if _current_tabs is None:  # just display the damn thing
         IPython.display.display(obj)

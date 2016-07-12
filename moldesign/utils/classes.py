@@ -77,6 +77,19 @@ class Alias(object):
         return getattr(proxied,self.methodname)
 
 
+class Synonym(object):
+    """ An attribute (class or intance) that is just a synonym for another.
+    """
+    def __init__(self, name):
+        self.name = name
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        setattr(instance, self.name, value)
+
+
 class DictLike(object):
     """
     This just wraps normal dicts so that other classes don't have to inherit from a built-in class,

@@ -31,7 +31,7 @@ class ChemicalGraphViewer(MolViz2DBaseWidget, ColorMixin):
     NBMolViz 2D widget.
 
     Args:
-        mol (moldesign.structure.AtomContainer): A collection of atoms (eg a list of atoms,
+        mol (moldesign.molecules.AtomContainer): A collection of atoms (eg a list of atoms,
             a residue, a molecule. etc)
         carbon_labels (bool): If True, draw atom names for carbons
         names (List[str]): (optional) a list of strings to label the atoms in the drawing
@@ -123,7 +123,7 @@ class DistanceGraphViewer(ChemicalGraphViewer):
     shows contacts from 3D space.
 
     Args:
-        mol (moldesign.structure.AtomContainer): A collection of atoms (eg a list of atoms,
+        mol (moldesign.molecules.AtomContainer): A collection of atoms (eg a list of atoms,
             a residue, a molecule. etc)
         distance_sensitivity (Tuple[u.Scalar[length]]): a tuple containing the minimum and
             maximum 3D distances to create edges for (default: ``(3.0*u.ang, 7.0*u.ang)``)

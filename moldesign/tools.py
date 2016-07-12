@@ -18,8 +18,9 @@ This module contains various utility functions that are exposed to API users
 
 from moldesign.interfaces.openbabel import add_hydrogen, guess_bond_orders
 from moldesign.interfaces.pdbfixer_interface import mutate, solvate
+from moldesign.interfaces.ambertools import assign_forcefield
 
 
-__all__ = 'add_hydrogen guess_bond_orders mutate solvate'.split()
+__all__ = 'add_hydrogen guess_bond_orders mutate solvate assign_forcefield'.split()
 
 

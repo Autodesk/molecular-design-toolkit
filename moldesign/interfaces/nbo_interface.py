@@ -102,7 +102,7 @@ def add_orbitals(mol, wfn, orbdata, orbtype):
 def make_nbo_input_file(mol, requests):
     """
     :param mol:
-    :type mol: moldesign.molecule.Molecule
+    :type mol: moldesign.molecules.Molecule
     :return:
     """
     # Units: angstroms, hartrees

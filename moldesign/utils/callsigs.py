@@ -99,11 +99,12 @@ def args_from(original_function,
 
     def decorator(f):
         """Modify f's call signature (using the `__signature__` attribute)"""
-        decorated = f
-        fname = f.__name__
         if wraps:
+            fname = original_function.__name__
             f = functools.wraps(original_function)(f)
             f.__name__ = fname  # revert name change
+        else:
+            fname = f.__name__
         f.__signature__ = sig
 
         if update_docstring_args or inject_kwargs:
@@ -120,7 +121,7 @@ def args_from(original_function,
 
         # Only for building sphinx documentation:
         if os.environ.get('SPHINX_IS_BUILDING_DOCS', ""):
-            sigstring = '%s%s\n' % (f.__name__, sig)
+            sigstring = '%s%s\n' % (fname, sig)
             if hasattr(f, '__doc__') and f.__doc__ is not None:
                 f.__doc__ = sigstring + f.__doc__
             else:

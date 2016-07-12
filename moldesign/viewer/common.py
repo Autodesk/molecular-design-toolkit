@@ -27,7 +27,7 @@ class ColorMixin(object):
         Args:
             atom_callback (callable OR str): callable f(atom) returns color OR
                 category OR an atom attribute (e.g., ``atnum, mass, residue.type``)
-            atoms (moldesign.structure.AtomContainer): atoms to color (default: self.atoms)
+            atoms (moldesign.molecules.AtomContainer): atoms to color (default: self.atoms)
             mplmap (str): name of the matplotlib colormap to use if colors aren't explicitly
                specified)
             force_cmap (bool): force the use of a colormap

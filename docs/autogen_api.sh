@@ -1,4 +1,4 @@
 #!/bin/bash
 
-sphinx-apidoc -o _moldesign_api ../moldesign --force --separate
+sphinx-apidoc -M -o _moldesign_api ../moldesign --force 
 

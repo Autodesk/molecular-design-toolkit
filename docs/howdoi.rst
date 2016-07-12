@@ -116,13 +116,13 @@ the molecule.
    >>> mol.calculate()
    >>> mol.potential_energy
    -6275.56597497 eV
-   >>> mol.electronic_state
+   >>> mol.wfn
    <ElectronicWfn (rhf/6-31g) of Molecule: benzene>
 
 These properties are stored in a :class:`dict` at ``mol.properties``:
 
    >>> mol.properties.keys()
-   ['electronic_state', 'positions', 'mulliken', 'potential_energy']
+   ['wfn', 'positions', 'mulliken', 'potential_energy']
 
 Most relevant for our purposes, we've calculated the electronic state of the molecule and are
 ready to visualize it.

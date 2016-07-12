@@ -152,7 +152,7 @@ def write_trajectory(traj, filename=None, format=None, overwrite=True):
     """ Write trajectory a file (if filename provided) or file-like buffer
 
     Args:
-        traj (moldesign.structure.Trajectory): trajectory to write
+        traj (moldesign.molecules.Trajectory): trajectory to write
         filename (str): name of file (return a file-like object if not passed)
         format (str): file format (guessed from filename if None)
         overwrite (bool): overwrite filename if it exists

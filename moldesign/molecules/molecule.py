@@ -276,8 +276,8 @@ class MolPropertyMixin(object):
             return self.properties[name]
         else:
             raise NotCalculatedError(
-                "The '%s' property hasn't been calculated yet. " % name,
-                "Calculate it with the .calc_%s() method" % name)
+                    ("The '{0}' property hasn't been calculated yet. "
+                     "Calculate it with the molecule.calculate_{0}() method").format(name))
 
     def calculate_forces(self, **kwargs):
         """ Calculate forces and return them
@@ -383,7 +383,7 @@ class MolDrawingMixin(object):
     """ Methods for visualizing molecular structure.
 
     See Also:
-        :class:`moldesign.structure.atomcollections.AtomContainer`
+        :class:`moldesign.molecules.atomcollections.AtomContainer`
 
     Note:
         This is a mixin class designed only to be mixed into the :class:`Molecule` class. Routines
