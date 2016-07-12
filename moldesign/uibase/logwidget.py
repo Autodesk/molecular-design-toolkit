@@ -39,8 +39,16 @@ _prev_tabs = None
 _current_tabs = None
 _capture_enabled = False
 
+# TODO: Something better than this
+try:
+    ipy.Text()
+except traitlets.TraitError:
+    widgets_enabled = False
+else:
+    widgets_enabled = True
 
-def display_log(obj, title=None):
+
+def display_log(obj, title=None, show=False):
     """
     Registers a new view. This is mostly so that we can
     display all views from a cell in a LoggingTabs object.
@@ -55,7 +63,7 @@ def display_log(obj, title=None):
     if _current_tabs is None:  # just display the damn thing
         IPython.display.display(obj)
     else:
-        _current_tabs.add_display(obj, title=title, display=True)
+        _current_tabs.add_display(obj, title=title, display=True, show=show)
 
 
 class WidgetValueHandler(logging.Handler):
@@ -119,16 +127,6 @@ def enable_logging_widgets(enable=True):
         ip.events.unregister('pre_run_cell', _capture_logging_displays)
         ip.events.unregister('post_run_cell', _finalize_logging_displays)
 
-# TODO: Remove this workaround for https://github.com/ipython/ipywidgets/issues/628
-# If ipywidgets#628 is a bug, then this can just be remoed
-# If this is the expected behavior, we should come up with something more elegant
-try:
-    ipy.Text()
-except traitlets.TraitError:
-    widgets_enabled = False
-else:
-    widgets_enabled = True
-
 if widgets_enabled:
     class LoggingTabs(StyledTab):
         def __init__(self, objects, display=False, **kwargs):
@@ -147,7 +145,7 @@ if widgets_enabled:
                 self._displayed = True
                 IPython.display.display(self)
 
-        def add_display(self, obj, title=None, display=True):
+        def add_display(self, obj, title=None, display=True, show=False):
             title = mdt.utils.if_not_none(title, str(obj))
             title = title[:40]
             oldtitle = title
@@ -161,6 +159,7 @@ if widgets_enabled:
             if display and not self._displayed:
                 IPython.display.display(self)
                 self._displayed = True
+                if show: self.selected_index = len(self.children) - 1
 
 
 class Logger(ipy.Textarea if widgets_enabled else object):

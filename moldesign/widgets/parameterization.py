@@ -40,6 +40,9 @@ class ParameterizationDisplay(ipy.Box):
         self.msg = []
         self.parse_errors(self.job)
 
+        self.status = ipy.HTML('<h4>Forcefield assignment: %s</h4>' %
+                               ('Success' if molout else 'FAILED'))
+
         self.listdesc = ipy.HTML('<b>Errors / warnings:</b>')
         self.errorlist = ipy.Select(options=collections.OrderedDict((e.short, e) for e in self.msg))
         self.errmsg = ipy.HTML('-')
@@ -51,7 +54,8 @@ class ParameterizationDisplay(ipy.Box):
         if self.errorlist.value is not None:
             self.switch_display({'old': self.errorlist.value, 'new': self.errorlist.value})
         self.errorlist.observe(self.switch_display, 'value')
-        children = (ipy.HBox([self.viewerpane, ipy.VBox([self.listdesc, self.errorlist])]),
+        children = (self.status,
+                    ipy.HBox([self.viewerpane, ipy.VBox([self.listdesc, self.errorlist])]),
                     self.errmsg)
 
         super(ParameterizationDisplay, self).__init__(children=children)

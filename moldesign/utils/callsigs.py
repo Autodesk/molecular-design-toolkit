@@ -199,10 +199,10 @@ def get_qualified_name(original_function):
         origname = '.'.join([original_function.__module__,
                              original_function.im_class.__name__,
                              original_function.__name__])
-        return ':method:`%s`' % origname
+        return ':meth:`%s`' % origname
     else:
         origname = original_function.__module__+'.'+original_function.__name__
-        return ':function:`%s`' % origname
+        return ':meth:`%s`' % origname
 
 
 class DocInherit(object):

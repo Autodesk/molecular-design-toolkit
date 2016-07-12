@@ -177,7 +177,7 @@ class AtomContainer(object):
         return com
     com = center_of_mass  # synonym
 
-    def draw(self, width=500, height=500, show_2dhydrogens=None):
+    def draw(self, width=500, height=500, show_2dhydrogens=None, display=False):
         """ Visualize this molecule (Jupyter only).
 
         Creates a 3D viewer, and, for small molecules, a 2D viewer).
@@ -187,11 +187,13 @@ class AtomContainer(object):
             height (int): height of the viewer in pixels
             show_2dhydrogens (bool): whether to show the hydrogens in 2d (default: True if there
                    are 10 or less heavy atoms, false otherwise)
+            display (bool): immediately display this viewer
 
         Returns:
             moldesign.ui.SelectionGroup
         """
         import ipywidgets as ipy
+        import IPython.display
 
         if self.num_atoms < 40:
 
@@ -204,7 +206,11 @@ class AtomContainer(object):
         else:
             views = self.draw3d(display=False)
 
-        return mdt.uibase.SelectionGroup([views, mdt.uibase.components.AtomInspector()])
+        displayobj = mdt.uibase.SelectionGroup([views, mdt.uibase.components.AtomInspector()])
+
+        if display:
+            IPython.display.display(displayobj)
+        return displayobj
 
     def draw3d(self, highlight_atoms=None, **kwargs):
         """ Draw this object in 3D. Jupyter only.

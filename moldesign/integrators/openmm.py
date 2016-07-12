@@ -42,7 +42,7 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
         # something more generalizable
         try:
             traj = self._run(run_for)
-        except pyccc.ProgramFailure:
+        except pyccc.python.ProgramFailure:
             raise pyccc.ProgramFailure('OpenMM crashed silently. Please examine the output. '
                                        'This may be due to large forces from, for example, '
                                        'an insufficiently minimized starting geometry.')
@@ -55,7 +55,6 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
     def _run(self, run_for):
         self.prep()
         nsteps = self.time_to_steps(run_for, self.params.timestep)
-        self.mol.time = 0.0 * u.default.time
         self.model._set_openmm_state()
 
         self.reporter = self._attach_reporters()

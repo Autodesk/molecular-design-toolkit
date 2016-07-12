@@ -253,8 +253,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
     def _set_openmm_state(self):  # TODO: periodic state
         self.sim.context.setPositions(opm.pint2simtk(self.mol.positions))
         self.sim.context.setVelocities(opm.pint2simtk(self.mol.velocities))
-        if self.mol.time is not None:
-            self.sim.context.setTime(opm.pint2simtk(self.mol.time))
+        self.sim.context.setTime(opm.pint2simtk(self.mol.time))
 
     def _sync_to_openmm(self, positions=True, momenta=True, time=True):
         """

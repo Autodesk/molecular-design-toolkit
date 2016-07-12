@@ -367,7 +367,7 @@ class Trajectory(object):
 
         Args:
             x,y (str): names of the properties
-            **kwargs (dict): kwargs for :function:`matplotlib.pylab.plot`
+            **kwargs (dict): kwargs for :meth:`matplotlib.pylab.plot`
 
         Returns:
             List[matplotlib.lines.Lines2D]: the lines that were plotted

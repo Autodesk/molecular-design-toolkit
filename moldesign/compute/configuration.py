@@ -105,7 +105,7 @@ def registry_login(client, login):
 def init_config():
     """Called at the end of package import to read initial configuration and setup cloud computing.
 
-    At runtime, call :function:`reset_from_config` to change the configuration
+    At runtime, call :meth:`reset_from_config` to change the configuration
     """
     config.update(CONFIG_DEFAULTS)
 

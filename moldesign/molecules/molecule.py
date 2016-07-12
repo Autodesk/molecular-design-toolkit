@@ -678,7 +678,10 @@ class MolSimulationMixin(object):
         Returns:
             moldesign.trajectory.Trajectory
         """
-        return self.integrator.run(run_for)
+        init_time = self.time
+        traj = self.integrator.run(run_for)
+        print 'Done - integrated "%s" from %s to %s' % (self, init_time, self.time)
+        return traj
 
     def calculate(self, requests=None, wait=True, use_cache=True):
         """
@@ -841,9 +844,16 @@ class Molecule(AtomContainer,
                MolReprMixin,
                MolTopologyMixin, MolSimulationMixin):
     """
-    This is moldesign's principal object. It stores a list of atoms in 3D space
-    and handles interfaces with energy and dynamics models.
+    ``Molecule`` objects store a molecular system, including atoms, 3D coordinates, molecular
+    properties, biomolecular entities, and other model-specific information. Interfaces with
+    simulation models take place through the molecule object.
 
+    Molecule objects will generally be created by reading files or parsing other input; see, for
+    example: :meth:`moldesign.read`, :meth:`moldesign.from_smiles`,
+    :meth:`moldesign.from_pdb`, etc.
+
+    This constructor is useful, however for copying other molecular structures (see
+    examples below).
 
     Args:
         atomcontainer (AtomContainer or AtomList or List[moldesign.Atom]): atoms that make up
@@ -859,17 +869,24 @@ class Molecule(AtomContainer,
             ``{atom1:{atom2:bond_order, atom3:bond_order}, atom2:...}``
             This structure must be symmetric; we require
             ``bond_graph[atom1][atom2] == bond_graph[atom2][atom1]``
-        energy_model (moldesign.models.base.EnergyModelBase): Object that drives calculation of
-            molecular properties, driven by `mol.calculate()`
-        integrator (moldesign.integrators.base.IntegratorBase): Object that drives movement of 3D
-            coordinates in time, driven by mol.run()
         copy_atoms (bool): Create the molecule with *copies* of the passed atoms
             (they will be copied automatically if they already belong to another molecule)
         pdbname (str): Name of the PDB file
         charge (units.Scalar[charge]): molecule's formal charge
 
+    Examples:
+        Use the ``Molecule`` class to create copies of other molecules and substructures thereof:
+        >>> benzene = mdt.from_name('benzene')
+        >>> benzene_copy = mdt.Molecule(benzene, name='benzene copy')
+
+        >>> protein = mdt.from_pdb('3AID')
+        >>> carbon_copies = mdt.Molecule([atom for atom in protein.atoms if atom.atnum==6])
+        >>> first_residue_copy = mdt.Molecule(protein.residues[0])
+
+    **Molecule instance attributes:**
+
     Attributes:
-        atoms
+        atoms (AtomList): List of all atoms in this molecule.
         bond_graph (dict): symmetric dictionary specifying bonds between the
            atoms:
 
@@ -895,6 +912,19 @@ class Molecule(AtomContainer,
         integrator (moldesign.integrators.base.IntegratorBase): Object that drives movement of 3D
             coordinates in time, driven by mol.run()
         is_biomolecule (bool): True if this molecule contains at least 2 biochemical residues
+
+
+    **Molecule methods and properties**
+
+    See also methods offered by the mixin superclasses:
+
+            - :class:`moldesign.molecules.AtomContainer`
+            - :class:`moldesign.molecules.MolPropertyMixin`
+            - :class:`moldesign.molecules.MolDrawingMixin`
+            - :class:`moldesign.molecules.MolSimulationMixin`
+            - :class:`moldesign.molecules.MolTopologyMixin`
+            - :class:`moldesign.molecules.MolConstraintMixin`
+            - :class:`moldesign.molecules.MolReprMixin`
     """
 
     # TODO: UML diagrams, describe structure
@@ -903,8 +933,6 @@ class Molecule(AtomContainer,
 
     def __init__(self, atomcontainer,
                  name=None, bond_graph=None,
-                 energy_model=None,
-                 integrator=None,
                  copy_atoms=False,
                  pdbname=None,
                  charge=0):
@@ -929,13 +957,15 @@ class Molecule(AtomContainer,
             atoms = oldatoms
 
         self.atoms = atoms
-        self.time = None
+        self.time = 0.0 * u.default.time
         self.name = 'uninitialized molecule'
         self._defres = None
         self._defchain = None
         self.pdbname = pdbname
         self.charge = charge
         self.constraints = []
+        self.energy_model = None
+        self.integrator = None
 
         # Builds the internal memory structures
         self.chains = Instance(molecule=self)
@@ -948,14 +978,7 @@ class Molecule(AtomContainer,
             self.name = 'unnamed macromolecule'
         else:
             self.name = self.get_stoichiometry()
-        if energy_model:
-            self.set_energy_model(energy_model)
-        else:
-            self.energy_model = None
-        if integrator:
-            self.set_integrator(integrator)
-        else:
-            self.integrator = None
+
         self._properties = MolecularProperties(self)
         self.ff = utils.DotDict()
 
@@ -989,7 +1012,8 @@ class Molecule(AtomContainer,
         """  Add a new atom to the molecule
 
         Args:
-            newatom (moldesign.Atom): The atom to add (it will be copied if it already belongs to a molecule
+            newatom (moldesign.Atom): The atom to add
+                (it will be copied if it already belongs to a molecule)
         """
         self.addatoms([newatom])
 
@@ -1016,6 +1040,9 @@ class Molecule(AtomContainer,
 
     def deletebond(self, bond):
         """ Remove this bond from the molecule's topology
+
+        Args:
+            Bond: bond to remove
         """
         self.bond_graph[bond.a1].pop(bond.a2)
         self.bond_graph[bond.a2].pop(bond.a1)
@@ -1026,10 +1053,10 @@ class Molecule(AtomContainer,
         2) have an RMS of less than 1/3 the tolerance value
 
         Args:
-            tolerance ([force]): force tolerance
+            tolerance (units.Scalar[force]): force tolerance
 
         Returns:
-            bool
+            bool: True if RMSD force is less than this quantity
         """
         forces = self.calc_forces()
         if forces.max() > tolerance: return False

@@ -67,7 +67,8 @@ ALL_BASES = BASES + ['%s5' % b for b in BASES] + ['%s3' % b for b in BASES]
 DBASES = ['D%s' % b for b in ALL_BASES]
 RBASES = ['R%s' % b for b in ALL_BASES]
 
-BACKBONES = {'dna': set("P OP1 OP2 O5' O4' C5' C4' C3' O3' C2' C1' H1' H2'' H2' H3' H4' H5' H5''".split()),
+BACKBONES = {'dna': set(("P OP1 OP2 O5' O4' C5' C4' C3' O3' C2' C1' H1' H2'' H2' H3' H4' H5' H5'' "
+                        "HO5' HO3'").split()),
              'protein': set("N CA C O OXT H HA HA2 HA3 H2 H3".split())}
 
 RESTYPES = dict(

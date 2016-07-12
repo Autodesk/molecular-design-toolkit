@@ -135,8 +135,8 @@ class AtomPropertyMixin(object):
 
     @property
     def basis_functions(self):
-        """ List[mdt.orbitals.AtomicBasisFunction]: This atom's basis functions, if available (
-        ``None`` otherwise)
+        """ List[mdt.orbitals.AtomicBasisFunction]: This atom's basis functions, if available
+        (``None`` otherwise)
         """
         if self.molecule is None:
             return None
@@ -190,7 +190,7 @@ class AtomReprMixin(object):
 
         Returns:
             str: markdown-formatted string
-            """
+        """
         if self.molecule is None:
             lines = ["<h3>Atom %s</h3>" % self.name]
         else:
@@ -245,15 +245,19 @@ class AtomReprMixin(object):
 
 @toplevel
 class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin):
-    """
-    Holds atomic info.
-    Once assigned to a Molecule, position and momentum are automatically linked to the molecule's
-    coordinates.
+    """ A data structure representing an atom.
+
+    ``Atom`` objects store information about individual atoms within a larger molecular system,
+    providing access to atom-specific geometric, biomolecular, topological and property
+    information. Each :class:`Molecule<moldesign.Molecule>` is composed of a list of atoms.
+
+    Atoms can be instantiated directly, but they will generally be created
+    automatically as part of molecules.
 
     Args:
         name (str): The atom's name (if not passed, set to the element name + the atom's index)
         atnum (int): Atomic number (if not passed, determined from element if possible)
-        mass (u.Scalar[mass]): The atomic mass (if not passed, set to the most abundant isotopic
+        mass (units.Scalar[mass]): The atomic mass (if not passed, set to the most abundant isotopic
             mass)
         chain (moldesign.Chain): biomolecular chain that this atom belongs to
         residue (moldesign.Residue): biomolecular residue that this atom belongs to
@@ -261,28 +265,39 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
         pdbindex (int): atom serial number in the PDB entry, if applicable
         element (str): Elemental symbol (if not passed, determined from atnum if possible)
 
+    **Atom instance attributes:**
+
     Attributes:
         name (str): A descriptive name for this atom
         element (str): IUPAC elemental symbol ('C', 'H', 'Cl', etc.)
         index (int): the atom's current index in the molecule
             (``self is self.parent.atoms[ self.index]``)
-
-        position (u.Vector[length, 3]): atomic positions
-        momentum (u.Vector[momentum, 3]): atomic momenta
         atnum (int): atomic number (synonyms: atomic_num)
         mass (u.Scalar[mass]): the atom's mass
+
+        position (units.Vector[length]): atomic position vector. Once an atom is part of a molecule,
+            this quantity will refer to ``self.molecule.positions[self.index]``.
+        momentum (units.Vector[momentum]): atomic momentum vector. Once an atom is part of a
+           molecule, this quantity will refer to ``self.molecule.momenta[self.index]``.
+
+        x,y,z (u.Scalar[length]): x, y, and z components of ``atom.position``
+        vx, vy, vz (u.Scalar[length/time]): x, y, of ``atom.velocity``
+        px, py, pz (u.Scalar[momentum]): x, y, and z of ``atom.momentum``
+        fx, fy, fz (u.Scalar[force]): x, y, and z ``atom.force``
 
         residue (moldesign.Residue): biomolecular residue that this atom belongs to
         chain (moldesign.Chain): biomolecular chain that this atom belongs to
         parent (moldesign.Molecule): molecule that this atom belongs to
         index (int): index in the parent molecule: ``atom is atom.parent.atoms[index]``
 
-        x,y,z (u.Scalar[length]): x, y, and z components of ``atom.position``
-        vx, vy, vz (u.Scalar[length/time]): x, y, of ``atom.velocity``
-        px, py, pz (u.Scalar[momentum]): x, y, and z of ``atom.momentum``
-        fx, fy, fz (u.Scalar[force]): x, y, and z ``atom.force``
-            Raises:
-                moldesign.molecule.NotCalculatedError: if forces are not calculated
+    **Atom methods and properties**
+
+    See also methods offered by the mixin superclasses:
+
+            - :class:`AtomDrawingMixin`
+            - :class:`AtomGeometryMixin`
+            - :class:`AtomPropertyMixin`
+            - :class:`AtomReprMixin`
     """
     x, y, z = (AtomCoordinate('position', i) for i in xrange(3))
     vx, vy, vz = (AtomCoordinate('velocity', i) for i in xrange(3))
@@ -324,18 +339,21 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
 
     @utils.args_from(AtomContainer.copy)
     def copy(self, *args, **kwargs):
+        """ Copy an atom (delegate to AtomContainer)
+        """
         return self._container.copy(*args, **kwargs)[0]
 
     def __getstate__(self):
+        """Helper for pickling"""
         state = self.__dict__.copy()
-        if self.molecule is not None:  # these don't belong to the atom anymore
+        if self.molecule is not None:  # then these don't belong to the atom anymore
             state['_bond_graph'] = None
             state['_position'] = self.position
             state['_momentum'] = self.momentum
         return state
 
     def _set_molecule(self, molecule):
-        """ Permanently bind this atom to a parent molecule
+        """ Permanently make this atom part of a molecule (private)
 
         Args:
             parent (moldesign.Molecule): the molecule that this atom will become a part of
@@ -345,13 +363,12 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
         self.molecule = molecule
 
     def _index_into_molecule(self, array_name, moleculearray, index):
-        """ Change the atom's position/momentum etc. arrays to be pointers into
-        the appropriate slices of the parent molecule's master array of positions/momenta
+        """ Link the atom's positions and momenta to the parent molecule (private)
 
         Args:
-            array_name: the private name of the array (assumes private name is '_'+array_name)
-            moleculearray: the molecule's master array
-            molslice: the python slice object
+            array_name (str): the private name of the array (assumes private name is '_'+array_name)
+            moleculearray (u.Array): the molecule's master array
+            index: the atom's index in the molecule
 
         Note:
             This will be called by the molecule's init method
@@ -361,7 +378,7 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
         setattr(self, '_' + array_name, None)  # remove the internally stored version
 
     def bond_to(self, other, order):
-        """ Create a bond to another atom
+        """ Create or modify a bond with another atom
 
         Args:
             other (Atom): atom to bond to
@@ -374,15 +391,13 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
             self.bond_graph[other] = other.bond_graph[self] = order
             if self.molecule is not None: self.molecule.num_bonds += 1
         else:  # allow unassigned atoms to be bonded to anything for building purposes
-            assert self.molecule is None
             self.bond_graph[other] = order
         return Bond(self, other, order)
 
     @property
     def bond_graph(self):
-        """ Mapping[Atom, int]: a dictionary containing all other atoms this atom is bonded to,
-        of the form
-           ``{nbr1: bond_order_1, nbr2: bond_order_2, ...}``
+        """ Mapping[Atom, int]: dictionary of this atoms bonded neighbors, of the form
+        ``{bonded_atom1, bond_order1, ...}``
         """
         if self.molecule is None:
             return self._bond_graph
@@ -412,7 +427,8 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
     def heavy_bonds(self):
         """ List[Bond]: list of all heavy atom bonds (where BOTH atoms are not hydrogen)
 
-        Note: this returns an empty list if called on a hydrogen atom
+        Note:
+            this returns an empty list if called on a hydrogen atom
         """
         if self.atnum == 1:
             return []
@@ -423,14 +439,19 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
 
     @property
     def force(self):
-        """ u.Vector[force, 3]: force on this atom
+        """ (units.Vector[force]): atomic force vector. This quantity must be calculated - it is
+        equivalent to ``self.molecule.forces[self.index]``
+
+        Raises:
+            moldesign.NotCalculatedError: if molecular forces have not been calculated
         """
         f = self.molecule.forces
         return f[self.index]
 
     @property
     def velocity(self):
-        """ u.Vector[length/time, 3]: velocity of this atom
+        """ u.Vector[length/time, 3]: velocity of this atom; equivalent to
+        ``self.momentum/self.mass``
         """
         return (self.momentum / self.mass).defunits()
 

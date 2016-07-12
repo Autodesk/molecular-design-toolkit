@@ -92,7 +92,7 @@ def build_bdna(sequence, **kwargs):
     Args:
         sequence (str): DNA sequence for one of the strands (a complementary sequence will
             automatically be created)
-        **kwargs: arguments for :function:`compute.run_job`
+        **kwargs: arguments for :meth:`compute.run_job`
 
     Returns:
         moldesign.Molecule: B-DNA double helix
@@ -144,7 +144,7 @@ def run_tleap(mol,
         organic (str): organic forcefield name (default: gaff2)
         off_files (List[batch.FileContainer]):
         frcmod_files (List[batch.FileContainer]):
-        **kwargs: keyword arguments to :function:`compute.run_job`
+        **kwargs: keyword arguments to :meth:`compute.run_job`
 
     References:
         Ambertools Manual, http://ambermd.org/doc12/Amber16.pdf. See page 33 for forcefield
@@ -181,18 +181,22 @@ def run_tleap(mol,
 def assign_forcefield(mol, **kwargs):
     """ see run_tleap docstring """
     from moldesign.widgets.parameterization import ParameterizationDisplay
-
     job = run_tleap(mol, **kwargs)
-    report = ParameterizationDisplay(job, mol)
-    if report.msg:
-        uibase.display_log(report, title='ERRORS/WARNINGS')
+
     if 'output.inpcrd' in job.get_output():
         prmtop = job.get_output('output.prmtop')
         inpcrd = job.get_output('output.inpcrd')
         params = AmberParameters(prmtop, inpcrd, job)
-        mol = mdt.read_amber(params.prmtop, params.inpcrd)
-        mol.ff.amber_params = params
-        return mol
+        newmol = mdt.read_amber(params.prmtop, params.inpcrd)
+        newmol.ff.amber_params = params
+    else:
+        newmol = None
+
+    report = ParameterizationDisplay(job, mol, molout=newmol)
+    uibase.display_log(report, title='ERRORS/WARNINGS', show=True)
+
+    if newmol is not None:
+        return newmol
     else:
         raise ParameterizationError('TLeap failed to assign force field parameters for %s' % mol, job)
 

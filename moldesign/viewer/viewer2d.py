@@ -110,7 +110,7 @@ class ChemicalGraphViewer(MolViz2DBaseWidget, ColorMixin):
         """ Highlight atoms in response to a selection event
 
         Args:
-            selection (dict): Selection event from :module:`moldesign.uibase.selectors`
+            selection (dict): Selection event from :mod:`moldesign.uibase.selectors`
         """
         if 'atoms' in selection:
             self.highlight_atoms(
