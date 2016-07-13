@@ -25,8 +25,9 @@
 ## Tips and guidelines
 
 ### What can I contribute?
-Contributions to this project are encouraged! If you're interested in getting started, here are some ideas:
+Contributions to this project are encouraged! Email the maintainers at `moldesign_maintainers@autodesk.com` to become a contributor.
 
+If you're interested in getting started, here are some ideas:
 
 **Tests**: This is one of the easiest ways to get started - see also `moldesign/tests/README.md`
 
@@ -65,12 +66,14 @@ contributions, see [the development guide](DEVELOPMENT.md).
 
 ## Submission Guidelines
 
-### Project Roles
-Folks with deep, official involvement the project are listed here. If you have any questions - these are the people to talk to! This is also the core group that reviews submissions and suggestions.
+### Maintainers
+Maintainers are responsible for responding to pull requests and issues, as well as guiding the direction of the project.
 
 Aaron Virshup - Lead developer and maintainer<br>
-Dion Amago - Contributor<br>
-Malte Tinnus - Contributor
+Dion Amago - Maintainer<br>
+Malte Tinnus - Maintainer
+
+If you've established yourself as impactful contributors for the project, and are willing take on the extra work, we'd love to have your help maintaining it! Email the maintainers list at `moldesign_maintainers@autodesk.com` for details.
 
 ### Timing
 
@@ -90,6 +93,7 @@ Providing the following information will increase the chances of your issue bein
 ### Pull Requests
 
 Before you submit your pull request consider the following guidelines:
+
 
 * Search GitHub for an open or closed Pull Request that relates to your submission. You don't want to duplicate effort.
 * Make your changes in a new git branch:
@@ -113,4 +117,4 @@ Before you submit your pull request consider the following guidelines:
     ```
 
 * In GitHub, send a pull request to `molecular-design-toolkit:dev`
-
+* Before any request is merged, you'll need to agree to the contribution boilerplate. Email us at `moldesign_maintainers@autodesk.com` for details. 
