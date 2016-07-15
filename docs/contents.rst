@@ -4,12 +4,10 @@
    :name: mastertoc
 
    Introduction <index>
+   Installation <install>
+   How do I ...? <howdoi>
    Atoms, molecules, and biomolecules <structure>
-   Energy models <energymodels>
-   Integrators <integrators>
-   The top-level namespace <toplevel>
-   Complete API reference <moldesign_api/moldesign>
-
+   Complete API reference <_moldesign_api/moldesign>
 
 * :ref:`Alphabetical index <genindex>`
 * :ref:`Search <search>`

@@ -1,0 +1,64 @@
+_SOURCES_:
+ - DockerMake.yml
+
+# This file is a hack to quickly build a docker image with the current dev version. A better option
+# is to mount it into the container, but that's not really supported by our remote job system
+
+moldesign_base:
+ requires:
+  - python_install
+ build_directory: moldesign
+ build: |
+  RUN mkdir -p /src/
+  COPY ./molecular-design-toolkit /src/molecular-design-toolkit/
+  COPY ./py-cloud-compute-cannon /src/py-cloud-compute-cannon
+  COPY ./notebook-molecular-visualization /src/notebook-molecular-visualization
+  RUN apt-get update && apt-get install -y curl python-matplotlib \
+   && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
+   && apt-get install -y nodejs gcc python-dev \
+   && npm config set unsafe-perm=true &&echo "this a hack for node not liking to run as root ..." \
+   && cd /src/ && pip install \
+         ./py-cloud-compute-cannon \
+         ./notebook-molecular-visualization \
+         ./molecular-design-toolkit \
+   && apt-get -y remove --purge npm nodejs gcc python-dev \
+   && apt-get -y autoremove --purge \
+   && apt-get -y clean
+
+
+moldesign:
+ requires:
+  - moldesign_base
+ build_directory: ../moldesign
+ build: |
+  ADD . /opt/moldesign
+
+
+deploy_test_base:
+  requires:
+    - python_install
+  description: Base for testing our python packages prior to release
+  build : |
+    RUN apt-get update && apt-get install -y git curl python-matplotlib python-dev
+    RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
+      && apt-get install -y nodejs \
+      && npm config set unsafe-perm=true
+    RUN pip install pytest
+
+
+pyccc_deploy_test:
+   requires:
+     - deploy_test_base
+   description: Test the PyCCC python package. *Note the hardcoded build directory*
+   build_directory: ../../py-cloud-compute-cannon
+   build: |
+      RUN pip install git+https://github.com/autodesk/py-cloud-compute-cannon
+      RUN cd /usr/local/lib/python2.7/dist-packages/pyccc/tests \
+          && py.test
+
+
+notebook_build_env:
+   requires:
+     - notebook
+   build: |
+     RUN apt-get update && apt-get install -y gcc gfortran python-dev

@@ -13,27 +13,38 @@
 # limitations under the License.
 import os
 import cStringIO as StringIO
-import cPickle as pkl
-import gzip, bz2
+import cPickle as pkl # TODO: if cpickle fails, retry with regular pickle to get a better traceback
+import gzip
+import bz2
 import string
 import functools
 
 import moldesign as mdt
 import moldesign.interfaces.openbabel as obabel
+import moldesign.molecules.atomcollections
 from moldesign.interfaces.opsin_interface import name_to_smiles
-from moldesign.interfaces.openmm import amber_to_mol as read_amber
 import moldesign.interfaces.biopython_interface as biopy
+
+# These routines are imported here solely to make them available in this namespace
+from moldesign.interfaces.openbabel import mol_to_pybel
+from moldesign.interfaces.openmm import amber_to_mol as read_amber
 from moldesign.interfaces.ambertools import build_bdna
 
-__all__ = ('read from_smiles from_pdb from_name build_bdna write read_amber '
-           'build_assembly').split()
 
-# TODO: if cpickle fails, retry with regular pickle to get a better traceback
+def exports(o, name=None):
+    __all__.append(o.__name__)
+    return o
+__all__ = ['read_amber', 'mol_to_pybel', 'build_bdna', 'from_smiles']
+
+
+
+# NOTE - all extensions MUST be lower case here
 PICKLE_EXTENSIONS = set("p pkl pickle mdt".split())
 COMPRESSION = {'gz': gzip.open,
                'gzip': gzip.open,
                'bz2': bz2.BZ2File,
-               'bzip2': bz2.BZ2File}  # extensions must be lower case here
+               'bzip2': bz2.BZ2File,
+               None: open}
 READERS = {'pdb': biopy.parse_pdb,
            'cif': biopy.parse_pdb}
 WRITERS = {}
@@ -44,8 +55,9 @@ for ext in PICKLE_EXTENSIONS:
 from_smiles = obabel.from_smiles
 
 
+@exports
 def read(f, format=None):
-    """ Read in a molecule from a file, file-like object, or string.
+    """Read in a molecule from a file, file-like object, or string.
     Will also depickle a pickled object.
 
     Note:
@@ -61,39 +73,30 @@ def read(f, format=None):
     Returns:
         moldesign.Molecule or object: molecule parsed from the file (or python object, for
             pickle files)
-            
+
     Raises:
         ValueError: if ``f`` isn't recognized as a string, file path, or file-like object
     """
-    filename = suffix = filestring = fileobj = None
+    filename = None
 
-    # Figure what sort of object was passed
-    if isinstance(f, str) and os.path.exists(f):
+    # Open a file-like object
+    if isinstance(f, str) and os.path.exists(f):  # it's a path to a file
         filename = f
-        suffix = filename.split('.')[-1]
-        if suffix in COMPRESSION:  # deal with compressed file paths
-            fileobj = COMPRESSION[suffix](filename, 'r')
-            suffix = filename.split('.')[-2]
-        if format is None:
-            format = suffix
-    elif hasattr(f, 'read'):
+        format, compression = _get_format(filename, format)
+        fileobj = COMPRESSION[compression](filename, mode='r')
+    elif hasattr(f, 'open'):  # we can get a file-like object
+        fileobj = f.open('r')
+    elif hasattr(f, 'read'):  # it's already file-like
         fileobj = f
-    elif isinstance(f, str):
-        filestring = f
-
-    # Open a file-like object for the file
-    if fileobj is None:
-        if filestring is not None:
-            fileobj = StringIO.StringIO(filestring)
-        elif filename is not None:
-            fileobj = open(filename, 'r')
-        else:
-            raise ValueError('Parameter to moldesign.read (%s) not ' % str(f) +
-                             'recognized as string, file path, or file-like object')
+    elif isinstance(f, str):  # it's just a string
+        fileobj = StringIO.StringIO(f)
+    else:
+        raise ValueError('Parameter to moldesign.read (%s) not ' % str(f) +
+                         'recognized as string, file path, or file-like object')
 
     if format in READERS:
         mol = READERS[format](fileobj)
-    else:  # default to openbabel if there's not an explicit writer for this format
+    else:  # default to openbabel if there's not an explicit reader for this format
         mol = obabel.read_stream(fileobj, format)
 
     if filename is not None:
@@ -102,6 +105,7 @@ def read(f, format=None):
     return mol
 
 
+@exports
 def write(obj, filename=None, format=None, mode='w'):
     """ Write a molecule to a file or string.
     Will also pickle arbitrary python objects.
@@ -119,34 +123,81 @@ def write(obj, filename=None, format=None, mode='w'):
     Returns:
         str: if filename is none, return the output file as a string (otherwise returns ``None``)
     """
+    # TODO: handle writing and return file-like objects
+    format, compression = _get_format(filename, format)
 
-    # create the file object to write to
+    # First, create an object to write to (either file handle or file-like buffer)
     if filename:
         return_string = False
-        suffix = filename.split('.')[-1]
-        if suffix in COMPRESSION:
-            fileobj = COMPRESSION[suffix](filename, mode=mode)
-            suffix = filename.split('.')[-2]
-        else:
-            fileobj = open(filename, mode=mode)
-        if format is None:
-            format = suffix
+        fileobj = COMPRESSION[compression](filename, mode=mode)
     else:
         return_string = True
         fileobj = StringIO.StringIO()
 
-    # write to fileobj
+    # Now, write to the object
     if format in WRITERS:
         WRITERS[format](obj, fileobj)
     else:
         fileobj.write(obabel.write_string(obj, format))
 
+    # Return a string if necessary
     if return_string:
         return fileobj.getvalue()
     else:
         fileobj.close()
 
 
+@exports
+def write_trajectory(traj, filename=None, format=None, overwrite=True):
+    """ Write trajectory a file (if filename provided) or file-like buffer
+
+    Args:
+        traj (moldesign.molecules.Trajectory): trajectory to write
+        filename (str): name of file (return a file-like object if not passed)
+        format (str): file format (guessed from filename if None)
+        overwrite (bool): overwrite filename if it exists
+
+    Returns:
+        StringIO: file-like object (only if filename not passed)
+    """
+    format, compression = _get_format(filename, format)
+
+    # If user is requesting a pickle, just dump the whole thing now and return
+    if format.lower() in PICKLE_EXTENSIONS:
+        write(traj, filename=filename, format=format)
+
+
+    # for traditional molecular file formats, write the frames one after another
+    else:
+        tempmol = traj._tempmol
+        if filename and (not overwrite) and os.path.exists(filename):
+            raise IOError('%s exists' % filename)
+        if not filename:
+            fileobj = StringIO.StringIO()
+        else:
+            fileobj = open(filename, 'w')
+
+        for frame in traj.frames:
+            traj.apply_frame(frame)
+            fileobj.write(tempmol.write(format=format))
+
+        if filename is None:
+            fileobj.seek(0)
+            return fileobj
+        else:
+            fileobj.close()
+
+
+
+@exports
+def mol_to_openmm_sim(mol):
+    try:
+        return mol.energy_model.get_openmm_simulation()
+    except AttributeError:
+        raise AttributeError("Can't create an OpenMM object - no OpenMM energy_model present")
+
+
+@exports
 def from_pdb(pdbcode):
     """ Import the given molecular geometry from PDB.org
         
@@ -169,6 +220,7 @@ def from_pdb(pdbcode):
     return mol
 
 
+@exports
 def from_name(name):
     """Attempt to convert an IUPAC or common name to a molecular geometry.
 
@@ -184,6 +236,7 @@ def from_name(name):
     return mol
 
 
+@exports
 def build_assembly(mol, assembly_name):
     """ Create biological assembly using a bioassembly specification.
 
@@ -222,7 +275,7 @@ def build_assembly(mol, assembly_name):
     alpha = iter(string.ascii_uppercase)
 
     # Create the new molecule by copying, transforming, and renaming the original chains
-    all_atoms = mdt.AtomList()
+    all_atoms = moldesign.molecules.atomcollections.AtomList()
     for i, t in enumerate(asm.transforms):
         for chain_name in asm.chains:
             chain = mol.chains[chain_name].copy()
@@ -236,3 +289,39 @@ def build_assembly(mol, assembly_name):
     newmol = mdt.Molecule(all_atoms,
                           name="%s (bioassembly %s)" % (mol.name, assembly_name))
     return newmol
+
+
+def _get_format(filename, format):
+    """ Determine the requested file format and optional compression library
+
+    Args:
+        filename (str or None): requested filename, if present
+        format (str or None): requested format, if present
+
+    Returns:
+        (str, str): (file format, compression format or ``None`` for no compression)
+
+    Examples:
+        >>> _get_format('mymol.pdb', None)
+        ('pdb', None)
+        >>> _get_format('smallmol.xyz.bz2', None)
+        ('xyz','bz2')
+        >>> _get_format('mymol.t.gz', 'sdf')
+        ('sdf','gz')
+    """
+    if filename is None and format is None:
+        raise ValueError('No filename or file format specified')
+    elif filename is None:
+        return format, None
+
+    fname, extn = os.path.splitext(filename)
+    suffix = extn[1:].lower()
+    compressor = None
+    if suffix in COMPRESSION:
+        compressor = suffix
+        suffix = os.path.splitext(fname)[1][1:].lower()
+
+    if format is None:
+        format = suffix
+
+    return format, compressor

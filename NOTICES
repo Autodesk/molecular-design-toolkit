@@ -1,0 +1,19 @@
+The Molecular Design Toolkit incorporates code from the following sources:
+
+   Transformations.py
+------------------------------
+Copyright (c) 2006-2015, Christoph Gohlke
+Copyright (c) 2006-2015, The Regents of the University of California
+SOURCE CODE: moldesign/external/transformations.py
+LICENSE: moldesign/external/transformations.py
+WEBSITE: http://www.lfd.uci.edu/~gohlke/
+
+
+       Sphinx
+-------------------------
+Copyright (c) 2007-2016 by the Sphinx team
+SOURCE CODE: moldesign/utils/docparsers/google.py
+Note that this source code has been heavily modified. Modifications are described in the file.
+LICENSE: moldesign/utils/docparsers/sphinxlicense
+WEBSITE: http://sphinx-doc.org
+

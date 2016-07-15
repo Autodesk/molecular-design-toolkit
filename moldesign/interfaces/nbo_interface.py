@@ -13,12 +13,11 @@
 # limitations under the License.
 import numpy as np
 
-import moldesign.logs
-from moldesign.utils import DotDict
-
 import moldesign as mdt
+import moldesign.molecules.bonds
 from moldesign import units as u
 from moldesign import utils
+from moldesign.utils import DotDict
 
 
 SIGMA_UTF = u"\u03C3"
@@ -28,20 +27,20 @@ PI_UTF = u"\u03C0"
 def run_nbo(mol, requests=('nlmo', 'nbo'),
             image='nbo',
             engine=None):
-    wfn = mol.electronic_state
+    wfn = mol.wfn
     inputs = {'in.47': make_nbo_input_file(mol, requests)}
     command = 'gennbo.i4.exe in.47'
     engine = utils.if_not_none(engine, mdt.compute.config.default_engine)
-    imagename = mdt.compute.get_image_path(image, engine)
+    imagename = mdt.compute.get_image_path(image)
     job = engine.launch(imagename,
                           command,
                           inputs=inputs,
                           name="nbo, %s" % mol.name)
-    moldesign.logs.display(job, "nbo, %s" % mol.name)
+    moldesign.uibase.display_log(job.get_display_object(), "nbo, %s"%mol.name)
 
     job.wait()
     parsed_data = parse_nbo(job.get_output('FILE.10'),
-                            len(mol.electronic_state.aobasis))
+                            len(mol.wfn.aobasis))
 
     for orbtype, data in parsed_data.iteritems():
         if orbtype[0] == 'P':  # copy data from the orthogonal orbitals
@@ -77,7 +76,7 @@ def add_orbitals(mol, wfn, orbdata, orbtype):
             utf_name = bname
         else:
             atoms.append(mol.atoms[orbdata.jatom[i] - 1])
-            bond = mdt.Bond(*atoms)
+            bond = moldesign.molecules.bonds.Bond(*atoms)
             if orbdata.bondnums[i] == 1:  # THIS IS NOT CORRECT
                 nbotype = 'sigma'
                 utf_type = SIGMA_UTF
@@ -90,24 +89,24 @@ def add_orbitals(mol, wfn, orbdata, orbtype):
                                            atoms[0].name, atoms[1].name)
         name = '%s %s' % (bname, orbtype)
 
-        orbs.append(mdt.orbitals.Orbital(orbdata.coeffs[i],
-                                        wfn=wfn, occupation=orbdata.occupations[i],
-                                        atoms=atoms, name=name,
-                                        nbotype=nbotype,
-                                        bond=bond,
-                                        unicode_name=utf_name,
-                                        _data=orbdata))
+        orbs.append(moldesign.methods.orbitals.Orbital(orbdata.coeffs[i],
+                                                       wfn=wfn, occupation=orbdata.occupations[i],
+                                                       atoms=atoms, name=name,
+                                                       nbotype=nbotype,
+                                                       bond=bond,
+                                                       unicode_name=utf_name,
+                                                       _data=orbdata))
     return wfn.add_orbitals(orbs, orbtype=orbtype)
 
 
 def make_nbo_input_file(mol, requests):
     """
     :param mol:
-    :type mol: moldesign.molecule.Molecule
+    :type mol: moldesign.molecules.Molecule
     :return:
     """
     # Units: angstroms, hartrees
-    wfn = mol.electronic_state
+    wfn = mol.wfn
     orbs = wfn.molecular_orbitals
     nbofile = []
     # TODO: check for open shell wfn (OPEN keyword)

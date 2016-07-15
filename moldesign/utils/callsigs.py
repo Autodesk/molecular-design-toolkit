@@ -12,56 +12,64 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import functools
+import inspect
+import os
 from functools import wraps
 
+import collections
+import funcsigs
+
 from .utils import if_not_none
+from .docparsers import GoogleDocArgumentInjector
 
 
 def args_from(original_function,
-              only=None, allexcept=None, inject_kwargs=None,
-              wrapper=None,
-              append_docstring_description=False, transfer_docstring_args=False):
+              only=None,
+              allexcept=None,
+              inject_kwargs=None,
+              inject_docs=None,
+              wraps=None,
+              update_docstring_args=False):
     """
     Decorator to transfer call signatures - helps to hide ugly *args and **kwargs in delegated calls
-
-    Note:
-        Docstring modification is not implemented. It will be intended to work with google-style
-        dosctrings only.
 
     Args:
         original_function (callable): the function to take the call signature from
         only (List[str]): only transfer these arguments (incompatible with `allexcept`)
-        wrapper (bool): Transfer documentation and attributes from original_function to
+        wraps (bool): Transfer documentation and attributes from original_function to
             decorated_function, using functools.wraps (default: True if call signature is
             unchanged, False otherwise)
         allexcept (List[str]): transfer all except these arguments (incompatible with `only`)
         inject_kwargs (dict): Inject new kwargs into the call signature
-            (of the form `{argname: defaultvalue}`)
-        transfer_docstring_args (bool): Update the 'Args:' section of the docstring with the
-            previous function's docs
-        append_docstring_description (bool): Update all sections of the docstring (other than args)
+            (of the form ``{argname: defaultvalue}``)
+        inject_docs (dict): Add or modifies argument documentation (requires google-style
+            docstrings) with a dict of the form `{argname: "(type): description"}`
+        update_docstring_args (bool): Update "arguments" section of the docstring using the
+           original function's documentation (requires google-style docstrings and wraps=False)
+
+    Note:
+        To use arguments from a classes' __init__ method, pass the class itself as
+        ``original_function`` - this will also allow us to inject the documentation
 
     Returns:
         Decorator function
     """
-    import funcsigs
-    # TODO - check 'self' behavior for instancemethods
-    # TODO - better integration with functools (esp. by using partial to mask arguments)
-    # TODO - deal with docstrings
     # NEWFEATURE - verify arguments?
-
-    if append_docstring_description or transfer_docstring_args:
-        raise NotImplementedError()
 
     if only and allexcept:
         raise ValueError('Error in keyword arguments - '
                          'pass *either* "only" or "allexcept", not both')
 
-    sig = funcsigs.signature(original_function)
+    origname = get_qualified_name(original_function)
+
+    if hasattr(original_function, '__signature__'):
+        sig = original_function.__signature__.replace()
+    else:
+        sig = funcsigs.signature(original_function)
 
     # Modify the call signature if necessary
     if only or allexcept or inject_kwargs:
-        wrapper = if_not_none(wrapper, False)
+        wraps = if_not_none(wraps, False)
         newparams = []
         if only:
             for param in only:
@@ -70,21 +78,132 @@ def args_from(original_function,
             for name, param in sig.parameters.iteritems():
                 if name not in allexcept:
                     newparams.append(param)
+        else:
+            newparams = sig.parameters.values()
         if inject_kwargs:
             for name, default in inject_kwargs.iteritems():
-                newp = funcsigs.Parameter(name, funcsigs.Parameter.KEYWORD_ONLY, default=default)
+                newp = funcsigs.Parameter(name, funcsigs.Parameter.POSITIONAL_OR_KEYWORD,
+                                          default=default)
                 newparams.append(newp)
+
         sig = sig.replace(parameters=newparams)
+
     else:
-        wrapper = if_not_none(wrapper, True)
+        wraps = if_not_none(wraps, True)
+
+    # Get the docstring arguments
+    if update_docstring_args:
+        original_docs = GoogleDocArgumentInjector(original_function.__doc__)
+        argument_docstrings = collections.OrderedDict((p.name, original_docs.args[p.name])
+                                                      for p in newparams)
 
     def decorator(f):
         """Modify f's call signature (using the `__signature__` attribute)"""
-        if wrapper: f = functools.wraps(original_function)(f)
+        if wraps:
+            fname = original_function.__name__
+            f = functools.wraps(original_function)(f)
+            f.__name__ = fname  # revert name change
+        else:
+            fname = f.__name__
         f.__signature__ = sig
+
+        if update_docstring_args or inject_kwargs:
+            if not update_docstring_args:
+                argument_docstrings = GoogleDocArgumentInjector(f.__doc__).args
+            docs = GoogleDocArgumentInjector(f.__doc__)
+            docs.args = argument_docstrings
+
+            if not hasattr(f, '__orig_docs'):
+                f.__orig_docs = []
+            f.__orig_docs.append(f.__doc__)
+
+            f.__doc__ = docs.new_docstring()
+
+        # Only for building sphinx documentation:
+        if os.environ.get('SPHINX_IS_BUILDING_DOCS', ""):
+            sigstring = '%s%s\n' % (fname, sig)
+            if hasattr(f, '__doc__') and f.__doc__ is not None:
+                f.__doc__ = sigstring + f.__doc__
+            else:
+                f.__doc__ = sigstring
         return f
 
     return decorator
+
+
+def kwargs_from(reference_function, mod_docs=True):
+    """ Replaces ``**kwargs`` in a call signature with keyword arguments from another function.
+
+    Args:
+        reference_function (function): function to get kwargs from
+        mod_docs (bool): whether to modify the decorated function's docstring
+
+    Note:
+        ``mod_docs`` works ONLY for google-style docstrings
+    """
+    refsig = funcsigs.signature(reference_function)
+
+    origname = get_qualified_name(reference_function)
+
+    kwparams = []
+    for name, param in refsig.parameters.iteritems():
+        if param.default != param.empty or param.kind in (param.VAR_KEYWORD, param.KEYWORD_ONLY):
+            if param.name[0] != '_':
+                kwparams.append(param)
+
+    if mod_docs:
+        refdocs = GoogleDocArgumentInjector(reference_function.__doc__)
+
+    def decorator(f):
+        sig = funcsigs.signature(f)
+
+        fparams = []
+        found_varkeyword = None
+
+        for name, param in sig.parameters.iteritems():
+            if param.kind == param.VAR_KEYWORD:
+                fparams.extend(kwparams)
+                found_varkeyword = name
+            else:
+                fparams.append(param)
+
+        if not found_varkeyword:
+            raise TypeError("Function has no **kwargs wildcard.")
+
+        f.__signature__ = sig.replace(parameters=fparams)
+
+        if mod_docs:
+            docs = GoogleDocArgumentInjector(f.__doc__)
+            new_args = collections.OrderedDict()
+            for argname, doc in docs.args.iteritems():
+                if argname == found_varkeyword:
+                    for param in kwparams:
+                        default_argdoc = '%s: argument for %s' % (param.name, origname)
+                        new_args[param.name] = refdocs.args.get(param.name, default_argdoc)
+                else:
+                    new_args[argname] = doc
+            docs.args = new_args
+
+            if not hasattr(f, '__orig_docs'):
+                f.__orig_docs = []
+            f.__orig_docs.append(f.__doc__)
+
+            f.__doc__ = docs.new_docstring()
+        return f
+
+    return decorator
+
+
+
+def get_qualified_name(original_function):
+    if inspect.ismethod(original_function):
+        origname = '.'.join([original_function.__module__,
+                             original_function.im_class.__name__,
+                             original_function.__name__])
+        return ':meth:`%s`' % origname
+    else:
+        origname = original_function.__module__+'.'+original_function.__name__
+        return ':meth:`%s`' % origname
 
 
 class DocInherit(object):
@@ -132,29 +251,3 @@ class DocInherit(object):
 
 #idiomatic decorator name
 doc_inherit = DocInherit
-
-
-def replace_wildcard_args(args_from=None, kwargs_from=None):
-    """ Decorator factory to replace *args and **kwargs with more useful call signatures.
-
-    Note:
-        Docstring modification is not implemented. It will be intended to work with google-style
-        dosctrings only.
-
-    Args:
-        original_function (callable): the function to take the call signature from
-        only (List[str]): only transfer these arguments (incompatible with `allexcept`)
-        wrapper (bool): Transfer documentation and attributes from original_function to
-            decorated_function, using functools.wraps (default: True if call signature is
-            unchanged, False otherwise)
-        allexcept (List[str]): transfer all except these arguments (incompatible with `only`)
-        inject_kwargs (dict): Inject new kwargs into the call signature
-            (of the form `{argname: defaultvalue}`)
-        transfer_docstring_args (bool): Update the 'Args:' section of the docstring with the
-            previous function's docs
-        append_docstring_description (bool): Update all sections of the docstring (other than args)
-
-    Returns:
-        callable: Decorator function
-    """
-    raise NotImplementedError()

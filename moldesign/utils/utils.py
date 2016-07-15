@@ -15,6 +15,8 @@ import threading
 from cStringIO import StringIO
 from uuid import uuid4
 
+import webcolors
+
 
 def make_none(): return None
 
@@ -42,6 +44,85 @@ def if_not_none(item, default):
         return default
     else:
         return item
+
+
+def printflush(s, newline=True):
+    if newline:
+        print s
+    else:
+        print s,
+    sys.stdout.flush()
+
+
+class textnotify(object):
+    """ Print a single, immediately flushed line to log the execution of a block.
+
+    Prints 'done' at the end of the line (or 'ERROR' if an uncaught exception)
+
+    Examples:
+        >>> import time
+        >>> with textnotify('starting to sleep'):
+        >>>     time.sleep(3)
+        starting to sleep...done
+        >>> with textnotify('raising an exception...'):
+        >>>     raise ValueError()
+        raising an exception...error
+        ValueError [...]
+    """
+    def __init__(self, startmsg):
+        if startmsg.strip()[-3:] != '...':
+            startmsg = startmsg.strip() + '...'
+        self.startmsg = startmsg
+
+
+    def __enter__(self):
+        printflush(self.startmsg, newline=False)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None:
+            printflush('done')
+        else:
+            printflush('ERROR')
+
+
+class progressbar(object):
+    """ Create a progress bar for a calculation
+
+    The context manager provides a callback which needs to be called as
+    set_progress(percent), where percent is a number between 0 and 100
+
+    Examples:
+        >>> import time
+        >>> with progressbar('count to 100') as set_progress:
+        >>>     for i in xrange(100):
+        >>>         time.sleep(0.5)
+        >>>         set_progress(i+1)
+    """
+    def __init__(self, description):
+        import ipywidgets as ipy
+        import traitlets
+        try:
+            self.progress_bar = ipy.FloatProgress(0, min=0, max=100, description=description)
+        except traitlets.TraitError:
+            self.progress_bar = None
+
+    def __enter__(self):
+        from IPython.display import display
+        if self.progress_bar is not None:
+            display(self.progress_bar)
+        return self.set_progress
+
+    def set_progress(self, percent):
+        if self.progress_bar is not None:
+            self.progress_bar.value = percent
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.progress_bar is not None:
+            self.value = 100.0
+            if exc_type is not None:
+                self.progress_bar.bar_style = 'danger'
+            else:
+                self.progress_bar.bar_style = 'success'
 
 
 class PipedFile(object):
@@ -233,3 +314,39 @@ class redirect_stderr(_RedirectStream):
 
 
 GETFLOAT = re.compile(r'-?\d+(\.\d+)?(e[-+]?\d+)')  # matches numbers, e.g. 1, -2.0, 3.5e50, 0.001e-10
+
+
+def is_color(s):
+    """ Do our best to determine if "s" is a color spec that can be converted to hex
+    :param s:
+    :return:
+    """
+    def in_range(i): return 0 <= i <= int('0xFFFFFF', 0)
+
+    try:
+        if type(s) == int:
+            return in_range(s)
+        elif type(s) not in (str, unicode):
+            return False
+        elif s in webcolors.css3_names_to_hex:
+            return True
+        elif s[0] == '#':
+            return in_range(int('0x' + s[1:], 0))
+        elif s[0:2] == '0x':
+            return in_range(int(s, 0))
+        elif len(s) == 6:
+            return in_range(int('0x' + s, 0))
+    except ValueError:
+        return False
+
+
+def from_filepath(func, filelike):
+    """Run func on a temporary *path* assigned to filelike"""
+    if type(filelike) == str:
+        return func(filelike)
+    else:
+        with tempfile.NamedTemporaryFile() as outfile:
+            outfile.write(filelike.read())
+            outfile.flush()
+            result = func(outfile.name)
+        return result

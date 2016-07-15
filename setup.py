@@ -21,13 +21,12 @@ import subprocess
 from setuptools import find_packages, setup
 from setuptools.command.install import install
 
+import versioneer
+
 assert sys.version_info[:2] == (2, 7), "Sorry, this package requires Python 2.7."
 
-########################
-__version__ = '0.3'
-VERSION = __version__
-ISRELEASED = False
-########################
+PACKAGE_NAME = 'moldesign'
+
 CLASSIFIERS = """\
 Development Status :: 4 - Beta
 Intended Audience :: Science/Research
@@ -51,49 +50,47 @@ PYEXT = set('.py .pyc .pyo'.split())
 with open('requirements.txt', 'r') as reqfile:
     requirements = [x.strip() for x in reqfile if x.strip()]
 
-def find_package_data():
+
+def find_package_data(pkgdir):
+    """ Just include all files that won't be included as package modules.
+    """
     files = []
-    for root, dirnames, filenames in os.walk('moldesign'):
+    for root, dirnames, filenames in os.walk(pkgdir):
+        not_a_package = '__init__.py' not in filenames
         for fn in filenames:
             basename, fext = os.path.splitext(fn)
-            if fext not in PYEXT or ('static' in fn):
-                files.append(relpath(join(root, fn), 'moldesign'))
+            if not_a_package or (fext not in PYEXT) or ('static' in fn):
+                files.append(relpath(join(root, fn), pkgdir))
     return files
 
-print 'printing works here'
 
 class PostInstall(install):
     def run(self):
         install.run(self)
-        #self.protect_db()  # causes pip install to crash
-        print 'hi'
         self.prompt_intro()
-
-    def protect_db(self):
-        # Prevent residue dictionary from getting corrupted
-        print 'heyhey'
-        modpath = imp.find_module('moldesign')[1]
-        dbpath = os.path.join(modpath, 'static/residue_bonds')
-        subprocess.check_call('chmod a-w {0}.dir {0}.dat'.format(dbpath))
 
     def prompt_intro(self):  # this doesn't actually display - print statements don't work?
         print 'Thank you for installing the Molecular Design Toolkit!!!'
         print 'For help, documentation, and any questions, visit us at '
-        print '    http://bionanoresearch.com/moldesign'
+        print '    http://moldesign.bionano.autodesk.com.com/'
         print '\nTo get started, please run:'
         print ' >>> python -m moldesign intro'
 
+cmdclass = versioneer.get_cmdclass()
+cmdclass['install'] = PostInstall
+
 setup(
-    name='Molecular Design Toolkit',
-    version='0.3',
-    classifiers=CLASSIFIERS.split('\n'),
+    name=PACKAGE_NAME,
+    version=versioneer.get_version(),
+    classifiers=CLASSIFIERS.splitlines(),
     packages=find_packages(),
-    package_data={'moldesign': find_package_data()},
+    package_data={PACKAGE_NAME: find_package_data(PACKAGE_NAME)},
     install_requires=requirements,
     url='http://autodeskresearch.com',
-    cmdclass={'install': PostInstall},
+    cmdclass=cmdclass,
     license='Apache 2.0',
     author='Aaron Virshup',
     author_email='aaron.virshup [at] autodesk [dot] com',
-    description='Dead-simple chemical simulation, visualization, and cloud computing in a notebook'
+    description='The Molecular Design Toolkit: Dead-simple chemical simulation, visualization, '
+                'and cloud computing in a notebook'
 )

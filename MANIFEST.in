@@ -1,0 +1,10 @@
+include versioneer.py
+include moldesign/_version.py
+include requirements.txt
+include LICENSE
+include README.md
+include CONTRIBUTING.md
+include DEVELOPMENT.md
+recursive-include moldesign/_static_data *.*
+recursive-include moldesign/_notebooks *.*
+global-exclude *.py[cod] __pycache__ *~ *.bak

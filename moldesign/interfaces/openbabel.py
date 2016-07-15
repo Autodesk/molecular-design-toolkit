@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import
+
 import os
 import string
+
+import moldesign.molecules.atomcollections
 
 try:
     import pybel as pb
@@ -25,11 +28,10 @@ else:  # this should be configurable
     force_remote = False  # debugging
 
 import moldesign as mdt
-from moldesign.compute import runsremotely
-import moldesign.atoms
+from moldesign.compute.runsremotely import runsremotely
+import moldesign.molecules.atoms
 from moldesign.units import *
-from moldesign.molecule import Molecule
-from moldesign import biounits
+from moldesign.molecules import biounits
 
 
 def read_file(filename, name=None, format=None):
@@ -80,7 +82,7 @@ def read_stream(filelike, format, name=None):
     return read_string(molstring, format, name=name)
 
 
-@runsremotely(remote=force_remote)
+@runsremotely(enable=force_remote)
 def read_string(molstring, format, name=None):
     """ Read a molecule from a file-like object
 
@@ -100,7 +102,7 @@ def read_string(molstring, format, name=None):
     return mol
 
 
-@runsremotely(remote=force_remote)
+@runsremotely(enable=force_remote)
 def write_string(mol, format):
     """ Create a file from the passed molecule
 
@@ -135,7 +137,7 @@ def write_file(mol, filename=None, mode='w', format=None):
             print >> wrf, outstr
 
 
-@runsremotely(remote=force_remote)
+@runsremotely(enable=force_remote)
 def guess_bond_orders(mol):
     """Use OpenBabel to guess bond orders using geometry and functional group templates.
 
@@ -152,7 +154,7 @@ def guess_bond_orders(mol):
     return newmol
 
 
-@runsremotely(remote=force_remote)
+@runsremotely(enable=force_remote)
 def add_hydrogen(mol):
     """Add hydrogens to saturate atomic valences. (Does not assign formal charges or correct
         for pH).
@@ -240,7 +242,7 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
     newatom_map = {}
     newresidues = {}
     newchains = {}
-    newatoms = moldesign.atoms.AtomList([])
+    newatoms = moldesign.molecules.atomcollections.AtomList([])
     backup_chain_names = list(string.ascii_uppercase)
 
     for pybatom in pbmol.atoms:
@@ -258,11 +260,11 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
         elif pybatom.atomicnum == 0:
             print "WARNING: openbabel failed to parse atom serial %d (name:%s); guessing %s. " % (
                 pybatom.OBAtom.GetIdx(), name, name[0])
-            atnum = mdt.data.ATOMIC_NUMBERS[name[0]]
+            atnum = moldesign.core.data.ATOMIC_NUMBERS[name[0]]
         else:
             atnum = pybatom.atomicnum
-        mdtatom = moldesign.atoms.Atom(atnum=atnum, name=name,
-                                      pdbname=name, pdbindex=pybatom.OBAtom.GetIdx())
+        mdtatom = moldesign.molecules.atoms.Atom(atnum=atnum, name=name,
+                                                 pdbname=name, pdbindex=pybatom.OBAtom.GetIdx())
         newatom_map[pybatom.OBAtom.GetIdx()] = mdtatom
         mdtatom.position = pybatom.coords * angstrom
         obres = pybatom.OBAtom.GetResidue()
@@ -317,7 +319,7 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
                         **kwargs)
 
 
-@runsremotely(remote=force_remote)
+@runsremotely(enable=force_remote)
 def from_smiles(smi, name=None):
     """ Translate a smiles string to a 3D structure.
     This method uses OpenBabel to generate a plausible 3D conformation of the 2D SMILES topology.

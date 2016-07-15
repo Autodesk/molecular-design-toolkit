@@ -1,12 +1,18 @@
 biopython
+docker-py
 fortranformat
 funcsigs
-ipywidgets >= 4.1
+ipywidgets >= 5.1
+ipython >= 4.2
 markdown2
+matplotlib
+nbmolviz >= 0.6.3
+notebook >= 4.2
 numpy
 pint >= 0.7
-pyyaml
+pyccc >= 0.6.2
 pytest
+pyyaml
 requests
 scipy
 webcolors

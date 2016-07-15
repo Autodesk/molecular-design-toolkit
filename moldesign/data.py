@@ -14,11 +14,11 @@
 import json
 import os
 
-import moldesign.utils.databases
-from moldesign import utils
+import moldesign as mdt
 import moldesign.units as u
+from moldesign import utils
 
-PACKAGEPATH = os.path.abspath(os.path.dirname(__file__))
+PACKAGEPATH = os.path.abspath(os.path.dirname(mdt.__file__))
 
 ##### ATOM DATA
 ATOMIC_NUMBERS = {'Ac': 89, 'Ag': 47, 'Al': 13, 'Am': 95, 'Ar': 18, 'As': 33, 'At': 85, 'Au': 79,
@@ -67,7 +67,8 @@ ALL_BASES = BASES + ['%s5' % b for b in BASES] + ['%s3' % b for b in BASES]
 DBASES = ['D%s' % b for b in ALL_BASES]
 RBASES = ['R%s' % b for b in ALL_BASES]
 
-BACKBONES = {'dna': set("P OP1 OP2 O5' O4' C5' C4' C3' O3' C2' C1' H1' H2'' H2' H3' H4' H5' H5''".split()),
+BACKBONES = {'dna': set(("P OP1 OP2 O5' O4' C5' C4' C3' O3' C2' C1' H1' H2'' H2' H3' H4' H5' H5'' "
+                        "HO5' HO3'").split()),
              'protein': set("N CA C O OXT H HA HA2 HA3 H2 H3".split())}
 
 RESTYPES = dict(
@@ -86,8 +87,8 @@ RESIDUE_ONE_LETTER = dict(ALA="A", ASX="B", CYS="C", ASP="D",
                           TRP="W", XAA="X", TYR="Y", GLX="Z")
 
 # This is a very big dict, so we load it as a compressed database
-_bondfilename = os.path.join(PACKAGEPATH, 'static/residue_bonds')
-RESIDUE_BONDS = utils.CompressedJsonDbm(_bondfilename, 'r')
+_bondfilename = os.path.join(PACKAGEPATH, '_static_data/residue_bonds')
+RESIDUE_BONDS = utils.CompressedJsonDbm(_bondfilename, 'r', dbm=utils.ReadOnlyDumb)
 
 AMINO_NAMES = {
     "ALA": "Alanine",
@@ -157,3 +158,24 @@ except ImportError:
     color_rotation = CyclicList(COLOR_LIST)
 else:
     color_rotation = CyclicList(map(webcolors.name_to_hex, COLOR_LIST))
+
+def print_environment():
+    """For reporting bugs - spits out the user's environment"""
+    import sys
+    version = {}
+    for pkg in 'moldesign IPython ipywidgets jupyter matplotlib numpy docker pyccc ' \
+               'nbmolviz jupyter_client jupyter_core pint Bio openbabel simtk pyscf'.split():
+        try:
+            module = __import__(pkg)
+        except ImportError:
+            version[pkg] = 'FAILED'
+        else:
+            try:
+                version[pkg] = module.__version__
+            except AttributeError:
+                version[pkg] = '???'
+    env = {'platform': sys.platform,
+           'version': sys.version}
+
+    print json.dumps({'env': env,
+                      'versions': version})
