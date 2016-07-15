@@ -48,9 +48,7 @@ If you're interested in getting started, here are some ideas:
 
 ### Pull requests are always welcome
 
-If your change is anything more significant than. Any significant improvement should be
-documented as [a GitHub issue](https://github.com/autodesk/moldesign/issues) before
-anybody starts working on it.
+All PRs should be documented as [GitHub issues](https://github.com/autodesk/moldesign/issues), ideally BEFORE you start working on them.
 
 ### Design and cleanup proposals
 
