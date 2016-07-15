@@ -8,4 +8,3 @@ include DEVELOPMENT.md
 recursive-include moldesign/_static_data *.*
 recursive-include moldesign/_notebooks *.*
 global-exclude *.py[cod] __pycache__ *~ *.bak
-graft moldesign docs

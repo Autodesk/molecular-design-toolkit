@@ -56,13 +56,9 @@ pyccc_deploy_test:
       RUN cd /usr/local/lib/python2.7/dist-packages/pyccc/tests \
           && py.test
 
-nbmolviz_deploy_test:
-   requires:
-     - pyccc_deploy_test
-   description: Test the nbmolviz python package. *Note the hardcoded build directory*
-   build_directory: ../..
-   build: |
-      RUN pip install git+https://github.com/autodesk/py-cloud-compute-cannon
-      RUN cd /usr/local/lib/python2.7/dist-packages/pyccc/tests \
-          && py.test
 
+notebook_build_env:
+   requires:
+     - notebook
+   build: |
+     RUN apt-get update && apt-get install -y gcc gfortran python-dev
