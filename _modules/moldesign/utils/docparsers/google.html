@@ -1,0 +1,839 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.utils.docparsers.google &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../index.html"/> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.utils.docparsers.google</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.utils.docparsers.google</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Routines for runtime docstring argument injection</span>
+
+<span class="sd">    This file contains HEAVILY modified routines from sphinx.ext.napoleon, from version 1.4.4</span>
+
+<span class="sd">    This has been vendored into MDT because the modification makes use of</span>
+<span class="sd">    private functions which have already changed in the dev branch.</span>
+
+<span class="sd">    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+<span class="sd">    :copyright: Copyright 2007-2016 by the Sphinx team, see sphinxlicense/AUTHORS.</span>
+<span class="sd">    :license: BSD, see sphinxlicense/LICENSE for details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">_google_section_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;^(\s|\w)+:\s*$&#39;</span><span class="p">)</span>
+<span class="n">_google_typed_arg_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;\s*(.+?)\s*\(\s*(.+?)\s*\)&#39;</span><span class="p">)</span>
+<span class="n">_single_colon_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;(?&lt;!:):(?!:)&#39;</span><span class="p">)</span>
+<span class="n">_xref_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;(:\w+:\S+:`.+?`|:\S+:`.+?`|`.+?`)&#39;</span><span class="p">)</span>
+<span class="n">_bullet_list_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;^(\*|\+|\-)(\s+\S|\s*$)&#39;</span><span class="p">)</span>
+<span class="n">_enumerated_list_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="s1">r&#39;^(?P&lt;paren&gt;\()?&#39;</span>
+    <span class="s1">r&#39;(\d+|#|[ivxlcdm]+|[IVXLCDM]+|[a-zA-Z])&#39;</span>
+    <span class="s1">r&#39;(?(paren)\)|\.)(\s+\S|\s*$)&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="GoogleDocArgumentInjector"><a class="viewcode-back" href="../../../../_moldesign_api/moldesign.utils.docparsers.html#moldesign.utils.docparsers.google.GoogleDocArgumentInjector">[docs]</a><span class="k">class</span> <span class="nc">GoogleDocArgumentInjector</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="n">SECTIONS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="s1">&#39;args arguments parameters&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docstring</span><span class="p">,</span> <span class="n">prepare</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="c1"># this routine has been modified - it&#39;s been streamlined for the current purpose</span>
+
+        <span class="k">if</span> <span class="n">prepare</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">docstring</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">docstring</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">docstring</span> <span class="o">=</span> <span class="n">prepare_docstring</span><span class="p">(</span><span class="n">docstring</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">docstring</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">docstring</span> <span class="o">=</span> <span class="n">docstring</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">docstring</span> <span class="o">=</span> <span class="n">docstring</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines_before_args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arg_section</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines_after_args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arg_indent</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arg_section_name</span> <span class="o">=</span> <span class="s1">&#39;Args&#39;</span>  <span class="c1"># default, can be overwritten by the actual section name</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_what</span> <span class="o">=</span> <span class="s1">&#39;function&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lines</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">docstring</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span> <span class="o">=</span> <span class="n">modify_iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">docstring</span><span class="p">,</span> <span class="n">modifier</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_in_section</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_section_indent</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sections</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_parameters_section</span><span class="p">,</span>
+                <span class="s1">&#39;arguments&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_parameters_section</span><span class="p">,</span>
+                <span class="s1">&#39;attributes&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;example&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;examples&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;keyword args&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;keyword arguments&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;methods&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;note&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;notes&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;other parameters&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;parameters&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_parameters_section</span><span class="p">,</span>
+                <span class="s1">&#39;return&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;returns&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;raises&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;references&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;see also&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;todo&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;warning&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;warnings&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;warns&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;yield&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="s1">&#39;yields&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
+
+<div class="viewcode-block" id="GoogleDocArgumentInjector.new_docstring"><a class="viewcode-back" href="../../../../_moldesign_api/moldesign.utils.docparsers.html#moldesign.utils.docparsers.google.GoogleDocArgumentInjector.new_docstring">[docs]</a>    <span class="k">def</span> <span class="nf">new_docstring</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a new docstring with the current state of the argument list</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: docstring with modified argument list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">newlines</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lines_before_args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="n">newlines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">arg_indent</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_section_name</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span><span class="p">)</span>
+            <span class="n">newlines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_indent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_indent</span><span class="o">+</span><span class="mi">4</span><span class="p">))</span>
+            <span class="n">newlines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">newlines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lines_after_args</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">newlines</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GoogleDocArgumentInjector.parse"><a class="viewcode-back" href="../../../../_moldesign_api/moldesign.utils.docparsers.html#moldesign.utils.docparsers.google.GoogleDocArgumentInjector.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; This method is a modified version of GoogleDocstring._parse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consume_empty</span><span class="p">()</span>
+
+        <span class="n">found_args</span> <span class="o">=</span> <span class="n">lines_are_args</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">has_next</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_section_header</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">section</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consume_section_header</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_is_in_section</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_section_indent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_indent</span><span class="p">()</span>
+
+                    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">section</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span><span class="p">]</span>
+
+                    <span class="k">if</span> <span class="n">section</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SECTIONS</span><span class="p">:</span>
+                        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sections</span><span class="p">[</span><span class="n">section</span><span class="o">.</span><span class="n">lower</span><span class="p">()](</span><span class="n">section</span><span class="p">))</span>
+                        <span class="n">found_args</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">lines_are_args</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_consume_to_next_section</span><span class="p">())</span>
+
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_is_in_section</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_section_indent</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_lines</span><span class="p">:</span>
+                    <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consume_contiguous</span><span class="p">()</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_consume_empty</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consume_to_next_section</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">lines_are_args</span><span class="p">:</span>
+                <span class="n">lines_are_args</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">arg_section</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">found_args</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lines_after_args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lines_before_args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_indent</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">arg_indent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_indent</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_parse_parameters_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; This method was heavily modified to store information instead of formatting it for rst</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arg_section_name</span> <span class="o">=</span> <span class="n">section</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consume_fields</span><span class="p">()</span>
+        <span class="n">num_indent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_indent</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arg_indent</span> <span class="o">=</span> <span class="n">num_indent</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_desc</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="n">_desc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strip_empty</span><span class="p">(</span><span class="n">_desc</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_desc</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">_desc</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">    &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_desc</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">_type</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">): </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_desc</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">_name</span><span class="p">,</span> <span class="n">_desc</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="n">_name</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;\*&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">line</span>
+
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indent</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">num_indent</span><span class="o">+</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="k">def</span> <span class="nf">_indent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="c1"># MDT: modified to include breaks within lines</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="n">n</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">sp</span> <span class="o">+</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="n">sp</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+
+
+    <span class="c1">######################################################</span>
+    <span class="c1">### All routines below are unmodified              ###</span>
+    <span class="c1">######################################################</span>
+<div class="viewcode-block" id="GoogleDocArgumentInjector.lines"><a class="viewcode-back" href="../../../../_moldesign_api/moldesign.utils.docparsers.html#moldesign.utils.docparsers.google.GoogleDocArgumentInjector.lines">[docs]</a>    <span class="k">def</span> <span class="nf">lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the parsed lines of the docstring in reStructuredText format.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`list` of :obj:`str`</span>
+<span class="sd">            The lines of the docstring in a list.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parsed_lines</span></div>
+
+    <span class="k">def</span> <span class="nf">_consume_indented_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
+        <span class="k">while</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_section_break</span><span class="p">()</span> <span class="ow">and</span>
+              <span class="p">(</span><span class="ow">not</span> <span class="n">line</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_indented</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">indent</span><span class="p">))):</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="p">))</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="k">def</span> <span class="nf">_consume_contiguous</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">has_next</span><span class="p">()</span> <span class="ow">and</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span> <span class="ow">and</span>
+               <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_section_header</span><span class="p">()):</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="k">def</span> <span class="nf">_consume_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">has_next</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="p">))</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="k">def</span> <span class="nf">_consume_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parse_type</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">prefer_type</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="p">)</span>
+
+        <span class="n">before</span><span class="p">,</span> <span class="n">colon</span><span class="p">,</span> <span class="n">after</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_field_on_colon</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_desc</span> <span class="o">=</span> <span class="n">before</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">after</span>
+
+        <span class="k">if</span> <span class="n">parse_type</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">_google_typed_arg_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">before</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">_name</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">_type</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_escape_args_and_kwargs</span><span class="p">(</span><span class="n">_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">prefer_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_type</span><span class="p">:</span>
+            <span class="n">_type</span><span class="p">,</span> <span class="n">_name</span> <span class="o">=</span> <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_indent</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">_desc</span> <span class="o">=</span> <span class="p">[</span><span class="n">_desc</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dedent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_consume_indented_block</span><span class="p">(</span><span class="n">indent</span><span class="p">))</span>
+        <span class="n">_desc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span><span class="n">_desc</span><span class="p">,</span> <span class="n">prepare</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">lines</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_desc</span>
+
+    <span class="k">def</span> <span class="nf">_consume_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parse_type</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">prefer_type</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_consume_empty</span><span class="p">()</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_section_break</span><span class="p">():</span>
+            <span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_desc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consume_field</span><span class="p">(</span><span class="n">parse_type</span><span class="p">,</span> <span class="n">prefer_type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_name</span> <span class="ow">or</span> <span class="n">_type</span> <span class="ow">or</span> <span class="n">_desc</span><span class="p">:</span>
+                <span class="n">fields</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">_name</span><span class="p">,</span> <span class="n">_type</span><span class="p">,</span> <span class="n">_desc</span><span class="p">,))</span>
+        <span class="k">return</span> <span class="n">fields</span>
+
+    <span class="k">def</span> <span class="nf">_consume_section_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="p">)</span>
+        <span class="n">stripped_section</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stripped_section</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sections</span><span class="p">:</span>
+            <span class="n">section</span> <span class="o">=</span> <span class="n">stripped_section</span>
+        <span class="k">return</span> <span class="n">section</span>
+
+    <span class="k">def</span> <span class="nf">_consume_to_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">has_next</span><span class="p">():</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">lines</span>
+
+    <span class="k">def</span> <span class="nf">_consume_to_next_section</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_consume_empty</span><span class="p">()</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_section_break</span><span class="p">():</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">lines</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consume_empty</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_dedent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">full</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">min_indent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_min_indent</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">line</span><span class="p">[</span><span class="n">min_indent</span><span class="p">:]</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_escape_args_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;**&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">r&#39;\*\*&#39;</span> <span class="o">+</span> <span class="n">name</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+        <span class="k">elif</span> <span class="n">name</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">r&#39;\*&#39;</span> <span class="o">+</span> <span class="n">name</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">name</span>
+
+    <span class="k">def</span> <span class="nf">_fix_field_desc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desc</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_list</span><span class="p">(</span><span class="n">desc</span><span class="p">):</span>
+            <span class="n">desc</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">desc</span>
+        <span class="k">elif</span> <span class="n">desc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;::&#39;</span><span class="p">):</span>
+            <span class="n">desc_block</span> <span class="o">=</span> <span class="n">desc</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">indent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_indent</span><span class="p">(</span><span class="n">desc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">block_indent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_initial_indent</span><span class="p">(</span><span class="n">desc_block</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">block_indent</span> <span class="o">&gt;</span> <span class="n">indent</span><span class="p">:</span>
+                <span class="n">desc</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">desc</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">desc</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">desc</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indent</span><span class="p">(</span><span class="n">desc_block</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">desc</span>
+
+    <span class="k">def</span> <span class="nf">_get_current_indent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">peek_ahead</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="n">peek_ahead</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[</span><span class="n">peek_ahead</span><span class="p">]</span>
+        <span class="k">while</span> <span class="n">line</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">sentinel</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_indent</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">peek_ahead</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">peek</span><span class="p">(</span><span class="n">peek_ahead</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[</span><span class="n">peek_ahead</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">_get_indent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">i</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_initial_indent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_indent</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">_get_min_indent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">):</span>
+        <span class="n">min_indent</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">indent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_indent</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">min_indent</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">min_indent</span> <span class="o">=</span> <span class="n">indent</span>
+                <span class="k">elif</span> <span class="n">indent</span> <span class="o">&lt;</span> <span class="n">min_indent</span><span class="p">:</span>
+                    <span class="n">min_indent</span> <span class="o">=</span> <span class="n">indent</span>
+        <span class="k">return</span> <span class="n">min_indent</span> <span class="ow">or</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">_is_indented</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">indent</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">s</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">_is_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="n">_bullet_list_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="n">_enumerated_list_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;::&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_indent</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">next_indent</span> <span class="o">=</span> <span class="n">indent</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">next_indent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_indent</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">next_indent</span> <span class="o">&gt;</span> <span class="n">indent</span>
+
+    <span class="k">def</span> <span class="nf">_is_section_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">_google_section_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">match</span> <span class="ow">and</span> <span class="n">section</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sections</span><span class="p">:</span>
+            <span class="n">header_indent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_indent</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+            <span class="n">section_indent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_indent</span><span class="p">(</span><span class="n">peek_ahead</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">section_indent</span> <span class="o">&gt;</span> <span class="n">header_indent</span>
+
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">_is_section_break</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_iter</span><span class="o">.</span><span class="n">has_next</span><span class="p">()</span> <span class="ow">or</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_is_section_header</span><span class="p">()</span> <span class="ow">or</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_in_section</span> <span class="ow">and</span>
+                    <span class="n">line</span> <span class="ow">and</span>
+                    <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_indented</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_section_indent</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="nf">_partition_field_on_colon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="n">before_colon</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">after_colon</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">colon</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">found_colon</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">source</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">_xref_regex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">line</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">found_colon</span><span class="p">:</span>
+                <span class="n">after_colon</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">_single_colon_regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">m</span><span class="p">:</span>
+                    <span class="n">found_colon</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="n">colon</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">start</span><span class="p">():</span> <span class="n">m</span><span class="o">.</span><span class="n">end</span><span class="p">()]</span>
+                    <span class="n">before_colon</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source</span><span class="p">[:</span><span class="n">m</span><span class="o">.</span><span class="n">start</span><span class="p">()])</span>
+                    <span class="n">after_colon</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source</span><span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">end</span><span class="p">():])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">before_colon</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">before_colon</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+                <span class="n">colon</span><span class="p">,</span>
+                <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">after_colon</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_strip_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">))):</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+
+
+<div class="viewcode-block" id="peek_iter"><a class="viewcode-back" href="../../../../_moldesign_api/moldesign.utils.docparsers.html#moldesign.utils.docparsers.google.peek_iter">[docs]</a><span class="k">class</span> <span class="nc">peek_iter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An iterator object that supports peeking ahead.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    o : iterable or callable</span>
+<span class="sd">        `o` is interpreted very differently depending on the presence of</span>
+<span class="sd">        `sentinel`.</span>
+<span class="sd">        If `sentinel` is not given, then `o` must be a collection object</span>
+<span class="sd">        which supports either the iteration protocol or the sequence protocol.</span>
+<span class="sd">        If `sentinel` is given, then `o` must be a callable object.</span>
+<span class="sd">    sentinel : any value, optional</span>
+<span class="sd">        If given, the iterator will call `o` with no arguments for each</span>
+<span class="sd">        call to its `next` method; if the value returned is equal to</span>
+<span class="sd">        `sentinel`, :exc:`StopIteration` will be raised, otherwise the</span>
+<span class="sd">        value will be returned.</span>
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    `peek_iter` can operate as a drop in replacement for the built-in</span>
+<span class="sd">    `iter &lt;https://docs.python.org/2/library/functions.html#iter&gt;`_ function.</span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sentinel</span>
+<span class="sd">        The value used to indicate the iterator is exhausted. If `sentinel`</span>
+<span class="sd">        was not given when the `peek_iter` was instantiated, then it will</span>
+<span class="sd">        be set to a new object instance: ``object()``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;__init__(o, sentinel=None)&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iterable</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sentinel</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sentinel</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c1"># note: prevent 2to3 to transform self.next() in next(self) which</span>
+        <span class="c1"># causes an infinite loop !</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;next&#39;</span><span class="p">)(</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_fillcache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Cache `n` items. If `n` is 0 or None, then 1 item is cached.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">n</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iterable</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sentinel</span><span class="p">)</span>
+
+<div class="viewcode-block" id="peek_iter.has_next"><a class="viewcode-back" href="../../../../_moldesign_api/moldesign.utils.docparsers.html#moldesign.utils.docparsers.google.peek_iter.has_next">[docs]</a>    <span class="k">def</span> <span class="nf">has_next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determine if iterator is exhausted.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if iterator has more items, False otherwise.</span>
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Will never raise :exc:`StopIteration`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentinel</span></div>
+
+<div class="viewcode-block" id="peek_iter.next"><a class="viewcode-back" href="../../../../_moldesign_api/moldesign.utils.docparsers.html#moldesign.utils.docparsers.google.peek_iter.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the next item or `n` items of the iterator.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n : int or None</span>
+<span class="sd">            The number of items to retrieve. Defaults to None.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        item or list of items</span>
+<span class="sd">            The next item or `n` items of the iterator. If `n` is None, the</span>
+<span class="sd">            item itself is returned. If `n` is an int, the items will be</span>
+<span class="sd">            returned in a list. If `n` is 0, an empty list is returned.</span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        StopIteration</span>
+<span class="sd">            Raised if the iterator is exhausted, even if `n` is 0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fillcache</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">n</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentinel</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">StopIteration</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentinel</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">StopIteration</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="peek_iter.peek"><a class="viewcode-back" href="../../../../_moldesign_api/moldesign.utils.docparsers.html#moldesign.utils.docparsers.google.peek_iter.peek">[docs]</a>    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Preview the next item or `n` items of the iterator.</span>
+<span class="sd">        The iterator is not advanced when peek is called.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        item or list of items</span>
+<span class="sd">            The next item or `n` items of the iterator. If `n` is None, the</span>
+<span class="sd">            item itself is returned. If `n` is an int, the items will be</span>
+<span class="sd">            returned in a list. If `n` is 0, an empty list is returned.</span>
+<span class="sd">            If the iterator is exhausted, `peek_iter.sentinel` is returned,</span>
+<span class="sd">            or placed as the last item in the returned list.</span>
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Will never raise :exc:`StopIteration`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fillcache</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">result</span></div></div>
+
+
+<div class="viewcode-block" id="modify_iter"><a class="viewcode-back" href="../../../../_moldesign_api/moldesign.utils.docparsers.html#moldesign.utils.docparsers.google.modify_iter">[docs]</a><span class="k">class</span> <span class="nc">modify_iter</span><span class="p">(</span><span class="n">peek_iter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An iterator object that supports modifying items as they are returned.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    o : iterable or callable</span>
+<span class="sd">        `o` is interpreted very differently depending on the presence of</span>
+<span class="sd">        `sentinel`.</span>
+<span class="sd">        If `sentinel` is not given, then `o` must be a collection object</span>
+<span class="sd">        which supports either the iteration protocol or the sequence protocol.</span>
+<span class="sd">        If `sentinel` is given, then `o` must be a callable object.</span>
+<span class="sd">    sentinel : any value, optional</span>
+<span class="sd">        If given, the iterator will call `o` with no arguments for each</span>
+<span class="sd">        call to its `next` method; if the value returned is equal to</span>
+<span class="sd">        `sentinel`, :exc:`StopIteration` will be raised, otherwise the</span>
+<span class="sd">        value will be returned.</span>
+<span class="sd">    modifier : callable, optional</span>
+<span class="sd">        The function that will be used to modify each item returned by the</span>
+<span class="sd">        iterator. `modifier` should take a single argument and return a</span>
+<span class="sd">        single value. Defaults to ``lambda x: x``.</span>
+<span class="sd">        If `sentinel` is not given, `modifier` must be passed as a keyword</span>
+<span class="sd">        argument.</span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    modifier : callable</span>
+<span class="sd">        `modifier` is called with each item in `o` as it is iterated. The</span>
+<span class="sd">        return value of `modifier` is returned in lieu of the item.</span>
+<span class="sd">        Values returned by `peek` as well as `next` are affected by</span>
+<span class="sd">        `modifier`. However, `modify_iter.sentinel` is never passed through</span>
+<span class="sd">        `modifier`; it will always be returned from `peek` unmodified.</span>
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; a = [&quot;     A list    &quot;,</span>
+<span class="sd">    ...      &quot;   of strings  &quot;,</span>
+<span class="sd">    ...      &quot;      with     &quot;,</span>
+<span class="sd">    ...      &quot;      extra    &quot;,</span>
+<span class="sd">    ...      &quot;   whitespace. &quot;]</span>
+<span class="sd">    &gt;&gt;&gt; modifier = lambda s: s.strip().replace(&#39;with&#39;, &#39;without&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; for s in modify_iter(a, modifier=modifier):</span>
+<span class="sd">    ...   print(&#39;&quot;%s&quot;&#39; % s)</span>
+<span class="sd">    &quot;A list&quot;</span>
+<span class="sd">    &quot;of strings&quot;</span>
+<span class="sd">    &quot;without&quot;</span>
+<span class="sd">    &quot;extra&quot;</span>
+<span class="sd">    &quot;whitespace.&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;__init__(o, sentinel=None, modifier=lambda x: x)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;modifier&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">modifier</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;modifier&#39;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">modifier</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">args</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">modifier</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modifier</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;modify_iter(o, modifier): &#39;</span>
+                            <span class="s1">&#39;modifier must be callable&#39;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">modify_iter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_fillcache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Cache `n` modified items. If `n` is 0 or None, 1 item is cached.</span>
+<span class="sd">        Each item returned by the iterator is passed through the</span>
+<span class="sd">        `modify_iter.modified` function before being cached.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">n</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modifier</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iterable</span><span class="p">)))</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sentinel</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="prepare_docstring"><a class="viewcode-back" href="../../../../_moldesign_api/moldesign.utils.docparsers.html#moldesign.utils.docparsers.google.prepare_docstring">[docs]</a><span class="k">def</span> <span class="nf">prepare_docstring</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a docstring into lines of parseable reST.  Remove common leading</span>
+<span class="sd">    indentation, where the indentation of a given number of lines (usually just</span>
+<span class="sd">    one) is ignored.</span>
+<span class="sd">    Return the docstring as a list of lines usable for inserting into a docutils</span>
+<span class="sd">    ViewList (used as argument of nested_parse().)  An empty line is added to</span>
+<span class="sd">    act as a separator between this docstring and following content.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">expandtabs</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="c1"># Find minimum indentation of any non-blank lines after ignored lines.</span>
+    <span class="n">margin</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="n">ignore</span><span class="p">:]:</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">content</span><span class="p">:</span>
+            <span class="n">indent</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">-</span> <span class="n">content</span>
+            <span class="n">margin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">margin</span><span class="p">,</span> <span class="n">indent</span><span class="p">)</span>
+    <span class="c1"># Remove indentation from ignored lines.</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ignore</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+            <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">margin</span> <span class="o">&lt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ignore</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)):</span>
+            <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">margin</span><span class="p">:]</span>
+    <span class="c1"># Remove any leading blank lines.</span>
+    <span class="k">while</span> <span class="n">lines</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># make sure there is an empty line at the end</span>
+    <span class="k">if</span> <span class="n">lines</span> <span class="ow">and</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lines</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

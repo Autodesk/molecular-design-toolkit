@@ -1,0 +1,648 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.orbitals.gaussians &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.orbitals.gaussians</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.orbitals.gaussians</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.orbitals</span> <span class="kn">import</span> <span class="n">Orbital</span><span class="p">,</span> <span class="n">SHELLS</span><span class="p">,</span> <span class="n">SPHERICALNAMES</span>
+
+
+<div class="viewcode-block" id="AbstractFunction"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.gaussians.AbstractFunction">[docs]</a><span class="k">class</span> <span class="nc">AbstractFunction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractFunction.normalize"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.gaussians.AbstractFunction.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Give this function unit norm by adjusting its coefficient</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AbstractFunction.overlap"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.gaussians.AbstractFunction.overlap">[docs]</a>    <span class="k">def</span> <span class="nf">overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">normalized</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot; Overlap of this function with another:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \int f_1(\mathbf r) f_2(\mathbf r) d^N \mathbf r</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other (AbstractFunction):</span>
+<span class="sd">            normalized (bool): If True, return the overlap of the two NORMALIZED functions.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Scalar: value of the overlap</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">newfn</span> <span class="o">=</span> <span class="bp">self</span> <span class="o">*</span> <span class="n">other</span>
+        <span class="n">integral</span> <span class="o">=</span> <span class="n">newfn</span><span class="o">.</span><span class="n">integral</span>
+        <span class="k">if</span> <span class="n">normalized</span><span class="p">:</span>
+            <span class="n">integral</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="o">*</span><span class="n">other</span><span class="o">.</span><span class="n">norm</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">integral</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot; The L2-Norm of this gaussian:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \int \left| G(\mathbf r) \right|^2 d^N \mathbf r</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-D </span><span class="si">%s</span><span class="s2"> with norm </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CartesianGaussian"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.gaussians.CartesianGaussian">[docs]</a><span class="k">class</span> <span class="nc">CartesianGaussian</span><span class="p">(</span><span class="n">AbstractFunction</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot; Stores an N-dimensional gaussian function of the form:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        G(\mathbf r) = C \times \left( \prod_{i=1}^N{{r_i}^{p_i} } \right)</span>
+<span class="sd">             e^{-a |\mathbf r - \mathbf{r}_0|^2}</span>
+
+<span class="sd">    For a three-dimensional gaussian, this is</span>
+
+<span class="sd">    ..math::</span>
+<span class="sd">        G(x,y,z) = C \times x^{p_1} y^{p_2} z^{p_3} e^{-a |\mathbf r - \mathbf{r}_0|^2}</span>
+
+<span class="sd">    where *C* is ``self.coeff``, *a* is ``self.exp``, *r0* is ``self.center``, and</span>
+<span class="sd">    :math:`p_1, p_2, ...` are given in the array ``self.powers``</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        Levine, Ira N. Quantum Chemistry, 5th ed. Prentice Hall, 2000. 486-94.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">powers</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;  Initialization:</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            center (Vector[length]): location of the gaussian&#39;s centroid</span>
+<span class="sd">            powers (List[int]): cartesian powers in each dimension (see</span>
+<span class="sd">                equations in :class:`CartesianGaussian` docs)</span>
+<span class="sd">            exp (Scalar[1/length**2]): gaussian width parameter</span>
+<span class="sd">            coeff (Scalar): multiplicative coefficient (if None, gaussian will be automatically</span>
+<span class="sd">                 normalized)</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            The dimensionality of the gaussian is determined by the dimensionality</span>
+<span class="sd">            of the centroid location vector and the power vector. So, if scalars are passed for the</span>
+<span class="sd">            ``center`` and ``powers``, it&#39;s 1-D. If length-3 vectors are passed for ``center``</span>
+<span class="sd">            and ``powers``, it&#39;s 3D.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">powers</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">center</span><span class="p">),</span> <span class="s2">&quot;Inconsistent dimensionality - number of cartesian &quot;</span> \
+                                           <span class="s2">&quot;powers must match dimensionality of centroid vector&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exp</span> <span class="o">=</span> <span class="n">exp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">powers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">coeff</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># dummy value overwritten by self.normalize()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="n">coeff</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cartesian</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;&lt;Gaussian (coeff: {coeff:4.2f}, &quot;</span>
+                <span class="s2">&quot;cartesian powers: {powers}, &quot;</span>
+                <span class="s2">&quot;exponent: {exp:4.2f}, &quot;</span>
+                <span class="s2">&quot;center: {center}&gt;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">center</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">exp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exp</span><span class="p">,</span>
+                <span class="n">powers</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">),</span> <span class="n">coeff</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ndim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">)</span>
+    <span class="n">num_dimensions</span> <span class="o">=</span> <span class="n">ndims</span> <span class="o">=</span> <span class="n">ndim</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">angular</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Angular momentum of this function (sum of cartesian powers)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">_include_cartesian</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Evaluate this function at the given coordinates.</span>
+
+<span class="sd">        Can be called either with a 1D column (e.g., ``[1,2,3]*u.angstrom ``) or</span>
+<span class="sd">        an ARRAY of coordinates (``[[0,0,0],[1,1,1]] * u.angstrom``)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            _include_cartesian (bool): include the contribution from the cartesian components</span>
+<span class="sd">                (for computational efficiency, this can sometimes omited now and included later)</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; g = CartesianGaussian([0,0,0]*u.angstrom, exp=1.0/u.angstrom**2, powers=(0,0,0))</span>
+<span class="sd">            &gt;&gt;&gt; g([0,0,0] * u.angstrom)</span>
+<span class="sd">            1.0</span>
+<span class="sd">            &gt;&gt;&gt; g[[0,0,0], [0,0,1], [0.5,0.5,0.5] * u.angstrom]</span>
+<span class="sd">            array([ 1.0,  0.36787944,  0.47236655])</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coords (Vector[length]): Coordinates or list of coordinates</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Scalar: function value(s) at the passed coordinates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">axis</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">disp</span> <span class="o">=</span> <span class="n">coords</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span>
+        <span class="n">prd</span> <span class="o">=</span> <span class="n">disp</span><span class="o">*</span><span class="n">disp</span>  <span class="c1"># don&#39;t use np.dot - allow multiple coords at once</span>
+        <span class="n">r2</span> <span class="o">=</span> <span class="n">prd</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">exp</span> <span class="o">*</span> <span class="n">r2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cartesian</span> <span class="ow">and</span> <span class="n">_include_cartesian</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">*=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">disp</span><span class="o">.</span><span class="n">magnitude</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+                      <span class="o">*</span> <span class="n">disp</span><span class="o">.</span><span class="n">units</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns product of two gaussian functions, which is also a gaussian</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other (CartesianGaussian): other gaussian wavepacket</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            CartesianGaussian: product gaussian</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># convert widths to prefactor form</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">exp</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">other</span><span class="o">.</span><span class="n">center</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">powers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">powers</span>
+        <span class="k">return</span> <span class="n">CartesianGaussian</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="n">center</span><span class="p">,</span> <span class="n">exp</span><span class="o">=</span><span class="n">exp</span><span class="p">,</span>
+                                 <span class="n">powers</span><span class="o">=</span><span class="n">powers</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="o">*</span><span class="n">other</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">integral</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Integral of this this gaussian over all N-dimensional space.</span>
+
+<span class="sd">        This is implemented only for 0 and positive integer cartesian powers.</span>
+<span class="sd">        The integral is 0 if any of the powers are odd. Otherwise, the integral</span>
+<span class="sd">        is given by:</span>
+<span class="sd">        .. math::</span>
+<span class="sd">            \int G(\mathbf r) d^N \mathbf r &amp; = c \int d^N e^{-a x^2} \mathbf r</span>
+<span class="sd">                    \prod_{i=1}^N{{r_i}^{p_i} }   \\</span>
+<span class="sd">               &amp;= (2a)^{-\sum_i p_i} \left( \frac{\pi}{2 a} \right) ^ {N/2} \prod_{i=1}^N{(p_i-1)!!}</span>
+
+<span class="sd">        where *N* is the dimensionality of the gaussian, :math:`p_i` are the cartesian powers,</span>
+<span class="sd">        and _!!_ is the &quot;odd factorial&quot; (:math:`n!!=1\times 3\times 5 \times ... \times n`)</span>
+
+<span class="sd">        References:</span>
+<span class="sd">            Dwight, Herbert B. Tables of Integrals and other Mathematical Data, 3rd ed.</span>
+<span class="sd">                Macmillan 1957. 201.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">integ</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">exp</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># no contribution</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># integral of odd function is exactly 0</span>
+                <span class="k">return</span> <span class="mf">0.0</span>
+            <span class="k">elif</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Powers must be positive or 0&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">integ</span> <span class="o">*=</span> <span class="n">_ODD_FACTORIAL</span><span class="p">[</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">*</span> <span class="n">integ</span></div>
+
+
+<div class="viewcode-block" id="Gaussian"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.gaussians.Gaussian">[docs]</a><span class="k">def</span> <span class="nf">Gaussian</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot; Constructor for an N-dimensional gaussian function.</span>
+
+<span class="sd">    The function is given by:</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        G(\mathbf r) = C e^{-a\left| \mathbf r - \mathbf r_0 \right|^2}</span>
+
+<span class="sd">    where *C* is ``self.coeff``, *a* is ``self.exp``, and :math:`\mathbf r_0` is ``self.center``.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This is just a special case of a cartesian gaussian where all the powers are 0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">CartesianGaussian</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span>
+                             <span class="n">powers</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">center</span><span class="p">],</span>
+                             <span class="n">coeff</span><span class="o">=</span><span class="n">coeff</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SphericalGaussian"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.gaussians.SphericalGaussian">[docs]</a><span class="k">class</span> <span class="nc">SphericalGaussian</span><span class="p">(</span><span class="n">AbstractFunction</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot; Stores a 3-dimensional spherical gaussian function:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        G_{nlm}(\mathbf r) = C Y^l_m(\mathbf r - \mathbf r_0) r^n e^{-a\left| \mathbf r - \mathbf r_0 \right|^2}</span>
+
+<span class="sd">    where *C* is ``self.coeff``, *a* is ``self.exp``, and :math:`\mathbf r_0` is ``self.center``,</span>
+<span class="sd">    *(n,l,m)* are given by ``(self.n, self.l, self.m)``, and :math:`Y^l_m(\mathbf{r})` is a</span>
+<span class="sd">    spherical harmonic.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        self.SPHERE_TO_CART stores expansion coefficients for spherical gaussians in terms of</span>
+<span class="sd">        cartesian gaussians. They are taken from the reference below.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        Schlegel and Frisch. Transformation between cartesian and pure spherical harmonic gaussians.</span>
+<span class="sd">            Int J Quantum Chem 54, 83-87 (1995). doi:10.1002/qua.560540202</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exp</span> <span class="o">=</span> <span class="n">exp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l</span> <span class="o">=</span> <span class="n">l</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">m</span>
+
+        <span class="k">if</span> <span class="n">coeff</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="n">coeff</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;&lt;Gaussian (coeff: {coeff:4.2f}, &quot;</span>
+                <span class="s2">&quot;exponent: {exp:4.2f}, &quot;</span>
+                <span class="s2">&quot;(n,l,m) = {qnums}&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">center</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="n">exp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exp</span><span class="p">,</span>
+                <span class="n">powers</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">),</span> <span class="n">coeff</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="p">,</span>
+                <span class="n">qnums</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">_include_spherical</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Evaluate this function at the given coordinates.</span>
+
+<span class="sd">        Can be called either with a 1D column (e.g., ``[1,2,3]*u.angstrom ``) or</span>
+<span class="sd">        an ARRAY of coordinates (``[[0,0,0],[1,1,1]] * u.angstrom``)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            _include_spherical (bool): include the contribution from the non-exponential parts</span>
+<span class="sd">                (for computational efficiency, this can sometimes omitted now and included later)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coords (Vector[length]): 3D Coordinates or list of 3D coordinates</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Scalar: function value(s) at the passed coordinates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+
+<div class="viewcode-block" id="AtomicBasisFunction"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.gaussians.AtomicBasisFunction">[docs]</a><span class="k">class</span> <span class="nc">AtomicBasisFunction</span><span class="p">(</span><span class="n">Orbital</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cart</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">primitives</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initialization:</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atom (moldesign.Atom): The atom this basis function belongs to</span>
+<span class="sd">            index (int): the index of this basis function (it is stored as</span>
+<span class="sd">                ``wfn.basis[self.index]``)</span>
+<span class="sd">            n (int): principal quantum number (``n&gt;=1``)</span>
+<span class="sd">            l (int): total angular momentum quantum number (``l&lt;=n-1``)</span>
+<span class="sd">            m (int): z-angular momentum quantum number (optional -</span>
+<span class="sd">                 for spherical sets only; ``|m|&lt;=l``)</span>
+<span class="sd">            cart (str): cartesian component (optional; for cartesian sets only)</span>
+<span class="sd">            primitives (List[PrimitiveBase]): List of primitives, if available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="n">atom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l</span> <span class="o">=</span> <span class="n">l</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">m</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">primitives</span> <span class="o">=</span> <span class="n">primitives</span>
+        <span class="k">if</span> <span class="n">cart</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">,</span> <span class="s1">&#39;Both cartesian and spherical components passed!&#39;</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cart</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">,</span> <span class="s1">&#39;Angular momentum does not match specified component </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cart</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">cart</span><span class="p">:</span> <span class="k">assert</span> <span class="n">e</span> <span class="ow">in</span> <span class="s1">&#39;xyz&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cart</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">cart</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cart</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c1"># These quantities can&#39;t be defined until we assemble the entire basis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">molecule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">occupation</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wfn</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_primitives</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">primitives</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate this orbital&#39;s norm</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: norm :math:`&lt;i|i&gt;`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">p1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">primitives</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">p2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">primitives</span><span class="p">:</span>
+                <span class="n">norm</span> <span class="o">+=</span> <span class="n">p1</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">norm</span>
+
+<div class="viewcode-block" id="AtomicBasisFunction.normalize"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.gaussians.AtomicBasisFunction.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Scale primitive coefficients to normalize this basis function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prefactor</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">primitive</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">primitives</span><span class="p">:</span>
+            <span class="n">primitive</span> <span class="o">*=</span> <span class="n">prefactor</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">orbtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; A string describing the orbital&#39;s angular momentum state.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; AtomicBasisFunction(n=1, l=0).orbtype</span>
+<span class="sd">            &#39;s&#39;</span>
+<span class="sd">            &gt;&gt;&gt; AtomicBasisFunction(n=2, l=1, cart=&#39;y&#39;).orbtype</span>
+<span class="sd">            &#39;py&#39;</span>
+<span class="sd">            &gt;&gt;&gt; AtomicBasisFunction(n=3, l=2, m=0).orbtype</span>
+<span class="sd">            &#39;d(z^2)&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">l</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="n">t</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">cart</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="n">t</span> <span class="o">=</span> <span class="n">SHELLS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cart</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">t</span> <span class="o">=</span> <span class="n">SPHERICALNAMES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">t</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">aotype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; A string describing the orbital&#39;s state.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; AtomicBasisFunction(n=1, l=0).aotype</span>
+<span class="sd">            &#39;1s&#39;</span>
+<span class="sd">            &gt;&gt;&gt; AtomicBasisFunction(n=2, l=1, cart=&#39;y&#39;).aotype</span>
+<span class="sd">            &#39;2py&#39;</span>
+<span class="sd">            &gt;&gt;&gt; AtomicBasisFunction(n=3, l=2, m=0).aotype</span>
+<span class="sd">            &#39;3d(z^2)&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orbtype</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">:</span> <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="n">t</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;AO &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> on atom </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aotype</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;Basis Fn&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<span class="c1"># Precompute odd factorial values (N!!)</span>
+<span class="n">_ODD_FACTORIAL</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>  <span class="c1">#by convention</span>
+<span class="n">_ofact</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">for</span> <span class="n">_i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="n">_ofact</span> <span class="o">*=</span> <span class="n">_i</span>
+    <span class="n">_ODD_FACTORIAL</span><span class="p">[</span><span class="n">_i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_ofact</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="cart_to_powers"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.gaussians.cart_to_powers">[docs]</a><span class="k">def</span> <span class="nf">cart_to_powers</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert a string to a list of cartesian powers</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; cart_to_powers(&#39;y&#39;)</span>
+<span class="sd">        [0, 1, 0]</span>
+<span class="sd">        &gt;&gt;&gt; cart_to_powers(&#39;xxyz&#39;)</span>
+<span class="sd">        [2, 1, 1]</span>
+<span class="sd">        &gt;&gt;&gt; cart_to_powers(&#39;zx^3&#39;)</span>
+<span class="sd">        [3,0,1]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">powers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">chars</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">lastchar</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">char</span> <span class="o">=</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">char</span> <span class="o">==</span> <span class="s1">&#39;^&#39;</span><span class="p">:</span>
+            <span class="n">power</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+            <span class="n">powers</span><span class="p">[</span><span class="n">DIMLABELS</span><span class="p">[</span><span class="n">lastchar</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">power</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">lastchar</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">powers</span><span class="p">[</span><span class="n">DIMLABELS</span><span class="p">[</span><span class="n">char</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">lastchar</span> <span class="o">=</span> <span class="n">char</span>
+
+    <span class="k">return</span> <span class="n">powers</span></div>
+
+
+<span class="n">DIMLABELS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="ERI4FoldTensor"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.gaussians.ERI4FoldTensor">[docs]</a><span class="k">class</span> <span class="nc">ERI4FoldTensor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mat</span><span class="p">,</span> <span class="n">basis_orbitals</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mat</span> <span class="o">=</span> <span class="n">mat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basis_orbitals</span> <span class="o">=</span> <span class="n">basis_orbitals</span>
+        <span class="n">nbasis</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basis_orbitals</span><span class="p">)</span>
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nbasis</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+        <span class="n">ij</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">mapping</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ij</span>
+                <span class="n">ij</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span> <span class="o">=</span> <span class="n">mapping</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span> <span class="o">=</span> <span class="n">item</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">]]</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

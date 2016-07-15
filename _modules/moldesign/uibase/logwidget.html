@@ -1,0 +1,406 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.uibase.logwidget &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.uibase.logwidget</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.uibase.logwidget</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">import</span> <span class="nn">IPython.display</span>
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="kn">as</span> <span class="nn">ipy</span>
+<span class="kn">import</span> <span class="nn">traitlets</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+
+<span class="kn">from</span> <span class="nn">.components</span> <span class="kn">import</span> <span class="n">StyledTab</span>
+
+<span class="n">STANDARD</span> <span class="o">=</span> <span class="mi">25</span>  <span class="c1"># logging level between INFO and WARN</span>
+
+<span class="c1"># We&#39;ll use standard + extra logging levels:</span>
+<span class="c1"># debug, info, *status*, *handled*, warning, error</span>
+
+<span class="n">root</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;moldesign&#39;</span><span class="p">)</span>
+<span class="n">root</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">STANDARD</span><span class="p">)</span>
+
+<span class="c1"># TODO: we need to handle logging outside the widget context - what if user is in CLI?</span>
+
+<span class="n">_prev_tabs</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">_current_tabs</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">_capture_enabled</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="c1"># TODO: Something better than this</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">ipy</span><span class="o">.</span><span class="n">Text</span><span class="p">()</span>
+<span class="k">except</span> <span class="n">traitlets</span><span class="o">.</span><span class="n">TraitError</span><span class="p">:</span>
+    <span class="n">widgets_enabled</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">widgets_enabled</span> <span class="o">=</span> <span class="bp">True</span>
+
+
+<div class="viewcode-block" id="display_log"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.logwidget.display_log">[docs]</a><span class="k">def</span> <span class="nf">display_log</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Registers a new view. This is mostly so that we can</span>
+<span class="sd">    display all views from a cell in a LoggingTabs object.</span>
+<span class="sd">    :param obj: The object to display. If it has a &quot;get_display_object&quot; method, \</span>
+<span class="sd">        its return value is displayed</span>
+<span class="sd">    :param title: A name for the object (otherwise, str(obj) is used)</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">widgets_enabled</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">obj</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">_current_tabs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>  <span class="c1"># just display the damn thing</span>
+        <span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_current_tabs</span><span class="o">.</span><span class="n">add_display</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WidgetValueHandler"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.logwidget.WidgetValueHandler">[docs]</a><span class="k">class</span> <span class="nc">WidgetValueHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Handler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Appends logging messages to a widget&#39;s value field.</span>
+<span class="sd">    Watch this for performance - we&#39;re repeatedly +=&#39;ing a string, which is not good</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widget</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the handler.</span>
+<span class="sd">        If stream is not specified, sys.stderr is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">WidgetValueHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">widget</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Textarea</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">widget</span>
+
+<div class="viewcode-block" id="WidgetValueHandler.emit"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.logwidget.WidgetValueHandler.emit">[docs]</a>    <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Emit a record.</span>
+<span class="sd">        If a formatter is specified, it is used to format the record.</span>
+<span class="sd">        The record is then written to the stream with a trailing newline.  If</span>
+<span class="sd">        exception information is present, it is formatted using</span>
+<span class="sd">        traceback.print_exception and appended to the stream.  If the stream</span>
+<span class="sd">        has an &#39;encoding&#39; attribute, it is used to determine how to do the</span>
+<span class="sd">        output to the stream.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="n">msg</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">handleError</span><span class="p">(</span><span class="n">record</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="enable_logging_widgets"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.logwidget.enable_logging_widgets">[docs]</a><span class="k">def</span> <span class="nf">enable_logging_widgets</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    :param enable: if False, disable it</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_capture_enabled</span><span class="p">,</span> <span class="n">_current_tabs</span>
+
+    <span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>
+    <span class="n">ip</span> <span class="o">=</span> <span class="n">get_ipython</span><span class="p">()</span>
+    <span class="s2">&quot;:type: IPython.core.interactiveshell.InteractiveShell&quot;</span>
+
+    <span class="k">if</span> <span class="n">ip</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">return</span>  <span class="c1"># this isn&#39;t an interactive session</span>
+
+    <span class="k">if</span> <span class="n">enable</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_capture_enabled</span><span class="p">:</span>
+        <span class="n">_capture_enabled</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="c1">#root.addHandler(capture_handler)</span>
+        <span class="n">ip</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;pre_run_cell&#39;</span><span class="p">,</span> <span class="n">_capture_logging_displays</span><span class="p">)</span>
+        <span class="n">ip</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;post_run_cell&#39;</span><span class="p">,</span> <span class="n">_finalize_logging_displays</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="n">enable</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_capture_enabled</span><span class="p">:</span>
+        <span class="n">_capture_enabled</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">_current_tabs</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="c1">#root.removeHandler(capture_handler)</span>
+        <span class="n">ip</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">unregister</span><span class="p">(</span><span class="s1">&#39;pre_run_cell&#39;</span><span class="p">,</span> <span class="n">_capture_logging_displays</span><span class="p">)</span>
+        <span class="n">ip</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">unregister</span><span class="p">(</span><span class="s1">&#39;post_run_cell&#39;</span><span class="p">,</span> <span class="n">_finalize_logging_displays</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="n">widgets_enabled</span><span class="p">:</span>
+    <span class="k">class</span> <span class="nc">LoggingTabs</span><span class="p">(</span><span class="n">StyledTab</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objects</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            :param objects: dict of form {TITLE: &lt;display object&gt;}</span>
+<span class="sd">            :param display: directly display the display collection</span>
+<span class="sd">            :param kwargs: kwargs to pass to ipywidgets initializers</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">objs</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="n">objects</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">LoggingTabs</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">objects</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">for</span> <span class="n">ikey</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">objects</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">ikey</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_displayed</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">if</span> <span class="n">display</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_displayed</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">add_display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">title</span><span class="p">[:</span><span class="mi">40</span><span class="p">]</span>
+            <span class="n">oldtitle</span> <span class="o">=</span> <span class="n">title</span>
+            <span class="n">ititle</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">title</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">objs</span><span class="p">:</span>
+                <span class="n">ititle</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">oldtitle</span><span class="p">,</span> <span class="n">ititle</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">objs</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">+=</span> <span class="p">(</span><span class="n">obj</span><span class="p">,)</span>  <span class="c1"># ipywidgets requires a tuple for some reason</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">display</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_displayed</span><span class="p">:</span>
+                <span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_displayed</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">if</span> <span class="n">show</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">selected_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+
+<div class="viewcode-block" id="Logger"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.logwidget.Logger">[docs]</a><span class="k">class</span> <span class="nc">Logger</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">Textarea</span> <span class="k">if</span> <span class="n">widgets_enabled</span> <span class="k">else</span> <span class="nb">object</span><span class="p">):</span>
+    <span class="c1"># TODO: need a javascript-side widget that will accept a stream - string concatenation is bad</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="s1">&#39;75%&#39;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="s1">&#39;300px&#39;</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;font_family&#39;</span><span class="p">,</span> <span class="s1">&#39;monospace&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="k">if</span> <span class="n">widgets_enabled</span><span class="p">:</span>  <span class="c1"># try to intialize widget</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">Logger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_widget</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_widget</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">True</span>  <span class="c1"># so user can&#39;t overwrite</span>
+
+    <span class="k">def</span> <span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_widget</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
+                <span class="n">display_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="n">string</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="n">string</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="c1"># temporary so that we can use this like a logging module later</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">warning</span> <span class="o">=</span> <span class="n">info</span> <span class="o">=</span> <span class="n">handled</span> <span class="o">=</span> <span class="n">debug</span> <span class="o">=</span> <span class="n">status</span> <span class="o">=</span> <span class="n">_write</span></div>
+
+
+<span class="k">def</span> <span class="nf">_capture_logging_displays</span><span class="p">(</span><span class="n">display</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">_current_tabs</span><span class="p">,</span> <span class="n">_prev_tabs</span>
+    <span class="n">_prev_tabs</span> <span class="o">=</span> <span class="n">_current_tabs</span>
+    <span class="k">if</span> <span class="n">widgets_enabled</span><span class="p">:</span>
+        <span class="n">_current_tabs</span> <span class="o">=</span> <span class="n">LoggingTabs</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">()),</span> <span class="n">display</span><span class="o">=</span><span class="n">display</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_current_tabs</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">enable_logging_widgets</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s1">&#39;Failed to create UI logging system. Logging widgets disabled&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">_finalize_logging_displays</span><span class="p">(</span><span class="n">display</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="c1"># FOR NOW, *always* enable the logging widgets</span>
+<span class="n">enable_logging_widgets</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

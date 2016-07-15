@@ -1,0 +1,44 @@
+moldesign.min package
+=====================
+
+.. automodule:: moldesign.min
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+moldesign.min.base module
+-------------------------
+
+.. automodule:: moldesign.min.base
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.min.bfgs module
+-------------------------
+
+.. automodule:: moldesign.min.bfgs
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.min.descent module
+----------------------------
+
+.. automodule:: moldesign.min.descent
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.min.smart module
+--------------------------
+
+.. automodule:: moldesign.min.smart
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

@@ -1,0 +1,20 @@
+moldesign.utils.docparsers package
+==================================
+
+.. automodule:: moldesign.utils.docparsers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+moldesign.utils.docparsers.google module
+----------------------------------------
+
+.. automodule:: moldesign.utils.docparsers.google
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

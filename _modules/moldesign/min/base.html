@@ -1,0 +1,379 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.min.base &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.min.base</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.min.base</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">data</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+
+
+<div class="viewcode-block" id="MinimizerBase"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.min.html#moldesign.MinimizerBase">[docs]</a><span class="k">class</span> <span class="nc">MinimizerBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="n">_strip_units</span> <span class="o">=</span> <span class="bp">True</span>  <span class="c1"># callbacks expect and return dimensionless quantities scaled to default unit system</span>
+    <span class="n">constraint_restraints</span> <span class="o">=</span> <span class="bp">True</span>  <span class="c1"># if True, add restraint penalties for both constraints and restraints</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">nsteps</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                 <span class="n">force_tolerance</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">DEFAULT_FORCE_TOLERANCE</span><span class="p">,</span>
+                 <span class="n">frame_interval</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">restraint_multiplier</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                 <span class="n">_restart_from</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">_restart_energy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nsteps</span> <span class="o">=</span> <span class="n">nsteps</span> <span class="o">-</span> <span class="n">_restart_from</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">force_tolerance</span> <span class="o">=</span> <span class="n">force_tolerance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame_interval</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">frame_interval</span><span class="p">,</span>
+                                                    <span class="nb">max</span><span class="p">(</span><span class="n">nsteps</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_restart_from</span> <span class="o">=</span> <span class="n">_restart_from</span>
+
+        <span class="c1"># Set up the trajectory to track the minimization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">traj</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Trajectory</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_step</span> <span class="o">=</span> <span class="n">_restart_from</span>
+        <span class="k">if</span> <span class="n">_restart_energy</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="o">.</span><span class="n">new_frame</span><span class="p">(</span><span class="n">minimization_step</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;minimization steps:</span><span class="si">%d</span><span class="s1"> (energy=</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span>
+                                           <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mol</span><span class="o">.</span><span class="n">calc_potential_energy</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_energy</span> <span class="o">=</span> <span class="n">_restart_energy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_energy</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_grad</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c1"># Figure out whether we&#39;ll use gradients</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restraint_multiplier</span> <span class="o">=</span> <span class="n">restraint_multiplier</span>
+        <span class="k">if</span> <span class="s1">&#39;forces&#39;</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">energy_model</span><span class="o">.</span><span class="n">ALL_PROPERTIES</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradtype</span> <span class="o">=</span> <span class="s1">&#39;analytical&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;forces&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gradtype</span> <span class="o">=</span> <span class="s1">&#39;approximate&#39;</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> \
+                <span class="s1">&#39;Constrained minimization only available with analytical gradients&#39;</span>
+
+    <span class="k">def</span> <span class="nf">_sync_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vector</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the molecule&#39;s position</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strip_units</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">length</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">c</span>
+
+    <span class="k">def</span> <span class="nf">_coords_to_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Convert position array to a flat vector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">num_atoms</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strip_units</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">vec</span><span class="o">.</span><span class="n">magnitude</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">vec</span>
+
+<div class="viewcode-block" id="MinimizerBase.objective"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.min.html#moldesign.MinimizerBase.objective">[docs]</a>    <span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vector</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Callback function to calculate the objective function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sync_positions</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">requests</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request_list</span><span class="p">)</span>
+        <span class="n">pot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">potential_energy</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraint_restraints</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">constraints</span><span class="p">:</span>
+                <span class="n">pot</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">restraint_multiplier</span> <span class="o">*</span> <span class="n">constraint</span><span class="o">.</span><span class="n">restraint_penalty</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_energy</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_energy</span> <span class="o">=</span> <span class="n">pot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_energy</span> <span class="o">=</span> <span class="n">pot</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strip_units</span><span class="p">:</span> <span class="k">return</span> <span class="n">pot</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span><span class="o">.</span><span class="n">magnitude</span>
+        <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="n">pot</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MinimizerBase.grad"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.min.html#moldesign.MinimizerBase.grad">[docs]</a>    <span class="k">def</span> <span class="nf">grad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vector</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Callback function to calculate the objective&#39;s gradient</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sync_positions</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">requests</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request_list</span><span class="p">)</span>
+        <span class="n">grad</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">forces</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraint_restraints</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">constraints</span><span class="p">:</span>
+                <span class="n">grad</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">restraint_multiplier</span> <span class="o">*</span> <span class="n">constraint</span><span class="o">.</span><span class="n">restraint_penalty_force</span><span class="p">()</span>
+
+        <span class="n">grad</span> <span class="o">=</span> <span class="n">grad</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">num_atoms</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_grad</span> <span class="o">=</span> <span class="n">grad</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strip_units</span><span class="p">:</span> <span class="k">return</span> <span class="n">grad</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span><span class="o">.</span><span class="n">magnitude</span>
+        <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="n">grad</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Run the minimization</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            moldesign.Trajectory: the minimization trajectory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="o">.</span><span class="n">num_frames</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">minimization_step</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_step</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="o">.</span><span class="n">new_frame</span><span class="p">(</span><span class="n">minimization_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_step</span><span class="p">,</span>
+                                <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;minimization result (</span><span class="si">%d</span><span class="s1"> steps) (energy=</span><span class="si">%s</span><span class="s1">)&#39;</span><span class="o">%</span>
+                                           <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">potential_energy</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">traj</span>
+
+<div class="viewcode-block" id="MinimizerBase.run"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.min.html#moldesign.MinimizerBase.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;This is an abstract base class&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MinimizerBase.callback"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.min.html#moldesign.MinimizerBase.callback">[docs]</a>    <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; To be called after each minimization step</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: ignored</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_step</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_step</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_interval</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span> <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="o">.</span><span class="n">new_frame</span><span class="p">(</span><span class="n">minimization_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_step</span><span class="p">,</span>
+                       <span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;minimization steps:</span><span class="si">%d</span><span class="s1"> (energy=</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span>
+                                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">potential_energy</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsteps</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Minimization step </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_step</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Step </span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsteps</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_restart_from</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_energy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">message</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">u&#39;</span><span class="se">\u0394</span><span class="s1">E={x.magnitude:.3e} {x.units}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_last_energy</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_energy</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradtype</span> <span class="o">==</span> <span class="s1">&#39;analytical&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_grad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">force</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_grad</span>
+
+            <span class="n">message</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">u&#39;RMS </span><span class="se">\u2207</span><span class="s1">E={rmsf.magnitude:.3e}, &#39;</span>
+                           <span class="s1">u&#39;max </span><span class="se">\u2207</span><span class="s1">E={mf.magnitude:.3e}{mf.units}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">rmsf</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">force</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">force</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">ndims</span><span class="p">),</span>
+                <span class="n">mf</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">force</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraint_restraints</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">constraints</span><span class="p">:</span>
+            <span class="n">nsatisfied</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">constraints</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">satisfied</span><span class="p">():</span> <span class="n">nsatisfied</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">message</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;constraints:</span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nsatisfied</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">constraints</span><span class="p">)))</span>
+
+        <span class="k">print</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_as_function</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">newname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a function that runs this minimization</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nd">@mdt.utils.args_from</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">allexcept</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;self&#39;</span><span class="p">])</span>
+        <span class="k">def</span> <span class="nf">asfn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="p">()</span>
+        <span class="n">asfn</span><span class="o">.</span><span class="n">__name__</span> <span class="o">=</span> <span class="n">newname</span>
+        <span class="n">asfn</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">__doc__</span>
+
+        <span class="k">return</span> <span class="n">asfn</span></div>
+
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

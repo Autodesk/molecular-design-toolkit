@@ -1,0 +1,281 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.viewer.common &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.viewer.common</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.viewer.common</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">moldesign.helpers</span> <span class="kn">import</span> <span class="n">colormap</span>
+
+
+<div class="viewcode-block" id="ColorMixin"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.viewer.common.ColorMixin">[docs]</a><span class="k">class</span> <span class="nc">ColorMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="ColorMixin.color_by"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.viewer.common.ColorMixin.color_by">[docs]</a>    <span class="k">def</span> <span class="nf">color_by</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom_callback</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">mplmap</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                 <span class="n">force_cmap</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Color atoms according to either:</span>
+<span class="sd">          * an atomic attribute (e.g., &#39;chain&#39;, &#39;residue&#39;, &#39;mass&#39;)</span>
+<span class="sd">          * a callback function that accepts an atom and returns a color or a category</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atom_callback (callable OR str): callable f(atom) returns color OR</span>
+<span class="sd">                category OR an atom attribute (e.g., ``atnum, mass, residue.type``)</span>
+<span class="sd">            atoms (moldesign.molecules.AtomContainer): atoms to color (default: self.atoms)</span>
+<span class="sd">            mplmap (str): name of the matplotlib colormap to use if colors aren&#39;t explicitly</span>
+<span class="sd">               specified)</span>
+<span class="sd">            force_cmap (bool): force the use of a colormap</span>
+<span class="sd">            render (bool): draw these changes immediately</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            If you&#39;d like to explicitly specify colors, the callback can return color</span>
+<span class="sd">            specifications as an HTML string (``&#39;#1234AB&#39;``), a hexadecimal integer (</span>
+<span class="sd">            ``0x12345AB``), or a CSS3 color keyword (``&#39;green&#39;``, ``&#39;purple&#39;``, etc., see</span>
+<span class="sd">            https://developer.mozilla.org/en-US/docs/Web/CSS/color_value)</span>
+
+<span class="sd">            If the callback returns an integer, it may be interpreted as a color spec (since RGB</span>
+<span class="sd">            colors are just hexadecimal integers). Use ``force_cmap=True`` to force the creation</span>
+<span class="sd">            of a colormap.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: mapping of categories to colors</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom_callback</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+            <span class="c1"># shortcut to use strings to access atom attributes, i.e. &quot;ff.partial_charge&quot;</span>
+            <span class="n">attrs</span> <span class="o">=</span> <span class="n">atom_callback</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+            <span class="c1"># make sure that whatever value is returned doesn&#39;t get interpreted as a color</span>
+            <span class="n">force_cmap</span> <span class="o">=</span> <span class="bp">True</span>
+
+            <span class="k">def</span> <span class="nf">atom_callback</span><span class="p">(</span><span class="n">atom</span><span class="p">):</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="n">atom</span>
+                <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+                    <span class="n">obj</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">obj</span>
+
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">Categorizer</span><span class="p">(</span><span class="n">atom_callback</span><span class="p">,</span> <span class="n">atoms</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">force_cmap</span><span class="p">:</span>
+            <span class="n">name_is_color</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name_is_color</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">is_color</span><span class="p">,</span> <span class="n">colors</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">colors</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gray&#39;</span><span class="p">:</span> <span class="n">atoms</span><span class="p">}</span>
+
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">name_is_color</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">name_is_color</span><span class="p">),</span> \
+                <span class="s2">&quot;callback function returned a mix of colors and categories&quot;</span>
+            <span class="n">categories</span> <span class="o">=</span> <span class="n">colors</span>
+            <span class="n">cats</span> <span class="o">=</span> <span class="n">categories</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="c1"># If there are &gt;256 categories, this is a many-to-one mapping</span>
+            <span class="n">colornames</span> <span class="o">=</span> <span class="n">colormap</span><span class="p">(</span><span class="n">cats</span><span class="p">,</span> <span class="n">mplmap</span><span class="o">=</span><span class="n">mplmap</span><span class="p">)</span>
+            <span class="n">colors</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">colornames</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">cat</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cats</span><span class="p">,</span> <span class="n">colornames</span><span class="p">):</span>
+                <span class="n">colors</span><span class="p">[</span><span class="n">color</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">categories</span><span class="p">[</span><span class="n">cat</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_colors</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">)</span></div></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

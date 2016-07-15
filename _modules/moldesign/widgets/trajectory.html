@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.widgets.trajectory &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.widgets.trajectory</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.widgets.trajectory</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="kn">as</span> <span class="nn">ipy</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+
+<span class="kn">from</span> <span class="nn">moldesign.uibase.components</span> <span class="kn">import</span> <span class="n">AtomInspector</span>
+<span class="kn">from</span> <span class="nn">moldesign.uibase</span> <span class="kn">import</span> <span class="n">selector</span>
+
+
+<div class="viewcode-block" id="TrajectoryViewer"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.trajectory.TrajectoryViewer">[docs]</a><span class="k">class</span> <span class="nc">TrajectoryViewer</span><span class="p">(</span><span class="n">selector</span><span class="o">.</span><span class="n">SelectionGroup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; 3D representation, with animation controls, for a trajectory.</span>
+
+<span class="sd">    Users will typically instantiate this using ``trajectory.draw()``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trajectory</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_fps</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">traj</span> <span class="o">=</span> <span class="n">trajectory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pane</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">VBox</span><span class="p">()</span>
+        <span class="n">trajectory</span><span class="o">.</span><span class="n">apply_frame</span><span class="p">(</span><span class="n">trajectory</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_container</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_viewer</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">append_frame</span><span class="p">(</span><span class="n">positions</span><span class="o">=</span><span class="n">frame</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span>
+                                     <span class="n">wfn</span><span class="o">=</span><span class="n">frame</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wfn&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">),</span>
+                                     <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_controls</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">view_container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">controls</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TrajectoryViewer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">pane</span><span class="p">,</span> <span class="n">AtomInspector</span><span class="p">()],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_selections</span><span class="p">(</span><span class="s1">&#39;initialization&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;framenum&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+
+<div class="viewcode-block" id="TrajectoryViewer.make_viewer"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.trajectory.TrajectoryViewer.make_viewer">[docs]</a>    <span class="k">def</span> <span class="nf">make_viewer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">viewer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="o">.</span><span class="n">_tempmol</span><span class="o">.</span><span class="n">draw3d</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;licorice&#39;</span><span class="p">)</span>
+        <span class="n">viewer</span><span class="o">.</span><span class="n">show_unbonded</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">viewer</span><span class="p">,</span> <span class="n">viewer</span></div>
+
+<div class="viewcode-block" id="TrajectoryViewer.make_controls"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.trajectory.TrajectoryViewer.make_controls">[docs]</a>    <span class="k">def</span> <span class="nf">make_controls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">controls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">play_button</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">u&quot;</span><span class="se">\u25B6</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_view</span> <span class="o">=</span> <span class="n">FrameInspector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="p">)</span>
+        <span class="n">controls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_view</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">play_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_play</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slider</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">create_value_selector</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">,</span>
+                                                     <span class="n">value_selects</span><span class="o">=</span><span class="s1">&#39;framenum&#39;</span><span class="p">,</span>
+                                                     <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Frame:&#39;</span><span class="p">,</span>
+                                                     <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">playbox</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">play_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="p">])</span>
+        <span class="n">controls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">playbox</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">controls</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">VBox</span><span class="p">(</span><span class="n">controls</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_play</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">animate</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TrajectoryViewer.animate"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.trajectory.TrajectoryViewer.animate">[docs]</a>    <span class="k">def</span> <span class="nf">animate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">fps</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">fps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_fps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">spf</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">fps</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">num_frames</span><span class="p">):</span>
+            <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+            <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;</span> <span class="n">spf</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">spf</span><span class="o">-</span><span class="n">dt</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Users can run viz commands directly on the trajectory,</span>
+<span class="sd">        e.g., trajectory.cpk(atoms=mol.chains[&#39;B&#39;])&quot;&quot;&quot;</span>
+        <span class="c1"># TODO: modify __dir__ to match</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TrajectoryOrbViewer"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.trajectory.TrajectoryOrbViewer">[docs]</a><span class="k">class</span> <span class="nc">TrajectoryOrbViewer</span><span class="p">(</span><span class="n">TrajectoryViewer</span><span class="p">):</span>
+<div class="viewcode-block" id="TrajectoryOrbViewer.make_viewer"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.trajectory.TrajectoryOrbViewer.make_viewer">[docs]</a>    <span class="k">def</span> <span class="nf">make_viewer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">viewframe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="o">.</span><span class="n">_tempmol</span><span class="o">.</span><span class="n">draw_orbitals</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">viewframe</span><span class="o">.</span><span class="n">viewer</span><span class="p">,</span> <span class="n">viewframe</span></div></div>
+
+
+
+<div class="viewcode-block" id="FrameInspector"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.trajectory.FrameInspector">[docs]</a><span class="k">class</span> <span class="nc">FrameInspector</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">HTML</span><span class="p">,</span> <span class="n">selector</span><span class="o">.</span><span class="n">Selector</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">traj</span> <span class="o">=</span> <span class="n">traj</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FrameInspector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FrameInspector.handle_selection_event"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.trajectory.FrameInspector.handle_selection_event">[docs]</a>    <span class="k">def</span> <span class="nf">handle_selection_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;framenum&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">framenum</span> <span class="o">=</span> <span class="n">selection</span><span class="p">[</span><span class="s1">&#39;framenum&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="p">[</span><span class="n">framenum</span><span class="p">],</span> <span class="s1">&#39;time&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="p">[</span><span class="n">framenum</span><span class="p">]</span><span class="o">.</span><span class="n">time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;Time: </span><span class="si">%s</span><span class="s1">; &#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="p">[</span><span class="n">framenum</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="p">[</span><span class="n">framenum</span><span class="p">]</span><span class="o">.</span><span class="n">annotation</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+            <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">result</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

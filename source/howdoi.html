@@ -1,0 +1,414 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>How do I ...? &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../index.html"/>
+        <link rel="next" title="Atoms, molecules, and biomolecules" href="structure.html"/>
+        <link rel="prev" title="Installing MDT" href="install.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How do I ...?</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-do-i-create-a-small-molecule">How do I create a small molecule?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-do-i-import-a-biomolecule">How do I import a biomolecule?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#basic-pdb-structures">Basic PDB structures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#biomolecular-assemblies">Biomolecular assemblies</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#how-do-i-measure-bonds">How do I measure bonds?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-do-i-visualize-molecular-orbitals">How do I visualize molecular orbitals?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-do-i-perform-an-energy-minimization">How do I perform an energy minimization?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-do-i-customize-a-3d-view">How do I customize a 3D view?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="contents.html">Docs</a> &raquo;</li>
+      
+    <li>How do I ...?</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/source/howdoi.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="how-do-i">
+<h1><a class="toc-backref" href="#id1">How do I ...?</a><a class="headerlink" href="#how-do-i" title="Permalink to this headline">¶</a></h1>
+<div class="contents topic" id="quick-guides-to-common-tasks">
+<p class="topic-title first">Quick guides to common tasks</p>
+<ul class="simple">
+<li><a class="reference internal" href="#how-do-i" id="id1">How do I ...?</a><ul>
+<li><a class="reference internal" href="#how-do-i-create-a-small-molecule" id="id2">How do I create a small molecule?</a></li>
+<li><a class="reference internal" href="#how-do-i-import-a-biomolecule" id="id3">How do I import a biomolecule?</a></li>
+<li><a class="reference internal" href="#how-do-i-measure-bonds" id="id4">How do I measure bonds?</a></li>
+<li><a class="reference internal" href="#how-do-i-visualize-molecular-orbitals" id="id5">How do I visualize molecular orbitals?</a></li>
+<li><a class="reference internal" href="#how-do-i-perform-an-energy-minimization" id="id6">How do I perform an energy minimization?</a></li>
+<li><a class="reference internal" href="#how-do-i-customize-a-3d-view" id="id7">How do I customize a 3D view?</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="how-do-i-create-a-small-molecule">
+<h2><a class="toc-backref" href="#id2">How do I create a small molecule?</a><a class="headerlink" href="#how-do-i-create-a-small-molecule" title="Permalink to this headline">¶</a></h2>
+<p>You can use an IUPAC name:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">moldesign</span> <span class="k">as</span> <span class="nn">mdt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_name</span><span class="p">(</span><span class="s1">&#39;benzene&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">caffeine</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_name</span><span class="p">(</span><span class="s1">&#39;1,3,7-Trimethylpurine-2,6-dione&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or a <a class="reference external" href="https://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system">SMILES string</a></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s1">&#39;c1ccccc1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">caffeine</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s1">&#39;CN1C=NC2=C1C(=O)N(C(=O)N2C)C&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or read it from a number of file formats:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;/home/myuser/benzene.sdf&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">caffeine</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;/home/myuser/caffeine.xyz&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-do-i-import-a-biomolecule">
+<h2><a class="toc-backref" href="#id3">How do I import a biomolecule?</a><a class="headerlink" href="#how-do-i-import-a-biomolecule" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="basic-pdb-structures">
+<h3>Basic PDB structures<a class="headerlink" href="#basic-pdb-structures" title="Permalink to this headline">¶</a></h3>
+<p>If you&#8217;re looking for a specific biomolecule, you&#8217;ll find its structure on
+<a class="reference external" href="http://pdb.org">the RCSB Protein Databank (PDB)</a> (if a structure exists). Structures in PDB are
+indexed with 4-character codes (such as <a class="reference external" href="http://www.rcsb.org/pdb/explore/explore.do?structureId=1mbn">1MBN</a>, <a class="reference external" href="http://www.rcsb.org/pdb/explore/explore.do?structureId=3aid">3AID</a>, <a class="reference external" href="http://www.rcsb.org/pdb/explore/explore.do?structureId=3fpp">3FPP</a>, ...).</p>
+<p>To download a structure with
+a specific PDB code, you can use</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_pdb</span><span class="p">(</span><span class="s1">&#39;3AID&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/howdoi_pdb1.png" src="../_images/howdoi_pdb1.png" />
+</div></blockquote>
+<p>You can, of course, also read in files from a variety of formats:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;/path/to/3AID.pdb&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="biomolecular-assemblies">
+<h3>Biomolecular assemblies<a class="headerlink" href="#biomolecular-assemblies" title="Permalink to this headline">¶</a></h3>
+<p>Many biomolecules in the PDB only contain a subset of the total biomolecular structure - the
+remaining parts of the structure can be generated via <a class="reference external" href="http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies">symmetry transformations</a>.</p>
+<p>When you read in such a structure, MDT will issue a warning.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_pdb</span><span class="p">(</span><span class="s1">&#39;3FPP&#39;</span><span class="p">)</span>
+<span class="go">WARNING: This PDB file contains the following biomolecular assemblies:</span>
+<span class="go">WARNING: Assembly &quot;1&quot;: 3 copies of chains A, B</span>
+<span class="go">WARNING: Use ``mdt.build_assembly([molecule],[assembly_name])`` to build one of the above assemblies</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>To create the full assembly, run</dt>
+<dd><div class="first highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">assembly</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">build_assembly</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assembly</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/howdoi_pdb_assm.png" class="last" src="../_images/howdoi_pdb_assm.png" />
+</dd>
+<dt>Note:</dt>
+<dd>Only PDB-formatted files are currently supported for biomolecular assemblies - MMCif support
+is in progress.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="how-do-i-measure-bonds">
+<h2><a class="toc-backref" href="#id4">How do I measure bonds?</a><a class="headerlink" href="#how-do-i-measure-bonds" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="_moldesign_api/moldesign.geom.html#module-moldesign.geom" title="moldesign.geom"><code class="xref py py-mod docutils literal"><span class="pre">moldesign.geom</span></code></a> module contains a variety of methods for measuring (and
+manipulate geometry).</p>
+<p>You can get the distance between any two atoms with the
+<code class="xref py py-meth docutils literal"><span class="pre">atom.distance</span></code> method.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom1</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">atom2</span><span class="p">)</span>
+<span class="go">[...] angstrom</span>
+</pre></div>
+</div>
+<p>Bond angles and dihedral (twist) angles can be measured using the <a class="reference internal" href="_moldesign_api/moldesign.geom.html#moldesign.geom.angle" title="moldesign.geom.angle"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.geom.angle()</span></code></a>
+and <a class="reference internal" href="_moldesign_api/moldesign.geom.html#moldesign.geom.dihedral" title="moldesign.geom.dihedral"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.geom.dihedral()</span></code></a> methods:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">moldesign</span><span class="o">.</span><span class="n">geom</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">)</span>
+<span class="go">[...] radians</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">moldesign</span><span class="o">.</span><span class="n">geom</span><span class="o">.</span><span class="n">dihedral</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">)</span>
+<span class="go">[...] radians</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-do-i-visualize-molecular-orbitals">
+<h2><a class="toc-backref" href="#id5">How do I visualize molecular orbitals?</a><a class="headerlink" href="#how-do-i-visualize-molecular-orbitals" title="Permalink to this headline">¶</a></h2>
+<p>First, you&#8217;ll need to calculate the molecule&#8217;s electronic structure using a quantum chemistry
+model. Quantum chemistry models are a type of
+<code class="xref py py-class docutils literal"><span class="pre">Energy</span> <span class="pre">Model</span></code> in MDT.</p>
+<p>You can use iPython&#8217;s autocomplete to get a list of the available methods by typing
+<code class="docutils literal"><span class="pre">mdt.models.</span></code> and then hitting the <code class="docutils literal"><span class="pre">Tab</span></code> key:</p>
+<img alt="../_images/howdoi_method_autocomplete.png" src="../_images/howdoi_method_autocomplete.png" />
+<p>In this example, let&#8217;s set up a small molecule with a simple quantum chemistry model -
+<a class="reference external" href="https://en.wikipedia.org/wiki/Hartree-Fock_method">restricted Hartree-Fock.</a></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_name</span><span class="p">(</span><span class="s1">&#39;benzene&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">set_energy_model</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">RHF</span><span class="p">(</span><span class="n">basis</span><span class="o">=</span><span class="s1">&#39;6-31g&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Next, we&#8217;ll run a calculation with this model - this will calculate several relevant properties for
+the molecule.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">calculate</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">potential_energy</span>
+<span class="go">-6275.56597497 eV</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">wfn</span>
+<span class="go">&lt;ElectronicWfn (rhf/6-31g) of Molecule: benzene&gt;</span>
+</pre></div>
+</div>
+<p>These properties are stored in a <a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a> at <code class="docutils literal"><span class="pre">mol.properties</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="go">[&#39;wfn&#39;, &#39;positions&#39;, &#39;mulliken&#39;, &#39;potential_energy&#39;]</span>
+</pre></div>
+</div>
+<p>Most relevant for our purposes, we&#8217;ve calculated the electronic state of the molecule and are
+ready to visualize it.</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">draw_orbitals</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/howdoi_orbs.png" src="../_images/howdoi_orbs.png" />
+</div></blockquote>
+<p>In an actual notebook, you can use the controls on the right to control the visualization.</p>
+</div>
+<div class="section" id="how-do-i-perform-an-energy-minimization">
+<h2><a class="toc-backref" href="#id6">How do I perform an energy minimization?</a><a class="headerlink" href="#how-do-i-perform-an-energy-minimization" title="Permalink to this headline">¶</a></h2>
+<p>First, you&#8217;ll need to create an <code class="xref py py-class docutils literal"><span class="pre">EnergyModel</span></code> for your molecule. Energy models can include quantum chemical, molecular mechanics, or wide assortment of other methods.</p>
+<p>We&#8217;ll follow the same setup as the previous step:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_name</span><span class="p">(</span><span class="s1">&#39;benzene&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">set_energy_model</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">RHF</span><span class="p">(</span><span class="n">basis</span><span class="o">=</span><span class="s1">&#39;sto-3g&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Now that our molecule has an <code class="xref py py-class docutils literal"><span class="pre">EnergyModel</span></code>, we can calculate energies and forces:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">calculate_forces</span><span class="p">()</span> <span class="c1"># returns vector of forces</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">calculate_potential_energy</span><span class="p">()</span> <span class="c1"># returns the molecule&#39;s energy</span>
+</pre></div>
+</div>
+<p>You&#8217;re now ready to use the molecule&#8217;s <code class="xref py py-meth docutils literal"><span class="pre">minimize</span></code> method:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">trajectory</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">nsteps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">frame_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And you can visualize the minimization process using the trajectory object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">trajectory</span><span class="o">.</span><span class="n">draw_orbitals</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/benz_min_traj.png" src="../_images/benz_min_traj.png" />
+</div>
+<div class="section" id="how-do-i-customize-a-3d-view">
+<h2><a class="toc-backref" href="#id7">How do I customize a 3D view?</a><a class="headerlink" href="#how-do-i-customize-a-3d-view" title="Permalink to this headline">¶</a></h2>
+<p>First, create a viewer. It will be rendered in your notebook when it&#8217;s the last object evaluated in a code cell.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">moldesign</span> <span class="k">as</span> <span class="nn">mdt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">moldesign</span> <span class="k">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_pdb</span><span class="p">(</span><span class="s1">&#39;3AID&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">draw3d</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span>
+</pre></div>
+</div>
+<img alt="../_images/howdoi_view1.png" src="../_images/howdoi_view1.png" />
+<p>At this point, the viewer will be drawn into your notebook. You can continue to manipulate it after it&#8217;s been drawn.</p>
+<p>For starters, let&#8217;s turn all the waters purple.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">wateratoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span> <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;water&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span><span class="o">.</span><span class="n">vdw</span><span class="p">(</span><span class="n">atoms</span><span class="o">=</span><span class="n">wateratoms</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;purple&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/howdoi_purplewater.png" src="../_images/howdoi_purplewater.png" />
+<p>Next, let&#8217;s make that drug molecule really stand out with with a transparent sphere, an arrow,
+and a label:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">drug</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="s1">&#39;ARQ401&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">drug</span><span class="o">.</span><span class="n">center_of_mass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sphere</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">draw_sphere</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">6</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arrow</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">draw_arrow</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">r</span><span class="o">+</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">26</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">r</span><span class="o">+</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">label</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">draw_label</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;Here&#39;s the drug&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/howdoi_annotated.png" src="../_images/howdoi_annotated.png" />
+<p>Maybe that&#8217;s too much - let&#8217;s remove the label and the sphere.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">viewer</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">sphere</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/howdoi_subtle.png" src="../_images/howdoi_subtle.png" />
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="structure.html" class="btn btn-neutral float-right" title="Atoms, molecules, and biomolecules" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="install.html" class="btn btn-neutral" title="Installing MDT" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

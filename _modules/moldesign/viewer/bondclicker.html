@@ -1,0 +1,324 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.viewer.bondclicker &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.viewer.bondclicker</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.viewer.bondclicker</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">moldesign.mathutils</span> <span class="kn">import</span> <span class="n">perpendicular</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">GeometryViewer</span>
+
+
+<div class="viewcode-block" id="BondClicker"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.viewer.bondclicker.BondClicker">[docs]</a><span class="k">class</span> <span class="nc">BondClicker</span><span class="p">(</span><span class="n">GeometryViewer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Allow the user to highlight bonds - this is a hack around 3dmol.js to allow</span>
+<span class="sd">    clickable bonds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">BONDCOLOR</span> <span class="o">=</span> <span class="s1">&#39;#C8C8C8&#39;</span>
+    <span class="n">ATOMRADIUS</span> <span class="o">=</span> <span class="mf">0.35</span>
+    <span class="n">SINGLERADIUS</span> <span class="o">=</span> <span class="mf">0.18</span>
+    <span class="n">DOUBLERADIUS</span> <span class="o">=</span> <span class="mf">0.13</span>
+    <span class="n">TRIPLERADIUS</span> <span class="o">=</span> <span class="mf">0.12</span>
+    <span class="n">DOUBLEOFFSET</span> <span class="o">=</span> <span class="mf">0.16</span>
+    <span class="n">TRIPLEOFFSET</span> <span class="o">=</span> <span class="mf">0.14</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bonds</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bond_shapes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bond_colors</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BondClicker</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">click_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vdw</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ATOMRADIUS</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_all_bonds</span><span class="p">(</span><span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BondClicker.set_positions"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.viewer.bondclicker.BondClicker.set_positions">[docs]</a>    <span class="k">def</span> <span class="nf">set_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">render</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;render&#39;</span><span class="p">,</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;render&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BondClicker</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_positions</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_all_bonds</span><span class="p">(</span><span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BondClicker.draw_all_bonds"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.viewer.bondclicker.BondClicker.draw_all_bonds">[docs]</a>    <span class="k">def</span> <span class="nf">draw_all_bonds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="c1"># TODO: this should be written in javascript, for speed and consistency</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_bond</span><span class="p">(</span><span class="n">bond</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="n">batch</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">render</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BondClicker.set_bond_color"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.viewer.bondclicker.BondClicker.set_bond_color">[docs]</a>    <span class="k">def</span> <span class="nf">set_bond_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">bond</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bond_colors</span><span class="p">[</span><span class="n">bond</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_bond</span><span class="p">(</span><span class="n">bond</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BondClicker.unset_bond_color"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.viewer.bondclicker.BondClicker.unset_bond_color">[docs]</a>    <span class="k">def</span> <span class="nf">unset_bond_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bond_colors</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">bond</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw_bond</span><span class="p">(</span><span class="n">bond</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BondClicker.draw_bond"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.viewer.bondclicker.BondClicker.draw_bond">[docs]</a>    <span class="k">def</span> <span class="nf">draw_bond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">shape_args</span><span class="p">):</span>
+        <span class="n">atom</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">a1</span>
+        <span class="n">nbr</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">a2</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">order</span>
+        <span class="k">assert</span> <span class="n">atom</span><span class="o">.</span><span class="n">index</span> <span class="o">!=</span> <span class="n">nbr</span><span class="o">.</span><span class="n">index</span>
+
+        <span class="k">if</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bond_shapes</span><span class="p">:</span>  <span class="c1"># i.e., we need to remove and redraw this bond</span>
+            <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bond_shapes</span><span class="p">[</span><span class="n">bond</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="n">batch</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="s1">&#39;clickable&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">shape_args</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bond_colors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">bond</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">BONDCOLOR</span><span class="p">)</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                      <span class="n">clickable</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                      <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                      <span class="n">batch</span><span class="o">=</span><span class="n">batch</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">shape_args</span><span class="p">)</span>
+
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">nbr</span><span class="o">.</span><span class="n">position</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DOUBLERADIUS</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DOUBLEOFFSET</span> <span class="o">*</span> <span class="n">perpendicular</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span>
+            <span class="n">t1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_tube</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">position</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span>
+                                <span class="n">nbr</span><span class="o">.</span><span class="n">position</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span>
+                                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">t2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_tube</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">offset</span><span class="p">,</span>
+                                <span class="n">nbr</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">offset</span><span class="p">,</span>
+                                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">shapes</span> <span class="o">=</span> <span class="p">[</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TRIPLERADIUS</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TRIPLEOFFSET</span> <span class="o">*</span> <span class="n">perpendicular</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span>
+            <span class="n">t1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_tube</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">position</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span>
+                                <span class="n">nbr</span><span class="o">.</span><span class="n">position</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span>
+                                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">t2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_tube</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">offset</span><span class="p">,</span>
+                                <span class="n">nbr</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">offset</span><span class="p">,</span>
+                                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">t3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_tube</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="n">nbr</span><span class="o">.</span><span class="n">position</span><span class="p">,</span>
+                                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">shapes</span> <span class="o">=</span> <span class="p">[</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">t3</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># assume single bond</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SINGLERADIUS</span>
+            <span class="n">tube</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_tube</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="n">nbr</span><span class="o">.</span><span class="n">position</span><span class="p">,</span>
+                                  <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">shapes</span> <span class="o">=</span> <span class="p">[</span><span class="n">tube</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bond_shapes</span><span class="p">[</span><span class="n">bond</span><span class="p">]</span> <span class="o">=</span> <span class="n">shapes</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bonds</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">bond</span>
+        <span class="k">if</span> <span class="n">render</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BondClicker.handle_click"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.viewer.bondclicker.BondClicker.handle_click">[docs]</a>    <span class="k">def</span> <span class="nf">handle_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trait_name</span><span class="p">,</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;pyid&#39;</span> <span class="ow">in</span> <span class="n">new</span><span class="p">:</span>
+            <span class="n">pyid</span> <span class="o">=</span> <span class="n">new</span><span class="p">[</span><span class="s1">&#39;pyid&#39;</span><span class="p">]</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bonds</span><span class="p">[</span><span class="n">pyid</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_callbacks</span><span class="p">:</span>
+                <span class="n">func</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">new</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_callbacks</span><span class="p">:</span>
+                <span class="n">func</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">click_callbacks</span><span class="p">:</span>
+            <span class="n">func</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

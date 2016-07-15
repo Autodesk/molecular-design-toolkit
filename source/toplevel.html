@@ -1,0 +1,2236 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>The Top-Level Namespace &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="contents.html">Docs</a> &raquo;</li>
+      
+    <li>The Top-Level Namespace</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/source/toplevel.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="the-top-level-namespace">
+<h1>The Top-Level Namespace<a class="headerlink" href="#the-top-level-namespace" title="Permalink to this headline">¶</a></h1>
+<p>The functions and classes listed here comprise the toolkit&#8217;s public API.
+These are functions and objects that can be accessed as</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">moldesign</span> <span class="k">as</span> <span class="nn">mdt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdt</span><span class="o">.</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+</pre></div>
+</div>
+<span class="target" id="module-moldesign"></span><dl class="function">
+<dt id="moldesign.read_amber">
+<code class="descclassname">moldesign.</code><code class="descname">read_amber</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.read_amber" title="Permalink to this definition">¶</a></dt>
+<dd><p>_amber_to_mol(prmtop_file, inpcrd_file, wait=True)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.mol_to_pybel">
+<code class="descclassname">moldesign.</code><code class="descname">mol_to_pybel</code><span class="sig-paren">(</span><em>mdtmol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openbabel.html#mol_to_pybel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.mol_to_pybel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate a moldesign molecule object into a pybel molecule object.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The focus is on translating topology and biomolecular structure -
+we don&#8217;t translate any metadata.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mdtmol</strong> (<a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule to translate</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">translated molecule</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pybel.Molecule</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.build_bdna">
+<code class="descclassname">moldesign.</code><code class="descname">build_bdna</code><span class="sig-paren">(</span><em>sequence</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#build_bdna"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.build_bdna" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses Ambertools&#8217; Nucleic Acid Builder to build a 3D double-helix B-DNA structure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sequence</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; DNA sequence for one of the strands (a complementary sequence will
+automatically be created)</li>
+<li><strong>engine</strong> (<em>pyccc.Engine</em>) &#8211; Engine to run this job on (default:
+<code class="docutils literal"><span class="pre">moldesign.compute.default_engine</span></code>)</li>
+<li><strong>image</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; URL for the docker image</li>
+<li><strong>wait</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if True, block until this function completes and return the function&#8217;s
+return value. Otherwise, return a job object immediately that can be queried later.</li>
+<li><strong>jobname</strong> &#8211; argument for <a class="reference internal" href="_moldesign_api/moldesign.compute.html#moldesign.compute.compute.run_job" title="moldesign.compute.compute.run_job"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.compute.compute.run_job()</span></code></a></li>
+<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if True, show logging output for this job</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">B-DNA double helix</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.from_smiles">
+<code class="descclassname">moldesign.</code><code class="descname">from_smiles</code><span class="sig-paren">(</span><em>smi</em>, <em>name=None</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openbabel.html#from_smiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.from_smiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate a smiles string to a 3D structure.
+This method uses OpenBabel to generate a plausible 3D conformation of the 2D SMILES topology.
+We only use the first result from the conformation generator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>smi</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; smiles string</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name to assign to molecule (default - the smiles string)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the translated molecule</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.read">
+<code class="descclassname">moldesign.</code><code class="descname">read</code><span class="sig-paren">(</span><em>f</em>, <em>format=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/converters.html#read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in a molecule from a file, file-like object, or string.
+Will also depickle a pickled object.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Files with <code class="docutils literal"><span class="pre">.bz2</span></code> or <code class="docutils literal"><span class="pre">.gz</span></code> suffixes will be automatically decompressed.
+Currently does not support files with more than one record - only returns the first record</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>f</strong> (<em>str or file-like</em>) &#8211; Either a path to a file, OR a string with the
+file&#8217;s contents, OR a file-like object</li>
+<li><strong>format</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; molecule format (pdb, xyz, sdf, etc.) or pickle format
+(recognizes p, pkl, or pickle); guessed from filename if not passed</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>molecule parsed from the file (or python object, for</dt>
+<dd><p class="first last">pickle files)</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">moldesign.Molecule or object</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if <code class="docutils literal"><span class="pre">f</span></code> isn&#8217;t recognized as a string, file path, or file-like object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.write">
+<code class="descclassname">moldesign.</code><code class="descname">write</code><span class="sig-paren">(</span><em>obj</em>, <em>filename=None</em>, <em>format=None</em>, <em>mode='w'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/converters.html#write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a molecule to a file or string.
+Will also pickle arbitrary python objects.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Files with <code class="docutils literal"><span class="pre">.bz2</span></code> or <code class="docutils literal"><span class="pre">.gz</span></code> suffixes will be automatically compressed.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<em>moldesign.Molecule or object</em>) &#8211; the molecule to be written
+(or python object to be pickled)</li>
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; filename (if not passed, then a string is returned)</li>
+<li><strong>format</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; molecule format (pdb, xyz, sdf, etc.) or a pickle file extension
+(&#8216;pkl&#8217; and &#8216;mdt&#8217; are both accepted)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">if filename is none, return the output file as a string (otherwise returns <code class="docutils literal"><span class="pre">None</span></code>)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.write_trajectory">
+<code class="descclassname">moldesign.</code><code class="descname">write_trajectory</code><span class="sig-paren">(</span><em>traj</em>, <em>filename=None</em>, <em>format=None</em>, <em>overwrite=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/converters.html#write_trajectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.write_trajectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write trajectory a file (if filename provided) or file-like buffer</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>traj</strong> (<a class="reference internal" href="_moldesign_api/moldesign.molecules.html#moldesign.molecules.Trajectory" title="moldesign.molecules.Trajectory"><em>moldesign.molecules.Trajectory</em></a>) &#8211; trajectory to write</li>
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of file (return a file-like object if not passed)</li>
+<li><strong>format</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; file format (guessed from filename if None)</li>
+<li><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; overwrite filename if it exists</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">file-like object (only if filename not passed)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/stringio.html#module-StringIO" title="(in Python v2.7)">StringIO</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.from_pdb">
+<code class="descclassname">moldesign.</code><code class="descname">from_pdb</code><span class="sig-paren">(</span><em>pdbcode</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/converters.html#from_pdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.from_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import the given molecular geometry from PDB.org</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/introduction">http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/introduction</a></p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pdbcode</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; 4-character PDB code (e.g. 3AID, 1BNA, etc.)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">molecule object</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.from_name">
+<code class="descclassname">moldesign.</code><code class="descname">from_name</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/converters.html#from_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.from_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempt to convert an IUPAC or common name to a molecular geometry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; molecular name (generally IUPAC - some common names are also recognized)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">molecule object</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.build_assembly">
+<code class="descclassname">moldesign.</code><code class="descname">build_assembly</code><span class="sig-paren">(</span><em>mol</em>, <em>assembly_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/converters.html#build_assembly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.build_assembly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create biological assembly using a bioassembly specification.</p>
+<p>This routine builds a biomolecular assembly using the specification from a PDB header (if
+present, this data can be found in the  &#8220;REMARK 350&#8221; lines in the PDB file). Assemblies are
+author-assigned structures created by copying, translating, and rotating a subset of the
+chains in the PDB file.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies">http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies</a></p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule with assembly data (assembly data will be created by the
+PDB parser at <code class="docutils literal"><span class="pre">molecule.properties.bioassembly</span></code>)</li>
+<li><strong>assembly_name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the biomolecular assembly to build.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>mol</strong> &#8211; molecule containing the complete assembly</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code> &#8211; If the molecule does not contain any biomolecular assembly data</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code> &#8211; If the specified assembly is not present</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.distance">
+<code class="descclassname">moldesign.</code><code class="descname">distance</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/coords.html#distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return distance between two atoms</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; the two atoms</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the distance</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar[length]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.angle">
+<code class="descclassname">moldesign.</code><code class="descname">angle</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/coords.html#angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>The angle between bonds a2-a1 and a2-a3
+:param a1,a2,a3: the atoms describing the vector
+:type a1,a2,a3: mdt.Atom</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the distance</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar[length]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.dihedral">
+<code class="descclassname">moldesign.</code><code class="descname">dihedral</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>a4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/coords.html#dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.dihedral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Twist angle of bonds a1-a2 and a4-a3 around around the central bond a2-a3</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2,a3,a4</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the dihedral</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.distance_gradient">
+<code class="descclassname">moldesign.</code><code class="descname">distance_gradient</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/grads.html#distance_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.distance_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gradient of the distance between two atoms,</p>
+<div class="math">
+\[\frac{\partial \mathbf{R}_1}{\partial \mathbf{r}} ||\mathbf{R}_1 - \mathbf{R}_2|| =
+   \frac{\mathbf{R}_1 - \mathbf{R}_2}{||\mathbf{R}_1 - \mathbf{R}_2||}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; the two atoms</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(gradient w.r.t. first atom, gradient w.r.t.
+second atom)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Tuple[u.Vector[length], u.Vector[length]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.angle_gradient">
+<code class="descclassname">moldesign.</code><code class="descname">angle_gradient</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/grads.html#angle_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.angle_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gradient of the angle between bonds a2-a1 and a2-a3</p>
+<div class="math">
+\[\nabla \theta_{ijkl} = \frac{\partial \theta_{ijkl}}{\partial \mathbf R}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2,a3</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the vector</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://salilab.org/modeller/9v6/manual/node436.html">https://salilab.org/modeller/9v6/manual/node436.html</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.dihedral_gradient">
+<code class="descclassname">moldesign.</code><code class="descname">dihedral_gradient</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>a4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/grads.html#dihedral_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.dihedral_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cartesian gradient of a dihedral coordinate,</p>
+<div class="math">
+\[\nabla \theta_{ijkl} = \frac{\partial \theta_{ijkl}}{\partial \mathbf R}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2,a3,a4</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the dihedral</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://salilab.org/modeller/9v6/manual/node436.html">https://salilab.org/modeller/9v6/manual/node436.html</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.set_distance">
+<code class="descclassname">moldesign.</code><code class="descname">set_distance</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>newlength</em>, <em>adjustmol=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/setcoord.html#set_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.set_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the distance between two atoms. They will be adjusted along the vector separating them.
+If the two atoms are A) bonded, B) not part of the same ring system, and C) <code class="docutils literal"><span class="pre">adjustmol</span></code> is
+True, then the entire molecule&#8217;s positions will be modified as well</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; atoms to adjust</li>
+<li><strong>newlength</strong> (<em>u.Scalar[length]</em>) &#8211; new length to set</li>
+<li><strong>adjustmol</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Adjust all atoms on either side of this bond?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.set_angle">
+<code class="descclassname">moldesign.</code><code class="descname">set_angle</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>theta</em>, <em>adjustmol=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/setcoord.html#set_angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.set_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the angle between bonds a1-a2 and a3-a2. The atoms will be adjusted along the
+gradient of the angle.
+If <code class="docutils literal"><span class="pre">adjustmol</span></code> is True and the topology is unambiguous, then the entire molecule&#8217;s positions
+will be modified as well</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a1,a2,a3</strong> (<em>mdt.Atom</em>) &#8211; atoms to adjust</li>
+<li><strong>theta</strong> (<em>u.Scalar[angle]</em>) &#8211; new angle to set</li>
+<li><strong>adjustmol</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Adjust all atoms on either side of this bond?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.set_dihedral">
+<code class="descclassname">moldesign.</code><code class="descname">set_dihedral</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>a4</em>, <em>theta</em>, <em>adjustmol=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/setcoord.html#set_dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.set_dihedral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the twist angle of atoms a1 and a4 around the central bond a2-a3. The atoms will be
+adjusted along the
+gradient of the angle.
+If <code class="docutils literal"><span class="pre">adjustmol</span></code> is True and the topology is unambiguous, then the entire molecule&#8217;s positions
+will be modified as well</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a1,a2,a3,a4</strong> (<em>mdt.Atom</em>) &#8211; atoms to adjust</li>
+<li><strong>theta</strong> (<em>u.Scalar[angle]</em>) &#8211; new angle to set</li>
+<li><strong>adjustmol</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Adjust all atoms on either side of this bond?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.FixedPosition">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">FixedPosition</code><span class="sig-paren">(</span><em>atom</em>, <em>point=None</em>, <em>value=None</em>, <em>tolerance=&lt;Quantity(0.001</em>, <em>'ang')&gt;</em>, <em>force_constant=&lt;Quantity(1000.0</em>, <em>'kcalpermol / ang ** 2')&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#FixedPosition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.FixedPosition" title="Permalink to this definition">¶</a></dt>
+<dd><p>This constraint is different than the others because it&#8217;s absolute, not relative</p>
+<dl class="method">
+<dt id="moldesign.FixedPosition.atomgrad">
+<code class="descname">atomgrad</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#FixedPosition.atomgrad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.FixedPosition.atomgrad" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>unit vector from the constraint location to the atom&#8217;s actual</dt>
+<dd>location (len=3)</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">u.Vector[length]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.FixedPosition.current">
+<code class="descname">current</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#FixedPosition.current"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.FixedPosition.current" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current value of the constrained quantity</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.FixedPosition.error">
+<code class="descname">error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#FixedPosition.error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.FixedPosition.error" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">deviation of current geometry from the constraint</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.bfgs">
+<code class="descclassname">moldesign.</code><code class="descname">bfgs</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.bfgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>SciPy&#8217;s implementation of the BFGS method, with gradients if available.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bfgs_threshold</strong> (<em>u.Scalar[force]</em>) &#8211; Maximum force on a single atom</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This implementation will fail rapidly if large forces are present (&gt;&gt; 1 eV/angstrom).</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.gradient_descent">
+<code class="descclassname">moldesign.</code><code class="descname">gradient_descent</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.gradient_descent" title="Permalink to this definition">¶</a></dt>
+<dd><p>A careful (perhaps overly careful) gradient descent implementation designed to relax
+structures far from equilibrium.</p>
+<dl class="docutils">
+<dt>The structure is adjusted along the force direction, but the step size is capped by</dt>
+<dd><code class="docutils literal"><span class="pre">max_atom_move</span></code> (.075 angstrom by default). If the energy increases after a move,
+the move is repeated with half the step size.</dd>
+</dl>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last docutils">
+<dt>This algorithm is good at stably removing large forces, but it&#8217;s very poorly suited to</dt>
+<dd>locating any type of critical point.</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.minimize">
+<code class="descclassname">moldesign.</code><code class="descname">minimize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.minimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses gradient descent until forces fall below a threshold,
+then switches to BFGS.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bfgs_threshold</strong> (<em>u.Scalar[force]</em>) &#8211; Maximum force on a single atom</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Not really that smart.</p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.BasisSet">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">BasisSet</code><span class="sig-paren">(</span><em>mol</em>, <em>orbitals</em>, <em>name=None</em>, <em>h1e=None</em>, <em>overlaps=None</em>, <em>angulartype=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/basis.html#BasisSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.BasisSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores a basis, typically of atomic orbitals.</p>
+<p>This is a special orbital type</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.AtomList">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">AtomList</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/atomcollections.html#AtomList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.AtomList" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of atoms that allows attribute &#8220;slicing&#8221; - accessing an attribute of the
+list will return a list of atom attributes.</p>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atomlist</span><span class="o">.</span><span class="n">mass</span> <span class="o">==</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atomlist</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">getattr</span><span class="p">(</span><span class="n">atomlist</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atomlist</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="moldesign.AtomList.atoms">
+<code class="descname">atoms</code><a class="headerlink" href="#moldesign.AtomList.atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a synonym for self so that AtomContainer methods will work here too</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.Bond">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">Bond</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>order=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/bonds.html#Bond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Bond" title="Permalink to this definition">¶</a></dt>
+<dd><p>A bond between two atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a1</strong> (<a class="reference internal" href="_moldesign_api/moldesign.molecules.html#moldesign.molecules.atoms.Atom" title="moldesign.molecules.atoms.Atom"><em>Atom</em></a>) &#8211; First atom</li>
+<li><strong>a2</strong> (<a class="reference internal" href="_moldesign_api/moldesign.molecules.html#moldesign.molecules.atoms.Atom" title="moldesign.molecules.atoms.Atom"><em>Atom</em></a>) &#8211; Second atom (the order of atoms doesn&#8217;t matter)</li>
+<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Order of the bond</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<dl class="docutils">
+<dt>Comparisons and hashes involving bonds will return True if the atoms involved in the bonds</dt>
+<dd>are the same. Bond orders are not compared.</dd>
+</dl>
+<p>These objects are used to represent and pass bond data only - they are not used for storage.</p>
+<dl class="attribute">
+<dt id="moldesign.Bond.a1">
+<code class="descname">a1</code><a class="headerlink" href="#moldesign.Bond.a1" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Atom</em> &#8211; First atom in the bond; assigned so that <code class="docutils literal"><span class="pre">self.a1.index</span> <span class="pre">&lt;</span> <span class="pre">self.a2.index</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Bond.a2">
+<code class="descname">a2</code><a class="headerlink" href="#moldesign.Bond.a2" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Atom</em> &#8211; Second atom in the bond; assigned so that <code class="docutils literal"><span class="pre">self.a2.index</span> <span class="pre">&gt;</span> <span class="pre">self.a1.index</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Bond.order">
+<code class="descname">order</code><a class="headerlink" href="#moldesign.Bond.order" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; bond order (can be <code class="docutils literal"><span class="pre">None</span></code>); not used in comparisons</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Bond.ff">
+<code class="descname">ff</code><a class="headerlink" href="#moldesign.Bond.ff" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>mdt.forcefield.BondTerm</em> &#8211; the force-field term for this bond (or <code class="docutils literal"><span class="pre">None</span></code> if no
+forcefield is present)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Bond.name">
+<code class="descname">name</code><a class="headerlink" href="#moldesign.Bond.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; name of the bond</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Bond.partner">
+<code class="descname">partner</code><span class="sig-paren">(</span><em>atom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/bonds.html#Bond.partner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Bond.partner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return this atom&#8217;s <em>partner</em> in the bond &#8211; i.e., the other atom in the bond</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atom</strong> (<em>mdt.Atom</em>) &#8211; return the atom that this one is bonded to</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the passed atom&#8217;s partner</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mdt.Atom</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if the passed atom is not part of this bond</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.Atom">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">Atom</code><span class="sig-paren">(</span><em>name=None</em>, <em>atnum=None</em>, <em>mass=None</em>, <em>chain=None</em>, <em>residue=None</em>, <em>pdbname=None</em>, <em>pdbindex=None</em>, <em>element=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/atoms.html#Atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>A data structure representing an atom.</p>
+<p><code class="docutils literal"><span class="pre">Atom</span></code> objects store information about individual atoms within a larger molecular system,
+providing access to atom-specific geometric, biomolecular, topological and property
+information. Each <a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> is composed of a list of atoms.</p>
+<p>Atoms can be instantiated directly, but they will generally be created
+automatically as part of molecules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The atom&#8217;s name (if not passed, set to the element name + the atom&#8217;s index)</li>
+<li><strong>atnum</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Atomic number (if not passed, determined from element if possible)</li>
+<li><strong>mass</strong> (<em>units.Scalar[mass]</em>) &#8211; The atomic mass (if not passed, set to the most abundant isotopic
+mass)</li>
+<li><strong>chain</strong> (<a class="reference internal" href="#moldesign.Chain" title="moldesign.Chain"><em>moldesign.Chain</em></a>) &#8211; biomolecular chain that this atom belongs to</li>
+<li><strong>residue</strong> (<a class="reference internal" href="#moldesign.Residue" title="moldesign.Residue"><em>moldesign.Residue</em></a>) &#8211; biomolecular residue that this atom belongs to</li>
+<li><strong>pdbname</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name from PDB entry, if applicable</li>
+<li><strong>pdbindex</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; atom serial number in the PDB entry, if applicable</li>
+<li><strong>element</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Elemental symbol (if not passed, determined from atnum if possible)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Atom instance attributes:</strong></p>
+<dl class="attribute">
+<dt id="moldesign.Atom.name">
+<code class="descname">name</code><a class="headerlink" href="#moldesign.Atom.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; A descriptive name for this atom</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.element">
+<code class="descname">element</code><a class="headerlink" href="#moldesign.Atom.element" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; IUPAC elemental symbol (&#8216;C&#8217;, &#8216;H&#8217;, &#8216;Cl&#8217;, etc.)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.index">
+<code class="descname">index</code><a class="headerlink" href="#moldesign.Atom.index" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; the atom&#8217;s current index in the molecule
+(<code class="docutils literal"><span class="pre">self</span> <span class="pre">is</span> <span class="pre">self.parent.atoms[</span> <span class="pre">self.index]</span></code>)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.atnum">
+<code class="descname">atnum</code><a class="headerlink" href="#moldesign.Atom.atnum" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; atomic number (synonyms: atomic_num)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.mass">
+<code class="descname">mass</code><a class="headerlink" href="#moldesign.Atom.mass" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>u.Scalar[mass]</em> &#8211; the atom&#8217;s mass</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.position">
+<code class="descname">position</code><a class="headerlink" href="#moldesign.Atom.position" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>units.Vector[length]</em> &#8211; atomic position vector. Once an atom is part of a molecule,
+this quantity will refer to <code class="docutils literal"><span class="pre">self.molecule.positions[self.index]</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.momentum">
+<code class="descname">momentum</code><a class="headerlink" href="#moldesign.Atom.momentum" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>units.Vector[momentum]</em> &#8211; atomic momentum vector. Once an atom is part of a
+molecule, this quantity will refer to <code class="docutils literal"><span class="pre">self.molecule.momenta[self.index]</span></code>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">x,y,z</code></dt>
+<dd><p><em>u.Scalar[length]</em> &#8211; x, y, and z components of <code class="docutils literal"><span class="pre">atom.position</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">vx, vy, vz</code></dt>
+<dd><p><em>u.Scalar[length/time]</em> &#8211; x, y, of <code class="docutils literal"><span class="pre">atom.velocity</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">px, py, pz</code></dt>
+<dd><p><em>u.Scalar[momentum]</em> &#8211; x, y, and z of <code class="docutils literal"><span class="pre">atom.momentum</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">fx, fy, fz</code></dt>
+<dd><p><em>u.Scalar[force]</em> &#8211; x, y, and z <code class="docutils literal"><span class="pre">atom.force</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.residue">
+<code class="descname">residue</code><a class="headerlink" href="#moldesign.Atom.residue" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>moldesign.Residue</em> &#8211; biomolecular residue that this atom belongs to</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.chain">
+<code class="descname">chain</code><a class="headerlink" href="#moldesign.Atom.chain" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>moldesign.Chain</em> &#8211; biomolecular chain that this atom belongs to</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.parent">
+<code class="descname">parent</code><a class="headerlink" href="#moldesign.Atom.parent" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>moldesign.Molecule</em> &#8211; molecule that this atom belongs to</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">index</code></dt>
+<dd><p><em>int</em> &#8211; index in the parent molecule: <code class="docutils literal"><span class="pre">atom</span> <span class="pre">is</span> <span class="pre">atom.parent.atoms[index]</span></code></p>
+</dd></dl>
+
+<p><strong>Atom methods and properties</strong></p>
+<p>See also methods offered by the mixin superclasses:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="xref py py-class docutils literal"><span class="pre">AtomDrawingMixin</span></code></li>
+<li><code class="xref py py-class docutils literal"><span class="pre">AtomGeometryMixin</span></code></li>
+<li><code class="xref py py-class docutils literal"><span class="pre">AtomPropertyMixin</span></code></li>
+<li><code class="xref py py-class docutils literal"><span class="pre">AtomReprMixin</span></code></li>
+</ul>
+</div></blockquote>
+<dl class="attribute">
+<dt id="moldesign.Atom.bond_graph">
+<code class="descname">bond_graph</code><a class="headerlink" href="#moldesign.Atom.bond_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Mapping[Atom, int]</em> &#8211; dictionary of this atoms bonded neighbors, of the form
+<code class="docutils literal"><span class="pre">{bonded_atom1,</span> <span class="pre">bond_order1,</span> <span class="pre">...}</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Atom.bond_to">
+<code class="descname">bond_to</code><span class="sig-paren">(</span><em>other</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/atoms.html#Atom.bond_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Atom.bond_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create or modify a bond with another atom</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>other</strong> (<a class="reference internal" href="_moldesign_api/moldesign.molecules.html#moldesign.molecules.atoms.Atom" title="moldesign.molecules.atoms.Atom"><em>Atom</em></a>) &#8211; atom to bond to</li>
+<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; bond order</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">bond object</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="_moldesign_api/moldesign.molecules.html#moldesign.molecules.bonds.Bond" title="moldesign.molecules.bonds.Bond">moldesign.molecules.bonds.Bond</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.bonds">
+<code class="descname">bonds</code><a class="headerlink" href="#moldesign.Atom.bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>List[Bond]</em> &#8211; list of all bonds this atom is involved in</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Atom.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.Atom.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy a group of atoms which may already have bonds, residues, and a parent molecule
+assigned. Do so by copying only the relevant entities, and creating a &#8220;mask&#8221; with
+deepcopy&#8217;s memo function to stop anything else from being copied.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of copied atoms</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#moldesign.AtomList" title="moldesign.AtomList">AtomList</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.elem">
+<code class="descname">elem</code><a class="headerlink" href="#moldesign.Atom.elem" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; elemental symbol</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">element</code></dt>
+<dd><p><em>str</em> &#8211; elemental symbol</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.force">
+<code class="descname">force</code><a class="headerlink" href="#moldesign.Atom.force" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>(units.Vector[force])</em> &#8211; atomic force vector. This quantity must be calculated - it is
+equivalent to <code class="docutils literal"><span class="pre">self.molecule.forces[self.index]</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">moldesign.NotCalculatedError</span></code> &#8211; if molecular forces have not been calculated</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.heavy_bonds">
+<code class="descname">heavy_bonds</code><a class="headerlink" href="#moldesign.Atom.heavy_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>List[Bond]</em> &#8211; list of all heavy atom bonds (where BOTH atoms are not hydrogen)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">this returns an empty list if called on a hydrogen atom</p>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.num_bonds">
+<code class="descname">num_bonds</code><a class="headerlink" href="#moldesign.Atom.num_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; the number of other atoms this atom is bonded to</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.symbol">
+<code class="descname">symbol</code><a class="headerlink" href="#moldesign.Atom.symbol" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; elemental symbol</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Atom.velocity">
+<code class="descname">velocity</code><a class="headerlink" href="#moldesign.Atom.velocity" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>u.Vector[length/time, 3]</em> &#8211; velocity of this atom; equivalent to
+<code class="docutils literal"><span class="pre">self.momentum/self.mass</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.Entity">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">Entity</code><span class="sig-paren">(</span><em>name=None</em>, <em>molecule=None</em>, <em>index=None</em>, <em>pdbname=None</em>, <em>pdbindex=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/biounits.html#Entity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generalized storage mechanism for hierarchical representation of biomolecules,
+e.g. by residue, chain, etc. Permits other groupings, provided that everything is
+tree-like.</p>
+<p>All children of a given entity must have unique keys. An individual child can be retrieved with
+<code class="docutils literal"><span class="pre">entity.childname</span></code> or <code class="docutils literal"><span class="pre">entity['childname']</span></code> or <code class="docutils literal"><span class="pre">entity[index]</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><em>Entity or mdt.Atom</em> &#8211; this entity&#8217;s children, in order</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldesign.Entity.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>item</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/biounits.html#Entity.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Entity.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a child to this entity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code> &#8211; if an object with this key already exists</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>item</strong> (<em>Entity or mdt.Atom</em>) &#8211; the child object to add</li>
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Key to retrieve this item (default: <code class="docutils literal"><span class="pre">item.name</span></code> )</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Entity.atoms">
+<code class="descname">atoms</code><a class="headerlink" href="#moldesign.Entity.atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>AtomList</em> &#8211; a sorted list of all atoms in this entity and/or its children</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Entity.indexlist">
+<code class="descname">indexlist</code><a class="headerlink" href="#moldesign.Entity.indexlist" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; list of all children, in order</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Entity.iteratoms">
+<code class="descname">iteratoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/biounits.html#Entity.iteratoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Entity.iteratoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over all atoms (i.e. leaf nodes)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><em>Atom</em> &#8211; all atoms in this entity and/or its children</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Entity.mass">
+<code class="descname">mass</code><a class="headerlink" href="#moldesign.Entity.mass" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>u.Scalar[mass]</em> &#8211; total mass of this object</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Entity.natoms">
+<code class="descname">natoms</code><a class="headerlink" href="#moldesign.Entity.natoms" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; number of atoms contained in this entity and its children</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Entity.num_atoms">
+<code class="descname">num_atoms</code><a class="headerlink" href="#moldesign.Entity.num_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; number of atoms contained in this entity and its children</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Entity.numatoms">
+<code class="descname">numatoms</code><a class="headerlink" href="#moldesign.Entity.numatoms" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; number of atoms contained in this entity and its children</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.Instance">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">Instance</code><span class="sig-paren">(</span><em>name=None</em>, <em>molecule=None</em>, <em>index=None</em>, <em>pdbname=None</em>, <em>pdbindex=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/biounits.html#Instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>The singleton biomolecular container for each <code class="docutils literal"><span class="pre">Molecule</span></code>. Its children are generally
+PDB chains. Users won&#8217;t ever really see this object.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.Residue">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">Residue</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/biounits.html#Residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Residue" title="Permalink to this definition">¶</a></dt>
+<dd><p>A biomolecular residue - most often an amino acid, a nucleic base, or a solvent
+molecule. In PDB structures, also often refers to non-biochemical molecules.</p>
+<p>Its children are almost always residues.</p>
+<dl class="attribute">
+<dt id="moldesign.Residue.parent">
+<code class="descname">parent</code><a class="headerlink" href="#moldesign.Residue.parent" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>mdt.Molecule</em> &#8211; the molecule this residue belongs to</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.chain">
+<code class="descname">chain</code><a class="headerlink" href="#moldesign.Residue.chain" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Chain</em> &#8211; the chain this residue belongs to</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Residue.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>atom</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/biounits.html#Residue.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Residue.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generalized storage mechanism for hierarchical representation of biomolecules,
+e.g. by residue, chain, etc. Permits other groupings, provided that everything is
+tree-like.</p>
+<p>All children of a given entity must have unique keys. An individual child can be retrieved with
+<code class="docutils literal"><span class="pre">entity.childname</span></code> or <code class="docutils literal"><span class="pre">entity['childname']</span></code> or <code class="docutils literal"><span class="pre">entity[index]</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><em>Entity or mdt.Atom</em> &#8211; this entity&#8217;s children, in order</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Residue.assign_template_bonds">
+<code class="descname">assign_template_bonds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/biounits.html#Residue.assign_template_bonds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Residue.assign_template_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign bonds from bioresidue templates.</p>
+<p>Only assigns bonds that are internal to this residue (does not connect different residues).
+The topologies here assume pH7.4 and may need to be corrected for other pHs</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><span class="xref std std-ref">moldesign.Chain.assign_biopolymer_bonds</span></p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if <code class="docutils literal"><span class="pre">residue.resname</span></code> is not in bioresidue templates</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code> &#8211; if an atom in this residue is not recognized</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.atomnames">
+<code class="descname">atomnames</code><a class="headerlink" href="#moldesign.Residue.atomnames" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Residue</em> &#8211; synonym for <code class="docutils literal"><span class="pre">`self`</span></code> for for the sake of readability &#8211; <code class="docutils literal"><span class="pre">`molecule.chains['A'].residues[123].atomnames['CA']`</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.backbone">
+<code class="descname">backbone</code><a class="headerlink" href="#moldesign.Residue.backbone" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>AtomList</em> &#8211; all backbone atoms for nucleic and protein residues
+(indentified using PDB names); returns None for other residue types</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.code">
+<code class="descname">code</code><a class="headerlink" href="#moldesign.Residue.code" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; one-letter amino acid code or two letter nucleic acid code, or &#8216;?&#8217; otherwise</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Residue.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/biounits.html#Residue.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Residue.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy a group of atoms which may already have bonds, residues, and a parent molecule
+assigned. Do so by copying only the relevant entities, and creating a &#8220;mask&#8221; with
+deepcopy&#8217;s memo function to stop anything else from being copied.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of copied atoms</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#moldesign.AtomList" title="moldesign.AtomList">AtomList</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.is_3prime_end">
+<code class="descname">is_3prime_end</code><a class="headerlink" href="#moldesign.Residue.is_3prime_end" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; this is the last base in a strand</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if this residue is not a DNA base</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.is_5prime_end">
+<code class="descname">is_5prime_end</code><a class="headerlink" href="#moldesign.Residue.is_5prime_end" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; this is the first base in a strand</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if this residue is not a DNA base</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.is_c_terminal">
+<code class="descname">is_c_terminal</code><a class="headerlink" href="#moldesign.Residue.is_c_terminal" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; this is the first residue in a peptide</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if this residue is not an amino acid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.is_monomer">
+<code class="descname">is_monomer</code><a class="headerlink" href="#moldesign.Residue.is_monomer" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; this residue is not part of a biopolymer</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.is_n_terminal">
+<code class="descname">is_n_terminal</code><a class="headerlink" href="#moldesign.Residue.is_n_terminal" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; this is the last residue in a peptide</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if this residue is not an amino acid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Residue.markdown_summary">
+<code class="descname">markdown_summary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/biounits.html#Residue.markdown_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Residue.markdown_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Markdown-formatted information about this residue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">markdown-formatted string</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.next_residue">
+<code class="descname">next_residue</code><a class="headerlink" href="#moldesign.Residue.next_residue" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt><em>Residue</em> &#8211;     The next residue in the chain (in the C-direction for proteins, 3&#8217;</dt>
+<dd>direction for nucleic acids)</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">NotImplementedError</span></code> &#8211; If we don&#8217;t know how to deal with this type of biopolymer</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">StopIteration</span></code> &#8211; If there isn&#8217;t a next residue (i.e. it&#8217;s a 3&#8217;- or C-terminus)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.prev_residue">
+<code class="descname">prev_residue</code><a class="headerlink" href="#moldesign.Residue.prev_residue" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Residue</em> &#8211;     The next residue in the chain (in the N-direction for proteins, 5&#8217; direction for nucleic acids)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">NotImplementedError</span></code> &#8211; If we don&#8217;t know how to deal with this type of biopolymer</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">StopIteration</span></code> &#8211; If there isn&#8217;t a previous residue (i.e. it&#8217;s a 5&#8217;- or N-terminus)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.resname">
+<code class="descname">resname</code><a class="headerlink" href="#moldesign.Residue.resname" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Synonym for pdbname</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.sidechain">
+<code class="descname">sidechain</code><a class="headerlink" href="#moldesign.Residue.sidechain" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>AtomList</em> &#8211; all sidechain atoms for nucleic and protein residues
+(defined as non-backbone atoms); returns None for other residue types</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.type">
+<code class="descname">type</code><a class="headerlink" href="#moldesign.Residue.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Classification of the residue (protein, solvent, dna, water, unknown)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.Chain">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">Chain</code><span class="sig-paren">(</span><em>pdbname=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/biounits.html#Chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Chain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Biomolecular chain class - its children are almost always residues.</p>
+<dl class="attribute">
+<dt id="moldesign.Chain.parent">
+<code class="descname">parent</code><a class="headerlink" href="#moldesign.Chain.parent" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>mdt.Molecule</em> &#8211; the molecule this residue belongs to</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Chain.chain">
+<code class="descname">chain</code><a class="headerlink" href="#moldesign.Chain.chain" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Chain</em> &#8211; the chain this residue belongs to</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Chain.assign_biopolymer_bonds">
+<code class="descname">assign_biopolymer_bonds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/biounits.html#Chain.assign_biopolymer_bonds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Chain.assign_biopolymer_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect bonds between residues in this chain. Does not .</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><span class="xref std std-ref">moldesign.Residue.assign_template_bonds</span></p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if <code class="docutils literal"><span class="pre">residue.resname</span></code> is not in bioresidue templates</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code> &#8211; if an atom in this residue is not recognized</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Chain.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/biounits.html#Chain.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Chain.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy a group of atoms which may already have bonds, residues, and a parent molecule
+assigned. Do so by copying only the relevant entities, and creating a &#8220;mask&#8221; with
+deepcopy&#8217;s memo function to stop anything else from being copied.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of copied atoms</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#moldesign.AtomList" title="moldesign.AtomList">AtomList</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Chain.residues">
+<code class="descname">residues</code><a class="headerlink" href="#moldesign.Chain.residues" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Chain</em> &#8211; synonym for &#8216;self&#8217; to enhance readability,
+e.g. <code class="docutils literal"><span class="pre">`molecule.chains['A'].residue[123]`</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Chain.sequence">
+<code class="descname">sequence</code><a class="headerlink" href="#moldesign.Chain.sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; this chain&#8217;s residue sequence with one-letter residue codes</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.MolecularProperties">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">MolecularProperties</code><span class="sig-paren">(</span><em>mol</em>, <em>**properties</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/molecule.html#MolecularProperties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.MolecularProperties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores property values for a molecule.
+These objects will be generally created and updated by EnergyModels, not by users.</p>
+<dl class="method">
+<dt id="moldesign.MolecularProperties.geometry_matches">
+<code class="descname">geometry_matches</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/molecule.html#MolecularProperties.geometry_matches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.MolecularProperties.geometry_matches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns:
+bool: True if the molecule&#8217;s <code class="docutils literal"><span class="pre">position</span></code> is the same as these properties&#8217; <code class="docutils literal"><span class="pre">position</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.Molecule">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">Molecule</code><span class="sig-paren">(</span><em>atomcontainer</em>, <em>name=None</em>, <em>bond_graph=None</em>, <em>copy_atoms=False</em>, <em>pdbname=None</em>, <em>charge=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/molecule.html#Molecule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Molecule" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="docutils literal"><span class="pre">Molecule</span></code> objects store a molecular system, including atoms, 3D coordinates, molecular
+properties, biomolecular entities, and other model-specific information. Interfaces with
+simulation models take place through the molecule object.</p>
+<p>Molecule objects will generally be created by reading files or parsing other input; see, for
+example: <a class="reference internal" href="#moldesign.read" title="moldesign.read"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.read()</span></code></a>, <a class="reference internal" href="#moldesign.from_smiles" title="moldesign.from_smiles"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.from_smiles()</span></code></a>,
+<a class="reference internal" href="#moldesign.from_pdb" title="moldesign.from_pdb"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.from_pdb()</span></code></a>, etc.</p>
+<p>This constructor is useful, however for copying other molecular structures (see
+examples below).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atomcontainer</strong> (<em>AtomContainer or AtomList or List[moldesign.Atom]</em>) &#8211; <p>atoms that make up
+this molecule.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the passed atoms don&#8217;t already belong to a molecule, they will be assigned
+to this one. If they DO already belong to a molecule, they will be copied,
+leaving the original molecule untouched.</p>
+</div>
+</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the molecule (automatically generated if not provided)</li>
+<li><strong>bond_graph</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; dictionary specifying bonds between the atoms - of the form
+<code class="docutils literal"><span class="pre">{atom1:{atom2:bond_order,</span> <span class="pre">atom3:bond_order},</span> <span class="pre">atom2:...}</span></code>
+This structure must be symmetric; we require
+<code class="docutils literal"><span class="pre">bond_graph[atom1][atom2]</span> <span class="pre">==</span> <span class="pre">bond_graph[atom2][atom1]</span></code></li>
+<li><strong>copy_atoms</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Create the molecule with <em>copies</em> of the passed atoms
+(they will be copied automatically if they already belong to another molecule)</li>
+<li><strong>pdbname</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of the PDB file</li>
+<li><strong>charge</strong> (<em>units.Scalar[charge]</em>) &#8211; molecule&#8217;s formal charge</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>Use the <code class="docutils literal"><span class="pre">Molecule</span></code> class to create copies of other molecules and substructures thereof:
+&gt;&gt;&gt; benzene = mdt.from_name(&#8216;benzene&#8217;)
+&gt;&gt;&gt; benzene_copy = mdt.Molecule(benzene, name=&#8217;benzene copy&#8217;)</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">protein</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_pdb</span><span class="p">(</span><span class="s1">&#39;3AID&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">carbon_copies</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Molecule</span><span class="p">([</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">protein</span><span class="o">.</span><span class="n">atoms</span> <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atnum</span><span class="o">==</span><span class="mi">6</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">first_residue_copy</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">protein</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><strong>Molecule instance attributes:</strong></p>
+<dl class="attribute">
+<dt id="moldesign.Molecule.atoms">
+<code class="descname">atoms</code><a class="headerlink" href="#moldesign.Molecule.atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>AtomList</em> &#8211; List of all atoms in this molecule.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.bond_graph">
+<code class="descname">bond_graph</code><a class="headerlink" href="#moldesign.Molecule.bond_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; symmetric dictionary specifying bonds between the
+atoms:</p>
+<blockquote>
+<div><p><code class="docutils literal"><span class="pre">bond_graph</span> <span class="pre">=</span> <span class="pre">{atom1:{atom2:bond_order,</span> <span class="pre">atom3:bond_order},</span> <span class="pre">atom2:...}</span></code></p>
+<p><code class="docutils literal"><span class="pre">bond_graph[atom1][atom2]</span> <span class="pre">==</span> <span class="pre">bond_graph[atom2][atom1]</span></code></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.residues">
+<code class="descname">residues</code><a class="headerlink" href="#moldesign.Molecule.residues" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>List[moldesign.Residue]</em> &#8211; flat list of all biomolecular residues in this molecule</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.chains">
+<code class="descname">chains</code><a class="headerlink" href="#moldesign.Molecule.chains" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Dict[moldesign.Chain]</em> &#8211; Biomolecular chains - individual chains can be
+accessed as <code class="docutils literal"><span class="pre">mol.chains[list_index]</span></code> or <code class="docutils literal"><span class="pre">mol.chains[chain_name]</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.name">
+<code class="descname">name</code><a class="headerlink" href="#moldesign.Molecule.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; A descriptive name for molecule</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.charge">
+<code class="descname">charge</code><a class="headerlink" href="#moldesign.Molecule.charge" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>units.Scalar[charge]</em> &#8211; molecule&#8217;s formal charge</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.ndims">
+<code class="descname">ndims</code><a class="headerlink" href="#moldesign.Molecule.ndims" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; length of the positions, momenta, and forces arrays (usually 3*self.num_atoms)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.num_atoms">
+<code class="descname">num_atoms</code><a class="headerlink" href="#moldesign.Molecule.num_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; number of atoms (synonyms: num_atoms, numatoms)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.positions">
+<code class="descname">positions</code><a class="headerlink" href="#moldesign.Molecule.positions" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>units.Array[length]</em> &#8211; Nx3 array of atomic positions</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.momenta">
+<code class="descname">momenta</code><a class="headerlink" href="#moldesign.Molecule.momenta" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>units.Array[momentum]</em> &#8211; Nx3 array of atomic momenta</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.masses">
+<code class="descname">masses</code><a class="headerlink" href="#moldesign.Molecule.masses" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>units.Vector[mass]</em> &#8211; vector of atomic masses</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.dim_masses">
+<code class="descname">dim_masses</code><a class="headerlink" href="#moldesign.Molecule.dim_masses" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>units.Array[mass]</em> &#8211; Nx3 array of atomic masses (for numerical convenience -
+allows you to calculate velocity, for instance, as
+<code class="docutils literal"><span class="pre">velocity</span> <span class="pre">=</span> <span class="pre">mol.momenta/mol.dim_masses</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.time">
+<code class="descname">time</code><a class="headerlink" href="#moldesign.Molecule.time" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>units.Scalar[time]</em> &#8211; current time in dynamics</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.energy_model">
+<code class="descname">energy_model</code><a class="headerlink" href="#moldesign.Molecule.energy_model" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>moldesign.models.base.EnergyModelBase</em> &#8211; Object that calculates
+molecular properties - driven by <cite>mol.calculate()</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.integrator">
+<code class="descname">integrator</code><a class="headerlink" href="#moldesign.Molecule.integrator" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>moldesign.integrators.base.IntegratorBase</em> &#8211; Object that drives movement of 3D
+coordinates in time, driven by mol.run()</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.is_biomolecule">
+<code class="descname">is_biomolecule</code><a class="headerlink" href="#moldesign.Molecule.is_biomolecule" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; True if this molecule contains at least 2 biochemical residues</p>
+</dd></dl>
+
+<p><strong>Molecule methods and properties</strong></p>
+<p>See also methods offered by the mixin superclasses:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="xref py py-class docutils literal"><span class="pre">moldesign.molecules.AtomContainer</span></code></li>
+<li><code class="xref py py-class docutils literal"><span class="pre">moldesign.molecules.MolPropertyMixin</span></code></li>
+<li><code class="xref py py-class docutils literal"><span class="pre">moldesign.molecules.MolDrawingMixin</span></code></li>
+<li><code class="xref py py-class docutils literal"><span class="pre">moldesign.molecules.MolSimulationMixin</span></code></li>
+<li><code class="xref py py-class docutils literal"><span class="pre">moldesign.molecules.MolTopologyMixin</span></code></li>
+<li><code class="xref py py-class docutils literal"><span class="pre">moldesign.molecules.MolConstraintMixin</span></code></li>
+<li><code class="xref py py-class docutils literal"><span class="pre">moldesign.molecules.MolReprMixin</span></code></li>
+</ul>
+</div></blockquote>
+<dl class="method">
+<dt id="moldesign.Molecule.addatom">
+<code class="descname">addatom</code><span class="sig-paren">(</span><em>newatom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/molecule.html#Molecule.addatom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Molecule.addatom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new atom to the molecule</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>newatom</strong> (<a class="reference internal" href="#moldesign.Atom" title="moldesign.Atom"><em>moldesign.Atom</em></a>) &#8211; The atom to add
+(it will be copied if it already belongs to a molecule)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Molecule.addatoms">
+<code class="descname">addatoms</code><span class="sig-paren">(</span><em>newatoms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/molecule.html#Molecule.addatoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Molecule.addatoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add new atoms to this molecule.
+For now, we really just rebuild the entire molecule in place.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>newatoms</strong> (<em>List[moldesign.Atom]</em>) &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.bonds">
+<code class="descname">bonds</code><a class="headerlink" href="#moldesign.Molecule.bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterator over all bonds in the molecule</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Yields:</th><td class="field-body"><em>moldesign.atoms.Bond</em> &#8211; bond object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Molecule.deletebond">
+<code class="descname">deletebond</code><span class="sig-paren">(</span><em>bond</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/molecule.html#Molecule.deletebond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Molecule.deletebond" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove this bond from the molecule&#8217;s topology</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>Bond</strong> &#8211; bond to remove</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.is_small_molecule">
+<code class="descname">is_small_molecule</code><a class="headerlink" href="#moldesign.Molecule.is_small_molecule" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; True if molecule&#8217;s mass is less than 500 Daltons (not mutually exclusive with
+<a class="reference internal" href="#moldesign.Molecule.is_biomolecule" title="moldesign.Molecule.is_biomolecule"><code class="xref py py-meth docutils literal"><span class="pre">self.is_biomolecule</span></code></a>)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Molecule.newbond">
+<code class="descname">newbond</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>order</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/molecule.html#Molecule.newbond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Molecule.newbond" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new bond</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>a1</strong> (<a class="reference internal" href="#moldesign.Atom" title="moldesign.Atom"><em>moldesign.Atom</em></a>) &#8211; First atom in the bond</li>
+<li><strong>a2</strong> (<a class="reference internal" href="#moldesign.Atom" title="moldesign.Atom"><em>moldesign.Atom</em></a>) &#8211; Second atom in the bond</li>
+<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; order of the bond</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">moldesign.Bond</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Molecule.velocities">
+<code class="descname">velocities</code><a class="headerlink" href="#moldesign.Molecule.velocities" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>u.Vector[length/time]</em> &#8211; Nx3 array of atomic velocities</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Molecule.write">
+<code class="descname">write</code><span class="sig-paren">(</span><em>filename=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/molecule.html#Molecule.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Molecule.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write this molecule to a string or file.</p>
+<p>This is a convenience method for <span class="xref std std-ref">moldesign.converters.write</span></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; filename to write (if not passed, write to string)</li>
+<li><strong>format</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; file format (if filename is not passed, format must be specified)
+Guessed from file extension if not passed</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.Trajectory">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">Trajectory</code><span class="sig-paren">(</span><em>mol</em>, <em>unit_system=None</em>, <em>first_frame=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/trajectory.html#Trajectory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Trajectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <code class="docutils literal"><span class="pre">Trajectory</span></code> stores information about a molecule&#8217;s motion and how its properties
+change as it moves.</p>
+<dl class="docutils">
+<dt>A trajectory object contains</dt>
+<dd><ol class="first last arabic simple">
+<li>a reference to the <a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule"><code class="xref py py-class docutils literal"><span class="pre">moldesign.Molecule</span></code></a> it describes, and</li>
+<li>a list of <code class="xref py py-class docutils literal"><span class="pre">Frame</span></code> objects, each one containing a snapshot of the molecule at a</li>
+</ol>
+</dd>
+</dl>
+<p>particular point in its motion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; the trajectory will describe the motion of this molecule</li>
+<li><strong>unit_system</strong> (<em>u.UnitSystem</em>) &#8211; convert all attributes to this unit system (default:
+<code class="docutils literal"><span class="pre">moldesign.units.default</span></code>)</li>
+<li><strong>first_frame</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Create the trajectory&#8217;s first <code class="xref py py-class docutils literal"><span class="pre">Frame</span></code> from the molecule&#8217;s
+current position</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="moldesign.Trajectory.mol">
+<code class="descname">mol</code><a class="headerlink" href="#moldesign.Trajectory.mol" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>moldesign.Molecule</em> &#8211; the molecule object that this trajectory comes from</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Trajectory.frames">
+<code class="descname">frames</code><a class="headerlink" href="#moldesign.Trajectory.frames" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>List[Frame]</em> &#8211; a list of the trajectory frames in the order they were created</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Trajectory.info">
+<code class="descname">info</code><a class="headerlink" href="#moldesign.Trajectory.info" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; text describing this trajectory</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Trajectory.unit_system">
+<code class="descname">unit_system</code><a class="headerlink" href="#moldesign.Trajectory.unit_system" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>u.UnitSystem</em> &#8211; convert all attributes to this unit system</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Trajectory.align_orbital_phases">
+<code class="descname">align_orbital_phases</code><span class="sig-paren">(</span><em>reference_frame=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/trajectory.html#Trajectory.align_orbital_phases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Trajectory.align_orbital_phases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to remove orbital sign flips between frames.
+If <cite>reference_frame</cite> is not passed, we&#8217;ll start with frame 0 and
+align successive pairs of orbitals.
+If <cite>reference_frame</cite> is an int, we&#8217;ll move forwards and backwards from that frame number.
+Otherwise, we&#8217;ll try to align every orbital frame to those in reference_frame</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>reference_frame</strong> (<em>int or Frame</em>) &#8211; <code class="docutils literal"><span class="pre">Frame</span></code> containing the orbitals to align with
+(default: align each frame with the previous one)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Trajectory.apply_frame">
+<code class="descname">apply_frame</code><span class="sig-paren">(</span><em>frame</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/trajectory.html#Trajectory.apply_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Trajectory.apply_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reconstruct the underlying molecule with the given frame.
+Right now, any data not passed is ignored, which may result in properties that aren&#8217;t synced up
+with each other ...</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Trajectory.draw">
+<code class="descname">draw</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.Trajectory.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>TrajectoryViewer: create a trajectory visualization</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Trajectory.draw3d">
+<code class="descname">draw3d</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/trajectory.html#Trajectory.draw3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Trajectory.draw3d" title="Permalink to this definition">¶</a></dt>
+<dd><p>TrajectoryViewer: create a trajectory visualization</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Trajectory.draw_orbitals">
+<code class="descname">draw_orbitals</code><span class="sig-paren">(</span><em>align=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/trajectory.html#Trajectory.draw_orbitals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Trajectory.draw_orbitals" title="Permalink to this definition">¶</a></dt>
+<dd><p>TrajectoryOrbViewer: create a trajectory visualization</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Trajectory.new_frame">
+<code class="descname">new_frame</code><span class="sig-paren">(</span><em>properties=None</em>, <em>**additional_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/trajectory.html#Trajectory.new_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Trajectory.new_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new frame, EITHER from the parent molecule or from a list of properties</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>properties</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; dictionary of properties (i.e. {&#8216;positions&#8217;:[...],</li>
+<li><strong>'potential_energy'</strong> &#8211; ...})</li>
+<li><strong>**additional_data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; any additional data to be added to the trajectory frame</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">frame number (0-based)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)">int</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Trajectory.num_frames">
+<code class="descname">num_frames</code><a class="headerlink" href="#moldesign.Trajectory.num_frames" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; number of frames in this trajectory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Trajectory.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/trajectory.html#Trajectory.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Trajectory.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a matplotlib plot of property x against property y</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x,y</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; names of the properties</li>
+<li><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; kwargs for <code class="xref py py-meth docutils literal"><span class="pre">matplotlib.pylab.plot()</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the lines that were plotted</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">List[matplotlib.lines.Lines2D]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Trajectory.rmsd">
+<code class="descname">rmsd</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>reference=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/trajectory.html#Trajectory.rmsd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Trajectory.rmsd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate root-mean-square displacement for each frame in the trajectory.</p>
+<p>The RMSD between times <span class="math">\(t\)</span> and <span class="math">\(t0\)</span> is given by</p>
+<p><span class="math">\(\text{RMSD}(t;t_0) =\sqrt{\sum_{i \in \text{atoms}} \left( \mathbf{R}_i(t) -
+\mathbf{R}_i(t_0) \right)^2}\)</span>,</p>
+<p>where <span class="math">\(\mathbf{R}_i(t)\)</span> is the position of atom <em>i</em> at time <em>t</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>atoms</strong> (<em>list[mdt.Atom]</em>) &#8211; list of atoms to calculate the RMSD for (all atoms in the
+<code class="docutils literal"><span class="pre">Molecule</span></code>)</li>
+<li><strong>reference</strong> (<em>u.Vector[length]</em>) &#8211; Reference positions for RMSD. (default:
+<code class="docutils literal"><span class="pre">traj.frames[0].positions</span></code>)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of RMSD displacements for each frame in the trajectory</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">u.Vector[length]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Trajectory.slice_frames">
+<code class="descname">slice_frames</code><span class="sig-paren">(</span><em>key</em>, <em>missing=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/trajectory.html#Trajectory.slice_frames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Trajectory.slice_frames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an array of giving the value of <code class="docutils literal"><span class="pre">key</span></code> at each frame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of the property, e.g., time, potential_energy, annotation, etc</li>
+<li><strong>missing</strong> &#8211; value to return if a given frame does not have this property</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>vector containing the value at each frame, or the value given</dt>
+<dd><p class="first last">in the <code class="docutils literal"><span class="pre">missing</span></code> keyword) (len= <cite>len(self)</cite> )</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">moldesign.units.Vector</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.add_hydrogen">
+<code class="descclassname">moldesign.</code><code class="descname">add_hydrogen</code><span class="sig-paren">(</span><em>mol</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openbabel.html#add_hydrogen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.add_hydrogen" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Add hydrogens to saturate atomic valences. (Does not assign formal charges or correct</dt>
+<dd>for pH).</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to saturate</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">New molecule with all valences saturated</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.guess_bond_orders">
+<code class="descclassname">moldesign.</code><code class="descname">guess_bond_orders</code><span class="sig-paren">(</span><em>mol</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openbabel.html#guess_bond_orders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.guess_bond_orders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use OpenBabel to guess bond orders using geometry and functional group templates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to perceive the bonds of</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">New molecule with assigned bonds</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.assign_forcefield">
+<code class="descclassname">moldesign.</code><code class="descname">assign_forcefield</code><span class="sig-paren">(</span><em>mol</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#assign_forcefield"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.assign_forcefield" title="Permalink to this definition">¶</a></dt>
+<dd><p>run_tleap(mol, protein=&#8217;ff14SB&#8217;, dna=&#8217;OL15&#8217;, rna=&#8217;OL3&#8217;, carbohydrate=&#8217;GLYCAM_06j-1&#8217;, lipid=&#8217;lipid14&#8217;, water=&#8217;tip3p&#8217;, organic=&#8217;gaff2&#8217;, off_files=(), frcmod_files=(), engine=None, image=None, wait=True, jobname=None, display=True)
+Drives tleap to create a prmtop and inpcrd file. Specifically uses the AmberTools 16
+tleap distribution.</p>
+<p>Defaults are as recommended in the ambertools manual.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<a class="reference internal" href="#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to set up</li>
+<li><strong>protein</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; protein forcefield name (default:ff14SB)</li>
+<li><strong>dna</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; dna forcefield name (default: OL15)</li>
+<li><strong>rna</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; rna forcefield name (default: OL3)</li>
+<li><strong>carbohydrate</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; carbohydrate forcefield name (default: GLYCAM_06j)</li>
+<li><strong>lipid</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; lipid forcefield name (default: lipid14)</li>
+<li><strong>water</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; water forcefield name (default: tip3p)</li>
+<li><strong>organic</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; organic forcefield name (default: gaff2)</li>
+<li><strong>off_files</strong> (<em>List[batch.FileContainer]</em>) &#8211; </li>
+<li><strong>frcmod_files</strong> (<em>List[batch.FileContainer]</em>) &#8211; </li>
+<li><strong>engine</strong> (<em>pyccc.Engine</em>) &#8211; Engine to run this job on (default:
+<code class="docutils literal"><span class="pre">moldesign.compute.default_engine</span></code>)</li>
+<li><strong>image</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; URL for the docker image</li>
+<li><strong>wait</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if True, block until this function completes and return the function&#8217;s
+return value. Otherwise, return a job object immediately that can be queried later.</li>
+<li><strong>jobname</strong> &#8211; argument for <a class="reference internal" href="_moldesign_api/moldesign.compute.html#moldesign.compute.compute.run_job" title="moldesign.compute.compute.run_job"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.compute.compute.run_job()</span></code></a></li>
+<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if True, show logging output for this job</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p>Ambertools Manual, <a class="reference external" href="http://ambermd.org/doc12/Amber16.pdf">http://ambermd.org/doc12/Amber16.pdf</a>. See page 33 for forcefield
+recommendations.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.ChemicalGraphViewer">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">ChemicalGraphViewer</code><span class="sig-paren">(</span><em>mol</em>, <em>carbon_labels=True</em>, <em>names=None</em>, <em>display=False</em>, <em>_forcebig=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.ChemicalGraphViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a JSON-format graph representing the chemical structure and draw it using the
+NBMolViz 2D widget.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<em>moldesign.molecules.AtomContainer</em>) &#8211; A collection of atoms (eg a list of atoms,
+a residue, a molecule. etc)</li>
+<li><strong>carbon_labels</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; If True, draw atom names for carbons</li>
+<li><strong>names</strong> (<em>List[str]</em>) &#8211; (optional) a list of strings to label the atoms in the drawing
+(default: <code class="docutils literal"><span class="pre">[atom.name</span> <span class="pre">for</span> <span class="pre">atom</span> <span class="pre">in</span> <span class="pre">mol.atoms]</span></code>)</li>
+<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; immediately display this drawing</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldesign.ChemicalGraphViewer.get_atom_index">
+<code class="descname">get_atom_index</code><span class="sig-paren">(</span><em>atom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer.get_atom_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.ChemicalGraphViewer.get_atom_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the atom&#8217;s index in this object&#8217;s storage</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.ChemicalGraphViewer.handle_selection_event">
+<code class="descname">handle_selection_event</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer.handle_selection_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.ChemicalGraphViewer.handle_selection_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Highlight atoms in response to a selection event</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>selection</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; Selection event from <code class="xref py py-mod docutils literal"><span class="pre">moldesign.uibase.selectors</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.DistanceGraphViewer">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">DistanceGraphViewer</code><span class="sig-paren">(</span><em>atoms</em>, <em>distance_sensitivity=(&lt;Quantity(3.0</em>, <em>'ang')&gt;</em>, <em>&lt;Quantity(7.0</em>, <em>'ang')&gt;)</em>, <em>bond_edge_weight=1.0</em>, <em>minimum_edge_weight=0.2</em>, <em>nonbond_weight_factor=0.66</em>, <em>angstrom_to_px=22.0</em>, <em>charge=-300</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#DistanceGraphViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.DistanceGraphViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a 2D graph that includes edges with 3D information. This gives a 2D chemical that
+shows contacts from 3D space.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<em>moldesign.molecules.AtomContainer</em>) &#8211; A collection of atoms (eg a list of atoms,
+a residue, a molecule. etc)</li>
+<li><strong>distance_sensitivity</strong> (<em>Tuple[u.Scalar[length]]</em>) &#8211; a tuple containing the minimum and
+maximum 3D distances to create edges for (default: <code class="docutils literal"><span class="pre">(3.0*u.ang,</span> <span class="pre">7.0*u.ang)</span></code>)</li>
+<li><strong>bond_edge_weight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; edge weight for covalent bonds</li>
+<li><strong>nonbond_weight_factor</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; scale non-covalent edge weights by this factor</li>
+<li><strong>angstrom_to_px</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of pixels per angstrom</li>
+<li><strong>charge</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; the force-directed layout repulsive &#8220;charge&#8221;</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.GeometryViewer">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">GeometryViewer</code><span class="sig-paren">(</span><em>mol=None</em>, <em>style=None</em>, <em>display=False</em>, <em>render=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.GeometryViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Viewer for static and multiple-frame geometries</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><a class="reference internal" href="_moldesign_api/moldesign.molecules.html#moldesign.molecules.Trajectory.mol" title="moldesign.molecules.Trajectory.mol"><strong>mol</strong></a> &#8211; Buckyball molecule</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldesign.GeometryViewer.calc_orb_grid">
+<code class="descname">calc_orb_grid</code><span class="sig-paren">(</span><em>orbname</em>, <em>npts</em>, <em>framenum</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.calc_orb_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.GeometryViewer.calc_orb_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate orbitals on a grid</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>orbname</strong> &#8211; Either orbital index (for canonical orbitals) or a tuple ( [orbital type],
+[orbital index] ) where [orbital type] is a keyword (e.g., canonical, natural, nbo,
+ao, etc)</li>
+<li><strong>npts</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; resolution in each dimension of the grid</li>
+<li><strong>framenum</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; wavefunction for which frame number?</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">orbital values on a grid</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">moldesign.viewer.VolumetricGrid</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.GeometryViewer.draw_atom_vectors">
+<code class="descname">draw_atom_vectors</code><span class="sig-paren">(</span><em>vecs</em>, <em>rescale_to=1.75</em>, <em>scale_factor=None</em>, <em>opacity=0.85</em>, <em>radius=0.11</em>, <em>render=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.draw_atom_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.GeometryViewer.draw_atom_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>For displaying atom-centered vector data (e.g., momenta, forces)
+:param rescale_to: rescale to this length (in angstroms) (not used if scale_factor is passed)
+:param scale_factor: Scaling factor for arrows: dimensions of [vecs dimensions] / [length]
+:param render: render immediately
+:param kwargs: keyword arguments for self.draw_arrow</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.GeometryViewer.handle_selection_event">
+<code class="descname">handle_selection_event</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.handle_selection_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.GeometryViewer.handle_selection_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deals with an external selection event
+:param selection:todo
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.GeometryViewer.highlight_atoms">
+<code class="descname">highlight_atoms</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.highlight_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.GeometryViewer.highlight_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atoms</strong> (<em>list[Atoms]</em>) &#8211; list of atoms to highlight. If None, remove all highlights</li>
+<li><strong>render</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; render this change immediately</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.GeometryViewer.set_colors">
+<code class="descname">set_colors</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.set_colors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.GeometryViewer.set_colors" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>colormap</strong> (<em>Mapping[str,List[Atoms]]</em>) &#8211; mapping of colors to atoms</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

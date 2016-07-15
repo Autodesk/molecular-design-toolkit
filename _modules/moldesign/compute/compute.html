@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.compute.compute &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.compute.compute</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.compute.compute</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">utils</span>
+
+<div class="viewcode-block" id="get_image_path"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.compute.html#moldesign.compute.compute.get_image_path">[docs]</a><span class="k">def</span> <span class="nf">get_image_path</span><span class="p">(</span><span class="n">image_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns a fully qualified tag that points to the correct registry</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image_name (str): name of the image (without tags, repository, etc.)</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; config.update({&#39;default_repository&#39;:&#39;my.docker.registry/orgname/myrepo:&#39;,</span>
+<span class="sd">                           &#39;default_version_tag&#39;:&#39;latest&#39;})</span>
+<span class="sd">        &gt;&gt;&gt; get_image_path(&#39;myimage&#39;)</span>
+<span class="sd">        &#39;my.docker.registry/orgname/myrepo:myimage-latest&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; config.update({&#39;default_repository&#39;:&#39;docker.io/myorg&#39;,</span>
+<span class="sd">                           &#39;default_version_tag&#39;:&#39;0.2&#39;})</span>
+<span class="sd">        &gt;&gt;&gt; get_image_path(&#39;someimage&#39;)</span>
+<span class="sd">        &#39;docker.io/myorg/someimage:0.2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">config</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">default_repository</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">image_name</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">default_repository</span><span class="p">,</span> <span class="n">image_name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">default_repository</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">default_repository</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;:&#39;</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">default_version_tag</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">version_tag</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">default_version_tag</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Faulty docker repository configuration not recognized&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">img</span></div>
+
+
+<div class="viewcode-block" id="DummyJob"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.compute.html#moldesign.compute.compute.DummyJob">[docs]</a><span class="k">class</span> <span class="nc">DummyJob</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A job that doesn&#39;t actually need to run.</span>
+<span class="sd">    Useful as a return value for processes that return a job object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s1">&#39;finished&#39;</span>
+    <span class="n">wait</span> <span class="o">=</span> <span class="n">kill</span> <span class="o">=</span> <span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">None</span>
+    <span class="n">get_stdout_stream</span> <span class="o">=</span> <span class="n">get_stderr_stream</span> <span class="o">=</span> <span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">stdout</span> <span class="o">=</span> <span class="n">stderr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="DummyJob.get_output_files"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.compute.html#moldesign.compute.compute.DummyJob.get_output_files">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_files</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}[</span><span class="n">filename</span><span class="p">]</span>  <span class="c1"># raises the exception on purpose</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">updated_object</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">if</span> <span class="n">updated_object</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updated_object</span> <span class="o">=</span> <span class="n">updated_object</span></div>
+
+
+<div class="viewcode-block" id="run_job"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.compute.html#moldesign.compute.compute.run_job">[docs]</a><span class="k">def</span> <span class="nf">run_job</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">jobname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">_return_result</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Helper for running jobs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        job (pyccc.Job): The job to run</span>
+<span class="sd">        engine (pyccc.Engine): Engine to run this job on (default:</span>
+<span class="sd">            ``moldesign.compute.default_engine``)</span>
+<span class="sd">        image (str): URL for the docker image</span>
+<span class="sd">        wait (bool): if True, block until this function completes and return the function&#39;s</span>
+<span class="sd">            return value. Otherwise, return a job object immediately that can be queried later.</span>
+<span class="sd">        display (bool): if True, show logging output for this job</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pyccc job object OR function&#39;s return value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">default_engine</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">engine</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No compute engine configured! Configure MDT using &#39;</span>
+                         <span class="s1">&#39;moldesign.compute.config&#39;</span><span class="p">)</span>
+
+    <span class="n">engine</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+
+    <span class="n">jobname</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">jobname</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">display</span><span class="p">:</span>
+        <span class="n">mdt</span><span class="o">.</span><span class="n">uibase</span><span class="o">.</span><span class="n">display_log</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get_display_object</span><span class="p">(),</span> <span class="n">jobname</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">wait</span><span class="p">:</span>
+        <span class="n">job</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">_return_result</span><span class="p">:</span> <span class="k">return</span> <span class="n">job</span><span class="o">.</span><span class="n">result</span>
+
+    <span class="k">return</span> <span class="n">job</span></div>
+
+
+
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

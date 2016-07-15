@@ -1,0 +1,28 @@
+moldesign.forcefields package
+=============================
+
+.. automodule:: moldesign.forcefields
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+moldesign.forcefields.forcefield module
+---------------------------------------
+
+.. automodule:: moldesign.forcefields.forcefield
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.forcefields.terms module
+----------------------------------
+
+.. automodule:: moldesign.forcefields.terms
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

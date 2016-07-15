@@ -1,0 +1,365 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.parameters &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.parameters</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.parameters</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module stores definitions of common parameters for common techniques.</span>
+
+<span class="sd">These are used to standardize our interfaces to other codes, and automatically generate interactive</span>
+<span class="sd">notebook interfaces to configure various techniques.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">moldesign.utils</span> <span class="kn">import</span> <span class="n">if_not_none</span><span class="p">,</span> <span class="n">DotDict</span>
+
+
+<div class="viewcode-block" id="ForceField"><a class="viewcode-back" href="../../_moldesign_api/moldesign.html#moldesign.parameters.ForceField">[docs]</a><span class="k">class</span> <span class="nc">ForceField</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generalized force field type (blank for now)&quot;&quot;&quot;</span></div>
+<div class="viewcode-block" id="BasisSet"><a class="viewcode-back" href="../../_moldesign_api/moldesign.html#moldesign.parameters.BasisSet">[docs]</a><span class="k">class</span> <span class="nc">BasisSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generalized basis set type (blank for now&quot;&quot;&quot;</span></div>
+<div class="viewcode-block" id="ElectronicWfn"><a class="viewcode-back" href="../../_moldesign_api/moldesign.html#moldesign.parameters.ElectronicWfn">[docs]</a><span class="k">class</span> <span class="nc">ElectronicWfn</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generalized orbital storage (blank for now)&quot;&quot;&quot;</span></div>
+<div class="viewcode-block" id="QMTheory"><a class="viewcode-back" href="../../_moldesign_api/moldesign.html#moldesign.parameters.QMTheory">[docs]</a><span class="k">class</span> <span class="nc">QMTheory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generalized QM type (blank for now)&quot;&quot;&quot;</span></div>
+<div class="viewcode-block" id="SymmetryGroup"><a class="viewcode-back" href="../../_moldesign_api/moldesign.html#moldesign.parameters.SymmetryGroup">[docs]</a><span class="k">class</span> <span class="nc">SymmetryGroup</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generalized symmetry type (blank for now)&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="Parameter"><a class="viewcode-back" href="../../_moldesign_api/moldesign.html#moldesign.parameters.Parameter">[docs]</a><span class="k">class</span> <span class="nc">Parameter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span>
+                 <span class="n">short_description</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">choices</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">select_multiple</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                 <span class="n">help_url</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A method&#39;s parameter</span>
+<span class="sd">        :param default: the default value. If this does not match any spec in choices, it must be set.</span>
+<span class="sd">        :param choices: A list of allowable values for the parameter</span>
+<span class="sd">        :param types: a list of types for the parameter (does not check choices if parameter is one of these types)</span>
+<span class="sd">        :param number: Number of values (&gt;1 should be passed in list). &#39;+&#39; indicates arbitrary list size</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">displayname</span> <span class="o">=</span> <span class="n">if_not_none</span><span class="p">(</span><span class="n">short_description</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="n">default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="n">if_not_none</span><span class="p">(</span><span class="n">choices</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">help_url</span> <span class="o">=</span> <span class="n">help_url</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">MdtQuantity</span><span class="p">):</span>
+            <span class="nb">type</span> <span class="o">=</span> <span class="nb">type</span><span class="o">.</span><span class="n">units</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">MdtUnit</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">float</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="nb">type</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_multiple</span> <span class="o">=</span> <span class="n">select_multiple</span></div>
+
+
+<span class="c1"># TODO - make this ordered as well as dotted</span>
+<div class="viewcode-block" id="named_dict"><a class="viewcode-back" href="../../_moldesign_api/moldesign.html#moldesign.parameters.named_dict">[docs]</a><span class="k">def</span> <span class="nf">named_dict</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">DotDict</span><span class="p">({</span><span class="n">i</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span><span class="p">})</span></div>
+
+<span class="n">model_parameters</span> <span class="o">=</span> <span class="n">named_dict</span><span class="p">([</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;subsystem&#39;</span><span class="p">)</span>
+<span class="p">])</span>
+
+<span class="n">FORCEFIELDS</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">PERIODICITIES</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;box&#39;</span><span class="p">]</span>
+<span class="n">QMTHEORIES</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">BASISSETS</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">mm_model_parameters</span> <span class="o">=</span> <span class="n">named_dict</span><span class="p">([</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;cutoff&#39;</span><span class="p">,</span> <span class="s1">&#39;Cutoff for nonbonded interactions&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">nm</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">nm</span><span class="p">),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;nonbonded&#39;</span><span class="p">,</span> <span class="s1">&#39;Nonbonded interaction method&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;cutoff&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+              <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cutoff&#39;</span><span class="p">,</span> <span class="s1">&#39;pme&#39;</span><span class="p">,</span> <span class="s1">&#39;ewald&#39;</span><span class="p">]),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;implicit_solvent&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;Implicit solvent method&#39;</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+              <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gbsa&#39;</span><span class="p">,</span> <span class="s1">&#39;obc&#39;</span><span class="p">,</span> <span class="s1">&#39;pbsa&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">]),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;solute_dielectric&#39;</span><span class="p">,</span> <span class="s1">&#39;Solute dielectric constant&#39;</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;solvent_dielectric&#39;</span><span class="p">,</span> <span class="s1">&#39;Solvent dielectric constant&#39;</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="mf">78.5</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;ewald_error&#39;</span><span class="p">,</span> <span class="s1">&#39;Ewald error tolerance&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0005</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="s1">&#39;Periodicity&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">PERIODICITIES</span><span class="p">)</span>
+<span class="p">])</span>
+
+<span class="n">qm_model_parameters</span> <span class="o">=</span> <span class="n">named_dict</span><span class="p">([</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;theory&#39;</span><span class="p">,</span> <span class="s1">&#39;QM theory&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">QMTHEORIES</span><span class="p">),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;multiplicity&#39;</span><span class="p">,</span> <span class="s1">&#39;Spin multiplicity&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;basis_set&#39;</span><span class="p">,</span> <span class="s1">&#39;Basis set&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">BASISSETS</span><span class="p">),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;symmetry&#39;</span><span class="p">,</span>  <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="s1">&#39;Auto&#39;</span><span class="p">,</span> <span class="s1">&#39;Loose&#39;</span><span class="p">]),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;wfn_guess&#39;</span><span class="p">,</span> <span class="s1">&#39;Starting guess method:&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;huckel&#39;</span><span class="p">,</span>
+              <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;huckel&#39;</span><span class="p">,</span> <span class="s1">&#39;guess&#39;</span><span class="p">]</span>
+              <span class="p">)])</span>
+
+<span class="n">integrator_parameters</span> <span class="o">=</span> <span class="n">named_dict</span><span class="p">([</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;timestep&#39;</span><span class="p">,</span> <span class="s1">&#39;Dynamics timestep&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">time</span><span class="p">),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;frame_interval&#39;</span><span class="p">,</span> <span class="s1">&#39;Time between frames&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">ps</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span>
+<span class="p">])</span>
+
+<span class="n">md_parameters</span> <span class="o">=</span> <span class="n">named_dict</span><span class="p">([</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;remove_translation&#39;</span><span class="p">,</span> <span class="s1">&#39;Remove global translations&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;constrain_hbonds&#39;</span><span class="p">,</span> <span class="s1">&#39;Constrain covalent hydrogen bonds&#39;</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;constrain_water&#39;</span><span class="p">,</span> <span class="s1">&#39;Constrain water geometries&#39;</span><span class="p">,</span>
+              <span class="n">default</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">),</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;remove_rotation&#39;</span><span class="p">,</span> <span class="s1">&#39;Remove global rotations&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">),</span>
+
+<span class="p">])</span>
+
+<span class="n">constant_temp_parameters</span> <span class="o">=</span> <span class="n">named_dict</span><span class="p">([</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="s1">&#39;Thermostat temperature&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">298</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">temperature</span><span class="p">)])</span>
+
+<span class="n">langevin_parameters</span> <span class="o">=</span> <span class="n">named_dict</span><span class="p">([</span>
+    <span class="n">Parameter</span><span class="p">(</span><span class="s1">&#39;collision_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;Thermal collision rate&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">ps</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">ps</span><span class="p">)</span>
+<span class="p">])</span>
+
+<span class="n">ground_state_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;forces&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;dipole_moment&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;quadrupole_moment&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;octupole_moment&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;mulliken_charges&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;esp_charges&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;orbitals&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;orbital_energies&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;ci_vector&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;hessian&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;am1_bcc_charges&#39;</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;If you&#39;re just calculating these, then just pass the</span>
+<span class="sd">requested quantities as a list of keywords to the calculate method&quot;&quot;&quot;</span>
+
+<span class="n">excited_state_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;state_energies&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;state_forces&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;state_ci_vector&#39;</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">When requesting these quantities, requests need to be passed to mol.calculate</span>
+<span class="sd">as a dict with a list of states for each quantity, e.g.</span>
+<span class="sd">&gt;&gt;&gt; mol.calculate(requests={&#39;state_energies&#39;:[1,2],&#39;forces&#39;:[1,2]})</span>
+<span class="sd">to get state_energies and forces for states 1 and 2.</span>
+
+<span class="sd">Adiabatic states are indexed starting at 0, so state 0 is</span>
+<span class="sd">the ground state, 1 is the first excited state, etc.</span>
+<span class="sd">E.g.. state_energies[0] == potential_energy</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">multistate_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;transition_dipole&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;nacv&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;oscillator_strength&#39;</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">When requesting these quantities, requests need to be passed to mol.calculate</span>
+<span class="sd">as a dict with a list of *pairs* of states for each quantity, e.g.</span>
+<span class="sd">&gt;&gt;&gt; mol.calculate(requests={&#39;esp_charges&#39;:None, &#39;nacv&#39;:[(0,1),(0,2),(1,2)]})</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

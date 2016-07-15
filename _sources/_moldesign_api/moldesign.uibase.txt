@@ -1,0 +1,44 @@
+moldesign.uibase package
+========================
+
+.. automodule:: moldesign.uibase
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+moldesign.uibase.components module
+----------------------------------
+
+.. automodule:: moldesign.uibase.components
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.uibase.logwidget module
+---------------------------------
+
+.. automodule:: moldesign.uibase.logwidget
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.uibase.plotting module
+--------------------------------
+
+.. automodule:: moldesign.uibase.plotting
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.uibase.selector module
+--------------------------------
+
+.. automodule:: moldesign.uibase.selector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

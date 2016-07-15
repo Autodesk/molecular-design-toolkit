@@ -1,0 +1,456 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.interfaces.nbo_interface &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.interfaces.nbo_interface</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.interfaces.nbo_interface</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">import</span> <span class="nn">moldesign.molecules.bonds</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">moldesign.utils</span> <span class="kn">import</span> <span class="n">DotDict</span>
+
+
+<span class="n">SIGMA_UTF</span> <span class="o">=</span> <span class="s2">u&quot;</span><span class="se">\u03C3</span><span class="s2">&quot;</span>
+<span class="n">PI_UTF</span> <span class="o">=</span> <span class="s2">u&quot;</span><span class="se">\u03C0</span><span class="s2">&quot;</span>
+
+
+<div class="viewcode-block" id="run_nbo"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.interfaces.nbo_interface.run_nbo">[docs]</a><span class="k">def</span> <span class="nf">run_nbo</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">requests</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;nlmo&#39;</span><span class="p">,</span> <span class="s1">&#39;nbo&#39;</span><span class="p">),</span>
+            <span class="n">image</span><span class="o">=</span><span class="s1">&#39;nbo&#39;</span><span class="p">,</span>
+            <span class="n">engine</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">wfn</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">wfn</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;in.47&#39;</span><span class="p">:</span> <span class="n">make_nbo_input_file</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">requests</span><span class="p">)}</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;gennbo.i4.exe in.47&#39;</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">default_engine</span><span class="p">)</span>
+    <span class="n">imagename</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">get_image_path</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="n">job</span> <span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">imagename</span><span class="p">,</span>
+                          <span class="n">command</span><span class="p">,</span>
+                          <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+                          <span class="n">name</span><span class="o">=</span><span class="s2">&quot;nbo, </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">moldesign</span><span class="o">.</span><span class="n">uibase</span><span class="o">.</span><span class="n">display_log</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get_display_object</span><span class="p">(),</span> <span class="s2">&quot;nbo, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="n">job</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="n">parsed_data</span> <span class="o">=</span> <span class="n">parse_nbo</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="s1">&#39;FILE.10&#39;</span><span class="p">),</span>
+                            <span class="nb">len</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">aobasis</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">orbtype</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">parsed_data</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">orbtype</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span>  <span class="c1"># copy data from the orthogonal orbitals</span>
+            <span class="n">orthdata</span> <span class="o">=</span> <span class="n">parsed_data</span><span class="p">[</span><span class="n">orbtype</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="s1">&#39;bond_names iatom jatom stars bondnums num_bonded_atoms&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">orthdata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">occupations</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span> <span class="k">for</span> <span class="n">orb</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">coeffs</span><span class="p">]</span>
+
+        <span class="n">add_orbitals</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">wfn</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">orbtype</span><span class="p">)</span>
+    <span class="n">wfn</span><span class="o">.</span><span class="n">_nbo_job</span> <span class="o">=</span> <span class="n">job</span></div>
+
+
+<div class="viewcode-block" id="add_orbitals"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.interfaces.nbo_interface.add_orbitals">[docs]</a><span class="k">def</span> <span class="nf">add_orbitals</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">wfn</span><span class="p">,</span> <span class="n">orbdata</span><span class="p">,</span> <span class="n">orbtype</span><span class="p">):</span>
+    <span class="n">orbs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">orbdata</span><span class="o">.</span><span class="n">coeffs</span><span class="p">)):</span>
+        <span class="n">bond</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">orbdata</span><span class="o">.</span><span class="n">iatom</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">orbdata</span><span class="o">.</span><span class="n">bond_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;RY&#39;</span><span class="p">:</span>
+            <span class="n">bname</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> Ryd*&#39;</span> <span class="o">%</span> <span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">nbotype</span> <span class="o">=</span> <span class="s1">&#39;rydberg&#39;</span>
+            <span class="n">utf_name</span> <span class="o">=</span> <span class="n">bname</span>
+        <span class="k">elif</span> <span class="n">orbdata</span><span class="o">.</span><span class="n">bond_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;LP&#39;</span><span class="p">:</span>
+            <span class="n">bname</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> lone pair&#39;</span> <span class="o">%</span> <span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">nbotype</span> <span class="o">=</span> <span class="s1">&#39;lone pair&#39;</span>
+            <span class="n">utf_name</span> <span class="o">=</span> <span class="n">bname</span>
+        <span class="k">elif</span> <span class="n">orbdata</span><span class="o">.</span><span class="n">bond_names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;LV&#39;</span><span class="p">:</span>
+            <span class="n">bname</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> lone vacancy&#39;</span> <span class="o">%</span> <span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">nbotype</span> <span class="o">=</span> <span class="s1">&#39;lone vacancy&#39;</span>
+            <span class="n">utf_name</span> <span class="o">=</span> <span class="n">bname</span>
+        <span class="k">elif</span> <span class="n">orbdata</span><span class="o">.</span><span class="n">num_bonded_atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">bname</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> Core&#39;</span> <span class="o">%</span> <span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">nbotype</span> <span class="o">=</span> <span class="s1">&#39;core&#39;</span>
+            <span class="n">utf_name</span> <span class="o">=</span> <span class="n">bname</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">orbdata</span><span class="o">.</span><span class="n">jatom</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">bond</span> <span class="o">=</span> <span class="n">moldesign</span><span class="o">.</span><span class="n">molecules</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">Bond</span><span class="p">(</span><span class="o">*</span><span class="n">atoms</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">orbdata</span><span class="o">.</span><span class="n">bondnums</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># THIS IS NOT CORRECT</span>
+                <span class="n">nbotype</span> <span class="o">=</span> <span class="s1">&#39;sigma&#39;</span>
+                <span class="n">utf_type</span> <span class="o">=</span> <span class="n">SIGMA_UTF</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">nbotype</span> <span class="o">=</span> <span class="s1">&#39;pi&#39;</span>
+                <span class="n">utf_type</span> <span class="o">=</span> <span class="n">PI_UTF</span>
+            <span class="n">bname</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1"> - </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nbotype</span><span class="p">,</span> <span class="n">orbdata</span><span class="o">.</span><span class="n">stars</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                        <span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">utf_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1"> - </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">utf_type</span><span class="p">,</span> <span class="n">orbdata</span><span class="o">.</span><span class="n">stars</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                           <span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">bname</span><span class="p">,</span> <span class="n">orbtype</span><span class="p">)</span>
+
+        <span class="n">orbs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">moldesign</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">orbitals</span><span class="o">.</span><span class="n">Orbital</span><span class="p">(</span><span class="n">orbdata</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                                       <span class="n">wfn</span><span class="o">=</span><span class="n">wfn</span><span class="p">,</span> <span class="n">occupation</span><span class="o">=</span><span class="n">orbdata</span><span class="o">.</span><span class="n">occupations</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                                       <span class="n">atoms</span><span class="o">=</span><span class="n">atoms</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                                                       <span class="n">nbotype</span><span class="o">=</span><span class="n">nbotype</span><span class="p">,</span>
+                                                       <span class="n">bond</span><span class="o">=</span><span class="n">bond</span><span class="p">,</span>
+                                                       <span class="n">unicode_name</span><span class="o">=</span><span class="n">utf_name</span><span class="p">,</span>
+                                                       <span class="n">_data</span><span class="o">=</span><span class="n">orbdata</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">wfn</span><span class="o">.</span><span class="n">add_orbitals</span><span class="p">(</span><span class="n">orbs</span><span class="p">,</span> <span class="n">orbtype</span><span class="o">=</span><span class="n">orbtype</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="make_nbo_input_file"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.interfaces.nbo_interface.make_nbo_input_file">[docs]</a><span class="k">def</span> <span class="nf">make_nbo_input_file</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">requests</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param mol:</span>
+<span class="sd">    :type mol: moldesign.molecules.Molecule</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Units: angstroms, hartrees</span>
+    <span class="n">wfn</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">wfn</span>
+    <span class="n">orbs</span> <span class="o">=</span> <span class="n">wfn</span><span class="o">.</span><span class="n">molecular_orbitals</span>
+    <span class="n">nbofile</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># TODO: check for open shell wfn (OPEN keyword)</span>
+    <span class="c1"># TODO: check normalization, orthogonalization</span>
+    <span class="n">nbofile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot; $GENNBO BODM NATOMS=</span><span class="si">%d</span><span class="s2"> NBAS=</span><span class="si">%d</span><span class="s2"> $END&quot;</span> <span class="o">%</span>
+                   <span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">wfn</span><span class="o">.</span><span class="n">aobasis</span><span class="p">)))</span>
+
+    <span class="n">commands</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NBOSUM&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">requests</span><span class="p">:</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;AO</span><span class="si">%s</span><span class="s1">=W10&#39;</span> <span class="o">%</span> <span class="n">r</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span> <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">r</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+    <span class="n">nbofile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;$NBO </span><span class="si">%s</span><span class="s1"> $END&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">commands</span><span class="p">)))</span>
+
+    <span class="n">nbofile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;$COORD</span><span class="se">\n</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">iatom</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+        <span class="c1">#TODO: deal with pseudopotential electrons</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">repr</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">))</span>
+        <span class="n">nbofile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">atnum</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">atnum</span><span class="p">,</span>
+                                                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+    <span class="n">nbofile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;$END&quot;</span><span class="p">)</span>
+
+    <span class="n">nbofile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;$BASIS&quot;</span><span class="p">)</span>
+    <span class="n">nbofile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; CENTER = &#39;</span> <span class="o">+</span>
+                   <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">bfn</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="k">for</span> <span class="n">bfn</span> <span class="ow">in</span> <span class="n">wfn</span><span class="o">.</span><span class="n">aobasis</span><span class="p">))</span>
+    <span class="n">nbofile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot; LABEL = &quot;</span> <span class="o">+</span>
+                   <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">AOLABELS</span><span class="p">[</span><span class="n">bfn</span><span class="o">.</span><span class="n">orbtype</span><span class="p">])</span> <span class="k">for</span> <span class="n">bfn</span> <span class="ow">in</span> <span class="n">wfn</span><span class="o">.</span><span class="n">aobasis</span><span class="p">))</span>
+    <span class="n">nbofile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;$END&#39;</span><span class="p">)</span>
+
+    <span class="c1">#TODO: deal with CI wavefunctions ($WF keyword)</span>
+    <span class="n">nbofile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;$OVERLAP&#39;</span><span class="p">)</span>
+    <span class="n">append_matrix</span><span class="p">(</span><span class="n">nbofile</span><span class="p">,</span> <span class="n">wfn</span><span class="o">.</span><span class="n">aobasis</span><span class="o">.</span><span class="n">overlaps</span><span class="p">)</span>
+    <span class="n">nbofile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;$END&#39;</span><span class="p">)</span>
+
+    <span class="n">nbofile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;$DENSITY&#39;</span><span class="p">)</span>
+    <span class="n">append_matrix</span><span class="p">(</span><span class="n">nbofile</span><span class="p">,</span> <span class="n">wfn</span><span class="o">.</span><span class="n">density_matrix</span><span class="p">)</span>
+    <span class="n">nbofile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;$END&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nbofile</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="parse_nbo"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.interfaces.nbo_interface.parse_nbo">[docs]</a><span class="k">def</span> <span class="nf">parse_nbo</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">):</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">__iter__</span><span class="p">()</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;in the AO basis:&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="n">orbname</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="n">orbname</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;s&#39;</span>
+            <span class="n">orbname</span> <span class="o">=</span> <span class="n">orbname</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">orbname</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span>  <span class="c1"># these are pre-orthogonal orbitals, it only prints the coefficients</span>
+                <span class="n">coeffs</span> <span class="o">=</span> <span class="n">_parse_wrapped_matrix</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">)</span>
+                <span class="n">parsed</span><span class="p">[</span><span class="n">orbname</span><span class="p">]</span> <span class="o">=</span> <span class="n">DotDict</span><span class="p">(</span><span class="n">coeffs</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coeffs</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># there&#39;s more complete information available</span>
+                <span class="n">parsed</span><span class="p">[</span><span class="n">orbname</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_orbital_set</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">parsed</span></div>
+
+
+<div class="viewcode-block" id="read_orbital_set"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.interfaces.nbo_interface.read_orbital_set">[docs]</a><span class="k">def</span> <span class="nf">read_orbital_set</span><span class="p">(</span><span class="n">lineiter</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">):</span>
+    <span class="c1"># First, get the actual matrix</span>
+    <span class="n">mat</span> <span class="o">=</span> <span class="n">_parse_wrapped_matrix</span><span class="p">(</span><span class="n">lineiter</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">)</span>
+
+    <span class="c1"># First, occupation numbers</span>
+    <span class="n">occupations</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span><span class="n">_get_wrapped_separated_vals</span><span class="p">(</span><span class="n">lineiter</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">))</span>
+
+    <span class="c1"># Next, a line of things that always appear to be ones (for spin orbitals maybe?)</span>
+    <span class="n">oneline</span> <span class="o">=</span> <span class="n">_get_wrapped_separated_vals</span><span class="p">(</span><span class="n">lineiter</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">oneline</span><span class="p">:</span> <span class="k">assert</span> <span class="n">x</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span>
+
+    <span class="c1"># next is number of atoms involved in the bond</span>
+    <span class="n">num_bonded_atoms</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">_get_wrapped_separated_vals</span><span class="p">(</span><span class="n">lineiter</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">))</span>
+    <span class="n">bond_names</span> <span class="o">=</span> <span class="n">_get_wrapped_separated_vals</span><span class="p">(</span><span class="n">lineiter</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">)</span>
+
+    <span class="c1"># Next indicates whether real or virtual</span>
+    <span class="n">stars</span> <span class="o">=</span> <span class="n">_get_wrapped_column_vals</span><span class="p">(</span><span class="n">lineiter</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stars</span><span class="p">:</span> <span class="k">assert</span> <span class="p">(</span><span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span>
+
+    <span class="c1"># number of bonds between this pair of atoms</span>
+    <span class="n">bondnums</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">_get_wrapped_separated_vals</span><span class="p">(</span><span class="n">lineiter</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">))</span>
+
+    <span class="c1"># first atom index (1-based)</span>
+    <span class="n">iatom</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">_get_wrapped_separated_vals</span><span class="p">(</span><span class="n">lineiter</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">))</span>
+    <span class="n">jatom</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">_get_wrapped_separated_vals</span><span class="p">(</span><span class="n">lineiter</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">))</span>
+
+    <span class="c1"># The rest appears to be 0 most of the time ...</span>
+
+    <span class="k">return</span> <span class="n">DotDict</span><span class="p">(</span><span class="n">coeffs</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mat</span><span class="p">),</span>
+                   <span class="n">iatom</span><span class="o">=</span><span class="n">iatom</span><span class="p">,</span> <span class="n">jatom</span><span class="o">=</span><span class="n">jatom</span><span class="p">,</span> <span class="n">bondnums</span><span class="o">=</span><span class="n">bondnums</span><span class="p">,</span>
+                   <span class="n">bond_names</span><span class="o">=</span><span class="n">bond_names</span><span class="p">,</span>
+                   <span class="n">num_bonded_atoms</span><span class="o">=</span><span class="n">num_bonded_atoms</span><span class="p">,</span>
+                   <span class="n">stars</span><span class="o">=</span><span class="n">stars</span><span class="p">,</span> <span class="n">occupations</span><span class="o">=</span><span class="n">occupations</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_parse_wrapped_matrix</span><span class="p">(</span><span class="n">lineiter</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">):</span>
+    <span class="n">mat</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nbasis</span><span class="p">):</span>
+        <span class="n">currline</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">_get_wrapped_separated_vals</span><span class="p">(</span><span class="n">lineiter</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">currline</span><span class="p">)</span> <span class="o">==</span> <span class="n">nbasis</span>
+        <span class="n">mat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">currline</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mat</span>
+
+
+<span class="k">def</span> <span class="nf">_get_wrapped_separated_vals</span><span class="p">(</span><span class="n">lineiter</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">):</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">lineiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="n">vals</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">==</span> <span class="n">nbasis</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">nbasis</span>
+    <span class="k">return</span> <span class="n">vals</span>
+
+
+<span class="k">def</span> <span class="nf">_get_wrapped_column_vals</span><span class="p">(</span><span class="n">lineiter</span><span class="p">,</span> <span class="n">nbasis</span><span class="p">):</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">lineiter</span><span class="o">.</span><span class="n">next</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">lenl</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">lenl</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="o">*</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="k">break</span>
+            <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="p">:</span> <span class="mi">3</span><span class="o">*</span><span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">==</span> <span class="n">nbasis</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">nbasis</span>
+    <span class="k">return</span> <span class="n">vals</span>
+
+
+<div class="viewcode-block" id="append_matrix"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.interfaces.nbo_interface.append_matrix">[docs]</a><span class="k">def</span> <span class="nf">append_matrix</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">mat</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">mat</span><span class="p">:</span>
+        <span class="n">icol</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">icol</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;   &#39;</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">repr</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="n">icol</span><span class="p">:</span><span class="n">icol</span> <span class="o">+</span> <span class="mi">6</span><span class="p">])))</span>
+            <span class="n">icol</span> <span class="o">+=</span> <span class="mi">6</span></div>
+
+
+<span class="n">AOLABELS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;px&#39;</span><span class="p">:</span> <span class="mi">101</span><span class="p">,</span> <span class="s1">&#39;py&#39;</span><span class="p">:</span> <span class="mi">102</span><span class="p">,</span> <span class="s1">&#39;pz&#39;</span><span class="p">:</span> <span class="mi">103</span><span class="p">,</span>
+            <span class="s2">&quot;dxx&quot;</span><span class="p">:</span> <span class="mi">201</span><span class="p">,</span> <span class="s2">&quot;dxy&quot;</span><span class="p">:</span> <span class="mi">202</span><span class="p">,</span> <span class="s2">&quot;dxz&quot;</span><span class="p">:</span> <span class="mi">203</span><span class="p">,</span> <span class="s2">&quot;dyy&quot;</span><span class="p">:</span> <span class="mi">204</span><span class="p">,</span> <span class="s2">&quot;dyz&quot;</span><span class="p">:</span> <span class="mi">205</span><span class="p">,</span> <span class="s2">&quot;dzz&quot;</span><span class="p">:</span> <span class="mi">206</span><span class="p">,</span>
+            <span class="s2">&quot;fxxx&quot;</span><span class="p">:</span> <span class="mi">301</span><span class="p">,</span> <span class="s2">&quot;fxxy&quot;</span><span class="p">:</span> <span class="mi">302</span><span class="p">,</span> <span class="s2">&quot;fxxz&quot;</span><span class="p">:</span> <span class="mi">303</span><span class="p">,</span> <span class="s2">&quot;fxyy&quot;</span><span class="p">:</span> <span class="mi">304</span><span class="p">,</span> <span class="s2">&quot;fxyz&quot;</span><span class="p">:</span> <span class="mi">305</span><span class="p">,</span>
+            <span class="s2">&quot;fxzz&quot;</span><span class="p">:</span> <span class="mi">306</span><span class="p">,</span> <span class="s2">&quot;fyyy&quot;</span><span class="p">:</span> <span class="mi">307</span><span class="p">,</span> <span class="s2">&quot;fyyz&quot;</span><span class="p">:</span> <span class="mi">308</span><span class="p">,</span> <span class="s2">&quot;fyzz&quot;</span><span class="p">:</span> <span class="mi">309</span><span class="p">,</span> <span class="s2">&quot;fzzz&quot;</span><span class="p">:</span> <span class="mi">310</span><span class="p">,</span>
+            <span class="s2">&quot;gxxxx&quot;</span><span class="p">:</span> <span class="mi">401</span><span class="p">,</span> <span class="s2">&quot;gxxxy&quot;</span><span class="p">:</span> <span class="mi">402</span><span class="p">,</span> <span class="s2">&quot;gxxxz&quot;</span><span class="p">:</span> <span class="mi">403</span><span class="p">,</span> <span class="s2">&quot;gxxyy&quot;</span><span class="p">:</span> <span class="mi">404</span><span class="p">,</span> <span class="s2">&quot;gxxyz&quot;</span><span class="p">:</span> <span class="mi">405</span><span class="p">,</span>
+            <span class="s2">&quot;gxxzz&quot;</span><span class="p">:</span> <span class="mi">406</span><span class="p">,</span> <span class="s2">&quot;gxyyy&quot;</span><span class="p">:</span> <span class="mi">407</span><span class="p">,</span> <span class="s2">&quot;gxyyz&quot;</span><span class="p">:</span> <span class="mi">408</span><span class="p">,</span> <span class="s2">&quot;gxyzz&quot;</span><span class="p">:</span> <span class="mi">409</span><span class="p">,</span> <span class="s2">&quot;gxzzz&quot;</span><span class="p">:</span> <span class="mi">410</span><span class="p">,</span>
+            <span class="s2">&quot;gyyyy&quot;</span><span class="p">:</span> <span class="mi">411</span><span class="p">,</span> <span class="s2">&quot;gyyyz&quot;</span><span class="p">:</span> <span class="mi">412</span><span class="p">,</span> <span class="s2">&quot;gyyzz&quot;</span><span class="p">:</span> <span class="mi">413</span><span class="p">,</span> <span class="s2">&quot;gyzzz&quot;</span><span class="p">:</span> <span class="mi">414</span><span class="p">,</span> <span class="s2">&quot;gzzzz&quot;</span><span class="p">:</span> <span class="mi">415</span><span class="p">,</span>  <span class="c1"># end of cartesian</span>
+            <span class="c1"># start of spherical:</span>
+            <span class="s1">&#39;p(x)&#39;</span><span class="p">:</span> <span class="mi">151</span><span class="p">,</span> <span class="s1">&#39;p(y)&#39;</span><span class="p">:</span> <span class="mi">152</span><span class="p">,</span> <span class="s1">&#39;p(z)&#39;</span><span class="p">:</span> <span class="mi">153</span><span class="p">,</span>
+            <span class="s2">&quot;d(xy)&quot;</span><span class="p">:</span> <span class="mi">251</span><span class="p">,</span> <span class="s2">&quot;d(xz)&quot;</span><span class="p">:</span> <span class="mi">252</span><span class="p">,</span> <span class="s2">&quot;d(yz)&quot;</span><span class="p">:</span> <span class="mi">253</span><span class="p">,</span> <span class="s2">&quot;d(x2-y2)&quot;</span><span class="p">:</span> <span class="mi">254</span><span class="p">,</span> <span class="s2">&quot;d(z2)&quot;</span><span class="p">:</span> <span class="mi">255</span><span class="p">,</span>
+            <span class="s2">&quot;f(z(5z2-3r2))&quot;</span><span class="p">:</span> <span class="mi">351</span><span class="p">,</span> <span class="s2">&quot;f(x(5z2-r2))&quot;</span><span class="p">:</span> <span class="mi">352</span><span class="p">,</span> <span class="s2">&quot;f(y(5z2-r2))&quot;</span><span class="p">:</span> <span class="mi">353</span><span class="p">,</span> <span class="s2">&quot;f(z(x2-y2))&quot;</span><span class="p">:</span> <span class="mi">354</span><span class="p">,</span> <span class="s2">&quot;f(xyz)&quot;</span><span class="p">:</span> <span class="mi">355</span><span class="p">,</span>
+            <span class="s2">&quot;f(x(x2-3y2))&quot;</span><span class="p">:</span> <span class="mi">356</span><span class="p">,</span> <span class="s2">&quot;f(y(3x2-y2))&quot;</span><span class="p">:</span> <span class="mi">357</span><span class="p">}</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

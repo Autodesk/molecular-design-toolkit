@@ -1,0 +1,379 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.compute.configuration &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.compute.configuration</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.compute.configuration</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">pyccc</span> <span class="kn">import</span> <span class="n">engines</span>
+
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">utils</span>
+
+<span class="n">default_engine</span> <span class="o">=</span> <span class="bp">None</span>
+
+<span class="n">FREE_COMPUTE_CANNON</span> <span class="o">=</span> <span class="s1">&#39;cloudcomputecannon.bionano.autodesk.com:9000&#39;</span>
+
+<span class="n">RUNNING_ON_WORKER</span> <span class="o">=</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;IS_PYCCC_JOB&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># TODO: *write* configuration plus initial install default; sensible defaults</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">DotDict</span><span class="p">()</span>
+<span class="sd">&quot;&quot;&quot; dict: dictionary of parameters (read from user&#39;s moldesign.yml at startup)</span>
+
+<span class="sd">This dictionary configures how MDT interacts with &quot;computational engines&quot; - the systems that run</span>
+<span class="sd">jobs, usually using docker images.</span>
+
+
+<span class="sd">Notes:</span>
+<span class="sd">    Values in this dictionary can be configured at runtime; however, after changing them,</span>
+<span class="sd">    you should update the compute configuration by running ``moldesign.compute.reset_from_config()``</span>
+
+<span class="sd">Configuration is specified using the following keys:</span>
+
+<span class="sd">Args:</span>
+<span class="sd">    engine_type (str): The computational job engine to use. Default: &#39;ccc&#39;. Currently supported:</span>
+<span class="sd">        &#39;docker&#39;, &#39;ccc&#39;, or &#39;subprocess&#39;</span>
+<span class="sd">    default_repository (str): Repository to pull MDT&#39;s standard images from.</span>
+<span class="sd">        default: &#39;docker.io/autodesk/moldesign:&#39;</span>
+<span class="sd">    default_python_image (str): Image to run python commands in</span>
+<span class="sd">        (default: ``docker.io/autodesk/moldesign:moldesign_complete-[VERSION]``, where</span>
+<span class="sd">        [VERSION] is the version of MDT)</span>
+<span class="sd">    default_version_tag (str): Default version tag for docker images (default: &#39;latest&#39;)</span>
+<span class="sd">    default_docker_machine (str): Name of the docker machine to connect to; if</span>
+<span class="sd">        ``engine_type==&#39;docker&#39;``, EITHER this OR ``default_docker_url`` (but not both) must</span>
+<span class="sd">        be set. (default: &#39;default&#39;)</span>
+<span class="sd">    default_docker_url (str): URL for the docker daemon to run; if ``engine_type==&#39;docker&#39;``,</span>
+<span class="sd">        EITHER this OR ``default_docker_machine`` (but not both) must be set.</span>
+<span class="sd">        (default: ``unix://var/run/docker.sock``, the URL for a local docker instance)</span>
+
+<span class="sd">MDT uses a non-standard docker tagging system to store its docker images. Generally,</span>
+<span class="sd">a given image is pulled from a URL of the form:</span>
+<span class="sd">   ``http://[some_docker_registry/orgname/reponame]:[imagename]-[versiontag]``</span>
+
+<span class="sd">For instance, the ambertools 0.6 image is stored in the default repository at:</span>
+<span class="sd">   ``http://docker.io/autodesk/moldesign:ambertools-0.6``</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">ENVVAR</span> <span class="o">=</span> <span class="s2">&quot;MOLDESIGN_CONFIG&quot;</span>
+<span class="sd">&quot;&quot;&quot; str: name of environmental variable that stores path to moldesign.yml file.</span>
+
+<span class="sd">If this variable is not set, ``$HOME/.moldesign/moldesign.yml`` will be used by default.&quot;&quot;&quot;</span>
+
+<span class="n">DEFAULT_CONFIG_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;HOME&#39;</span><span class="p">],</span> <span class="s1">&#39;.moldesign/moldesign.yml&#39;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot; str: default search path for moldesign.yml.&quot;&quot;&quot;</span>
+
+
+<span class="n">CONFIG_DEFAULTS</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">DotDict</span><span class="p">(</span><span class="n">engine_type</span><span class="o">=</span><span class="s1">&#39;docker-machine&#39;</span><span class="p">,</span>
+                                <span class="n">default_repository</span><span class="o">=</span><span class="s1">&#39;docker-hub.autodesk.com/virshua/moldesign:&#39;</span><span class="p">,</span>
+                                <span class="n">default_ccc_host</span><span class="o">=</span><span class="n">FREE_COMPUTE_CANNON</span><span class="p">,</span>
+                                <span class="n">default_python_image</span><span class="o">=</span><span class="s1">&#39;moldesign_complete&#39;</span><span class="p">,</span>
+                                <span class="n">default_docker_host</span><span class="o">=</span><span class="s1">&#39;unix://var/run/docker.sock&#39;</span><span class="p">,</span>
+                                <span class="n">default_docker_machine</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
+                                <span class="n">default_version_tag</span><span class="o">=</span><span class="s1">&#39;latest&#39;</span><span class="p">)</span>
+
+<span class="n">DEF_CONFIG</span> <span class="o">=</span> <span class="n">CONFIG_DEFAULTS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="sd">&quot;&quot;&quot; dict: default configuration to be written to moldesign.yml if it doesn&#39;t exist</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="s1">&#39;default_docker_machine&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span> <span class="n">DEF_CONFIG</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="registry_login"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.compute.html#moldesign.compute.configuration.registry_login">[docs]</a><span class="k">def</span> <span class="nf">registry_login</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">login</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s1">&#39;Logging into docker registry @ </span><span class="si">%s</span><span class="s1"> ...&#39;</span> <span class="o">%</span> <span class="n">login</span><span class="p">[</span><span class="s1">&#39;registry&#39;</span><span class="p">],</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="o">**</span><span class="n">login</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Failed to connect to </span><span class="si">%s</span><span class="s1">. &#39;</span> <span class="o">%</span> <span class="n">login</span><span class="p">[</span><span class="s1">&#39;registry&#39;</span><span class="p">]</span> <span class="o">+</span>
+                      <span class="s1">&#39;Some functions may time out.&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s1">&#39;done&#39;</span></div>
+
+
+<div class="viewcode-block" id="init_config"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.compute.html#moldesign.compute.configuration.init_config">[docs]</a><span class="k">def</span> <span class="nf">init_config</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Called at the end of package import to read initial configuration and setup cloud computing.</span>
+
+<span class="sd">    At runtime, call :meth:`reset_from_config` to change the configuration</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CONFIG_DEFAULTS</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ENVVAR</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">ENVVAR</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">DEFAULT_CONFIG_PATH</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s1">&#39;Reading configuration from </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">path</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">infile</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s1">&#39;No config file found at </span><span class="si">%s</span><span class="s1"> - using defaults&#39;</span> <span class="o">%</span> <span class="n">path</span>
+
+    <span class="n">reset_from_config</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="reset_from_config"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.compute.html#moldesign.compute.configuration.reset_from_config">[docs]</a><span class="k">def</span> <span class="nf">reset_from_config</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Read the configuration dict at ``moldesign.compute.config`` and set up compute engine</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: copy of the config dictionary (for posterity)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">compute</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">engine_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;docker&#39;</span><span class="p">,</span> <span class="s1">&#39;docker-machine&#39;</span><span class="p">):</span>
+        <span class="n">compute</span><span class="o">.</span><span class="n">default_engine</span> <span class="o">=</span> <span class="n">_setup_docker</span><span class="p">()</span>
+
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">engine_type</span> <span class="o">==</span> <span class="s1">&#39;subprocess&#39;</span><span class="p">:</span>
+        <span class="n">compute</span><span class="o">.</span><span class="n">default_engine</span> <span class="o">=</span> <span class="n">engines</span><span class="o">.</span><span class="n">Subprocess</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unrecognized engine </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">config</span><span class="o">.</span><span class="n">default_engine</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_setup_docker</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Connect to a docker server, either directly or via docker-machine</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">docker</span>
+    <span class="kn">from</span> <span class="nn">pyccc</span> <span class="kn">import</span> <span class="n">docker_utils</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">engine_type</span> <span class="o">==</span> <span class="s1">&#39;docker-machine&#39;</span><span class="p">:</span>
+        <span class="n">dm</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">default_docker_machine</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s1">&#39;docker-machine&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="n">dm</span><span class="p">])</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
+            <span class="k">print</span> <span class="s1">&#39;WARNING: could not find docker-machine named &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">dm</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s1">&#39;Running&#39;</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s1">&#39;WARNING: docker-machine </span><span class="si">%s</span><span class="s1"> returned status: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dm</span><span class="p">,</span> <span class="n">status</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">utils</span><span class="o">.</span><span class="n">textnotify</span><span class="p">(</span><span class="s1">&#39;Connecting to docker-machine &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">dm</span><span class="p">):</span>
+                        <span class="n">dockerclient</span> <span class="o">=</span> <span class="n">docker_utils</span><span class="o">.</span><span class="n">docker_machine_client</span><span class="p">(</span><span class="n">dm</span><span class="p">)</span>
+                <span class="k">except</span> <span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s1">&#39;WARNING: error connecting to docker-machine &quot;</span><span class="si">%s</span><span class="s1">&quot;: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dm</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">success</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s1">&#39;WARNING: failed to connect to docker machine - cannot run jobs.&#39;</span>
+            <span class="k">print</span> <span class="s1">&#39;After changing the configuration (moldesign.config.default_docker_machine) &#39;</span> \
+                  <span class="s1">&#39;and/or starting the docker-machine, run &#39;</span> \
+                  <span class="s1">&#39;moldesign.compute.reset_from_config() to try again.&#39;</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">engine_type</span> <span class="o">==</span> <span class="s1">&#39;docker&#39;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">utils</span><span class="o">.</span><span class="n">textnotify</span><span class="p">(</span><span class="s1">&#39;Connecting to docker at &#39;</span> <span class="o">%</span> <span class="n">config</span><span class="o">.</span><span class="n">default_docker_url</span><span class="p">):</span>
+            <span class="n">dockerclient</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">base_url</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">default_docker_url</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;docker_registry_login&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="n">registry_login</span><span class="p">(</span><span class="n">dockerclient</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">docker_registry_login</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">engines</span><span class="o">.</span><span class="n">Docker</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">dockerclient</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

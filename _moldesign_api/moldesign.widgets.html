@@ -1,0 +1,773 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.widgets package &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../index.html"/>
+        <link rel="up" title="moldesign package" href="moldesign.html"/>
+        <link rel="prev" title="moldesign.viewer package" href="moldesign.viewer.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="moldesign.html">Complete API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="moldesign.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="moldesign.compute.html">moldesign.compute package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.external.html">moldesign.external package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.forcefields.html">moldesign.forcefields package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.geom.html">moldesign.geom package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.integrators.html">moldesign.integrators package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.interfaces.html">moldesign.interfaces package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.min.html">moldesign.min package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.models.html">moldesign.models package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.molecules.html">moldesign.molecules package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.orbitals.html">moldesign.orbitals package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.uibase.html">moldesign.uibase package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.units.html">moldesign.units package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.utils.html">moldesign.utils package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.viewer.html">moldesign.viewer package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">moldesign.widgets package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.widgets.computeconfig">moldesign.widgets.computeconfig module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.widgets.configurator">moldesign.widgets.configurator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.widgets.geombuilder">moldesign.widgets.geombuilder module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.widgets.orbitals">moldesign.widgets.orbitals module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.widgets.parameterization">moldesign.widgets.parameterization module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.widgets.selection">moldesign.widgets.selection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.widgets.symmetry">moldesign.widgets.symmetry module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.widgets.trajectory">moldesign.widgets.trajectory module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.converters">moldesign.converters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.data">moldesign.data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.exceptions">moldesign.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.helpers">moldesign.helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.mathutils">moldesign.mathutils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.method">moldesign.method module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.parameters">moldesign.parameters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.tools">moldesign.tools module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="moldesign.html">moldesign package</a> &raquo;</li>
+      
+    <li>moldesign.widgets package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_moldesign_api/moldesign.widgets.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-moldesign.widgets">
+<span id="moldesign-widgets-package"></span><h1>moldesign.widgets package<a class="headerlink" href="#module-moldesign.widgets" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="moldesign.widgets.configure">
+<code class="descclassname">moldesign.widgets.</code><code class="descname">configure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#configure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.configure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="moldesign.widgets.about">
+<code class="descclassname">moldesign.widgets.</code><code class="descname">about</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.widgets.about" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-moldesign.widgets.computeconfig">
+<span id="moldesign-widgets-computeconfig-module"></span><h2>moldesign.widgets.computeconfig module<a class="headerlink" href="#module-moldesign.widgets.computeconfig" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.widgets.computeconfig.ComputeConfig">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.computeconfig.</code><code class="descname">ComputeConfig</code><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#ComputeConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.computeconfig.ComputeConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ipywidgets.widgets.widget_box.Box</span></code></p>
+<dl class="method">
+<dt id="moldesign.widgets.computeconfig.ComputeConfig.apply_config">
+<code class="descname">apply_config</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#ComputeConfig.apply_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.computeconfig.ComputeConfig.apply_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.computeconfig.ComputeConfig.reset_config">
+<code class="descname">reset_config</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#ComputeConfig.reset_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.computeconfig.ComputeConfig.reset_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset configuration in UI widget to the stored values</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.computeconfig.ComputeConfig.save_config">
+<code class="descname">save_config</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#ComputeConfig.save_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.computeconfig.ComputeConfig.save_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.computeconfig.ComputeConfig.update_engine_display">
+<code class="descname">update_engine_display</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#ComputeConfig.update_engine_display"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.computeconfig.ComputeConfig.update_engine_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.widgets.computeconfig.MDTConfig">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.computeconfig.</code><code class="descname">MDTConfig</code><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#MDTConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.computeconfig.MDTConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ipywidgets.widgets.widget_box.Box</span></code></p>
+<dl class="method">
+<dt id="moldesign.widgets.computeconfig.MDTConfig.make_header">
+<code class="descname">make_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#MDTConfig.make_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.computeconfig.MDTConfig.make_header" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.widgets.computeconfig.about">
+<code class="descclassname">moldesign.widgets.computeconfig.</code><code class="descname">about</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.widgets.computeconfig.about" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="moldesign.widgets.computeconfig.configure">
+<code class="descclassname">moldesign.widgets.computeconfig.</code><code class="descname">configure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#configure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.computeconfig.configure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.widgets.configurator">
+<span id="moldesign-widgets-configurator-module"></span><h2>moldesign.widgets.configurator module<a class="headerlink" href="#module-moldesign.widgets.configurator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.widgets.configurator.Configurator">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.configurator.</code><code class="descname">Configurator</code><span class="sig-paren">(</span><em>paramlist</em>, <em>paramdefs</em>, <em>title=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/configurator.html#Configurator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.configurator.Configurator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ipywidgets.widgets.widget_box.Box</span></code></p>
+<p>Interactive configuration widget for a list of parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>paramlist</strong> (<em>Mapping[str,object]</em>) &#8211; Mapping of parameter names to their current values</li>
+<li><strong>paramdefs</strong> (<em>Mapping[str,Parameter]</em>) &#8211; Mapping of parameter names to their definitions</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="moldesign.widgets.configurator.Configurator.selectors">
+<code class="descname">selectors</code><a class="headerlink" href="#moldesign.widgets.configurator.Configurator.selectors" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Mapping[str,ParamSelector]</em> &#8211; Mapping of parameters names to their selector
+widgets</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.configurator.Configurator.apply_values">
+<code class="descname">apply_values</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/configurator.html#Configurator.apply_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.configurator.Configurator.apply_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.configurator.Configurator.reset_values">
+<code class="descname">reset_values</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/configurator.html#Configurator.reset_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.configurator.Configurator.reset_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.widgets.geombuilder">
+<span id="moldesign-widgets-geombuilder-module"></span><h2>moldesign.widgets.geombuilder module<a class="headerlink" href="#module-moldesign.widgets.geombuilder" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.geombuilder.</code><code class="descname">GeometryBuilder</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="moldesign.uibase.html#moldesign.uibase.components.ViewerToolBase" title="moldesign.uibase.components.ViewerToolBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.uibase.components.ViewerToolBase</span></code></a></p>
+<dl class="attribute">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.DEGFMT">
+<code class="descname">DEGFMT</code><em class="property"> = u'{:.1f}\xb0'</em><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.DEGFMT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.HIGHLIGHTOPACITY">
+<code class="descname">HIGHLIGHTOPACITY</code><em class="property"> = 0.6</em><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.HIGHLIGHTOPACITY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.MAXDIST">
+<code class="descname">MAXDIST</code><em class="property"> = 20.0</em><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.MAXDIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.NBR1HIGHLIGHT">
+<code class="descname">NBR1HIGHLIGHT</code><em class="property"> = '#AFC6A8'</em><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.NBR1HIGHLIGHT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.NBR2HIGHLIGHT">
+<code class="descname">NBR2HIGHLIGHT</code><em class="property"> = '#C5AED8'</em><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.NBR2HIGHLIGHT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.POSFMT">
+<code class="descname">POSFMT</code><em class="property"> = u'{:.3f} \u212b'</em><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.POSFMT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.VIEWERTYPE">
+<code class="descname">VIEWERTYPE</code><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.VIEWERTYPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">BondClicker</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.atom_click">
+<code class="descname">atom_click</code><span class="sig-paren">(</span><em>atom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.atom_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.atom_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.bond_click">
+<code class="descname">bond_click</code><span class="sig-paren">(</span><em>bond</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.bond_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.bond_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.clear_selection">
+<code class="descname">clear_selection</code><span class="sig-paren">(</span><em>render=True</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.clear_selection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.clear_selection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.label_atoms">
+<code class="descname">label_atoms</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.label_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.label_atoms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.reset_geometry">
+<code class="descname">reset_geometry</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.reset_geometry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.reset_geometry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.set_angle">
+<code class="descname">set_angle</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.set_angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.set_angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.set_atom_x">
+<code class="descname">set_atom_x</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.set_atom_x"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.set_atom_x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.set_atom_y">
+<code class="descname">set_atom_y</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.set_atom_y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.set_atom_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.set_atom_z">
+<code class="descname">set_atom_z</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.set_atom_z"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.set_atom_z" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.set_dihedral">
+<code class="descname">set_dihedral</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.set_dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.set_dihedral" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.geombuilder.GeometryBuilder.set_distance">
+<code class="descname">set_distance</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.set_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.geombuilder.GeometryBuilder.set_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.widgets.orbitals">
+<span id="moldesign-widgets-orbitals-module"></span><h2>moldesign.widgets.orbitals module<a class="headerlink" href="#module-moldesign.widgets.orbitals" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.widgets.orbitals.OrbitalUIPane">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.orbitals.</code><code class="descname">OrbitalUIPane</code><span class="sig-paren">(</span><em>viz</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/orbitals.html#OrbitalUIPane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.orbitals.OrbitalUIPane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="moldesign.uibase.html#moldesign.uibase.selector.Selector" title="moldesign.uibase.selector.Selector"><code class="xref py py-class docutils literal"><span class="pre">moldesign.uibase.selector.Selector</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">ipywidgets.widgets.widget_box.Box</span></code></p>
+<dl class="method">
+<dt id="moldesign.widgets.orbitals.OrbitalUIPane.change_resolution">
+<code class="descname">change_resolution</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/orbitals.html#OrbitalUIPane.change_resolution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.orbitals.OrbitalUIPane.change_resolution" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.orbitals.OrbitalUIPane.handle_selection_event">
+<code class="descname">handle_selection_event</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/orbitals.html#OrbitalUIPane.handle_selection_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.orbitals.OrbitalUIPane.handle_selection_event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.orbitals.OrbitalUIPane.new_orb_type">
+<code class="descname">new_orb_type</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/orbitals.html#OrbitalUIPane.new_orb_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.orbitals.OrbitalUIPane.new_orb_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create list of available orbitals when user selects a new type</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.orbitals.OrbitalUIPane.new_orbital_selection">
+<code class="descname">new_orbital_selection</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/orbitals.html#OrbitalUIPane.new_orbital_selection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.orbitals.OrbitalUIPane.new_orbital_selection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.widgets.orbitals.OrbitalViewer">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.orbitals.</code><code class="descname">OrbitalViewer</code><span class="sig-paren">(</span><em>mol</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/orbitals.html#OrbitalViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.orbitals.OrbitalViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="moldesign.uibase.html#moldesign.uibase.selector.SelectionGroup" title="moldesign.uibase.selector.SelectionGroup"><code class="xref py py-class docutils literal"><span class="pre">moldesign.uibase.selector.SelectionGroup</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.widgets.parameterization">
+<span id="moldesign-widgets-parameterization-module"></span><h2>moldesign.widgets.parameterization module<a class="headerlink" href="#module-moldesign.widgets.parameterization" title="Permalink to this headline">¶</a></h2>
+<p>This module contains methods to display 3D information about the assignment of force field
+parameters to a biomolecule.</p>
+<p>This helps users to visualize errors that occur when trying to assign a forcefield,
+such as unrecognized residues, missing atoms, etc.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is currently tied to ambertools and tleap! It will need to be made generic if/when
+another method for assigning forcefields is added.</p>
+</div>
+<dl class="class">
+<dt id="moldesign.widgets.parameterization.ForceFieldMessage">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.parameterization.</code><code class="descname">ForceFieldMessage</code><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#ForceFieldMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.ForceFieldMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.widgets.parameterization.MissingAtom">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.parameterization.</code><code class="descname">MissingAtom</code><span class="sig-paren">(</span><em>message</em>, <em>residue</em>, <em>atom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#MissingAtom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.MissingAtom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.widgets.parameterization.ForceFieldMessage" title="moldesign.widgets.parameterization.ForceFieldMessage"><code class="xref py py-class docutils literal"><span class="pre">moldesign.widgets.parameterization.ForceFieldMessage</span></code></a></p>
+<dl class="method">
+<dt id="moldesign.widgets.parameterization.MissingAtom.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>viewer</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#MissingAtom.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.MissingAtom.show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.parameterization.MissingAtom.unshow">
+<code class="descname">unshow</code><span class="sig-paren">(</span><em>viewer</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#MissingAtom.unshow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.MissingAtom.unshow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.widgets.parameterization.ParameterizationDisplay">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.parameterization.</code><code class="descname">ParameterizationDisplay</code><span class="sig-paren">(</span><em>job</em>, <em>molin</em>, <em>molout=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#ParameterizationDisplay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.ParameterizationDisplay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ipywidgets.widgets.widget_box.Box</span></code></p>
+<dl class="attribute">
+<dt id="moldesign.widgets.parameterization.ParameterizationDisplay.ATOMSPEC">
+<code class="descname">ATOMSPEC</code><em class="property"> = &lt;_sre.SRE_Pattern object&gt;</em><a class="headerlink" href="#moldesign.widgets.parameterization.ParameterizationDisplay.ATOMSPEC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.parameterization.ParameterizationDisplay.parse_errors">
+<code class="descname">parse_errors</code><span class="sig-paren">(</span><em>job</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#ParameterizationDisplay.parse_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.ParameterizationDisplay.parse_errors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.parameterization.ParameterizationDisplay.switch_display">
+<code class="descname">switch_display</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#ParameterizationDisplay.switch_display"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.ParameterizationDisplay.switch_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.widgets.parameterization.UnknownAtom">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.parameterization.</code><code class="descname">UnknownAtom</code><span class="sig-paren">(</span><em>message</em>, <em>residue</em>, <em>atom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#UnknownAtom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.UnknownAtom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.widgets.parameterization.ForceFieldMessage" title="moldesign.widgets.parameterization.ForceFieldMessage"><code class="xref py py-class docutils literal"><span class="pre">moldesign.widgets.parameterization.ForceFieldMessage</span></code></a></p>
+<dl class="method">
+<dt id="moldesign.widgets.parameterization.UnknownAtom.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>viewer</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#UnknownAtom.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.UnknownAtom.show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.parameterization.UnknownAtom.unshow">
+<code class="descname">unshow</code><span class="sig-paren">(</span><em>viewer</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#UnknownAtom.unshow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.UnknownAtom.unshow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.widgets.parameterization.UnknownResidue">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.parameterization.</code><code class="descname">UnknownResidue</code><span class="sig-paren">(</span><em>message</em>, <em>residue</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#UnknownResidue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.UnknownResidue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.widgets.parameterization.ForceFieldMessage" title="moldesign.widgets.parameterization.ForceFieldMessage"><code class="xref py py-class docutils literal"><span class="pre">moldesign.widgets.parameterization.ForceFieldMessage</span></code></a></p>
+<dl class="method">
+<dt id="moldesign.widgets.parameterization.UnknownResidue.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>viewer</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#UnknownResidue.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.UnknownResidue.show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.parameterization.UnknownResidue.unshow">
+<code class="descname">unshow</code><span class="sig-paren">(</span><em>viewer</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#UnknownResidue.unshow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.UnknownResidue.unshow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.widgets.parameterization.UnusualBond">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.parameterization.</code><code class="descname">UnusualBond</code><span class="sig-paren">(</span><em>message</em>, <em>atoms</em>, <em>residues</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#UnusualBond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.UnusualBond" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.widgets.parameterization.ForceFieldMessage" title="moldesign.widgets.parameterization.ForceFieldMessage"><code class="xref py py-class docutils literal"><span class="pre">moldesign.widgets.parameterization.ForceFieldMessage</span></code></a></p>
+<dl class="method">
+<dt id="moldesign.widgets.parameterization.UnusualBond.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>viewer</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#UnusualBond.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.UnusualBond.show" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.parameterization.UnusualBond.unshow">
+<code class="descname">unshow</code><span class="sig-paren">(</span><em>viewer</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/parameterization.html#UnusualBond.unshow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.parameterization.UnusualBond.unshow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.widgets.selection">
+<span id="moldesign-widgets-selection-module"></span><h2>moldesign.widgets.selection module<a class="headerlink" href="#module-moldesign.widgets.selection" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.widgets.selection.BondSelector">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.selection.</code><code class="descname">BondSelector</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#BondSelector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.selection.BondSelector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="moldesign.uibase.html#moldesign.uibase.components.SelBase" title="moldesign.uibase.components.SelBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.uibase.components.SelBase</span></code></a></p>
+<dl class="attribute">
+<dt id="moldesign.widgets.selection.BondSelector.VIEWERTYPE">
+<code class="descname">VIEWERTYPE</code><a class="headerlink" href="#moldesign.widgets.selection.BondSelector.VIEWERTYPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">BondClicker</span></code></p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.widgets.selection.BondSelector.bondkey">
+<em class="property">static </em><code class="descname">bondkey</code><span class="sig-paren">(</span><em>bond</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#BondSelector.bondkey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.selection.BondSelector.bondkey" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.selection.BondSelector.clear_selections">
+<code class="descname">clear_selections</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#BondSelector.clear_selections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.selection.BondSelector.clear_selections" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.selection.BondSelector.handle_remove_button_click">
+<code class="descname">handle_remove_button_click</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#BondSelector.handle_remove_button_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.selection.BondSelector.handle_remove_button_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.selection.BondSelector.remove_bondlist_highlight">
+<code class="descname">remove_bondlist_highlight</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#BondSelector.remove_bondlist_highlight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.selection.BondSelector.remove_bondlist_highlight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.selection.BondSelector.select_all_bonds">
+<code class="descname">select_all_bonds</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#BondSelector.select_all_bonds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.selection.BondSelector.select_all_bonds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.selection.BondSelector.selected_bonds">
+<code class="descname">selected_bonds</code><a class="headerlink" href="#moldesign.widgets.selection.BondSelector.selected_bonds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.selection.BondSelector.toggle_bond">
+<code class="descname">toggle_bond</code><span class="sig-paren">(</span><em>bond</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#BondSelector.toggle_bond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.selection.BondSelector.toggle_bond" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.widgets.selection.ResidueSelector">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.selection.</code><code class="descname">ResidueSelector</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#ResidueSelector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.selection.ResidueSelector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="moldesign.uibase.html#moldesign.uibase.components.SelBase" title="moldesign.uibase.components.SelBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.uibase.components.SelBase</span></code></a></p>
+<p>Selections at the atom/residue/chain level.
+Selecting a residue selects all of its atoms.
+Selecting all atoms of a residue is equivalent to selecting the residue.
+A residue is not selected if only some of its atoms are selected.</p>
+<dl class="method">
+<dt id="moldesign.widgets.selection.ResidueSelector.atom_click">
+<code class="descname">atom_click</code><span class="sig-paren">(</span><em>atom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#ResidueSelector.atom_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.selection.ResidueSelector.atom_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.widgets.selection.ResidueSelector.atomkey">
+<em class="property">static </em><code class="descname">atomkey</code><span class="sig-paren">(</span><em>atom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#ResidueSelector.atomkey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.selection.ResidueSelector.atomkey" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.selection.ResidueSelector.handle_remove_button_click">
+<code class="descname">handle_remove_button_click</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#ResidueSelector.handle_remove_button_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.selection.ResidueSelector.handle_remove_button_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.selection.ResidueSelector.remove_reslist_highlight">
+<code class="descname">remove_reslist_highlight</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#ResidueSelector.remove_reslist_highlight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.selection.ResidueSelector.remove_reslist_highlight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.widgets.selection.ResidueSelector.reskey">
+<em class="property">static </em><code class="descname">reskey</code><span class="sig-paren">(</span><em>residue</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#ResidueSelector.reskey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.selection.ResidueSelector.reskey" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.selection.ResidueSelector.selected_residues">
+<code class="descname">selected_residues</code><a class="headerlink" href="#moldesign.widgets.selection.ResidueSelector.selected_residues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.selection.ResidueSelector.toggle_residue">
+<code class="descname">toggle_residue</code><span class="sig-paren">(</span><em>residue</em>, <em>clickatom=None</em>, <em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#ResidueSelector.toggle_residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.selection.ResidueSelector.toggle_residue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.widgets.symmetry">
+<span id="moldesign-widgets-symmetry-module"></span><h2>moldesign.widgets.symmetry module<a class="headerlink" href="#module-moldesign.widgets.symmetry" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.widgets.symmetry.Symmetrizer">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.symmetry.</code><code class="descname">Symmetrizer</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/symmetry.html#Symmetrizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.symmetry.Symmetrizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ipywidgets.widgets.widget_box.Box</span></code></p>
+<dl class="method">
+<dt id="moldesign.widgets.symmetry.Symmetrizer.apply_selected_symmetry">
+<code class="descname">apply_selected_symmetry</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/symmetry.html#Symmetrizer.apply_selected_symmetry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.symmetry.Symmetrizer.apply_selected_symmetry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.symmetry.Symmetrizer.coords_changed">
+<code class="descname">coords_changed</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/symmetry.html#Symmetrizer.coords_changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.symmetry.Symmetrizer.coords_changed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.symmetry.Symmetrizer.reset_coords">
+<code class="descname">reset_coords</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/symmetry.html#Symmetrizer.reset_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.symmetry.Symmetrizer.reset_coords" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.symmetry.Symmetrizer.set_highest_symmetry">
+<code class="descname">set_highest_symmetry</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/symmetry.html#Symmetrizer.set_highest_symmetry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.symmetry.Symmetrizer.set_highest_symmetry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.symmetry.Symmetrizer.show_symmetry">
+<code class="descname">show_symmetry</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/symmetry.html#Symmetrizer.show_symmetry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.symmetry.Symmetrizer.show_symmetry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.symmetry.Symmetrizer.viewer">
+<code class="descname">viewer</code><em class="property"> = None</em><a class="headerlink" href="#moldesign.widgets.symmetry.Symmetrizer.viewer" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>type viewer</em> &#8211; moldesign.viewer.GeometryViewer</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.widgets.trajectory">
+<span id="moldesign-widgets-trajectory-module"></span><h2>moldesign.widgets.trajectory module<a class="headerlink" href="#module-moldesign.widgets.trajectory" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.widgets.trajectory.FrameInspector">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.trajectory.</code><code class="descname">FrameInspector</code><span class="sig-paren">(</span><em>traj</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/trajectory.html#FrameInspector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.trajectory.FrameInspector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ipywidgets.widgets.widget_string.HTML</span></code>, <a class="reference internal" href="moldesign.uibase.html#moldesign.uibase.selector.Selector" title="moldesign.uibase.selector.Selector"><code class="xref py py-class docutils literal"><span class="pre">moldesign.uibase.selector.Selector</span></code></a></p>
+<dl class="method">
+<dt id="moldesign.widgets.trajectory.FrameInspector.handle_selection_event">
+<code class="descname">handle_selection_event</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/trajectory.html#FrameInspector.handle_selection_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.trajectory.FrameInspector.handle_selection_event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.widgets.trajectory.TrajectoryOrbViewer">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.trajectory.</code><code class="descname">TrajectoryOrbViewer</code><span class="sig-paren">(</span><em>trajectory</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/trajectory.html#TrajectoryOrbViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.trajectory.TrajectoryOrbViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.widgets.trajectory.TrajectoryViewer" title="moldesign.widgets.trajectory.TrajectoryViewer"><code class="xref py py-class docutils literal"><span class="pre">moldesign.widgets.trajectory.TrajectoryViewer</span></code></a></p>
+<dl class="method">
+<dt id="moldesign.widgets.trajectory.TrajectoryOrbViewer.make_viewer">
+<code class="descname">make_viewer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/trajectory.html#TrajectoryOrbViewer.make_viewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.trajectory.TrajectoryOrbViewer.make_viewer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.widgets.trajectory.TrajectoryViewer">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.trajectory.</code><code class="descname">TrajectoryViewer</code><span class="sig-paren">(</span><em>trajectory</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/trajectory.html#TrajectoryViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.trajectory.TrajectoryViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="moldesign.uibase.html#moldesign.uibase.selector.SelectionGroup" title="moldesign.uibase.selector.SelectionGroup"><code class="xref py py-class docutils literal"><span class="pre">moldesign.uibase.selector.SelectionGroup</span></code></a></p>
+<p>3D representation, with animation controls, for a trajectory.</p>
+<p>Users will typically instantiate this using <code class="docutils literal"><span class="pre">trajectory.draw()</span></code></p>
+<dl class="method">
+<dt id="moldesign.widgets.trajectory.TrajectoryViewer.animate">
+<code class="descname">animate</code><span class="sig-paren">(</span><em>fps=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/trajectory.html#TrajectoryViewer.animate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.trajectory.TrajectoryViewer.animate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.trajectory.TrajectoryViewer.make_controls">
+<code class="descname">make_controls</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/trajectory.html#TrajectoryViewer.make_controls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.trajectory.TrajectoryViewer.make_controls" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.trajectory.TrajectoryViewer.make_viewer">
+<code class="descname">make_viewer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/trajectory.html#TrajectoryViewer.make_viewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.trajectory.TrajectoryViewer.make_viewer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="moldesign.viewer.html" class="btn btn-neutral" title="moldesign.viewer package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

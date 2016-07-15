@@ -1,0 +1,97 @@
+moldesign package
+=================
+
+.. automodule:: moldesign
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+
+    moldesign.compute
+    moldesign.external
+    moldesign.forcefields
+    moldesign.geom
+    moldesign.integrators
+    moldesign.interfaces
+    moldesign.min
+    moldesign.models
+    moldesign.molecules
+    moldesign.orbitals
+    moldesign.uibase
+    moldesign.units
+    moldesign.utils
+    moldesign.viewer
+    moldesign.widgets
+
+Submodules
+----------
+
+moldesign.converters module
+---------------------------
+
+.. automodule:: moldesign.converters
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.data module
+---------------------
+
+.. automodule:: moldesign.data
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.exceptions module
+---------------------------
+
+.. automodule:: moldesign.exceptions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.helpers module
+------------------------
+
+.. automodule:: moldesign.helpers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.mathutils module
+--------------------------
+
+.. automodule:: moldesign.mathutils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.method module
+-----------------------
+
+.. automodule:: moldesign.method
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.parameters module
+---------------------------
+
+.. automodule:: moldesign.parameters
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.tools module
+----------------------
+
+.. automodule:: moldesign.tools
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

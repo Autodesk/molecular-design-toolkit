@@ -1,0 +1,463 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.units package &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../index.html"/>
+        <link rel="up" title="moldesign package" href="moldesign.html"/>
+        <link rel="next" title="moldesign.utils package" href="moldesign.utils.html"/>
+        <link rel="prev" title="moldesign.uibase package" href="moldesign.uibase.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="moldesign.html">Complete API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="moldesign.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="moldesign.compute.html">moldesign.compute package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.external.html">moldesign.external package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.forcefields.html">moldesign.forcefields package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.geom.html">moldesign.geom package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.integrators.html">moldesign.integrators package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.interfaces.html">moldesign.interfaces package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.min.html">moldesign.min package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.models.html">moldesign.models package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.molecules.html">moldesign.molecules package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.orbitals.html">moldesign.orbitals package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.uibase.html">moldesign.uibase package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">moldesign.units package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.units.constants">moldesign.units.constants module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.units.quantity">moldesign.units.quantity module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.units.tools">moldesign.units.tools module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.units.unitsystem">moldesign.units.unitsystem module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.utils.html">moldesign.utils package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.viewer.html">moldesign.viewer package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.widgets.html">moldesign.widgets package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.converters">moldesign.converters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.data">moldesign.data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.exceptions">moldesign.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.helpers">moldesign.helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.mathutils">moldesign.mathutils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.method">moldesign.method module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.parameters">moldesign.parameters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.tools">moldesign.tools module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="moldesign.html">moldesign package</a> &raquo;</li>
+      
+    <li>moldesign.units package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/source/_moldesign_api/moldesign.units.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-moldesign.units">
+<span id="moldesign-units-package"></span><h1>moldesign.units package<a class="headerlink" href="#module-moldesign.units" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-moldesign.units.constants">
+<span id="moldesign-units-constants-module"></span><h2>moldesign.units.constants module<a class="headerlink" href="#module-moldesign.units.constants" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-moldesign.units.quantity">
+<span id="moldesign-units-quantity-module"></span><h2>moldesign.units.quantity module<a class="headerlink" href="#module-moldesign.units.quantity" title="Permalink to this headline">¶</a></h2>
+<p>Set up physical constants and unit systems</p>
+<dl class="class">
+<dt id="moldesign.units.quantity.Array">
+<em class="property">class </em><code class="descclassname">moldesign.units.quantity.</code><code class="descname">Array</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#Array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.Array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.units.quantity.MdtQuantity" title="moldesign.units.quantity.MdtQuantity"><code class="xref py py-class docutils literal"><span class="pre">moldesign.units.quantity.MdtQuantity</span></code></a></p>
+<p>A matrix quantity (i.e., a matrix of floats) with attached units, which behaves like a
+2-dimensional numpy array</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.units.quantity.MdtQuantity">
+<em class="property">class </em><code class="descclassname">moldesign.units.quantity.</code><code class="descname">MdtQuantity</code><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#MdtQuantity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.MdtQuantity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pint.unit.Quantity</span></code></p>
+<p>This is a &#8216;patched&#8217; version of pint&#8217;s quantities that can be pickled (slightly hacky)
+and supports more numpy operations.
+Users should never need to instantiate this directly - instead, construct
+BuckyBall quantities by multiplying numbers/arrays with the pre-defined units</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mf">5.0</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">femtoseconds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">eV</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="moldesign.units.quantity.MdtQuantity.compare">
+<code class="descname">compare</code><span class="sig-paren">(</span><em>other</em>, <em>op</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#MdtQuantity.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.MdtQuantity.compare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Augments the <code class="xref py py-class docutils literal"><span class="pre">pint._Quantity</span></code> method with the following features:
+- Comparisons to 0 ignore units</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.units.quantity.MdtQuantity.cross">
+<code class="descname">cross</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#MdtQuantity.cross"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.MdtQuantity.cross" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.units.quantity.MdtQuantity.defunits">
+<code class="descname">defunits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#MdtQuantity.defunits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.MdtQuantity.defunits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return this quantity in moldesign&#8217;s default unit system (as specified in moldesign.units.default)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.units.quantity.MdtQuantity.defunits_inplace">
+<code class="descname">defunits_inplace</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#MdtQuantity.defunits_inplace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.MdtQuantity.defunits_inplace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internally convert quantity to default units</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.units.quantity.MdtQuantity.defunits_value">
+<code class="descname">defunits_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#MdtQuantity.defunits_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.MdtQuantity.defunits_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.units.quantity.MdtQuantity.dot">
+<code class="descname">dot</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#MdtQuantity.dot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.MdtQuantity.dot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute norm but respect units
+:returns: MdtQuantity</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.units.quantity.MdtQuantity.get_units">
+<code class="descname">get_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#MdtQuantity.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.MdtQuantity.get_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the base unit system of an quantity</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.units.quantity.MdtQuantity.ldot">
+<code class="descname">ldot</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#MdtQuantity.ldot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.MdtQuantity.ldot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Left-multiplication version of dot.
+Use this to preserve units (built-in numpy versions don&#8217;t)
+getting hackier ...</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.units.quantity.MdtQuantity.norm">
+<code class="descname">norm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#MdtQuantity.norm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.MdtQuantity.norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute norm but respect units</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.units.quantity.MdtQuantity.shape">
+<code class="descname">shape</code><a class="headerlink" href="#moldesign.units.quantity.MdtQuantity.shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.units.quantity.MdtQuantity.to_simtk">
+<code class="descname">to_simtk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#MdtQuantity.to_simtk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.MdtQuantity.to_simtk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.units.quantity.MdtQuantity.value_in">
+<code class="descname">value_in</code><span class="sig-paren">(</span><em>units</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#MdtQuantity.value_in"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.MdtQuantity.value_in" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.units.quantity.MdtUnit">
+<em class="property">class </em><code class="descclassname">moldesign.units.quantity.</code><code class="descname">MdtUnit</code><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#MdtUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.MdtUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pint.unit.Unit</span></code></p>
+<p>Pickleable version of pint&#8217;s Unit class.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.units.quantity.Scalar">
+<em class="property">class </em><code class="descclassname">moldesign.units.quantity.</code><code class="descname">Scalar</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#Scalar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.Scalar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.units.quantity.MdtQuantity" title="moldesign.units.quantity.MdtQuantity"><code class="xref py py-class docutils literal"><span class="pre">moldesign.units.quantity.MdtQuantity</span></code></a></p>
+<p>A scalar quantity (i.e., a single floating point number) with attached units</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.units.quantity.Tensor">
+<em class="property">class </em><code class="descclassname">moldesign.units.quantity.</code><code class="descname">Tensor</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#Tensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.Tensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.units.quantity.MdtQuantity" title="moldesign.units.quantity.MdtQuantity"><code class="xref py py-class docutils literal"><span class="pre">moldesign.units.quantity.MdtQuantity</span></code></a></p>
+<p>A vector quantity (i.e., a list of floats) with attached units, which behaves like a
+multidimensional numpy array</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.units.quantity.Vector">
+<em class="property">class </em><code class="descclassname">moldesign.units.quantity.</code><code class="descname">Vector</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/quantity.html#Vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.quantity.Vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.units.quantity.MdtQuantity" title="moldesign.units.quantity.MdtQuantity"><code class="xref py py-class docutils literal"><span class="pre">moldesign.units.quantity.MdtQuantity</span></code></a></p>
+<p>A vector quantity (i.e., a list of floats) with attached units, which behaves like a
+1-dimensional numpy array</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.units.tools">
+<span id="moldesign-units-tools-module"></span><h2>moldesign.units.tools module<a class="headerlink" href="#module-moldesign.units.tools" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="moldesign.units.tools.array">
+<code class="descclassname">moldesign.units.tools.</code><code class="descname">array</code><span class="sig-paren">(</span><em>qlist</em>, <em>baseunit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/tools.html#array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.tools.array" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Facilitates creating an array with units - like numpy.array, but it also checks</dt>
+<dd>units for all components of the array</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>qlist</strong> &#8211; List-like object of quantity objects</li>
+<li><strong>baseunit</strong> &#8211; (optional) unit to standardize with</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Quantity object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.units.tools.broadcast_to">
+<code class="descclassname">moldesign.units.tools.</code><code class="descname">broadcast_to</code><span class="sig-paren">(</span><em>arr</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/tools.html#broadcast_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.tools.broadcast_to" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="moldesign.units.tools.get_units">
+<code class="descclassname">moldesign.units.tools.</code><code class="descname">get_units</code><span class="sig-paren">(</span><em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/tools.html#get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.tools.get_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the base unit system of an quantity</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.units.tools.units_transfer">
+<code class="descclassname">moldesign.units.tools.</code><code class="descname">units_transfer</code><span class="sig-paren">(</span><em>from_var</em>, <em>to_var</em>, <em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/tools.html#units_transfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.tools.units_transfer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Give the &#8220;to_var&#8221; object the same units as &#8220;from_var&#8221;
+:param from_var:
+:param to_var:
+:param force: Transfer the units even if from_var and to_var have incompatible units
+:return:</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.units.unitsystem">
+<span id="moldesign-units-unitsystem-module"></span><h2>moldesign.units.unitsystem module<a class="headerlink" href="#module-moldesign.units.unitsystem" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.units.unitsystem.UnitSystem">
+<em class="property">class </em><code class="descclassname">moldesign.units.unitsystem.</code><code class="descname">UnitSystem</code><span class="sig-paren">(</span><em>length</em>, <em>mass</em>, <em>time</em>, <em>energy</em>, <em>temperature=&lt;Unit('kelvin')&gt;</em>, <em>force=None</em>, <em>momentum=None</em>, <em>angle=&lt;Unit('radian')&gt;</em>, <em>charge=&lt;Unit('elementary_charge')&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/unitsystem.html#UnitSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.unitsystem.UnitSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Class for standardizing units - specifies preferred units for length, mass, energy etc.</p>
+<p>In MDT, many methods will automatically convert output using the UnitSystem at
+<code class="docutils literal"><span class="pre">moldesign.units.default</span></code></p>
+<dl class="method">
+<dt id="moldesign.units.unitsystem.UnitSystem.convert">
+<code class="descname">convert</code><span class="sig-paren">(</span><em>quantity</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/unitsystem.html#UnitSystem.convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.unitsystem.UnitSystem.convert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a quantity into this unit system
+&#64;param quantity: moldesign.external.pint.Quantity</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.units.unitsystem.UnitSystem.force">
+<code class="descname">force</code><a class="headerlink" href="#moldesign.units.unitsystem.UnitSystem.force" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.units.unitsystem.UnitSystem.get_baseunit">
+<code class="descname">get_baseunit</code><span class="sig-paren">(</span><em>quantity</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/units/unitsystem.html#UnitSystem.get_baseunit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.units.unitsystem.UnitSystem.get_baseunit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.units.unitsystem.UnitSystem.momentum">
+<code class="descname">momentum</code><a class="headerlink" href="#moldesign.units.unitsystem.UnitSystem.momentum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="moldesign.utils.html" class="btn btn-neutral float-right" title="moldesign.utils package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="moldesign.uibase.html" class="btn btn-neutral" title="moldesign.uibase package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

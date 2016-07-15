@@ -1,0 +1,357 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installing MDT &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="index.html"/>
+        <link rel="next" title="How do I ...?" href="howdoi.html"/>
+        <link rel="prev" title="Molecular Design Toolkit: API documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-installation">Basic installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#notebook-extensions">Notebook extensions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-python-installs">Optional python installs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#openbabel">OpenBabel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openmm">OpenMM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyscf">PySCF</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#changing-where-your-jobs-run">Changing where your jobs run</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-a-docker-machine">Using a docker-machine</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#running-jobs-on-aws">Running jobs on AWS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#system-specific-installation">System-specific installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mac-os-x">Mac OS X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ubuntu-debian">Ubuntu / Debian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#red-hat-fedora-centos">Red Hat / Fedora / CentOS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#windows">Windows</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="contents.html">Docs</a> &raquo;</li>
+      
+    <li>Installing MDT</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/install.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installing-mdt">
+<h1><a class="toc-backref" href="#id2">Installing MDT</a><a class="headerlink" href="#installing-mdt" title="Permalink to this headline">¶</a></h1>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#installing-mdt" id="id2">Installing MDT</a><ul>
+<li><a class="reference internal" href="#basic-installation" id="id3">Basic installation</a></li>
+<li><a class="reference internal" href="#optional-python-installs" id="id4">Optional python installs</a></li>
+<li><a class="reference internal" href="#changing-where-your-jobs-run" id="id5">Changing where your jobs run</a></li>
+<li><a class="reference internal" href="#system-specific-installation" id="id6">System-specific installation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="basic-installation">
+<h2><a class="toc-backref" href="#id3">Basic installation</a><a class="headerlink" href="#basic-installation" title="Permalink to this headline">¶</a></h2>
+<p>MDT requires Python 2.7. Type</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>python --version
+</pre></div>
+</div>
+<p>to make sure that you have Python 2.7.X.  If not, you&#8217;ll want to use your <a class="reference external" href="#system-specific-installation">system&#8217;s package manager.</a> If have Python 2.7 but not <code class="docutils literal"><span class="pre">pip</span></code> (the python package manager), you can install it by running</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>easy_install pip
+</pre></div>
+</div>
+<p>At this point, you should have everything you need to install MDT.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install moldesign
+</pre></div>
+</div>
+<div class="section" id="notebook-extensions">
+<h3>Notebook extensions<a class="headerlink" href="#notebook-extensions" title="Permalink to this headline">¶</a></h3>
+<p>MDT will automatically install and enable the <code class="docutils literal"><span class="pre">nbmolviz</span></code> and <code class="docutils literal"><span class="pre">widgetsnbextensions</span></code> for Jupyter if they&#8217;re not already enabled (these extensions provide the interactive molecular visualization framework). You can list the installed extensions by running</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>jupyter nbextension list
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="optional-python-installs">
+<h2><a class="toc-backref" href="#id4">Optional python installs</a><a class="headerlink" href="#optional-python-installs" title="Permalink to this headline">¶</a></h2>
+<p>MDT relies on several open source python packages to provide various functions.
+It&#8217;s not necessary to have any of them installed on your own machine, but it can be convenient to
+have them locally, especially for development</p>
+<div class="section" id="openbabel">
+<h3>OpenBabel<a class="headerlink" href="#openbabel" title="Permalink to this headline">¶</a></h3>
+<p>MDT makes heavy use of <a class="reference external" href="https://openbabel.org/">OpenBabel&#8217;s</a> file i/o routines. While powerful,
+OpenBabel and its Python bindings can be challenging to compile. It&#8217;s highly recommended to use
+a package manager:</p>
+<blockquote>
+<div><ul class="simple">
+<li>For Debian and Ubuntu, use <code class="docutils literal"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">openbabel</span> <span class="pre">python-openbabel</span></code></li>
+<li>For MacOS X, use <code class="docutils literal"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">--with-python</span> <span class="pre">open-babel</span></code>.</li>
+</ul>
+</div></blockquote>
+<p>See <a class="reference external" href="https://openbabel.org/docs/dev/Installation/install.html">the OpenBabel docs</a> for more
+information.</p>
+</div>
+<div class="section" id="openmm">
+<h3>OpenMM<a class="headerlink" href="#openmm" title="Permalink to this headline">¶</a></h3>
+<p>We recommend the <a class="reference external" href="https://simtk.org/frs/?group_id=161">pre-compiled binary installers available directly from the OpenMM
+developers.</a></p>
+</div>
+<div class="section" id="pyscf">
+<h3>PySCF<a class="headerlink" href="#pyscf" title="Permalink to this headline">¶</a></h3>
+<p>MDT uses quantum chemical implementations and basis set logic from the excellent <a class="reference external" href="http://sunqm.net/pyscf/">PySCF library</a>. You can install it locally by running</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install git+https://github.com/sunqm/pyscf
+</pre></div>
+</div>
+<p>If you run into problems, see the <a class="reference external" href="http://sunqm.net/pyscf/">documentation</a> and
+<a class="reference external" href="https://github.com/sunqm/pyscf">GitHub README.</a>.</p>
+</div>
+</div>
+<div class="section" id="changing-where-your-jobs-run">
+<h2><a class="toc-backref" href="#id5">Changing where your jobs run</a><a class="headerlink" href="#changing-where-your-jobs-run" title="Permalink to this headline">¶</a></h2>
+<p>The toolkit is built to run jobs using the <a class="reference external" href="https://www.docker.com/">Docker containerization technology</a> (which <em>has nothing to do with molecular docking</em>).  Docker eliminates the need to configure or compile
+software on different computers.</p>
+<p>By default, MDT is configured to use a free cloud-based docker cluster provided by Autodesk
+Research. If you&#8217;d like to run jobs on your local machine, you&#8217;ll need to install a couple more
+things.</p>
+<div class="section" id="using-a-docker-machine">
+<h3>Using a docker-machine<a class="headerlink" href="#using-a-docker-machine" title="Permalink to this headline">¶</a></h3>
+<p>A recent version of Docker (&gt;1.11) is required.</p>
+<p><em>Mac or Windows</em>: Download and install the <a class="reference external" href="https://www.docker.com/products/docker-toolbox">Docker Toolbox</a>.</p>
+<p><em>Linux</em>: <a class="reference external" href="https://docs.docker.com/engine/installation/linux/">Follow the instructions for your distribution</a>.</p>
+<p>Next, create a docker-machine (ideally, it should have at least 4 GB of RAM and 40 GB of disk
+space):</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ docker-machine create --driver virtualbox --virtualbox-memory <span class="s2">&quot;4096&quot;</span> --virtualbox-disk-size <span class="s2">&quot;40000&quot;</span>
+</pre></div>
+</div>
+<div class="section" id="running-jobs-on-aws">
+<h4>Running jobs on AWS<a class="headerlink" href="#running-jobs-on-aws" title="Permalink to this headline">¶</a></h4>
+<p>coming soon</p>
+</div>
+</div>
+</div>
+<div class="section" id="system-specific-installation">
+<h2><a class="toc-backref" href="#id6">System-specific installation</a><a class="headerlink" href="#system-specific-installation" title="Permalink to this headline">¶</a></h2>
+<p>Use these instructions to get the dependencies installed on your machine, then proceed with the
+<a class="reference external" href="#basic-installation">basic installation</a>.</p>
+<div class="section" id="mac-os-x">
+<h3>Mac OS X<a class="headerlink" href="#mac-os-x" title="Permalink to this headline">¶</a></h3>
+<p>Install <a class="reference external" href="http://brew.sh">homebrew</a> if it&#8217;s not already installed:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>/usr/bin/ruby -e <span class="s2">&quot;</span><span class="k">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install<span class="k">)</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>Install Python:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ brew install python
+</pre></div>
+</div>
+</div>
+<div class="section" id="ubuntu-debian">
+<h3>Ubuntu / Debian<a class="headerlink" href="#ubuntu-debian" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>apt-get install python python-pip
+</pre></div>
+</div>
+</div>
+<div class="section" id="red-hat-fedora-centos">
+<h3>Red Hat / Fedora / CentOS<a class="headerlink" href="#red-hat-fedora-centos" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>yum install python python-pip
+</pre></div>
+</div>
+</div>
+<div class="section" id="windows">
+<h3>Windows<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h3>
+<p>Windows is not supported at this time, although if the Python dependencies can be installed, MDT should work fine. We highly recommend running your notebooks in Chrome or Firefox. We&#8217;re working on Windows support - if you have any problems, please <a class="reference external" href="https://github.com/autodesk/moldesign/issues">open an issue on GitHub</a>.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="howdoi.html" class="btn btn-neutral float-right" title="How do I ...?" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Molecular Design Toolkit: API documentation" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

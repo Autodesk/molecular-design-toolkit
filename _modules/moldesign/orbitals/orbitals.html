@@ -1,0 +1,554 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.orbitals.orbitals &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.orbitals.orbitals</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.orbitals.orbitals</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="sd">&quot;&quot;&quot; Class definitions for atomic and molecular orbitals.</span>
+
+<span class="sd">Notes:</span>
+<span class="sd">    In this documentation, we use the following conventions for labeling orbitals:</span>
+<span class="sd">      - atomic orbitals using lower case greek labels and subscripts, e.g.,</span>
+<span class="sd">          :math:`\left| \mu \right \rangle, F_{\nu \lambda}, etc.</span>
+<span class="sd">      - molecular orbitals use lower case labels and subscripts, e.g.,</span>
+<span class="sd">          :math:`\left| i \right \rangle, F_{kl}, etc.</span>
+<span class="sd">      - adiabatic electronic states are indexed using capital letters, _N_, _L_, _M_, etc.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">moldesign.utils</span> <span class="kn">import</span> <span class="n">Alias</span>
+
+<span class="n">SHELLS</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="s1">&#39;h&#39;</span><span class="p">}</span>
+<span class="n">ANGMOM</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">SHELLS</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()}</span>
+
+<span class="c1"># See https://en.wikipedia.org/wiki/Table_of_spherical_harmonics#Real_spherical_harmonics</span>
+<span class="n">SPHERICALNAMES</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span> <span class="s1">&#39;p(x)&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="s1">&#39;p(z)&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="s1">&#39;p(y)&#39;</span><span class="p">,</span>
+                  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="s1">&#39;d(z^2)&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">):</span> <span class="s1">&#39;d(xy)&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span> <span class="s1">&#39;d(yz)&#39;</span><span class="p">,</span>
+                  <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="s1">&#39;d(xz)&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="s1">&#39;d(x^2-y^2)&#39;</span><span class="p">,</span>
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">):</span> <span class="s1">&#39;f(3yx^2-y^3)&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">):</span> <span class="s1">&#39;f(xyz)&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span> <span class="s1">&#39;f(yz^2)&#39;</span><span class="p">,</span>
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="s1">&#39;f(z^3)&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="s1">&#39;f(xz^2)&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="s1">&#39;f(zx^2-zy^2)&#39;</span><span class="p">,</span>
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="s1">&#39;f(x^3-3xy^2)&#39;</span><span class="p">}</span>
+<span class="n">ANGULAR_NAME_TO_COMPONENT</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                             <span class="s1">&#39;z^2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;xy&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="s1">&#39;yz&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;xz&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                             <span class="s1">&#39;x^2-y^2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                             <span class="s1">&#39;zx^2-zy^2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s1">&#39;xyz&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="s1">&#39;z^3&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                             <span class="s1">&#39;3yx^2-y^3&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">),</span> <span class="s1">&#39;x^3 - 3xy^2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="s1">&#39;xz^2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                             <span class="s1">&#39;yz^2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)}</span>
+
+
+<div class="viewcode-block" id="ConvergenceError"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.orbitals.ConvergenceError">[docs]</a><span class="k">class</span> <span class="nc">ConvergenceError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span> <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Orbital"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.orbitals.Orbital">[docs]</a><span class="k">class</span> <span class="nc">Orbital</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">    Stores a single orbital and its meta-data</span>
+<span class="sd">    Generally wants to be part of a set of MolecularOrbitals</span>
+
+<span class="sd">    The orbital is defined as</span>
+<span class="sd">    .. math::</span>
+<span class="sd">        \left| i \right \rangle = \sum_\mu c_{i \mu} \left| \mu \right \rangle</span>
+
+<span class="sd">    where the coefficients :math:`c_{i \mu}` are stored in ``self.coeffs`` and the basis orbitals</span>
+<span class="sd">    :math:`\left| \mu \right \rangle` are stored at ``self.basis``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">wfn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">occupation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;unnamed&#39;</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initialization:</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coeffs (numpy.array): orbital coefficients</span>
+<span class="sd">            basis (moldesign.orbitals.basis.BasisSet): basis for this orbital</span>
+<span class="sd">            wfn (moldesign.orbitals.wfn.ElectronicWfn): total electronic wavefunction that this orbital is a part of</span>
+<span class="sd">            occupation (float): occupation of this orbital</span>
+<span class="sd">            name (str): optional label for this orbital:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="o">=</span> <span class="n">basis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">occupation</span> <span class="o">=</span> <span class="n">occupation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wfn</span> <span class="o">=</span> <span class="n">wfn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c1"># will be set by the containing MolecularOrbitals object</span>
+
+        <span class="c1"># Assign the basis functions</span>
+        <span class="k">if</span> <span class="n">wfn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">wfn</span><span class="o">.</span><span class="n">aobasis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">wfn</span><span class="o">.</span><span class="n">aobasis</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="o">=</span> <span class="n">wfn</span><span class="o">.</span><span class="n">aobasis</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="p">)</span>
+
+        <span class="c1"># Assign arbitrary attributes</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Orbital.overlap"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.orbitals.Orbital.overlap">[docs]</a>    <span class="k">def</span> <span class="nf">overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate overlap with another orbital</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other (Orbital): calculate the overlap with this orbital</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: orbital overlap</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">overlaps</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">coeffs</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Orbital.fock_element"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.orbitals.Orbital.fock_element">[docs]</a>    <span class="k">def</span> <span class="nf">fock_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate fock matrix element with another orbital</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other (Orbital): calculate the fock element with this orbital</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            u.Scalar[energy]: fock matrix element</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">fock_ao</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">coeffs</span><span class="p">)</span><span class="o">.</span><span class="n">ldot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">)</span>  <span class="c1"># use ldot to preserve units</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; u.Scalar[energy]: This orbital&#39;s energy</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            This is equivalent to self.fock(self)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fock_element</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate the orbital&#39;s value at a position (or list of positions)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            coords (u.Vector[length]): Coordinates (shape ``(len(coords), 3)``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            u.Scalar[length**(-3/2)]: value of the orbital</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">coeffs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="n">__len__</span> <span class="o">=</span> <span class="n">Alias</span><span class="p">(</span><span class="s1">&#39;coeffs.__len__&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MolecularOrbitals"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.orbitals.MolecularOrbitals">[docs]</a><span class="k">class</span> <span class="nc">MolecularOrbitals</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores a wfn of molecular orbitals in an AO wfn</span>
+<span class="sd">    Orbitals are accessed as orbs[orbital index, ao index]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orbitals</span><span class="p">,</span> <span class="n">wfn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">canonical</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                 <span class="n">orbtype</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initialization:</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            orbitals (List[Orbital] OR numpy.array): EITHER a list of orbitals OR an</span>
+<span class="sd">               array of coefficients (indexed as coeffs[orbital_index, basis_index])</span>
+<span class="sd">            basis (moldesign.orbitals.basis.BasisSet): orbital basis set</span>
+<span class="sd">            wfn (moldesign.orbitals.wfn.ElectronicWfn): total electronic wavefunction that this orbital is a part of</span>
+<span class="sd">            canonical (bool): designate these as the canonical orbitals</span>
+<span class="sd">            orbtype (str): description of these orbitals</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Determine if these are the canonical orbitals</span>
+        <span class="k">if</span> <span class="n">canonical</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">orbtype</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">orbtype</span> <span class="o">==</span> <span class="s1">&#39;canonical&#39;</span>
+            <span class="n">orbtype</span> <span class="o">=</span> <span class="s1">&#39;canonical&#39;</span>
+        <span class="k">if</span> <span class="n">orbtype</span> <span class="o">==</span> <span class="s1">&#39;canonical&#39;</span><span class="p">:</span>
+            <span class="n">canonical</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">orbitals</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;basis&#39;</span><span class="p">):</span>
+            <span class="n">coeffs</span> <span class="o">=</span> <span class="n">orbitals</span>
+            <span class="n">orbitals</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">coeffs</span><span class="p">:</span>
+                <span class="n">orbitals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Orbital</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="n">basis</span><span class="p">,</span> <span class="n">wfn</span><span class="o">=</span><span class="n">wfn</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span> <span class="o">=</span> <span class="n">orbitals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">orb</span><span class="o">.</span><span class="n">coeffs</span> <span class="k">for</span> <span class="n">orb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wfn</span> <span class="o">=</span> <span class="n">wfn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="o">=</span> <span class="n">basis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orbtype</span> <span class="o">=</span> <span class="n">orbtype</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wfn</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wfn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">wfn</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">basis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">basis</span>
+
+        <span class="k">for</span> <span class="n">iorb</span><span class="p">,</span> <span class="n">orbital</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span><span class="p">):</span>
+            <span class="n">orbital</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">iorb</span>
+            <span class="k">assert</span> <span class="n">orbital</span><span class="o">.</span><span class="n">basis</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis</span>
+            <span class="k">assert</span> <span class="n">orbital</span><span class="o">.</span><span class="n">wfn</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">wfn</span>
+            <span class="n">orbital</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="n">iorb</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="k">if</span> <span class="n">canonical</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_cmo_names</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MolecularOrbitals.align_phases"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.orbitals.MolecularOrbitals.align_phases">[docs]</a>    <span class="k">def</span> <span class="nf">align_phases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">assert_same_type</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Flip the signs of these orbitals to bring them into maximum coincidence</span>
+<span class="sd">        with another set of orbitals</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other (MolecularOrbitals): the &quot;reference&quot; set of orbitals to match phases with</span>
+<span class="sd">            threshold (float): only flip orbital if the overlap is less than -1*threshold</span>
+<span class="sd">            assert_same_type (bool): require that ``self.orbtype == other.orbtype``</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            This function assumes that the overlap matrix is the same for both sets of</span>
+<span class="sd">            orbitals - this is a reasonable assumption if the two sets of orbitals were</span>
+<span class="sd">            calculated at very similar molecular geometries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">assert_same_type</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">orbtype</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">orbtype</span><span class="p">,</span> <span class="s2">&quot;Orbital type mismatch: </span><span class="si">%s</span><span class="s2"> vs. </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">orbtype</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">orbtype</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">thisorb</span><span class="p">,</span> <span class="n">otherorb</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">thisorb</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span><span class="n">otherorb</span><span class="p">)</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">threshold</span><span class="p">:</span>
+                <span class="n">thisorb</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">*=</span> <span class="o">-</span><span class="mf">1.0</span></div>
+                <span class="c1"># TODO: print a warning if overlap is small?</span>
+
+<div class="viewcode-block" id="MolecularOrbitals.overlap"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.orbitals.MolecularOrbitals.overlap">[docs]</a>    <span class="k">def</span> <span class="nf">overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate overlaps between this and another set of orbitals</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other (MolecularOrbitals):</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.array: overlaps between the two sets of orbitals.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; canonical = mol.wfn.canonical</span>
+<span class="sd">            &gt;&gt;&gt; atomic = mol.wfn.basis</span>
+<span class="sd">            &gt;&gt;&gt; overlaps = canonical.overlap(atomic)</span>
+<span class="sd">            &gt;&gt;&gt; overlaps[i, j] == canonical.orbitals[i].overlap(atomic.orbitals[j])</span>
+<span class="sd">            True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aobasis</span><span class="o">.</span><span class="n">overlaps</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">T</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> orbitals&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">orbtype</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> in </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">orbtype</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wfn</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;u.Vector[energy]: energies of the molecular orbitals</span>
+
+<span class="sd">        This is just the diagonal of the fock matrix&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fock</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;u.Array[energy]: Fock matrix for these orbitals&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_ao</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">fock_ao</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">overlaps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;np.array: overlap matrix for these orbitals&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_ao</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">aobasis</span><span class="o">.</span><span class="n">overlaps</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">h1e</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;u.Array[energy]: 1-electron matrix elements for these orbitals&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_ao</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">aobasis</span><span class="o">.</span><span class="n">h1e</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">h2e</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;u.Array[energy]: 2-electron matrix elements for these orbitals&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fock</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">h1e</span>
+
+<div class="viewcode-block" id="MolecularOrbitals.from_ao"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.orbitals.MolecularOrbitals.from_ao">[docs]</a>    <span class="k">def</span> <span class="nf">from_ao</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ao_operator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Transform an operator into this orbital basis from the ao basis</span>
+
+<span class="sd">        Given the matrix elements :math:`\hat O_{\mu \nu}` of an operator over AO basis indices</span>
+<span class="sd">        :math:`\mu,\nu`, returns the operator&#39;s matrix elements :math:`\hat O_{ij}` over</span>
+<span class="sd">        orbital indices :math:`i,j`:</span>
+
+<span class="sd">        ..math::</span>
+<span class="sd">            \hat O_{ij} =</span>
+<span class="sd">             \left \langle i \right| \hat O \left| j \right \rangle =</span>
+<span class="sd">              \sum_{\mu \nu}C_{i \mu} O_{\mu \nu} C_{j \nu}</span>
+
+
+<span class="sd">        where :math:`C_{i \mu}` is the expansion coefficient for AO basis function :math:`\mu` in</span>
+<span class="sd">        molecular orbital _i_.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ao_operator (u.Array): matrix elements of the operator in the ao basis</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            u.Array: matrix elements of the operator in this orbital basis</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            Assumes that this set of orbitals is orthogonal</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Dot doesn&#39;t place nice with units, so we need to pass them explicitly</span>
+        <span class="n">ao_units</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">ao_operator</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ao_operator</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="o">.</span><span class="n">T</span><span class="p">))</span> <span class="o">*</span> <span class="n">ao_units</span></div>
+
+<div class="viewcode-block" id="MolecularOrbitals.to_ao"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.orbitals.MolecularOrbitals.to_ao">[docs]</a>    <span class="k">def</span> <span class="nf">to_ao</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mo_operator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Transform an operator from this orbital basis into the AO basis</span>
+
+<span class="sd">        Given the matrix elements :math:`\hat O_{ij}` of an operator over orbital basis indices</span>
+<span class="sd">        :math:`i,j`, returns the operator&#39;s matrix elements :math:`\hat O_{\mu \nu}` over</span>
+<span class="sd">        orbital indices :math:`\mu, \nu`:</span>
+
+<span class="sd">        ..math::</span>
+<span class="sd">           \hat O_{\mu \nu} =</span>
+<span class="sd">           \left \langle \mu \right| \hat O \left| \nu \right \rangle =</span>
+<span class="sd">           \sum_{i,j,\lambda,\kappa}S_{\mu \lambda} C_{i \lambda} O_{ij} C_{j \kappa} S_{\kappa \nu}</span>
+
+<span class="sd">        where :math:`S_{\mu \nu} = \left \langle \mu | \nu \right \rangle` is the AO overlap matrix</span>
+<span class="sd">        and :math:`C_{i \mu}` is the expansion coefficient for AO basis function :math:`\mu` in</span>
+<span class="sd">        molecular orbital _i_.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mo_operator (u.Array): matrix elements of the operator in this orbital basis</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            u.Array: matrix elements of the operator in the AO basis</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">units</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">mo_operator</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">aobasis</span><span class="o">.</span><span class="n">overlaps</span>
+        <span class="n">o_ao</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mo_operator</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">o_ao</span> <span class="o">*</span> <span class="n">units</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_cmo_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">orb</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">orb</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;unnamed&#39;</span> <span class="ow">and</span> <span class="n">orb</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">homo</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">homo</span> <span class="o">-</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">orb</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;cmo </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span>
+                <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">homo</span><span class="p">:</span>
+                    <span class="n">orb</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HOMO&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">orb</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HOMO-</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">homo</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">lumo</span><span class="p">:</span>
+                    <span class="n">orb</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;LUMO&#39;</span>
+                <span class="k">elif</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">lumo</span> <span class="o">+</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">orb</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;LUMO+</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">lumo</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">orb</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;virt cmo </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,474 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.utils.docparsers package &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../index.html"/>
+        <link rel="up" title="moldesign.utils package" href="moldesign.utils.html"/>
+        <link rel="next" title="moldesign.viewer package" href="moldesign.viewer.html"/>
+        <link rel="prev" title="moldesign.utils package" href="moldesign.utils.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="moldesign.html">Complete API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="moldesign.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="moldesign.compute.html">moldesign.compute package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.external.html">moldesign.external package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.forcefields.html">moldesign.forcefields package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.geom.html">moldesign.geom package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.integrators.html">moldesign.integrators package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.interfaces.html">moldesign.interfaces package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.min.html">moldesign.min package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.models.html">moldesign.models package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.molecules.html">moldesign.molecules package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.orbitals.html">moldesign.orbitals package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.uibase.html">moldesign.uibase package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.units.html">moldesign.units package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="moldesign.utils.html">moldesign.utils package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="moldesign.utils.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moldesign.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moldesign.utils.html#module-moldesign.utils.callsigs">moldesign.utils.callsigs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moldesign.utils.html#module-moldesign.utils.classes">moldesign.utils.classes module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moldesign.utils.html#module-moldesign.utils.databases">moldesign.utils.databases module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moldesign.utils.html#module-moldesign.utils.utils">moldesign.utils.utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.viewer.html">moldesign.viewer package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.widgets.html">moldesign.widgets package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.converters">moldesign.converters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.data">moldesign.data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.exceptions">moldesign.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.helpers">moldesign.helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.mathutils">moldesign.mathutils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.method">moldesign.method module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.parameters">moldesign.parameters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.tools">moldesign.tools module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="moldesign.html">moldesign package</a> &raquo;</li>
+      
+          <li><a href="moldesign.utils.html">moldesign.utils package</a> &raquo;</li>
+      
+    <li>moldesign.utils.docparsers package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/source/_moldesign_api/moldesign.utils.docparsers.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-moldesign.utils.docparsers">
+<span id="moldesign-utils-docparsers-package"></span><h1>moldesign.utils.docparsers package<a class="headerlink" href="#module-moldesign.utils.docparsers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-moldesign.utils.docparsers.google">
+<span id="moldesign-utils-docparsers-google-module"></span><h2>moldesign.utils.docparsers.google module<a class="headerlink" href="#module-moldesign.utils.docparsers.google" title="Permalink to this headline">¶</a></h2>
+<p>Routines for runtime docstring argument injection</p>
+<p>This file contains HEAVILY modified routines from sphinx.ext.napoleon, from version 1.4.4</p>
+<p>This has been vendored into MDT because the modification makes use of
+private functions which have already changed in the dev branch.</p>
+<dl class="class">
+<dt id="moldesign.utils.docparsers.google.GoogleDocArgumentInjector">
+<em class="property">class </em><code class="descclassname">moldesign.utils.docparsers.google.</code><code class="descname">GoogleDocArgumentInjector</code><span class="sig-paren">(</span><em>docstring</em>, <em>prepare=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/utils/docparsers/google.html#GoogleDocArgumentInjector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.docparsers.google.GoogleDocArgumentInjector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="moldesign.utils.docparsers.google.GoogleDocArgumentInjector.SECTIONS">
+<code class="descname">SECTIONS</code><em class="property"> = set(['args', 'arguments', 'parameters'])</em><a class="headerlink" href="#moldesign.utils.docparsers.google.GoogleDocArgumentInjector.SECTIONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.docparsers.google.GoogleDocArgumentInjector.lines">
+<code class="descname">lines</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/utils/docparsers/google.html#GoogleDocArgumentInjector.lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.docparsers.google.GoogleDocArgumentInjector.lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the parsed lines of the docstring in reStructuredText format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The lines of the docstring in a list.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-obj docutils literal"><span class="pre">str</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.docparsers.google.GoogleDocArgumentInjector.new_docstring">
+<code class="descname">new_docstring</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/utils/docparsers/google.html#GoogleDocArgumentInjector.new_docstring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.docparsers.google.GoogleDocArgumentInjector.new_docstring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new docstring with the current state of the argument list</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">docstring with modified argument list</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.docparsers.google.GoogleDocArgumentInjector.parse">
+<code class="descname">parse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/utils/docparsers/google.html#GoogleDocArgumentInjector.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.docparsers.google.GoogleDocArgumentInjector.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is a modified version of GoogleDocstring._parse</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.docparsers.google.modify_iter">
+<em class="property">class </em><code class="descclassname">moldesign.utils.docparsers.google.</code><code class="descname">modify_iter</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/utils/docparsers/google.html#modify_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.docparsers.google.modify_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.utils.docparsers.google.peek_iter" title="moldesign.utils.docparsers.google.peek_iter"><code class="xref py py-class docutils literal"><span class="pre">moldesign.utils.docparsers.google.peek_iter</span></code></a></p>
+<p>An iterator object that supports modifying items as they are returned.
+:param o: <cite>o</cite> is interpreted very differently depending on the presence of</p>
+<blockquote>
+<div><cite>sentinel</cite>.
+If <cite>sentinel</cite> is not given, then <cite>o</cite> must be a collection object
+which supports either the iteration protocol or the sequence protocol.
+If <cite>sentinel</cite> is given, then <cite>o</cite> must be a callable object.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sentinel</strong> (<em>any value, optional</em>) &#8211; If given, the iterator will call <cite>o</cite> with no arguments for each
+call to its <cite>next</cite> method; if the value returned is equal to
+<cite>sentinel</cite>, <code class="xref py py-exc docutils literal"><span class="pre">StopIteration</span></code> will be raised, otherwise the
+value will be returned.</li>
+<li><strong>modifier</strong> (<em>callable, optional</em>) &#8211; The function that will be used to modify each item returned by the
+iterator. <cite>modifier</cite> should take a single argument and return a
+single value. Defaults to <code class="docutils literal"><span class="pre">lambda</span> <span class="pre">x:</span> <span class="pre">x</span></code>.
+If <cite>sentinel</cite> is not given, <cite>modifier</cite> must be passed as a keyword
+argument.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="moldesign.utils.docparsers.google.modify_iter.modifier">
+<code class="descname">modifier</code><a class="headerlink" href="#moldesign.utils.docparsers.google.modify_iter.modifier" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>callable</em> &#8211; <cite>modifier</cite> is called with each item in <cite>o</cite> as it is iterated. The
+return value of <cite>modifier</cite> is returned in lieu of the item.
+Values returned by <cite>peek</cite> as well as <cite>next</cite> are affected by
+<cite>modifier</cite>. However, <cite>modify_iter.sentinel</cite> is never passed through
+<cite>modifier</cite>; it will always be returned from <cite>peek</cite> unmodified.</p>
+</dd></dl>
+
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;     A list    &quot;</span><span class="p">,</span>
+<span class="gp">... </span>     <span class="s2">&quot;   of strings  &quot;</span><span class="p">,</span>
+<span class="gp">... </span>     <span class="s2">&quot;      with     &quot;</span><span class="p">,</span>
+<span class="gp">... </span>     <span class="s2">&quot;      extra    &quot;</span><span class="p">,</span>
+<span class="gp">... </span>     <span class="s2">&quot;   whitespace. &quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">modifier</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;with&#39;</span><span class="p">,</span> <span class="s1">&#39;without&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">modify_iter</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">modifier</span><span class="o">=</span><span class="n">modifier</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">s</span><span class="p">)</span>
+<span class="go">&quot;A list&quot;</span>
+<span class="go">&quot;of strings&quot;</span>
+<span class="go">&quot;without&quot;</span>
+<span class="go">&quot;extra&quot;</span>
+<span class="go">&quot;whitespace.&quot;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.docparsers.google.peek_iter">
+<em class="property">class </em><code class="descclassname">moldesign.utils.docparsers.google.</code><code class="descname">peek_iter</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/utils/docparsers/google.html#peek_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.docparsers.google.peek_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>An iterator object that supports peeking ahead.
+:param o: <cite>o</cite> is interpreted very differently depending on the presence of</p>
+<blockquote>
+<div><cite>sentinel</cite>.
+If <cite>sentinel</cite> is not given, then <cite>o</cite> must be a collection object
+which supports either the iteration protocol or the sequence protocol.
+If <cite>sentinel</cite> is given, then <cite>o</cite> must be a callable object.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sentinel</strong> (<em>any value, optional</em>) &#8211; If given, the iterator will call <cite>o</cite> with no arguments for each
+call to its <cite>next</cite> method; if the value returned is equal to
+<cite>sentinel</cite>, <code class="xref py py-exc docutils literal"><span class="pre">StopIteration</span></code> will be raised, otherwise the
+value will be returned.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><cite>peek_iter</cite> can operate as a drop in replacement for the built-in
+<a class="reference external" href="https://docs.python.org/2/library/functions.html#iter">iter</a> function.</p>
+</div>
+<dl class="attribute">
+<dt id="moldesign.utils.docparsers.google.peek_iter.sentinel">
+<code class="descname">sentinel</code><a class="headerlink" href="#moldesign.utils.docparsers.google.peek_iter.sentinel" title="Permalink to this definition">¶</a></dt>
+<dd><p>The value used to indicate the iterator is exhausted. If <cite>sentinel</cite>
+was not given when the <cite>peek_iter</cite> was instantiated, then it will
+be set to a new object instance: <code class="docutils literal"><span class="pre">object()</span></code>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.docparsers.google.peek_iter.has_next">
+<code class="descname">has_next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/utils/docparsers/google.html#peek_iter.has_next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.docparsers.google.peek_iter.has_next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if iterator is exhausted.
+:returns: True if iterator has more items, False otherwise.
+:rtype: bool</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Will never raise <code class="xref py py-exc docutils literal"><span class="pre">StopIteration</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.docparsers.google.peek_iter.next">
+<code class="descname">next</code><span class="sig-paren">(</span><em>n=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/utils/docparsers/google.html#peek_iter.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.docparsers.google.peek_iter.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the next item or <cite>n</cite> items of the iterator.
+:param n: The number of items to retrieve. Defaults to None.
+:type n: int or None</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The next item or <cite>n</cite> items of the iterator. If <cite>n</cite> is None, the
+item itself is returned. If <cite>n</cite> is an int, the items will be
+returned in a list. If <cite>n</cite> is 0, an empty list is returned.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">item or list of items</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">StopIteration</span></code> &#8211; Raised if the iterator is exhausted, even if <cite>n</cite> is 0.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.docparsers.google.peek_iter.peek">
+<code class="descname">peek</code><span class="sig-paren">(</span><em>n=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/utils/docparsers/google.html#peek_iter.peek"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.docparsers.google.peek_iter.peek" title="Permalink to this definition">¶</a></dt>
+<dd><p>Preview the next item or <cite>n</cite> items of the iterator.
+The iterator is not advanced when peek is called.
+:returns: The next item or <cite>n</cite> items of the iterator. If <cite>n</cite> is None, the</p>
+<blockquote>
+<div>item itself is returned. If <cite>n</cite> is an int, the items will be
+returned in a list. If <cite>n</cite> is 0, an empty list is returned.
+If the iterator is exhausted, <cite>peek_iter.sentinel</cite> is returned,
+or placed as the last item in the returned list.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">item or list of items</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Will never raise <code class="xref py py-exc docutils literal"><span class="pre">StopIteration</span></code>.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.docparsers.google.prepare_docstring">
+<code class="descclassname">moldesign.utils.docparsers.google.</code><code class="descname">prepare_docstring</code><span class="sig-paren">(</span><em>s</em>, <em>ignore=1</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/moldesign/utils/docparsers/google.html#prepare_docstring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.docparsers.google.prepare_docstring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a docstring into lines of parseable reST.  Remove common leading
+indentation, where the indentation of a given number of lines (usually just
+one) is ignored.
+Return the docstring as a list of lines usable for inserting into a docutils
+ViewList (used as argument of nested_parse().)  An empty line is added to
+act as a separator between this docstring and following content.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="moldesign.viewer.html" class="btn btn-neutral float-right" title="moldesign.viewer package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="moldesign.utils.html" class="btn btn-neutral" title="moldesign.utils package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

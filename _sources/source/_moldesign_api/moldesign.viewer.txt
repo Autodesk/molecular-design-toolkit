@@ -1,0 +1,44 @@
+moldesign.viewer package
+========================
+
+.. automodule:: moldesign.viewer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+moldesign.viewer.bondclicker module
+-----------------------------------
+
+.. automodule:: moldesign.viewer.bondclicker
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.viewer.common module
+------------------------------
+
+.. automodule:: moldesign.viewer.common
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.viewer.viewer2d module
+--------------------------------
+
+.. automodule:: moldesign.viewer.viewer2d
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.viewer.viewer3d module
+--------------------------------
+
+.. automodule:: moldesign.viewer.viewer3d
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

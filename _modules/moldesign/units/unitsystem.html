@@ -1,0 +1,314 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.units.unitsystem &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.units.unitsystem</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.units.unitsystem</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="kn">from</span> <span class="nn">.quantity</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="UnitSystem"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.units.html#moldesign.units.unitsystem.UnitSystem">[docs]</a><span class="k">class</span> <span class="nc">UnitSystem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Class for standardizing units - specifies preferred units for length, mass, energy etc.</span>
+
+<span class="sd">    In MDT, many methods will automatically convert output using the UnitSystem at</span>
+<span class="sd">    ``moldesign.units.default``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">mass</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span>
+                 <span class="n">temperature</span><span class="o">=</span><span class="n">kelvin</span><span class="p">,</span>
+                 <span class="n">force</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">angle</span><span class="o">=</span><span class="n">radians</span><span class="p">,</span>
+                 <span class="n">charge</span><span class="o">=</span><span class="n">q_e</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="n">mass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">energy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">force</span> <span class="o">=</span> <span class="n">force</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">momentum</span> <span class="o">=</span> <span class="n">momentum</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">angle</span> <span class="o">=</span> <span class="n">angle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="n">charge</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; For convenience when using pint dimensionality descriptions.</span>
+<span class="sd">        This aliases self[&#39;item&#39;] = self[&#39;[item]&#39;] = self.item,</span>
+<span class="sd">        e.g. self[&#39;length&#39;] = self[&#39;[length]&#39;] = self.length</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">itemname</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">itemname</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">force</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_force</span>
+
+    <span class="nd">@force.setter</span>
+    <span class="k">def</span> <span class="nf">force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_force</span> <span class="o">=</span> <span class="n">f</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">momentum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_momentum</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_momentum</span>
+
+    <span class="nd">@momentum.setter</span>
+    <span class="k">def</span> <span class="nf">momentum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_momentum</span> <span class="o">=</span> <span class="n">f</span>
+
+<div class="viewcode-block" id="UnitSystem.convert"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.units.html#moldesign.units.unitsystem.UnitSystem.convert">[docs]</a>    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a quantity into this unit system</span>
+<span class="sd">        @param quantity: moldesign.external.pint.Quantity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">baseunit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_baseunit</span><span class="p">(</span><span class="n">quantity</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">quantity</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">baseunit</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="UnitSystem.get_baseunit"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.units.html#moldesign.units.unitsystem.UnitSystem.get_baseunit">[docs]</a>    <span class="k">def</span> <span class="nf">get_baseunit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">):</span>
+        <span class="c1"># TODO: this needs to deal with angles</span>
+        <span class="c1"># if quantity.dimensionless: return 1.0 # don&#39;t call this - it&#39;s super-slow (Pint 0.6.1)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dims</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">quantity</span><span class="o">.</span><span class="n">dimensionality</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_baseunit</span><span class="p">(</span><span class="n">quantity</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>  <span class="c1"># Assume dimensionless</span>
+                <span class="k">return</span> <span class="mi">1</span>
+        <span class="n">baseunit</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># Factor out energy units (this doesn&#39;t work for things like energy/length)</span>
+        <span class="k">if</span> <span class="s1">&#39;[length]&#39;</span> <span class="ow">in</span> <span class="n">dims</span> <span class="ow">and</span> <span class="s1">&#39;[mass]&#39;</span> <span class="ow">in</span> <span class="n">dims</span> <span class="ow">and</span> <span class="s1">&#39;[time]&#39;</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;[length]&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;[mass]&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;[time]&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span>
+                <span class="n">baseunit</span> <span class="o">*=</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">]</span>
+                <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;[length]&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">2</span>
+                <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;[mass]&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;[time]&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">2</span>
+
+        <span class="k">if</span> <span class="s1">&#39;[current]&#39;</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
+            <span class="n">dims</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;[charge]&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">dims</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;[time]&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;[charge]&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;[current]&#39;</span><span class="p">]</span>
+            <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;[time]&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">dims</span><span class="p">[</span><span class="s1">&#39;[current]&#39;</span><span class="p">]</span>
+            <span class="n">dims</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;[current]&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Otherwise, just use the units</span>
+        <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dims</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">baseunit</span> <span class="o">*=</span> <span class="bp">self</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span><span class="o">**</span><span class="n">dims</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="n">baseunit</span> <span class="o">*=</span> <span class="n">ureg</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span><span class="o">**</span><span class="n">dims</span><span class="p">[</span><span class="n">unit</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">baseunit</span></div></div>
+
+
+<span class="n">default</span> <span class="o">=</span> <span class="n">UnitSystem</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">angstrom</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">amu</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span> <span class="n">energy</span><span class="o">=</span><span class="n">eV</span><span class="p">)</span>
+<span class="n">atomic_units</span> <span class="o">=</span> <span class="n">UnitSystem</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">a0</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">m_e</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">energy</span><span class="o">=</span><span class="n">hartree</span><span class="p">)</span>
+<span class="n">nano_si</span> <span class="o">=</span> <span class="n">UnitSystem</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">nm</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">dalton</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span> <span class="n">energy</span><span class="o">=</span><span class="n">kjpermol</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

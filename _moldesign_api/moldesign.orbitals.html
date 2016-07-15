@@ -1,0 +1,882 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.orbitals package &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../index.html"/>
+        <link rel="up" title="moldesign package" href="moldesign.html"/>
+        <link rel="next" title="moldesign.uibase package" href="moldesign.uibase.html"/>
+        <link rel="prev" title="moldesign.molecules package" href="moldesign.molecules.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="moldesign.html">Complete API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="moldesign.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="moldesign.compute.html">moldesign.compute package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.external.html">moldesign.external package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.forcefields.html">moldesign.forcefields package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.geom.html">moldesign.geom package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.integrators.html">moldesign.integrators package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.interfaces.html">moldesign.interfaces package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.min.html">moldesign.min package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.models.html">moldesign.models package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.molecules.html">moldesign.molecules package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">moldesign.orbitals package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#moldesign-orbitals-basis-module">moldesign.orbitals.basis module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.orbitals.gaussians">moldesign.orbitals.gaussians module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.orbitals.orbitals">moldesign.orbitals.orbitals module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.orbitals.wfn">moldesign.orbitals.wfn module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.uibase.html">moldesign.uibase package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.units.html">moldesign.units package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.utils.html">moldesign.utils package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.viewer.html">moldesign.viewer package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="moldesign.widgets.html">moldesign.widgets package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.converters">moldesign.converters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.data">moldesign.data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.exceptions">moldesign.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.helpers">moldesign.helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.mathutils">moldesign.mathutils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.method">moldesign.method module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.parameters">moldesign.parameters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.tools">moldesign.tools module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="moldesign.html">moldesign package</a> &raquo;</li>
+      
+    <li>moldesign.orbitals package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_moldesign_api/moldesign.orbitals.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="moldesign-orbitals-package">
+<h1>moldesign.orbitals package<a class="headerlink" href="#moldesign-orbitals-package" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-moldesign.orbitals"></span><dl class="class">
+<dt id="moldesign.orbitals.BasisSet">
+<em class="property">class </em><code class="descclassname">moldesign.orbitals.</code><code class="descname">BasisSet</code><span class="sig-paren">(</span><em>mol</em>, <em>orbitals</em>, <em>name=None</em>, <em>h1e=None</em>, <em>overlaps=None</em>, <em>angulartype=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/basis.html#BasisSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.BasisSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.orbitals.orbitals.MolecularOrbitals" title="moldesign.orbitals.orbitals.MolecularOrbitals"><code class="xref py py-class docutils literal"><span class="pre">moldesign.orbitals.orbitals.MolecularOrbitals</span></code></a></p>
+<p>Stores a basis, typically of atomic orbitals.</p>
+<p>This is a special orbital type</p>
+<dl class="attribute">
+<dt id="moldesign.orbitals.BasisSet.fock">
+<code class="descname">fock</code><a class="headerlink" href="#moldesign.orbitals.BasisSet.fock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="moldesign-orbitals-basis-module">
+<h2>moldesign.orbitals.basis module<a class="headerlink" href="#moldesign-orbitals-basis-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-moldesign.orbitals.basis"></span><dl class="class">
+<dt id="moldesign.orbitals.basis.BasisSet">
+<em class="property">class </em><code class="descclassname">moldesign.orbitals.basis.</code><code class="descname">BasisSet</code><span class="sig-paren">(</span><em>mol</em>, <em>orbitals</em>, <em>name=None</em>, <em>h1e=None</em>, <em>overlaps=None</em>, <em>angulartype=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/basis.html#BasisSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.basis.BasisSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.orbitals.orbitals.MolecularOrbitals" title="moldesign.orbitals.orbitals.MolecularOrbitals"><code class="xref py py-class docutils literal"><span class="pre">moldesign.orbitals.orbitals.MolecularOrbitals</span></code></a></p>
+<p>Stores a basis, typically of atomic orbitals.</p>
+<p>This is a special orbital type</p>
+<dl class="attribute">
+<dt id="moldesign.orbitals.basis.BasisSet.fock">
+<code class="descname">fock</code><a class="headerlink" href="#moldesign.orbitals.basis.BasisSet.fock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.orbitals.basis.PrimitiveBase">
+<em class="property">class </em><code class="descclassname">moldesign.orbitals.basis.</code><code class="descname">PrimitiveBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/basis.html#PrimitiveBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.basis.PrimitiveBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="moldesign.orbitals.basis.PrimitiveBase.norm">
+<code class="descname">norm</code><a class="headerlink" href="#moldesign.orbitals.basis.PrimitiveBase.norm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.orbitals.basis.PrimitiveBase.overlap">
+<code class="descname">overlap</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/basis.html#PrimitiveBase.overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.basis.PrimitiveBase.overlap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.orbitals.gaussians">
+<span id="moldesign-orbitals-gaussians-module"></span><h2>moldesign.orbitals.gaussians module<a class="headerlink" href="#module-moldesign.orbitals.gaussians" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.orbitals.gaussians.AbstractFunction">
+<em class="property">class </em><code class="descclassname">moldesign.orbitals.gaussians.</code><code class="descname">AbstractFunction</code><a class="reference internal" href="../_modules/moldesign/orbitals/gaussians.html#AbstractFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.gaussians.AbstractFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="moldesign.orbitals.gaussians.AbstractFunction.norm">
+<code class="descname">norm</code><a class="headerlink" href="#moldesign.orbitals.gaussians.AbstractFunction.norm" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id1"><span class="problematic" id="id2">**</span></a>The L2-Norm of this gaussian* &#8211; .. math* &#8211; :
+int left| G(mathbf r) right|^2 d^N mathbf r</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.orbitals.gaussians.AbstractFunction.normalize">
+<code class="descname">normalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/gaussians.html#AbstractFunction.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.gaussians.AbstractFunction.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Give this function unit norm by adjusting its coefficient</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.orbitals.gaussians.AbstractFunction.overlap">
+<code class="descname">overlap</code><span class="sig-paren">(</span><em>other</em>, <em>normalized=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/gaussians.html#AbstractFunction.overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.gaussians.AbstractFunction.overlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overlap of this function with another:</p>
+<div class="math">
+\[\int f_1(\mathbf r) f_2(\mathbf r) d^N \mathbf r\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>other</strong> (<a class="reference internal" href="#moldesign.orbitals.gaussians.AbstractFunction" title="moldesign.orbitals.gaussians.AbstractFunction"><em>AbstractFunction</em></a>) &#8211; </li>
+<li><strong>normalized</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; If True, return the overlap of the two NORMALIZED functions.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">value of the overlap</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="moldesign.units.html#moldesign.units.quantity.Scalar" title="moldesign.units.quantity.Scalar">Scalar</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.orbitals.gaussians.AtomicBasisFunction">
+<em class="property">class </em><code class="descclassname">moldesign.orbitals.gaussians.</code><code class="descname">AtomicBasisFunction</code><span class="sig-paren">(</span><em>atom</em>, <em>n=None</em>, <em>l=None</em>, <em>m=None</em>, <em>cart=None</em>, <em>primitives=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/gaussians.html#AtomicBasisFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.gaussians.AtomicBasisFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.orbitals.orbitals.Orbital" title="moldesign.orbitals.orbitals.Orbital"><code class="xref py py-class docutils literal"><span class="pre">moldesign.orbitals.orbitals.Orbital</span></code></a></p>
+<dl class="attribute">
+<dt id="moldesign.orbitals.gaussians.AtomicBasisFunction.aotype">
+<code class="descname">aotype</code><a class="headerlink" href="#moldesign.orbitals.gaussians.AtomicBasisFunction.aotype" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string describing the orbital&#8217;s state.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">AtomicBasisFunction</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">aotype</span>
+<span class="go">&#39;1s&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AtomicBasisFunction</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cart</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">aotype</span>
+<span class="go">&#39;2py&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AtomicBasisFunction</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">aotype</span>
+<span class="go">&#39;3d(z^2)&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.gaussians.AtomicBasisFunction.name">
+<code class="descname">name</code><a class="headerlink" href="#moldesign.orbitals.gaussians.AtomicBasisFunction.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.gaussians.AtomicBasisFunction.norm">
+<code class="descname">norm</code><a class="headerlink" href="#moldesign.orbitals.gaussians.AtomicBasisFunction.norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate this orbital&#8217;s norm</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">norm <span class="math">\(&lt;i|i&gt;\)</span></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.orbitals.gaussians.AtomicBasisFunction.normalize">
+<code class="descname">normalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/gaussians.html#AtomicBasisFunction.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.gaussians.AtomicBasisFunction.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale primitive coefficients to normalize this basis function</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.gaussians.AtomicBasisFunction.num_primitives">
+<code class="descname">num_primitives</code><a class="headerlink" href="#moldesign.orbitals.gaussians.AtomicBasisFunction.num_primitives" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.gaussians.AtomicBasisFunction.orbtype">
+<code class="descname">orbtype</code><a class="headerlink" href="#moldesign.orbitals.gaussians.AtomicBasisFunction.orbtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string describing the orbital&#8217;s angular momentum state.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">AtomicBasisFunction</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">orbtype</span>
+<span class="go">&#39;s&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AtomicBasisFunction</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cart</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">orbtype</span>
+<span class="go">&#39;py&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AtomicBasisFunction</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">orbtype</span>
+<span class="go">&#39;d(z^2)&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.orbitals.gaussians.CartesianGaussian">
+<em class="property">class </em><code class="descclassname">moldesign.orbitals.gaussians.</code><code class="descname">CartesianGaussian</code><span class="sig-paren">(</span><em>center</em>, <em>exp</em>, <em>powers</em>, <em>coeff=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/gaussians.html#CartesianGaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.gaussians.CartesianGaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.orbitals.gaussians.AbstractFunction" title="moldesign.orbitals.gaussians.AbstractFunction"><code class="xref py py-class docutils literal"><span class="pre">moldesign.orbitals.gaussians.AbstractFunction</span></code></a></p>
+<p>Stores an N-dimensional gaussian function of the form:</p>
+<div class="math">
+\[G(\mathbf r) = C \times \left( \prod_{i=1}^N{{r_i}^{p_i} } \right)
+     e^{-a |\mathbf r - \mathbf{r}_0|^2}\]</div>
+<p>For a three-dimensional gaussian, this is</p>
+<dl class="docutils">
+<dt>..math::</dt>
+<dd>G(x,y,z) = C times x^{p_1} y^{p_2} z^{p_3} e^{-a <a href="#id3"><span class="problematic" id="id4">|</span></a>mathbf r - mathbf{r}_0|^2}</dd>
+</dl>
+<p>where <em>C</em> is <code class="docutils literal"><span class="pre">self.coeff</span></code>, <em>a</em> is <code class="docutils literal"><span class="pre">self.exp</span></code>, <em>r0</em> is <code class="docutils literal"><span class="pre">self.center</span></code>, and
+<span class="math">\(p_1, p_2, ...\)</span> are given in the array <code class="docutils literal"><span class="pre">self.powers</span></code></p>
+<p class="rubric">References</p>
+<p>Levine, Ira N. Quantum Chemistry, 5th ed. Prentice Hall, 2000. 486-94.</p>
+<dl class="attribute">
+<dt id="moldesign.orbitals.gaussians.CartesianGaussian.angular">
+<code class="descname">angular</code><a class="headerlink" href="#moldesign.orbitals.gaussians.CartesianGaussian.angular" title="Permalink to this definition">¶</a></dt>
+<dd><p>Angular momentum of this function (sum of cartesian powers)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.gaussians.CartesianGaussian.integral">
+<code class="descname">integral</code><a class="headerlink" href="#moldesign.orbitals.gaussians.CartesianGaussian.integral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integral of this this gaussian over all N-dimensional space.</p>
+<p>This is implemented only for 0 and positive integer cartesian powers.
+The integral is 0 if any of the powers are odd. Otherwise, the integral
+is given by:
+.. math:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>\int G(\mathbf r) d^N \mathbf r &amp; = c \int d^N e^{-a x^2} \mathbf r
+        \prod_{i=1}^N{{r_i}^{p_i} }   \\
+   &amp;= (2a)^{-\sum_i p_i} \left( \frac{\pi}{2 a} \right) ^ {N/2} \prod_{i=1}^N{(p_i-1)!!}
+</pre></div>
+</div>
+<p>where <em>N</em> is the dimensionality of the gaussian, <span class="math">\(p_i\)</span> are the cartesian powers,
+and _!!_ is the &#8220;odd factorial&#8221; (<span class="math">\(n!!=1\times 3\times 5 \times ... \times n\)</span>)</p>
+<p class="rubric">References</p>
+<dl class="docutils">
+<dt>Dwight, Herbert B. Tables of Integrals and other Mathematical Data, 3rd ed.</dt>
+<dd>Macmillan 1957. 201.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.gaussians.CartesianGaussian.ndim">
+<code class="descname">ndim</code><a class="headerlink" href="#moldesign.orbitals.gaussians.CartesianGaussian.ndim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.gaussians.CartesianGaussian.ndims">
+<code class="descname">ndims</code><a class="headerlink" href="#moldesign.orbitals.gaussians.CartesianGaussian.ndims" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.gaussians.CartesianGaussian.num_dimensions">
+<code class="descname">num_dimensions</code><a class="headerlink" href="#moldesign.orbitals.gaussians.CartesianGaussian.num_dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.orbitals.gaussians.ERI4FoldTensor">
+<em class="property">class </em><code class="descclassname">moldesign.orbitals.gaussians.</code><code class="descname">ERI4FoldTensor</code><span class="sig-paren">(</span><em>mat</em>, <em>basis_orbitals</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/gaussians.html#ERI4FoldTensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.gaussians.ERI4FoldTensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.orbitals.gaussians.Gaussian">
+<code class="descclassname">moldesign.orbitals.gaussians.</code><code class="descname">Gaussian</code><span class="sig-paren">(</span><em>center</em>, <em>exp</em>, <em>coeff=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/gaussians.html#Gaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.gaussians.Gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor for an N-dimensional gaussian function.</p>
+<p>The function is given by:
+.. math:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">G</span><span class="p">(</span>\<span class="n">mathbf</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="n">C</span> <span class="n">e</span><span class="o">^</span><span class="p">{</span><span class="o">-</span><span class="n">a</span>\<span class="n">left</span><span class="o">|</span> \<span class="n">mathbf</span> <span class="n">r</span> <span class="o">-</span> \<span class="n">mathbf</span> <span class="n">r_0</span> \<span class="n">right</span><span class="o">|^</span><span class="mi">2</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>where <em>C</em> is <code class="docutils literal"><span class="pre">self.coeff</span></code>, <em>a</em> is <code class="docutils literal"><span class="pre">self.exp</span></code>, and <span class="math">\(\mathbf r_0\)</span> is <code class="docutils literal"><span class="pre">self.center</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is just a special case of a cartesian gaussian where all the powers are 0.</p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.orbitals.gaussians.SphericalGaussian">
+<em class="property">class </em><code class="descclassname">moldesign.orbitals.gaussians.</code><code class="descname">SphericalGaussian</code><span class="sig-paren">(</span><em>center</em>, <em>exp</em>, <em>n</em>, <em>l</em>, <em>m</em>, <em>coeff=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/gaussians.html#SphericalGaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.gaussians.SphericalGaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.orbitals.gaussians.AbstractFunction" title="moldesign.orbitals.gaussians.AbstractFunction"><code class="xref py py-class docutils literal"><span class="pre">moldesign.orbitals.gaussians.AbstractFunction</span></code></a></p>
+<p>Stores a 3-dimensional spherical gaussian function:</p>
+<div class="math">
+\[G_{nlm}(\mathbf r) = C Y^l_m(\mathbf r - \mathbf r_0) r^n e^{-a\left| \mathbf r - \mathbf r_0 \right|^2}\]</div>
+<p>where <em>C</em> is <code class="docutils literal"><span class="pre">self.coeff</span></code>, <em>a</em> is <code class="docutils literal"><span class="pre">self.exp</span></code>, and <span class="math">\(\mathbf r_0\)</span> is <code class="docutils literal"><span class="pre">self.center</span></code>,
+<em>(n,l,m)</em> are given by <code class="docutils literal"><span class="pre">(self.n,</span> <span class="pre">self.l,</span> <span class="pre">self.m)</span></code>, and <span class="math">\(Y^l_m(\mathbf{r})\)</span> is a
+spherical harmonic.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">self.SPHERE_TO_CART stores expansion coefficients for spherical gaussians in terms of
+cartesian gaussians. They are taken from the reference below.</p>
+</div>
+<p class="rubric">References</p>
+<dl class="docutils">
+<dt>Schlegel and Frisch. Transformation between cartesian and pure spherical harmonic gaussians.</dt>
+<dd>Int J Quantum Chem 54, 83-87 (1995). doi:10.1002/qua.560540202</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.orbitals.gaussians.cart_to_powers">
+<code class="descclassname">moldesign.orbitals.gaussians.</code><code class="descname">cart_to_powers</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/gaussians.html#cart_to_powers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.gaussians.cart_to_powers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a string to a list of cartesian powers</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cart_to_powers</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="go">[0, 1, 0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cart_to_powers</span><span class="p">(</span><span class="s1">&#39;xxyz&#39;</span><span class="p">)</span>
+<span class="go">[2, 1, 1]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cart_to_powers</span><span class="p">(</span><span class="s1">&#39;zx^3&#39;</span><span class="p">)</span>
+<span class="go">[3,0,1]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.orbitals.orbitals">
+<span id="moldesign-orbitals-orbitals-module"></span><h2>moldesign.orbitals.orbitals module<a class="headerlink" href="#module-moldesign.orbitals.orbitals" title="Permalink to this headline">¶</a></h2>
+<p>Class definitions for atomic and molecular orbitals.</p>
+<p class="rubric">Notes</p>
+<dl class="docutils">
+<dt>In this documentation, we use the following conventions for labeling orbitals:</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt>atomic orbitals using lower case greek labels and subscripts, e.g.,</dt>
+<dd><p class="first last">:math:<a href="#id5"><span class="problematic" id="id6">`</span></a>left| mu</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>ight
+angle, F_{
+u lambda}, etc.</p>
+<blockquote>
+<div><ul>
+<li><dl class="first docutils">
+<dt>molecular orbitals use lower case labels and subscripts, e.g.,</dt>
+<dd><p class="first last">:math:<a href="#id7"><span class="problematic" id="id8">`</span></a>left| i</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>ight
+angle, F_{kl}, etc.</p>
+<blockquote>
+<div><ul class="simple">
+<li>adiabatic electronic states are indexed using capital letters, _N_, _L_, _M_, etc.</li>
+</ul>
+</div></blockquote>
+<dl class="exception">
+<dt id="moldesign.orbitals.orbitals.ConvergenceError">
+<em class="property">exception </em><code class="descclassname">moldesign.orbitals.orbitals.</code><code class="descname">ConvergenceError</code><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#ConvergenceError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.ConvergenceError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/exceptions.html#exceptions.Exception" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.orbitals.orbitals.MolecularOrbitals">
+<em class="property">class </em><code class="descclassname">moldesign.orbitals.orbitals.</code><code class="descname">MolecularOrbitals</code><span class="sig-paren">(</span><em>orbitals</em>, <em>wfn=None</em>, <em>basis=None</em>, <em>canonical=False</em>, <em>orbtype=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#MolecularOrbitals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.MolecularOrbitals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Stores a wfn of molecular orbitals in an AO wfn
+Orbitals are accessed as orbs[orbital index, ao index]</p>
+<dl class="method">
+<dt id="moldesign.orbitals.orbitals.MolecularOrbitals.align_phases">
+<code class="descname">align_phases</code><span class="sig-paren">(</span><em>other</em>, <em>threshold=0.5</em>, <em>assert_same_type=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#MolecularOrbitals.align_phases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.MolecularOrbitals.align_phases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flip the signs of these orbitals to bring them into maximum coincidence
+with another set of orbitals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>other</strong> (<a class="reference internal" href="#moldesign.orbitals.orbitals.MolecularOrbitals" title="moldesign.orbitals.orbitals.MolecularOrbitals"><em>MolecularOrbitals</em></a>) &#8211; the &#8220;reference&#8221; set of orbitals to match phases with</li>
+<li><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; only flip orbital if the overlap is less than -1*threshold</li>
+<li><strong>assert_same_type</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; require that <code class="docutils literal"><span class="pre">self.orbtype</span> <span class="pre">==</span> <span class="pre">other.orbtype</span></code></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function assumes that the overlap matrix is the same for both sets of
+orbitals - this is a reasonable assumption if the two sets of orbitals were
+calculated at very similar molecular geometries.</p>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.orbitals.MolecularOrbitals.energies">
+<code class="descname">energies</code><a class="headerlink" href="#moldesign.orbitals.orbitals.MolecularOrbitals.energies" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>u.Vector[energy]</em> &#8211; energies of the molecular orbitals</p>
+<p>This is just the diagonal of the fock matrix</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.orbitals.MolecularOrbitals.fock">
+<code class="descname">fock</code><a class="headerlink" href="#moldesign.orbitals.orbitals.MolecularOrbitals.fock" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>u.Array[energy]</em> &#8211; Fock matrix for these orbitals</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.orbitals.orbitals.MolecularOrbitals.from_ao">
+<code class="descname">from_ao</code><span class="sig-paren">(</span><em>ao_operator</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#MolecularOrbitals.from_ao"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.MolecularOrbitals.from_ao" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform an operator into this orbital basis from the ao basis</p>
+<blockquote>
+<div>Given the matrix elements :math:<a href="#id9"><span class="problematic" id="id10">`</span></a>hat O_{mu</div></blockquote>
+<dl class="docutils">
+<dt>u}` of an operator over AO basis indices</dt>
+<dd>:math:<a href="#id11"><span class="problematic" id="id12">`</span></a>mu,</dd>
+<dt>u`, returns the operator&#8217;s matrix elements <span class="math">\(\hat O_{ij}\)</span> over</dt>
+<dd><p class="first">orbital indices <span class="math">\(i,j\)</span>:</p>
+<dl class="last docutils">
+<dt>..math::</dt>
+<dd><dl class="first last docutils">
+<dt>hat O_{ij} =</dt>
+<dd>left langle i</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>ight| hat O left| j
+ight
+angle =</p>
+<blockquote>
+<div>sum_{mu</div></blockquote>
+<p>u}C_{i mu} O_{mu
+u} C_{j
+u}</p>
+<blockquote>
+<div><p>where <span class="math">\(C_{i \mu}\)</span> is the expansion coefficient for AO basis function <span class="math">\(\mu\)</span> in
+molecular orbital _i_.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>ao_operator (u.Array): matrix elements of the operator in the ao basis</dd>
+<dt>Returns:</dt>
+<dd>u.Array: matrix elements of the operator in this orbital basis</dd>
+<dt>Note:</dt>
+<dd>Assumes that this set of orbitals is orthogonal</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.orbitals.MolecularOrbitals.h1e">
+<code class="descname">h1e</code><a class="headerlink" href="#moldesign.orbitals.orbitals.MolecularOrbitals.h1e" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>u.Array[energy]</em> &#8211; 1-electron matrix elements for these orbitals</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.orbitals.MolecularOrbitals.h2e">
+<code class="descname">h2e</code><a class="headerlink" href="#moldesign.orbitals.orbitals.MolecularOrbitals.h2e" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>u.Array[energy]</em> &#8211; 2-electron matrix elements for these orbitals</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.orbitals.orbitals.MolecularOrbitals.overlap">
+<code class="descname">overlap</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#MolecularOrbitals.overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.MolecularOrbitals.overlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate overlaps between this and another set of orbitals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<a class="reference internal" href="#moldesign.orbitals.orbitals.MolecularOrbitals" title="moldesign.orbitals.orbitals.MolecularOrbitals"><em>MolecularOrbitals</em></a>) &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">overlaps between the two sets of orbitals.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">canonical</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">canonical</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atomic</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">basis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">overlaps</span> <span class="o">=</span> <span class="n">canonical</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span><span class="n">atomic</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">overlaps</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">canonical</span><span class="o">.</span><span class="n">orbitals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span><span class="n">atomic</span><span class="o">.</span><span class="n">orbitals</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.orbitals.MolecularOrbitals.overlaps">
+<code class="descname">overlaps</code><a class="headerlink" href="#moldesign.orbitals.orbitals.MolecularOrbitals.overlaps" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>np.array</em> &#8211; overlap matrix for these orbitals</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.orbitals.orbitals.MolecularOrbitals.to_ao">
+<code class="descname">to_ao</code><span class="sig-paren">(</span><em>mo_operator</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#MolecularOrbitals.to_ao"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.MolecularOrbitals.to_ao" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform an operator from this orbital basis into the AO basis</p>
+<blockquote>
+<div>Given the matrix elements <span class="math">\(\hat O_{ij}\)</span> of an operator over orbital basis indices
+<span class="math">\(i,j\)</span>, returns the operator&#8217;s matrix elements :math:<a href="#id13"><span class="problematic" id="id14">`</span></a>hat O_{mu</div></blockquote>
+<dl class="docutils">
+<dt>u}` over</dt>
+<dd>orbital indices :math:<a href="#id15"><span class="problematic" id="id16">`</span></a>mu,</dd>
+</dl>
+<p>u`:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>..math::</dt>
+<dd>hat O_{mu</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>u} =</dt>
+<dd>left langle mu</dd>
+</dl>
+<p>ight| hat O left|
+u
+ight
+angle =</p>
+<blockquote>
+<div>sum_{i,j,lambda,kappa}S_{mu lambda} C_{i lambda} O_{ij} C_{j kappa} S_{kappa</div></blockquote>
+<p>u}</p>
+<blockquote>
+<div>where :math:<a href="#id17"><span class="problematic" id="id18">`</span></a>S_{mu</div></blockquote>
+<p>u} = left langle mu |
+u
+ight
+angle` is the AO overlap matrix</p>
+<blockquote>
+<div><p>and <span class="math">\(C_{i \mu}\)</span> is the expansion coefficient for AO basis function <span class="math">\(\mu\)</span> in
+molecular orbital _i_.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>mo_operator (u.Array): matrix elements of the operator in this orbital basis</dd>
+<dt>Returns:</dt>
+<dd>u.Array: matrix elements of the operator in the AO basis</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.orbitals.orbitals.Orbital">
+<em class="property">class </em><code class="descclassname">moldesign.orbitals.orbitals.</code><code class="descname">Orbital</code><span class="sig-paren">(</span><em>coeffs</em>, <em>basis=None</em>, <em>wfn=None</em>, <em>occupation=None</em>, <em>name='unnamed'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#Orbital"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.Orbital" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Stores a single orbital and its meta-data
+Generally wants to be part of a set of MolecularOrbitals</p>
+<p>The orbital is defined as
+.. math:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>\<span class="n">left</span><span class="o">|</span> <span class="n">i</span> \<span class="n">right</span> \<span class="n">rangle</span> <span class="o">=</span> \<span class="n">sum_</span>\<span class="n">mu</span> <span class="n">c_</span><span class="p">{</span><span class="n">i</span> \<span class="n">mu</span><span class="p">}</span> \<span class="n">left</span><span class="o">|</span> \<span class="n">mu</span> \<span class="n">right</span> \<span class="n">rangle</span>
+</pre></div>
+</div>
+<p>where the coefficients <span class="math">\(c_{i \mu}\)</span> are stored in <code class="docutils literal"><span class="pre">self.coeffs</span></code> and the basis orbitals
+<span class="math">\(\left| \mu \right \rangle\)</span> are stored at <code class="docutils literal"><span class="pre">self.basis</span></code></p>
+<dl class="attribute">
+<dt id="moldesign.orbitals.orbitals.Orbital.energy">
+<code class="descname">energy</code><a class="headerlink" href="#moldesign.orbitals.orbitals.Orbital.energy" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>u.Scalar[energy]</em> &#8211; This orbital&#8217;s energy</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is equivalent to self.fock(self)</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.orbitals.orbitals.Orbital.fock_element">
+<code class="descname">fock_element</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#Orbital.fock_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.Orbital.fock_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate fock matrix element with another orbital</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<a class="reference internal" href="#moldesign.orbitals.orbitals.Orbital" title="moldesign.orbitals.orbitals.Orbital"><em>Orbital</em></a>) &#8211; calculate the fock element with this orbital</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">fock matrix element</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar[energy]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.orbitals.orbitals.Orbital.overlap">
+<code class="descname">overlap</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#Orbital.overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.Orbital.overlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate overlap with another orbital</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<a class="reference internal" href="#moldesign.orbitals.orbitals.Orbital" title="moldesign.orbitals.orbitals.Orbital"><em>Orbital</em></a>) &#8211; calculate the overlap with this orbital</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">orbital overlap</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.orbitals.wfn">
+<span id="moldesign-orbitals-wfn-module"></span><h2>moldesign.orbitals.wfn module<a class="headerlink" href="#module-moldesign.orbitals.wfn" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.orbitals.wfn.ElectronicWfn">
+<em class="property">class </em><code class="descclassname">moldesign.orbitals.wfn.</code><code class="descname">ElectronicWfn</code><span class="sig-paren">(</span><em>mol</em>, <em>num_electrons</em>, <em>model=None</em>, <em>aobasis=None</em>, <em>fock_ao=None</em>, <em>positions=None</em>, <em>civectors=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/wfn.html#ElectronicWfn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.wfn.ElectronicWfn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Stores the results of a quantum chemistry calculation.</p>
+<p>This is necessarily pretty flexible, but generally stores an LCAO wfn and one or more sets of
+orbitals. Can also store CI vectors, etc.</p>
+<p>These objects will usually be created by quantum chemical energy models.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule this wavefunction belongs to</li>
+<li><strong>num_electrons</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of electrons in this wavefunction</li>
+<li><strong>theory</strong> (<a class="reference internal" href="moldesign.models.html#moldesign.models.base.EnergyModelBase" title="moldesign.models.base.EnergyModelBase"><em>moldesign.models.base.EnergyModelBase</em></a>) &#8211; The model this wavefunction was created with</li>
+<li><strong>aobasis</strong> (<a class="reference internal" href="#moldesign.orbitals.BasisSet" title="moldesign.orbitals.BasisSet"><em>moldesign.orbitals.BasisSet</em></a>) &#8211; The basis functions for the enclosed orbitals</li>
+<li><strong>fock_ao</strong> (<em>moldesign.units.Array[energy]</em>) &#8211; fock matrix in the AO basis</li>
+<li><strong>positions</strong> (<em>moldesign.units.Array[length]</em>) &#8211; positions of the nuclei for this wfn</li>
+<li><strong>civectors</strong> (<em>np.ndarray</em>) &#8211; CI vectors (if applicable)</li>
+<li><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; arbitrary metadata</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldesign.orbitals.wfn.ElectronicWfn.add_orbitals">
+<code class="descname">add_orbitals</code><span class="sig-paren">(</span><em>orbs</em>, <em>orbtype='canonical'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/wfn.html#ElectronicWfn.add_orbitals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.wfn.ElectronicWfn.add_orbitals" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.orbitals.wfn.ElectronicWfn.align_orbital_phases">
+<code class="descname">align_orbital_phases</code><span class="sig-paren">(</span><em>other</em>, <em>assert_same=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/wfn.html#ElectronicWfn.align_orbital_phases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.wfn.ElectronicWfn.align_orbital_phases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Align this wavefunction&#8217;s orbitals to have the same phase as those in <cite>other</cite>.
+:type other: ElectronicWfn
+:param assert_same: raise an exception if the two wavefunctions do not have the same kinds of orbitals</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.wfn.ElectronicWfn.description">
+<code class="descname">description</code><a class="headerlink" href="#moldesign.orbitals.wfn.ElectronicWfn.description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.orbitals.wfn.ElectronicWfn.molecular_orbitals">
+<code class="descname">molecular_orbitals</code><a class="headerlink" href="#moldesign.orbitals.wfn.ElectronicWfn.molecular_orbitals" title="Permalink to this definition">¶</a></dt>
+<dd><p>A synonym for self.orbitals[&#8216;canonical&#8217;], since this is usually what&#8217;s wanted</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.orbitals.wfn.ElectronicWfn.run_nbo">
+<code class="descname">run_nbo</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/wfn.html#ElectronicWfn.run_nbo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.wfn.ElectronicWfn.run_nbo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.orbitals.wfn.ElectronicWfn.set_canonical_mos">
+<code class="descname">set_canonical_mos</code><span class="sig-paren">(</span><em>orbs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/wfn.html#ElectronicWfn.set_canonical_mos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.wfn.ElectronicWfn.set_canonical_mos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="moldesign.uibase.html" class="btn btn-neutral float-right" title="moldesign.uibase package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="moldesign.molecules.html" class="btn btn-neutral" title="moldesign.molecules package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

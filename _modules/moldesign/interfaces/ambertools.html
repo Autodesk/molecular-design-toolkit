@@ -1,0 +1,438 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.interfaces.ambertools &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.interfaces.ambertools</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.interfaces.ambertools</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">import</span> <span class="nn">pyccc</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">compute</span><span class="p">,</span> <span class="n">uibase</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+
+<span class="n">IMAGE</span> <span class="o">=</span> <span class="s1">&#39;ambertools&#39;</span>
+
+<span class="n">AmberParameters</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;AmberParameters&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;prmtop inpcrd job&#39;</span><span class="p">)</span>
+<span class="n">GAFFParameters</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;GAFFParameters&#39;</span><span class="p">,</span>
+                                        <span class="s1">&#39;lib frcmod job&#39;</span><span class="p">)</span>
+
+<span class="n">DNA_FF</span> <span class="o">=</span> <span class="p">{</span><span class="n">ff</span><span class="p">:</span> <span class="s1">&#39;leaprc.DNA.</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">ff</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;OL15&#39;</span><span class="p">,</span> <span class="s1">&#39;bsc1&#39;</span><span class="p">]}</span>
+<span class="n">RNA_FF</span> <span class="o">=</span> <span class="p">{</span><span class="n">ff</span><span class="p">:</span> <span class="s1">&#39;leaprc.RNA.</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">ff</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;OL3&#39;</span><span class="p">,</span> <span class="s1">&#39;YIL&#39;</span><span class="p">]}</span>
+<span class="n">PROTEIN_FF</span> <span class="o">=</span> <span class="p">{</span><span class="n">ff</span><span class="p">:</span> <span class="s1">&#39;leaprc.protein.</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">ff</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span>
+              <span class="p">[</span><span class="s1">&#39;ff14SB&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ff14SBonlysc&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ff14SB.redq&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ff15ipq&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ff15ipq-vac&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ff03.r1&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ff03ua&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;fb15&#39;</span><span class="p">]}</span>
+<span class="n">LIPID_FF</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lipid14&#39;</span><span class="p">:</span> <span class="s1">&#39;leaprc.lipid14&#39;</span><span class="p">}</span>
+<span class="n">WATER_FF</span> <span class="o">=</span> <span class="p">{</span><span class="n">ff</span><span class="p">:</span> <span class="s1">&#39;leaprc.water.</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">ff</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span>
+            <span class="p">[</span><span class="s1">&#39;tip3p&#39;</span><span class="p">,</span> <span class="s1">&#39;tip4pew&#39;</span><span class="p">,</span> <span class="s1">&#39;spce&#39;</span><span class="p">,</span> <span class="s1">&#39;opc&#39;</span><span class="p">]}</span>
+<span class="n">CARB_FF</span> <span class="o">=</span> <span class="p">{</span><span class="n">ff</span><span class="p">:</span> <span class="s1">&#39;leaprc.</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">ff</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;GLYCAM_06EPb&#39;</span><span class="p">,</span> <span class="s1">&#39;GLYCAM_06j-1&#39;</span><span class="p">]}</span>
+<span class="n">ORGANIC_FF</span> <span class="o">=</span> <span class="p">{</span><span class="n">ff</span><span class="p">:</span> <span class="s1">&#39;leaprc.</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">ff</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;gaff&#39;</span><span class="p">,</span> <span class="s1">&#39;gaff2&#39;</span><span class="p">]}</span>
+<span class="n">OTHER_FF</span> <span class="o">=</span> <span class="p">{</span><span class="n">ff</span><span class="p">:</span> <span class="s1">&#39;leaprc.</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">ff</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;phosaa10&#39;</span><span class="p">,</span> <span class="s1">&#39;modrna08&#39;</span><span class="p">,</span> <span class="s1">&#39;xFPchromophores&#39;</span><span class="p">]}</span>
+<span class="n">LEAPRCFILES</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">ffiles</span> <span class="ow">in</span> <span class="p">(</span><span class="n">DNA_FF</span><span class="p">,</span> <span class="n">RNA_FF</span><span class="p">,</span> <span class="n">PROTEIN_FF</span><span class="p">,</span> <span class="n">LIPID_FF</span><span class="p">,</span> <span class="n">CARB_FF</span><span class="p">,</span> <span class="n">WATER_FF</span><span class="p">,</span> <span class="n">ORGANIC_FF</span><span class="p">,</span> <span class="n">OTHER_FF</span><span class="p">):</span>
+    <span class="n">LEAPRCFILES</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ffiles</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ParameterizationError"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.ParameterizationError">[docs]</a><span class="k">class</span> <span class="nc">ParameterizationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span> <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="am1_bcc_charges"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.am1_bcc_charges">[docs]</a><span class="k">def</span> <span class="nf">am1_bcc_charges</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">minsteps</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Doesn&#39;t work yet ...&quot;&quot;&quot;</span>
+    <span class="n">charge</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">default_engine</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">compute</span><span class="o">.</span><span class="n">get_image_path</span><span class="p">(</span><span class="n">IMAGE</span><span class="p">,</span> <span class="n">engine</span><span class="p">)</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;antechamber -fi pdb -i mol.pdb -fo mol2 -o out.mol2 -c bcc -an n&#39;</span>
+    <span class="k">if</span> <span class="n">charge</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span> <span class="n">command</span> <span class="o">+=</span> <span class="s1">&#39; -nc </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">charge</span>
+    <span class="k">if</span> <span class="n">minsteps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="n">command</span> <span class="o">+=</span> <span class="s1">&#39; -ek &quot;maxcyc=</span><span class="si">%d</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">minsteps</span>
+
+    <span class="k">def</span> <span class="nf">parse_mol2</span><span class="p">(</span><span class="n">job</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback to complete the job&quot;&quot;&quot;</span>
+        <span class="n">atom_info</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">DotDict</span><span class="p">(</span><span class="n">job</span><span class="o">=</span><span class="n">job</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="s1">&#39;out.mol2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ATOM&#39;</span><span class="p">:</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="k">assert</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span>
+                <span class="n">atom_info</span><span class="p">[</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">DotDict</span><span class="p">(</span><span class="n">partialcharge</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">q_e</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]),</span>
+                                                    <span class="n">atomtype</span><span class="o">=</span><span class="n">fields</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">atom_info</span>
+
+    <span class="n">job</span> <span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">image</span><span class="p">,</span>
+                        <span class="n">command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;am1-bcc, </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                        <span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;mol.pdb&#39;</span><span class="p">:</span> <span class="n">mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;pdb&#39;</span><span class="p">)},</span>
+                        <span class="n">when_finished</span><span class="o">=</span><span class="n">parse_mol2</span><span class="p">)</span>
+    <span class="n">uibase</span><span class="o">.</span><span class="n">display_log</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get_display_object</span><span class="p">(),</span> <span class="n">job</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">wait</span><span class="p">:</span> <span class="k">return</span> <span class="n">job</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span> <span class="n">job</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
+
+
+<span class="nd">@utils.kwargs_from</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">run_job</span><span class="p">)</span>
+<div class="viewcode-block" id="build_bdna"><a class="viewcode-back" href="../../../toplevel.html#moldesign.build_bdna">[docs]</a><span class="k">def</span> <span class="nf">build_bdna</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Uses Ambertools&#39; Nucleic Acid Builder to build a 3D double-helix B-DNA structure.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sequence (str): DNA sequence for one of the strands (a complementary sequence will</span>
+<span class="sd">            automatically be created)</span>
+<span class="sd">        **kwargs: arguments for :meth:`compute.run_job`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        moldesign.Molecule: B-DNA double helix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">infile</span> <span class="o">=</span> <span class="s1">&#39;molecule m;</span><span class="se">\n</span><span class="s1">m = bdna( &quot;</span><span class="si">%s</span><span class="s1">&quot; );</span><span class="se">\n</span><span class="s1">putpdb( &quot;helix.pdb&quot;, m, &quot;-wwpdb&quot;);</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">%</span> \
+             <span class="n">sequence</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">finish_job</span><span class="p">(</span><span class="n">job</span><span class="p">):</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="s1">&#39;helix.pdb&#39;</span><span class="p">),</span> <span class="n">format</span><span class="o">=</span><span class="s1">&#39;pdb&#39;</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;BDNA: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sequence</span>
+        <span class="k">return</span> <span class="n">mol</span>
+
+    <span class="n">job</span> <span class="o">=</span> <span class="n">pyccc</span><span class="o">.</span><span class="n">Job</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="s1">&#39;nab -o buildbdna build.nab &amp;&amp; ./buildbdna&#39;</span><span class="p">,</span>
+                    <span class="n">image</span><span class="o">=</span><span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">get_image_path</span><span class="p">(</span><span class="n">IMAGE</span><span class="p">),</span>
+                    <span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;build.nab&#39;</span><span class="p">:</span> <span class="n">infile</span><span class="p">},</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;NAB_build_bdna&#39;</span><span class="p">,</span>
+                    <span class="n">when_finished</span><span class="o">=</span><span class="n">finish_job</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">run_job</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">_return_result</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="c1"># TODO: use a single force field specification object rather than 20 kwargs</span>
+<span class="nd">@utils.kwargs_from</span><span class="p">(</span><span class="n">compute</span><span class="o">.</span><span class="n">run_job</span><span class="p">)</span>
+<div class="viewcode-block" id="run_tleap"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.run_tleap">[docs]</a><span class="k">def</span> <span class="nf">run_tleap</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span>
+              <span class="n">protein</span><span class="o">=</span><span class="s1">&#39;ff14SB&#39;</span><span class="p">,</span>
+              <span class="n">dna</span><span class="o">=</span><span class="s1">&#39;OL15&#39;</span><span class="p">,</span>
+              <span class="n">rna</span><span class="o">=</span><span class="s1">&#39;OL3&#39;</span><span class="p">,</span>
+              <span class="n">carbohydrate</span><span class="o">=</span><span class="s1">&#39;GLYCAM_06j-1&#39;</span><span class="p">,</span>
+              <span class="n">lipid</span><span class="o">=</span><span class="s1">&#39;lipid14&#39;</span><span class="p">,</span>
+              <span class="n">water</span><span class="o">=</span><span class="s1">&#39;tip3p&#39;</span><span class="p">,</span>
+              <span class="n">organic</span><span class="o">=</span><span class="s1">&#39;gaff2&#39;</span><span class="p">,</span>
+              <span class="n">off_files</span><span class="o">=</span><span class="p">(),</span>
+              <span class="n">frcmod_files</span><span class="o">=</span><span class="p">(),</span>
+              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Drives tleap to create a prmtop and inpcrd file. Specifically uses the AmberTools 16</span>
+<span class="sd">    tleap distribution.</span>
+
+<span class="sd">    Defaults are as recommended in the ambertools manual.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): Molecule to set up</span>
+<span class="sd">        protein (str): protein forcefield name (default:ff14SB)</span>
+<span class="sd">        dna (str): dna forcefield name (default: OL15)</span>
+<span class="sd">        rna (str): rna forcefield name (default: OL3)</span>
+<span class="sd">        carbohydrate (str): carbohydrate forcefield name (default: GLYCAM_06j)</span>
+<span class="sd">        lipid (str): lipid forcefield name (default: lipid14)</span>
+<span class="sd">        water (str): water forcefield name (default: tip3p)</span>
+<span class="sd">        organic (str): organic forcefield name (default: gaff2)</span>
+<span class="sd">        off_files (List[batch.FileContainer]):</span>
+<span class="sd">        frcmod_files (List[batch.FileContainer]):</span>
+<span class="sd">        **kwargs: keyword arguments to :meth:`compute.run_job`</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        Ambertools Manual, http://ambermd.org/doc12/Amber16.pdf. See page 33 for forcefield</span>
+<span class="sd">        recommendations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Prepare input for tleap</span>
+    <span class="n">leapstr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;source </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">LEAPRCFILES</span><span class="p">[</span><span class="n">ff</span><span class="p">]</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span>
+               <span class="p">(</span><span class="n">protein</span><span class="p">,</span> <span class="n">dna</span><span class="p">,</span> <span class="n">rna</span><span class="p">,</span> <span class="n">carbohydrate</span><span class="p">,</span> <span class="n">lipid</span><span class="p">,</span> <span class="n">water</span><span class="p">,</span> <span class="n">organic</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">frcmod</span> <span class="ow">in</span> <span class="n">frcmod_files</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">frcmod</span><span class="o">.</span><span class="n">dumphere</span><span class="p">()</span>
+        <span class="n">leapstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;loadamberparam </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">off</span> <span class="ow">in</span> <span class="n">off_files</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">off</span><span class="o">.</span><span class="n">dumphere</span><span class="p">()</span>
+        <span class="n">leapstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;loadoff </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+    <span class="n">leapstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;mol = loadpdb input.pdb</span><span class="se">\n</span><span class="s1">&#39;</span>
+                   <span class="s2">&quot;check mol</span><span class="se">\n</span><span class="s2">&quot;</span>
+                   <span class="s2">&quot;saveamberparm mol output.prmtop output.inpcrd</span><span class="se">\n</span><span class="s2">&quot;</span>
+                   <span class="s2">&quot;quit</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Launch the job</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;input.pdb&#39;</span><span class="p">:</span> <span class="n">mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;pdb&#39;</span><span class="p">),</span>
+              <span class="s1">&#39;input.leap&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">leapstr</span><span class="p">)}</span>
+
+    <span class="n">job</span> <span class="o">=</span> <span class="n">pyccc</span><span class="o">.</span><span class="n">Job</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">compute</span><span class="o">.</span><span class="n">get_image_path</span><span class="p">(</span><span class="n">IMAGE</span><span class="p">),</span>
+                    <span class="n">command</span><span class="o">=</span><span class="s1">&#39;tleap -f input.leap&#39;</span><span class="p">,</span>
+                    <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;tleap, </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">compute</span><span class="o">.</span><span class="n">run_job</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="nd">@mdt.utils.args_from</span><span class="p">(</span><span class="n">run_tleap</span><span class="p">)</span>
+<div class="viewcode-block" id="assign_forcefield"><a class="viewcode-back" href="../../../toplevel.html#moldesign.assign_forcefield">[docs]</a><span class="k">def</span> <span class="nf">assign_forcefield</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; see run_tleap docstring &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">moldesign.widgets.parameterization</span> <span class="kn">import</span> <span class="n">ParameterizationDisplay</span>
+    <span class="n">job</span> <span class="o">=</span> <span class="n">run_tleap</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;output.inpcrd&#39;</span> <span class="ow">in</span> <span class="n">job</span><span class="o">.</span><span class="n">get_output</span><span class="p">():</span>
+        <span class="n">prmtop</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="s1">&#39;output.prmtop&#39;</span><span class="p">)</span>
+        <span class="n">inpcrd</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="s1">&#39;output.inpcrd&#39;</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">AmberParameters</span><span class="p">(</span><span class="n">prmtop</span><span class="p">,</span> <span class="n">inpcrd</span><span class="p">,</span> <span class="n">job</span><span class="p">)</span>
+        <span class="n">newmol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">read_amber</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">prmtop</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">inpcrd</span><span class="p">)</span>
+        <span class="n">newmol</span><span class="o">.</span><span class="n">ff</span><span class="o">.</span><span class="n">amber_params</span> <span class="o">=</span> <span class="n">params</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">newmol</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">report</span> <span class="o">=</span> <span class="n">ParameterizationDisplay</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">molout</span><span class="o">=</span><span class="n">newmol</span><span class="p">)</span>
+    <span class="n">uibase</span><span class="o">.</span><span class="n">display_log</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;ERRORS/WARNINGS&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">newmol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">newmol</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ParameterizationError</span><span class="p">(</span><span class="s1">&#39;TLeap failed to assign force field parameters for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mol</span><span class="p">,</span> <span class="n">job</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_gaff_parameters"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.get_gaff_parameters">[docs]</a><span class="k">def</span> <span class="nf">get_gaff_parameters</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">charges</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="n">IMAGE</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Doesn&#39;t work yet&quot;&quot;&quot;</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Add charges to molecule</span>
+    <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;mol.charges&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">charges</span><span class="p">))</span>
+    <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;mol.mol2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;mol2&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Creates a mol2 file with the passed charges</span>
+    <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;antechamber -i mol.mol2 -fi mol2 -o mol_charged.mol2 -fo mol2 -c rc -cf mol.charges&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Add missing parameters, write out library and parameter files</span>
+    <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;parmchk -i mol_charged.mol2 -f mol2 -o mol.frcmod&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Create the lib file</span>
+    <span class="n">cmds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;tleap -f lea.in&#39;</span><span class="p">)</span>
+    <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;leap.in&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;source leaprc.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">ff</span><span class="p">,</span>
+                                   <span class="s2">&quot;source leaprc.gaff&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;LIG = loadmol2 mol_charged.mol2&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;fmod = loadamberparams mol.frcmod&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;check LIG&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;saveoff LIG mol.lib&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;saveamberparm LIG mol.prmtop mol.inpcrd&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;quit</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">])</span>
+
+    <span class="c1"># Submit the job and wait</span>
+    <span class="n">job</span> <span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">imagename</span><span class="p">,</span>
+                          <span class="s1">&#39; &amp;&amp; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmds</span><span class="p">),</span>
+                          <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+                          <span class="n">name</span><span class="o">=</span><span class="s2">&quot;GAFF assignments&quot;</span> <span class="o">%</span> <span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">uibase</span><span class="o">.</span><span class="n">display_log</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get_display_object</span><span class="p">(),</span> <span class="s2">&quot;tleap, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">job</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+    <span class="n">param</span> <span class="o">=</span> <span class="n">GAFFParameters</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="s1">&#39;mol.lib&#39;</span><span class="p">),</span>
+                           <span class="n">job</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="s1">&#39;mol.frcmod&#39;</span><span class="p">),</span>
+                           <span class="n">job</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">param</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,449 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.utils.callsigs &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.utils.callsigs</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.utils.callsigs</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">funcsigs</span>
+
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">if_not_none</span>
+<span class="kn">from</span> <span class="nn">.docparsers</span> <span class="kn">import</span> <span class="n">GoogleDocArgumentInjector</span>
+
+
+<div class="viewcode-block" id="args_from"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.callsigs.args_from">[docs]</a><span class="k">def</span> <span class="nf">args_from</span><span class="p">(</span><span class="n">original_function</span><span class="p">,</span>
+              <span class="n">only</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+              <span class="n">allexcept</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+              <span class="n">inject_kwargs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+              <span class="n">inject_docs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+              <span class="n">wraps</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+              <span class="n">update_docstring_args</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator to transfer call signatures - helps to hide ugly *args and **kwargs in delegated calls</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        original_function (callable): the function to take the call signature from</span>
+<span class="sd">        only (List[str]): only transfer these arguments (incompatible with `allexcept`)</span>
+<span class="sd">        wraps (bool): Transfer documentation and attributes from original_function to</span>
+<span class="sd">            decorated_function, using functools.wraps (default: True if call signature is</span>
+<span class="sd">            unchanged, False otherwise)</span>
+<span class="sd">        allexcept (List[str]): transfer all except these arguments (incompatible with `only`)</span>
+<span class="sd">        inject_kwargs (dict): Inject new kwargs into the call signature</span>
+<span class="sd">            (of the form ``{argname: defaultvalue}``)</span>
+<span class="sd">        inject_docs (dict): Add or modifies argument documentation (requires google-style</span>
+<span class="sd">            docstrings) with a dict of the form `{argname: &quot;(type): description&quot;}`</span>
+<span class="sd">        update_docstring_args (bool): Update &quot;arguments&quot; section of the docstring using the</span>
+<span class="sd">           original function&#39;s documentation (requires google-style docstrings and wraps=False)</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        To use arguments from a classes&#39; __init__ method, pass the class itself as</span>
+<span class="sd">        ``original_function`` - this will also allow us to inject the documentation</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Decorator function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># NEWFEATURE - verify arguments?</span>
+
+    <span class="k">if</span> <span class="n">only</span> <span class="ow">and</span> <span class="n">allexcept</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Error in keyword arguments - &#39;</span>
+                         <span class="s1">&#39;pass *either* &quot;only&quot; or &quot;allexcept&quot;, not both&#39;</span><span class="p">)</span>
+
+    <span class="n">origname</span> <span class="o">=</span> <span class="n">get_qualified_name</span><span class="p">(</span><span class="n">original_function</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">original_function</span><span class="p">,</span> <span class="s1">&#39;__signature__&#39;</span><span class="p">):</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">original_function</span><span class="o">.</span><span class="n">__signature__</span><span class="o">.</span><span class="n">replace</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">funcsigs</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">original_function</span><span class="p">)</span>
+
+    <span class="c1"># Modify the call signature if necessary</span>
+    <span class="k">if</span> <span class="n">only</span> <span class="ow">or</span> <span class="n">allexcept</span> <span class="ow">or</span> <span class="n">inject_kwargs</span><span class="p">:</span>
+        <span class="n">wraps</span> <span class="o">=</span> <span class="n">if_not_none</span><span class="p">(</span><span class="n">wraps</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="n">newparams</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">only</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">only</span><span class="p">:</span>
+                <span class="n">newparams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">param</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">allexcept</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allexcept</span><span class="p">:</span>
+                    <span class="n">newparams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">newparams</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">inject_kwargs</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">default</span> <span class="ow">in</span> <span class="n">inject_kwargs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="n">newp</span> <span class="o">=</span> <span class="n">funcsigs</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">funcsigs</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">POSITIONAL_OR_KEYWORD</span><span class="p">,</span>
+                                          <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span>
+                <span class="n">newparams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newp</span><span class="p">)</span>
+
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">parameters</span><span class="o">=</span><span class="n">newparams</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">wraps</span> <span class="o">=</span> <span class="n">if_not_none</span><span class="p">(</span><span class="n">wraps</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+
+    <span class="c1"># Get the docstring arguments</span>
+    <span class="k">if</span> <span class="n">update_docstring_args</span><span class="p">:</span>
+        <span class="n">original_docs</span> <span class="o">=</span> <span class="n">GoogleDocArgumentInjector</span><span class="p">(</span><span class="n">original_function</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+        <span class="n">argument_docstrings</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">((</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">original_docs</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+                                                      <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">newparams</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Modify f&#39;s call signature (using the `__signature__` attribute)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">wraps</span><span class="p">:</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">original_function</span><span class="o">.</span><span class="n">__name__</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">original_function</span><span class="p">)(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">__name__</span> <span class="o">=</span> <span class="n">fname</span>  <span class="c1"># revert name change</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">__name__</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">__signature__</span> <span class="o">=</span> <span class="n">sig</span>
+
+        <span class="k">if</span> <span class="n">update_docstring_args</span> <span class="ow">or</span> <span class="n">inject_kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">update_docstring_args</span><span class="p">:</span>
+                <span class="n">argument_docstrings</span> <span class="o">=</span> <span class="n">GoogleDocArgumentInjector</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span><span class="o">.</span><span class="n">args</span>
+            <span class="n">docs</span> <span class="o">=</span> <span class="n">GoogleDocArgumentInjector</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+            <span class="n">docs</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">argument_docstrings</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;__orig_docs&#39;</span><span class="p">):</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">__orig_docs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">__orig_docs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+
+            <span class="n">f</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">docs</span><span class="o">.</span><span class="n">new_docstring</span><span class="p">()</span>
+
+        <span class="c1"># Only for building sphinx documentation:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SPHINX_IS_BUILDING_DOCS&#39;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+            <span class="n">sigstring</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;__doc__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">__doc__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">sigstring</span> <span class="o">+</span> <span class="n">f</span><span class="o">.</span><span class="n">__doc__</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">sigstring</span>
+        <span class="k">return</span> <span class="n">f</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+<div class="viewcode-block" id="kwargs_from"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.callsigs.kwargs_from">[docs]</a><span class="k">def</span> <span class="nf">kwargs_from</span><span class="p">(</span><span class="n">reference_function</span><span class="p">,</span> <span class="n">mod_docs</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Replaces ``**kwargs`` in a call signature with keyword arguments from another function.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        reference_function (function): function to get kwargs from</span>
+<span class="sd">        mod_docs (bool): whether to modify the decorated function&#39;s docstring</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        ``mod_docs`` works ONLY for google-style docstrings</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">refsig</span> <span class="o">=</span> <span class="n">funcsigs</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">reference_function</span><span class="p">)</span>
+
+    <span class="n">origname</span> <span class="o">=</span> <span class="n">get_qualified_name</span><span class="p">(</span><span class="n">reference_function</span><span class="p">)</span>
+
+    <span class="n">kwparams</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">refsig</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">default</span> <span class="o">!=</span> <span class="n">param</span><span class="o">.</span><span class="n">empty</span> <span class="ow">or</span> <span class="n">param</span><span class="o">.</span><span class="n">kind</span> <span class="ow">in</span> <span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">VAR_KEYWORD</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;_&#39;</span><span class="p">:</span>
+                <span class="n">kwparams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mod_docs</span><span class="p">:</span>
+        <span class="n">refdocs</span> <span class="o">=</span> <span class="n">GoogleDocArgumentInjector</span><span class="p">(</span><span class="n">reference_function</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">funcsigs</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="n">fparams</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">found_varkeyword</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">param</span><span class="o">.</span><span class="n">VAR_KEYWORD</span><span class="p">:</span>
+                <span class="n">fparams</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">kwparams</span><span class="p">)</span>
+                <span class="n">found_varkeyword</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fparams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found_varkeyword</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Function has no **kwargs wildcard.&quot;</span><span class="p">)</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">__signature__</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">parameters</span><span class="o">=</span><span class="n">fparams</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mod_docs</span><span class="p">:</span>
+            <span class="n">docs</span> <span class="o">=</span> <span class="n">GoogleDocArgumentInjector</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+            <span class="n">new_args</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">argname</span><span class="p">,</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">argname</span> <span class="o">==</span> <span class="n">found_varkeyword</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">kwparams</span><span class="p">:</span>
+                        <span class="n">default_argdoc</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: argument for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">origname</span><span class="p">)</span>
+                        <span class="n">new_args</span><span class="p">[</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">refdocs</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">default_argdoc</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_args</span><span class="p">[</span><span class="n">argname</span><span class="p">]</span> <span class="o">=</span> <span class="n">doc</span>
+            <span class="n">docs</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">new_args</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;__orig_docs&#39;</span><span class="p">):</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">__orig_docs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">__orig_docs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+
+            <span class="n">f</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">docs</span><span class="o">.</span><span class="n">new_docstring</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">f</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+
+<div class="viewcode-block" id="get_qualified_name"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.callsigs.get_qualified_name">[docs]</a><span class="k">def</span> <span class="nf">get_qualified_name</span><span class="p">(</span><span class="n">original_function</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">original_function</span><span class="p">):</span>
+        <span class="n">origname</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">original_function</span><span class="o">.</span><span class="n">__module__</span><span class="p">,</span>
+                             <span class="n">original_function</span><span class="o">.</span><span class="n">im_class</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                             <span class="n">original_function</span><span class="o">.</span><span class="n">__name__</span><span class="p">])</span>
+        <span class="k">return</span> <span class="s1">&#39;:meth:`</span><span class="si">%s</span><span class="s1">`&#39;</span> <span class="o">%</span> <span class="n">origname</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">origname</span> <span class="o">=</span> <span class="n">original_function</span><span class="o">.</span><span class="n">__module__</span><span class="o">+</span><span class="s1">&#39;.&#39;</span><span class="o">+</span><span class="n">original_function</span><span class="o">.</span><span class="n">__name__</span>
+        <span class="k">return</span> <span class="s1">&#39;:meth:`</span><span class="si">%s</span><span class="s1">`&#39;</span> <span class="o">%</span> <span class="n">origname</span></div>
+
+
+<div class="viewcode-block" id="DocInherit"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.callsigs.DocInherit">[docs]</a><span class="k">class</span> <span class="nc">DocInherit</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Allows methods to inherit docstrings from their superclasses</span>
+<span class="sd">    FROM http://code.activestate.com/recipes/576862/</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mthd</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mthd</span> <span class="o">=</span> <span class="n">mthd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">mthd</span><span class="o">.</span><span class="n">__name__</span>
+
+    <span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_with_inst</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_no_inst</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DocInherit.get_with_inst"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.callsigs.DocInherit.get_with_inst">[docs]</a>    <span class="k">def</span> <span class="nf">get_with_inst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">cls</span><span class="p">):</span>
+
+        <span class="n">overridden</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="nd">@wraps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mthd</span><span class="p">,</span> <span class="n">assigned</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;__name__&#39;</span><span class="p">,</span><span class="s1">&#39;__module__&#39;</span><span class="p">))</span>
+        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mthd</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_parent_doc</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">overridden</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DocInherit.get_no_inst"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.callsigs.DocInherit.get_no_inst">[docs]</a>    <span class="k">def</span> <span class="nf">get_no_inst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls</span><span class="p">):</span>
+
+        <span class="k">for</span> <span class="n">parent</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">__mro__</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">overridden</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">overridden</span><span class="p">:</span> <span class="k">break</span>
+
+        <span class="nd">@wraps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mthd</span><span class="p">,</span> <span class="n">assigned</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;__name__&#39;</span><span class="p">,</span><span class="s1">&#39;__module__&#39;</span><span class="p">))</span>
+        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mthd</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_parent_doc</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">overridden</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DocInherit.use_parent_doc"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.callsigs.DocInherit.use_parent_doc">[docs]</a>    <span class="k">def</span> <span class="nf">use_parent_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NameError</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Can&#39;t find &#39;</span><span class="si">%s</span><span class="s2">&#39; in parents&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">func</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">__doc__</span>
+        <span class="k">return</span> <span class="n">func</span></div></div>
+
+<span class="c1">#idiomatic decorator name</span>
+<span class="n">doc_inherit</span> <span class="o">=</span> <span class="n">DocInherit</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

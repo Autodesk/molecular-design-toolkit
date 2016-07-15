@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.interfaces.biopython_interface &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.interfaces.biopython_interface</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.interfaces.biopython_interface</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+
+<span class="kn">import</span> <span class="nn">Bio.PDB</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+
+<span class="n">BioAssembly</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;BioAssembly&#39;</span><span class="p">,</span> <span class="s1">&#39;desc chains transforms&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="parse_pdb"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.interfaces.biopython_interface.parse_pdb">[docs]</a><span class="k">def</span> <span class="nf">parse_pdb</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse a PDB file (using the Biopython parser), assign bonds, and return a molecule</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        f (file): file-like object containing the PDB file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        moldesign.Molecule: parsed molecule</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: this needs to handle strings and streams</span>
+    <span class="c1"># TODO: deal with alternate locations</span>
+
+    <span class="c1"># First, get the structure</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">Bio</span><span class="o">.</span><span class="n">PDB</span><span class="o">.</span><span class="n">PDBParser</span><span class="p">()</span>
+    <span class="n">struc</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="s1">&#39;no name&#39;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+    <span class="n">mol</span> <span class="o">=</span> <span class="n">biopy_to_mol</span><span class="p">(</span><span class="n">struc</span><span class="p">)</span>
+
+    <span class="c1"># Next, assign standard biopolymer bonds</span>
+    <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
+        <span class="n">chain</span><span class="o">.</span><span class="n">assign_biopolymer_bonds</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">residue</span><span class="o">.</span><span class="n">assign_template_bonds</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">print</span> <span class="p">(</span><span class="s1">&#39;WARNING: failed to assign bonds for residue </span><span class="si">%s</span><span class="s1">; use &#39;</span>
+                   <span class="s1">&#39;``residue.assign_distance.bonds`` to guess the topology&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span>
+
+    <span class="c1"># Get biomolecular assembly info</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">assemblies</span> <span class="o">=</span> <span class="n">get_assemblies</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">assemblies</span><span class="p">:</span>
+        <span class="c1"># Don&#39;t warn if the only assembly is the asymmetric unit</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">assemblies</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">assemblies</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transforms</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s2">&quot;WARNING: This PDB file contains the following biomolecular assemblies:&quot;</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">asm</span> <span class="ow">in</span> <span class="n">assemblies</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">print</span> <span class="s1">&#39;WARNING: Assembly &quot;</span><span class="si">%s</span><span class="s1">&quot;: </span><span class="si">%d</span><span class="s1"> copies of chains </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">asm</span><span class="o">.</span><span class="n">transforms</span><span class="p">),</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">asm</span><span class="o">.</span><span class="n">chains</span><span class="p">))</span>
+                <span class="k">print</span> <span class="s1">&#39;WARNING: Use ``mdt.build_assembly([molecule],[assembly_name])``&#39;</span> \
+                      <span class="s1">&#39; to build one of the above assemblies&#39;</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">bioassemblies</span> <span class="o">=</span> <span class="n">assemblies</span>
+
+    <span class="c1"># Finally, parse the CONECT records</span>
+    <span class="n">conect_graph</span> <span class="o">=</span> <span class="n">get_conect_records</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">serials</span> <span class="o">=</span> <span class="p">{</span><span class="n">atom</span><span class="o">.</span><span class="n">pdbindex</span><span class="p">:</span> <span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">atomserial</span><span class="p">,</span> <span class="n">nbrs</span> <span class="ow">in</span> <span class="n">conect_graph</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="n">atom</span> <span class="o">=</span> <span class="n">serials</span><span class="p">[</span><span class="n">atomserial</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">nbrserial</span><span class="p">,</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">nbrs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">nbr</span> <span class="o">=</span> <span class="n">serials</span><span class="p">[</span><span class="n">nbrserial</span><span class="p">]</span>
+            <span class="n">mol</span><span class="o">.</span><span class="n">newbond</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">nbr</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mol</span></div>
+
+
+<div class="viewcode-block" id="biopy_to_mol"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.interfaces.biopython_interface.biopy_to_mol">[docs]</a><span class="k">def</span> <span class="nf">biopy_to_mol</span><span class="p">(</span><span class="n">struc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert a biopython PDB structure to an MDT molecule.</span>
+<span class="sd">    Because Biopython doesn&#39;t assign bonds, assign connectivity using templates.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        struc (Bio.PDB.Structure.Structure): Biopython PDB structure to convert</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        moldesign.Molecule: converted molecule</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: assign bonds using 1) CONECT records, 2) residue templates, 3) distance</span>
+    <span class="n">newatoms</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">struc</span><span class="o">.</span><span class="n">get_chains</span><span class="p">():</span>
+        <span class="n">tmp</span><span class="p">,</span> <span class="n">pdbidx</span><span class="p">,</span> <span class="n">pdbid</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_full_id</span><span class="p">()</span>
+        <span class="n">newchain</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Chain</span><span class="p">(</span><span class="n">pdbname</span><span class="o">=</span><span class="n">pdbid</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+        <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_residues</span><span class="p">():</span>
+            <span class="n">newresidue</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Residue</span><span class="p">(</span><span class="n">pdbname</span><span class="o">=</span><span class="n">residue</span><span class="o">.</span><span class="n">resname</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+                                     <span class="n">pdbindex</span><span class="o">=</span><span class="n">residue</span><span class="o">.</span><span class="n">id</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="n">newchain</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">newresidue</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">get_atom</span><span class="p">():</span>
+                <span class="n">newatom</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="n">element</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">element</span><span class="p">,</span>
+                                   <span class="n">name</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">get_name</span><span class="p">(),</span>
+                                   <span class="n">pdbname</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">get_name</span><span class="p">(),</span>
+                                   <span class="n">pdbindex</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">get_serial_number</span><span class="p">())</span>
+                <span class="n">newatom</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">coord</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span>
+                <span class="n">newresidue</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">newatom</span><span class="p">)</span>
+
+                <span class="n">newatoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newatom</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">newatoms</span><span class="p">,</span>
+                        <span class="n">name</span><span class="o">=</span><span class="n">struc</span><span class="o">.</span><span class="n">get_full_id</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="get_conect_records"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.interfaces.biopython_interface.get_conect_records">[docs]</a><span class="k">def</span> <span class="nf">get_conect_records</span><span class="p">(</span><span class="n">pdbfile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse a PDB file, return CONECT records</span>
+
+<span class="sd">    Bond orders are assigned as 1 by default. Repeated CONECT records are interpreted as</span>
+<span class="sd">    higher order bonds.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pdbfile (file): file-like object</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt; CONECT   1   2   3</span>
+<span class="sd">        &gt; CONECT   1   2</span>
+<span class="sd">        &gt; CONECT   2   1   1</span>
+<span class="sd">        &gt; CONECT   3   1</span>
+<span class="sd">        These records are interpreted as a double-bond between atoms 1 and 2</span>
+<span class="sd">        and a single bond between atoms 1 and 3</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This only returns the covalent CONECT records (the first 4 entries) - it doesn&#39;t</span>
+<span class="sd">        return salt bridges or hydrogen bonds</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: CONECT records using serial numbers -</span>
+<span class="sd">             ``{serial1: {serial2:order. serial3:order, }, ...}``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">conect</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">pdbfile</span><span class="p">:</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;CONECT&#39;</span><span class="p">:</span> <span class="k">continue</span>
+
+        <span class="n">atombonds</span> <span class="o">=</span> <span class="n">conect</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">{})</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">6</span><span class="p">]:</span>  <span class="c1"># TODO: check the end bound</span>
+            <span class="n">serial</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">serial</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">atombonds</span><span class="p">:</span>
+                <span class="n">atombonds</span><span class="p">[</span><span class="n">serial</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">atombonds</span><span class="p">[</span><span class="n">serial</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">conect</span></div>
+
+
+<div class="viewcode-block" id="get_assemblies"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.interfaces.biopython_interface.get_assemblies">[docs]</a><span class="k">def</span> <span class="nf">get_assemblies</span><span class="p">(</span><span class="n">fileobj</span><span class="p">):</span>
+    <span class="n">assemblies</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">lineiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">fileobj</span><span class="p">)</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>  <span class="c1"># first, search for assembly transformations</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">lineiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+        <span class="c1"># Conditions that indicate we&#39;re past the &quot;REMARK 350&quot; section</span>
+        <span class="k">if</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;ATOM&#39;</span><span class="p">,</span> <span class="s1">&#39;HETATM&#39;</span><span class="p">,</span> <span class="s1">&#39;CONECT&#39;</span><span class="p">):</span>
+            <span class="k">break</span>
+        <span class="k">if</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;REMARK&#39;</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">350</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="c1"># look for start of a assembly transformation, i.e. &quot;REMARK 350 BIOMOLECULE: [name]  &quot;</span>
+        <span class="k">if</span> <span class="n">fields</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;REMARK 350 BIOMOLECULE:&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="n">assembly_name</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">assemblies</span><span class="p">[</span><span class="n">assembly_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_read_assembly</span><span class="p">(</span><span class="n">lineiter</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">assemblies</span></div>
+
+
+<span class="k">def</span> <span class="nf">_read_assembly</span><span class="p">(</span><span class="n">lineiter</span><span class="p">):</span>
+
+    <span class="c1"># First, there&#39;s description lines: &quot;REMARK 350 AUTHOR DETERMINED BIOLOGICAL UNIT: OCTAMERIC&quot;</span>
+    <span class="n">description_lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="n">lineiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">while</span> <span class="n">fields</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;REMARK 350 APPLY THE FOLLOWING TO CHAINS:&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+        <span class="n">description_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;REMARK 350 &#39;</span><span class="p">):])</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">lineiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">description_lines</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="c1"># Next, we get the chains in this assembly: &quot;REMARK 350 APPLY THE FOLLOWING TO CHAINS:  C, D&quot;</span>
+    <span class="k">assert</span> <span class="n">fields</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;REMARK 350 APPLY THE FOLLOWING TO CHAINS:&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">chain_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">[</span><span class="mi">7</span><span class="p">:]]</span>
+    <span class="n">transforms</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>  <span class="c1"># loop over each assembly transformation</span>
+        <span class="c1"># example: &quot;REMARK 350   BIOMT1   1  1.000000  0.000000  0.000000        0.00000 &quot;</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+        <span class="n">t</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="k">for</span> <span class="n">idim</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">lineiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">idim</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">BioAssembly</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">chain_names</span><span class="p">,</span> <span class="n">transforms</span><span class="p">)</span>
+
+            <span class="k">assert</span> <span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">transforms</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+            <span class="k">assert</span> <span class="n">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;BIOMT</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">idim</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">t</span><span class="p">[</span><span class="n">idim</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">fields</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span>
+
+        <span class="n">transforms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+
+
+
+
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

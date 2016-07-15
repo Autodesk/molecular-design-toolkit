@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.widgets.orbitals &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.widgets.orbitals</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.widgets.orbitals</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="kn">as</span> <span class="nn">ipy</span>
+
+<span class="kn">from</span> <span class="nn">moldesign.uibase.selector</span> <span class="kn">import</span> <span class="n">SelectionGroup</span><span class="p">,</span> <span class="n">Selector</span><span class="p">,</span> <span class="n">create_value_selector</span>
+<span class="kn">from</span> <span class="nn">moldesign.viewer</span> <span class="kn">import</span> <span class="n">GeometryViewer</span>
+
+
+<div class="viewcode-block" id="OrbitalViewer"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.orbitals.OrbitalViewer">[docs]</a><span class="k">class</span> <span class="nc">OrbitalViewer</span><span class="p">(</span><span class="n">SelectionGroup</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param mol: a molecule with A) orbitals, and B) an energy model with calculate_orbital_grid</span>
+<span class="sd">        :param kwargs: kwargs for the viewer</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span> <span class="o">=</span> <span class="n">GeometryViewer</span><span class="p">(</span><span class="n">mol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">wfns</span> <span class="o">=</span> <span class="p">[</span><span class="n">mol</span><span class="o">.</span><span class="n">wfn</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uipane</span> <span class="o">=</span> <span class="n">OrbitalUIPane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">height</span><span class="p">)</span><span class="o">-</span><span class="mi">50</span><span class="p">)</span>
+        <span class="n">hb</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uipane</span><span class="p">])</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">OrbitalViewer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">([</span><span class="n">hb</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="OrbitalUIPane"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.orbitals.OrbitalUIPane">[docs]</a><span class="k">class</span> <span class="nc">OrbitalUIPane</span><span class="p">(</span><span class="n">Selector</span><span class="p">,</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">):</span>
+    <span class="c1"># TODO: deal with orbitals not present in all frames of a trajectory</span>
+    <span class="c1"># TODO: deal with orbital properties (occupation and energy) changing over a trajectory</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viz</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz</span> <span class="o">=</span> <span class="n">viz</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="mi">325</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">type_dropdown</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">orbitals</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">initial_orb</span> <span class="o">=</span> <span class="s1">&#39;canonical&#39;</span>
+        <span class="k">if</span> <span class="n">initial_orb</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_dropdown</span><span class="o">.</span><span class="n">options</span><span class="p">:</span>
+            <span class="n">initial_orb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_dropdown</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">()</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">initial_orb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type_dropdown</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_orb_type</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">orblist</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="bp">None</span><span class="p">:</span> <span class="bp">None</span><span class="p">},</span>
+                                  <span class="n">width</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;px&#39;</span><span class="p">,</span>
+                                  <span class="n">height</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">75</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;px&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">isoval_selector</span> <span class="o">=</span> <span class="n">create_value_selector</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">,</span>
+                                                     <span class="n">value_selects</span><span class="o">=</span><span class="s1">&#39;orbital_isovalue&#39;</span><span class="p">,</span>
+                                                     <span class="nb">min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">0.075</span><span class="p">,</span>
+                                                     <span class="n">value</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.00075</span><span class="p">,</span>
+                                                     <span class="n">width</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span>
+                                                     <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Isovalue&#39;</span><span class="p">,</span>
+                                                     <span class="n">readout_format</span><span class="o">=</span><span class="s1">&#39;.4f&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">orb_resolution</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Orbital resolution&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">75</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orb_resolution</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;40&#39;</span>  <span class="c1"># string because it&#39;s required for the &#39;on_submit&#39; method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">change_resolution</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orb_resolution</span><span class="o">.</span><span class="n">on_submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">change_resolution</span><span class="p">)</span>
+
+        <span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">type_dropdown</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">orblist</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">isoval_selector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">orb_resolution</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">OrbitalUIPane</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">children</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_orb_type</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orblist</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_orbital_selection</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="OrbitalUIPane.new_orbital_selection"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.orbitals.OrbitalUIPane.new_orbital_selection">[docs]</a>    <span class="k">def</span> <span class="nf">new_orbital_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fire_selection_event</span><span class="p">({</span><span class="s1">&#39;orbname&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">orblist</span><span class="o">.</span><span class="n">value</span><span class="p">)})</span></div>
+
+<div class="viewcode-block" id="OrbitalUIPane.handle_selection_event"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.orbitals.OrbitalUIPane.handle_selection_event">[docs]</a>    <span class="k">def</span> <span class="nf">handle_selection_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="c1"># TODO: update the selected orbitals if something actually else triggers this</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="OrbitalUIPane.new_orb_type"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.orbitals.OrbitalUIPane.new_orb_type">[docs]</a>    <span class="k">def</span> <span class="nf">new_orb_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create list of available orbitals when user selects a new type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">wfn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">wfn</span>
+        <span class="n">newtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_dropdown</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">neworbs</span> <span class="o">=</span> <span class="n">wfn</span><span class="o">.</span><span class="n">orbitals</span><span class="p">[</span><span class="n">newtype</span><span class="p">]</span>
+        <span class="n">orblist</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+
+        <span class="n">orblist</span><span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">orb</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">neworbs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">orb</span><span class="p">,</span> <span class="s1">&#39;unicode_name&#39;</span><span class="p">):</span>
+                <span class="n">orbname</span> <span class="o">=</span> <span class="n">orb</span><span class="o">.</span><span class="n">unicode_name</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">orbname</span> <span class="o">=</span> <span class="n">orb</span><span class="o">.</span><span class="n">name</span>
+
+            <span class="n">meta</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">if</span> <span class="n">orb</span><span class="o">.</span><span class="n">energy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">meta</span> <span class="o">=</span> <span class="s1">&#39;{:.02fP}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">orb</span><span class="o">.</span><span class="n">energy</span><span class="o">.</span><span class="n">defunits</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">orb</span><span class="o">.</span><span class="n">occupation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">meta</span><span class="p">:</span> <span class="n">meta</span> <span class="o">+=</span> <span class="s1">&#39;, &#39;</span>
+                <span class="n">meta</span> <span class="o">+=</span> <span class="s1">&#39;occ </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">orb</span><span class="o">.</span><span class="n">occupation</span>
+            <span class="k">if</span> <span class="n">meta</span><span class="p">:</span>
+                <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">. </span><span class="si">%s</span><span class="s1">   (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">orbname</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">. </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">orbname</span><span class="p">)</span>
+            <span class="n">orblist</span><span class="p">[</span><span class="n">desc</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orblist</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orblist</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">orblist</span></div>
+
+<div class="viewcode-block" id="OrbitalUIPane.change_resolution"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.orbitals.OrbitalUIPane.change_resolution">[docs]</a>    <span class="k">def</span> <span class="nf">change_resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">viewer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz</span><span class="o">.</span><span class="n">viewer</span>
+        <span class="n">viewer</span><span class="o">.</span><span class="n">orbital_spec</span><span class="p">[</span><span class="s1">&#39;npts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">orb_resolution</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">viewer</span><span class="o">.</span><span class="n">current_orbital</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">viewer</span><span class="o">.</span><span class="n">draw_orbital</span><span class="p">(</span><span class="n">viewer</span><span class="o">.</span><span class="n">current_orbital</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">viewer</span><span class="o">.</span><span class="n">orbital_spec</span><span class="p">)</span></div></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

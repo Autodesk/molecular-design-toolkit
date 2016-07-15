@@ -1,0 +1,468 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.interfaces.openmm &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.interfaces.openmm</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.interfaces.openmm</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">pyccc</span>
+<span class="kn">from</span> <span class="nn">moldesign.utils</span> <span class="kn">import</span> <span class="n">from_filepath</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
+    <span class="kn">from</span> <span class="nn">simtk</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">stku</span>
+    <span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="kn">import</span> <span class="n">app</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">mm</span> <span class="o">=</span> <span class="n">stku</span> <span class="o">=</span> <span class="n">app</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">force_remote</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">force_remote</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="kn">from</span> <span class="nn">pyccc</span> <span class="kn">import</span> <span class="n">LocalFile</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">compute</span>
+
+<span class="kn">from</span> <span class="nn">moldesign.molecules</span> <span class="kn">import</span> <span class="n">Trajectory</span><span class="p">,</span> <span class="n">Molecule</span>
+
+
+<div class="viewcode-block" id="OpenMMPickleMixin"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.OpenMMPickleMixin">[docs]</a><span class="k">class</span> <span class="nc">OpenMMPickleMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mystate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;sim&#39;</span> <span class="ow">in</span> <span class="n">mystate</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="s1">&#39;sim_args&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mystate</span>
+            <span class="n">sim</span> <span class="o">=</span> <span class="n">mystate</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;sim&#39;</span><span class="p">)</span>
+            <span class="n">mystate</span><span class="p">[</span><span class="s1">&#39;sim_args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">integrator</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mystate</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;sim_args&#39;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="s1">&#39;sim&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;sim_args&#39;</span><span class="p">)</span>
+            <span class="n">state</span><span class="p">[</span><span class="s1">&#39;sim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">state</span><span class="p">)</span></div>
+
+
+<span class="c1"># This class needs special treatment because it inherits from an</span>
+<span class="c1"># openmm class, but OpenMM may not be present in the user&#39;s environment</span>
+<span class="k">if</span> <span class="n">force_remote</span><span class="p">:</span>
+    <span class="n">MdtReporter</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="k">else</span><span class="p">:</span>
+<div class="viewcode-block" id="MdtReporter"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.MdtReporter">[docs]</a>    <span class="k">class</span> <span class="nc">MdtReporter</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">StateDataReporter</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        We&#39;ll use this class to capture all the information we need about a trajectory</span>
+<span class="sd">        It&#39;s pretty basic - the assumption is that there will be more processing on the client side</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">LEN</span> <span class="o">=</span> <span class="mi">30</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">report_interval</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">report_interval</span> <span class="o">=</span> <span class="n">report_interval</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span> <span class="o">=</span> <span class="n">Trajectory</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_row_format</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;{:&lt;</span><span class="si">%d</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="mi">10</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="p">(</span><span class="s2">&quot;{:&gt;</span><span class="si">%d</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">LEN</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_printed_header</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_report_time</span> <span class="o">=</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="MdtReporter.report_from_mol"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.MdtReporter.report_from_mol">[docs]</a>        <span class="k">def</span> <span class="nf">report_from_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">calculate</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;annotation&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">new_frame</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MdtReporter.report"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.MdtReporter.report">[docs]</a>        <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Callback for dynamics after the specified interval</span>
+<span class="sd">            :type simulation: simtk.openmm.app.Simulation</span>
+<span class="sd">            :type state: simtk.openmm.State</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
+            <span class="c1"># TODO: make sure openmm masses are the same as MDT masses</span>
+            <span class="n">report</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">positions</span><span class="o">=</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getPositions</span><span class="p">()),</span>
+                <span class="n">momenta</span><span class="o">=</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getVelocities</span><span class="p">())</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">dim_masses</span><span class="p">,</span>
+                <span class="n">forces</span><span class="o">=</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getForces</span><span class="p">()),</span>
+                <span class="n">time</span><span class="o">=</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getTime</span><span class="p">()),</span>
+                <span class="n">vectors</span><span class="o">=</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getPeriodicBoxVectors</span><span class="p">()),</span>
+                <span class="n">potential_energy</span><span class="o">=</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="n">report</span><span class="p">[</span><span class="s1">&#39;annotation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_printed_header</span><span class="p">:</span>
+                <span class="n">timeheader</span> <span class="o">=</span> <span class="s1">&#39;time / {units}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+                <span class="n">peheader</span> <span class="o">=</span> <span class="s1">&#39;potential / {units}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+                <span class="n">keheader</span> <span class="o">=</span> <span class="s1">&#39;kinetic / {units}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+                <span class="n">temperatureheader</span> <span class="o">=</span> <span class="s1">&#39;T / {units}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">units</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">temperature</span><span class="p">)</span>
+                <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">_row_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">timeheader</span><span class="p">,</span> <span class="n">peheader</span><span class="p">,</span> <span class="n">keheader</span><span class="p">,</span> <span class="n">temperatureheader</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_printed_header</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">ke</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">kinetic_energy</span><span class="p">(</span><span class="n">report</span><span class="p">[</span><span class="s1">&#39;momenta&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">dim_masses</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">ke</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">k_b</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">dynamic_dof</span><span class="p">)</span>
+            <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">_row_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">report</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">defunits_value</span><span class="p">(),</span>
+                                          <span class="n">report</span><span class="p">[</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">defunits_value</span><span class="p">(),</span>
+                                          <span class="n">ke</span><span class="o">.</span><span class="n">defunits_value</span><span class="p">(),</span>
+                                          <span class="n">t</span><span class="o">.</span><span class="n">defunits_value</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_report_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">time</span>
+
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">new_frame</span><span class="p">(</span><span class="n">properties</span><span class="o">=</span><span class="n">report</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MdtReporter.describeNextReport"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.MdtReporter.describeNextReport">[docs]</a>        <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            :type simulation: simtk.openmm.app.Simulation</span>
+<span class="sd">            :return: report_description</span>
+<span class="sd">                A five element tuple.  The first element is the number of steps</span>
+<span class="sd">                until the next report.  The remaining elements specify whether</span>
+<span class="sd">                that report will require positions, velocities, forces, and</span>
+<span class="sd">                energies respectively.</span>
+<span class="sd">            :return type: tuple</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">report_interval</span> <span class="o">-</span> <span class="n">simulation</span><span class="o">.</span><span class="n">currentStep</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">report_interval</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span></div></div>
+
+
+<span class="n">PINT_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mole&#39;</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">avogadro</span><span class="p">,</span>
+              <span class="s1">&#39;degree&#39;</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">,</span>
+              <span class="s1">&#39;radian&#39;</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">radians</span><span class="p">,</span>
+              <span class="s1">&#39;elementary charge&#39;</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">q_e</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="simtk2pint"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.simtk2pint">[docs]</a><span class="k">def</span> <span class="nf">simtk2pint</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a quantity from the simtk unit system to a quantity from the pint unit system</span>
+<span class="sd">    :param quantity:</span>
+<span class="sd">    :param flat: if True, flatten 3xN arrays to 3N</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mag</span> <span class="o">=</span> <span class="n">quantity</span><span class="o">.</span><span class="n">_value</span>
+
+    <span class="k">if</span> <span class="n">quantity</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="n">stku</span><span class="o">.</span><span class="n">radian</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mag</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">radians</span>
+    <span class="k">if</span> <span class="n">quantity</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="n">stku</span><span class="o">.</span><span class="n">degree</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mag</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">degrees</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="s1">&#39;__getslice__&#39;</span><span class="p">):</span> <span class="n">mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mag</span><span class="p">[:])</span>
+    <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">exp</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="n">quantity</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">iter_scaled_units</span><span class="p">(),</span>
+                                    <span class="n">quantity</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">iter_top_base_units</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">dim</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">PINT_NAMES</span><span class="p">:</span>
+            <span class="n">pintunit</span> <span class="o">=</span> <span class="n">PINT_NAMES</span><span class="p">[</span><span class="n">dim</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pintunit</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">ureg</span><span class="o">.</span><span class="n">parse_expression</span><span class="p">(</span><span class="n">dim</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">mag</span> <span class="o">=</span> <span class="n">mag</span> <span class="o">*</span> <span class="p">(</span><span class="n">pintunit</span><span class="o">**</span><span class="n">exp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">flat</span><span class="p">:</span> <span class="n">mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mag</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">mag</span><span class="o">.</span><span class="n">shape</span><span class="p">),))</span>
+    <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">mag</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="pint2simtk"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.pint2simtk">[docs]</a><span class="k">def</span> <span class="nf">pint2simtk</span><span class="p">(</span><span class="n">quantity</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Converts a quantity from the pint to simtk unit system.</span>
+<span class="sd">    Note SimTK appears limited, esp for energy units. May need to have pint convert</span>
+<span class="sd">    to SI first</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SIMTK_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ang&#39;</span><span class="p">:</span> <span class="n">stku</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
+                   <span class="s1">&#39;fs&#39;</span><span class="p">:</span> <span class="n">stku</span><span class="o">.</span><span class="n">femtosecond</span><span class="p">,</span>
+                   <span class="s1">&#39;nm&#39;</span><span class="p">:</span> <span class="n">stku</span><span class="o">.</span><span class="n">nanometer</span><span class="p">,</span>
+                   <span class="s1">&#39;ps&#39;</span><span class="p">:</span> <span class="n">stku</span><span class="o">.</span><span class="n">picosecond</span><span class="p">}</span>
+
+    <span class="n">newvar</span> <span class="o">=</span> <span class="n">quantity</span><span class="o">.</span><span class="n">_magnitude</span>
+    <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">exp</span> <span class="ow">in</span> <span class="n">quantity</span><span class="o">.</span><span class="n">_units</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">SIMTK_NAMES</span><span class="p">:</span>
+            <span class="n">stkunit</span> <span class="o">=</span> <span class="n">SIMTK_NAMES</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">stkunit</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">stku</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
+        <span class="n">newvar</span> <span class="o">=</span> <span class="n">newvar</span> <span class="o">*</span> <span class="n">stkunit</span> <span class="o">**</span> <span class="n">exp</span>
+    <span class="k">return</span> <span class="n">newvar</span></div>
+
+
+<span class="nd">@compute.runsremotely</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="n">force_remote</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_amber_to_mol</span><span class="p">(</span><span class="n">prmtop_file</span><span class="p">,</span> <span class="n">inpcrd_file</span><span class="p">):</span>
+    <span class="n">prmtop</span> <span class="o">=</span> <span class="n">from_filepath</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">AmberPrmtopFile</span><span class="p">,</span> <span class="n">prmtop_file</span><span class="p">)</span>
+    <span class="n">inpcrd</span> <span class="o">=</span> <span class="n">from_filepath</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">AmberInpcrdFile</span><span class="p">,</span> <span class="n">inpcrd_file</span><span class="p">)</span>
+
+    <span class="n">mol</span> <span class="o">=</span> <span class="n">topology_to_mol</span><span class="p">(</span><span class="n">prmtop</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span>
+                          <span class="n">positions</span><span class="o">=</span><span class="n">inpcrd</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span>
+                          <span class="n">velocities</span><span class="o">=</span><span class="n">inpcrd</span><span class="o">.</span><span class="n">velocities</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mol</span>
+
+
+<span class="k">if</span> <span class="n">force_remote</span><span class="p">:</span>
+<div class="viewcode-block" id="amber_to_mol"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.amber_to_mol">[docs]</a>    <span class="k">def</span> <span class="nf">amber_to_mol</span><span class="p">(</span><span class="n">prmtop_file</span><span class="p">,</span> <span class="n">inpcrd_file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prmtop_file</span><span class="p">,</span> <span class="n">pyccc</span><span class="o">.</span><span class="n">FileContainer</span><span class="p">):</span>
+            <span class="n">prmtop_file</span> <span class="o">=</span> <span class="n">LocalFile</span><span class="p">(</span><span class="n">prmtop_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inpcrd_file</span><span class="p">,</span> <span class="n">pyccc</span><span class="o">.</span><span class="n">FileContainer</span><span class="p">):</span>
+            <span class="n">inpcrd_file</span> <span class="o">=</span> <span class="n">LocalFile</span><span class="p">(</span><span class="n">inpcrd_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_amber_to_mol</span><span class="p">(</span><span class="n">prmtop_file</span><span class="p">,</span> <span class="n">inpcrd_file</span><span class="p">)</span></div>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">amber_to_mol</span> <span class="o">=</span> <span class="n">_amber_to_mol</span>
+
+
+<div class="viewcode-block" id="topology_to_mol"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.topology_to_mol">[docs]</a><span class="k">def</span> <span class="nf">topology_to_mol</span><span class="p">(</span><span class="n">topo</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">positions</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">velocities</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :type topo: simtk.openmm.app.topology.Topology</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Atoms</span>
+    <span class="n">atommap</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">newatoms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">masses</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">amu</span><span class="o">*</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">mass</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">stku</span><span class="o">.</span><span class="n">amu</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">topo</span><span class="o">.</span><span class="n">atoms</span><span class="p">()]</span>
+    <span class="k">for</span> <span class="n">atom</span><span class="p">,</span><span class="n">mass</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">topo</span><span class="o">.</span><span class="n">atoms</span><span class="p">(),</span> <span class="n">masses</span><span class="p">):</span>
+        <span class="n">newatom</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="n">atnum</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span>
+                           <span class="n">name</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                           <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">)</span>
+        <span class="n">atommap</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span> <span class="o">=</span> <span class="n">newatom</span>
+        <span class="n">newatoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newatom</span><span class="p">)</span>
+
+    <span class="c1"># Coordinates</span>
+    <span class="k">if</span> <span class="n">positions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">poslist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">stku</span><span class="o">.</span><span class="n">nanometer</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">])</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">nm</span>
+        <span class="n">poslist</span><span class="o">.</span><span class="n">ito</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">newatom</span><span class="p">,</span> <span class="n">position</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">newatoms</span><span class="p">,</span> <span class="n">poslist</span><span class="p">):</span>
+            <span class="n">newatom</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">position</span>
+    <span class="k">if</span> <span class="n">velocities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">velolist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">v</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">stku</span><span class="o">.</span><span class="n">nanometer</span><span class="o">/</span><span class="n">stku</span><span class="o">.</span><span class="n">femtosecond</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">velocities</span><span class="p">])</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">nm</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">fs</span>
+        <span class="n">velolist</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">velolist</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">newatom</span><span class="p">,</span> <span class="n">velocity</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">newatoms</span><span class="p">,</span> <span class="n">velolist</span><span class="p">):</span>
+            <span class="n">newatom</span><span class="o">.</span><span class="n">momentum</span> <span class="o">=</span> <span class="n">newatom</span><span class="o">.</span><span class="n">mass</span> <span class="o">*</span> <span class="n">simtk2pint</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span>
+
+    <span class="c1"># Biounits</span>
+    <span class="n">chains</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">topo</span><span class="o">.</span><span class="n">chains</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">chain</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chains</span><span class="p">:</span>
+            <span class="n">chains</span><span class="p">[</span><span class="n">chain</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Chain</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">chain</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">chain</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">newchain</span> <span class="o">=</span> <span class="n">chains</span><span class="p">[</span><span class="n">chain</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">chain</span><span class="o">.</span><span class="n">residues</span><span class="p">():</span>
+            <span class="n">newresidue</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Residue</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                                         <span class="n">residue</span><span class="o">.</span><span class="n">index</span><span class="p">),</span>
+                                          <span class="n">chain</span><span class="o">=</span><span class="n">newchain</span><span class="p">,</span>
+                                          <span class="n">pdbindex</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+                                          <span class="n">pdbname</span><span class="o">=</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">newchain</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">newresidue</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">():</span>
+                <span class="n">newatom</span> <span class="o">=</span> <span class="n">atommap</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span>
+                <span class="n">newatom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="n">newresidue</span>
+                <span class="n">newatom</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">newchain</span>
+                <span class="n">newresidue</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">newatom</span><span class="p">)</span>
+
+    <span class="c1"># Bonds</span>
+    <span class="n">bonds</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">topo</span><span class="o">.</span><span class="n">bonds</span><span class="p">():</span>
+        <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">bond</span>
+        <span class="n">na1</span><span class="p">,</span> <span class="n">na2</span> <span class="o">=</span> <span class="n">atommap</span><span class="p">[</span><span class="n">a1</span><span class="p">],</span><span class="n">atommap</span><span class="p">[</span><span class="n">a2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">na1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bonds</span><span class="p">:</span>
+            <span class="n">bonds</span><span class="p">[</span><span class="n">na1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">na2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bonds</span><span class="p">:</span>
+            <span class="n">bonds</span><span class="p">[</span><span class="n">na2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">bonds</span><span class="p">[</span><span class="n">na1</span><span class="p">][</span><span class="n">na2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">bonds</span><span class="p">[</span><span class="n">na2</span><span class="p">][</span><span class="n">na1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Unnamed molecule from OpenMM&#39;</span>
+    <span class="n">newmol</span> <span class="o">=</span> <span class="n">Molecule</span><span class="p">(</span><span class="n">newatoms</span><span class="p">,</span> <span class="n">bond_graph</span><span class="o">=</span><span class="n">bonds</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newmol</span></div>
+
+
+<div class="viewcode-block" id="mol_to_toplogy"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.mol_to_toplogy">[docs]</a><span class="k">def</span> <span class="nf">mol_to_toplogy</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

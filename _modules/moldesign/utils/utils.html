@@ -1,0 +1,548 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.utils.utils &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.utils.utils</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.utils.utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">My standard utilities. Intended to be included in all projects</span>
+<span class="sd">Obviously everything included here needs to be in the standard library (or numpy)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
+<span class="kn">import</span> <span class="nn">fractions</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">cStringIO</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">import</span> <span class="nn">webcolors</span>
+
+
+<div class="viewcode-block" id="make_none"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.make_none">[docs]</a><span class="k">def</span> <span class="nf">make_none</span><span class="p">():</span> <span class="k">return</span> <span class="bp">None</span></div>
+
+
+<span class="nd">@contextlib.contextmanager</span>
+<div class="viewcode-block" id="recursionlimit_atleast"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.recursionlimit_atleast">[docs]</a><span class="k">def</span> <span class="nf">recursionlimit_atleast</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Context manager for temporarily raising the context manager&#39;s</span>
+<span class="sd">    the interpreter&#39;s maximum call stack size (misleading called the ``recursion limit``)</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        This will explicitly reset the the recursion limit when we exit the context;</span>
+<span class="sd">            any intermediate recursion limit changes will be lost</span>
+<span class="sd">        This will not lower the limit ``n`` is less than the current recursion limit.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">current_limit</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">getrecursionlimit</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="n">current_limit</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">setrecursionlimit</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">yield</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">setrecursionlimit</span><span class="p">(</span><span class="n">current_limit</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="if_not_none"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.if_not_none">[docs]</a><span class="k">def</span> <span class="nf">if_not_none</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">default</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Equivalent to `item if item is not None else default` &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">default</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">item</span></div>
+
+
+<div class="viewcode-block" id="printflush"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.printflush">[docs]</a><span class="k">def</span> <span class="nf">printflush</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">newline</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">s</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">s</span><span class="p">,</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="textnotify"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.textnotify">[docs]</a><span class="k">class</span> <span class="nc">textnotify</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Print a single, immediately flushed line to log the execution of a block.</span>
+
+<span class="sd">    Prints &#39;done&#39; at the end of the line (or &#39;ERROR&#39; if an uncaught exception)</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import time</span>
+<span class="sd">        &gt;&gt;&gt; with textnotify(&#39;starting to sleep&#39;):</span>
+<span class="sd">        &gt;&gt;&gt;     time.sleep(3)</span>
+<span class="sd">        starting to sleep...done</span>
+<span class="sd">        &gt;&gt;&gt; with textnotify(&#39;raising an exception...&#39;):</span>
+<span class="sd">        &gt;&gt;&gt;     raise ValueError()</span>
+<span class="sd">        raising an exception...error</span>
+<span class="sd">        ValueError [...]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">startmsg</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">startmsg</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span> <span class="o">!=</span> <span class="s1">&#39;...&#39;</span><span class="p">:</span>
+            <span class="n">startmsg</span> <span class="o">=</span> <span class="n">startmsg</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;...&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startmsg</span> <span class="o">=</span> <span class="n">startmsg</span>
+
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">printflush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startmsg</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">printflush</span><span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">printflush</span><span class="p">(</span><span class="s1">&#39;ERROR&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="progressbar"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.progressbar">[docs]</a><span class="k">class</span> <span class="nc">progressbar</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a progress bar for a calculation</span>
+
+<span class="sd">    The context manager provides a callback which needs to be called as</span>
+<span class="sd">    set_progress(percent), where percent is a number between 0 and 100</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import time</span>
+<span class="sd">        &gt;&gt;&gt; with progressbar(&#39;count to 100&#39;) as set_progress:</span>
+<span class="sd">        &gt;&gt;&gt;     for i in xrange(100):</span>
+<span class="sd">        &gt;&gt;&gt;         time.sleep(0.5)</span>
+<span class="sd">        &gt;&gt;&gt;         set_progress(i+1)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="kn">as</span> <span class="nn">ipy</span>
+        <span class="kn">import</span> <span class="nn">traitlets</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">FloatProgress</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">traitlets</span><span class="o">.</span><span class="n">TraitError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_progress</span>
+
+<div class="viewcode-block" id="progressbar.set_progress"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.progressbar.set_progress">[docs]</a>    <span class="k">def</span> <span class="nf">set_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">percent</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">percent</span></div>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">100.0</span>
+            <span class="k">if</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span><span class="o">.</span><span class="n">bar_style</span> <span class="o">=</span> <span class="s1">&#39;danger&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span><span class="o">.</span><span class="n">bar_style</span> <span class="o">=</span> <span class="s1">&#39;success&#39;</span></div>
+
+
+<div class="viewcode-block" id="PipedFile"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.PipedFile">[docs]</a><span class="k">class</span> <span class="nc">PipedFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Allows us to pass data by filesystem path without ever writing it to disk</span>
+<span class="sd">    To prevent deadlock, we spawn a thread to write to the pipe</span>
+<span class="sd">    Call it as a context manager:</span>
+<span class="sd">    &gt;&gt;&gt; with PipedFile(&#39;file contents&#39;,filename=&#39;contents.txt&#39;) as pipepath:</span>
+<span class="sd">    &gt;&gt;&gt;     print open(pipepath,&#39;r&#39;).read()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileobj</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;pipe&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">fileobj</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">unicode</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">(</span><span class="n">fileobj</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span> <span class="o">=</span> <span class="n">fileobj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tempdir</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="s1">&#39;/&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">,</span><span class="s2">&quot;Filename must not include directory&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tempdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tempdir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkfifo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipe_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_write_to_pipe</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_path</span>
+
+    <span class="k">def</span> <span class="nf">_write_to_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipe_path</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pipe</span><span class="p">:</span>
+            <span class="n">pipe</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tempdir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tempdir</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="remove_directories"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.remove_directories">[docs]</a><span class="k">def</span> <span class="nf">remove_directories</span><span class="p">(</span><span class="n">list_of_paths</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Removes non-leafs from a list of directory paths</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">found_dirs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">list_of_paths</span><span class="p">:</span>
+        <span class="n">dirs</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dirs</span><span class="p">)):</span>
+            <span class="n">found_dirs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirs</span><span class="p">[:</span><span class="n">i</span><span class="p">]))</span>
+
+    <span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">list_of_paths</span> <span class="k">if</span>
+             <span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">found_dirs</span><span class="p">)</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">paths</span></div>
+
+
+<div class="viewcode-block" id="make_local_temp_dir"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.make_local_temp_dir">[docs]</a><span class="k">def</span> <span class="nf">make_local_temp_dir</span><span class="p">():</span>
+    <span class="n">tempdir</span> <span class="o">=</span> <span class="s1">&#39;/tmp/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">uuid4</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">tempdir</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tempdir</span></div>
+
+
+<div class="viewcode-block" id="BaseTable"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.BaseTable">[docs]</a><span class="k">class</span> <span class="nc">BaseTable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">categories</span><span class="p">,</span> <span class="n">fileobj</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categories</span> <span class="o">=</span> <span class="n">categories</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span> <span class="o">=</span> <span class="n">fileobj</span>
+
+<div class="viewcode-block" id="BaseTable.add_line"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.BaseTable.add_line">[docs]</a>    <span class="k">def</span> <span class="nf">add_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;keys&#39;</span><span class="p">):</span>
+            <span class="n">newline</span> <span class="o">=</span> <span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span>
+            <span class="n">newline</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newline</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writeline</span><span class="p">(</span><span class="n">newline</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BaseTable.writeline"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.BaseTable.writeline">[docs]</a>    <span class="k">def</span> <span class="nf">writeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newline</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BaseTable.getstring"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.BaseTable.getstring">[docs]</a>    <span class="k">def</span> <span class="nf">getstring</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="PrintTable"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.PrintTable">[docs]</a><span class="k">class</span> <span class="nc">PrintTable</span><span class="p">(</span><span class="n">BaseTable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formatstr</span><span class="p">,</span> <span class="n">fileobj</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="o">=</span> <span class="n">formatstr</span>
+        <span class="n">categories</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wrote_header</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">Formatter</span><span class="p">()</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">formatstr</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">categories</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PrintTable</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">categories</span><span class="p">,</span> <span class="n">fileobj</span><span class="o">=</span><span class="n">fileobj</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PrintTable.writeline"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.PrintTable.writeline">[docs]</a>    <span class="k">def</span> <span class="nf">writeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrote_header</span><span class="p">:</span>
+            <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fileobj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wrote_header</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">return</span>
+        <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileobj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatstr</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">line</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PrintTable.getstring"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.PrintTable.getstring">[docs]</a>    <span class="k">def</span> <span class="nf">getstring</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
+            <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="n">s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="MarkdownTable"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.MarkdownTable">[docs]</a><span class="k">class</span> <span class="nc">MarkdownTable</span><span class="p">(</span><span class="n">BaseTable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">categories</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MarkdownTable</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MarkdownTable.markdown"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.MarkdownTable.markdown">[docs]</a>    <span class="k">def</span> <span class="nf">markdown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">replace</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">replace</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">outlines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;| &#39;</span> <span class="o">+</span> <span class="s1">&#39; | &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; |&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;|-&#39;</span> <span class="o">+</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;|-&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;|&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
+            <span class="n">nextline</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">replace</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">line</span><span class="p">]</span>
+            <span class="n">outlines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;| &#39;</span> <span class="o">+</span> <span class="s1">&#39; | &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nextline</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; |&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outlines</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MarkdownTable.writeline"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.MarkdownTable.writeline">[docs]</a>    <span class="k">def</span> <span class="nf">writeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newline</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="MarkdownTable.getstring"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.MarkdownTable.getstring">[docs]</a>    <span class="k">def</span> <span class="nf">getstring</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">markdown</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="binomial_coefficient"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.binomial_coefficient">[docs]</a><span class="k">def</span> <span class="nf">binomial_coefficient</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="c1"># credit to http://stackoverflow.com/users/226086/nas-banov</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">reduce</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span>
+                      <span class="p">(</span><span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">)),</span> <span class="mi">1</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="pairwise_displacements"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.pairwise_displacements">[docs]</a><span class="k">def</span> <span class="nf">pairwise_displacements</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :type a: numpy.array</span>
+<span class="sd">    from http://stackoverflow.com/questions/22390418/pairwise-displacement-vectors-among-set-of-points</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">binomial_coefficient</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">l</span> <span class="o">+</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">sl</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>  <span class="c1"># no point1 - point1!</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span><span class="p">[:</span><span class="n">n</span> <span class="o">-</span> <span class="n">sl</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="n">sl</span><span class="p">:]</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="n">r</span> <span class="o">+=</span> <span class="n">n</span> <span class="o">-</span> <span class="p">(</span><span class="n">sl</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="is_printable"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.is_printable">[docs]</a><span class="k">def</span> <span class="nf">is_printable</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">string</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">printable</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+
+
+<span class="k">class</span> <span class="nc">_RedirectStream</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;From python3.4 stdlib</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_stream</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_target</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_new_target</span> <span class="o">=</span> <span class="n">new_target</span>
+        <span class="c1"># We use a list of old targets to make this CM re-entrant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_old_targets</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_old_targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span><span class="p">))</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_target</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_target</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exctype</span><span class="p">,</span> <span class="n">excinst</span><span class="p">,</span> <span class="n">exctb</span><span class="p">):</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_targets</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="redirect_stdout"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.redirect_stdout">[docs]</a><span class="k">class</span> <span class="nc">redirect_stdout</span><span class="p">(</span><span class="n">_RedirectStream</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;From python3.4 stdlib&quot;&quot;&quot;</span>
+    <span class="n">_stream</span> <span class="o">=</span> <span class="s2">&quot;stdout&quot;</span></div>
+
+
+<div class="viewcode-block" id="redirect_stderr"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.redirect_stderr">[docs]</a><span class="k">class</span> <span class="nc">redirect_stderr</span><span class="p">(</span><span class="n">_RedirectStream</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;From python3.4 stdlib&quot;&quot;&quot;</span>
+    <span class="n">_stream</span> <span class="o">=</span> <span class="s2">&quot;stderr&quot;</span></div>
+
+
+<span class="n">GETFLOAT</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;-?\d+(\.\d+)?(e[-+]?\d+)&#39;</span><span class="p">)</span>  <span class="c1"># matches numbers, e.g. 1, -2.0, 3.5e50, 0.001e-10</span>
+
+
+<div class="viewcode-block" id="is_color"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.is_color">[docs]</a><span class="k">def</span> <span class="nf">is_color</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Do our best to determine if &quot;s&quot; is a color spec that can be converted to hex</span>
+<span class="sd">    :param s:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">in_range</span><span class="p">(</span><span class="n">i</span><span class="p">):</span> <span class="k">return</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="nb">int</span><span class="p">(</span><span class="s1">&#39;0xFFFFFF&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">in_range</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">elif</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">webcolors</span><span class="o">.</span><span class="n">css3_names_to_hex</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">elif</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;#&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">in_range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="s1">&#39;0x&#39;</span> <span class="o">+</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;0x&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">in_range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">in_range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="s1">&#39;0x&#39;</span> <span class="o">+</span> <span class="n">s</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span></div>
+
+
+<div class="viewcode-block" id="from_filepath"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.utils.html#moldesign.utils.utils.from_filepath">[docs]</a><span class="k">def</span> <span class="nf">from_filepath</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">filelike</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run func on a temporary *path* assigned to filelike&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">filelike</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">filelike</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filelike</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="n">outfile</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">outfile</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

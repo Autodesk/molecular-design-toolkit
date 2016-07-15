@@ -1,0 +1,36 @@
+moldesign.compute package
+=========================
+
+.. automodule:: moldesign.compute
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+moldesign.compute.compute module
+--------------------------------
+
+.. automodule:: moldesign.compute.compute
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.compute.configuration module
+--------------------------------------
+
+.. automodule:: moldesign.compute.configuration
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.compute.runsremotely module
+-------------------------------------
+
+.. automodule:: moldesign.compute.runsremotely
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

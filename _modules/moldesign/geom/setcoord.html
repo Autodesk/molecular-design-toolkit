@@ -1,0 +1,367 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.geom.setcoord &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.geom.setcoord</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.geom.setcoord</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">moldesign.molecules.atomcollections</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">external</span>
+<span class="kn">from</span> <span class="nn">moldesign.mathutils</span> <span class="kn">import</span> <span class="n">sub_angles</span><span class="p">,</span> <span class="n">apply_4x4_transform</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">toplevel</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">dihedral</span>
+
+
+<span class="nd">@toplevel</span>
+<div class="viewcode-block" id="set_distance"><a class="viewcode-back" href="../../../toplevel.html#moldesign.set_distance">[docs]</a><span class="k">def</span> <span class="nf">set_distance</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">newlength</span><span class="p">,</span> <span class="n">adjustmol</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Set the distance between two atoms. They will be adjusted along the vector separating them.</span>
+<span class="sd">    If the two atoms are A) bonded, B) not part of the same ring system, and C) ``adjustmol`` is</span>
+<span class="sd">    True, then the entire molecule&#39;s positions will be modified as well</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        a1,a2 (mdt.Atom): atoms to adjust</span>
+<span class="sd">        newlength (u.Scalar[length]): new length to set</span>
+<span class="sd">        adjustmol (bool): Adjust all atoms on either side of this bond?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#T ODO: lots of room for optimization here</span>
+    <span class="k">if</span> <span class="n">adjustmol</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">a1</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">a1</span><span class="o">.</span><span class="n">molecule</span> <span class="o">==</span> <span class="n">a2</span><span class="o">.</span><span class="n">molecule</span>
+    <span class="n">vec</span> <span class="o">=</span> <span class="n">a1</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">a2</span><span class="o">.</span><span class="n">position</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vec</span><span class="p">))</span>
+    <span class="n">direction</span> <span class="o">=</span> <span class="n">vec</span> <span class="o">/</span> <span class="n">dist</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">newlength</span> <span class="o">-</span> <span class="n">dist</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.0e-5</span> <span class="o">*</span> <span class="n">delta</span><span class="o">.</span><span class="n">get_units</span><span class="p">():</span> <span class="k">return</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">adjustmol</span><span class="p">:</span>
+        <span class="n">a1</span><span class="o">.</span><span class="n">position</span> <span class="o">+=</span> <span class="n">direction</span> <span class="o">*</span> <span class="n">delta</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">a2</span><span class="o">.</span><span class="n">position</span> <span class="o">-=</span> <span class="n">direction</span> <span class="o">*</span> <span class="n">delta</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">a1</span><span class="o">.</span><span class="n">molecule</span>
+        <span class="n">indices</span><span class="p">,</span> <span class="n">sign</span> <span class="o">=</span> <span class="n">_get_fragment_indices</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">+=</span> <span class="n">delta</span><span class="o">*</span><span class="n">direction</span><span class="o">*</span><span class="n">sign</span></div>
+
+
+<span class="nd">@toplevel</span>
+<div class="viewcode-block" id="set_angle"><a class="viewcode-back" href="../../../toplevel.html#moldesign.set_angle">[docs]</a><span class="k">def</span> <span class="nf">set_angle</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">adjustmol</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Set the angle between bonds a1-a2 and a3-a2. The atoms will be adjusted along the</span>
+<span class="sd">    gradient of the angle.</span>
+<span class="sd">    If ``adjustmol`` is True and the topology is unambiguous, then the entire molecule&#39;s positions</span>
+<span class="sd">    will be modified as well</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        a1,a2,a3 (mdt.Atom): atoms to adjust</span>
+<span class="sd">        theta (u.Scalar[angle]): new angle to set</span>
+<span class="sd">        adjustmol (bool): Adjust all atoms on either side of this bond?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: deal with co-linear a1, a2, a3 - the rotation axis is ill-defined in this case \</span>
+    <span class="c1">#      (require an axis to be specified)</span>
+    <span class="c1"># TODO: weakly cache the rotation axis so that users can set angle to 0 or 180 without losing the axis</span>
+    <span class="n">current</span> <span class="o">=</span> <span class="n">angle</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span>
+    <span class="n">rotation</span> <span class="o">=</span> <span class="n">sub_angles</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">rotation</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.0e-6</span><span class="p">:</span> <span class="k">return</span>
+
+    <span class="n">axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">a2</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="n">a3</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">a2</span><span class="o">.</span><span class="n">position</span><span class="p">)</span> <span class="c1"># do vecs need to be normalized?</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">adjustmol</span><span class="p">:</span>
+        <span class="n">rotmat_l</span> <span class="o">=</span> <span class="n">external</span><span class="o">.</span><span class="n">transformations</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">(</span><span class="n">rotation</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">a2</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="n">rotmat_r</span> <span class="o">=</span> <span class="n">external</span><span class="o">.</span><span class="n">transformations</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">(</span><span class="o">-</span><span class="n">rotation</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">a2</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+
+        <span class="n">a1</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">apply_4x4_transform</span><span class="p">(</span><span class="n">rotmat_l</span><span class="p">,</span> <span class="n">a1</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="n">a3</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">apply_4x4_transform</span><span class="p">(</span><span class="n">rotmat_r</span><span class="p">,</span> <span class="n">a3</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">a2</span><span class="o">.</span><span class="n">molecule</span>
+        <span class="n">indices</span><span class="p">,</span> <span class="n">sign</span> <span class="o">=</span> <span class="n">_get_fragment_indices</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
+        <span class="n">rotmat</span> <span class="o">=</span> <span class="n">external</span><span class="o">.</span><span class="n">transformations</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">(</span><span class="n">rotation</span><span class="p">,</span> <span class="n">axis</span><span class="o">*</span><span class="n">sign</span><span class="p">,</span> <span class="n">a2</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_4x4_transform</span><span class="p">(</span><span class="n">rotmat</span><span class="p">,</span> <span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="n">indices</span><span class="p">])</span></div>
+
+
+<span class="nd">@toplevel</span>
+<div class="viewcode-block" id="set_dihedral"><a class="viewcode-back" href="../../../toplevel.html#moldesign.set_dihedral">[docs]</a><span class="k">def</span> <span class="nf">set_dihedral</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">adjustmol</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Set the twist angle of atoms a1 and a4 around the central bond a2-a3. The atoms will be</span>
+<span class="sd">    adjusted along the</span>
+<span class="sd">    gradient of the angle.</span>
+<span class="sd">    If ``adjustmol`` is True and the topology is unambiguous, then the entire molecule&#39;s positions</span>
+<span class="sd">    will be modified as well</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        a1,a2,a3,a4 (mdt.Atom): atoms to adjust</span>
+<span class="sd">        theta (u.Scalar[angle]): new angle to set</span>
+<span class="sd">        adjustmol (bool): Adjust all atoms on either side of this bond?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: deal with co-linear a1/a4, a2, a3 - the angle is ill-defined \</span>
+    <span class="c1">#      (should just an arbitrary axis normal to the central bond)</span>
+    <span class="n">current</span> <span class="o">=</span> <span class="n">dihedral</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span>
+    <span class="n">rotation</span> <span class="o">=</span> <span class="n">sub_angles</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">current</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">rotation</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.0e-6</span><span class="p">:</span> <span class="k">return</span>
+
+    <span class="n">axis</span> <span class="o">=</span> <span class="n">a2</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">a3</span><span class="o">.</span><span class="n">position</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">adjustmol</span><span class="p">:</span>
+        <span class="n">rotmat_l</span> <span class="o">=</span> <span class="n">external</span><span class="o">.</span><span class="n">transformations</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">(</span><span class="o">-</span><span class="n">rotation</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">a3</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="n">rotmat_r</span> <span class="o">=</span> <span class="n">external</span><span class="o">.</span><span class="n">transformations</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">(</span><span class="n">rotation</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">a3</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+
+        <span class="n">a1</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">apply_4x4_transform</span><span class="p">(</span><span class="n">rotmat_l</span><span class="p">,</span> <span class="n">a1</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="n">a4</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">apply_4x4_transform</span><span class="p">(</span><span class="n">rotmat_r</span><span class="p">,</span> <span class="n">a4</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">a2</span><span class="o">.</span><span class="n">molecule</span>
+        <span class="n">indices</span><span class="p">,</span> <span class="n">sign</span> <span class="o">=</span> <span class="n">_get_fragment_indices</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
+        <span class="n">rotmat</span> <span class="o">=</span> <span class="n">external</span><span class="o">.</span><span class="n">transformations</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">(</span><span class="n">rotation</span><span class="p">,</span> <span class="n">axis</span><span class="o">*</span><span class="n">sign</span><span class="p">,</span> <span class="n">a3</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_4x4_transform</span><span class="p">(</span><span class="n">rotmat</span><span class="p">,</span> <span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="n">indices</span><span class="p">])</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_fragment</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a pair of atoms a1 and a2, return two fragments, one composed of all atoms on a1&#39;s</span>
+<span class="sd">    side of the molecule, the other composed of all atoms on a2&#39;s side of the molecule.</span>
+
+<span class="sd">    This won&#39;t work if a1 and a2 are in a cycle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># DFS for a1&#39;s side of the bond. To prevent visiting a2, we mark it as visited at the start</span>
+    <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">a2</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">dfs_dive</span><span class="p">(</span><span class="n">atom</span><span class="p">):</span>
+        <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">nbr</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">nbr</span> <span class="ow">is</span> <span class="n">a2</span> <span class="ow">and</span> <span class="n">atom</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">a1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;a1 and a2 are in a cyclic moiety&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">nbr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                <span class="n">dfs_dive</span><span class="p">(</span><span class="n">nbr</span><span class="p">)</span>
+    <span class="n">dfs_dive</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
+    <span class="n">visited</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">a2</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">moldesign</span><span class="o">.</span><span class="n">molecules</span><span class="o">.</span><span class="n">atomcollections</span><span class="o">.</span><span class="n">AtomList</span><span class="p">(</span><span class="n">visited</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span> <span class="nf">_get_fragment_indices</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">):</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">_get_fragment_indices</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_get_fragment_indices</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="c1"># Try to get the smaller fragment ... a bit hacky right now</span>
+    <span class="k">try</span><span class="p">:</span> <span class="n">frag1</span> <span class="o">=</span> <span class="n">_get_fragment</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">frag1</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">try</span><span class="p">:</span> <span class="n">frag2</span> <span class="o">=</span> <span class="n">_get_fragment</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a1</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">frag1</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">raise</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">frag</span> <span class="o">=</span> <span class="n">frag1</span>
+            <span class="n">sign</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">frag1</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">frag1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">frag2</span><span class="p">):</span>
+            <span class="n">frag</span> <span class="o">=</span> <span class="n">frag2</span>
+            <span class="n">sign</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">frag</span> <span class="o">=</span> <span class="n">frag1</span>
+            <span class="n">sign</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">frag</span><span class="p">]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+    <span class="n">_get_fragment_indices</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">sign</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">sign</span>
+
+<span class="n">_get_fragment_indices</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

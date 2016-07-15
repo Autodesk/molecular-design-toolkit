@@ -1,0 +1,447 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.uibase.components &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.uibase.components</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.uibase.components</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="kn">as</span> <span class="nn">ipy</span>
+<span class="kn">import</span> <span class="nn">traitlets</span>
+
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">viewer</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+
+<span class="kn">from</span> <span class="nn">.selector</span> <span class="kn">import</span> <span class="n">Selector</span>
+
+
+<div class="viewcode-block" id="StyledTab"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.StyledTab">[docs]</a><span class="k">class</span> <span class="nc">StyledTab</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">Tab</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Objects can inherit from this to maintain consistent styling.</span>
+<span class="sd">    TODO: Probably better to do this with CSS?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;font_size&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StyledTab</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AtomInspector"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.AtomInspector">[docs]</a><span class="k">class</span> <span class="nc">AtomInspector</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">HTML</span><span class="p">,</span> <span class="n">Selector</span><span class="p">):</span>
+<div class="viewcode-block" id="AtomInspector.handle_selection_event"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.AtomInspector.handle_selection_event">[docs]</a>    <span class="k">def</span> <span class="nf">handle_selection_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;atoms&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">:</span> <span class="k">return</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="n">selection</span><span class="p">[</span><span class="s1">&#39;atoms&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;No selection&#39;</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">atom</span> <span class="o">=</span> <span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span>
+            <span class="n">chain</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;&lt;b&gt;Molecule&lt;/b&gt;: </span><span class="si">%s</span><span class="s2">&lt;br&gt;&quot;</span> <span class="o">%</span> <span class="n">atom</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span>
+                <span class="s2">&quot;&lt;b&gt;Chain&lt;/b&gt; </span><span class="si">%s</span><span class="s2">&lt;br&gt;&quot;</span> <span class="o">%</span> <span class="n">chain</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span>
+                <span class="s2">&quot;&lt;b&gt;Residue&lt;/b&gt; </span><span class="si">%s</span><span class="s2">, index </span><span class="si">%d</span><span class="s2">&lt;br&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">+</span>
+                <span class="s2">&quot;&lt;b&gt;Atom&lt;/b&gt; </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">), index </span><span class="si">%d</span><span class="s2">&lt;br&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">atstrings</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&lt;b&gt;</span><span class="si">%s</span><span class="s1">&lt;/b&gt; / res &lt;b&gt;</span><span class="si">%s</span><span class="s1">&lt;/b&gt; / chain &lt;b&gt;</span><span class="si">%s</span><span class="s1">&lt;/b&gt;&#39;</span> <span class="o">%</span>
+                         <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;&lt;br&gt;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">atstrings</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ViewerToolBase"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.ViewerToolBase">[docs]</a><span class="k">class</span> <span class="nc">ViewerToolBase</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The base for most viewer-based widgets - it consists of a viewer in the top-left,</span>
+<span class="sd">    UI controls on the right, and some additional widgets underneath the viewer</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">VIEWERTYPE</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">GeometryViewer</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolpane</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VIEWERTYPE</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">subtools</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer_pane</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">VBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">subtools</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_pane</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer_pane</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">toolpane</span><span class="p">])</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">ViewerToolBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">main_pane</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SelBase"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.SelBase">[docs]</a><span class="k">class</span> <span class="nc">SelBase</span><span class="p">(</span><span class="n">ViewerToolBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SelBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atomset</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_listname</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;&lt;b&gt;Selected atoms:&lt;/b&gt;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_list</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">SelectMultiple</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(),</span>
+                                            <span class="n">height</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_all_atoms_button</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Select all atoms&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_all_atoms_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">select_all_atoms</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_none</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Clear all selections&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">select_none</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clear_selections</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_button</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Unselect&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handle_remove_button_click</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">selected_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomset</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+    <span class="nd">@selected_atoms.setter</span>
+    <span class="k">def</span> <span class="nf">selected_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atomset</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">((</span><span class="n">atom</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_redraw_selection_state</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_redraw_selection_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_list</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">atomkey</span><span class="p">(</span><span class="n">atom</span><span class="p">),</span> <span class="n">atom</span><span class="p">)</span>
+                                                         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomset</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">highlight_atoms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_atomset</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SelBase.toggle_atom"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.SelBase.toggle_atom">[docs]</a>    <span class="k">def</span> <span class="nf">toggle_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Toggles atom&#39;s state in and out of the selection group&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomset</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomset</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomset</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_redraw_selection_state</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SelBase.remove_atomlist_highlight"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.SelBase.remove_atomlist_highlight">[docs]</a>    <span class="k">def</span> <span class="nf">remove_atomlist_highlight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_list</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="SelBase.atomkey"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.SelBase.atomkey">[docs]</a>    <span class="k">def</span> <span class="nf">atomkey</span><span class="p">(</span><span class="n">atom</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> (index </span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">index</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SelBase.select_all_atoms"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.SelBase.select_all_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">select_all_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span></div>
+
+<div class="viewcode-block" id="SelBase.handle_remove_button_click"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.SelBase.handle_remove_button_click">[docs]</a>    <span class="k">def</span> <span class="nf">handle_remove_button_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_list</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_list</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atomset</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_redraw_selection_state</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SelBase.clear_selections"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.SelBase.clear_selections">[docs]</a>    <span class="k">def</span> <span class="nf">clear_selections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_atoms</span> <span class="o">=</span> <span class="p">[]</span></div></div>
+
+
+<div class="viewcode-block" id="ReadoutFloatSlider"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.ReadoutFloatSlider">[docs]</a><span class="k">class</span> <span class="nc">ReadoutFloatSlider</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">):</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">traitlets</span><span class="o">.</span><span class="n">Unicode</span><span class="p">()</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">traitlets</span><span class="o">.</span><span class="n">Float</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;FloatSlider&#39;</span><span class="p">)</span>
+        <span class="nb">min</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="nb">max</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;max&#39;</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formatstring</span> <span class="o">=</span> <span class="n">format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">HTML</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readout</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">on_submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parse_value</span><span class="p">)</span>
+
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;readout&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slider</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minlabel</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="s1">u&#39;&lt;font size=1.5&gt;{}&lt;/font&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formatstring</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">min</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxlabel</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="s1">u&#39;&lt;font size=1.5&gt;{}&lt;/font&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formatstring</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">max</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sliderbox</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">minlabel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxlabel</span><span class="p">])</span>
+        <span class="n">traitlets</span><span class="o">.</span><span class="n">link</span><span class="p">((</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">))</span>
+        <span class="n">traitlets</span><span class="o">.</span><span class="n">link</span><span class="p">((</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">),</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_readout</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ReadoutFloatSlider</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">,</span>
+                                                  <span class="bp">self</span><span class="o">.</span><span class="n">readout</span><span class="p">,</span>
+                                                  <span class="bp">self</span><span class="o">.</span><span class="n">sliderbox</span><span class="p">])</span>
+
+    <span class="nd">@traitlets.observe</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">update_readout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatstring</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ReadoutFloatSlider.parse_value"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.ReadoutFloatSlider.parse_value">[docs]</a>    <span class="k">def</span> <span class="nf">parse_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">GETFLOAT</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">readout</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatstring</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">print</span> <span class="s2">&quot;Couldn&#39;t parse string </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">s</span>
+                <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">match</span><span class="o">.</span><span class="n">start</span><span class="p">():</span><span class="n">match</span><span class="o">.</span><span class="n">end</span><span class="p">()])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">f</span></div></div>
+
+
+<div class="viewcode-block" id="UnitText"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.UnitText">[docs]</a><span class="k">class</span> <span class="nc">UnitText</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Widget for a user to input a quantity with physical units.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        value (u.Scalar): initial value for the widget</span>
+<span class="sd">        units (u.MdtUnit): if provided, require that input has the same dimensionality as these</span>
+<span class="sd">            units</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        A very rough approximation of the FloatText, IntText, etc. widgets - this does NOT have a</span>
+<span class="sd">        counterpart in JavaScript. But it will behave similarly when setting units and values</span>
+<span class="sd">        from python.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">INVALID</span> <span class="o">=</span> <span class="s1">u&#39;</span><span class="se">\u274C</span><span class="s1">&#39;</span>
+    <span class="n">VALID</span> <span class="o">=</span> <span class="s2">u&quot;</span><span class="se">\u2705</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">UnitText</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">ipy</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">display</span><span class="o">=</span><span class="s1">&#39;flex&#39;</span><span class="p">,</span> <span class="n">flex_flow</span><span class="o">=</span><span class="s1">&#39;row wrap&#39;</span><span class="p">),</span>
+                                       <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">textbox</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Text</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">textbox</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error_msg</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="n">units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dimensionality</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">units</span><span class="p">)</span><span class="o">.</span><span class="n">dimensionality</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dimensionality</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validated_value</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validated</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">INVALID</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">textbox</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">validated</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_valid</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validated_value</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error_msg</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="c1"># Check that we can parse this</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">ureg</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">])</span>
+        <span class="k">except</span><span class="p">:</span>  <span class="c1"># parsing failed, pint just raises generic &quot;Exception&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_error_msg</span> <span class="o">=</span> <span class="s2">&quot;Failed to parse &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">textbox</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># Check dimensionality</span>
+            <span class="n">valdim</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">dimensionality</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensionality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">valdim</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensionality</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_error_msg</span> <span class="o">=</span> <span class="s2">&quot;Requires dimensionality </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensionality</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_msg</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validated</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;&lt;span title=&quot;Valid quantity&quot;&gt;</span><span class="si">%s</span><span class="s1">&lt;/span&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">VALID</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validated_value</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validated</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;&lt;span title=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;</span><span class="si">%s</span><span class="s1">&lt;/span&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVALID</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validated_value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validated_value</span>
+
+    <span class="nd">@value.setter</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">textbox</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

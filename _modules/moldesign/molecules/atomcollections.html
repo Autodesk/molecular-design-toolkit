@@ -1,0 +1,605 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.molecules.atomcollections &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.molecules.atomcollections</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.molecules.atomcollections</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">distance</span> <span class="k">as</span> <span class="n">spd</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">external</span><span class="p">,</span> <span class="n">mathutils</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">toplevel</span>
+
+
+<div class="viewcode-block" id="AtomContainer"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer">[docs]</a><span class="k">class</span> <span class="nc">AtomContainer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Mixin functions for objects that have a ``self.atoms`` attribute with a list of atoms</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        atoms (List[Atom]): a list of atoms</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; u.Array[length]: (Nx3) array of atomic positions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">position</span>
+
+    <span class="nd">@positions.setter</span>
+    <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span>
+        <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">p</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; This should never be called directly - it will be called by the `super` methods</span>
+<span class="sd">        of its subclasses &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AtomContainer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_atom_attrs</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz2d</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz3d</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">heavy_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; AtomList: a list of all heavy atoms (i.e., non-hydrogen) in this object &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">AtomList</span><span class="p">([</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">atnum</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">])</span>
+
+<div class="viewcode-block" id="AtomContainer.get_atoms"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.get_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">get_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">queries</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Allows keyword-based atom queries.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **queries (dict): parameters to match</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AtomList: the atoms matching this query</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">queries</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="k">def</span> <span class="nf">atom_callback</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">atom</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">obj</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">q</span><span class="p">,</span> <span class="n">matches</span> <span class="ow">in</span> <span class="n">queries</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="n">attr</span> <span class="o">=</span> <span class="n">atom_callback</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">attr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span> <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">attr</span> <span class="o">!=</span> <span class="n">matches</span><span class="p">:</span> <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># if here, this atom matched all queries</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="AtomContainer.calc_distance_array"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.calc_distance_array">[docs]</a>    <span class="k">def</span> <span class="nf">calc_distance_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate an array of pairwise distance between all atoms in self and other</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other (AtomContainer): object to calculate distances to (default: self)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            u.Array[length]: 2D array of pairwise distances between the two objects</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; dists = self.calc_distance_array(other)</span>
+<span class="sd">            &gt;&gt;&gt; dists[i, j] == self.atoms[i].distance(other.atoms[j])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">other</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">other_positions</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">positions</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">ang</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">other_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">other</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">ang</span><span class="p">)])</span>
+
+        <span class="n">distances</span> <span class="o">=</span> <span class="n">spd</span><span class="o">.</span><span class="n">cdist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">ang</span><span class="p">),</span> <span class="n">other_positions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">distances</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">ang</span></div>
+
+<div class="viewcode-block" id="AtomContainer.calc_displacements"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.calc_displacements">[docs]</a>    <span class="k">def</span> <span class="nf">calc_displacements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate an array of displacements between all atoms in this object</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            u.Array[length]: array of pairwise displacements between atoms</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; displacements = self.calc_displacements(other)</span>
+<span class="sd">            &gt;&gt;&gt; displacements[i, j] == (self.atoms[i].position - self.atoms[j].position)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: allow other, similar to calc_distance array</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">pairwise_displacements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AtomContainer.distance"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.distance">[docs]</a>    <span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns closest distance between this and the other entity</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other (AtomContainer): object to calculate distance to</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            u.Scalar[length]: closest distance between self and other</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; distance = self.distance(other)</span>
+<span class="sd">            &gt;&gt;&gt; distance == self.calc_distance_array(other).min()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">distance_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_distance_array</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">distance_array</span><span class="o">.</span><span class="n">min</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="AtomContainer.atoms_within"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.atoms_within">[docs]</a>    <span class="k">def</span> <span class="nf">atoms_within</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">include_self</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return all atoms in an object within a given radius of this object</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            radius (u.Scalar[length]): radius to search for atoms</span>
+<span class="sd">            other (AtomContainer): object containing the atoms to search (default:self.parent)</span>
+<span class="sd">            include_self (bool): if True, include the atoms from this object (since, by definition,</span>
+<span class="sd">               their distance from this object is 0)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AtomList: list of the atoms within ``radius`` of this object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">other</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">molecule</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">include_self</span><span class="p">:</span>
+            <span class="n">myatoms</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+
+        <span class="n">close_atoms</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">radius</span> <span class="ow">and</span> <span class="p">(</span><span class="n">include_self</span> <span class="ow">or</span> <span class="p">(</span><span class="n">atom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">myatoms</span><span class="p">)):</span>
+                <span class="n">close_atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">close_atoms</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; int: number of atoms in this object &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="n">natoms</span> <span class="o">=</span> <span class="n">numatoms</span> <span class="o">=</span> <span class="n">num_atoms</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">center_of_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; units.Vector[length]: The (x,y,z) coordinates of this object&#39;s center of mass &quot;&quot;&quot;</span>
+        <span class="n">total_mass</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">mass</span>
+        <span class="n">com</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">length</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">mass</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="n">total_mass</span> <span class="o">+=</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span>
+            <span class="n">com</span> <span class="o">+=</span> <span class="n">atom</span><span class="o">.</span><span class="n">position</span> <span class="o">*</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span>
+        <span class="n">com</span> <span class="o">=</span> <span class="n">com</span> <span class="o">/</span> <span class="n">total_mass</span>
+        <span class="k">return</span> <span class="n">com</span>
+    <span class="n">com</span> <span class="o">=</span> <span class="n">center_of_mass</span>  <span class="c1"># synonym</span>
+
+<div class="viewcode-block" id="AtomContainer.draw"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.draw">[docs]</a>    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">show_2dhydrogens</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Visualize this molecule (Jupyter only).</span>
+
+<span class="sd">        Creates a 3D viewer, and, for small molecules, a 2D viewer).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            width (int): width of the viewer in pixels</span>
+<span class="sd">            height (int): height of the viewer in pixels</span>
+<span class="sd">            show_2dhydrogens (bool): whether to show the hydrogens in 2d (default: True if there</span>
+<span class="sd">                   are 10 or less heavy atoms, false otherwise)</span>
+<span class="sd">            display (bool): immediately display this viewer</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            moldesign.ui.SelectionGroup</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="kn">as</span> <span class="nn">ipy</span>
+        <span class="kn">import</span> <span class="nn">IPython.display</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span> <span class="o">&lt;</span> <span class="mi">40</span><span class="p">:</span>
+
+            <span class="n">viz2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw2d</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+                                <span class="n">display</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                                <span class="n">show_hydrogens</span><span class="o">=</span><span class="n">show_2dhydrogens</span><span class="p">)</span>
+            <span class="n">viz3d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw3d</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+                                <span class="n">display</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">views</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="n">viz2d</span><span class="p">,</span> <span class="n">viz3d</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">views</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw3d</span><span class="p">(</span><span class="n">display</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="n">displayobj</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">uibase</span><span class="o">.</span><span class="n">SelectionGroup</span><span class="p">([</span><span class="n">views</span><span class="p">,</span> <span class="n">mdt</span><span class="o">.</span><span class="n">uibase</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">AtomInspector</span><span class="p">()])</span>
+
+        <span class="k">if</span> <span class="n">display</span><span class="p">:</span>
+            <span class="n">IPython</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">displayobj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">displayobj</span></div>
+
+<div class="viewcode-block" id="AtomContainer.draw3d"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.draw3d">[docs]</a>    <span class="k">def</span> <span class="nf">draw3d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">highlight_atoms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Draw this object in 3D. Jupyter only.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            highlight_atoms (List[Atom]): atoms to highlight when the structure is drawn</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mdt.GeometryViewer: 3D viewer object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">viewer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz3d</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">GeometryViewer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">highlight_atoms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">viz3d</span><span class="o">.</span><span class="n">highlight_atoms</span><span class="p">(</span><span class="n">highlight_atoms</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz3d</span></div>
+
+<div class="viewcode-block" id="AtomContainer.draw2d"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.draw2d">[docs]</a>    <span class="k">def</span> <span class="nf">draw2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">highlight_atoms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">show_hydrogens</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Draw this object in 2D. Jupyter only.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            highlight_atoms (List[Atom]): atoms to highlight when the structure is drawn</span>
+<span class="sd">            show_hydrogens (bool): whether to draw the hydrogens or not (default: True if there</span>
+<span class="sd">                   are 10 or less heavy atoms, false otherwise)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mdt.ChemicalGraphViewer: 2D viewer object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">viewer</span>
+        <span class="k">if</span> <span class="n">show_hydrogens</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">show_hydrogens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">heavy_atoms</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">10</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_hydrogens</span><span class="p">:</span>
+            <span class="n">alist</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atnum</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">alist</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz2d</span> <span class="o">=</span> <span class="n">viewer</span><span class="o">.</span><span class="n">DistanceGraphViewer</span><span class="p">(</span><span class="n">alist</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">highlight_atoms</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz2d</span><span class="o">.</span><span class="n">highlight_atoms</span><span class="p">(</span><span class="n">highlight_atoms</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz2d</span></div>
+
+<div class="viewcode-block" id="AtomContainer.copy"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Copy a group of atoms which may already have bonds, residues, and a parent molecule</span>
+<span class="sd">        assigned. Do so by copying only the relevant entities, and creating a &quot;mask&quot; with</span>
+<span class="sd">        deepcopy&#39;s memo function to stop anything else from being copied.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AtomList: list of copied atoms</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">oldatoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span>
+        <span class="n">old_bond_graph</span> <span class="o">=</span> <span class="p">{</span><span class="n">a</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">nbr</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">nbr</span> <span class="ow">in</span> <span class="n">old_bond_graph</span><span class="p">:</span>
+                    <span class="n">old_bond_graph</span><span class="p">[</span><span class="n">atom</span><span class="p">][</span><span class="n">nbr</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">[</span><span class="n">nbr</span><span class="p">]</span>
+
+        <span class="c1"># Figure out which bonds, residues and chains to copy</span>
+        <span class="n">tempatoms</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">([</span><span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">oldatoms</span><span class="p">])</span>
+        <span class="n">old_to_new</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">oldatoms</span><span class="p">,</span> <span class="n">tempatoms</span><span class="p">))</span>
+        <span class="n">temp_bond_graph</span> <span class="o">=</span> <span class="p">{</span><span class="n">a</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">tempatoms</span><span class="p">}</span>
+        <span class="n">replaced</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">oldatom</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tempatoms</span><span class="p">,</span> <span class="n">oldatoms</span><span class="p">):</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">molecule</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">bond_graph</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">chain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">chain</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">replaced</span><span class="p">:</span>
+                    <span class="n">chain</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">chain</span><span class="p">)</span>
+                    <span class="n">chain</span><span class="o">.</span><span class="n">molecule</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="n">chain</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">replaced</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">chain</span><span class="p">]</span> <span class="o">=</span> <span class="n">chain</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">chain</span> <span class="o">=</span> <span class="n">replaced</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">chain</span><span class="p">]</span>
+
+                <span class="n">atom</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">chain</span>
+
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">replaced</span><span class="p">:</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="p">)</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">molecule</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">chain</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">{}</span>
+
+                    <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+                    <span class="n">replaced</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">replaced</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="p">]</span>
+
+                <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="n">res</span>
+                <span class="k">assert</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="ow">is</span> <span class="n">atom</span><span class="o">.</span><span class="n">chain</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">oldnbr</span><span class="p">,</span> <span class="n">bondorder</span> <span class="ow">in</span> <span class="n">oldatom</span><span class="o">.</span><span class="n">bond_graph</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">oldnbr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">old_to_new</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="n">newnbr</span> <span class="o">=</span> <span class="n">old_to_new</span><span class="p">[</span><span class="n">oldnbr</span><span class="p">]</span>
+                <span class="n">temp_bond_graph</span><span class="p">[</span><span class="n">atom</span><span class="p">][</span><span class="n">newnbr</span><span class="p">]</span> <span class="o">=</span> <span class="n">bondorder</span>
+
+        <span class="c1"># Finally, do a deepcopy, which bring all the information along without linking it</span>
+        <span class="n">newatoms</span><span class="p">,</span> <span class="n">new_bond_graph</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">((</span><span class="n">tempatoms</span><span class="p">,</span> <span class="n">temp_bond_graph</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">original</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">newatoms</span><span class="p">,</span> <span class="n">oldatoms</span><span class="p">):</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">bond_graph</span> <span class="o">=</span> <span class="n">new_bond_graph</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="n">position</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">momentum</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="n">momentum</span>
+
+        <span class="k">return</span> <span class="n">AtomList</span><span class="p">(</span><span class="n">newatoms</span><span class="p">)</span></div>
+
+    <span class="c1">###########################################</span>
+    <span class="c1"># Routines to modify the geometry</span>
+<div class="viewcode-block" id="AtomContainer.rotate"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Rotate this object in 3D space</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            angle (u.Scalar[angle]): angle to rotate by</span>
+<span class="sd">            axis (u.Vector[length]): axis to rotate about (len=3)</span>
+<span class="sd">            center (u.Vector[length]): center of rotation (len=3) (default: origin)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">com</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">):</span> <span class="n">angle</span> <span class="o">=</span> <span class="n">angle</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">radians</span><span class="p">)</span>
+        <span class="n">rotmat</span> <span class="o">=</span> <span class="n">external</span><span class="o">.</span><span class="n">transformations</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">point</span><span class="o">=</span><span class="n">center</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">rotmat</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AtomContainer.translate"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.translate">[docs]</a>    <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vector</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Translate this object in 3D space</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            vector (u.Vector[length]): translation vector, len=3</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">position</span> <span class="o">+=</span> <span class="n">vector</span></div>
+
+<div class="viewcode-block" id="AtomContainer.transform"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Transform this object&#39;s coordinates using the provided 4x4 matrix</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            matrix (numpy.ndarray): transformation matrix, shape=(4,4)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: deal with units ... hard because the matrix has diff units for diff columns</span>
+        <span class="k">assert</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="n">newpos</span> <span class="o">=</span> <span class="n">mathutils</span><span class="o">.</span><span class="n">apply_4x4_transform</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">positions</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">,</span> <span class="n">newpos</span><span class="p">):</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">r</span></div></div>
+
+
+<span class="nd">@toplevel</span>
+<div class="viewcode-block" id="AtomList"><a class="viewcode-back" href="../../../toplevel.html#moldesign.AtomList">[docs]</a><span class="k">class</span> <span class="nc">AtomList</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">AtomContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A list of atoms that allows attribute &quot;slicing&quot; - accessing an attribute of the</span>
+<span class="sd">    list will return a list of atom attributes.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; atomlist.mass == [atom.mass for atom in atomlist.atoms]</span>
+<span class="sd">        &gt;&gt;&gt; getattr(atomlist, attr) == [getattr(atom, attr) for atom in atomlist.atoms]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AtomList</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overrides ``dir`` to allow tab completion for both this object&#39;s attributes</span>
+<span class="sd">        and the underlying atomic properties</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atom_attrs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_atom_attrs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span>
+                                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">v</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_atom_attrs</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">))</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an array of atomic properties, e.g., an array of all atomic masses</span>
+<span class="sd">        is returned by ``AtomContainer.mass = AtomContainer.__getattr__(&#39;mass&#39;)``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span>
+        <span class="n">atom_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">atom_attrs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">StopIteration</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">atom_attrs</span>
+
+    <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">vals</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set an array of atomic properties, e.g., set all atomic masses to 1 with</span>
+<span class="sd">        ``atoms.mass = [1.0 for a in atoms]``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vals</span><span class="p">):</span> <span class="nb">setattr</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This is a synonym for self so that AtomContainer methods will work here too&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__getslice__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">AtomList</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">AtomList</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__getslice__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,431 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Atoms, molecules, and biomolecules &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="index.html"/>
+        <link rel="next" title="moldesign package" href="_moldesign_api/moldesign.html"/>
+        <link rel="prev" title="How do I ...?" href="howdoi.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Atoms, molecules, and biomolecules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#atoms">Atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bonds">Bonds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#molecules">Molecules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coordinates">Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#molecular-properties">Molecular properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#primary-structure">Primary structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#electronic-structure">Electronic structure</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="contents.html">Docs</a> &raquo;</li>
+      
+    <li>Atoms, molecules, and biomolecules</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/structure.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="atoms-molecules-and-biomolecules">
+<h1><a class="toc-backref" href="#id1">Atoms, molecules, and biomolecules</a><a class="headerlink" href="#atoms-molecules-and-biomolecules" title="Permalink to this headline">¶</a></h1>
+<p>The Molecular design toolkit is built around familiar physical objects. Below is a quick rundown of
+those objects and how they relate to one another.</p>
+<dl class="docutils">
+<dt>For most of the examples here, we&#8217;ll look at a benzene molecule, which you can create as follows:</dt>
+<dd><div class="first highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">moldesign</span> <span class="k">as</span> <span class="nn">mdt</span><span class="o">,</span> <span class="nn">moldesign.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_name</span><span class="p">(</span><span class="s1">&#39;benzene&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/struc_benzene.png" class="last" src="_images/struc_benzene.png" />
+</dd>
+</dl>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#atoms-molecules-and-biomolecules" id="id1">Atoms, molecules, and biomolecules</a><ul>
+<li><a class="reference internal" href="#atoms" id="id2">Atoms</a></li>
+<li><a class="reference internal" href="#bonds" id="id3">Bonds</a></li>
+<li><a class="reference internal" href="#molecules" id="id4">Molecules</a></li>
+<li><a class="reference internal" href="#coordinates" id="id5">Coordinates</a></li>
+<li><a class="reference internal" href="#molecular-properties" id="id6">Molecular properties</a></li>
+<li><a class="reference internal" href="#primary-structure" id="id7">Primary structure</a></li>
+<li><a class="reference internal" href="#electronic-structure" id="id8">Electronic structure</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="atoms">
+<h2><a class="toc-backref" href="#id2">Atoms</a><a class="headerlink" href="#atoms" title="Permalink to this headline">¶</a></h2>
+<p><strong>Class documentation:</strong> <a class="reference internal" href="toplevel.html#moldesign.Atom" title="moldesign.Atom"><code class="xref py py-class docutils literal"><span class="pre">moldesign.Atom</span></code></a></p>
+<p>An atom object contains physical information,</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span>
+<span class="go">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span>
+<span class="go">12.0 * u.amu</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">position</span>
+<span class="go">[0.0, 0.0, 0.0] * u.angstrom</span>
+</pre></div>
+</div>
+<p>bond topology,</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span> <span class="o">=</span> <span class="n">benzene</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">bonds</span>
+<span class="go">[&lt;Bond: C3 (#3) - C4 (#4) (order: 1)&gt;,</span>
+<span class="go"> &lt;Bond: C2 (#2) - C3 (#3) (order: 2)&gt;,</span>
+<span class="go"> &lt;Bond: C3 (#3) - H9 (#9) (order: 1)&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">bond_graph</span>
+<span class="go"> {&lt;Atom C2 (elem C), index 2 in molecule Molecule: benzene&gt;: 2,</span>
+<span class="go">  &lt;Atom C4 (elem C), index 4 in molecule Molecule: benzene&gt;: 1,</span>
+<span class="go">  &lt;Atom H9 (elem H), index 9 in molecule Molecule: benzene&gt;: 1}</span>
+</pre></div>
+</div>
+<p>and contains references to the residue, chain, and molecule it belongs to.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_pdb</span><span class="p">(</span><span class="s1">&#39;3fpp&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">molecule</span>
+<span class="go">&lt;3fpp (Molecule), 4097 atoms&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span>
+<span class="go">&lt;Residue PRO43 (index 0, chain A) in Molecule: 3fpp&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">chain</span>
+<span class="go">&lt;Chain A in Molecule: 3fpp&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="bonds">
+<h2><a class="toc-backref" href="#id3">Bonds</a><a class="headerlink" href="#bonds" title="Permalink to this headline">¶</a></h2>
+<p><strong>Class documentation:</strong> <a class="reference internal" href="toplevel.html#moldesign.Bond" title="moldesign.Bond"><code class="xref py py-class docutils literal"><span class="pre">moldesign.Bond</span></code></a></p>
+<p><strong>Data structure documentation:</strong> <a class="reference internal" href="toplevel.html#moldesign.Molecule.bond_graph" title="moldesign.Molecule.bond_graph"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.Molecule.bond_graph()</span></code></a></p>
+<p>The molecule&#8217;s bonding topology can be accessed as an iterator over
+<a class="reference internal" href="toplevel.html#moldesign.Bond" title="moldesign.Bond"><code class="xref py py-class docutils literal"><span class="pre">bonds</span></code></a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">benzene</span><span class="o">.</span><span class="n">bonds</span><span class="p">)</span>
+<span class="go">[&lt;Bond: C4 (#4) - H10 (#10) (order: 1)&gt;,</span>
+<span class="go"> &lt;Bond: C4 (#4) - C5 (#5) (order: 2)&gt;,</span>
+<span class="go"> &lt;Bond: C3 (#3) - H9 (#9) (order: 1)&gt;,</span>
+<span class="go"> &lt;Bond: C3 (#3) - C4 (#4) (order: 1)&gt;,</span>
+<span class="go"> &lt;Bond: C5 (#5) - H11 (#11) (order: 1)&gt;,</span>
+<span class="go"> &lt;Bond: C0 (#0) - C1 (#1) (order: 2)&gt;,</span>
+<span class="go"> &lt;Bond: C0 (#0) - C5 (#5) (order: 1)&gt;,</span>
+<span class="go"> &lt;Bond: C0 (#0) - H6 (#6) (order: 1)&gt;,</span>
+<span class="go"> &lt;Bond: C1 (#1) - H7 (#7) (order: 1)&gt;,</span>
+<span class="go"> &lt;Bond: C1 (#1) - C2 (#2) (order: 1)&gt;,</span>
+<span class="go"> &lt;Bond: C2 (#2) - C3 (#3) (order: 2)&gt;,</span>
+<span class="go"> &lt;Bond: C2 (#2) - H8 (#8) (order: 1)&gt;]</span>
+</pre></div>
+</div>
+<p>Bonding information can also be accessed as a <a class="reference internal" href="toplevel.html#moldesign.Molecule.bond_graph" title="moldesign.Molecule.bond_graph"><code class="xref py py-meth docutils literal"><span class="pre">bond</span> <span class="pre">graph</span></code></a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span><span class="o">.</span><span class="n">bond_graph</span>
+<span class="go">{&lt;Atom C1 (elem C), index 1 in molecule Molecule: benzene&gt;:</span>
+<span class="go">      {&lt;Atom C0 (elem C), index 0 in molecule Molecule: benzene&gt;: 2,</span>
+<span class="go">       &lt;Atom C2 (elem C), index 2 in molecule Molecule: benzene&gt;: 1,</span>
+<span class="go">       &lt;Atom H7 (elem H), index 7 in molecule Molecule: benzene&gt;: 1},</span>
+<span class="go"> &lt;Atom C0 (elem C), index 0 in molecule Molecule: benzene&gt;:</span>
+<span class="go">      {&lt;Atom C1 (elem C), index 1 in molecule Molecule: benzene&gt;: 2,</span>
+<span class="go">       ...},</span>
+<span class="go"> ...}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="molecules">
+<h2><a class="toc-backref" href="#id4">Molecules</a><a class="headerlink" href="#molecules" title="Permalink to this headline">¶</a></h2>
+<p><strong>Class documentation:</strong> <a class="reference internal" href="toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><code class="xref py py-class docutils literal"><span class="pre">moldesign.Molecule</span></code></a></p>
+<p>You&#8217;ll spend most of your time in MDT working with <a class="reference internal" href="toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecules</span></code></a>. They
+contain all the information necessary to describe a molecular system.</p>
+<p>Each <a class="reference internal" href="toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> contains a list of <a class="reference internal" href="toplevel.html#moldesign.Atom" title="moldesign.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atoms</span></code></a>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">benzene</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+<span class="go">12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span> <span class="o">=</span> <span class="n">benzene</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">index</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="coordinates">
+<h2><a class="toc-backref" href="#id5">Coordinates</a><a class="headerlink" href="#coordinates" title="Permalink to this headline">¶</a></h2>
+<p>The 3D positions and momenta of all atoms in a molecule are stored as an Nx3 array:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span><span class="o">.</span><span class="n">positions</span>
+<span class="go">[[-0.76003939,  1.16931777,  0.02273989],</span>
+<span class="go"> [ 0.63314801,  1.24365634, -0.01297972],</span>
+<span class="go"> [ 1.39390687,  0.07715829, -0.01219047],</span>
+<span class="go"> [ 0.76420701, -1.16771399,  0.02607069],</span>
+<span class="go"> ...                                   ] * u.angstrom</span>
+</pre></div>
+</div>
+<p>These coordinates can also be accessed and modified through individual atoms, both through a 3D
+position vector at <code class="docutils literal"><span class="pre">atom.position</span></code>, and through individual elements <code class="docutils literal"><span class="pre">atom.x,</span> <span class="pre">atom.y,</span> <span class="pre">atom.z</span></code>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span> <span class="o">=</span> <span class="n">benzene</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">position</span> <span class="o">==</span> <span class="n">benzene</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="mi">2</span><span class="p">,:]</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mf">100.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">    [ 100.0  0.07715829 -0.01219047] * u.angstrom</span>
+</pre></div>
+</div>
+<p>Note that changes to <cite>atom.position</cite> are automatically reflected in <cite>molecule.positions</cite>, and
+vice versa. <code class="docutils literal"><span class="pre">atom.momentum</span></code>, <code class="docutils literal"><span class="pre">atom.px,</span> <span class="pre">atom.py,</span> <span class="pre">atom.pz</span></code>, and <code class="docutils literal"><span class="pre">molecule.momenta</span></code> are
+similarly linked.</p>
+</div>
+<div class="section" id="molecular-properties">
+<h2><a class="toc-backref" href="#id6">Molecular properties</a><a class="headerlink" href="#molecular-properties" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="_moldesign_api/moldesign.molecules.html#moldesign.molecules.molecule.MolecularProperties" title="moldesign.molecules.molecule.MolecularProperties"><code class="xref py py-class docutils literal"><span class="pre">Molecular</span> <span class="pre">properties</span></code></a> are quantities
+that have been calculated by an <a class="reference internal" href="_moldesign_api/moldesign.models.html#moldesign.models.base.EnergyModelBase" title="moldesign.models.base.EnergyModelBase"><code class="xref py py-class docutils literal"><span class="pre">energy</span> <span class="pre">model</span></code></a> at the
+molecule&#8217;s current position.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span><span class="o">.</span><span class="n">set_potential_model</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">RHF</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="s1">&#39;3-21g&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span><span class="o">.</span><span class="n">calculate</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span><span class="o">.</span><span class="n">potential_energy</span>
+<span class="go">-6201.2054456 * u.eV</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span><span class="o">.</span><span class="n">calculate_forces</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span><span class="o">.</span><span class="n">forces</span>
+<span class="go">[[ 0.25704289, -0.3918098 , -0.10710722],</span>
+<span class="go"> [-0.24434863, -0.15226163,  0.05302621],</span>
+<span class="go"> [-0.2362215 , -0.16058291,  0.05744945],</span>
+<span class="go"> [-0.25672489,  0.3913183 , -0.10966027],</span>
+<span class="go"> ...                                   ] * u.eV/u.angstrom</span>
+</pre></div>
+</div>
+<p>Properties almost always include <code class="docutils literal"><span class="pre">potential_energy</span></code>; other common properties include
+<code class="docutils literal"><span class="pre">forces</span></code>, <code class="docutils literal"><span class="pre">wfn</span></code>, and <code class="docutils literal"><span class="pre">dipole</span></code>. Calling <code class="docutils literal"><span class="pre">mol.calculate()</span></code> will only calculate the model&#8217;s
+default quantities (see <code class="docutils literal"><span class="pre">model.DEFAULT_PROPERTIES</span></code> for a given model). Additional properties,
+if available, can be requested via <code class="docutils literal"><span class="pre">mol.calculate(requests=[prop1,</span> <span class="pre">prop2,</span> <span class="pre">...])</span></code></p>
+<dl class="docutils">
+<dt>Note:</dt>
+<dd><p class="first">These properties are only accessible if they correspond to the molecule&#8217;s current position -
+MDT will throw a NotCalculatedError if the molecule has moved.</p>
+<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span><span class="o">.</span><span class="n">calculate</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span><span class="o">.</span><span class="n">potential_energy</span>
+<span class="go">-6201.2054456 * u.eV</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdt</span><span class="o">.</span><span class="n">set_angle</span><span class="p">(</span><span class="n">benzene</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">benzene</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">benzene</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mf">5.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">benzene</span><span class="o">.</span><span class="n">potential_energy</span>
+<span class="gt">Traceback (most recent call last):</span>
+ <span class="c">...</span>
+<span class="gr">NotCalculatedError</span>: <span class="n">The &#39;potential_energy&#39; property hasn&#39;t been calculated yet. ...</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="primary-structure">
+<h2><a class="toc-backref" href="#id7">Primary structure</a><a class="headerlink" href="#primary-structure" title="Permalink to this headline">¶</a></h2>
+<p><strong>Class documentation:</strong> <a class="reference internal" href="toplevel.html#moldesign.Chain" title="moldesign.Chain"><code class="xref py py-class docutils literal"><span class="pre">moldesign.Chain</span></code></a>, <a class="reference internal" href="toplevel.html#moldesign.Residue" title="moldesign.Residue"><code class="xref py py-class docutils literal"><span class="pre">moldesign.Residue</span></code></a></p>
+<p>Biomolecules also contain primary structure information such as <a class="reference internal" href="toplevel.html#moldesign.Chain" title="moldesign.Chain"><code class="xref py py-class docutils literal"><span class="pre">Chains</span></code></a>
+and <a class="reference internal" href="toplevel.html#moldesign.Residue" title="moldesign.Residue"><code class="xref py py-class docutils literal"><span class="pre">Residues</span></code></a>. Chains can be accessed by name OR by index:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">chain1</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chain2</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chain1</span> <span class="ow">is</span> <span class="n">chain2</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Each chain contains <a class="reference internal" href="toplevel.html#moldesign.Residue" title="moldesign.Residue"><code class="xref py py-class docutils literal"><span class="pre">residues</span></code></a>. In a chain, residues can similarly be
+accessed through a flat list or by name:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">res0</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">resA</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="s1">&#39;PRO1&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res0</span> <span class="ow">is</span> <span class="n">resA</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>A flat list of all residues in a molecule is also available at <cite>molecule.residues</cite>.</p>
+</div>
+<div class="section" id="electronic-structure">
+<h2><a class="toc-backref" href="#id8">Electronic structure</a><a class="headerlink" href="#electronic-structure" title="Permalink to this headline">¶</a></h2>
+<p><strong>Class documentation:</strong> <a class="reference internal" href="_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.wfn.ElectronicWfn" title="moldesign.orbitals.wfn.ElectronicWfn"><code class="xref py py-class docutils literal"><span class="pre">moldesign.orbitals.wfn.ElectronicWfn</span></code></a></p>
+<p>If you&#8217;ve run an quantum chemistry calculation on a molecule, its electronic structure will also
+be available. This information is accessible through:
+<code class="xref py py-class docutils literal"><span class="pre">mol.wfn</span> <span class="pre">(see</span> <span class="pre">its</span> <span class="pre">documentation</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">details)</span></code>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">set_energy_model</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">RHF</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="s1">&#39;sto-3g&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">calculate</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wfn</span> <span class="o">=</span> <span class="n">benzene</span><span class="o">.</span><span class="n">wfn</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wfn</span><span class="o">.</span><span class="n">aobasis</span>
+<span class="go">&lt;BasisSet (sto-3g) of Molecule: benzene&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wfn</span><span class="o">.</span><span class="n">orbitals</span>
+<span class="go">{&#39;atomic&#39;: &lt;BasisSet (sto-3g) of Molecule: benzene&gt;,</span>
+<span class="go"> &#39;canonical&#39;: &lt;36 canonical MolecularOrbitals in None/sto-3g wfn&gt;}</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="_moldesign_api/moldesign.html" class="btn btn-neutral float-right" title="moldesign package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="howdoi.html" class="btn btn-neutral" title="How do I ...?" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

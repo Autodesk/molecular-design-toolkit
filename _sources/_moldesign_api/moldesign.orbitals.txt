@@ -1,0 +1,44 @@
+moldesign.orbitals package
+==========================
+
+.. automodule:: moldesign.orbitals
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+moldesign.orbitals.basis module
+-------------------------------
+
+.. automodule:: moldesign.orbitals.basis
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.orbitals.gaussians module
+-----------------------------------
+
+.. automodule:: moldesign.orbitals.gaussians
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.orbitals.orbitals module
+----------------------------------
+
+.. automodule:: moldesign.orbitals.orbitals
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.orbitals.wfn module
+-----------------------------
+
+.. automodule:: moldesign.orbitals.wfn
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

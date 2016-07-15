@@ -1,0 +1,358 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.models.base &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.models.base</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.models.base</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">moldesign.parameters</span> <span class="kn">import</span> <span class="n">mm_model_parameters</span> <span class="k">as</span> <span class="n">mmp</span><span class="p">,</span> <span class="n">qm_model_parameters</span> <span class="k">as</span> <span class="n">qmp</span>
+<span class="kn">from</span> <span class="nn">moldesign.method</span> <span class="kn">import</span> <span class="n">Method</span>
+
+
+<div class="viewcode-block" id="EnergyModelBase"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.base.EnergyModelBase">[docs]</a><span class="k">class</span> <span class="nc">EnergyModelBase</span><span class="p">(</span><span class="n">Method</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for all energy models</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># TODO:should add some architecture to check implementations, e.g.</span>
+    <span class="c1"># TODO: ensure prep gets called when necessary, make sure all parameters can be consumed</span>
+
+    <span class="n">DEFAULT_PROPERTIES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">,</span> <span class="s1">&#39;forces&#39;</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;List[str]: list of the properties that are always calculated by this method&quot;&quot;&quot;</span>
+    <span class="n">ALL_PROPERTIES</span> <span class="o">=</span> <span class="n">DEFAULT_PROPERTIES</span>
+    <span class="sd">&quot;&quot;&quot;List[str]: List of all the properties that this model can calculate&quot;&quot;&quot;</span>
+
+    <span class="n">PARAMETERS</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="EnergyModelBase.calculate"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.base.EnergyModelBase.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requests</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the the default properties and any additiona requests</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            requests (List[str]): the requested properties to calculate</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           utils.DotDict: A dict of calculated properties (or a job object that will return them)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prep</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;EnergyModelBase is an abstract base class&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EnergyModelBase.minimize"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.base.EnergyModelBase.minimize">[docs]</a>    <span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bfgs&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If the energy model provides its own minimizer, it should be hooked up here</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="EnergyModelBase.get_formal_charge"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.base.EnergyModelBase.get_formal_charge">[docs]</a>    <span class="k">def</span> <span class="nf">get_formal_charge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determine the formal charge of the molecular system.</span>
+<span class="sd">         This can be set either as a molecular attribute OR in the parameters of the energy model.</span>
+
+<span class="sd">         Returns:</span>
+<span class="sd">             u.Scalar[charge]: the formal charge used for this model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;charge&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">charge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">charge</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="s1">&#39;charge&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">charge</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="EnergyModelBase.finite_difference_force"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.base.EnergyModelBase.finite_difference_force">[docs]</a>    <span class="k">def</span> <span class="nf">finite_difference_force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stepsize</span><span class="o">=</span><span class="mf">0.025</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute force using a finite difference with the given step size.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            direction (int): EITHER +1, -1, (for one-sided finite differences) or</span>
+<span class="sd">               0 (for central  difference - better but twice as expensive)</span>
+<span class="sd">            step (u.Scalar[lenght]): step size to take in each direction</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            u.Vector[force]: force vector, len= `self.mol.ndims`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: this should totally be parallelized - how do we request/configure/control this?</span>
+        <span class="n">forces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">ndims</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">force</span>
+        <span class="n">properties</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">direction</span> <span class="ow">in</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">e0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">calc_potential_energy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Finite difference direction must be -1, 0, or 1&#39;</span>
+
+        <span class="k">for</span> <span class="n">iatom</span><span class="p">,</span> <span class="n">idim</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">),</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">)):</span>
+            <span class="k">print</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">Finite differencing </span><span class="si">%s</span><span class="s1"> for atom </span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="s1">&#39;xyz&#39;</span><span class="p">[</span><span class="n">iatom</span><span class="p">],</span>
+                                                             <span class="n">iatom</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                                                             <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">),</span>
+            <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="n">iatom</span><span class="p">,</span> <span class="n">idim</span><span class="p">]</span> <span class="o">+=</span> <span class="n">stepsize</span> <span class="o">/</span> <span class="mf">2.0</span>
+                <span class="n">eplus</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">calc_potential_energy</span><span class="p">()</span>
+                <span class="n">pplus</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">properties</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="n">iatom</span><span class="p">,</span> <span class="n">idim</span><span class="p">]</span> <span class="o">-=</span> <span class="n">stepsize</span>
+                <span class="n">eminus</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">calc_potential_energy</span><span class="p">()</span>
+                <span class="n">pminus</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">properties</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="n">iatom</span><span class="p">,</span> <span class="n">idim</span><span class="p">]</span> <span class="o">+=</span> <span class="n">stepsize</span> <span class="o">/</span> <span class="mf">2.0</span>  <span class="c1"># resets the position</span>
+                <span class="n">properties</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pminus</span><span class="p">,</span> <span class="n">pplus</span><span class="p">))</span>
+                <span class="n">forces</span><span class="p">[</span><span class="n">iatom</span><span class="p">,</span> <span class="n">idim</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">eminus</span> <span class="o">-</span> <span class="n">eplus</span><span class="p">)</span> <span class="o">/</span> <span class="n">stepsize</span>
+
+            <span class="k">elif</span> <span class="n">direction</span> <span class="ow">in</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="n">iatom</span><span class="p">,</span> <span class="n">idim</span><span class="p">]</span> <span class="o">+=</span> <span class="n">direction</span> <span class="o">*</span> <span class="n">stepsize</span>
+                <span class="n">enew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">calc_potential_energy</span><span class="p">()</span>
+                <span class="n">properties</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span>
+                <span class="n">forces</span><span class="p">[</span><span class="n">iatom</span><span class="p">,</span> <span class="n">idim</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">e0</span> <span class="o">-</span> <span class="n">enew</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">direction</span> <span class="o">*</span> <span class="n">stepsize</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="n">iatom</span><span class="p">,</span> <span class="n">idim</span><span class="p">]</span> <span class="o">-=</span> <span class="n">direction</span> <span class="o">*</span> <span class="n">stepsize</span>
+
+        <span class="k">return</span> <span class="n">forces</span><span class="p">,</span> <span class="n">properties</span></div>
+
+<div class="viewcode-block" id="EnergyModelBase.prep"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.base.EnergyModelBase.prep">[docs]</a>    <span class="k">def</span> <span class="nf">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepare to run. Possibly do a test to ensure that the model is ready.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;EnergyModelBase is an abstract base class&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MMBase"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.base.MMBase">[docs]</a><span class="k">class</span> <span class="nc">MMBase</span><span class="p">(</span><span class="n">EnergyModelBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Common interface for molecular mechanics&quot;&quot;&quot;</span>
+
+    <span class="n">PARAMETERS</span> <span class="o">=</span> <span class="n">EnergyModelBase</span><span class="o">.</span><span class="n">PARAMETERS</span> <span class="o">+</span> <span class="n">mmp</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MMBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mdtforcefield</span> <span class="o">=</span> <span class="bp">None</span></div>
+
+
+<div class="viewcode-block" id="QMBase"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.base.QMBase">[docs]</a><span class="k">class</span> <span class="nc">QMBase</span><span class="p">(</span><span class="n">EnergyModelBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Common interface for quantum mechanics&quot;&quot;&quot;</span>
+
+    <span class="n">DEFAULT_PROPERTIES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;nuclear_repulsion&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;dipole_moment&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;orbitals&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;orbital_energies&#39;</span><span class="p">]</span>
+    <span class="n">ALL_PROPERTIES</span> <span class="o">=</span> <span class="n">DEFAULT_PROPERTIES</span>
+    <span class="c1"># properties will be a pretty long list for most packages</span>
+
+    <span class="n">PARAMETERS</span> <span class="o">=</span> <span class="n">qmp</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+
+<div class="viewcode-block" id="QMBase.set_wfn_guess"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.base.QMBase.set_wfn_guess">[docs]</a>    <span class="k">def</span> <span class="nf">set_wfn_guess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+
+
+<div class="viewcode-block" id="QMMMBase"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.base.QMMMBase">[docs]</a><span class="k">class</span> <span class="nc">QMMMBase</span><span class="p">(</span><span class="n">EnergyModelBase</span><span class="p">):</span>
+    <span class="n">DEFAULT_PROPERTIES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;qm_energy&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;mm_energy&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;interaction_energy&#39;</span>
+                          <span class="s1">&#39;qm_dipole_moment&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;orbitals&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;orbital_energies&#39;</span><span class="p">]</span>
+    <span class="n">ALL_PROPERTIES</span> <span class="o">=</span> <span class="n">DEFAULT_PROPERTIES</span>
+
+    <span class="n">PARAMETERS</span> <span class="o">=</span> <span class="n">MMBase</span><span class="o">.</span><span class="n">PARAMETERS</span> <span class="o">+</span> <span class="n">QMBase</span><span class="o">.</span><span class="n">PARAMETERS</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

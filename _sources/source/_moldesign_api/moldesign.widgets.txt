@@ -1,0 +1,76 @@
+moldesign.widgets package
+=========================
+
+.. automodule:: moldesign.widgets
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+moldesign.widgets.computeconfig module
+--------------------------------------
+
+.. automodule:: moldesign.widgets.computeconfig
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.widgets.configurator module
+-------------------------------------
+
+.. automodule:: moldesign.widgets.configurator
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.widgets.geombuilder module
+------------------------------------
+
+.. automodule:: moldesign.widgets.geombuilder
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.widgets.orbitals module
+---------------------------------
+
+.. automodule:: moldesign.widgets.orbitals
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.widgets.parameterization module
+-----------------------------------------
+
+.. automodule:: moldesign.widgets.parameterization
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.widgets.selection module
+----------------------------------
+
+.. automodule:: moldesign.widgets.selection
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.widgets.symmetry module
+---------------------------------
+
+.. automodule:: moldesign.widgets.symmetry
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+moldesign.widgets.trajectory module
+-----------------------------------
+
+.. automodule:: moldesign.widgets.trajectory
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

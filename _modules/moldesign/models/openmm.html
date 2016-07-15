@@ -1,0 +1,564 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.models.openmm &mdash; Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7rc1+1.gea8a3b1.dirty documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7rc1+1.gea8a3b1.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../contents.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.models.openmm</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.models.openmm</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="kn">from</span> <span class="nn">cStringIO</span> <span class="kn">import</span> <span class="n">StringIO</span>
+
+<span class="kn">import</span> <span class="nn">moldesign.molecules</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">compute</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">forcefields</span> <span class="k">as</span> <span class="n">ff</span>
+<span class="kn">from</span> <span class="nn">moldesign.molecules</span> <span class="kn">import</span> <span class="n">Trajectory</span><span class="p">,</span> <span class="n">MolecularProperties</span>
+<span class="kn">from</span> <span class="nn">moldesign.utils</span> <span class="kn">import</span> <span class="n">from_filepath</span>
+
+<span class="kn">import</span> <span class="nn">moldesign.interfaces.openmm</span> <span class="kn">as</span> <span class="nn">opm</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">MMBase</span>
+
+
+<span class="k">def</span> <span class="nf">exports</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+    <span class="n">__all__</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">o</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="nd">@exports</span>
+<div class="viewcode-block" id="OpenMMPotential"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.openmm.OpenMMPotential">[docs]</a><span class="k">class</span> <span class="nc">OpenMMPotential</span><span class="p">(</span><span class="n">MMBase</span><span class="p">,</span> <span class="n">opm</span><span class="o">.</span><span class="n">OpenMMPickleMixin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates an OpenMM &quot;context&quot; to drive energy calculations.</span>
+<span class="sd">    Note that, while a dummy integrator is assigned, a different context will</span>
+<span class="sd">    be created for any MD calculations.</span>
+
+<span class="sd">    :ivar sim: openmm simulation object</span>
+<span class="sd">    :type sim: simtk.openmm.app.Simulation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># NEWFEATURE: need to set/get platform (and properties, e.g. number of threads)</span>
+    <span class="n">DEFAULT_PROPERTIES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">,</span> <span class="s1">&#39;forces&#39;</span><span class="p">]</span>
+    <span class="n">_openmm_compatible</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">OpenMMPotential</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim</span> <span class="o">=</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="OpenMMPotential.get_openmm_simulation"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.openmm.OpenMMPotential.get_openmm_simulation">[docs]</a>    <span class="k">def</span> <span class="nf">get_openmm_simulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">opm</span><span class="o">.</span><span class="n">force_remote</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t create an OpenMM object on this machine - OpenMM not &quot;</span>
+                              <span class="s2">&quot;installed&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepped</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">prep</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span></div>
+
+    <span class="nd">@compute.runsremotely</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="n">opm</span><span class="o">.</span><span class="n">force_remote</span><span class="p">,</span> <span class="n">is_imethod</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="viewcode-block" id="OpenMMPotential.calculate"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.openmm.OpenMMPotential.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requests</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Drive a calculation and, when finished, update the parent molecule with the results.</span>
+<span class="sd">        TODO: this update is SYNCHRONOUS, unlike other `calculate` methods that run remotely.</span>
+<span class="sd">        TODO: Probably need to update DummyJob (call it localjob, syncjob?) to handle this</span>
+<span class="sd">        :param requests: list of quantities to calculate</span>
+<span class="sd">        :return: PythonJob-like object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">requests</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">requests</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_PROPERTIES</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prep</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_openmm_state</span><span class="p">()</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getForces</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">getEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="n">MolecularProperties</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span>
+                                    <span class="n">potential_energy</span><span class="o">=</span><span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()),</span>
+                                    <span class="n">forces</span><span class="o">=</span><span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getForces</span><span class="p">(),</span> <span class="n">flat</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">props</span></div>
+
+<div class="viewcode-block" id="OpenMMPotential.prep"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.openmm.OpenMMPotential.prep">[docs]</a>    <span class="k">def</span> <span class="nf">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Drive the construction of the openmm simulation</span>
+<span class="sd">        This will rebuild this OpenMM simulation if: A) it&#39;s not built yet, or B)</span>
+<span class="sd">        there&#39;s a new integrator</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># TODO: automatically set _prepped to false if the model or integration parameters change</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepped</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prep_integrator</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">integrator</span><span class="p">:</span> <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_system</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">integrator</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">integrator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_dummy_integrator</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">integrator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">get_openmm_integrator</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_constraints</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim</span> <span class="o">=</span> <span class="n">opm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mm_topology</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mm_system</span><span class="p">,</span> <span class="n">integrator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepped</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">print</span> <span class="s1">&#39;Created OpenMM kernel (Platform: </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getPlatform</span><span class="p">()</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prep_integrator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">integrator</span></div>
+
+<div class="viewcode-block" id="OpenMMPotential.minimize"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.openmm.OpenMMPotential.minimize">[docs]</a>    <span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">traj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimize</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">opm</span><span class="o">.</span><span class="n">force_remote</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wait&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sync_remote</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+            <span class="n">traj</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span>
+
+        <span class="k">return</span> <span class="n">traj</span></div>
+
+    <span class="k">def</span> <span class="nf">_sync_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+        <span class="c1"># TODO: this is a hack to update the object after a minimization</span>
+        <span class="c1">#        We need a better pattern for this, ideally one that doesn&#39;t</span>
+        <span class="c1">#        require an explicit wrapper like this - we shouldn&#39;t have to copy</span>
+        <span class="c1">#        the properties over manually</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">positions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">momenta</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">momenta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">properties</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">time</span>
+
+    <span class="nd">@compute.runsremotely</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="n">opm</span><span class="o">.</span><span class="n">force_remote</span><span class="p">,</span> <span class="n">is_imethod</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_minimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsteps</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+                 <span class="n">force_tolerance</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">frame_interval</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Run an OpenMM minimization.</span>
+<span class="sd">        Note:</span>
+<span class="sd">            We&#39;re not able to support `frame_interval` for this method;</span>
+<span class="sd">                see https://github.com/pandegroup/openmm/issues/1155</span>
+<span class="sd">        Args:</span>
+<span class="sd">           nsteps(int): maximum number of steps</span>
+<span class="sd">           force_tolerance (moldesign.units.MdtQuantity): RMSD tolerance for convergence</span>
+<span class="sd">               [energy/length]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># NEWFEATURE: write/find an openmm &quot;integrator&quot; to do this minimization</span>
+        <span class="c1"># openmm doesn&#39;t work with small step numbers, and doesn&#39;t support</span>
+        <span class="c1"># callbacks during minimization, so frame_interval is disabled.</span>
+        <span class="k">if</span> <span class="n">frame_interval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;frame_interval not supported by OpenMM minimizer.&#39;</span>
+                             <span class="s1">&#39; Use a method from moldesign.minimizers instead&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prep</span><span class="p">()</span>
+        <span class="n">trajectory</span> <span class="o">=</span> <span class="n">Trajectory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_openmm_state</span><span class="p">()</span>
+        <span class="n">trajectory</span><span class="o">.</span><span class="n">new_frame</span><span class="p">(</span><span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;initial structure, energy=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">calc_potential_energy</span><span class="p">()</span><span class="o">.</span><span class="n">defunits</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">minimizeEnergy</span><span class="p">(</span><span class="n">maxIterations</span><span class="o">=</span><span class="n">nsteps</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>  <span class="c1"># tolerance is in kj/mole ...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sync_to_openmm</span><span class="p">()</span>
+        <span class="n">new_energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">calc_potential_energy</span><span class="p">()</span>
+        <span class="n">trajectory</span><span class="o">.</span><span class="n">new_frame</span><span class="p">(</span><span class="n">annotation</span><span class="o">=</span><span class="s1">&#39;minimization result, energy=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">new_energy</span><span class="o">.</span><span class="n">defunits</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">trajectory</span>
+
+    <span class="nd">@compute.runsremotely</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="n">opm</span><span class="o">.</span><span class="n">force_remote</span><span class="p">,</span> <span class="n">is_imethod</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="viewcode-block" id="OpenMMPotential.get_forcefield"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.openmm.OpenMMPotential.get_forcefield">[docs]</a>    <span class="k">def</span> <span class="nf">get_forcefield</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the force field parameters for this molecule.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            The returned object is for introspection only; it can&#39;t be used (yet) to modify the energy model, and</span>
+<span class="sd">                it doesn&#39;t include the entire force field (most notably missing are periodic replicate forces,</span>
+<span class="sd">                1-4 nonbonded attenuation, and implicit solvent effects)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            moldesign.forcefield.ForceField</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdtforcefield</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepped</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mdtforcefield</span> <span class="o">=</span> <span class="n">_system_to_forcefield</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;mm_system&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_create_system</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">mdtforcefield</span> <span class="o">=</span> <span class="n">_system_to_forcefield</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mm_system</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mdtforcefield</span></div>
+
+
+    <span class="c1">#################################################</span>
+    <span class="c1"># &quot;Private&quot; methods for managing OpenMM are below</span>
+    <span class="k">def</span> <span class="nf">_set_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">system</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mm_system</span>
+        <span class="n">fixed_atoms</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="c1"># Constrain atom positions</span>
+        <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">constraints</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">constraint</span><span class="o">.</span><span class="n">desc</span> <span class="o">==</span> <span class="s1">&#39;position&#39;</span><span class="p">:</span>
+                <span class="n">fixed_atoms</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">constraint</span><span class="o">.</span><span class="n">atom</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">assert_atom</span><span class="p">(</span><span class="n">constraint</span><span class="o">.</span><span class="n">atom</span><span class="p">)</span>
+                <span class="n">system</span><span class="o">.</span><span class="n">setParticleMass</span><span class="p">(</span><span class="n">constraint</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+            <span class="c1"># Constrain distances between atom pairs</span>
+            <span class="k">elif</span> <span class="n">constraint</span><span class="o">.</span><span class="n">desc</span> <span class="o">==</span> <span class="s1">&#39;distance&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">assert_atom</span><span class="p">(</span><span class="n">constraint</span><span class="o">.</span><span class="n">a1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">assert_atom</span><span class="p">(</span><span class="n">constraint</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span>
+                <span class="n">system</span><span class="o">.</span><span class="n">addConstraint</span><span class="p">(</span><span class="n">constraint</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span>
+                                     <span class="n">constraint</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span>
+                                     <span class="n">opm</span><span class="o">.</span><span class="n">pint2simtk</span><span class="p">(</span><span class="n">constraint</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;OpenMM interface does not support &quot;</span><span class="si">%s</span><span class="s1">&quot; constraints.&#39;</span> <span class="o">%</span> <span class="n">constraint</span><span class="o">.</span><span class="n">desc</span><span class="p">)</span>
+
+        <span class="c1"># Workaround for OpenMM issue: can&#39;t have an atom that&#39;s both fixed *and* has a distance constraint.</span>
+        <span class="c1"># If both atoms in the distance constraint are also fixed, then we can just remove the constraint</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fixed_atoms</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">num_constraints</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">getNumConstraints</span><span class="p">()</span>
+            <span class="n">ic</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">ic</span> <span class="o">&lt;</span> <span class="n">num_constraints</span><span class="p">:</span>
+                <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">dist</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">getConstraintParameters</span><span class="p">(</span><span class="n">ic</span><span class="p">)</span>
+                <span class="n">ai</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">aj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">ai</span> <span class="ow">in</span> <span class="n">fixed_atoms</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">aj</span> <span class="ow">in</span> <span class="n">fixed_atoms</span><span class="p">):</span>
+                    <span class="n">system</span><span class="o">.</span><span class="n">removeConstraint</span><span class="p">(</span><span class="n">ic</span><span class="p">)</span>
+                    <span class="n">num_constraints</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">ai</span> <span class="ow">in</span> <span class="n">fixed_atoms</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">aj</span> <span class="ow">in</span> <span class="n">fixed_atoms</span><span class="p">):</span>  <span class="c1">#only one is fixed</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;In OpenMM, fixed atoms cannot be part of a constrained &#39;</span>
+                                     <span class="s1">&#39;bond (</span><span class="si">%s</span><span class="s1">)&#39;</span><span class="o">%</span><span class="n">moldesign</span><span class="o">.</span><span class="n">molecules</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">Bond</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">aj</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ic</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_make_dummy_integrator</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">opm</span><span class="o">.</span><span class="n">mm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">opm</span><span class="o">.</span><span class="n">stku</span><span class="o">.</span><span class="n">femtoseconds</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_create_system</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Parse the stored PRMTOP file if it&#39;s available</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;amber_params&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">ff</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;mm_prmtop&#39;</span><span class="p">):</span>
+            <span class="k">print</span> <span class="s1">&#39;Parsing stored PRMTOP file: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">ff</span><span class="o">.</span><span class="n">amber_params</span><span class="o">.</span><span class="n">prmtop</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mm_prmtop</span> <span class="o">=</span> <span class="n">from_filepath</span><span class="p">(</span><span class="n">opm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">AmberPrmtopFile</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">ff</span><span class="o">.</span><span class="n">amber_params</span><span class="o">.</span><span class="n">prmtop</span><span class="p">)</span>
+
+        <span class="c1"># Create the OpenMM system</span>
+        <span class="n">system_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_system_params</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;mm_prmtop&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mm_system</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mm_prmtop</span><span class="o">.</span><span class="n">createSystem</span><span class="p">(</span><span class="o">**</span><span class="n">system_params</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mm_topology</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mm_prmtop</span><span class="o">.</span><span class="n">topology</span>
+            <span class="k">print</span> <span class="s1">&#39;Created force field using embedded prmtop file&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mm_pdb</span> <span class="o">=</span> <span class="n">from_filepath</span><span class="p">(</span><span class="n">opm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">PDBFile</span><span class="p">,</span>
+                                        <span class="n">StringIO</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;pdb&#39;</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mm_topology</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mm_pdb</span><span class="o">.</span><span class="n">topology</span>
+            <span class="n">ffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_forcefield_args</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mm_forcefield</span> <span class="o">=</span> <span class="n">opm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">ForceField</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_forcefield_args</span><span class="p">())</span>
+            <span class="k">print</span> <span class="s1">&#39;Created force field using OpenMM templates: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">ffs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mm_system</span><span class="o">.</span><span class="n">createSystem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mm_topology</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                        <span class="o">**</span><span class="n">system_params</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_forcefield_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">forcefield</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ff</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;amber&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.xml&#39;</span> <span class="o">%</span> <span class="n">ff</span><span class="p">,</span> <span class="s1">&#39;tip3p.xml&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_set_openmm_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># TODO: periodic state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">opm</span><span class="o">.</span><span class="n">pint2simtk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setVelocities</span><span class="p">(</span><span class="n">opm</span><span class="o">.</span><span class="n">pint2simtk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">velocities</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setTime</span><span class="p">(</span><span class="n">opm</span><span class="o">.</span><span class="n">pint2simtk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_sync_to_openmm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">momenta</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Syncs the moldesign molecule&#39;s positions, momenta, and time to the simulation&#39;s</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">get_positions</span> <span class="o">=</span> <span class="p">(</span><span class="n">positions</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="n">get_velocities</span> <span class="o">=</span> <span class="p">(</span><span class="n">momenta</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">get_positions</span> <span class="ow">or</span> <span class="n">get_velocities</span><span class="p">:</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getPositions</span><span class="o">=</span><span class="n">get_positions</span><span class="p">,</span>
+                                              <span class="n">getVelocities</span><span class="o">=</span><span class="n">get_velocities</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">get_positions</span><span class="p">:</span>
+                <span class="n">positions</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getPositions</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">get_velocities</span><span class="p">:</span>
+                <span class="n">velocities</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getVelocities</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">iatom</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">positions</span> <span class="o">!=</span> <span class="bp">False</span><span class="p">:</span> <span class="c1">#this is weird because of numpy comparisons</span>
+                    <span class="n">atom</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">positions</span><span class="p">[</span><span class="n">iatom</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">velocities</span> <span class="o">!=</span> <span class="bp">False</span><span class="p">:</span>
+                    <span class="n">atom</span><span class="o">.</span><span class="n">momentum</span> <span class="o">=</span> <span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">velocities</span><span class="p">[</span><span class="n">iatom</span><span class="p">])</span> <span class="o">*</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span>
+
+        <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">()</span>
+            <span class="n">time</span> <span class="o">=</span> <span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getTime</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">time</span><span class="p">:</span>
+            <span class="n">time</span> <span class="o">=</span> <span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">time</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span>
+
+    <span class="k">def</span> <span class="nf">_get_system_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Translates the spec from MMBase into system parameter keywords for createSystem</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># need cmm motion</span>
+        <span class="n">nonbonded_names</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;nocutoff&#39;</span><span class="p">:</span> <span class="n">opm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">NoCutoff</span><span class="p">,</span>
+                           <span class="s1">&#39;ewald&#39;</span><span class="p">:</span> <span class="n">opm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">Ewald</span><span class="p">,</span>
+                           <span class="s1">&#39;pme&#39;</span><span class="p">:</span> <span class="n">opm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">PME</span><span class="p">,</span>
+                           <span class="s1">&#39;cutoff&#39;</span><span class="p">:</span> <span class="n">opm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">CutoffPeriodic</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">periodic</span> <span class="k">else</span> <span class="n">opm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span><span class="p">}</span>
+        <span class="n">implicit_solvent_names</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;obc&#39;</span><span class="p">:</span> <span class="n">opm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">OBC2</span><span class="p">}</span>
+
+        <span class="n">system_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nonbondedMethod</span><span class="o">=</span><span class="n">nonbonded_names</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">nonbonded</span><span class="p">],</span>
+                             <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="n">opm</span><span class="o">.</span><span class="n">pint2simtk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">cutoff</span><span class="p">),</span>
+                             <span class="n">implicitSolvent</span><span class="o">=</span><span class="n">implicit_solvent_names</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">implicit_solvent</span><span class="p">])</span>
+
+        <span class="n">system_params</span><span class="p">[</span><span class="s1">&#39;rigidWater&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">system_params</span><span class="p">[</span><span class="s1">&#39;constraints&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">integrator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;constrain_water&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">):</span>
+                <span class="n">system_params</span><span class="p">[</span><span class="s1">&#39;rigidWater&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;constrain_hbonds&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">):</span>
+                <span class="n">system_params</span><span class="p">[</span><span class="s1">&#39;constraints&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">HBonds</span>
+
+        <span class="k">return</span> <span class="n">system_params</span></div>
+
+
+<span class="k">def</span> <span class="nf">list_openmmplatforms</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">opm</span><span class="o">.</span><span class="n">mm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatform</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">opm</span><span class="o">.</span><span class="n">mm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getNumPlatforms</span><span class="p">())]</span>
+
+
+<span class="k">def</span> <span class="nf">_system_to_forcefield</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+    <span class="c1"># TODO: 1-4 bond rules</span>
+    <span class="c1"># TODO: constraints</span>
+    <span class="n">forces</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">getForces</span><span class="p">()</span>
+    <span class="n">bonds</span><span class="p">,</span> <span class="n">angles</span><span class="p">,</span> <span class="n">dihedrals</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="n">charges</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">ljparameters</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">forces</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">==</span> <span class="n">opm</span><span class="o">.</span><span class="n">mm</span><span class="o">.</span><span class="n">HarmonicBondForce</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ibond</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">getNumBonds</span><span class="p">()):</span>
+                <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">d0</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">getBondParameters</span><span class="p">(</span><span class="n">ibond</span><span class="p">)</span>
+                <span class="n">bond</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">HarmonicBondTerm</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i1</span><span class="p">],</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i2</span><span class="p">],</span>
+                                           <span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">k</span><span class="p">),</span>
+                                           <span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">d0</span><span class="p">))</span>
+                <span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bond</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">==</span> <span class="n">opm</span><span class="o">.</span><span class="n">mm</span><span class="o">.</span><span class="n">HarmonicAngleForce</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">iangle</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">getNumAngles</span><span class="p">()):</span>
+                <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">i3</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">getAngleParameters</span><span class="p">(</span><span class="n">iangle</span><span class="p">)</span>
+                <span class="n">angle</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">HarmonicAngleTerm</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i1</span><span class="p">],</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i2</span><span class="p">],</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i3</span><span class="p">],</span>
+                                             <span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">k</span><span class="p">),</span>
+                                             <span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">t0</span><span class="p">))</span>
+                <span class="n">angles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">==</span> <span class="n">opm</span><span class="o">.</span><span class="n">mm</span><span class="o">.</span><span class="n">PeriodicTorsionForce</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">itorsion</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">getNumTorsions</span><span class="p">()):</span>
+                <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">i3</span><span class="p">,</span> <span class="n">i4</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">v_n</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">getTorsionParameters</span><span class="p">(</span><span class="n">itorsion</span><span class="p">)</span>
+                <span class="n">torsion</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">PeriodicTorsionTerm</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i1</span><span class="p">],</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i2</span><span class="p">],</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i3</span><span class="p">],</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i4</span><span class="p">],</span>
+                                                 <span class="n">n</span><span class="p">,</span> <span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">v_n</span><span class="p">),</span>
+                                                 <span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">t0</span><span class="p">))</span>
+                <span class="n">dihedrals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">torsion</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">==</span> <span class="n">opm</span><span class="o">.</span><span class="n">mm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+                <span class="n">q</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">epsilon</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">getParticleParameters</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">charges</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span> <span class="o">=</span> <span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+                <span class="n">ljparameters</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">LennardJonesSigmaEps</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span>
+                                                             <span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">sigma</span><span class="p">),</span>
+                                                             <span class="n">opm</span><span class="o">.</span><span class="n">simtk2pint</span><span class="p">(</span><span class="n">epsilon</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">==</span> <span class="n">opm</span><span class="o">.</span><span class="n">mm</span><span class="o">.</span><span class="n">CMMotionRemover</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">==</span> <span class="n">opm</span><span class="o">.</span><span class="n">mm</span><span class="o">.</span><span class="n">GBSAOBCForce</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+    <span class="n">ffparams</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">FFParameters</span><span class="p">(</span><span class="n">bonds</span><span class="p">,</span> <span class="n">angles</span><span class="p">,</span> <span class="n">dihedrals</span><span class="p">,</span> <span class="n">charges</span><span class="p">,</span> <span class="n">ljparameters</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ffparams</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7rc1+1.gea8a3b1.dirty',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
