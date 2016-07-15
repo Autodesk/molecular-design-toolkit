@@ -46,7 +46,7 @@ To get online documentation about a function or method, type the method's name, 
 
 To get the complete docstring for any object, type its name then a question mark.
 
-.. image:: questiondoc.png
+.. image:: img/questiondoc.png
 
 
 Get help

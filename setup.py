@@ -82,7 +82,7 @@ cmdclass['install'] = PostInstall
 setup(
     name=PACKAGE_NAME,
     version=versioneer.get_version(),
-    classifiers=CLASSIFIERS.split('\n'),
+    classifiers=CLASSIFIERS.splitlines(),
     packages=find_packages(),
     package_data={PACKAGE_NAME: find_package_data(PACKAGE_NAME)},
     install_requires=requirements,

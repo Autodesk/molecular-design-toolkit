@@ -32,3 +32,37 @@ moldesign:
  build_directory: ../moldesign
  build: |
   ADD . /opt/moldesign
+
+
+deploy_test_base:
+  requires:
+    - python_install
+  description: Base for testing our python packages prior to release
+  build : |
+    RUN apt-get update && apt-get install -y git curl python-matplotlib python-dev
+    RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
+      && apt-get install -y nodejs \
+      && npm config set unsafe-perm=true
+    RUN pip install pytest
+
+
+pyccc_deploy_test:
+   requires:
+     - deploy_test_base
+   description: Test the PyCCC python package. *Note the hardcoded build directory*
+   build_directory: ../../py-cloud-compute-cannon
+   build: |
+      RUN pip install git+https://github.com/autodesk/py-cloud-compute-cannon
+      RUN cd /usr/local/lib/python2.7/dist-packages/pyccc/tests \
+          && py.test
+
+nbmolviz_deploy_test:
+   requires:
+     - pyccc_deploy_test
+   description: Test the nbmolviz python package. *Note the hardcoded build directory*
+   build_directory: ../..
+   build: |
+      RUN pip install git+https://github.com/autodesk/py-cloud-compute-cannon
+      RUN cd /usr/local/lib/python2.7/dist-packages/pyccc/tests \
+          && py.test
+

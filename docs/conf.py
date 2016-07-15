@@ -40,7 +40,8 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
-    'sphinx.ext.napoleon']
+    'sphinx.ext.napoleon',
+    'sphinx.ext.githubpages']
 
 
 # def skip(app, what, name, obj, skip, options):
@@ -165,7 +166,7 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static', 'img']
+html_static_path = ['img']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -230,7 +231,7 @@ html_static_path = ['_static', 'img']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'MolecularDesignToolkitdoc'
+htmlhelp_basename = 'moldesign-doc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -253,7 +254,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'MolecularDesignToolkit.tex', u'Molecular Design Toolkit Documentation',
-     u'Aaron Virshup, Bio/Nano Research Group, Autodesk', 'manual'),
+     u'Aaron Virshup, BioNano Research Group, Autodesk', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

@@ -4,48 +4,55 @@ Molecular modeling without the pain - a Python 2.7 library offering integrated s
 
 The toolkit aims to lower the barriers between you and your science by integrating mature, open source simulation packages with a readable abstract API, Jupyter notebook visualization, and native cloud computing.
 
-**Install it**: `pip install moldesign`
-**Launch an example notebook**: `python -m moldesign intro`
+## Get started
+On the command line, run:
+```shell
+pip install moldesign
+python -m moldesign intro
+```
+
+See [the documentation](docs/install.rst) for development instructions and other use cases.
 
 ## Code Example
 
 You'll almost always import the package and its units module:
-<pre><code>import moldesign as mdt
+```python
+import moldesign as mdt
 from moldesign import units as u
-</code></pre>
+```
 
 Download a protein from the PDB and visualize it in 3D (in a notebook):
-<pre><code>
+```python
 protease = mdt.from_pdb('3AID')
 protease.draw()
-</code></pre>
+```
 
 Create a small molecule and relax its geometry:
-<pre><code>mol = mdt.from_name('bipyridine')
+```python
+mol = mdt.from_name('bipyridine')
 mol.set_energy_model(mdt.models.RHF(basis='STO-3G'))
 min_trajectory = mol.minimize(nsteps=20)
 min_trajectory.draw_orbitals()
-</code></pre>
+```
 
 For in-depth examples, see the built-in example notebooks (run `python -m moldesign intro` to launch).
 
 
-## Documentation
+## Get help
 
-API documentation link
-User documentation link
-Forums
+[API Documentation](https://https://autodesk.github.io/molecular-design-toolkit)
+[Forums](https://forum.bionano.autodesk.com/c/Molecular-Design-Toolkit)
+[Email us](mailto:moleculardesigntoolkit@autodesk.com)
 
 
-## Tests
 
-`moldesign/tests` 
+## Contributing
 
-## Contributors
-
-CONTRIBUTING.md
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details. Note that the [Notebook Molecular Visualization](https://github.com/autodesk/notebook-molecular-design) library and [PyCloudComputeCannon](https://github.com/autodesk/py-cloud-compute-cannon) are also developed under this project's umbrella.
 
 ## License
+
+See [NOTICES](NOTICES) for incorporated code licenses.
 
 Copyright 2016 Autodesk Inc.
 

@@ -80,7 +80,7 @@ def main():
     if args.command == 'intro':
         copy_example_dir(use_existing=True)
         launch(cwd=EXAMPLE_DIR_TARGET,
-               path='notebooks/index.ipynb')
+               path='notebooks/Getting%20Started.ipynb')
 
     elif args.command == 'pull':
         pull()

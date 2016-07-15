@@ -56,7 +56,7 @@ class MDTConfig(ipy.Box):
                     ("https://github.com/autodesk/molecular-design-toolkit/issues", 'Issues'),
                     ("http://bionano.autodesk.com/MolecularDesignToolkit/explore.html",
                      "Tutorials"),
-                    ('http://moldesign.readthedocs.io/', 'Documentation'),
+                    ('http://autodesk.github.io/molecular-design-toolkit/', 'Documentation'),
                     )]
         linkbar = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.join(links)
         return ipy.HTML(("<span style='float:left;font-size:0.8em;font-weight:bold'>Version: "
