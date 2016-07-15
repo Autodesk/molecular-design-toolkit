@@ -71,7 +71,7 @@ Aaron Virshup - Lead developer and maintainer<br>
 Dion Amago - Maintainer<br>
 Malte Tinnus - Maintainer
 
-If you've established yourself as impactful contributors for the project, and are willing take on the extra work, we'd love to have your help maintaining it! Email the maintainers list at `moldesign_maintainers@autodesk.com` for details.
+If you've established yourself as an impactful contributor for the project, and are willing take on the extra work, we'd love to have your help maintaining it! Email the maintainers list at `moldesign_maintainers@autodesk.com` for details.
 
 ### Timing
 
