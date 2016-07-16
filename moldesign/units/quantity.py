@@ -100,6 +100,11 @@ class MdtQuantity(ureg.Quantity):
             else:  # case 3: attribute error is unrelated to this
                 raise
 
+    def to_json(self):
+        import json
+        return json.dumps({'magnitude': self.magnitude,
+                           'units': str(self.units)})
+
     def __eq__(self, other):
         """ Bug fixes and behavior changes for pint's implementation
         These get removed as they are fixed in pint

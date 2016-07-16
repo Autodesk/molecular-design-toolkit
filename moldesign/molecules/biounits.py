@@ -192,6 +192,14 @@ class Residue(Entity):
         return newatoms[0].residue
     copy.__doc__ = Entity.copy.__doc__
 
+
+    def to_json(self, parent=None):
+        if not isinstance(parent, mdt.Molecule):
+            return str(self.index)
+
+        else:
+            mdt.chemjson.jsonify(self, 'index chain name pdbname pdbindex')
+
     @utils.args_from(Entity)
     def __init__(self, **kwargs):
         """ Initialization
