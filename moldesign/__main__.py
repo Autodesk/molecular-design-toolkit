@@ -41,7 +41,7 @@ HOME = os.environ['HOME']
 CONFIG_DIR = os.path.join(HOME, '.moldesign')
 EXAMPLE_DIR_TARGET = os.path.join(os.path.curdir, 'moldesign-examples')
 EXAMPLE_DIR_SRC = unit_def_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                                               'notebooks')
+                                               '_notebooks')
 
 
 APPLESCRIPT_INSTALL_DOCKER = ('set response to (display dialog '
