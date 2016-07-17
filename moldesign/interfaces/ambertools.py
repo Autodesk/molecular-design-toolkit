@@ -54,7 +54,7 @@ def am1_bcc_charges(mol, minsteps=None, wait=True):
     """ Doesn't work yet ..."""
     charge = utils.if_not_none(mol.charge, 0)
 
-    engine = mdt.compute.default_engine
+    engine = mdt.compute.get_engine()
     image = compute.get_image_path(IMAGE, engine)
     command = 'antechamber -fi pdb -i mol.pdb -fo mol2 -o out.mol2 -c bcc -an n'
     if charge != 0: command += ' -nc %d' % charge

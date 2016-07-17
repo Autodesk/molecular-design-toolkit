@@ -14,6 +14,7 @@
 import moldesign as mdt
 from moldesign import utils
 
+
 def get_image_path(image_name):
     """ Returns a fully qualified tag that points to the correct registry
 
@@ -80,7 +81,7 @@ def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True,
     Args:
         job (pyccc.Job): The job to run
         engine (pyccc.Engine): Engine to run this job on (default:
-            ``moldesign.compute.default_engine``)
+            ``moldesign.compute.get_engine()``)
         image (str): URL for the docker image
         wait (bool): if True, block until this function completes and return the function's
             return value. Otherwise, return a job object immediately that can be queried later.
@@ -90,7 +91,7 @@ def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True,
         pyccc job object OR function's return value
     """
 
-    engine = utils.if_not_none(engine, mdt.compute.default_engine)
+    engine = utils.if_not_none(engine, mdt.compute.get_engine())
 
     if engine is None:
         raise ValueError('No compute engine configured! Configure MDT using '

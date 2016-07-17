@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import pyccc
+import pyccc.exceptions
 
 from moldesign import units as u
 from moldesign import compute
@@ -42,8 +43,8 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
         # something more generalizable
         try:
             traj = self._run(run_for)
-        except pyccc.python.ProgramFailure:
-            raise pyccc.ProgramFailure('OpenMM crashed silently. Please examine the output. '
+        except pyccc.exceptions.ProgramFailure:
+            raise pyccc.exceptions.ProgramFailure('OpenMM crashed silently. Please examine the output. '
                                        'This may be due to large forces from, for example, '
                                        'an insufficiently minimized starting geometry.')
         if force_remote or (not wait):
