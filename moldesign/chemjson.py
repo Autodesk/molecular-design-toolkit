@@ -13,15 +13,16 @@
 # limitations under the License.
 
 import json
+import numpy
+
 
 # TODO: register deserializers (with decorators?)
-
 class JsonEncoder(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj, 'to_json'):
-            return obj.to_json()
-        else:
-            return super(JsonEncoder, self).default(obj)
+            obj = obj.to_json()
+
+        return obj
 
 
 def writer(obj, fileobj):
@@ -47,11 +48,7 @@ def jsonify(obj, attrnames):
     js = {}
     for item in attrnames:
         attr = getattr(obj, item, None)
-        if item is None: continue
+        if attr is None: continue
+        js[item] = attr
 
-        if hasattr(item, 'to_json'):
-            js[item] = attr.to_json(parent=obj)
-        else:
-            js[item] = attr
-
-        return json.dumps(js)
+    return js

@@ -15,7 +15,7 @@
 This module contains abstract base classes for potential models, integrators, and various
 associated data types (force fields, orbitals, basis sets, etc.).
 """
-
+import moldesign as mdt
 from moldesign.utils import DotDict
 
 
@@ -51,6 +51,11 @@ class Method(object):
         for param in self.PARAMETERS:
             if param.name not in self.params:
                 self.params[param.name] = param.default
+
+    def to_json(self):
+        return {'params': self.params,
+                'name': type(self).__name__,
+                'version': 'MolecularDesignToolkit-%s' % mdt.__version__}
 
     def configure(self):
         from moldesign.widgets.configurator import Configurator

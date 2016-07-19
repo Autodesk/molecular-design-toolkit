@@ -53,6 +53,11 @@ class Bond(object):
         """Has this object using the atoms involved in its bond"""
         return hash((self.a1, self.a2))
 
+    def to_json(self):
+        return dict(a1=self.a1.index,
+                    a2=self.a2.index,
+                    order=self.order)
+
     def partner(self, atom):
         """ Return this atom's *partner* in the bond -- i.e., the other atom in the bond
 

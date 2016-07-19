@@ -527,6 +527,13 @@ class MolTopologyMixin(object):
         newmol.properties = self.properties.copy()
         return newmol
 
+    def to_json(self):
+        js = mdt.chemjson.jsonify(self,
+                                  ('time residues atoms name'
+                                   'properties energy_model integrator').split())
+        js['chains'] = list(self.chains)
+        js['bonds'] = list(self.bonds)
+        return js
 
 
     def assert_atom(self, atom):

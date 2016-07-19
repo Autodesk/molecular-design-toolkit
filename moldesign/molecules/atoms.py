@@ -341,12 +341,12 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
 
     def to_json(self, parent=None):
         """Designed to be called by the MdtJsonEncoder"""
-        return mdt.chemjson.jsonify(self,
-                                    'name index atnum position '
-                                    'mass momentum chain residue'.split())
-
-
-
+        js = mdt.chemjson.jsonify(self,
+                                  ('name index atnum position '
+                                   'mass momentum').split())
+        js['chain'] = self.chain.index
+        js['residue'] = self.residue.index
+        return js
 
     @utils.args_from(AtomContainer.copy)
     def copy(self, *args, **kwargs):

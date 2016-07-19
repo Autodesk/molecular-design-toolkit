@@ -192,13 +192,11 @@ class Residue(Entity):
         return newatoms[0].residue
     copy.__doc__ = Entity.copy.__doc__
 
-
-    def to_json(self, parent=None):
-        if not isinstance(parent, mdt.Molecule):
-            return str(self.index)
-
-        else:
-            mdt.chemjson.jsonify(self, 'index chain name pdbname pdbindex')
+    def to_json(self):
+        js = mdt.chemjson.jsonify(self, 'index resname name pdbindex'.split())
+        js['chain'] = self.chain.index
+        js['atoms'] = [atom.index for atom in self.atoms]
+        return js
 
     @utils.args_from(Entity)
     def __init__(self, **kwargs):
@@ -497,6 +495,11 @@ class Chain(Entity):
         super(Chain, self).__init__(pdbname=pdbname, **kwargs)
         if self.name is None: self.name = self.pdbname
         if self.pdbindex is not None: self.pdbindex = self.pdbname
+
+    def to_json(self):
+        js = mdt.chemjson.jsonify(self, 'index name pdbindex'.split())
+        js['residues'] = [res.index for res in self.residues]
+        return js
 
     def copy(self):
         newatoms = super(Chain, self).copy()
