@@ -10,7 +10,7 @@ nbmolviz >= 0.6.3
 notebook >= 4.2
 numpy
 pint >= 0.7
-pyccc >= 0.6.2
+pyccc >= 0.6.4
 pytest
 pyyaml
 requests

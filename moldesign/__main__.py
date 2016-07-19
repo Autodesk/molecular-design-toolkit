@@ -73,7 +73,6 @@ def main():
 
     args = parser.parse_args()
 
-    print args
     if args.config_file:
         CONFIG_PATH = args.config_file
 
@@ -159,8 +158,12 @@ def launch_jupyter_server(cwd=None):
 def open_browser(url):
     for exe in URL_OPENERS:
         if distutils.spawn.find_executable(exe) is not None:
-            subprocess.check_call([exe, url])
-            return
+            try:
+                subprocess.check_call([exe, url])
+            except subprocess.CalledProcessError:
+                continue
+            else:
+                return
     print 'Point your browser to %s to get started.' % url  # fallback
 
 
