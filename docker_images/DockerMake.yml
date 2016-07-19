@@ -77,41 +77,33 @@ devtools:
 
 ############################################
 # moldesign
-moldesign:  # hacked until we're up on pypi ...
- requires:
+moldesign:
+ requires:  # TODO: remove biopython dependency (it's in C ...)
   - python_install
  build_directory: moldesign
  build: |
-  RUN mkdir -p /src/
-  COPY ./molecular-design-toolkit /src/molecular-design-toolkit/
-  COPY ./py-cloud-compute-cannon /src/py-cloud-compute-cannon
-  COPY ./notebook-molecular-visualization /src/notebook-molecular-visualization
-  RUN apt-get update && apt-get install -y curl python-matplotlib \
-   && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
-   && apt-get install -y nodejs gcc python-dev \
-   && npm config set unsafe-perm=true &&echo "this a hack for node not liking to run as root ..." \
-   && cd /src/ && pip install \
-         ./py-cloud-compute-cannon \
-         ./notebook-molecular-visualization \
-         ./molecular-design-toolkit \
-   && apt-get -y remove --purge npm nodejs gcc python-dev \
+  RUN apt-get update && apt-get install -y gcc gfortran python-dev \
+   && pip install biopython \
+   && apt-get -y remove --purge gcc gfortran python-dev \
    && apt-get -y autoremove --purge \
    && apt-get -y clean
+  RUN pip install moldesign
 
 
 pyccc:
  requires:
   - python_install
  build: |
-  RUN pip install git+https://git.autodesk.com/bionano/py-cloud-compute-cannon
+  RUN pip install pyccc
 
 
 nbmolviz:
  requires:
   - python_install
  build: |
-  RUN pip install git+https://git.autodesk.com/bionano/notebook-molecular-visualization
-  RUN jupyter nbextension enable --python --system nbmolviz widgetsnbextensions
+  RUN pip install nbmolviz
+  RUN jupyter nbextension enable --python --sys-prefix nbmolviz &&
+      jupyter nbextension enable --python --sys-prefix widgetsnbextensions
 
 
 moldesign_notebook:
@@ -121,11 +113,9 @@ moldesign_notebook:
   - notebook
   - moldesign
  build: |
-  RUN cp -r /src/molecular-design-toolkit/moldesign/_notebooks /notebooks/moldesign_examples
-  RUN jupyter nbextension install --python --system widgetsnbextension \
-   && jupyter nbextension enable --python --system widgetsnbextension \
-   && jupyter nbextension install --python --system nbmolviz \
-   && jupyter nbextension enable --python --system nbmolviz
+  RUN cp -r /usr/local/lib/python2.7/dist-packages/moldesign/_notebooks /notebooks/moldesign_examples
+  RUN jupyter nbextension enable --python --sys-prefix widgetsnbextension \
+   && jupyter nbextension enable --python --sys-prefix nbmolviz
 
 
 

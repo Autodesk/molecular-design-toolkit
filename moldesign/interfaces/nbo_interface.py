@@ -30,7 +30,7 @@ def run_nbo(mol, requests=('nlmo', 'nbo'),
     wfn = mol.wfn
     inputs = {'in.47': make_nbo_input_file(mol, requests)}
     command = 'gennbo.i4.exe in.47'
-    engine = utils.if_not_none(engine, mdt.compute.config.default_engine)
+    engine = utils.if_not_none(engine, mdt.compute.config.get_engine())
     imagename = mdt.compute.get_image_path(image)
     job = engine.launch(imagename,
                           command,

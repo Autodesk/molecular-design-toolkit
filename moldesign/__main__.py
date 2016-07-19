@@ -41,7 +41,7 @@ HOME = os.environ['HOME']
 CONFIG_DIR = os.path.join(HOME, '.moldesign')
 EXAMPLE_DIR_TARGET = os.path.join(os.path.curdir, 'moldesign-examples')
 EXAMPLE_DIR_SRC = unit_def_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                                               'notebooks')
+                                               '_notebooks')
 
 
 APPLESCRIPT_INSTALL_DOCKER = ('set response to (display dialog '
@@ -101,14 +101,11 @@ def main():
 DOCKER_IMAGES = 'ambertools14 moldesign moldesign_notebook opsin symmol python_install'.split()
 def pull():
     from moldesign import compute
-    from moldesign.compute import config
-    assert config.config_yaml.default_engine == 'docker', 'Pull only works for docker engines'
-    assert config.config_yaml.default_repository, "Can't pull - no repository specified"
     streams = []
     for img in DOCKER_IMAGES:
         imgurl = compute.get_image_path(img)
         print 'Pulling %s' % imgurl
-        streams.append(compute.default_engine.client.pull(imgurl))
+        streams.append(compute.get_engine().client.pull(imgurl))
     for s in streams:
         for line in s.split('\n'):
             print line

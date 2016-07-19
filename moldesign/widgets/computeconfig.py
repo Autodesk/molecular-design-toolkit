@@ -35,6 +35,7 @@ about = configure
 __packageall.append('about')
 
 
+
 class MDTConfig(ipy.Box):
     def __init__(self):
         super(MDTConfig, self).__init__(display='flex', flex_flow='column')
@@ -81,7 +82,7 @@ class ComputeConfig(ipy.Box):
         self.engine_dropdown.observe(self.update_engine_display)
 
         self.engine_config_description = ipy.HTML('description')
-        self.engine_config_value = ipy.Text('blank')
+        self.engine_config_value = ipy.Text('blank', width='500px')
         self.engine_config = ipy.HBox([self.engine_config_description,
                                        self.engine_config_value])
 
@@ -91,9 +92,13 @@ class ComputeConfig(ipy.Box):
                                                 tooltip='Apply for this session')
         self._save_changes_button = ipy.Button(description='Make default',
                                                tooltip='Make this the default for new sessions')
+        self._test_button = ipy.Button(description='Test connection',
+                                       tooltip='Test if MDT can run jobs with the '
+                                               'current configuration')
         self._reset_config_button.on_click(self.reset_config)
         self._apply_changes_button.on_click(self.apply_config)
         self._save_changes_button.on_click(self.save_config)
+        self._test_button.on_click(self.test_connection)
 
         self.children = [self.engine_dropdown,
                          ipy.HTML('<hr>'),
@@ -101,6 +106,7 @@ class ComputeConfig(ipy.Box):
                                    self.engine_config_value]),
                          ipy.HBox([self._reset_config_button,
                                    self._apply_changes_button,
+                                   self._test_button,
                                    self._save_changes_button])
                          ]
         self.reset_config()
@@ -120,38 +126,90 @@ class ComputeConfig(ipy.Box):
     def reset_config(self, *args):
         """ Reset configuration in UI widget to the stored values
         """
-        if self.engine_dropdown.value != compute.config.engine_type:
+        if compute.config.engine_type not in ENGINES[self.engine_dropdown.value]['aliases']:
             self.engine_dropdown.value = compute.config.engine_type
         else:
             self.update_engine_display()
 
     def apply_config(self, *args):
         enginename = self.engine_dropdown.value
-        compute.config.engine_type = enginename
+        compute.config.engine_type = ENGINES[enginename]['aliases'][0]
         compute.config[ENGINES[enginename]['configkey']] = self.engine_config_value.value
-        compute.reset_from_config()
+        compute.reset_compute_engine()
+
+    def test_connection(self, *args):
+        self.apply_config()
+        engine = compute.default_engine
+        if engine is None:
+            raise ValueError('Failed to create compute engine with current configuration')
+        engine.test_connection()
+        print "SUCCESS: %s is accepting jobs" % engine
 
     def save_config(self, *args):
-        raise NotImplementedError
+        compute.write_config()
 
 
-ENGINES = collections.OrderedDict((
+class RegistryConfig(ipy.Box):
+    def __init__(self):
+        super(RegistryConfig, self).__init__(display='flex', flex_flow='column')
+        self.repo_field = ipy.Text(description='Image repository')
+        self.version_field = ipy.Text(description='Image version')
+
+        self._reset_config_button = ipy.Button(description='Reset',
+                                               tooltip='Reset to current configuration')
+
+        self._apply_changes_button = ipy.Button(description='Apply',
+                                                tooltip='Apply for this session')
+        self._save_changes_button = ipy.Button(description='Make default',
+                                               tooltip='Make this the default for new sessions')
+        self._pull_button = ipy.Button(description='Pull images',
+                                       tooltip=
+                                       'Download all moldesign images to the compute engine')
+
+        self.children = (ipy.HBox([self.repo_field, self.version_field]),
+                         ipy.HBox([self._reset_config_button,
+                                                self._apply_changes_button,
+                                                self._pull_button]))
+
+        self._reset_config_button.on_click(self.reset_config)
+        self._apply_changes_button.on_click(self.apply_config)
+        self._save_changes_button.on_click(self.save_config)
+        self._test_button.on_click(self.test_connection)
+
+    def reset_config(self, *args):
+        self.repo_field.value = mdt.compute.config.default_repository
+        self.version_field.value = mdt.compute.config.version_tag
+
+    def apply_config(self, *args):
+        compute.config.default_repository = self.repo_field.value
+        compute.config.version_tag = self.version_field.value
+
+
+_enginedefs = (
     ('free-compute-cannon', {'displayname': "Public CloudComputeCannon Demo",
                              'hostdescription': 'Autodesk-sponsored cloud compute server',
-                             'configkey':'default_ccc_host'}),
+                             'configkey': 'default_ccc_host',
+                             'aliases': ('ccc', 'cloudcomputecannon')
+                             }),
 
     ('cloud-compute-cannon', {'displayname': 'CloudComputeCannon',
-                              'hostdescription': 'Server name with port (e.g.,   '
-                                                 '"192.168.0.1:8000")',
-                              'configkey':'default_ccc_host'}),
+                              'hostdescription': 'Server address and port (e.g.,   '
+                                                 '"192.168.0.1:9000")',
+                              'configkey': 'default_ccc_host',
+                              'aliases': ('ccc', 'cloudcomputecannon')}),
 
     ('docker', {'displayname': 'Docker',
                 'hostdescription': 'Docker host with port (e.g., "localhost:2375")',
-                'configkey':'default_docker_host'}),
+                'configkey': 'default_docker_host',
+                'aliases': ('docker',)
+                }),
 
     ('docker-machine', {'displayname': 'Docker Machine',
                         'hostdescription': 'Name of docker-machine (e.g., "default")',
-                        'configkey':'default_docker_machine'}),
-))
+                        'configkey': 'default_docker_machine',
+                        'aliases': ('docker-machine',)
+                        }),
+)
 
+ENGINES = collections.OrderedDict(_enginedefs)
 ENGINE_DISPLAY = collections.OrderedDict((v['displayname'],k) for k,v in ENGINES.iteritems())

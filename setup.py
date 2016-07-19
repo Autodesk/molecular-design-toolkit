@@ -86,11 +86,11 @@ setup(
     packages=find_packages(),
     package_data={PACKAGE_NAME: find_package_data(PACKAGE_NAME)},
     install_requires=requirements,
-    url='http://autodeskresearch.com',
+    url='http://moldesign.bionano.autodesk.com',
     cmdclass=cmdclass,
     license='Apache 2.0',
-    author='Aaron Virshup',
-    author_email='aaron.virshup [at] autodesk [dot] com',
+    author='Aaron Virshup, BioNano Research at Atuodesk',
+    author_email='moleculardesigntoolkit@autodesk.com',
     description='The Molecular Design Toolkit: Dead-simple chemical simulation, visualization, '
                 'and cloud computing in a notebook'
 )
