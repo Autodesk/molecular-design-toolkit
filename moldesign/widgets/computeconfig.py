@@ -82,7 +82,7 @@ class ComputeConfig(ipy.Box):
         self.engine_dropdown.observe(self.update_engine_display)
 
         self.engine_config_description = ipy.HTML('description')
-        self.engine_config_value = ipy.Text('blank')
+        self.engine_config_value = ipy.Text('blank', width='500px')
         self.engine_config = ipy.HBox([self.engine_config_description,
                                        self.engine_config_value])
 
@@ -143,10 +143,46 @@ class ComputeConfig(ipy.Box):
         if engine is None:
             raise ValueError('Failed to create compute engine with current configuration')
         engine.test_connection()
-        print "Success: connected to %s" % engine
+        print "SUCCESS: %s is accepting jobs" % engine
 
     def save_config(self, *args):
         compute.write_config()
+
+
+class RegistryConfig(ipy.Box):
+    def __init__(self):
+        super(RegistryConfig, self).__init__(display='flex', flex_flow='column')
+        self.repo_field = ipy.Text(description='Image repository')
+        self.version_field = ipy.Text(description='Image version')
+
+        self._reset_config_button = ipy.Button(description='Reset',
+                                               tooltip='Reset to current configuration')
+
+        self._apply_changes_button = ipy.Button(description='Apply',
+                                                tooltip='Apply for this session')
+        self._save_changes_button = ipy.Button(description='Make default',
+                                               tooltip='Make this the default for new sessions')
+        self._pull_button = ipy.Button(description='Pull images',
+                                       tooltip=
+                                       'Download all moldesign images to the compute engine')
+
+        self.children = (ipy.HBox([self.repo_field, self.version_field]),
+                         ipy.HBox([self._reset_config_button,
+                                                self._apply_changes_button,
+                                                self._pull_button]))
+
+        self._reset_config_button.on_click(self.reset_config)
+        self._apply_changes_button.on_click(self.apply_config)
+        self._save_changes_button.on_click(self.save_config)
+        self._test_button.on_click(self.test_connection)
+
+    def reset_config(self, *args):
+        self.repo_field.value = mdt.compute.config.default_repository
+        self.version_field.value = mdt.compute.config.version_tag
+
+    def apply_config(self, *args):
+        compute.config.default_repository = self.repo_field.value
+        compute.config.version_tag = self.version_field.value
 
 
 _enginedefs = (
@@ -157,8 +193,8 @@ _enginedefs = (
                              }),
 
     ('cloud-compute-cannon', {'displayname': 'CloudComputeCannon',
-                              'hostdescription': 'Server name with port (e.g.,   '
-                                                 '"192.168.0.1:8000")',
+                              'hostdescription': 'Server address and port (e.g.,   '
+                                                 '"192.168.0.1:9000")',
                               'configkey': 'default_ccc_host',
                               'aliases': ('ccc', 'cloudcomputecannon')}),
 

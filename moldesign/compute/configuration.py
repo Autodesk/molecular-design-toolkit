@@ -89,7 +89,7 @@ CONFIG_DEFAULTS = utils.DotDict(engine_type='ccc',
                                 default_python_image='moldesign_complete',
                                 default_docker_host='unix://var/run/docker.sock',
                                 default_docker_machine='default',
-                                default_version_tag='latest')
+                                default_version_tag='0.7.0')
 
 DEF_CONFIG = CONFIG_DEFAULTS.copy()
 """ dict: default configuration to be written to moldesign.yml if it doesn't exist
@@ -115,8 +115,9 @@ def write_config(path=None):
 
     if not os.path.exists(path) and path == DEFAULT_CONFIG_PATH:
         confdir = os.path.dirname(path)
-        os.mkdir(confdir)
-        print 'Created moldesign configuration directory %s' % confdir
+        if not os.path.exists(confdir):
+            os.mkdir(confdir)
+            print 'Created moldesign configuration directory %s' % confdir
 
     with open(path, 'w') as f:
         yaml.dump(config, f)
