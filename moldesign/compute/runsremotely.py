@@ -42,7 +42,7 @@ class RunsRemotely(object):
             sendsource (bool): if False (default), call this function directly on the remote worker;
                if True, send the function's source code (for debugging, mostly)
             engine (pyccc.engine.EngineBase): engine to send the job to (default:
-                moldesign.compute.default_engine)
+                moldesign.compute.get_engine())
             image (str): name of the docker image (including registry, repository, and tags)
                 (default: moldesign.config.default_python_image)
             is_imethod (bool): This is an instancemethod
@@ -91,7 +91,7 @@ class RunsRemotely(object):
             # Submit job to remote engine
             python_call = bpy.PythonCall(f, *args, **kwargs)
             image = utils.if_not_none(self.image, configuration.config.default_python_image)
-            engine = utils.if_not_none(self.engine, mdt.compute.default_engine)
+            engine = utils.if_not_none(self.engine, mdt.compute.get_engine())
             job = bpy.PythonJob(engine,
                                 image,
                                 python_call,

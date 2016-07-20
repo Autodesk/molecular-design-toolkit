@@ -275,6 +275,7 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
                                                                     native=self.DISTANCE_UNITS)
         shapes = []
         for atom, vecarray in zip(self.mol.atoms, arrowvecs):
+            if vecarray.norm() < 0.2: continue
             shapes.append(self.draw_arrow(atom.position, vector=vecarray, render=False, **kwargs))
         if render: self.render()
         return shapes

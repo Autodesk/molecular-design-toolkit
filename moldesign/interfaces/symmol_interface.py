@@ -43,7 +43,7 @@ def run_symmol(mol,
     inputs = {'sym.in': '\n'.join(infile)}
 
     # TODO: this boilerplate has to go
-    engine = utils.if_not_none(engine, mdt.compute.default_engine)
+    engine = utils.if_not_none(engine, mdt.compute.get_engine())
     imagename = mdt.compute.get_image_path(image)
     job = engine.launch(imagename,
                           command,

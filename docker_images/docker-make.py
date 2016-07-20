@@ -16,6 +16,7 @@
 Multiple inheritance for your dockerfiles.
 Requires: python 2.7, docker-py, pyyaml (RUN: easy_install pip; pip install docker-py pyyaml)
 """
+import json
 import sys
 import os
 import textwrap
@@ -44,7 +45,8 @@ class DockerMaker(object):
         # Connect to docker daemon if necessary
         if build_images:
             connection = docker.utils.kwargs_from_env()
-            connection['tls'].assert_hostname = False
+            if 'tls' in connection:
+                connection['tls'].assert_hostname = False
             self.client = docker.Client(**connection)
         else:
             self.client = None
@@ -132,17 +134,27 @@ class DockerMaker(object):
         else:
             build_args['fileobj'] = StringIO(unicode(dockerfile))
 
+        # TODO: remove this workaround for docker/docker-py#1134 -- AMV 7/19/16
+        build_args['decode'] = False
+
         # start the build
         stream = self.client.build(**build_args)
 
         # monitor the output
         for item in stream:
+            # TODO: this is more workaround for docker/docker-py#1134
+            try:
+                item = json.loads(item)
+            except ValueError:
+                print item,
+                continue
+            #### end of workaround - this can be removed once resolved - AMV 7/19/16
             if item.keys() == ['stream']:
                 print item['stream'].strip()
             elif 'errorDetail' in item or 'error' in item:
                 raise BuildError(dockerfile, item, build_args)
             else:
-                print item
+                print item,
 
         # remove the temporary dockerfile
         if step.build_dir is not None:

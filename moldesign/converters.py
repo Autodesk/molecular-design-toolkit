@@ -24,6 +24,7 @@ import moldesign.interfaces.openbabel as obabel
 import moldesign.molecules.atomcollections
 from moldesign.interfaces.opsin_interface import name_to_smiles
 import moldesign.interfaces.biopython_interface as biopy
+from moldesign import chemjson
 
 # These routines are imported here solely to make them available in this namespace
 from moldesign.interfaces.openbabel import mol_to_pybel
@@ -46,8 +47,9 @@ COMPRESSION = {'gz': gzip.open,
                'bzip2': bz2.BZ2File,
                None: open}
 READERS = {'pdb': biopy.parse_pdb,
-           'cif': biopy.parse_pdb}
-WRITERS = {}
+           'cif': biopy.parse_pdb,
+           'json': chemjson.reader}
+WRITERS = {'json': chemjson.writer}
 for ext in PICKLE_EXTENSIONS:
     READERS[ext] = pkl.load
     WRITERS[ext] = functools.partial(pkl.dump, protocol=2)

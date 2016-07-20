@@ -41,7 +41,7 @@ class SQMPotential(QMBase):
             inputfile.append(' {atom.atnum}  {atom.name}  {pos[0]:.8f} {pos[1]:.8f} {pos[2]:.8f}'.format(
                 atom=atom, pos=atom.position.value_in(u.angstrom)))
 
-        engine = mdt.compute.default_engine
+        engine = mdt.compute.get_engine()
         image = compute.get_image_path(IMAGE)
         job = engine.launch(image,
                               'sqm -i mol.in -o mol.out',

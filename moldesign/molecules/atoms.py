@@ -339,6 +339,15 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
                                                 u.default.mass/u.default.time)
         self._bond_graph = {}
 
+    def to_json(self, parent=None):
+        """Designed to be called by the MdtJsonEncoder"""
+        js = mdt.chemjson.jsonify(self,
+                                  ('name index atnum position '
+                                   'mass momentum').split())
+        js['chain'] = self.chain.index
+        js['residue'] = self.residue.index
+        return js
+
     @utils.args_from(AtomContainer.copy)
     def copy(self, *args, **kwargs):
         """ Copy an atom (delegate to AtomContainer)

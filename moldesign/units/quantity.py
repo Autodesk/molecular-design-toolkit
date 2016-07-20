@@ -100,6 +100,14 @@ class MdtQuantity(ureg.Quantity):
             else:  # case 3: attribute error is unrelated to this
                 raise
 
+    def to_json(self):
+        if hasattr(self.magnitude, 'tolist'):
+            mag = self.magnitude.tolist()
+        else:
+            mag = self.magnitude
+        return {'magnitude': mag,
+                'units': str(self.units)}
+
     def __eq__(self, other):
         """ Bug fixes and behavior changes for pint's implementation
         These get removed as they are fixed in pint

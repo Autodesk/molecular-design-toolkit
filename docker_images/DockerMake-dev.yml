@@ -41,24 +41,18 @@ deploy_test_base:
   build : |
     RUN apt-get update && apt-get install -y git curl python-matplotlib python-dev
     RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
-      && apt-get install -y nodejs \
+      && apt-get install -y nodejs gcc \
       && npm config set unsafe-perm=true
     RUN pip install pytest
+    EXPOSE 8888
 
-
-pyccc_deploy_test:
+dev_deploys:
    requires:
-     - deploy_test_base
-   description: Test the PyCCC python package. *Note the hardcoded build directory*
-   build_directory: ../../py-cloud-compute-cannon
+    - deploy_test_base
+   description: installs dev version of all 3 public repos. BEWARE OF CACHING
    build: |
-      RUN pip install git+https://github.com/autodesk/py-cloud-compute-cannon
-      RUN cd /usr/local/lib/python2.7/dist-packages/pyccc/tests \
-          && py.test
+     RUN pip install git+https://github.com/Autodesk/molecular-design-toolkit@dev \
+      && pip install git+https://github.com/Autodesk/notebook-molecular-visualization@dev \
+      && pip install git+https://github.com/Autodesk/py-cloud-compute-cannon@dev
+     ENTRYPOINT python -m moldesign intro
 
-
-notebook_build_env:
-   requires:
-     - notebook
-   build: |
-     RUN apt-get update && apt-get install -y gcc gfortran python-dev
