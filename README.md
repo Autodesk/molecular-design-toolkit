@@ -1,4 +1,5 @@
-# The Molecular Design Toolkit
+# Molecular Design Toolkit
+[![PyPI version](https://badge.fury.io/py/moldesign.svg)](https://badge.fury.io/py/moldesign)
 
 Molecular modeling without the pain - a Python 2.7 library offering integrated simulation, visualization, analysis, and cloud computing. 
 
