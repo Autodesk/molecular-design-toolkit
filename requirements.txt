@@ -6,7 +6,7 @@ ipywidgets >= 5.1
 ipython >= 4.2
 markdown2
 matplotlib
-nbmolviz >= 0.6.3
+nbmolviz >= 0.6.5
 notebook >= 4.2
 numpy
 pint >= 0.7

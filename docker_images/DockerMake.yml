@@ -79,17 +79,18 @@ devtools:
 
 ############################################
 # moldesign
+# Note - this image installs from GITHUB MASTER so that we can test it before pushing to pypi
 moldesign:
  requires:  # TODO: remove biopython dependency (it's in C ...)
   - python_install
  build_directory: moldesign
  build: |
-  RUN apt-get update && apt-get install -y gcc gfortran python-dev \
+  RUN apt-get update && apt-get install -y gcc gfortran python-dev git \
    && pip install biopython \
-   && apt-get -y remove --purge gcc gfortran python-dev \
+   && pip install git+https://github.com/Autodesk/molecular-design-toolkit@master \
+   && apt-get -y remove --purge gcc gfortran python-dev git \
    && apt-get -y autoremove --purge \
    && apt-get -y clean
-  RUN pip install moldesign
 
 
 pyccc:
@@ -272,9 +273,9 @@ pyscf:
     git \
     gfortran \
    && cd /opt \
-     && wget -nv https://github.com/sunqm/pyscf/archive/v1.1.tar.gz \
-     && tar xvzf v1.1.tar.gz && rm v1.1.tar.gz \
-     && mv pyscf-1.1 pyscf \
+     && wget -nv https://github.com/sunqm/pyscf/archive/v1.1.1.tar.gz \
+     && tar xvzf v1.1.1.tar.gz && rm v1.1.1.tar.gz \
+     && mv pyscf-1.1.1 pyscf \
    && cd /opt/pyscf/lib \
      && mv CMakeLists.txt CMakeLists.txt.old \
      && sed -e "s/libcint\.git/qcint.git/" CMakeLists.txt.old > CMakeLists.txt \
