@@ -34,7 +34,13 @@ def distance(a1, a2):
     Returns:
         u.Scalar[length]: the distance
     """
-    return a1.distance(a2)
+    diffvec = a1.position - a2.position
+    dim = len(diffvec.shape)
+    if dim == 1:
+        return np.sqrt(diffvec.dot(diffvec))
+    else:
+        assert dim == 2
+        return np.sqrt((diffvec*diffvec).sum(axis=0))
 
 
 @toplevel
@@ -50,7 +56,13 @@ def angle(a1, a2, a3):
     r23 = (a3.position - a2.position).defunits_value()
     e12 = normalized(r21)
     e23 = normalized(r23)
-    costheta = np.dot(e12, e23)
+
+    dim = len(e12.shape)
+    if dim == 2:
+        costheta = (e12*e23).sum(axis=1)
+    else:
+        assert dim == 1
+        costheta = np.dot(e12, e23)
     theta = safe_arccos(costheta)
     return theta * u.radians
 
@@ -64,22 +76,39 @@ def dihedral(a1, a2, a3, a4):
     """
     r21 = (a1.position - a2.position).defunits_value()  # remove units immediately to improve speed
     r34 = (a4.position - a3.position).defunits_value()
+
+    dim = len(r21.shape)
     center_bond = (a2.position - a3.position).defunits_value()
     plane_normal = normalized(center_bond)
-    r21_proj = r21 - plane_normal * r21.dot(plane_normal)
-    r34_proj = r34 - plane_normal * r34.dot(plane_normal)
+
+    if dim == 1:
+        r21_proj = r21 - plane_normal * r21.dot(plane_normal)
+        r34_proj = r34 - plane_normal * r34.dot(plane_normal)
+    else:
+        assert dim == 2
+        r21_proj = r21 - plane_normal * (r21*plane_normal).sum(axis=1)[:, None]
+        r34_proj = r34 - plane_normal * (r34*plane_normal).sum(axis=1)[:, None]
+
     va = normalized(r21_proj)
     vb = normalized(r34_proj)
-    costheta = np.dot(va, vb)
-    if np.allclose(costheta, 1.0):
-        return 0.0 * u.radians
-    elif np.allclose(costheta, -1.0):
-        return u.pi * u.radians
+
+    if dim == 1:
+        costheta = np.dot(va, vb)
+        if np.allclose(costheta, 1.0):
+            return 0.0 * u.radians
+        elif np.allclose(costheta, -1.0):
+            return u.pi * u.radians
     else:
-        abstheta = safe_arccos(costheta)
-        cross = np.cross(va, vb)
+        costheta = (va*vb).sum(axis=1)
+
+    abstheta = safe_arccos(costheta)
+    cross = np.cross(va, vb)
+
+    if dim == 1:
         theta = abstheta * np.sign(np.dot(cross, plane_normal))
-        return (theta * u.radians) % (2.0 * u.pi * u.radians)
+    else:
+        theta = abstheta * np.sign((cross*plane_normal).sum(axis=1))
+    return (theta * u.radians) % (2.0 * u.pi * u.radians)
 
 
 

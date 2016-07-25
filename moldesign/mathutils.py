@@ -37,19 +37,32 @@ def normalized(vec):
     Returns:
         u.Vector: normalized vector
     """
-    mag = vec.dot(vec)
-    if mag == 0.0: return vec * 0.0
-    else: return vec / np.sqrt(vec.dot(vec))
-
+    if len(vec.shape) == 1:  # it's just a single column vector
+        mag = vec.dot(vec)
+        if mag == 0.0:
+            return vec*0.0
+        else:
+            return vec/np.sqrt(mag)
+    else:  # treat as list of vectors
+        mag = (vec*vec).sum(axis=1)
+        mag[mag == 0.0] = 1.0  # prevent div by 0
+        return vec / np.sqrt(mag)[:, None]
 
 def safe_arccos(costheta):
     """ Version of arccos that can handle numerical noise greater than 1.0
     """
-    if abs(costheta) > 1.0:
-        assert abs(costheta) - 1.0 < 1.0e-14
-        return u.pi
-    else:
+    if hasattr(costheta, 'shape') and costheta.shape:  # vector version
+        assert (np.abs(costheta)-1.0 < 1.0e-13).all()
+        costheta[costheta > 1.0] = 1.0
+        costheta[costheta < -1.0] = -1.0
         return np.arccos(costheta)
+
+    else:
+        if abs(costheta) > 1.0:
+            assert abs(costheta) - 1.0 < 1.0e-14
+            return u.pi
+        else:
+            return np.arccos(costheta)
 
 
 def sub_angles(a, b):
