@@ -224,6 +224,27 @@ class Trajectory(object):
         self._update_property_keys(new_frame)
         self.frames.append(new_frame)
 
+
+    def _get_traj_atom(self, a):
+        if a is None:
+            return None
+        elif isinstance(a, mdt.Atom):
+            return self.atoms[a.index]
+        else:
+            assert isinstance(a, _TrajAtom)
+
+    def distance(self, a1, a2):
+        a1, a2 = map(self._get_traj_atom, (a1, a2))
+        return mdt.distance(a1, a2)
+
+    def angle(self, a1, a2, a3):
+        a1, a2, a3 = map(self._get_traj_atom, (a1, a2, a3))
+        return mdt.angle(a1, a2, a3)
+
+    def dihedral(self, a1, a2, a3=None, a4=None):
+        a1, a2, a3, a4 = map(self._get_traj_atom, (a1, a2, a3, a4))
+        return mdt.dihedral(a1, a2, a3, a4)
+
     def _update_property_keys(self, new_frame=None):
         """
         Update the internal list of molecular properties that can be sliced. If a frame is passed,

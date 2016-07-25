@@ -145,12 +145,22 @@ def dihedral(a1, a2, a3=None, a4=None):
 
 
 def _infer_dihedral(a2, a3):
+    """ Given two atoms defining the central bond in a dihedral, pick the first and last atoms
+    in a heuristic way (see :meth:`_pick_atom`) to get a unique-ish definition.
+    """
     a1 = _pick_atom(a2, a3)
     a4 = _pick_atom(a3, a2)
     return a1, a2, a3, a4
 
 
 def _pick_atom(atom, nbr):
+    """ Pick an atom bonded to ``atom`` that:
+      A) is not nbr
+      B) has the largest atomic number
+      C) has the lowest index
+
+    This gives us a unique definition for dihedrals when only passing 2 atoms
+    """
     newat = None
 
     if hasattr(atom, 'traj'):
@@ -158,6 +168,8 @@ def _pick_atom(atom, nbr):
         traj = atom.traj
         atom = atom.real_atom
         nbr = nbr.real_atom
+    else:
+        istraj = False
 
     for bond in atom.bonds:
         pt = bond.partner(atom)

@@ -46,7 +46,7 @@ class IntegratorBase(Method):
             assert type(time) == int, "argument to integrator.run must have units of time or be an int"
             return time
         else:
-            return int(time / timestep)
+            return int(round(time / timestep))
 
 
 class MDBase(IntegratorBase):

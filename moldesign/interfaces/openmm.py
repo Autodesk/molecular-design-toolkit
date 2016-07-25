@@ -207,10 +207,17 @@ else:
     amber_to_mol = _amber_to_mol
 
 
-def topology_to_mol(topo, name=None, positions=None, velocities=None):
-    """
-    :type topo: simtk.openmm.app.topology.Topology
-    :return:
+def topology_to_mol(topo, name=None, positions=None, velocities=None, assign_bond_orders=True):
+    """ Convert an OpenMM topology object into an MDT molecule.
+
+    Args:
+        topo (simtk.openmm.app.topology.Topology): topology to convert
+        name (str): name to assign to molecule
+        positions (list): simtk list of atomic positions
+        velocities (list): simtk list of atomic velocities
+        assign_bond_orders (bool): assign bond orders from templates (simtk topologies
+             do not store bond orders)
+
     """
     # Atoms
     atommap = {}
@@ -258,16 +265,26 @@ def topology_to_mol(topo, name=None, positions=None, velocities=None):
     bonds = {}
     for bond in topo.bonds():
         a1, a2 = bond
-        na1, na2 = atommap[a1],atommap[a2]
+        na1, na2 = atommap[a1], atommap[a2]
         if na1 not in bonds:
             bonds[na1] = {}
         if na2 not in bonds:
             bonds[na2] = {}
-        bonds[na1][na2] = -1
-        bonds[na2][na1] = -1
+        bonds[na1][na2] = 1
+        bonds[na2][na1] = 1
 
-    if name is None: name = 'Unnamed molecule from OpenMM'
+    if name is None:
+        name = 'Unnamed molecule from OpenMM'
+
     newmol = Molecule(newatoms, bond_graph=bonds, name=name)
+
+    if assign_bond_orders:
+        for residue in newmol.residues:
+            try:
+                residue.assign_template_bonds()
+            except (KeyError, ValueError):
+                pass
+
     return newmol
 
 
