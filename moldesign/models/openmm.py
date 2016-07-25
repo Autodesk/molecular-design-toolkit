@@ -71,7 +71,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         state = self.sim.context.getState(getForces=True, getEnergy=True)
         props = MolecularProperties(self.mol,
                                     potential_energy=opm.simtk2pint(state.getPotentialEnergy()),
-                                    forces=opm.simtk2pint(state.getForces(), flat=True))
+                                    forces=opm.simtk2pint(state.getForces(), flat=False))
         return props
 
     def prep(self, force=False):

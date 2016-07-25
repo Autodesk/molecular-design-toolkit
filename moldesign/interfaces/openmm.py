@@ -79,8 +79,12 @@ else:
         def report_from_mol(self, **kwargs):
             self.mol.calculate()
             if self.annotation is not None:
-                kwargs.setdefault('annotation',self.annotation)
-            self.trajectory.new_frame(**kwargs)
+                kwargs.setdefault('annotation', self.annotation)
+            self.report(self.mol.energy_model.sim,
+                        self.mol.energy_model.sim.context.getState(getEnergy=True,
+                                                                   getForces=True,
+                                                                   getPositions=True,
+                                                                   getVelocities=True))
 
         def report(self, simulation, state):
             """
@@ -113,7 +117,6 @@ else:
                                           ke.defunits_value(),
                                           t.defunits_value())
             self.last_report_time = self.mol.time
-
 
             self.trajectory.new_frame(properties=report)
 
