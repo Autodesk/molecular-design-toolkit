@@ -177,6 +177,43 @@ class AtomContainer(object):
         return com
     com = center_of_mass  # synonym
 
+    def _getatom(self, a):
+        """ Given an atom's name, index, or object, return the atom object
+        """
+        if a is None:
+            return None
+        elif isinstance(a, basestring) or isinstance(a, int):
+            return self[a]
+        else:
+            return a
+
+    def angle(self, a1, a2, a3):
+        """ Calculate the angle between three atoms.
+
+        Atoms can be passed as the atoms themselves or as the atom names
+
+        Args:
+            a1, a2, a3 (str OR int OR moldesign.Atom): atoms defining the angle
+
+        Returns:
+            units.Scalar[angle]
+        """
+        # TODO: use single dispatch to also accept two bonds
+        return mdt.geom.angle(*map(self._getatom, (a1, a2, a3)))
+
+    def dihedral(self, a1, a2, a3=None, a4=None):
+        """ Calculate the dihedral angle between atoms a1, a2, a3, a4.
+
+        Atoms can be passed as the atoms themselves or as the atom names
+
+        Args:
+            a1, a2, a3, a4 (str OR int OR moldesign.Atom): atoms defining the dihedral
+
+        Returns:
+            units.Scalar[angle]
+        """
+        return mdt.geom.dihedral(*map(self._getatom, (a1, a2, a3, a4)))
+
     def draw(self, width=500, height=500, show_2dhydrogens=None, display=False):
         """ Visualize this molecule (Jupyter only).
 

@@ -41,8 +41,8 @@ eV = electronvolts = ureg.eV
 kcalpermol = ureg.kcalpermol
 gpermol = ureg.gpermol
 kjpermol = ureg.kjpermol
-radians = rad = ureg.rad
-degrees = deg = ureg.degrees
+radians = radian = rad = ureg.rad
+degrees = degree = deg = ureg.degrees
 amu = da = dalton = ureg.amu
 kelvin = ureg.kelvin
 nm = ureg.nanometers

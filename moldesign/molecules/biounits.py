@@ -509,7 +509,7 @@ class Chain(Entity):
     @property
     def residues(self):
         """Chain: synonym for 'self' to enhance readability,
-            e.g. ```molecule.chains['A'].residue[123]```"""
+            e.g. ``molecule.chains['A'].residue[123]``"""
         return self
 
     def add(self, residue, **kwargs):
@@ -521,7 +521,7 @@ class Chain(Entity):
         return super(Chain, self).add(residue, **kwargs)
 
     def assign_biopolymer_bonds(self):
-        """Connect bonds between residues in this chain. Does not .
+        """Connect bonds between residues in this chain.
 
         See Also:
             :ref:`moldesign.Residue.assign_template_bonds`

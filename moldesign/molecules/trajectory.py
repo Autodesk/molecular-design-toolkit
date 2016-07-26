@@ -77,7 +77,8 @@ class _TrajAtom(object):
         self.real_atom = self.traj.mol.atoms[self.index]
 
     def __getattr__(self, item):
-        if item == 'traj': raise AttributeError('_TrajAtom.traj not assigned (pickle issue?)')
+        if item in ('traj', 'index', 'real_atom'):
+            raise AttributeError('_TrajAtom.%s not assigned (pickle issue?)' % item)
 
         if item in self.ATOMIC_ARRAYS:
             is_array = True
@@ -85,7 +86,10 @@ class _TrajAtom(object):
         else:
             is_array = False
 
-        trajslice = getattr(self.traj, item)
+        try:  # try to get a time-dependent version
+            trajslice = getattr(self.traj, item)
+        except AttributeError:  # not time-dependent - look for an atomic property
+            return getattr(self.real_atom, item)
 
         if is_array:
             return trajslice[:, self.index, :]
@@ -94,6 +98,13 @@ class _TrajAtom(object):
                 raise ValueError('%s is not an atomic quantity' % item)
             else:
                 return u.array([f[self.real_atom] for f in trajslice])
+
+    def __dir__(self):
+        attrs = [self.ATOMIC_ARRAYS.get(x, x) for x in dir(self.traj)]
+        attrs.extend(dir(self.atom))
+
+    def distance(self, other):
+        return mdt.geom.distance(self, other)
 
 
 @toplevel
@@ -212,6 +223,27 @@ class Trajectory(object):
 
         self._update_property_keys(new_frame)
         self.frames.append(new_frame)
+
+
+    def _get_traj_atom(self, a):
+        if a is None:
+            return None
+        elif isinstance(a, mdt.Atom):
+            return self.atoms[a.index]
+        else:
+            assert isinstance(a, _TrajAtom)
+
+    def distance(self, a1, a2):
+        a1, a2 = map(self._get_traj_atom, (a1, a2))
+        return mdt.distance(a1, a2)
+
+    def angle(self, a1, a2, a3):
+        a1, a2, a3 = map(self._get_traj_atom, (a1, a2, a3))
+        return mdt.angle(a1, a2, a3)
+
+    def dihedral(self, a1, a2, a3=None, a4=None):
+        a1, a2, a3, a4 = map(self._get_traj_atom, (a1, a2, a3, a4))
+        return mdt.dihedral(a1, a2, a3, a4)
 
     def _update_property_keys(self, new_frame=None):
         """

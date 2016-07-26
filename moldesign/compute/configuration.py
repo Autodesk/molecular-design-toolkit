@@ -47,7 +47,8 @@ jobs, usually using docker images.
 
 Notes:
     Values in this dictionary can be configured at runtime; however, after changing them,
-    you should update the compute configuration by running ``moldesign.compute.reset_compute_engine()``
+    you should update the compute configuration by running
+    ``moldesign.compute.reset_compute_engine()``
 
 Configuration is specified using the following keys:
 
@@ -85,7 +86,7 @@ DEFAULT_CONFIG_PATH = os.path.join(os.environ['HOME'], '.moldesign/moldesign.yml
 
 
 CONFIG_DEFAULTS = utils.DotDict(engine_type='ccc',
-                                default_repository='autodesk/moldesign:',
+                                default_repository='docker.io/autodesk/moldesign:',
                                 default_ccc_host=FREE_COMPUTE_CANNON,
                                 default_python_image=None,
                                 default_docker_host='unix://var/run/docker.sock',

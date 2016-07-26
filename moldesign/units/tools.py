@@ -67,13 +67,15 @@ def array(qlist, baseunit=None):
     :param baseunit: (optional) unit to standardize with
     :return: Quantity object
     """
+    if hasattr(qlist, 'units') and hasattr(qlist, 'magnitude'):
+        return MdtQuantity(qlist)
+
     if baseunit is None:
         baseunit = get_units(qlist)
         if baseunit == 1.0: return np.array(qlist)
 
     try:
-        newlist = [array(item, baseunit=baseunit).magnitude
-                   for item in qlist]
+        newlist = [array(item, baseunit=baseunit).magnitude for item in qlist]
         return baseunit * newlist
     except TypeError as exc:
         return qlist.to(baseunit)
