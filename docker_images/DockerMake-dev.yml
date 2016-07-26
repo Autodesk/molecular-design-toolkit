@@ -56,3 +56,11 @@ dev_deploys:
       && pip install git+https://github.com/Autodesk/py-cloud-compute-cannon@dev
      ENTRYPOINT python -m moldesign intro
 
+master_deploy:
+  requires:
+    - deploy_test_base
+  description: Install from master branch
+  build: |
+    RUN pip install biopython jupyter
+    RUN pip install git+https://github.com/Autodesk/molecular-design-toolkit@master
+
