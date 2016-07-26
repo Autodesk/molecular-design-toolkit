@@ -79,7 +79,7 @@ devtools:
 
 ############################################
 # moldesign
-# Note - this image installs from GITHUB MASTER so that we can test it before pushing to pypi
+# Note - this image installs from github so we can test it before submitting to pypi
 moldesign:
  requires:  # TODO: remove biopython dependency (it's in C ...)
   - python_install
@@ -87,7 +87,7 @@ moldesign:
  build: |
   RUN apt-get update && apt-get install -y gcc gfortran python-dev git \
    && pip install biopython \
-   && pip install git+https://github.com/Autodesk/molecular-design-toolkit@master \
+   && pip install git+https://github.com/Autodesk/molecular-design-toolkit@0.7.2 \
    && apt-get -y remove --purge gcc gfortran python-dev git \
    && apt-get -y autoremove --purge \
    && apt-get -y clean
@@ -97,7 +97,7 @@ pyccc:
  requires:
   - python_install
  build: |
-  RUN pip install pyccc
+  RUN pip install pyccc==0.6.4
 
 
 nbmolviz:
@@ -105,7 +105,7 @@ nbmolviz:
   - python_install
  build: |
   RUN pip install nbmolviz
-  RUN jupyter nbextension enable --python --sys-prefix nbmolviz &&
+  RUN jupyter nbextension enable --python --sys-prefix nbmolviz==0.6.5 &&
       jupyter nbextension enable --python --sys-prefix widgetsnbextensions
 
 
