@@ -58,3 +58,11 @@ class ResidueTemplate(object):
     def get_ffparams(self):
         chargemap = {atom: self.charges[atom.pdbname] for atom in self.mol.atoms}
         return mdt.interfaces.ambertools.get_gaff_parameters(self.mol, chargemap)
+
+ffdefaults = dict(protein='ff14SB',
+                  dna='OL15',
+                  rna='OL3',
+                  carbohydrate='GLYCAM_06j-1',
+                  lipid='lipid14',
+                  water='tip3p',
+                  organic='gaff2')

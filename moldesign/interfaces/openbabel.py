@@ -206,7 +206,7 @@ def mol_to_pybel(mdtmol):
             obres = resmap[atom.residue]
 
         obres.AddAtom(obatom)
-        obres.SetAtomID(obatom, atom.pdbname)
+        obres.SetAtomID(obatom, atom.name)
 
     for atom in mdtmol.bond_graph:
         a1 = atommap[atom]

@@ -22,8 +22,8 @@ IMAGE = 'ambertools'
 
 AmberParameters = collections.namedtuple('AmberParameters',
                                          'prmtop inpcrd job')
-GAFFParameters = collections.namedtuple('GAFFParameters',
-                                        'lib frcmod job')
+ExtraAmberParameters = collections.namedtuple('GAFFParameters',
+                                              'lib frcmod job')
 
 DNA_FF = {ff: 'leaprc.DNA.%s'%ff for ff in ['OL15', 'bsc1']}
 RNA_FF = {ff: 'leaprc.RNA.%s'%ff for ff in ['OL3', 'YIL']}
@@ -47,42 +47,44 @@ for ffiles in (DNA_FF, RNA_FF, PROTEIN_FF, LIPID_FF, CARB_FF, WATER_FF, ORGANIC_
     LEAPRCFILES.update(ffiles)
 
 
-class ParameterizationError(Exception): pass
+class ParameterizationError(Exception):
+    pass
 
 
-def am1_bcc_charges(mol, minsteps=None, wait=True):
-    """ Doesn't work yet ..."""
+@utils.kwargs_from(mdt.compute.run_job)
+def calc_am1_bcc_charges(mol, **kwargs):
+    """Calculate am1 bcc charges at current geometry"""
     charge = utils.if_not_none(mol.charge, 0)
-
-    engine = mdt.compute.get_engine()
-    image = compute.get_image_path(IMAGE, engine)
     command = 'antechamber -fi pdb -i mol.pdb -fo mol2 -o out.mol2 -c bcc -an n'
-    if charge != 0: command += ' -nc %d' % charge
-    if minsteps is not None: command += ' -ek "maxcyc=%d"' % minsteps
+    if charge != 0:
+        command += ' -nc %d' % charge
 
-    def parse_mol2(job):
+    def finish_job(job):
         """Callback to complete the job"""
-        atom_info = utils.DotDict(job=job)
         lines = iter(job.get_output('out.mol2').read().split('\n'))
-        while True:
-            line = lines.next()
-            fields = line.split()
-            if fields[0] == 'ATOM':
-                idx = int(fields[1]) - 1
-                name = fields[2]
-                assert mol.atoms[idx].name == name
-                atom_info[mol.atoms[idx]] = utils.DotDict(partialcharge=u.q_e * float(fields[-2]),
-                                                    atomtype=fields[-1])
-        return atom_info
+        charges = utils.DotDict(type='atomic')
 
-    job = engine.launch(image,
-                        command=command,
-                        name="am1-bcc, %s" % mol.name,
-                        inputs={'mol.pdb': mol.write(format='pdb')},
-                        when_finished=parse_mol2)
-    uibase.display_log(job.get_display_object(), job.name)
-    if not wait: return job()
-    else: job.wait()
+        line = lines.next()
+        while line.strip()[:len('@<TRIPOS>ATOM')] != '@<TRIPOS>ATOM':
+            line = lines.next()
+
+        line = lines.next()
+        while line.strip()[:len('@<TRIPOS>BOND')] != '@<TRIPOS>BOND':
+            fields = line.split()
+            idx = int(fields[0]) - 1
+            assert mol.atoms[idx].name == fields[1]
+            charges[mol.atoms[idx]] = u.q_e * float(fields[-1])
+            line = lines.next()
+
+        mol.properties['am1_bcc'] = charges
+        return charges
+
+    job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
+                    command=command,
+                    name="am1-bcc, %s" % mol.name,
+                    inputs={'mol.pdb': mol.write(format='pdb')},
+                    when_finished=finish_job)
+    return compute.run_job(job, _return_result=True, **kwargs)
 
 
 @utils.kwargs_from(mdt.compute.run_job)
@@ -114,19 +116,8 @@ def build_bdna(sequence, **kwargs):
     return mdt.compute.run_job(job, _return_result=True, **kwargs)
 
 
-# TODO: use a single force field specification object rather than 20 kwargs
 @utils.kwargs_from(compute.run_job)
-def run_tleap(mol,
-              protein='ff14SB',
-              dna='OL15',
-              rna='OL3',
-              carbohydrate='GLYCAM_06j-1',
-              lipid='lipid14',
-              water='tip3p',
-              organic='gaff2',
-              off_files=(),
-              frcmod_files=(),
-              **kwargs):
+def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
     """
     Drives tleap to create a prmtop and inpcrd file. Specifically uses the AmberTools 16
     tleap distribution.
@@ -135,15 +126,11 @@ def run_tleap(mol,
 
     Args:
         mol (moldesign.Molecule): Molecule to set up
-        protein (str): protein forcefield name (default:ff14SB)
-        dna (str): dna forcefield name (default: OL15)
-        rna (str): rna forcefield name (default: OL3)
-        carbohydrate (str): carbohydrate forcefield name (default: GLYCAM_06j)
-        lipid (str): lipid forcefield name (default: lipid14)
-        water (str): water forcefield name (default: tip3p)
-        organic (str): organic forcefield name (default: gaff2)
-        off_files (List[batch.FileContainer]):
-        frcmod_files (List[batch.FileContainer]):
+        forcefields (List[str]): list of the names of forcefields to use
+            (see AmberTools manual for descriptions)
+        parameters (List[ExtraAmberParameters]): (optional) list of amber parameters
+            for non-standard residues
+
         **kwargs: keyword arguments to :meth:`compute.run_job`
 
     References:
@@ -151,23 +138,25 @@ def run_tleap(mol,
         recommendations.
     """
     # Prepare input for tleap
-    leapstr = ['source %s' % LEAPRCFILES[ff] for ff in
-               (protein, dna, rna, carbohydrate, lipid, water, organic)]
+    if forcefields is None: forcefields = mdt.forcefields.ffdefaults.values()
+    leapstr = ['source %s' % LEAPRCFILES[ff] for ff in forcefields]
+    inputs = {'input.pdb': mol.write(format='pdb')}
 
-    for frcmod in frcmod_files:
-        fname = frcmod.dumphere()
-        leapstr.append('loadamberparam %s' % fname)
-    for off in off_files:
-        fname = off.dumphere()
-        leapstr.append('loadoff %s' % fname)
+    if parameters:
+        for ipmtr, p in enumerate(parameters):
+            frcname = 'res%d.frcmod' % ipmtr
+            libname = 'res%d.lib' % ipmtr
+            inputs[frcname] = p.frcmod
+            inputs[libname] = p.lib
+            leapstr.append('loadamberparam %s' % frcname)
+            leapstr.append('loadoff %s' % libname)
+
     leapstr.append('mol = loadpdb input.pdb\n'
                    "check mol\n"
                    "saveamberparm mol output.prmtop output.inpcrd\n"
                    "quit\n")
 
-    # Launch the job
-    inputs = {'input.pdb': mol.write(format='pdb'),
-              'input.leap': '\n'.join(leapstr)}
+    inputs['input.leap'] = '\n'.join(leapstr)
 
     job = pyccc.Job(image=compute.get_image_path(IMAGE),
                     command='tleap -f input.leap',
@@ -201,24 +190,41 @@ def assign_forcefield(mol, **kwargs):
         raise ParameterizationError('TLeap failed to assign force field parameters for %s' % mol, job)
 
 
-def get_gaff_parameters(mol, charges, image=IMAGE, engine=None):
-    """ Doesn't work yet"""
-    inputs = {}
+@utils.kwargs_from(mdt.compute.run_job)
+def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
+    """Parameterize ``mol``, typically using GAFF parameters.
 
-    # Add charges to molecule
-    inputs['mol.charges'] = '\n'.join(map(str, charges))
-    inputs['mol.mol2'] = mol.write(format='mol2')
+    Note: this requires partial charges to alread
 
-    # Creates a mol2 file with the passed charges
-    cmds.append('antechamber -i mol.mol2 -fi mol2 -o mol_charged.mol2 -fo mol2 -c rc -cf mol.charges')
+    Args:
+        mol (moldesign.Molecule):
+        charges (str): what kind of partial charges to use? These will be taken from
+           ``mol.properties.[charges name]``; typical values will be 'esp', 'mulliken',
+           'am1-bcc', etc. Use 'zero' to set all charges to 0 (for QM/MM and testing)
+           'am1-bcc' will be calculated automatically if not available.
+        ffname (str): Name of the gaff-like forcefield file (default: gaff2)
 
-    # Add missing parameters, write out library and parameter files
-    cmds.append('parmchk -i mol_charged.mol2 -f mol2 -o mol.frcmod')
+    Returns:
+        ExtraAmberParameters: Parameters for the molecule
+    """
 
-    # Create the lib file
-    cmds.append('tleap -f lea.in')
-    inputs['leap.in'] = '\n'.join(["source leaprc.%s" % ff,
-                                   "source leaprc.gaff",
+    if charges == 'am1-bcc' and 'am1-bcc' not in mol.properties:
+        calc_am1_bcc_charges(mol)
+
+    if charges == 'zero':
+        charges = [0.0 for atom in mol.atoms]
+    else:
+        charges = u.array([mol.properties[charges][atom] for atom in mol.atoms])
+        if not charges.dimensionless:  # allow for floats or charge units
+            charges = charges.to(u.q_e).magnitude
+
+    inputs = {'mol.mol2': mol.write(format='mol2'),
+              'mol.charges': '\n'.join(map(str, charges))}
+
+    cmds = ['antechamber -i mol.mol2 -fi mol2 -o mol_charged.mol2 -fo mol2 -c rc -cf mol.charges',
+            'parmchk -i mol_charged.mol2 -f mol2 -o mol.frcmod', 'tleap -f leap.in']
+
+    inputs['leap.in'] = '\n'.join(["source leaprc.%s" % ffname,
                                    "LIG = loadmol2 mol_charged.mol2",
                                    "fmod = loadamberparams mol.frcmod",
                                    "check LIG",
@@ -226,17 +232,18 @@ def get_gaff_parameters(mol, charges, image=IMAGE, engine=None):
                                    "saveamberparm LIG mol.prmtop mol.inpcrd",
                                    "quit\n"])
 
-    # Submit the job and wait
-    job = engine.launch(imagename,
-                          ' && '.join(cmds),
-                          inputs=inputs,
-                          name="GAFF assignments" % mol.name)
-    uibase.display_log(job.get_display_object(), "tleap, %s"%mol.name)
-    job.wait()
+    def finish_job(j):
+        param = ExtraAmberParameters(j.get_output('mol.lib'),
+                                     j.get_output('mol.frcmod'),
+                                     j)
+        return param
 
-    param = GAFFParameters(job.get_output('mol.lib'),
-                           job.get_output('mol.frcmod'),
-                           job)
-    return param
+    job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
+                    command=' && '.join(cmds),
+                    inputs=inputs,
+                    when_finished=finish_job,
+                    name="GAFF assignment: %s" % mol.name)
+
+    return mdt.compute.run_job(job, _return_result=True, **kwargs)
 
 

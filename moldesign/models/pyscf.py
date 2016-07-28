@@ -66,11 +66,11 @@ class PySCFPotential(QMBase):
         self.kernel = None
         self.logs = StringIO()
         self.last_el_state = None
-        self.logger = uibase.Logger('PySCF interface')  # eventually, this be a child of the parent molecule
+        self.logger = uibase.Logger('PySCF interface')
 
     @compute.runsremotely(enable=force_remote, is_imethod=True)
     def calculate(self, requests=None, guess=None):
-        self.logger = uibase.Logger('PySCF calc')  # eventually, this be a child of the parent molecule
+        self.logger = uibase.Logger('PySCF calc')
         do_forces = 'forces' in requests
         if do_forces and self.params.theory not in self.FORCE_CALCULATORS:
             raise ValueError('Forces are only available for the following theories:'
