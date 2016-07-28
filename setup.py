@@ -15,9 +15,6 @@ import os
 import sys
 from os.path import relpath, join
 
-import imp
-
-import subprocess
 from setuptools import find_packages, setup
 from setuptools.command.install import install
 

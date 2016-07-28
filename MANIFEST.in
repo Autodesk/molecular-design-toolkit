@@ -5,6 +5,8 @@ include LICENSE
 include README.md
 include CONTRIBUTING.md
 include DEVELOPMENT.md
+include NOTICES
+include moldesign/HISTORY.rst
 recursive-include moldesign/_static_data *.*
 recursive-include moldesign/_notebooks *.*
 global-exclude *.py[cod] __pycache__ *~ *.bak
