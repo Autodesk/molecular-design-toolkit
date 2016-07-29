@@ -163,7 +163,7 @@ class AtomContainer(object):
     def num_atoms(self):
         """ int: number of atoms in this object """
         return len(self.atoms)
-    natoms = numatoms = num_atoms
+    natoms = num_atoms
 
     @property
     def center_of_mass(self):

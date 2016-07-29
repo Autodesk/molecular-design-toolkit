@@ -158,12 +158,6 @@ class Entity(AtomContainer, utils.DictLike):
                                 key=lambda x: x.index))
         return atoms
 
-    @property
-    def natoms(self):
-        """ int: number of atoms contained in this entity and its children
-        """
-        return len(self.atoms)
-    num_atoms = numatoms = natoms
 
 
 @toplevel

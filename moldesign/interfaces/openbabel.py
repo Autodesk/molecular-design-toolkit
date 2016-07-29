@@ -216,12 +216,11 @@ def mol_to_pybel(mdtmol):
                 obmol.AddBond(a1.GetIdx(), a2.GetIdx(), order)
     obmol.EndModify()
     pbmol = pb.Molecule(obmol)
-    if hasattr(mdtmol.atoms[0], 'charge'):
-        for atom in atommap:
-            idx = atommap[atom].GetIdx()
-            obatom = obmol.GetAtom(idx)
-            obatom.SetPartialCharge(atom.charge)
-            print atommap[atom],
+
+    for atom in atommap:
+        idx = atommap[atom].GetIdx()
+        obatom = obmol.GetAtom(idx)
+        obatom.SetFormalCharge(atom.formal_charge)
     return pbmol
 
 
@@ -254,16 +253,17 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
 
         if pybatom.atomicnum == 67:
             print ("WARNING: openbabel parsed atom serial %d (name:%s) as Holmium; "
-                   "correcting to hydrogen. ")%(pybatom.OBAtom.GetIdx(), name)
+                   "correcting to hydrogen. ") % (pybatom.OBAtom.GetIdx(), name)
             atnum = 1
 
         elif pybatom.atomicnum == 0:
             print "WARNING: openbabel failed to parse atom serial %d (name:%s); guessing %s. " % (
                 pybatom.OBAtom.GetIdx(), name, name[0])
-            atnum = moldesign.core.data.ATOMIC_NUMBERS[name[0]]
+            atnum = moldesign.data.ATOMIC_NUMBERS[name[0]]
         else:
             atnum = pybatom.atomicnum
         mdtatom = moldesign.molecules.atoms.Atom(atnum=atnum, name=name,
+                                                 formal_charge=pybatom.formalcharge,
                                                  pdbname=name, pdbindex=pybatom.OBAtom.GetIdx())
         newatom_map[pybatom.OBAtom.GetIdx()] = mdtatom
         mdtatom.position = pybatom.coords * angstrom

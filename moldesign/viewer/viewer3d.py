@@ -96,7 +96,7 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
                     cartoon_atoms.extend(residue.atoms)
                 elif residue.type in ('water', 'solvent'):
                     line_atoms.extend(residue.atoms)
-                elif residue.type in ('dna', 'rna') and self.mol.numatoms > 1000:
+                elif residue.type in ('dna', 'rna') and self.mol.num_atoms > 1000:
                     cartoon_atoms.extend(residue.atoms)
                 else:  # includes DNA, RNA if molecule is small enough
                     stick_atoms.extend(residue.atoms)
@@ -113,7 +113,7 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
                 self.stick(atoms=stick_atoms, render=False)
 
         # Deal with unbonded atoms (they only show up in VDW rep)
-        if self.mol.numatoms > 1000:
+        if self.mol.num_atoms > 1000:
             print 'WARN: large structure; waters not shown by default.'
             lone = [atom for atom in self.mol.atoms if
                     atom.num_bonds == 0 and atom.residue.type != 'water']

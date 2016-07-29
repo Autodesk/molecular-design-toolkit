@@ -19,7 +19,6 @@ from nbmolviz.widget2d import MolViz2DBaseWidget
 
 from moldesign import utils
 import moldesign.units as u
-from moldesign.data import color_rotation
 from moldesign.molecules import AtomList
 
 from . import toplevel, ColorMixin
@@ -61,7 +60,15 @@ class ChemicalGraphViewer(MolViz2DBaseWidget, ColorMixin):
             raise ValueError('Refusing to draw more than 200 atoms in 2D visualization. '
                              'Override this with _forcebig=True')
 
-        if names is None: self.names = [atom.name for atom in self.atoms]
+        if names is None:
+            names = []
+            for atom in self.atoms:
+                if atom.formal_charge == 0:
+                    names.append(atom.name)
+                else:
+                    names.append(atom.name + _charge_str(atom.formal_charge))
+
+        self.names = names
 
         self.atom_indices = {atom: i for i, atom in enumerate(self.atoms)}
         self.selection_group = None
@@ -78,7 +85,7 @@ class ChemicalGraphViewer(MolViz2DBaseWidget, ColorMixin):
     def to_graph(self, atoms):
         nodes, links = [], []
         for i1, atom1 in enumerate(atoms):
-            nodes.append(dict(atom=atom1.name, index=i1))
+            nodes.append(dict(atom=self.names[i1], index=i1))
             if atom1.atnum == 6 and not self.carbon_labels:
                 nodes[-1].update({'atom': '',
                                   'size': 0.5,
@@ -115,6 +122,19 @@ class ChemicalGraphViewer(MolViz2DBaseWidget, ColorMixin):
         if 'atoms' in selection:
             self.highlight_atoms(
                 [a for a in selection['atoms'] if a in self.atom_indices])
+
+
+def _charge_str(q):
+    if q == 0:
+        return ''
+    elif q == 1:
+        return '+'
+    elif q == -1:
+        return '-'
+    elif q > 0:
+        return '+%d' % q
+    else:
+        return str(q)
 
 
 @toplevel

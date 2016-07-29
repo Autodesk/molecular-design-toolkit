@@ -565,11 +565,6 @@ class MolTopologyMixin(object):
         self._assign_atom_indices()
         self._assign_residue_indices()
         self._dof = None
-        num_bonds = 0
-        for atom in self.bond_graph:
-            num_bonds += len(atom.bond_graph)
-        assert num_bonds % 2 == 0
-        self.num_bonds = num_bonds / 2
 
     @staticmethod
     def _build_bonds(atoms):
@@ -906,7 +901,8 @@ class Molecule(AtomContainer,
         name (str): A descriptive name for molecule
         charge (units.Scalar[charge]): molecule's formal charge
         ndims (int): length of the positions, momenta, and forces arrays (usually 3*self.num_atoms)
-        num_atoms (int): number of atoms (synonyms: num_atoms, numatoms)
+        num_atoms (int): number of atoms (synonym: natoms)
+        num_bonds (int): number of bonds (synonym: nbonds)
         positions (units.Array[length]): Nx3 array of atomic positions
         momenta (units.Array[momentum]): Nx3 array of atomic momenta
         masses (units.Vector[mass]): vector of atomic masses
@@ -942,7 +938,7 @@ class Molecule(AtomContainer,
                  name=None, bond_graph=None,
                  copy_atoms=False,
                  pdbname=None,
-                 charge=0):
+                 charge=None):
         # NEW_FEATURE: deal with random number generators per-geometry
         # NEW_FEATURE: per-geometry output logging
         super(Molecule, self).__init__()
@@ -969,10 +965,11 @@ class Molecule(AtomContainer,
         self._defres = None
         self._defchain = None
         self.pdbname = pdbname
-        self.charge = charge
         self.constraints = []
         self.energy_model = None
         self.integrator = None
+
+        self.charge = utils.if_not_none(charge, sum(atom.formal_charge for atom in self.atoms))
 
         # Builds the internal memory structures
         self.chains = Instance(molecule=self)
@@ -1014,6 +1011,13 @@ class Molecule(AtomContainer,
     @velocities.setter
     def velocities(self, value):
         self.momenta = value * self.dim_masses
+
+    @property
+    def num_bonds(self):
+        """int: number of chemical bonds in this molecule"""
+        return sum(atom.nbonds for atom in self.atoms)
+
+    nbonds = num_bonds
 
     def addatom(self, newatom):
         """  Add a new atom to the molecule
