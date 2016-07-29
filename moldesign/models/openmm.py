@@ -234,21 +234,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
             self.mm_topology = self.mm_prmtop.topology
             print 'Created force field using embedded prmtop file'
         else:
-            self.mm_pdb = from_filepath(opm.app.PDBFile,
-                                        StringIO(self.mol.write(format='pdb')))
-            self.mm_topology = self.mm_pdb.topology
-            ffs = self._get_forcefield_args()
-            self.mm_forcefield = opm.app.ForceField(*self._get_forcefield_args())
-            print 'Created force field using OpenMM templates: %s' % str(ffs)
-            self.mm_system.createSystem(self.mm_topology, self.mol.name,
-                                        **system_params)
-
-    def _get_forcefield_args(self):
-        ff = self.params.forcefield[:2]
-        if ff[:5] == 'amber':
-            return ('%s.xml' % ff, 'tip3p.xml')
-        else:
-            raise NotImplementedError()
+            raise NotImplementedError('OpenMM requires a PRMTOP file')
 
     def _set_openmm_state(self):  # TODO: periodic state
         self.sim.context.setPositions(opm.pint2simtk(self.mol.positions))

@@ -60,7 +60,8 @@ Args:
     default_python_image (str): Image to run python commands in
         (default: ``docker.io/autodesk/moldesign:moldesign_complete-[VERSION]``, where
         [VERSION] is the version of MDT)
-    default_version_tag (str): Default version tag for docker images (default: 'latest')
+    default_version_tag (str): Default version tag for docker images
+         (default: ``moldesign.__version__``)
     default_docker_machine (str): Name of the docker machine to connect to; if
         ``engine_type=='docker'``, EITHER this OR ``default_docker_url`` (but not both) must
         be set. (default: 'default')
@@ -91,7 +92,7 @@ CONFIG_DEFAULTS = utils.DotDict(engine_type='ccc',
                                 default_python_image=None,
                                 default_docker_host='unix://var/run/docker.sock',
                                 default_docker_machine='default',
-                                default_version_tag='0.7.1')
+                                default_version_tag='0.7.2')
 
 DEF_CONFIG = CONFIG_DEFAULTS.copy()
 """ dict: default configuration to be written to moldesign.yml if it doesn't exist

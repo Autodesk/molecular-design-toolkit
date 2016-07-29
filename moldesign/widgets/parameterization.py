@@ -47,15 +47,14 @@ class ParameterizationDisplay(ipy.Box):
         self.errorlist = ipy.Select(options=collections.OrderedDict((e.short, e) for e in self.msg))
         self.errmsg = ipy.HTML('-')
 
-        self.viewerpane = self.molin.draw()
-        self.viewer = self.viewerpane.children[0]
+        self.viewer = self.molin.draw3d()
         self.viewer.ribbon(opacity=0.7)
 
         if self.errorlist.value is not None:
             self.switch_display({'old': self.errorlist.value, 'new': self.errorlist.value})
         self.errorlist.observe(self.switch_display, 'value')
         children = (self.status,
-                    ipy.HBox([self.viewerpane, ipy.VBox([self.listdesc, self.errorlist])]),
+                    ipy.HBox([self.viewer, ipy.VBox([self.listdesc, self.errorlist])]),
                     self.errmsg)
 
         super(ParameterizationDisplay, self).__init__(children=children)

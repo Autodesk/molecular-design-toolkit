@@ -53,11 +53,42 @@ class ParameterizationError(Exception):
 
 @utils.kwargs_from(mdt.compute.run_job)
 def calc_am1_bcc_charges(mol, **kwargs):
-    """Calculate am1 bcc charges at current geometry"""
+    """Calculate am1 bcc charges
+
+    Args:
+        mol (moldesign.Molecule): assign partial charges to this molecule
+            (they will be stored at ``mol.properties['am1-bcc']``)
+
+    Note:
+        This will implicity run an AM1 energy minimization before calculating the final
+        partial charges. For more control over this process, use the
+        ``moldesign.models.SQMPotential`` energy model to calculate the charges.
+
+    Returns:
+        Mapping[moldesign.Atom, units.Scalar[charge]]: AM1-BCC partial charges on each atom
+    """
+    return _antechamber_calc_charges(mol, 'bcc', 'am1-bcc', kwargs)
+
+
+@utils.kwargs_from(mdt.compute.run_job)
+def calc_gasteiger_charges(mol, **kwargs):
+    """Calculate gasteiger charges
+
+    Args:
+        mol (moldesign.Molecule): assign partial charges to this molecule
+
+    Returns:
+        Mapping[moldesign.Atom, units.Scalar[charge]]: gasteiger partial charges on each atom
+             (they will be stored at ``mol.properties['gasteiger']``)
+    """
+    return _antechamber_calc_charges(mol, 'gas', 'gasteiger', kwargs)
+
+
+def _antechamber_calc_charges(mol, ambname, chargename, kwargs):
     charge = utils.if_not_none(mol.charge, 0)
-    command = 'antechamber -fi pdb -i mol.pdb -fo mol2 -o out.mol2 -c bcc -an n'
+    command = 'antechamber -fi pdb -i mol.pdb -fo mol2 -o out.mol2 -c %s -an n'%ambname
     if charge != 0:
-        command += ' -nc %d' % charge
+        command += ' -nc %d'%charge
 
     def finish_job(job):
         """Callback to complete the job"""
@@ -71,20 +102,21 @@ def calc_am1_bcc_charges(mol, **kwargs):
         line = lines.next()
         while line.strip()[:len('@<TRIPOS>BOND')] != '@<TRIPOS>BOND':
             fields = line.split()
-            idx = int(fields[0]) - 1
+            idx = int(fields[0])-1
             assert mol.atoms[idx].name == fields[1]
-            charges[mol.atoms[idx]] = u.q_e * float(fields[-1])
+            charges[mol.atoms[idx]] = u.q_e*float(fields[-1])
             line = lines.next()
 
-        mol.properties['am1_bcc'] = charges
+        mol.properties[chargename] = charges
         return charges
 
     job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
                     command=command,
-                    name="am1-bcc, %s" % mol.name,
+                    name="%s, %s"%(chargename, mol.name),
                     inputs={'mol.pdb': mol.write(format='pdb')},
                     when_finished=finish_job)
     return compute.run_job(job, _return_result=True, **kwargs)
+
 
 
 @utils.kwargs_from(mdt.compute.run_job)
@@ -143,6 +175,8 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
     inputs = {'input.pdb': mol.write(format='pdb')}
 
     if parameters:
+        if isinstance(parameters, ExtraAmberParameters):
+            parameters = [parameters]
         for ipmtr, p in enumerate(parameters):
             frcname = 'res%d.frcmod' % ipmtr
             libname = 'res%d.lib' % ipmtr
@@ -207,15 +241,19 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
     Returns:
         ExtraAmberParameters: Parameters for the molecule
     """
+    assert mol.num_residues == 1
+    resname = mol.residues[0].resname
 
     if charges == 'am1-bcc' and 'am1-bcc' not in mol.properties:
         calc_am1_bcc_charges(mol)
+    elif charges == 'gasteiger' and 'gasteiger' not in mol.properties:
+        calc_gasteiger_charges(mol)
 
     if charges == 'zero':
         charges = [0.0 for atom in mol.atoms]
     else:
         charges = u.array([mol.properties[charges][atom] for atom in mol.atoms])
-        if not charges.dimensionless:  # allow for floats or charge units
+        if not charges.dimensionless:  # implicitly convert floats to fundamental charge units
             charges = charges.to(u.q_e).magnitude
 
     inputs = {'mol.mol2': mol.write(format='mol2'),
@@ -225,11 +263,11 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
             'parmchk -i mol_charged.mol2 -f mol2 -o mol.frcmod', 'tleap -f leap.in']
 
     inputs['leap.in'] = '\n'.join(["source leaprc.%s" % ffname,
-                                   "LIG = loadmol2 mol_charged.mol2",
+                                   "%s = loadmol2 mol_charged.mol2" % resname,
                                    "fmod = loadamberparams mol.frcmod",
-                                   "check LIG",
-                                   "saveoff LIG mol.lib",
-                                   "saveamberparm LIG mol.prmtop mol.inpcrd",
+                                   "check %s" % resname,
+                                   "saveoff %s mol.lib" % resname,
+                                   "saveamberparm %s mol.prmtop mol.inpcrd" % resname,
                                    "quit\n"])
 
     def finish_job(j):
