@@ -114,14 +114,13 @@ class MdtQuantity(ureg.Quantity):
 
         Notes:
             - Allow equality test between compatible units
-            - Allow comparisons to 0 to ignore units
+            - Allow comparisons to unitless 0
         """
-        if hasattr(other, 'value_in'):
-            return self.magnitude == other.value_in(self.units)
-        elif other == 0.0:  # ignore units
-            return self.magnitude == other
+        other = MdtQuantity(other)
+        if other.magnitude == 0.0 and other.dimensionless:
+            return self.magnitude == other.magnitude
         else:
-            return super(MdtQuantity, self).__eq__(other)
+            return self.magnitude == other.value_in(self.units)
 
     @property
     def shape(self):
@@ -133,12 +132,13 @@ class MdtQuantity(ureg.Quantity):
 
     def compare(self, other, op):
         """ Augments the :class:`pint._Quantity` method with the following features:
-          - Comparisons to 0 ignore units
+          - Comparisons to dimensionless 0 can proceed without unit checking
         """
-        if other == 0.0:
-            return op(self.magnitude, other)
+        other = MdtQuantity(other)
+        if other.magnitude == 0.0 and other.dimensionless:
+            return op(self.magnitude, other.magnitude)
         else:
-            return super(MdtQuantity, self).compare(other, op)
+            return op(self.magnitude, other.value_in(self.units))
 
     def get_units(self):
         """

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import numpy as np
+
 try:
     import pdbfixer as pf
 except ImportError:
@@ -20,17 +22,21 @@ except ImportError:
 else:
     force_remote = False
 
+import moldesign as mdt
 from moldesign import units as u
+from moldesign import compute
 
-from .  import openmm as opm
+from . import openmm as opm
 
 
+@compute.runsremotely(enable=force_remote)
 def add_hydrogen(mol, pH=7.4):
     fixer = _get_fixer(mol)
     fixer.addMissingHydrogens(pH)
     return _get_mol(fixer)
 
 
+@compute.runsremotely(enable=force_remote)
 def mutate(mol, mutationmap):
     fixer = _get_fixer(mol)
     chain_mutations = {}
@@ -44,12 +50,76 @@ def mutate(mol, mutationmap):
     return _get_mol(fixer)
 
 
-def solvate(mol, padding=10.0*u.angstrom, size=None, cation='Na+', anion='Cl-'):
-    fixer = _get_fixer(mol)
-    if size is not None: size = size.to_simtk()
-    if padding is not None: padding = padding.to_simtk()
-    fixer.addSolvent(padding=padding, boxSize=size, positiveIon=cation, negativeIon=anion)
-    return _get_mol(fixer)
+@compute.runsremotely(enable=force_remote)
+def add_water(mol, min_box_size=None, padding=None,
+              ion_concentration=None, neutralize=True,
+              positive_ion='Na+', negative_ion='Cl-'):
+    """ Solvate a molecule in a water box with optional ions
+
+    Args:
+        mol (moldesign.Molecule): solute molecule
+        min_box_size (u.Scalar[length] or u.Vector[length]): size of the water box - either
+           a vector of x,y,z dimensions, or just a uniform cube length. Either this or
+           ``padding`` (or both) must be passed
+        padding (u.Scalar[length]): distance to edge of water box from the solute in each dimension
+        neutralize (bool): add ions to neutralize solute charge (in
+            addition to specified ion concentration)
+        positive_ion (str): type of positive ions to add, if needed. Allowed values
+            (from OpenMM modeller) are Cs, K, Li, Na (the default) and Rb
+        negative_ion (str): type of negative ions to add, if needed. Allowed values
+            (from OpenMM modeller) are Cl (the default), Br, F, and I
+        ion_concentration (float or u.Scalar[molarity]): ionic concentration in addition to
+            whatever is needed to neutralize the solute. (if float is passed, we assume the
+            number is Molar)
+
+    Returns:
+        moldesign.Molecule: new Molecule object containing both solvent and solute
+    """
+    if padding is None and min_box_size is None:
+        raise ValueError('Solvate arguments: must pass padding or min_box_size or both.')
+
+    # add +s and -s to ion names if not already present
+    if positive_ion[-1] != '+':
+        assert positive_ion[-1] != '-'
+        positive_ion += '+'
+    if negative_ion[-1] != '-':
+        assert negative_ion[-1] != '+'
+        negative_ion += '-'
+
+    if ion_concentration is not None:
+        ion_concentration = u.MdtQuantity(ion_concentration)
+        if ion_concentration.dimensionless:
+            ion_concentration *= u.molar
+
+    # calculate box size - in each dimension, use the largest of min_box_size or
+    #    the calculated padding
+    boxsize = np.zeros(3) * u.angstrom
+    if min_box_size:
+        boxsize[:] = min_box_size
+    if padding:
+        ranges = mol.positions.max(axis=0) - mol.positions.min(axis=0)
+        for idim, r in enumerate(ranges):
+            boxsize[idim] = max(boxsize[idim], r+padding)
+    assert (boxsize >= 0.0).all()
+
+    modeller = opm.mol_to_modeller(mol)
+
+    # TODO: this is like 10 bad things at once. Should probably submit a
+    #       PR to PDBFixer to make this a public staticmethod instead of a private instancemethod
+    #       Alternatively, PR to create Fixers directly from Topology objs
+    ff = pf.PDBFixer.__dict__['_createForceField'](None, modeller.getTopology(), True)
+
+    modeller.addSolvent(ff,
+                        boxSize=opm.pint2simtk(boxsize),
+                        positiveIon=positive_ion,
+                        negativeIon=negative_ion,
+                        ionicStrength=opm.pint2simtk(ion_concentration),
+                        neutralize=neutralize)
+
+    return opm.topology_to_mol(modeller.getTopology(),
+                               positions=modeller.getPositions(),
+                               name='%s with water box' % mol.name)
+
 
 
 def _get_fixer(mol):

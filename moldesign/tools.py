@@ -17,12 +17,12 @@ This module contains various utility functions that are exposed to API users
 """
 
 from moldesign.interfaces.openbabel import add_hydrogen, guess_bond_orders
-from moldesign.interfaces.pdbfixer_interface import mutate, solvate
+from moldesign.interfaces.pdbfixer_interface import mutate, add_water
 from moldesign.interfaces.ambertools import assign_forcefield, parameterize
 from moldesign.interfaces.ambertools import calc_am1_bcc_charges, calc_gasteiger_charges
 
 
-__all__ = ('add_hydrogen guess_bond_orders mutate solvate'
+__all__ = ('add_hydrogen guess_bond_orders mutate add_water'
            ' assign_forcefield parameterize').split()
 
 

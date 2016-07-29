@@ -288,5 +288,31 @@ def topology_to_mol(topo, name=None, positions=None, velocities=None, assign_bon
     return newmol
 
 
-def mol_to_toplogy(mol):
-    raise NotImplementedError
+def mol_to_topology(mol):
+    """ Create an openmm topology object from an MDT molecule
+
+    Args:
+        mol (moldesign.Molecule): molecule to copy topology from
+
+    Returns:
+        simtk.openmm.app.Topology: topology of the molecule
+
+    """
+    top = app.Topology()
+    chainmap = {chain: top.addChain(chain.name) for chain in mol.chains}
+    resmap = {res: top.addResidue(res.resname, chainmap[res.chain], str(res.pdbindex))
+              for res in mol.residues}
+    atommap = {atom: top.addAtom(atom.name,
+                                 app.Element.getBySymbol(atom.element),
+                                 resmap[atom.residue],
+                                 id=str(atom.pdbindex))
+               for atom in mol.atoms}
+    for bond in mol.bonds:
+        top.addBond(atommap[bond.a1], atommap[bond.a2])
+
+    return top
+
+
+def mol_to_modeller(mol):
+    return app.Modeller(mol_to_topology(mol), pint2simtk(mol.positions))
+
