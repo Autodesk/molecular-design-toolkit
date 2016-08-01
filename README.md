@@ -15,6 +15,8 @@ pip install moldesign
 python -m moldesign intro
 ```
 
+Note: depending on how python is installed on your system, some users may need to install the package as root: `sudo pip install moldesign`.
+
 The best way to get started is to play with the examples that `python -m moldesign intro` will pull up. See [the documentation](https://autodesk.github.io/molecular-design-toolkit/) for complete API docs, development instructions and other installation scenarios.
 
 ## Code Example
