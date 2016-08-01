@@ -1,13 +1,13 @@
 # Programming guidelines
 
 ### Principles
- 1. Users are **scientists, not programmers**. They'll need to know enough python to accomplish their science, but Buckyball users may never know (or want to know) what a metaclass is or even how a web page works. Most workflows should be accomplishable without deep python or programming skills.
+ 1. Users are **scientists, not programmers**. They'll need to know enough python to accomplish their science, but Molecular Design Toolkit (MDT) users may never know (or want to know) what a metaclass is or even how a web page works. Most workflows should be accomplishable without deep python or programming skills.
  1. Build **power tools for competent computational chemists** - users need customizable, introspectable, and composable tools to build complex simulation workflows. We can support users with good documentation, great examples, and sensible defaults (e.g., well-chosen convergence parameters, proper timesteps).
- 1. Prefer a **clean, stable API** above all else. Buckyball's python API *is* its user interface. A good implementation is one that produces a good interface.
+ 1. Prefer a **clean, stable API** above all else. MDT's python API *is* its user interface. A good implementation is one that produces a good interface.
  1. When in doubt, strive for **usability and user-friendliness**
 
 ### Make information accessible and intuitive
-Buckyball is designed, as much as possible, to allow users to interactively explore molecular systems. Here are some of the ways we try to make the API an intuitive experience:
+MDT is designed, as much as possible, to allow users to interactively explore molecular systems. Here are some of the ways we try to make the API an intuitive experience:
  1. **Write for autocomplete**: users should be encouraged to type a couple letters then hit `tab`, even if they don't know exactly what they're looking for 
  1. **Keep namespaces flat**: don't make users hunt for a piece of data - make it accessible from the highest-level logical location (`mol.aobasis`, not  `mol.electronic_wavefunction.orbitals.aobasis`)
  1. **Add specific, use-case-based sugar** - e.g., users will frequently create lists of different types of residues. It's easier to type `waters = mol.get_residues(type='water')` than it is to type `waters = [res for res in mol.residues if res.type == 'water']`. If this is a *really common* use case, consider adding `mol.get_water_residues()`.
@@ -21,9 +21,9 @@ Buckyball is designed, as much as possible, to allow users to interactively expl
  1. **Expose heavy-duty computation as methods** - A potential energy calculation could take anywhere from milliseconds to days. This should NOT be triggered by a user accessing `mol.potential_energy`; instead, they should call `mol.calculate_potential_energy()`.
 
 ### Keeping the API clean, flat, and Jupyter-friendly
-1. The **top level buckyball namespace** should contain everything the user will need:<br> 
-   - YES: `buckyball.[name]`, e.g. `buckyball.from_smiles`
-   - NO: `buckyball.[name1].[name2].[name3]`, e.g. `buckyball.interfaces.openbabel.from_smiles`
+1. The **top level `moldesign` namespace** should contain everything the user will need:<br> 
+   - YES: `moldesign.[name]`, e.g. `moldesign.from_smiles`
+   - NO: `moldesign.[name1].[name2].[name3]`, e.g. `moldesign.interfaces.openbabel.from_smiles`
 1. Use **delegation** to flatten complex objects: override `__getattr__` to allow an object to call its attributes' methods.<br>
    - YES: `trajectory.set_style('vdw')`
    - NO: `trajectory.viewer.set_style('vdw')`
@@ -54,7 +54,7 @@ Use inheritance when it makes sense and is easy to understand. For example:
 
 1. Use **abstract base classes** to define interfaces -- e.g., all energy models derive from the abstract `EnergyModelBase`, because they all offer `.prep`, `.calculate`, `.DEFAULT_PROPERTIES`, etc. Similarly, `Residue` and `Chain` both inherit from `BioUnit`.
    * But don't use the built-in `abc` module, which requires too much conceptual overhead for too little benefit
-1. **Mixins** - defining a set of methods that should work with a variety of classes (e.g., the `AtomContainer` class is mixed into `Atom`, `AtomList`, `BioUnit`, and `Molecule`, giving all of these classes access to `self.distance`, `self.copy_topology`. 
+1. **Mixins** - defining a set of methods that should work with a variety of classes (e.g., the `AtomContainer` class is mixed into `Atom`, `AtomList`, `BioUnit`, and `Molecule`, giving all of these classes access to `self.distance`, `self.copy_topology`. We're also using "trivial mix-ins" (designed just to mix together one big class) to help organize the `Atom` and `Molecule` types.
 1. **When it makes sense** - complex inheritance is preferable to code duplication. Sometimes it really is the best answer.
  
 ### Code style
@@ -66,16 +66,16 @@ Use inheritance when it makes sense and is easy to understand. For example:
 # Contributing
 
 ### Who should contribute?
-Anyone with a molecular modeling workflow that they want to enable or share. Experience and research-level knowledge of the field is an important asset! However, limited programming experience *is definitely not* barrier to contributing - we can help you with that! Please ask for help getting started in our forums [link].
+Anyone with a molecular modeling workflow that they want to enable or share. Experience and research-level knowledge of the field is an important asset! In contrast, limited programming experience *is definitely not* barrier to contributing - we can help you with that! Please ask for help getting started in our forums [link].
 
-### Scope: What goes into buckyball?
-Established techniques and general simulation tools that will be useful for **3-dimensional biomolecular modeling**. Buckyball aims to enable scientists to easily build new simulation techniques and workflows, but new, immature techniques, or those with limited applicability outside of a particular system should be implemented as separate python programs.
-###### Could (and should!) be implemented in buckbyall:
+### Scope: What goes into MDT?
+Established techniques and general simulation tools that will be useful for **3-dimensional biomolecular modeling**. MDT aims to enable scientists to easily build new simulation techniques and workflows, but new, immature techniques, or those with limited applicability outside of a particular system should be implemented as separate projects that *use* MDT, not *part of* MDT.
+###### Could (and should!) be implemented in MDT:
  * Physical simulation and modelilng: Lambda dynamics; homology modelling; surface hopping; RPMD; metadynamics; markov state models; a library of common 3D structures (such as amino acids, carbon nanotubes, small molecules, etc.)
  * Visualization and UI: transitions between different views; interactive structure building and editing; ray-traced rendering; movie exports
  
 ###### Should implemented as a separate project:
  * Computational techniques: fluid dynamics solver (not useful at the atomic level), biological network models (no clear connection to 3D structures); machine-learning based quantum chemistry (immature, untested)
- * Visualization and UI: visualizations for specific visualizations (not generally applicable); 
+ * Visualization and UI: visualizations for specific systems (not generally applicable); 
 
 
