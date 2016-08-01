@@ -15,7 +15,7 @@ pip install moldesign
 python -m moldesign intro
 ```
 
-See [the documentation](docs/install.rst) for development instructions and other use cases.
+The best way to get started is to play with the examples that `python -m moldesign intro` will pull up. See [the documentation](https://autodesk.github.io/molecular-design-toolkit/) for complete API docs, development instructions and other installation scenarios.
 
 ## Code Example
 
