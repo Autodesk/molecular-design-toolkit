@@ -17,3 +17,12 @@ Note that this source code has been heavily modified. Modifications are describe
 LICENSE: moldesign/utils/docparsers/sphinxlicense
 WEBSITE: http://sphinx-doc.org
 
+   Versioneer
+-------------------------
+By Brian Warner
+SOURCE CODE: versioneer.py, moldesign/_version.py
+WEBSITE: https://github.com/warner/python-versioneer
+LICENSE: To make Versioneer easier to embed, all its code is dedicated to the public domain.
+The _version.py that it creates is also in the public domain. Specifically, both are released
+under the Creative Commons "Public Domain Dedication" license (CC0-1.0), as described in
+https://creativecommons.org/publicdomain/zero/1.0/ 
