@@ -98,7 +98,6 @@ class Symmetrizer(ipy.Box):
             descrip += 'RMS Error = {:.03P}'.format(self.symmetry.rms)
         self.description.value = descrip
         self.viewer.append_frame(positions=self.symmetry.orientation)
-        self.viewer.center()
 
     def apply_selected_symmetry(self, *args):
         idx = self.symm_selector.value.idx
