@@ -429,8 +429,13 @@ class MolReprMixin(object):
         lines = ['### Molecule: "%s" (%d atoms)' % (self.name, self.natoms),
                  '**Mass**: {:.2f}'.format(self.mass),
                  '**Formula**: %s' % self.get_stoichiometry(html=True),
-                 '**Potential model**: %s' % str(self.energy_model),
-                 '**Integrator**: %s' % self.integrator]
+                 '**Charge**: %s'%self.charge]
+
+        if self.energy_model:
+            lines.append('**Potential model**: %s' % str(self.energy_model))
+
+        if self.integrator:
+            lines.append('**Integrator**: %s' % str(self.integrator))
 
         if self.is_biomolecule:
             lines.extend(self.biomol_summary_markdown())
@@ -452,10 +457,13 @@ class MolReprMixin(object):
             # extra '|' here may be workaround for a bug in ipy.markdown?
             lines.append(table.markdown(replace={0: ' '}) + '|')
 
-            lines.append('### Chains')
+            lines.append('### Biopolymer chains')
             seqs = []
             for chain in self.chains:
                 seq = chain.sequence
+                if not seq.strip():  # don't write anything if there's no sequence
+                    continue
+
                 # deal with extra-long sequences
                 seqstring = []
                 for i in xrange(0, len(seq), 80):
@@ -463,6 +471,7 @@ class MolReprMixin(object):
                 seqstring = '\n'.join(seqstring)
                 seqs.append('**%s**: `%s`' % (chain.name, seqstring))
             lines.append('<br>'.join(seqs))
+
         return lines
 
     def get_residue_table(self):
@@ -470,7 +479,8 @@ class MolReprMixin(object):
 
         Returns:
             moldesign.utils.MarkdownTable"""
-        table = utils.MarkdownTable(*(['chain'] + data.RESTYPES.keys()))
+        table = utils.MarkdownTable(*(['chain'] +
+                                      'protein dna rna unknown water solvent'.split()))
         for chain in self.chains:
             counts = {}
             unk = []

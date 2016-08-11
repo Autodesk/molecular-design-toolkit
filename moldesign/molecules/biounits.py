@@ -562,7 +562,7 @@ class Chain(Entity):
         missing = '.'  # don't do this
         outputs = []
         last_idx = None
-        for res in sorted(self, key=lambda x:x.pdbindex):
+        for res in sorted(self, key=lambda x: x.pdbindex):
             if res.type not in ('protein', 'dna', 'rna'): continue
             if last_idx is not None:
                 num_missing = res.pdbindex - last_idx - 1

@@ -47,7 +47,6 @@ COMPRESSION = {'gz': gzip.open,
                'bzip2': bz2.BZ2File,
                None: open}
 READERS = {'pdb': biopy.parse_pdb,
-           'cif': biopy.parse_pdb,
            'json': chemjson.reader}
 WRITERS = {'json': chemjson.writer}
 for ext in PICKLE_EXTENSIONS:
@@ -214,10 +213,10 @@ def from_pdb(pdbcode):
     """
     import urllib2
     assert len(pdbcode) == 4, "%s is not a valid pdb ID." % pdbcode
-    request = urllib2.urlopen('http://www.rcsb.org/pdb/files/%s.pdb' % pdbcode)
+    request = urllib2.urlopen('http://www.rcsb.org/pdb/files/%s.cif' % pdbcode)
     ":type: urllib2.req"
     filestring = request.read()
-    mol = read(filestring, format='pdb')
+    mol = read(filestring, format='cif')
     mol.name = pdbcode
     return mol
 
