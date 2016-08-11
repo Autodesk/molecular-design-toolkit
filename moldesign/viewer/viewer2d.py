@@ -125,6 +125,7 @@ class ChemicalGraphViewer(MolViz2DBaseWidget, ColorMixin):
 
 
 def _charge_str(q):
+    q = q.value_in(u.q_e)
     if q == 0:
         return ''
     elif q == 1:
