@@ -39,7 +39,7 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
     DEFAULT_COLOR_MAP = colormap
     DEFAULT_WIDTH = 625
     DEFAULT_HEIGHT = 400
-    DEF_PADDING = 1.75 * u.angstrom
+    DEF_PADDING = 2.25 * u.angstrom
 
     def __reduce__(self):
         """prevent these from being pickled for now"""

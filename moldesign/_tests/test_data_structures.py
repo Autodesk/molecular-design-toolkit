@@ -184,14 +184,15 @@ def test_h2_hierarchy(h2):
     assert chain == atom1.chain == atom2.chain
     assert res == atom1.residue == atom2.residue
 
+
 def test_h2_array_link(h2):
     atom1, atom2 = h2.atoms
-    atom2.momentum[1] = 3.0 * u.default.momentum
-    h2.positions[0, 1] = 0.1 * u.angstrom
+    atom2.momentum[1] = 3.0*u.default.momentum
+    h2.positions[0, 1] = 0.1*u.angstrom
     assert atom1.index == 0 and atom2.index == 1
-    assert atom1.y == 0.1 * u.angstrom
-    assert h2.momenta[1, 1] == 3.0 * u.default.momentum
-    assert h2.atoms[1].py == 3.0 * u.default.momentum
+    assert atom1.y == 0.1*u.angstrom
+    assert h2.momenta[1, 1] == 3.0*u.default.momentum
+    assert h2.atoms[1].py == 3.0*u.default.momentum
 
 
 def test_copy_breaks_link(h2):
@@ -239,6 +240,7 @@ def test_h2_harmonic_copy_loses_simulation(h2_harmonic_copy, h2_harmonic):
     assert mol.atoms[0].bond_graph[mol.atoms[1]] == 1
     assert mol.atoms[1].bond_graph[mol.atoms[0]] == 1
 
+
 def test_h2_calculation_caching(h2_harmonic):
     h2 = h2_harmonic
     h2.properties = moldesign.molecules.molecule.MolecularProperties(h2)
@@ -255,6 +257,7 @@ def test_h2_calculation_caching(h2_harmonic):
     assert props2.potential_energy == h2.potential_energy == true_energy
     assert h2.calc_potential_energy() == true_energy
 
+
 def test_h2_cache_flush(h2_harmonic):
     h2 = h2_harmonic
     pe = h2.calc_potential_energy()
@@ -263,7 +266,8 @@ def test_h2_cache_flush(h2_harmonic):
     pe2 = h2.calc_potential_energy()
     f2 = h2.forces
     assert pe != pe2
-    assert not np.array_equal(f,f2)
+    assert not np.array_equal(f, f2)
+
 
 def test_h2_not_calculated_yet(h2_harmonic):
     h2_harmonic.calculate()
@@ -273,6 +277,7 @@ def test_h2_not_calculated_yet(h2_harmonic):
     with pytest.raises(moldesign.exceptions.NotCalculatedError):
         h2_harmonic.potential_energy
 
+
 def h2_properties_raises_not_calculated_yet(h2_harmonic):
     h2_harmonic.calculate()
     h2_harmonic.atoms[1].x += 0.3*u.ang
@@ -280,6 +285,7 @@ def h2_properties_raises_not_calculated_yet(h2_harmonic):
         h2_harmonic.properties.forces
     with pytest.raises(moldesign.exceptions.NotCalculatedError):
         h2_harmonic.properties.potential_energy
+
 
 @typedfixture('submolecule')
 def copy_atoms_from_h2_harmonic(h2_harmonic):
@@ -361,6 +367,7 @@ def ligand3aid(ligand_residue_3aid):
     newmol = mdt.Molecule(ligand_residue_3aid)
     return newmol
 
+
 @pytest.fixture
 def random_atoms_from_3aid(pdb3aid):
     atoms = moldesign.molecules.atomcollections.AtomList(random.sample(pdb3aid.atoms, 10))
@@ -387,12 +394,22 @@ def test_ligand3aid(ligand3aid):
     assert len(mol.residues) == 1
 
 
+def test_nucleic_build(nucleic):
+    mol = nucleic
+    assert mol.num_chains == 2
+    assert mol.num_residues == 8
+    assert mol.chains[0] is mol.chains['A']
+    assert mol.chains[1] is mol.chains['B']
+    assert len(mol.chains[0].residues) == len(mol.chains[1].residues) == 4
+
+
+
 ######################################
 # Tests around a piece of DNA
 @typedfixture('molecule', scope='session')
 def nucleic():
-    mol = mdt.interfaces.openmm.amber_to_mol('../notebooks/data/nuc.prmtop',
-                                            '../notebooks/data/nuc.inpcrd')
+    # ACTG.pdb contains a molecule generated using mdt.build_dna('ACTG')
+    mol = mdt.read('data/ACTG.pdb')
     return mol
 
 

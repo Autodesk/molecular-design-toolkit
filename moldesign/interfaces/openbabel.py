@@ -30,8 +30,8 @@ else:  # this should be configurable
 import moldesign as mdt
 from moldesign.compute.runsremotely import runsremotely
 import moldesign.molecules.atoms
-from moldesign.units import *
 from moldesign.molecules import biounits
+from moldesign import units as u
 
 
 def read_file(filename, name=None, format=None):
@@ -220,7 +220,7 @@ def mol_to_pybel(mdtmol):
     for atom in atommap:
         idx = atommap[atom].GetIdx()
         obatom = obmol.GetAtom(idx)
-        obatom.SetFormalCharge(atom.formal_charge)
+        obatom.SetFormalCharge(int(atom.formal_charge.value_in(u.q_e)))
     return pbmol
 
 
@@ -263,10 +263,10 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
         else:
             atnum = pybatom.atomicnum
         mdtatom = moldesign.molecules.atoms.Atom(atnum=atnum, name=name,
-                                                 formal_charge=pybatom.formalcharge,
+                                                 formal_charge=pybatom.formalcharge * u.q_e,
                                                  pdbname=name, pdbindex=pybatom.OBAtom.GetIdx())
         newatom_map[pybatom.OBAtom.GetIdx()] = mdtatom
-        mdtatom.position = pybatom.coords * angstrom
+        mdtatom.position = pybatom.coords * u.angstrom
         obres = pybatom.OBAtom.GetResidue()
         resname = obres.GetName()
         residx = obres.GetIdx()

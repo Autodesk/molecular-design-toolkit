@@ -331,7 +331,7 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
         if mass is None: self.mass = data.ATOMIC_MASSES[self.atnum]
         else: self.mass = mass
 
-        self.formal_charge = formal_charge
+        self.formal_charge = utils.if_not_none(formal_charge, 0.0 * u.q_e)
         self.residue = residue
         self.chain = chain
         self.molecule = None
@@ -402,7 +402,6 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
         """
         if self.molecule is other.molecule:
             self.bond_graph[other] = other.bond_graph[self] = order
-            if self.molecule is not None: self.molecule.num_bonds += 1
         else:  # allow unassigned atoms to be bonded to anything for building purposes
             self.bond_graph[other] = order
         return Bond(self, other, order)
@@ -478,6 +477,12 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
         """
         return len(self.bond_graph)
     nbonds = num_bonds
+
+    @property
+    def valence(self):
+        """ int: the sum of this atom's bond orders
+        """
+        return sum(v for v in self.bond_graph.itervalues())
 
     @property
     def symbol(self):

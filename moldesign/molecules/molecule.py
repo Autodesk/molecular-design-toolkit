@@ -218,7 +218,7 @@ class MolPropertyMixin(object):
     @property
     def num_electrons(self):
         """int: The number of electrons in the system, based on the atomic numbers and self.charge"""
-        return sum(self.atoms.atnum)-self.charge
+        return sum(self.atoms.atnum) - self.charge.value_in(u.q_e)
 
     @property
     def homo(self):
