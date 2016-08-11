@@ -232,7 +232,7 @@ class Residue(Entity):
             ValueError: if this residue is not an amino acid
         """
         if self.type != 'protein':
-            raise ValueError('This residue is not a recognized peptide monomer')
+            raise ValueError('%s is not a recognized peptide monomer' % self)
         return self._is_starting_residue
 
     @property
@@ -243,7 +243,7 @@ class Residue(Entity):
             ValueError: if this residue is not an amino acid
         """
         if self.type != 'protein':
-            raise ValueError('This residue is not a recognized peptide monomer')
+            raise ValueError('%s is not a recognized peptide monomer' % self)
         return self._is_ending_residue
 
     @property
@@ -254,7 +254,7 @@ class Residue(Entity):
             ValueError: if this residue is not a DNA base
         """
         if self.type != 'dna':
-            raise ValueError('This residue is not a recognized nucleic acid monomer')
+            raise ValueError('%s is not a recognized nucleic acid monomer' % self)
         return self._is_starting_residue
 
     @property
@@ -265,7 +265,7 @@ class Residue(Entity):
             ValueError: if this residue is not a DNA base
         """
         if self.type != 'dna':
-            raise ValueError('This residue is not a recognized nucleic acid monomer')
+            raise ValueError('%s is not a recognized nucleic acid monomer' % self)
         return self._is_ending_residue
 
     @property
@@ -360,8 +360,8 @@ class Residue(Entity):
 
     @property
     def prev_residue(self):
-        """Residue:
-            The next residue in the chain (in the N-direction for proteins, 5' direction for nucleic acids)
+        """Residue: The next residue in the chain (in the N-direction for proteins, 5' direction for
+            nucleic acids)
 
         Raises:
             NotImplementedError: If we don't know how to deal with this type of biopolymer

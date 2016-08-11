@@ -20,3 +20,10 @@ class NoConvergence(Exception):
 class NotCalculatedError(Exception):
     """ Raised when a molecular property is requested that hasn't been calculated """
     pass
+
+
+class UnhandledValenceError(Exception):
+    def __init__(self, atom):
+        self.message = 'Atom %s has unhandled valence: %d' % (atom, atom.valence)
+
+
