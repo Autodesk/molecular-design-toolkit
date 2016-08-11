@@ -14,6 +14,7 @@
 """
 Set up physical constants and unit systems
 """
+import operator
 import copy
 from os.path import join, abspath, dirname
 
@@ -109,18 +110,7 @@ class MdtQuantity(ureg.Quantity):
                 'units': str(self.units)}
 
     def __eq__(self, other):
-        """ Bug fixes and behavior changes for pint's implementation
-        These get removed as they are fixed in pint
-
-        Notes:
-            - Allow equality test between compatible units
-            - Allow comparisons to unitless 0
-        """
-        other = MdtQuantity(other)
-        if other.magnitude == 0.0 and other.dimensionless:
-            return self.magnitude == other.magnitude
-        else:
-            return self.magnitude == other.value_in(self.units)
+        return self.compare(other, operator.eq)
 
     @property
     def shape(self):
@@ -135,7 +125,12 @@ class MdtQuantity(ureg.Quantity):
           - Comparisons to dimensionless 0 can proceed without unit checking
         """
         other = MdtQuantity(other)
-        if other.magnitude == 0.0 and other.dimensionless:
+        try:
+            iszero = other.magnitude == 0.0 and other.dimensionless
+        except ValueError:
+            iszero = False
+
+        if iszero:
             return op(self.magnitude, other.magnitude)
         else:
             return op(self.magnitude, other.value_in(self.units))
@@ -197,9 +192,9 @@ class MdtQuantity(ureg.Quantity):
         m = s_mag % o_mag
         return m * my_units
 
-    def value_in(self, units):
-        val = self.to(units)
-        return val._magnitude
+    # backwards-compatible name
+    value_in = ureg.Quantity.m_as
+
 
     def defunits_value(self):
         return self.defunits()._magnitude

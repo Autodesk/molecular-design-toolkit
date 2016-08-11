@@ -163,19 +163,37 @@ def print_environment():
     """For reporting bugs - spits out the user's environment"""
     import sys
     version = {}
-    for pkg in 'moldesign IPython ipywidgets jupyter matplotlib numpy docker pyccc ' \
-               'nbmolviz jupyter_client jupyter_core pint Bio openbabel simtk pyscf'.split():
+    for pkg in 'moldesign IPython ipywidgets jupyter matplotlib numpy docker pyccc distutils' \
+               'nbmolviz jupyter_client jupyter_core pint Bio openbabel simtk pyscf pip setuptools'\
+            .split():
         try:
             module = __import__(pkg)
-        except ImportError:
-            version[pkg] = 'FAILED'
+        except ImportError as e:
+            version[pkg] = str(e)
         else:
             try:
                 version[pkg] = module.__version__
-            except AttributeError:
-                version[pkg] = '???'
+            except AttributeError as e:
+                version[pkg] = str(e)
     env = {'platform': sys.platform,
-           'version': sys.version}
+           'version': sys.version,
+           'prefix': sys.prefix}
+
+    try:
+        import platform
+        env['machine'] = platform.machine()
+        env['linux'] = platform.linux_distribution()
+        env['mac'] = platform.mac_ver()
+        env['windows'] = platform.win32_ver()
+        env['impl'] = platform.python_implementation()
+        env['arch'] = platform.architecture()
+        env['system'] = platform.system()
+        env['python_build'] = platform.python_build()
+        env['platform_version'] = platform.version()
+
+    except Exception as e:
+        env['platform_exception'] = str(e)
+
 
     print json.dumps({'env': env,
                       'versions': version})

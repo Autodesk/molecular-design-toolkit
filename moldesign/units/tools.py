@@ -72,13 +72,18 @@ def array(qlist, baseunit=None):
 
     if baseunit is None:
         baseunit = get_units(qlist)
-        if baseunit == 1.0: return np.array(qlist)
+        try:
+            if baseunit == 1.0:
+                return np.array(qlist)
+        except DimensionalityError:
+            pass
 
     try:
-        newlist = [array(item, baseunit=baseunit).magnitude for item in qlist]
+        newlist = [array(item, baseunit=baseunit).value_in(baseunit) for item in qlist]
         return baseunit * newlist
     except TypeError as exc:
         return qlist.to(baseunit)
+
 
 #@utils.args_from(np.broadcast_to)
 def broadcast_to(arr, *args, **kwargs):

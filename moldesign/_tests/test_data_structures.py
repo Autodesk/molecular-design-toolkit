@@ -55,24 +55,7 @@ def test_dictlike(objkey, request):
     assert set(dd.values()) == {'b', 3, 'e'}
 
 
-########################################
-# Test the unit system
-def test_units():
-    assert u.default.length == u.angstrom
-    assert u.default.mass == u.amu
-    assert u.default.energy == u.eV
-
-
-def test_default_unit_conversions():
-    my_list = [1.0*u.angstrom, 1.0*u.nm, 1.0*u.a0]
-    my_array = u.array(my_list).defunits()
-    assert my_array.get_units() == u.default.convert(my_array).get_units()
-    result = my_array.value_in(u.nm)
-    np.testing.assert_almost_equal(result[0], 0.1, 9)
-    np.testing.assert_almost_equal(result[1], 1.0, 9)
-    np.testing.assert_almost_equal(result[2], 0.05291772, 7)
-
-
+# Some objects with units
 @typedfixture('object')
 def list_of_units(): return [1.0 * u.angstrom, 1.0 * u.nm, 1.0 * u.a0]
 
@@ -230,10 +213,12 @@ def test_h2_harmonic_oscillator(h2_harmonic):
     mol = h2_harmonic
     atoms = h2_harmonic.atoms
     atoms[0].x = -1.0*u.angstrom
+    atoms[1].x = 0.0*u.angstrom
+    atoms[1].y = 0.3 * u.angstrom
     e1 = mol.calc_potential_energy()
-    f1 = mol.forces[0]
+    f1 = mol.forces[0,0]
     atoms[0].x = 1.0*u.angstrom
-    f2 = mol.calc_forces()[0]
+    f2 = mol.calc_forces()[0,0]
     e2 = mol.potential_energy
 
     assert e1 == e2 == 0.5*u.kcalpermol
