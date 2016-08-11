@@ -529,14 +529,6 @@ def test_pickled_equality(objkey, request):
         assert (y == obj).all()
 
 
-@pytest.mark.parametrize('fixture_name', moldesign_objects)
-def test_markdown_repr(fixture_name, request):
-    """Just tests whether it works, not its content"""
-    obj = request.getfuncargvalue(fixture_name)
-    result = obj._repr_markdown_()
-    assert bool(result)
-
-
 @pytest.mark.parametrize('fixture_key', ['h2_harmonic_atoms',
                                          'ligand_3aid_atoms',
                                          'random_atoms_from_3aid'])

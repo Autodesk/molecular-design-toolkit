@@ -1015,7 +1015,7 @@ class Molecule(AtomContainer,
     @property
     def num_bonds(self):
         """int: number of chemical bonds in this molecule"""
-        return sum(atom.nbonds for atom in self.atoms)
+        return sum(atom.nbonds for atom in self.atoms)/2
 
     nbonds = num_bonds
 
