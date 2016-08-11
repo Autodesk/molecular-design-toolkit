@@ -320,7 +320,11 @@ class Residue(Entity):
             bonds_by_name = data.RESIDUE_BONDS[resname]
             self._template_name = resname
         except KeyError:
-            raise ValueError("No bonding template for residue '%s'" % resname)
+            if len(self) == 1:
+                print 'INFO: no bonds assigned to residue %s' % self
+                return
+            else:
+                raise ValueError("No bonding template for residue '%s'" % resname)
 
         # intra-residue bonds
         bond_graph = {atom: {} for atom in self}

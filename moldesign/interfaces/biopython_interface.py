@@ -99,7 +99,10 @@ def biopy_to_mol(struc):
             newchain.add(newresidue)
 
             for atom in residue.get_atom():
-                newatom = mdt.Atom(element=atom.element,
+                elem = atom.element
+                if len(elem) == 2:
+                    elem = elem[0] + elem[1].lower()
+                newatom = mdt.Atom(element=elem,
                                    name=atom.get_name(),
                                    pdbname=atom.get_name(),
                                    pdbindex=atom.get_serial_number())
@@ -206,11 +209,6 @@ def _read_assembly(lineiter):
             t[idim, :] = map(float, fields[4:8])
 
         transforms.append(t)
-
-
-
-
-
 
 
 
