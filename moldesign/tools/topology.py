@@ -18,22 +18,18 @@ This module contains various utility functions that are exposed to API users
 import moldesign as mdt
 from moldesign import units as u
 
+from . import toplevel, __all__ as _pkgall
+
 from moldesign.interfaces.openbabel import add_hydrogen, guess_bond_orders
 from moldesign.interfaces.pdbfixer_interface import mutate, add_water
 from moldesign.interfaces.ambertools import assign_forcefield, parameterize
 from moldesign.interfaces.ambertools import calc_am1_bcc_charges, calc_gasteiger_charges
 
-
-__all__ = ('add_hydrogen guess_bond_orders mutate add_water'
-           ' assign_forcefield parameterize').split()
-
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
+_pkgall.extend(('add_hydrogen guess_bond_orders mutate add_water'
+                ' assign_forcefield parameterize calc_am1_bcc_charges calc_gasteiger_charges').split())
 
 
-@exports
+@toplevel
 def assign_formal_charges(mol, ignore_nonzero=True):
     """ Assign formal charges to C,N,O,F atoms in this molecule based on valence
 
@@ -111,7 +107,7 @@ def assign_formal_charges(mol, ignore_nonzero=True):
             mol.charge += newcharge * u.q_e - atom.formal_charge
             atom.formal_charge = newcharge * u.q_e
 
-@exports
+@toplevel
 def clean_pdb(mol):
     """ Attempt to clean up a molecule from PDB format that may be missing data
 

@@ -24,7 +24,7 @@ PACKAGEPATH = data.PACKAGEPATH
 
 # Import all subpackages / submodules
 from . import compute
-from . import converters
+from . import fileio
 from . import exceptions
 from . import external
 from . import forcefields
@@ -47,7 +47,7 @@ from . import viewer
 from . import widgets
 
 # Populate the top-level namespace (imports everything from each <submodule>.__all__ variable)
-from .converters import *
+from .fileio import *
 from .forcefields import *
 from .geom import *
 from .min import *
@@ -77,11 +77,11 @@ _warnings.simplefilter('error', _np.ComplexWarning)
 
 # For documentation purposes only - make sphinx document the toplevel namespace
 if _building_docs:
-    __all__ = converters.__all__ + \
+    __all__ = fileio.__all__ + \
               geom.__all__ + \
               min.__all__ + \
-              orbitals.__all__+ \
-              molecules.__all__+ \
+              orbitals.__all__ + \
+              molecules.__all__ + \
               tools.__all__ + \
               viewer.__all__
 

@@ -113,20 +113,13 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
                 self.stick(atoms=stick_atoms, render=False)
 
         # Deal with unbonded atoms (they only show up in VDW rep)
-        if self.mol.num_atoms > 1000:
-            print 'WARN: large structure; waters not shown by default.'
-            lone = [atom for atom in self.mol.atoms if
-                    atom.num_bonds == 0 and atom.residue.type != 'water']
-            self.hide(atoms=[atom for atom in self.mol.atoms if atom.num_bonds == 0 and
-                             atom.residue.type == 'water'])
-        else:
-            self.show_unbonded()
+        if self.mol.num_atoms < 1000:
+            lone = [atom for atom in self.mol.atoms if atom.num_bonds == 0]
+            if lone:
+                self.vdw(atoms=lone, render=False, radius=0.5)
 
-        if render: self.render()
-
-    def show_unbonded(self, radius=0.5):
-        lone = [atom for atom in self.mol.atoms if atom.num_bonds == 0]
-        if lone: self.vdw(atoms=lone, render=False, radius=radius)
+        if render:
+            self.render()
 
     @staticmethod
     def _atoms_to_json(atomlist):

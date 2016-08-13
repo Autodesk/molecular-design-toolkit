@@ -1,18 +1,25 @@
 0.7.3 (WIP)
 ===========
-NEW MODELLING FEATURES
+NEW MODELING FEATURES
  - GAFF parameterizer for small molecules -- ``params = mdt.parameterize(mol)``
- - AM1-BCC and Gasteiger partial charge calculators
+ - AM1-BCC and Gasteiger partial charge calculators: ``mdt.calc_am1_bcc_charges`` and
+    ``mdt.calc_gasteiger_charges``
+ - Add biomolecular assembly support for mmCIF files
+ - #72 - Add ``moldesign.guess_formal_charges`` and ``moldesign.clean_pdb``
 
 CHANGES
- - create changelog and version check to the ``mdt.about()`` (aka mdt.configure) widget
+ - Create changelog and version check to the ``mdt.about()`` (aka mdt.configure) widget
+ - Change moldesign.tools and moldesign.helpers modules into more rationally organized subpackages
+ - (WIP) ``mdt.set_dihedral`` can be called with two atoms in the same way as ``mdt.dihedral``
 
 BUGFIXES
+ - #61 - fixed a KeyError when parsing PDBs with metal centers or ions
+ - #74 (WIP) - Output PDB files with correct TER records
 
 
 0.7.2 - July 26, 2016
 =====================
-NEW MODELLING FEATURES
+NEW MODELING FEATURES
  - Add trajectory geometry analysis functions (``traj.dihedral``, ``traj.angle``, etc.)
  - Can now calculate angles, dists, and dihedrals by name within a residue
     (``residue.distance('CA','CG')``)

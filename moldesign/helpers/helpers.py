@@ -64,7 +64,7 @@ def get_all_atoms(*objects):
             List[moldesign.AtomContainer]): objects to take atoms from
 
     """
-    from . import molecules
+    from moldesign import molecules
 
     atoms = collections.OrderedDict()
 
