@@ -546,6 +546,7 @@ class MolTopologyMixin(object):
                 positions.insert(j, position.magnitude)
 
             js['atoms'].insert(i, {
+                'serial': i,
                 'name': atom.name,
                 'elem': atom.elem,
                 'mass_magnitude': atom.mass.magnitude,
