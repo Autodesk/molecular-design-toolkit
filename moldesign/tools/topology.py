@@ -94,6 +94,7 @@ def assign_formal_charges(mol, ignore_nonzero=True):
             mol.charge += newcharge * u.q_e - atom.formal_charge
             atom.formal_charge = newcharge * u.q_e
 
+
 @toplevel
 def clean_pdb(mol):
     """ Attempt to clean up a molecule from PDB format that may be missing data
@@ -112,6 +113,33 @@ def clean_pdb(mol):
     return m
 
 
+@toplevel
+def guess_histidine_states(mol):
+    """ Attempt to assign protonation states to histidine residues.
+
+    Note:
+        This function is highly unlikely to give accurate results! It is intended for convenience
+        when histidine states can easily be guessed from already-present hydrogens or when they are
+        judged to be relatively unimportant.
+
+    This can be done simply by renaming HIS residues:
+      1. If HE2 and HD1 are present, the residue is renamed to HIP
+      2. If only HE2 is present, the residue is renamed to HIE
+      3. Otherwise, the residue is renamed to HID (the most common form)
+
+    Args:
+        mol (moldesign.Molecule): molecule to change (in place)
+    """
+    for residue in mol.residues:
+        if residue.resname == 'HIS':
+            oldname = str(residue)
+            if 'HE2' in residue and 'HD1' in residue:
+                residue.resname = 'HIP'
+            elif 'HE2' in residue:
+                residue.resname = 'HIE'
+            else:
+                residue.resname = 'HID'
+            print 'Renaming %s from HIS to %s' % (oldname, residue.resname)
 
 
 
