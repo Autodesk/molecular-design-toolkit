@@ -24,7 +24,7 @@ from moldesign.helpers.pdb import BioAssembly
 
 
 def parse_mmcif(f):
-    """Parse an mmCIF file (using the Biopython parser), assign bonds, and return a molecule
+    """Parse an mmCIF file (using the Biopython parser) and return a molecule
 
     Note:
         This routine is not currently called by any part of the user-facing API! The
@@ -37,13 +37,7 @@ def parse_mmcif(f):
     Returns:
         moldesign.Molecule: parsed molecule
     """
-    raise NotImplementedError
-
-    # First, get the structure
-    parser = Bio.PDB.MMCIFParser()
-    struc = parser.get_structure('no name', f)
-    mol = biopy_to_mol(struc)
-    return mol
+    return _parse_file(f, Bio.PDB.MMCIFParser)
 
 
 def parse_pdb(f):
@@ -66,8 +60,11 @@ def parse_pdb(f):
     # TODO: this needs to handle strings and streams
     # TODO: deal with alternate locations
 
-    # First, get the structure
-    parser = Bio.PDB.PDBParser()
+    return _parse_file(f, Bio.PDB.PDBParser)
+
+
+def _parse_file(f, parser_type):
+    parser = parser_type()
     struc = parser.get_structure('no name', f)
     mol = biopy_to_mol(struc)
     return mol
@@ -75,7 +72,10 @@ def parse_pdb(f):
 
 def biopy_to_mol(struc):
     """Convert a biopython PDB structure to an MDT molecule.
-    Because Biopython doesn't assign bonds, assign connectivity using templates.
+
+    Note:
+        Biopython doesn't deal with bond data, so no bonds will be present
+        in the Molecule
 
     Args:
         struc (Bio.PDB.Structure.Structure): Biopython PDB structure to convert

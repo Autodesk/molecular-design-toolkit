@@ -88,7 +88,7 @@ def _antechamber_calc_charges(mol, ambname, chargename, kwargs):
     charge = utils.if_not_none(mol.charge, 0)
     command = 'antechamber -fi pdb -i mol.pdb -fo mol2 -o out.mol2 -c %s -an n'%ambname
     if charge != 0:
-        command += ' -nc %d'%charge
+        command += ' -nc %d'%charge.value_in(u.q_e)
 
     def finish_job(job):
         """Callback to complete the job"""

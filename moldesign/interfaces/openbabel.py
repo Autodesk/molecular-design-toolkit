@@ -30,7 +30,6 @@ else:  # this should be configurable
 import moldesign as mdt
 from moldesign.compute.runsremotely import runsremotely
 import moldesign.molecules.atoms
-from moldesign.molecules import biounits
 from moldesign import units as u
 
 
@@ -281,7 +280,7 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
                 chain_id = backup_chain_names.pop()
                 print 'WARNING: assigned name %s to unnamed chain object @ %s' % (
                     chain_id, hex(chain_id_num))
-            chn = biounits.Chain(pdbname=str(chain_id))
+            chn = mdt.Chain(pdbname=str(chain_id))
             newchains[chain_id_num] = chn
         else:
             chn = newchains[chain_id_num]
@@ -289,7 +288,7 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
         if residx not in newresidues:
             # Create new residue
             pdb_idx = obres.GetNum()
-            res = biounits.Residue(pdbname=resname,
+            res = mdt.Residue(pdbname=resname,
                                    pdbindex=pdb_idx)
             newresidues[residx] = res
             chn.add(res)
