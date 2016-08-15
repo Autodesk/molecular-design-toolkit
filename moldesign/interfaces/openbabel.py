@@ -193,7 +193,7 @@ def mol_to_pybel(mdtmol):
         obatom = obmol.NewAtom()
         obatom.SetAtomicNum(atom.atnum)
         atommap[atom] = obatom
-        pos = atom.position.to('angstrom')._magnitude
+        pos = atom.position.value_in(u.angstrom)
         obatom.SetVector(*pos)
 
         if atom.residue and atom.residue not in resmap:
@@ -206,7 +206,9 @@ def mol_to_pybel(mdtmol):
             obres = resmap[atom.residue]
 
         obres.AddAtom(obatom)
+        obres.SetHetAtom(obatom, not atom.residue.is_standard_residue)
         obres.SetAtomID(obatom, atom.name)
+        obres.SetSerialNum(obatom, atom.pdbindex)
 
     for atom in mdtmol.bond_graph:
         a1 = atommap[atom]

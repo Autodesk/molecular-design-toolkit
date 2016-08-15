@@ -28,6 +28,21 @@ from moldesign.interfaces.ambertools import calc_am1_bcc_charges, calc_gasteiger
 _pkgall.extend(('add_hydrogen guess_bond_orders mutate add_water'
                 ' assign_forcefield parameterize calc_am1_bcc_charges calc_gasteiger_charges').split())
 
+ATNUM_VALENCE_CHARGE = {6: {3: -1, 4: 0},
+                        7: {2: -1, 3: 0, 4: 1},
+                        8: {1: -1, 2: 0, 3: 1},
+                        9: {1: 0, 2: 1}}
+
+ION_CHARGE = {1: 1,  # H
+              11: 1,  # Na+
+              19: 1,  # K+
+              12: 2,  # Mg 2+
+              20: 2,  # Ca 2+
+              9: -1,  # F-
+              17: -1,  # Cl-
+              35: -1,  # Br-
+              53: -1}  # I-
+
 
 @toplevel
 def assign_formal_charges(mol, ignore_nonzero=True):
@@ -51,57 +66,29 @@ def assign_formal_charges(mol, ignore_nonzero=True):
     """
     from moldesign.exceptions import UnhandledValenceError
 
+    # TODO: scrape formal charge data from the PDB chem comp dictionary
+
     # cache these values in case we fail to assign charges
     totalcharge = mol.charge
     oldcharges = [atom.formal_charge for atom in mol.atoms]
 
-    def fail():  # reset all charges before raising exception
-        for oldcharge, a in zip(oldcharges, mol.atoms):
-            a.oldcharge = oldcharge
-        mol.charge = totalcharge
-        raise UnhandledValenceError(atom)
-
     for atom in mol.atoms:
-        if ignore_nonzero and atom.formal_charge != 0: continue
+        if ignore_nonzero and atom.formal_charge != 0:
+            continue
 
         v = atom.valence
         newcharge = None
 
-        if atom.atnum == 6:
-            if v == 3:
-                newcharge = -1
-            elif v == 4:
-                newcharge = 0
+        if atom.atnum in ATNUM_VALENCE_CHARGE:
+            if v in ATNUM_VALENCE_CHARGE[atom.atnum]:
+                newcharge = ATNUM_VALENCE_CHARGE[atom.atnum][v]
             else:
-                fail()
-
-        elif atom.atnum == 7:
-            if v == 2:
-                newcharge = -1
-            elif v == 3:
-                newcharge = 0
-            elif v == 4:
-                newcharge = 1
-            else:
-                fail()
-
-        elif atom.atnum == 8:
-            if v == 1:
-                newcharge = -1
-            elif v == 2:
-                newcharge = 0
-            elif v == 3:
-                newcharge = 1
-            else:
-                fail()
-
-        elif atom.atnum == 9:
-            if v == 1:
-                newcharge = 0
-            elif v == 2:
-                newcharge = 1
-            else:
-                fail()
+                for oldcharge, a in zip(oldcharges, mol.atoms):
+                    a.oldcharge = oldcharge
+                mol.charge = totalcharge
+                raise UnhandledValenceError(atom)
+        elif atom in ION_CHARGE and v == 0:
+            newcharge = ION_CHARGE[atom.atnum]
 
         if newcharge is not None:
             mol.charge += newcharge * u.q_e - atom.formal_charge

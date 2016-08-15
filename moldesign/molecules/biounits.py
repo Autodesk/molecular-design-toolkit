@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import collections
+
 import moldesign as mdt
 from moldesign import data, utils
 
@@ -276,24 +278,23 @@ class Residue(Entity):
 
     @property
     def _is_ending_residue(self):
-        """bool: this is the last residue in the chain"""
-        for otherres in self.molecule.residues[self.index+1:]:
-            if otherres.chain != self.chain:
-                return True
-            elif otherres.type == self.type:
-                return False
-        return True
+        """bool: this is the last residue in a polymer"""
+        try:
+            nextres = self.next_residue
+        except StopIteration:
+            return True
+        else:
+            return False
 
     @property
     def _is_starting_residue(self):
-        """bool: this is the first residue of its type in the chain"""
-        for otherres in self.molecule.residues[self.index-1::-1]:
-            if otherres.chain != self.chain:
-                return True
-            elif otherres.type == self.type:
-                return False
-
-        return True
+        """bool: this is the first residue in a polymer"""
+        try:
+            prevres = self.prev_residue
+        except StopIteration:
+            return True
+        else:
+            return False
 
     def assign_template_bonds(self):
         """Assign bonds from bioresidue templates.
@@ -351,9 +352,9 @@ class Residue(Entity):
             NotImplementedError: If we don't know how to deal with this type of biopolymer
             StopIteration: If there isn't a next residue (i.e. it's a 3'- or C-terminus)
         """
-        if self.type == 'protein':
+        if self.chain.type == 'protein':
             return self._get_neighbor('C', 'C-terminus')
-        elif self.type == 'dna':
+        elif self.chain.type == 'dna':
             return self._get_neighbor("O3'", "3' end")
         else:
             raise NotImplementedError('We only deal with dna and amino acids right now')
@@ -367,9 +368,9 @@ class Residue(Entity):
             NotImplementedError: If we don't know how to deal with this type of biopolymer
             StopIteration: If there isn't a previous residue (i.e. it's a 5'- or N-terminus)
         """
-        if self.type == 'protein':
+        if self.chain.type == 'protein':
             return self._get_neighbor('N', 'N-terminus')
-        elif self.type == 'dna':
+        elif self.chain.type == 'dna':
             return self._get_neighbor("P", "5' end")
         else:
             raise NotImplementedError('We only deal with dna and amino acids right now')
@@ -396,10 +397,7 @@ class Residue(Entity):
     @property
     def type(self):
         """str: Classification of the residue (protein, solvent, dna, water, unknown)"""
-        for restype, names in data.RESTYPES.iteritems():
-            if self.pdbname in names:
-                return restype
-        return 'unknown'
+        return data.RESIDUE_TYPES.get(self.resname, 'unknown')
 
     @property
     def code(self):
@@ -438,6 +436,23 @@ class Residue(Entity):
             bb = set(self.backbone)
             self._sidechain = [atom for atom in self if atom not in bb]
         return self._sidechain
+
+    @property
+    def is_standard_residue(self):
+        """ bool: this residue is a "standard residue" for the purposes of a PDB entry.
+
+        In PDB files, this will be stored using 'ATOM' if this is a standard residue
+        and 'HETATM' records if not.
+
+        Note:
+            We currently define "standard" residues as those whose 3 letter residue code appears in
+            the ``moldesign.data.RESIDUE_DESCRIPTIONS`` dictionary. Although this seems to work
+            well, we'd welcome a PR with a less hacky method.
+
+        References:
+            PDB format guide: http://www.wwpdb.org/documentation/file-format
+        """
+        return self.resname in mdt.data.RESIDUE_DESCRIPTIONS
 
     def __str__(self):
         return 'Residue %s (index %d, chain %s)' % (self.name, self.index,
@@ -479,7 +494,6 @@ class Residue(Entity):
 
         return '<br>'.join(lines)
 
-
 @toplevel
 class Chain(Entity):
     """ Biomolecular chain class - its children are almost always residues.
@@ -493,6 +507,52 @@ class Chain(Entity):
         super(Chain, self).__init__(pdbname=pdbname, **kwargs)
         if self.name is None: self.name = self.pdbname
         if self.pdbindex is not None: self.pdbindex = self.pdbname
+        self._type = None
+
+        self._5p_end = self._3p_end = self._n_terminal = self._c_terminal = None
+
+    @property
+    def type(self):
+        """ str: the type of chain - protein, DNA, solvent, etc.
+
+        This field returns the type of chain, classified by the following rules:
+        1) If the chain contains only one type of residue, it is given that classification
+           (so a chain containing only ions has type "ion"
+        2) If the chain contains a biopolymer + ligands and solvent, it is classified as a
+           biopolymer (i.e. 'protein', 'dna', or 'rna'). This is the most common case with .pdb
+           files from the PDB.
+        3) If the chain contains multiple biopolymer types, it will be given a hybrid classification
+           (e.g. 'dna/rna', 'protein/dna') - this is rare!
+        4) If it contains multiple kinds of non-biopolymer residues, it will be called "solvent"
+           (if all non-bio residues are water/solvent/ion) or given a hybrid name as in 3)
+        """
+        if self._type is None:
+
+            counts = collections.Counter(x.type for x in self.residues)
+            unique_types = sum(bool(v) for v in counts.itervalues())
+            if unique_types == 1:
+                if self.num_residues == 1:
+                    self._type = data.CHAIN_MONOMER_NAMES[self.residues[0].type]
+                else:
+                    self._type = self.residues[0].type
+
+            else:
+                polymer_types = sum(bool(counts[t]) for t in data.BIOPOLYMER_TYPES)
+                if polymer_types == 1:  # the most common case - a polymer + solvent/ligands
+                    for residue in self.residues:
+                        if residue.type in data.BIOPOLYMER_TYPES: break
+                    else:
+                        assert False, "No biopolymer found but polymer_types==1"
+                    self._type = residue.type
+
+                elif polymer_types > 1:  # for rare cases, e.g. "DNA/RNA/PROTEIN"
+                    self._type = '/'.join(k for k in data.BIOPOLYMER_TYPES if counts[k])
+                elif polymer_types == 0:
+                    if counts['unknown'] > 0:  # some molecule + solvent
+                        self._type = '/'.join(k for k in counts if counts[k])
+                    else:  # just solvent
+                        self._type = 'solvent'
+        return self._type
 
     def to_json(self):
         js = mdt.chemjson.jsonify(self, 'index name pdbindex'.split())
@@ -517,6 +577,34 @@ class Chain(Entity):
             assert residue.chain is self, "Residue is not a member of this chain"
 
         return super(Chain, self).add(residue, **kwargs)
+
+    def _get_chain_end(self, restype, selfattr, test):
+        currval = getattr(self, selfattr)
+        if currval is None or not getattr(currval, test):
+            for residue in self.residues:
+                if residue.type != restype:
+                    continue
+                if getattr(residue, test):
+                    setattr(self, selfattr, residue)
+                    break
+        return getattr(self, selfattr)
+
+    @property
+    def c_terminal(self):
+        return self._get_chain_end('protein', '_c_terminal', 'is_c_terminal')
+
+    @property
+    def n_terminal(self):
+        return self._get_chain_end('protein', '_n_terminal', 'is_n_terminal')
+
+    @property
+    def fiveprime_end(self):
+        return self._get_chain_end('dna', '_5p_end', 'is_5prime_end')
+
+    @property
+    def threeprime_end(self):
+        return self._get_chain_end('dna', '_3p_end', 'is_3prime_end')
+
 
     def assign_biopolymer_bonds(self):
         """Connect bonds between residues in this chain.

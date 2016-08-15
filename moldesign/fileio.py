@@ -101,7 +101,15 @@ def write(obj, filename=None, format=None, mode='w'):
     Returns:
         str: if filename is none, return the output file as a string (otherwise returns ``None``)
     """
-    # TODO: handle writing and return file-like objects
+    # TODO: handle writing and returning file-like objects instead of strings
+
+    # lets users call mdt.write(obj, 'pdb') and get a string (without needing the "format" keyword
+    if (format is None and
+                filename is not None and
+                len(filename) < 5 and
+                '.' not in filename):
+        filename, format = None, filename
+
     format, compression = _get_format(filename, format)
 
     # First, create an object to write to (either file handle or file-like buffer)
