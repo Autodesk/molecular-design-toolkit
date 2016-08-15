@@ -17,11 +17,79 @@ We don't yet (and hopefully will never need) an internal PDB parser or writer. F
 routines in this module read and write data that's not necessarily parsed by other implementations.
 """
 import collections
+from cStringIO import StringIO
 
 import numpy as np
 
 BioAssembly = collections.namedtuple('BioAssembly', 'desc chains transforms')
 
+
+def insert_ter_records(mol, pdbfile):
+    """ Inserts TER records to indicate the end of the biopolymeric part of a chain
+
+    Many common PDB writers - including OpenBabel - don't insert TER records. This can
+    cause a problem for situations such as forcefield assignment. This routine is one
+    solution to that problem.
+
+    What it does:
+    This routine inserts 'TER' records
+    1) after any protein residue not bound to the next residue via backbone peptide bond, and
+    2) after any DNA residue not bound to the next residue via a backbone phosphate bond
+
+    In the input PDB file, the ATOM records be formatted with the proper columns (see
+    http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM) and
+    the chain names and residue numbers must match ``chain.pdbname`` and ``residue.pdbindex``,
+    respectively.
+
+    Args:
+        mol (moldesign.Molecule): the MDT version of the molecule that pdbfile describes
+        pdbfile (TextIO OR str): pdb file (file-like or string)
+
+    Returns:
+        cStringIO.StringIO OR str: copy of the pdb file with added TER records - it will be
+         returned as the same type passed (i.e., as a filelike buffer or as a string)
+    """
+
+    is_string = False
+    if isinstance(pdbfile, basestring):
+        pdbfile = StringIO(pdbfile)
+        is_string = True
+
+    # First, identify where to insert records (if anywhere)
+    ter_residues = set()
+    for chain in mol.chains:
+        if chain.type == 'protein':
+            ter_residues.add((chain.pdbname, chain.c_terminal.pdbindex))
+        elif chain.type == 'dna':
+            ter_residues.add((chain.pdbname, chain.threeprime_end.pdbindex))
+
+    # insert the records (if necessary)
+    newf = StringIO()
+    pdbfile.seek(0)
+    watchres = None
+    for line in pdbfile:
+        fields = line.split()
+        if fields and fields[0] in ('ATOM','HETATM'):  # line is an atom record
+            res = (line[21], int(line[22:26].strip()))
+            if watchres:
+                if res != watchres:
+                    print >> newf, 'TER'
+                    watchres = None
+            if res in ter_residues:
+                watchres = res
+
+        elif watchres is not None:  # line is not an atom record
+            watchres = None
+            if line.strip() != 'TER':
+                print >> newf, 'TER'
+
+        newf.write(line)
+
+    newf.seek(0)
+    if is_string:
+        return newf.read()
+    else:
+        return newf
 
 def warn_assemblies(mol, assemblies):
     """ Print a warning message if the PDB structure contains a biomolecular assembly

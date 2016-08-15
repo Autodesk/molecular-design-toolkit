@@ -118,7 +118,6 @@ def _antechamber_calc_charges(mol, ambname, chargename, kwargs):
     return compute.run_job(job, _return_result=True, **kwargs)
 
 
-
 @utils.kwargs_from(mdt.compute.run_job)
 def build_bdna(sequence, **kwargs):
     """ Uses Ambertools' Nucleic Acid Builder to build a 3D double-helix B-DNA structure.
@@ -172,7 +171,7 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
     # Prepare input for tleap
     if forcefields is None: forcefields = mdt.forcefields.ffdefaults.values()
     leapstr = ['source %s' % LEAPRCFILES[ff] for ff in forcefields]
-    inputs = {'input.pdb': mol.write(format='pdb')}
+    inputs = {'input.pdb': mdt.helpers.insert_ter_records(mol, mol.write(format='pdb'))}
 
     if parameters:
         if isinstance(parameters, ExtraAmberParameters):
