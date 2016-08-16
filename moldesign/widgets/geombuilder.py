@@ -13,12 +13,10 @@
 # limitations under the License.
 import ipywidgets as ipy
 
-from moldesign.geom import set_angle, set_dihedral, set_distance
-import moldesign.molecules.bonds
+import moldesign as mdt
+from moldesign import utils
 from moldesign.viewer import BondClicker
 from moldesign import units as u
-
-from moldesign import geom, utils
 
 from moldesign.uibase import ViewerToolBase, ReadoutFloatSlider
 
@@ -107,21 +105,21 @@ class GeometryBuilder(ViewerToolBase):
         sel = self._selection
         assert sel.type == 'bond'
         dist_in_angstrom = self.length_slider.value
-        set_distance(sel.a1, sel.a2, dist_in_angstrom*u.angstrom, adjustmol=self.adjust_button.value)
+        mdt.set_distance(sel.a1, sel.a2, dist_in_angstrom*u.angstrom, adjustmol=self.adjust_button.value)
         self.viewer.set_positions()
 
     def set_angle(self, *args):
         sel = self._selection
         assert sel.type == 'bond'
         angle = self.angle_slider.value
-        set_angle(sel.a1, sel.a2, sel.nbr_a2, angle*u.pi/180.0, adjustmol=self.adjust_button.value)
+        mdt.set_angle(sel.a1, sel.a2, sel.nbr_a2, angle*u.pi/180.0, adjustmol=self.adjust_button.value)
         self.viewer.set_positions()
 
     def set_dihedral(self, *args):
         sel = self._selection
         assert sel.type == 'bond'
         angle = self.dihedral_slider.value
-        set_dihedral(sel.nbr_a1, sel.a1, sel.a2, sel.nbr_a2, angle*u.pi/180.0,
+        mdt.set_dihedral(sel.nbr_a1, sel.a1, sel.a2, sel.nbr_a2, angle*u.pi/180.0,
                                              adjustmol=self.adjust_button.value)
         self.viewer.set_positions()
 
@@ -152,7 +150,7 @@ class GeometryBuilder(ViewerToolBase):
                 return self.clear_selection()
 
             elif atom in sel.atom.bond_graph:  # select the bond
-                return self.bond_click(moldesign.molecules.bonds.Bond(sel.atom, atom))  # turn this into a bond selection
+                return self.bond_click(mdt.Bond(sel.atom, atom))  # turn this into a bond selection
             else:  # select a new atom
                 self.clear_selection(render=False)
                 sel = self._selection
@@ -207,7 +205,7 @@ class GeometryBuilder(ViewerToolBase):
 
             # Bond angle
             if sel.nbr_a2:
-                self.angle_slider.value = geom.angle(sel.a1, sel.a2, sel.nbr_a2).value_in(u.degrees)
+                self.angle_slider.value = mdt.angle(sel.a1, sel.a2, sel.nbr_a2).value_in(u.degrees)
                 # self.angle_slider.observe(self.set_angle, 'value')
                 self.angle_slider.disabled = False
                 self.angle_slider.description = '<b>Bond angle</b> <span style="color:{c1}">{a1.name}' \
@@ -222,7 +220,7 @@ class GeometryBuilder(ViewerToolBase):
 
             # Dihedral twist
             if sel.nbr_a2 and sel.nbr_a1:
-                self.dihedral_slider.value = geom.dihedral(sel.nbr_a1, sel.a1, sel.a2, sel.nbr_a2).value_in(u.degrees)
+                self.dihedral_slider.value = mdt.dihedral(sel.nbr_a1, sel.a1, sel.a2, sel.nbr_a2).value_in(u.degrees)
                 # self.dihedral_slider.observe(self.set_dihedral, 'value')
                 self.dihedral_slider.disabled = False
                 self.dihedral_slider.description = '<b>Dihedral angle</b> <span style="color:{c0}">{a4.name}</span>' \
@@ -304,12 +302,12 @@ class GeometryBuilder(ViewerToolBase):
             self._highlight_atoms([sel.a1, sel.a2], render=False)
 
             if sel.nbr_a1 is not None:
-                nmdtond = moldesign.molecules.bonds.Bond(sel.a1, sel.nbr_a1)
+                nmdtond = mdt.Bond(sel.a1, sel.nbr_a1)
                 self._highlight_atoms([sel.nbr_a1], color=self.NBR1HIGHLIGHT, render=False)
                 self.viewer.set_bond_color(self.NBR1HIGHLIGHT, nmdtond, render=False)
                 self._highlighted_bonds.append(nmdtond)
             if sel.nbr_a2 is not None:
-                nmdtond = moldesign.molecules.bonds.Bond(sel.a2, sel.nbr_a2)
+                nmdtond = mdt.Bond(sel.a2, sel.nbr_a2)
                 self._highlight_atoms([sel.nbr_a2], color=self.NBR2HIGHLIGHT, render=False)
                 self.viewer.set_bond_color(self.NBR2HIGHLIGHT, nmdtond, render=False)
                 self._highlighted_bonds.append(nmdtond)

@@ -20,6 +20,7 @@ import os
 
 from moldesign.interfaces import biopython_interface
 import moldesign.interfaces.openbabel as openbabel_interface
+from moldesign.interfaces.openmm import amber_to_mol as read_amber
 from moldesign.helpers import pdb
 from moldesign import chemjson
 
@@ -27,7 +28,7 @@ def exports(o, name=None):
     __all__.append(o.__name__)
     return o
 
-__all__ = ['from_smiles']
+__all__ = ['from_smiles', 'read_amber']
 
 
 from_smiles = openbabel_interface.from_smiles

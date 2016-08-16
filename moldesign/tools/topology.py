@@ -96,11 +96,15 @@ def assign_formal_charges(mol, ignore_nonzero=True):
 
 
 @toplevel
-def clean_pdb(mol):
-    """ Attempt to clean up a molecule from PDB format that may be missing data
+def add_missing_data(mol):
+    """ Add missing hydrogens, bond orders, and formal charges to a structure (often from the PDB)
 
     Specifically, this is a convenience function that runs:
     ``mdt.guess_bond_orders``, ``mdt.add_hydrogen``, and ``mdt.assign_formal_charges``
+
+    Note:
+        This does NOT add missing residues to biochemical structures. This functionality will be
+        available as :meth:`moldesign.add_missing_residues`
 
     Args:
         mol (moldesign.Molecule): molecule to clean

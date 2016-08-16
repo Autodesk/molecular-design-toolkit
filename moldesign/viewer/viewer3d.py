@@ -121,6 +121,10 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
         if render:
             self.render()
 
+    def show_unbonded(self, radius=0.5):
+        lone = [atom for atom in self.mol.atoms if atom.num_bonds == 0]
+        if lone: self.vdw(atoms=lone, render=False, radius=radius)
+
     @staticmethod
     def _atoms_to_json(atomlist):
         if hasattr(atomlist, 'iteratoms'):

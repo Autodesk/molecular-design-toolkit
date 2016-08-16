@@ -17,9 +17,9 @@ from IPython import display as dsp
 
 from nbmolviz.widget2d import MolViz2DBaseWidget
 
+import moldesign as mdt
 from moldesign import utils
 import moldesign.units as u
-from moldesign.molecules import AtomList
 
 from . import toplevel, ColorMixin
 
@@ -51,7 +51,7 @@ class ChemicalGraphViewer(MolViz2DBaseWidget, ColorMixin):
         try:
             self.atoms = mol.atoms
         except AttributeError:
-            self.atoms = AtomList(mol)
+            self.atoms = mdt.AtomList(mol)
             self.mol = self.atoms
         else:
             self.mol = mol

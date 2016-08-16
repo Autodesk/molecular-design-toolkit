@@ -16,8 +16,8 @@ import collections
 import ipywidgets as ipy
 import numpy as np
 
+import moldesign as mdt
 from moldesign import units as u
-from moldesign.geom.symmetry import get_symmetry
 
 
 def exports(o):
@@ -65,11 +65,12 @@ class Symmetrizer(ipy.Box):
                                    ipy.HBox([self.tolerance_chooser, self.recalculate_button]),
                                    self.tolerance_descrip],
                                   width=325)
+
+        self.symmetry = None
         self.coords_changed()
 
         self.hbox = ipy.HBox([ipy.VBox([self.viewer, self.showing]), self.symm_pane])
         super(Symmetrizer, self).__init__([self.hbox])
-
 
     def reset_coords(self, *args):
         self.mol.positions = self.original_coords
@@ -81,7 +82,7 @@ class Symmetrizer(ipy.Box):
             self.symm_selector.options = {}
         self.description.value = 'Finding symmetries ...'
         self.tolerance = self.tolerance_chooser.value * u.angstrom
-        self.symmetry = get_symmetry(self.mol, tolerance=self.tolerance)
+        self.symmetry = mdt.geom.get_symmetry(self.mol, tolerance=self.tolerance)
         options = collections.OrderedDict()
         for elem in self.symmetry.elems:
             if elem.max_diff.magnitude != 0.0:

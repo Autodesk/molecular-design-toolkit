@@ -164,10 +164,14 @@ class Trajectory(object):
         """overrides len(trajectory) to return number of frames"""
         return len(self.frames)
 
-    def draw3d(self):
-        """TrajectoryViewer: create a trajectory visualization"""
-        from moldesign import widgets
-        self._viz = widgets.trajectory.TrajectoryViewer(self)
+    @utils.kwargs_from(mdt.widgets.trajectory.TrajectoryViewer)
+    def draw3d(self, **kwargs):
+        """TrajectoryViewer: create a trajectory visualization
+
+        Args:
+            **kwargs (dict): kwargs for :class:`moldesign.widgets.trajectory.TrajectoryViewer`
+        """
+        self._viz = mdt.widgets.trajectory.TrajectoryViewer(self, **kwargs)
         return self._viz
     draw = draw3d  # synonym for backwards compatibility
 

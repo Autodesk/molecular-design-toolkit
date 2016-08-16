@@ -161,7 +161,6 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
             (see AmberTools manual for descriptions)
         parameters (List[ExtraAmberParameters]): (optional) list of amber parameters
             for non-standard residues
-
         **kwargs: keyword arguments to :meth:`compute.run_job`
 
     References:
@@ -187,6 +186,7 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
     leapstr.append('mol = loadpdb input.pdb\n'
                    "check mol\n"
                    "saveamberparm mol output.prmtop output.inpcrd\n"
+                   "savepdb mol output.pdb\n"
                    "quit\n")
 
     inputs['input.leap'] = '\n'.join(leapstr)
@@ -199,7 +199,7 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
     return compute.run_job(job, **kwargs)
 
 
-@mdt.utils.args_from(run_tleap)
+@utils.args_from(run_tleap)
 def assign_forcefield(mol, **kwargs):
     """ see run_tleap docstring """
     from moldesign.widgets.parameterization import ParameterizationDisplay

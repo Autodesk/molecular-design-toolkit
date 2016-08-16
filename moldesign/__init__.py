@@ -22,7 +22,13 @@ import moldesign.__main__
 from . import data
 PACKAGEPATH = data.PACKAGEPATH
 
-# Import all subpackages / submodules
+# Base subpackages - import these first
+from . import utils
+from . import units
+from . import uibase
+from . import widgets
+
+# Functional subpackages
 from . import compute
 from . import fileio
 from . import exceptions
@@ -40,11 +46,8 @@ from . import method
 from . import orbitals
 from . import molecules
 from . import tools
-from . import uibase
-from . import units
-from . import utils
 from . import viewer
-from . import widgets
+
 
 # Populate the top-level namespace (imports everything from each <submodule>.__all__ variable)
 from .fileio import *
