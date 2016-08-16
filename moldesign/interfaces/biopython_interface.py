@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import itertools
+import string
 
 import Bio.PDB
 import Bio.PDB.MMCIF2Dict
@@ -85,9 +86,12 @@ def biopy_to_mol(struc):
     """
     # TODO: assign bonds using 1) CONECT records, 2) residue templates, 3) distance
     newatoms = []
+    backup_chain_names = list(string.ascii_uppercase)
 
     for chain in struc.get_chains():
         tmp, pdbidx, pdbid = chain.get_full_id()
+        if not pdbid.strip():
+            pdbid = backup_chain_names.pop()
         newchain = mdt.Chain(pdbname=pdbid.strip())
 
         for residue in chain.get_residues():

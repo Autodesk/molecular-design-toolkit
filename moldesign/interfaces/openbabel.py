@@ -207,7 +207,8 @@ def mol_to_pybel(mdtmol):
         obres.AddAtom(obatom)
         obres.SetHetAtom(obatom, not atom.residue.is_standard_residue)
         obres.SetAtomID(obatom, atom.name)
-        obres.SetSerialNum(obatom, atom.pdbindex)
+        obres.SetSerialNum(obatom,
+                           mdt.utils.if_not_none(atom.pdbindex, atom.index+1))
 
     for atom in mdtmol.bond_graph:
         a1 = atommap[atom]
@@ -276,7 +277,7 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
 
         if chain_id_num not in newchains:
             # create new chain
-            if not mdt.utils.is_printable(chain_id.strip()):
+            if not mdt.utils.is_printable(chain_id.strip()) or not chain_id.strip():
                 chain_id = backup_chain_names.pop()
                 print 'WARNING: assigned name %s to unnamed chain object @ %s' % (
                     chain_id, hex(chain_id_num))
@@ -289,7 +290,7 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
             # Create new residue
             pdb_idx = obres.GetNum()
             res = mdt.Residue(pdbname=resname,
-                                   pdbindex=pdb_idx)
+                              pdbindex=pdb_idx)
             newresidues[residx] = res
             chn.add(res)
             res.chain = chn

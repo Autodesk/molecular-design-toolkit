@@ -32,7 +32,7 @@ class TrajectoryViewer(selector.SelectionGroup):
     """
 
     def __init__(self, trajectory, display=False, **kwargs):
-        from IPython.display import display
+        from IPython.display import display as displaynow
 
         self.default_fps = 10
         self.traj = trajectory
@@ -41,14 +41,14 @@ class TrajectoryViewer(selector.SelectionGroup):
         self.viewer, self.view_container = self.make_viewer()
         for frame in self.traj.frames[1:]:
             self.viewer.append_frame(positions=frame.positions,
-                                     wfn=frame.get('wfn',None),
+                                     wfn=frame.get('wfn', None),
                                      render=False)
         self.make_controls()
         self.pane.children = [self.view_container, self.controls]
         super(TrajectoryViewer, self).__init__([self.pane, AtomInspector()], **kwargs)
         self.update_selections('initialization', {'framenum': 0})
         if display:
-            display(self)
+            displaynow(self)
 
     def make_viewer(self):
         viewer = self.traj._tempmol.draw3d(style='licorice')
