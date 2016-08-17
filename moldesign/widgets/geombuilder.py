@@ -317,7 +317,6 @@ class GeometryBuilder(ViewerToolBase):
         elif sel.type is not None:
             raise ValueError('Unknown selection type %s' % self._selection.type)
 
-        self.viewer.render()
         self._set_tool_state()
 
     def clear_selection(self, render=True, *args):

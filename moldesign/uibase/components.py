@@ -112,7 +112,6 @@ class SelBase(ViewerToolBase):
         self.atom_list.options = collections.OrderedDict((self.atomkey(atom), atom)
                                                          for atom in self._atomset.keys())
         self.viewer.highlight_atoms(self._atomset.keys(), render=False)
-        self.viewer.render()
 
     def toggle_atom(self, atom):
         """Toggles atom's state in and out of the selection group"""

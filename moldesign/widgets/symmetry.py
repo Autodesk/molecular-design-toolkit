@@ -111,10 +111,9 @@ class Symmetrizer(ipy.Box):
     def show_symmetry(self, *args):
         self.showing.value = ''
         if self._current_shapes:
-            for s in self._current_shapes: self.viewer.remove(s, render=False)
+            for s in self._current_shapes: self.viewer.remove(s)
             self._current_shapes = []
         if self.symm_selector.value is None:
-            self.viewer.render()
             return
 
         elem = self.symm_selector.value
@@ -123,7 +122,6 @@ class Symmetrizer(ipy.Box):
         self.showing.value = '%s visualization not implemented' % symbol
 
         if symbol == 'C1':
-            self.viewer.render()
             self.showing.value = 'Identity operation'
             return
 
@@ -131,7 +129,7 @@ class Symmetrizer(ipy.Box):
             inversion = self.viewer.draw_sphere(np.zeros(3) * u.angstrom,
                                                 color='0x4AB4C4',
                                                 radius=0.5 * u.angstrom,
-                                                opacity=0.85, render=False)
+                                                opacity=0.85)
             self._current_shapes.append(inversion)
             self.showing.value = 'Inversion center'
 
@@ -142,7 +140,7 @@ class Symmetrizer(ipy.Box):
                                             axis,
                                             radius=rad,
                                             opacity=0.6,
-                                            color='0xAB00FE', render=False)
+                                            color='0xAB00FE')
             self._current_shapes.append(plane)
             self.showing.value = 'Mirror plane (normal = %s)' % axis
 
@@ -153,14 +151,12 @@ class Symmetrizer(ipy.Box):
             top = axis * max(3.25 * projections.max(), 3.0*u.angstrom)
             bottom = axis * min(2.5 * projections.min(), -2.5*u.angstrom)
             arrow = self.viewer.draw_arrow(start=bottom, end=top,
-                                           color='0x00FE03', render=False, opacity=0.8)
+                                           color='0x00FE03', opacity=0.8)
             self._current_shapes.append(arrow)
             if symbol[0] == 'S':
                 self.showing.value = '%d-fold improper rotation axis (%s)' % (nrot, axis)
             else:
                 self.showing.value = '%d-fold rotation axis (%s)' % (nrot, axis)
-
-        self.viewer.render()
 
 
     def set_highest_symmetry(self, *args):
