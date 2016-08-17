@@ -16,6 +16,7 @@ from moldesign import utils, data
 
 from . import Entity, AtomList, toplevel
 
+
 @toplevel
 class Residue(Entity):
     """ A biomolecular residue - most often an amino acid, a nucleic base, or a solvent
@@ -54,6 +55,10 @@ class Residue(Entity):
         self._sidechain = None
         self._template_name = None
         if self.name is None: self.name = self.pdbname + str(self.pdbindex)
+
+    @property
+    def atoms(self):
+        return self
 
     def add(self, atom, key=None):
         """Deals with atom name clashes within a residue - common for small molecules"""

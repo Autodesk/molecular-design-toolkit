@@ -230,7 +230,8 @@ def read_mmcif(f):
     mol = openbabel_interface.read_stream(f, 'cif')
     f.seek(0)
     assemblies = biopython_interface.get_mmcif_assemblies(f)
-    pdb.warn_assemblies(mol, assemblies)
+    if assemblies:
+        pdb.warn_assemblies(mol, assemblies)
     mol.properties.bioassemblies = assemblies
     return mol
 

@@ -60,7 +60,8 @@ class Chain(Entity):
             unique_types = sum(bool(v) for v in counts.itervalues())
             if unique_types == 1:
                 if self.num_residues == 1:
-                    self._type = data.CHAIN_MONOMER_NAMES[self.residues[0].type]
+                    self._type = data.CHAIN_MONOMER_NAMES.get(self.residues[0].type,
+                                                              self.residues[0].type)
                 else:
                     self._type = self.residues[0].type
 

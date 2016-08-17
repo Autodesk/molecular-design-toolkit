@@ -3,6 +3,7 @@ import collections
 import pytest
 
 import moldesign as mdt
+mdt.compute.config.engine_type = 'docker'
 from moldesign import units as u
 
 
@@ -63,9 +64,6 @@ def test_read_bipyridine_from_format(key, request):
     assert len(bondorders) == 2
 
 
-
-
-
 @pytest.fixture
 def dna_pdb():
     return mdt.read('data/ACTG.pdb')
@@ -77,3 +75,8 @@ def dna_mmcif():
 @pytest.fixture
 def dna_sequence():
     return mdt.build_bdna('ACTG')
+
+
+@pytest.mark.parametrize('key', 'pdb mmcif sequence'.split())
+def test_read_dna_from_format(key, request):
+    mol = request.getfuncargvalue('dna_'+key)

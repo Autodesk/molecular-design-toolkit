@@ -61,9 +61,9 @@ class EnergyModelBase(Method):
              u.Scalar[charge]: the formal charge used for this model
         """
         if 'charge' in self.params and self.params.charge is not None:
-            return self.params.charge
+            return self.params.charge.value_in(u.q_e)
         elif hasattr(self.mol, 'charge'):
-            return self.mol.charge
+            return self.mol.charge.value_in(u.q_e)
         else:
             return 0
 
