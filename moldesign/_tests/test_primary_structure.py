@@ -1,3 +1,6 @@
+""" Tests introspection and methods for protein primary structure
+"""
+
 import pytest
 
 import moldesign as mdt

@@ -1,3 +1,5 @@
+""" Tests the unit system
+"""
 import pytest
 import numpy as np
 

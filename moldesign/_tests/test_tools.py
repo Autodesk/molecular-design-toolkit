@@ -1,3 +1,5 @@
+""" Tests topology manipulation tools
+"""
 import collections
 
 import pytest

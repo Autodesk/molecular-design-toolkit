@@ -1,3 +1,5 @@
+""" Tests for molecule creation and file i/o
+"""
 import collections
 
 import pytest

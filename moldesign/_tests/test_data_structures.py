@@ -1,3 +1,6 @@
+""" Tests Molecule instances and other base classes they depend on
+"""
+
 import pickle
 import random
 
@@ -11,6 +14,7 @@ import moldesign.utils.classes
 from moldesign import units as u
 
 registered_types = {}
+
 
 def typedfixture(*types, **kwargs):
     """This is a decorator that lets us associate fixtures with one or more arbitrary types.

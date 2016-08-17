@@ -1,3 +1,6 @@
+""" Tests internal math routines
+"""
+
 import random
 
 import numpy as np

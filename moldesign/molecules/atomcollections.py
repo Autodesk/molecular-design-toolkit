@@ -100,12 +100,12 @@ class AtomContainer(object):
         """
         other = utils.if_not_none(other, self)
         try:
-            other_positions = other.positions.value_in(u.ang)
+            other_positions = other.positions.defunits_value()
         except AttributeError:
-            other_positions = np.array([other.position.value_in(u.ang)])
+            other_positions = np.array([other.position.defunits_value()])
 
-        distances = spd.cdist(self.position.value_in(u.ang), other_positions)
-        return distances * u.ang
+        distances = spd.cdist(self.positions.defunits_value(), other_positions)
+        return distances * u.default.length
 
     def calc_displacements(self):
         """ Calculate an array of displacements between all atoms in this object

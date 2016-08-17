@@ -31,6 +31,7 @@ class ElectronicWfn(object):
         num_electrons (int): number of electrons in this wavefunction
         theory (moldesign.models.base.EnergyModelBase): The model this wavefunction was created with
         aobasis (moldesign.orbitals.BasisSet): The basis functions for the enclosed orbitals
+        nbasis (int): number of AO basis functions
         fock_ao (moldesign.units.Array[energy]): fock matrix in the AO basis
         positions (moldesign.units.Array[length]): positions of the nuclei for this wfn
         civectors (np.ndarray): CI vectors (if applicable)
@@ -46,6 +47,10 @@ class ElectronicWfn(object):
         self.model = model
         self.civectors = civectors
         self.aobasis = aobasis
+        if aobasis:
+            self.nbasis = len(self.aobasis)
+        else:
+            self.nbasis = None
         self.orbitals = DotDict()
         self.fock_ao = fock_ao
         self.num_electrons = num_electrons
