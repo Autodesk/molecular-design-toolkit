@@ -551,6 +551,8 @@ class MolTopologyMixin(object):
                 'elem': atom.elem,
                 'mass_magnitude': atom.mass.magnitude,
                 'residue_index': atom.residue.index,
+                'residue_name': atom.residue.name,
+                'chain': atom.chain.name,
                 'positions': positions,
                 'momenta': momenta,
             })
