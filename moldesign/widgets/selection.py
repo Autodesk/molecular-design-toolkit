@@ -14,6 +14,7 @@
 import collections
 
 import ipywidgets as ipy
+import traitlets
 
 from moldesign import viewer
 from moldesign.uibase.components import SelBase
@@ -116,12 +117,13 @@ class ResidueSelector(SelBase):
     """
     def __init__(self, mol):
         super(ResidueSelector, self).__init__(mol)
-        self.viewer.add_click_callback(self.atom_click)
 
         self._residue_selection = collections.OrderedDict()
         self._residueset = collections.OrderedDict()
-        self.selection_type = ipy.Dropdown(description='Clicks select:',value='Residue',
+        self.selection_type = ipy.Dropdown(description='Clicks select:',value=self.viewer.selection_type,
                                            options=('Atom', 'Residue', 'Chain'))
+
+        traitlets.link((self.selection_type, 'value'), (self.viewer, 'selection_type'))
 
         self.residue_listname = ipy.HTML('<b>Selected residues:</b>')
         self.residue_list = ipy.SelectMultiple(options=collections.OrderedDict(),
@@ -176,16 +178,6 @@ class ResidueSelector(SelBase):
 
         self._residueset = newres
         self._redraw_selection_state()
-
-    def atom_click(self, atom):
-        if self.selection_type.value == 'Atom':
-            self.toggle_atom(atom)
-        elif self.selection_type.value == 'Residue':
-            self.toggle_residue(atom.residue, clickatom=atom)
-        elif self.selection_type.value == 'Chain':
-            self.toggle_chain(atom.chain, atom)
-        else:
-            raise ValueError('Unknown selecton_type %s' % self.selection_type.value)
 
     def toggle_residue(self, residue, clickatom=None, render=True):
         if clickatom is not None:
