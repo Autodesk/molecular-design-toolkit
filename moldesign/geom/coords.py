@@ -103,6 +103,9 @@ def dihedral(a1, a2, a3=None, a4=None):
         a1,a2 (mdt.Atom): the atoms describing the dihedral
         a3,a4 (mdt.Atom): (optional) if not passed, ``a1`` and ``a2`` will be treated as the
             central atoms in this bond, and a3 and a4 will be inferred.
+
+    Returns:
+        (units.Scalar[angle]): angle -  [0, 2 pi) radians
     """
     if a3 is a4 is None:  # infer the first and last atoms
         a1, a2, a3, a4 = _infer_dihedral(a1, a2)

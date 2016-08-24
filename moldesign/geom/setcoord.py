@@ -18,6 +18,7 @@ from moldesign import external
 from moldesign.mathutils import sub_angles, apply_4x4_transform
 
 from . import toplevel, angle, dihedral
+from .coords import _infer_dihedral
 
 
 @toplevel
@@ -84,10 +85,14 @@ def set_angle(a1, a2, a3, theta, adjustmol=True):
 
 
 @toplevel
-def set_dihedral(a1, a2, a3, a4, theta, adjustmol=True):
+def set_dihedral(a1, a2, a3=None, a4=None, theta=None, adjustmol=True):
     """ Set the twist angle of atoms a1 and a4 around the central bond a2-a3. The atoms will be
-    adjusted along the
-    gradient of the angle.
+    adjusted along the gradient of the angle.
+
+    Can be called as ``set_dihedral(a1, a2, a3, a4, theta, adjustmol=True)``
+              OR     ``set_dihedral(a2, a2, theta, adjustmol=True)
+
+
     If ``adjustmol`` is True and the topology is unambiguous, then the entire molecule's positions
     will be modified as well
 
@@ -98,6 +103,13 @@ def set_dihedral(a1, a2, a3, a4, theta, adjustmol=True):
     """
     # TODO: deal with co-linear a1/a4, a2, a3 - the angle is ill-defined \
     #      (should just an arbitrary axis normal to the central bond)
+    if a4 is None:
+        if a3 is not None and theta is None:
+            theta, a3 = a3, theta
+        elif a3 is not None or a4 is not None or theta is None:
+            raise ValueError('Invalid number of arguments for set_dihedral')
+        a1, a2, a3, a4 = _infer_dihedral(a1, a2)
+
     current = dihedral(a1, a2, a3, a4)
     rotation = sub_angles(theta, current)
     if abs(rotation) < 1.0e-6: return
