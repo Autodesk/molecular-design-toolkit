@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import collections
+import warnings
 
 import moldesign as mdt
 import pyccc
@@ -130,8 +131,40 @@ def build_bdna(sequence, **kwargs):
     Returns:
         moldesign.Molecule: B-DNA double helix
     """
-    infile = 'molecule m;\nm = bdna( "%s" );\nputpdb( "helix.pdb", m, "-wwpdb");\n'% \
-             sequence.lower()
+    print('DeprecationWarning: build_bdna is deprecated. '
+          "Use `build_dna_helix(sequence, helix_type='b')` instead")
+    return build_dna_helix(sequence, helix_type='b', **kwargs)
+
+
+@utils.kwargs_from(mdt.compute.run_job)
+def build_dna_helix(sequence, helix_type='B', **kwargs):
+    """ Uses Ambertools' Nucleic Acid Builder to build a 3D DNA double-helix.
+
+    Args:
+        sequence (str): DNA sequence for one of the strands (a complementary sequence will
+            automatically be created)
+        helix_type (str): Type of helix - 'A'=Arnott A-DNA
+                                          'B'=B-DNA from standard templates and helical params,
+                                          'LB'=Langridge B-DNA,
+                                          'AB'=Arnott B-DNA,
+                                          'SB'=Sasisekharan left-handed B-DNA
+        **kwargs: arguments for :meth:`compute.run_job`
+
+    All helix types except 'B' are taken from fiber diffraction data (see the refernce for details)
+
+    Returns:
+        moldesign.Molecule: B-DNA double helix
+
+    References:
+        See NAB / AmberTools documentation, http://ambermd.org/doc12/Amber16.pdf
+    """
+    infile = ['molecule m;']
+    if helix_type.lower() == 'b':
+        infile.append('m = bdna( "%s" );' % sequence.lower())
+    else:
+        infile.append('m = fd_helix( "%sdna",  "%s", "dna" );'
+                      % (helix_type.lower(), sequence.lower()))
+    infile.append('putpdb( "helix.pdb", m, "-wwpdb");\n')
 
     def finish_job(job):
         mol = mdt.read(job.get_output('helix.pdb'), format='pdb')
@@ -140,8 +173,8 @@ def build_bdna(sequence, **kwargs):
 
     job = pyccc.Job(command='nab -o buildbdna build.nab && ./buildbdna',
                     image=mdt.compute.get_image_path(IMAGE),
-                    inputs={'build.nab': infile},
-                    name='NAB_build_bdna',
+                    inputs={'build.nab': '\n'.join(infile)},
+                    name='NAB_build_dna',
                     when_finished=finish_job)
 
     return mdt.compute.run_job(job, _return_result=True, **kwargs)

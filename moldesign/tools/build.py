@@ -17,11 +17,11 @@ import string
 import moldesign as mdt
 import moldesign.molecules
 
-from moldesign.interfaces.ambertools import build_bdna
+from moldesign.interfaces.ambertools import build_bdna, build_dna_helix
 
 from . import toplevel, __all__ as _pkgall
 
-_pkgall.append('build_bdna')
+_pkgall.extend(['build_bdna', 'build_dna_helix'])
 
 
 @toplevel
