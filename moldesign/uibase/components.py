@@ -101,9 +101,6 @@ class SelBase(ViewerToolBase):
         self.select_none = ipy.Button(description='Clear all selections')
         self.select_none.on_click(self.clear_selections)
 
-        self.remove_button = ipy.Button(description='Unselect')
-        self.remove_button.on_click(self.handle_remove_button_click)
-
     def remove_atomlist_highlight(self, *args):
         self.atom_list.value = tuple()
 
@@ -113,11 +110,6 @@ class SelBase(ViewerToolBase):
 
     def select_all_atoms(self, *args):
         self.viewer.selected_atoms = set(i for i, atom in enumerate(self.mol.atoms))
-
-    def handle_remove_button_click(self, *args):
-        if self.atom_list.value:
-            for atom in self.atom_list.value: self._atomset.pop(atom)
-            self._redraw_selection_state()
 
     def clear_selections(self, *args):
         self.viewer.selected_atoms = set()

@@ -52,8 +52,7 @@ class BondSelector(SelBase):
         self.toolpane.children = (self.atom_listname,
                                   self.atom_list,
                                   self.bond_listname,
-                                  self.bond_list,
-                                  self.remove_button)
+                                  self.bond_list)
 
     def select_all_bonds(self, *args):
         self.selected_bonds = list(self.mol.bonds)
@@ -92,12 +91,6 @@ class BondSelector(SelBase):
         else: self._bondset[bond] = None  # select the bond
         self._redraw_selection_state()
 
-    def handle_remove_button_click(self, *args):
-        if self.bond_list.value:
-            for bond in self.bond_list.value: self._bondset.pop(bond)
-            self._redraw_selection_state()
-        super(BondSelector, self).handle_remove_button_click(*args)
-
     def select_all_bonds(self, *args):
         self.selected_bonds = list(self.mol.bonds)
 
@@ -135,8 +128,7 @@ class ResidueSelector(SelBase):
                                   self.atom_listname,
                                   self.atom_list,
                                   self.residue_listname,
-                                  self.residue_list,
-                                  self.remove_button]
+                                  self.residue_list]
 
     # Returns a list of all residues indicated in the set of atoms
     def _atoms_to_residues(self, selected_atoms):
@@ -227,11 +219,3 @@ class ResidueSelector(SelBase):
     @staticmethod
     def reskey(residue):
         return '{res.name} in chain "{res.chain.name}"'.format(res=residue)
-
-    def handle_remove_button_click(self, *args):
-        if self.residue_list.value:
-            for res in self.residue_list.value:
-                self.toggle_residue(res, render=False)
-            self._redraw_selection_state()
-        else:
-            super(ResidueSelector, self).handle_remove_button_click(*args)
