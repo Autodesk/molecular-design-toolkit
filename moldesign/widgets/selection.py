@@ -32,7 +32,6 @@ class BondSelector(SelBase):
 
     def __init__(self, mol):
         super(BondSelector, self).__init__(mol)
-        self.viewer.atom_callbacks.append(self.toggle_atom)
         self.viewer.bond_callbacks.append(self.toggle_bond)
 
         self._bondset = collections.OrderedDict()
@@ -126,8 +125,8 @@ class ResidueSelector(SelBase):
         traitlets.link((self.selection_type, 'value'), (self.viewer, 'selection_type'))
 
         self.residue_listname = ipy.HTML('<b>Selected residues:</b>')
-        self.residue_list = ipy.SelectMultiple(options=collections.OrderedDict(),
-                                               height=150)
+        self.residue_list = ipy.SelectMultiple(options=list(), height=150)
+        traitlets.directional_link((self.viewer, 'selected_atoms'), (self.residue_list, 'options'), self._atoms_to_residues)
         self.residue_list.observe(self.remove_atomlist_highlight, 'value')
         self.atom_list.observe(self.remove_reslist_highlight, 'value')
 
@@ -138,6 +137,32 @@ class ResidueSelector(SelBase):
                                   self.residue_listname,
                                   self.residue_list,
                                   self.remove_button]
+
+    # Returns a list of all residues indicated in the set of atoms
+    def _atoms_to_residues(self, selected_atoms):
+        # Get all residues and their total number of atoms
+        residues = dict()
+        for atom in self.mol.atoms:
+            if atom.residue.index in residues:
+                residues[atom.residue.index]['total'] += 1
+            else:
+                residues[atom.residue.index] = {
+                    'total': 1,
+                }
+
+        # Get the total number of selected atoms per residue and compare to total
+        selected_residues = set()
+        for atomIndex in selected_atoms:
+            atom = self.mol.atoms[atomIndex]
+            if 'selected_count' in residues[atom.residue.index]:
+                residues[atom.residue.index]['selected_count'] += 1
+            else:
+                residues[atom.residue.index]['selected_count'] = 1
+
+            if residues[atom.residue.index]['selected_count'] >= residues[atom.residue.index]['total']:
+                selected_residues.add(atom.residue.name)
+
+        return list(selected_residues)
 
     def _redraw_selection_state(self):
         # this is slow and crappy ...
