@@ -39,29 +39,27 @@ class BondClicker(GeometryViewer):
         self.bond_callbacks = []
         self.click_callbacks = []
         self.vdw(radius=self.ATOMRADIUS, render=False)
-        self.draw_all_bonds(render=True)
+        self.draw_all_bonds()
 
     def set_positions(self, *args, **kwargs):
         render = kwargs.get('render',True)
-        kwargs['render'] = False
         super(BondClicker, self).set_positions(*args, **kwargs)
-        self.draw_all_bonds(render=render)
+        self.draw_all_bonds()
 
-    def draw_all_bonds(self, render=True, batch=True):
+    def draw_all_bonds(self, batch=True):
         # TODO: this should be written in javascript, for speed and consistency
         for bond in self.mol.bonds:
-            self.draw_bond(bond, batch=batch, render=False)
-        if render: self.render()
+            self.draw_bond(bond, batch=batch)
 
     def set_bond_color(self, color, bond, render=True):
         self._bond_colors[bond] = color
-        self.draw_bond(bond, render=render)
+        self.draw_bond(bond)
 
     def unset_bond_color(self, bond, render=True):
         self._bond_colors.pop(bond, None)
-        self.draw_bond(bond, render=render)
+        self.draw_bond(bond)
 
-    def draw_bond(self, bond, render=True, batch=False, **shape_args):
+    def draw_bond(self, bond, batch=False, **shape_args):
         atom = bond.a1
         nbr = bond.a2
         order = bond.order
@@ -73,8 +71,7 @@ class BondClicker(GeometryViewer):
 
         assert 'clickable' not in shape_args
         color = self._bond_colors.get(bond, self.BONDCOLOR)
-        kwargs = dict(render=False,
-                      clickable=True,
+        kwargs = dict(clickable=True,
                       color=color,
                       batch=batch)
         kwargs.update(shape_args)
@@ -111,7 +108,6 @@ class BondClicker(GeometryViewer):
         self._bond_shapes[bond] = shapes
         for x in shapes:
             self._bonds[x] = bond
-        if render: self.render()
 
     def handle_click(self, trait_name, old, new):
         if 'pyid' in new:
