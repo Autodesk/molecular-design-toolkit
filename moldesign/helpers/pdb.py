@@ -226,10 +226,13 @@ def assign_biopolymer_bonds(mol):
     """
 
     for chain in mol.chains:
-        chain.assign_biopolymer_bonds()
+        try:
+            chain.assign_biopolymer_bonds()
+        except KeyError:
+            print('WARNING: failed to assign backbone bonds for %s') % str(chain)
     for residue in mol.residues:
         try:
             residue.assign_template_bonds()
         except KeyError:
-            print ('WARNING: failed to assign bonds for residue %s; use '
-                   '``residue.assign_distance.bonds`` to guess the topology') % str(residue)
+            print('WARNING: failed to assign bonds for %s; use '
+                  '``residue.assign_distance.bonds`` to guess the topology') % str(residue)

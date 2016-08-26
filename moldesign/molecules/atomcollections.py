@@ -55,6 +55,12 @@ class AtomContainer(object):
         """ AtomList: a list of all heavy atoms (i.e., non-hydrogen) in this object """
         return AtomList([a for a in self.atoms if a.atnum != 1])
 
+    @property
+    def mass(self):
+        """ u.Scalar[mass]: total mass of this object
+        """
+        return sum(a.mass for a in self.atoms)
+
     def get_atoms(self, **queries):
         """Allows keyword-based atom queries.
 

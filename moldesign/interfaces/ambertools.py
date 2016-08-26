@@ -144,7 +144,7 @@ def build_dna_helix(sequence, helix_type='B', **kwargs):
         sequence (str): DNA sequence for one of the strands (a complementary sequence will
             automatically be created)
         helix_type (str): Type of helix - 'A'=Arnott A-DNA
-                                          'B'=B-DNA from standard templates and helical params,
+                                          'B'=B-DNA (from standard templates and helical params),
                                           'LB'=Langridge B-DNA,
                                           'AB'=Arnott B-DNA,
                                           'SB'=Sasisekharan left-handed B-DNA
@@ -156,7 +156,7 @@ def build_dna_helix(sequence, helix_type='B', **kwargs):
         moldesign.Molecule: B-DNA double helix
 
     References:
-        See NAB / AmberTools documentation, http://ambermd.org/doc12/Amber16.pdf
+        See NAB / AmberTools documentation: http://ambermd.org/doc12/Amber16.pdf, pg 771-2
     """
     infile = ['molecule m;']
     if helix_type.lower() == 'b':
@@ -167,8 +167,20 @@ def build_dna_helix(sequence, helix_type='B', **kwargs):
     infile.append('putpdb( "helix.pdb", m, "-wwpdb");\n')
 
     def finish_job(job):
-        mol = mdt.read(job.get_output('helix.pdb'), format='pdb')
-        mol.name = 'BDNA: %s' % sequence
+        mol = mdt.fileio.read_pdb(job.get_output('helix.pdb').open(), assign_ccd_bonds=False)
+        if mol.num_chains == 1:
+            assert mol.num_residues % 2 == 0
+            oldchain = mol.chains[0]
+            oldchain.name = oldchain.pdbindex = oldchain.pdbname = 'A'
+            newchain = mdt.Chain('B')
+            for residue in mol.residues[mol.num_residues//2:]:
+                residue.chain = newchain
+                for atom in residue:
+                    atom.chain = newchain
+            mol = mdt.Molecule(mol)
+        mdt.helpers.assign_biopolymer_bonds(mol)
+
+        mol.name = '%s-DNA Helix: %s' % (helix_type.upper(), sequence)
         return mol
 
     job = pyccc.Job(command='nab -o buildbdna build.nab && ./buildbdna',

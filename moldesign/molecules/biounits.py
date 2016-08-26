@@ -56,12 +56,6 @@ class Entity(AtomContainer, utils.DictLike):
         for name, val in kwargs.iteritems():
             setattr(self, name, val)
 
-    @property
-    def mass(self):
-        """ u.Scalar[mass]: total mass of this object
-        """
-        return sum(self.atoms.mass)
-
     def add(self, item, key=None):
         """ Add a child to this entity.
 

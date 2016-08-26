@@ -1102,7 +1102,7 @@ class Molecule(AtomContainer,
     def is_small_molecule(self):
         """bool: True if molecule's mass is less than 500 Daltons (not mutually exclusive with
         :meth:`self.is_biomolecule <Molecule.is_biomolecule>`)"""
-        return sum(self.atoms.mass) <= 500.0 * u.amu
+        return self.mass <= 500.0 * u.amu
 
     @property
     def bonds(self):
