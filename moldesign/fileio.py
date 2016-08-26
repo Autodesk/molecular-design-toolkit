@@ -174,7 +174,7 @@ def write_trajectory(traj, filename=None, format=None, overwrite=True):
             fileobj.close()
 
 
-def read_pdb(f):
+def read_pdb(f, assign_ccd_bonds=True):
     """ Read a PDB file and return a molecule.
 
     This uses the biopython parser to get the molecular structure, but uses internal parsers
@@ -186,6 +186,8 @@ def read_pdb(f):
 
     Args:
         f (filelike): filelike object giving access to the PDB file (must implement seek)
+        assign_ccd_bonds (bool): Use the PDB Chemical Component Dictionary (CCD) to create bond
+            topology (note that bonds from CONECT records will always be created as well)
 
     Returns:
         moldesign.Molecule: the parsed molecule
@@ -197,8 +199,11 @@ def read_pdb(f):
     f.seek(0)
     conect_graph = pdb.get_conect_records(f)
 
-    # Assign bonds (biopython doesn't get them)
-    pdb.assign_biopolymer_bonds(mol)
+    # Assign bonds from residue templates
+    if assign_ccd_bonds:
+        pdb.assign_biopolymer_bonds(mol)
+
+    # Create bonds from CONECT records
     serials = {atom.pdbindex: atom for atom in mol.atoms}
     for atomserial, nbrs in conect_graph.iteritems():
         atom = serials[atomserial]

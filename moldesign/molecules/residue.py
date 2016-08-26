@@ -58,7 +58,7 @@ class Residue(Entity):
 
     @property
     def atoms(self):
-        return self
+        return self.children
 
     def add(self, atom, key=None):
         """Deals with atom name clashes within a residue - common for small molecules"""
@@ -183,7 +183,7 @@ class Residue(Entity):
             for nbrname, order in bonds_by_name.get(atom.name, {}).iteritems():
                 try:
                     nbr = self[nbrname]
-                except KeyError:  # missing atom in this structure is normal (often hydrogen)
+                except KeyError:  # missing atoms are normal (often hydrogen)
                     pass
                 else:
                     bond_graph[atom][nbr] = bond_graph[nbr][atom] = order

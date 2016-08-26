@@ -22,7 +22,7 @@ def typedfixture(*types, **kwargs):
     return fixture_wrapper
 
 
-@typedfixture('3AID')
+@typedfixture('3AID', 'protein')
 def protease_pdb():
     return mdt.read('data/3aid.pdb')
 

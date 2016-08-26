@@ -128,7 +128,6 @@ class Chain(Entity):
             raise ValueError('Multiple ligands detected. Use `chain.unclassified_residues` to '
                              'iterate over them')
 
-
     def to_json(self):
         js = mdt.chemjson.jsonify(self, 'index name pdbindex'.split())
         js['residues'] = [res.index for res in self.residues]
@@ -147,9 +146,8 @@ class Chain(Entity):
 
     @property
     def residues(self):
-        """Chain: synonym for 'self' to enhance readability,
-            e.g. ``molecule.chains['A'].residue[123]``"""
-        return self
+        """ChildList: list of residues in this chain """
+        return self.children
 
     def add(self, residue, **kwargs):
         if residue.chain is None:

@@ -11,27 +11,87 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import collections
+import operator
 
 import moldesign as mdt
-from moldesign import data, utils
+from moldesign import utils
 
 from . import toplevel, AtomList, AtomContainer
 
 
+class ChildList(AtomContainer):
+    """ A list of biochemical objects that can be accessed by name or by index.
+    """
+    __len__ = utils.Alias('_childinorder.__len__')
+    __iter__ = utils.Alias('_childinorder.__iter__')
+
+    def __str__(self):
+        return str(self._childinorder._items)
+
+    def __repr__(self):
+        try:
+            return '<Children of %s: %s>' % (self.parent, self)
+        except:
+            return '<ChildList @ %x (__repr__ failed)>' % id(self)
+
+    def __init__(self, parent):
+        super(ChildList, self).__init__()
+        self.parent = parent
+        self._childbyname = {}
+        self._childinorder = utils.SortedCollection(key=operator.attrgetter('pdbindex'))
+
+    def __getitem__(self, item):
+        if isinstance(item, basestring):
+            return self._childbyname[item]
+        else:
+            return self._childinorder[item]
+
+    def __setitem__(self, key, val):
+        if key in self._childbyname:
+            raise KeyError('%s already exists in %s' % (key, self.parent))
+        self._childbyname[key] = val
+        self._childinorder.insert_right(val)
+
+    def iteratoms(self):
+        """Iterate over all atoms
+
+        Yields:
+            Atom: all atoms in this entity and/or its children
+        """
+        for child in self:
+            if isinstance(child, mdt.Atom):
+                yield child
+            else:
+                for atom in child.iteratoms():
+                    yield atom
+
+    @property
+    def atoms(self):
+        """ AtomList: a sorted list of all atoms in this entity and/or its children
+        """
+        return AtomList(self.iteratoms())
+
+
 @toplevel
-class Entity(AtomContainer, utils.DictLike):
+class Entity(AtomContainer):
     """
     Generalized storage mechanism for hierarchical representation of biomolecules,
     e.g. by residue, chain, etc. Permits other groupings, provided that everything is
     tree-like.
 
-    All children of a given entity must have unique keys. An individual child can be retrieved with
+    All children of a given entity must have unique names. An individual child can be retrieved with
     ``entity.childname`` or ``entity['childname']`` or ``entity[index]``
 
     Yields:
         Entity or mdt.Atom: this entity's children, in order
     """
+
+    __getitem__ = utils.Alias('children.__getitem__')
+    __len__ = utils.Alias('children.__len__')
+    __iter__ = utils.Alias('children.__iter__')
+    atoms = utils.Alias('children.atoms')
+    iteratoms = utils.Alias('children.iteratoms')
+
     def __init__(self, name=None, molecule=None, index=None, pdbname=None, pdbindex=None,
                  **kwargs):
         """  Initialization:
@@ -44,14 +104,13 @@ class Entity(AtomContainer, utils.DictLike):
             pdbindex (str): Index of this entity in PDB format
         """
         super(Entity, self).__init__()
+        self.children = ChildList(self)
         self.molecule = molecule
         self.name = name
         self.index = index
 
         self.pdbname = pdbname
         self.pdbindex = pdbindex
-
-        self._indexlist = None
 
         for name, val in kwargs.iteritems():
             setattr(self, name, val)
@@ -66,40 +125,14 @@ class Entity(AtomContainer, utils.DictLike):
             item (Entity or mdt.Atom): the child object to add
             key (str): Key to retrieve this item (default: ``item.name`` )
         """
-        self._indexlist = None
         if key is None:
             key = item.name
-        if key in self:
-            raise KeyError('%s already exists in %s' % (key, self))
-        self[key] = item
+        self.children[key] = item
 
-    def __contains__(self, item):
-        # TODO: O(N) lookup is bad
-        return item in self.children
+    __setitem__ = add
 
-    def __getitem__(self, item):
-        try:
-            return super(Entity, self).__getitem__(item)
-        except (KeyError, TypeError) as orig:
-            try:
-                return self.indexlist[item]
-            except (TypeError, IndexError) as exc:
-                raise orig
-
-    @property
-    def indexlist(self):
-        """ list: list of all children, in order
-        """
-        if self._indexlist is None:
-            self._indexlist = list(self)
-        return self._indexlist
-
-    def __iter__(self):
-        if self._indexlist is not None:
-            for item in self._indexlist: yield item
-        else:
-            keys = sorted(self.keys())
-            for k in keys: yield self[k]
+    def __getattr__(self, item):
+        return self[item]
 
     def __hash__(self):
         """ Explicitly hash by object id
@@ -128,32 +161,11 @@ class Entity(AtomContainer, utils.DictLike):
         Allow for some simple queries, i.e. mol.chain['A'].residue(pdbname='ALA')
         """
         retlist = []
-        for child in self:
+        for child in self._inorder:
             for key, val in kwargs.iteritems():
                 if hasattr(child, key) and getattr(child, key) == val:
                     retlist.append(child)
         return retlist
-
-    def iteratoms(self):
-        """Iterate over all atoms (i.e. leaf nodes)
-
-        Yields:
-            Atom: all atoms in this entity and/or its children
-        """
-        for item in self.itervalues():
-            if hasattr(item,'itervalues'):
-                for x in item.itervalues(): yield x
-            else:
-                yield item
-
-    @property
-    def atoms(self):
-        """ AtomList: a sorted list of all atoms in this entity and/or its children
-        """
-        atoms = AtomList(sorted(self.iteratoms(),
-                                key=lambda x: x.index))
-        return atoms
-
 
 
 @toplevel
@@ -162,5 +174,8 @@ class Instance(Entity):
     PDB chains. Users won't ever really see this object.
     """
     def __str__(self):
-        return "biounit container (chains: %s) for molecule %s" % (', '.join(self.keys()), self.molecule.name)
+        return str(self.children)
+
+    def __repr__(self):
+        return '<Molecule instance: %s>' % str(self.children)
 
