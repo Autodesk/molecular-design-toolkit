@@ -302,6 +302,8 @@ class AtomContainer(object):
         Returns:
             AtomList: list of copied atoms
         """
+        from . import ChildList
+
         oldatoms = self.atoms
         old_bond_graph = {a: {} for a in self.atoms}
         for atom in self.atoms:
@@ -322,7 +324,7 @@ class AtomContainer(object):
                 if atom.chain not in replaced:
                     chain = copy.copy(atom.chain)
                     chain.molecule = None
-                    chain.children = {}
+                    chain.children = ChildList(chain)
                     replaced[atom.chain] = chain
                 else:
                     chain = replaced[atom.chain]
@@ -334,7 +336,7 @@ class AtomContainer(object):
                     res = copy.copy(atom.residue)
                     res.molecule = None
                     res.chain = atom.chain
-                    res.children = {}
+                    res.children = ChildList(res)
 
                     res.chain.add(res)
                     replaced[atom.residue] = res

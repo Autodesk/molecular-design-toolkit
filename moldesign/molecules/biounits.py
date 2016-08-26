@@ -38,7 +38,10 @@ class ChildList(AtomContainer):
         super(ChildList, self).__init__()
         self.parent = parent
         self._childbyname = {}
-        self._childinorder = utils.SortedCollection(key=operator.attrgetter('pdbindex'))
+        self._childinorder = utils.SortedCollection(key=_sortkey)
+
+    def __dir__(self):
+        return self.__dict__.keys() + self.__class__.__dict__.keys() + self._childbyname.keys()
 
     def __getitem__(self, item):
         if isinstance(item, basestring):
@@ -51,6 +54,22 @@ class ChildList(AtomContainer):
             raise KeyError('%s already exists in %s' % (key, self.parent))
         self._childbyname[key] = val
         self._childinorder.insert_right(val)
+
+    def __contains__(self, item):
+        if isinstance(item, basestring):
+            return (item in self._childbyname)
+        else:
+            return (item in self._childinorder)
+
+    def __getattr__(self, item):
+        if not hasattr(self, '_childbyname'):
+            raise AttributeError('Uninitialized')
+
+        try:
+            return self._childbyname[item]
+        except KeyError:
+            raise AttributeError('ChildList object in %s has no attribute %s.' % (
+                self.parent, item))
 
     def iteratoms(self):
         """Iterate over all atoms
@@ -70,6 +89,10 @@ class ChildList(AtomContainer):
         """ AtomList: a sorted list of all atoms in this entity and/or its children
         """
         return AtomList(self.iteratoms())
+
+
+def _sortkey(x):
+    return x.pdbindex
 
 
 @toplevel
@@ -131,8 +154,18 @@ class Entity(AtomContainer):
 
     __setitem__ = add
 
+    def __dir__(self):
+        return (self.__dict__.keys() +
+                self.__class__.__dict__.keys() +
+                [x.name for x in self])
+
     def __getattr__(self, item):
-        return self[item]
+        if not hasattr(self, 'children'):
+            raise AttributeError("Uninitialized")
+        try:
+            return self.children[item]
+        except KeyError:
+            raise AttributeError('%s has no attribute "%s"' % (self, item))
 
     def __hash__(self):
         """ Explicitly hash by object id
@@ -161,7 +194,7 @@ class Entity(AtomContainer):
         Allow for some simple queries, i.e. mol.chain['A'].residue(pdbname='ALA')
         """
         retlist = []
-        for child in self._inorder:
+        for child in self:
             for key, val in kwargs.iteritems():
                 if hasattr(child, key) and getattr(child, key) == val:
                     retlist.append(child)
@@ -178,4 +211,5 @@ class Instance(Entity):
 
     def __repr__(self):
         return '<Molecule instance: %s>' % str(self.children)
+
 

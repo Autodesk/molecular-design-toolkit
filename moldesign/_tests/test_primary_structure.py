@@ -1,13 +1,13 @@
 """ Tests introspection and methods for protein primary structure
 """
-
+import itertools
 import pytest
 
 import moldesign as mdt
 from moldesign import units as u
 
 
-registered_types = {}
+fixture_types = {}
 
 
 def typedfixture(*types, **kwargs):
@@ -16,7 +16,7 @@ def typedfixture(*types, **kwargs):
 
     def fixture_wrapper(func):
         for t in types:
-            registered_types.setdefault(t, []).append(func.__name__)
+            fixture_types.setdefault(t, []).append(func.__name__)
         return pytest.fixture(**kwargs)(func)
 
     return fixture_wrapper
@@ -49,9 +49,9 @@ def test_3aid_cif_separate_waters(protease_cif):
     assert mol.chains['E'].num_residues == 3
 
 
-@pytest.mark.parametrize('objkey', registered_types['3AID'])
-def test_3aid_chain_properties(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+@pytest.mark.parametrize('fixture', fixture_types['3AID'])
+def test_3aid_chain_properties(fixture, request):
+    mol = request.getfuncargvalue(fixture)
     for chainid in 'AB':
         c = mol.chains[chainid]
         assert c.n_terminal == c.residues['PRO1']
@@ -59,67 +59,103 @@ def test_3aid_chain_properties(objkey, request):
         assert c.type == 'protein'
 
 
-@pytest.mark.parametrize('objkey', registered_types['3AID'])
-def test_3aid_atom_selection(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+@pytest.mark.parametrize('fixture', fixture_types['3AID'])
+def test_3aid_primary_structure_access_methods(fixture, request):
+    mol = request.getfuncargvalue(fixture)
+
+    a1 = mol.chains['A'].residues['GLN2'].atoms['CB']
+    assert a1 is mol.atoms[a1.index]
+    assert a1 is mol.chains.A.residues.GLN2.atoms.CB
+    assert a1 is mol.chains.A.GLN2.CB
+    assert 'GLN2' in dir(mol.chains.A)
+    assert 'CB' in dir(mol.chains.A.GLN2)
+
+
+
+@pytest.mark.parametrize('fixture', fixture_types['3AID'])
+def test_3aid_atom_selection(fixture, request):
+    mol = request.getfuncargvalue(fixture)
 
     a1 = mol.chains['A'].residues['GLN2'].atoms['CB']
     a2 = mol.chains['B'].residues['LYS20'].atoms['O']
     assert abs(a1.distance(a2) - 27.206*u.angstrom) < 0.001 * u.angstrom
 
 
-@pytest.mark.parametrize('objkey', registered_types['protein'])
-def test_chain_lookup_by_name_and_index(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+@pytest.mark.parametrize('fixture', fixture_types['protein'])
+def test_chain_lookup_by_name_and_index(fixture, request):
+    mol = request.getfuncargvalue(fixture)
 
-    for chain in mol.chains:
+    for ic, chain in enumerate(mol.chains):
         assert mol.chains[chain.index] is chain
         assert mol.chains[chain.name] is chain
+        assert mol.chains[ic] is chain
+        assert getattr(mol.chains, chain.name) is chain
 
 
-@pytest.mark.parametrize('objkey', registered_types['protein'])
-def test_residue_lookup_by_name_and_index(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+@pytest.mark.parametrize('fixture', fixture_types['protein'])
+def test_residue_lookup_by_name_and_index(fixture, request):
+    mol = request.getfuncargvalue(fixture)
 
     for chain in mol.chains:
-        for residue in chain.residues:
+        for ires, residue in enumerate(chain.residues):
             assert mol.residues[residue.index] is residue
             assert chain[residue.name] is residue
+            assert chain[ires] is residue
+            assert getattr(chain, residue.name) is residue
+
+            assert chain.residues[residue.name] is residue
+            assert chain.residues[ires] is residue
+            assert getattr(chain.residues, residue.name) is residue
 
             assert residue.chain is chain
 
 
-@pytest.mark.parametrize('objkey', registered_types['protein'])
-def test_atom_lookup_by_name_and_index(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+@pytest.mark.parametrize('fixture', fixture_types['protein'])
+def test_atom_lookup_by_name_and_index(fixture, request):
+    mol = request.getfuncargvalue(fixture)
 
     for residue in mol.residues:
-        for atom in residue.atoms:
+        for iatom, atom in enumerate(residue.atoms):
             assert residue[atom.name] is atom
+            assert residue[iatom] is atom
+            assert getattr(residue,atom.name) is atom
+
+            assert residue.atoms[atom.name] is atom
+            assert residue.atoms[iatom] is atom
+            assert getattr(residue.atoms, atom.name) is atom
+
             assert mol.atoms[atom.index] is atom
 
             assert atom.chain is residue.chain
             assert atom.residue is residue
 
 
-@pytest.mark.parametrize('objkey', registered_types['protein'])
-def test_chains_iterate_in_order(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+@pytest.mark.parametrize('fixture', fixture_types['protein'])
+def test_molecule_links(fixture, request):
+    mol = request.getfuncargvalue(fixture)
+
+    for obj in itertools.chain(mol.atoms, mol.residues, mol.chains):
+        assert obj.molecule == mol
+
+
+@pytest.mark.parametrize('fixture', fixture_types['protein'])
+def test_chains_iterate_in_order(fixture, request):
+    mol = request.getfuncargvalue(fixture)
     _iter_index_order_tester(mol.chains)
 
 
-@pytest.mark.parametrize('objkey', registered_types['protein'])
-def test_residues_iterate_in_order(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+@pytest.mark.parametrize('fixture', fixture_types['protein'])
+def test_residues_iterate_in_order(fixture, request):
+    mol = request.getfuncargvalue(fixture)
     _iter_index_order_tester(mol.residues)
 
     for chain in mol.chains:
         _iter_index_order_tester(chain.residues)
 
 
-@pytest.mark.parametrize('objkey', registered_types['protein'])
-def test_atoms_iterate_in_order(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+@pytest.mark.parametrize('fixture', fixture_types['protein'])
+def test_atoms_iterate_in_order(fixture, request):
+    mol = request.getfuncargvalue(fixture)
     _iter_index_order_tester(mol.atoms)
 
     for chain in mol.chains:

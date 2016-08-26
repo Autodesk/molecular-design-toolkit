@@ -137,6 +137,7 @@ class SortedCollection(object):
 
     TAKEN WITHOUT MODIFICATION FROM:
     https://code.activestate.com/recipes/577197-sortedcollection/
+    (EDIT: removed ``__reduce__`` - better behavior with __dict__ states)
 
     SortedCollection() is much easier to work with than using bisect() directly.
     It supports key functions like those use in sorted(), min(), and max().
@@ -201,7 +202,6 @@ class SortedCollection(object):
      ('bill', 'smith', 22),
      ('david', 'thomas', 32),
      ('roger', 'young', 30)]
-
     """
 
     def __init__(self, iterable=(), key=None):
@@ -248,9 +248,6 @@ class SortedCollection(object):
             self._items,
             getattr(self._given_key, '__name__', repr(self._given_key))
         )
-
-    def __reduce__(self):
-        return self.__class__, (self._items, self._given_key)
 
     def __contains__(self, item):
         k = self._key(item)
