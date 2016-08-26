@@ -32,15 +32,20 @@ class BondSelector(SelBase):
 
     def __init__(self, mol):
         super(BondSelector, self).__init__(mol)
-        self.viewer.bond_callbacks.append(self.toggle_bond)
 
         self._bondset = collections.OrderedDict()
         self._drawn_bond_state = set()
 
         self.bond_listname = ipy.HTML('<b>Selected bonds:</b>')
-        self.bond_list = ipy.SelectMultiple(options=collections.OrderedDict(),
+        self.bond_list = ipy.SelectMultiple(options=list(),
                                             height=150)
-        self.bond_list.observe(self.remove_atomlist_highlight, 'value')
+
+        traitlets.directional_link(
+            (self.viewer, 'selected_bonds'),
+            (self.bond_list, 'options'),
+            lambda selectedBonds: list(selectedBonds)
+        )
+
         self.atom_list.observe(self.remove_bondlist_highlight, 'value')
 
         self.select_all_bonds_button = ipy.Button(description='Select all bonds')
@@ -53,18 +58,6 @@ class BondSelector(SelBase):
                                   self.atom_list,
                                   self.bond_listname,
                                   self.bond_list)
-
-    def select_all_bonds(self, *args):
-        self.selected_bonds = list(self.mol.bonds)
-
-    @property
-    def selected_bonds(self):
-        return self._bondset.keys()
-
-    @selected_bonds.setter
-    def selected_bonds(self, newbonds):
-        self._bondset = collections.OrderedDict((b,None) for b in newbonds)
-        self._redraw_selection_state()
 
     def _redraw_selection_state(self):
         currentset = set(self._bondset)
@@ -86,16 +79,11 @@ class BondSelector(SelBase):
     def bondkey(bond):
         return bond.name
 
-    def toggle_bond(self, bond):
-        if bond in self._bondset: self._bondset.pop(bond)  # unselect the bond
-        else: self._bondset[bond] = None  # select the bond
-        self._redraw_selection_state()
-
     def select_all_bonds(self, *args):
-        self.selected_bonds = list(self.mol.bonds)
+        self.viewer.selected_bonds = self.mol.bonds
 
     def clear_selections(self, *args):
-        self.selected_bonds = []
+        self.viewer.selected_bonds = []
         super(BondSelector, self).clear_selections(*args)
 
 

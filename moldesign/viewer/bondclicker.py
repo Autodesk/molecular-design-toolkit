@@ -38,7 +38,6 @@ class BondClicker(GeometryViewer):
         self.atom_callbacks = []
         self.bond_callbacks = []
         self.click_callbacks = []
-        self.vdw(radius=self.ATOMRADIUS, render=False)
         self.draw_all_bonds()
 
     def set_positions(self, *args, **kwargs):
