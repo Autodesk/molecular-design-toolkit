@@ -15,13 +15,12 @@ from __future__ import absolute_import  # prevent clashes between this and the "
 
 from cStringIO import StringIO
 
-from moldesign import orbitals
 from moldesign import units as u, compute, orbitals
 from moldesign.interfaces.pyscf_interface import force_remote, mol_to_pyscf, \
     StatusLogger, SPHERICAL_NAMES
 from .base import QMBase
 from moldesign import uibase
-from moldesign.utils import DotDict, if_not_none
+from moldesign.utils import DotDict
 
 
 def exports(o):
@@ -73,10 +72,11 @@ class PySCFPotential(QMBase):
                                            'nuclear_forces',
                                            'electronic_forces']
 
-    NAME_MAP = {'b3lyp':'b3lyp'}
+    NAME_MAP = {'b3lyp': 'b3lyp'}
 
     NEEDS_REFERENCE = set('mcscf casscf casci mp2'.split())
     NEEDS_FUNCTIONAL = set('dft rks ks uks'.split())
+    IS_SCF = set('rhf uhf hf casscf mcscf dft rks ks'.split())
 
     FORCE_UNITS = u.hartree / u.bohr
 
@@ -107,25 +107,65 @@ class PySCFPotential(QMBase):
         else:
             dm0 = None
         self.prep(force=True)  # rebuild every time
+
+        # Compute reference WFN
+        refobj = self.pyscfmol
+        if self.params.theory in self.NEEDS_REFERENCE:
+            reference = self._build_theory(self.params.get('reference', 'rhf'),
+                                           refobj)
+            kernel, failures = self._converge(reference, dm0=dm0)
+            refobj = self.reference = kernel
+            kwargs = {}
+        else:
+            self.reference = None
+
+        # Compute WFN
+        theory = self._build_theory(self.params['theory'],
+                                    refobj)
+        if self.params['theory'] not in self.IS_SCF:
+            theory.kernel()
+            self.kernel = theory
+        else:
+            self.kernel, failures = self._converge(theory, **kwargs)
+
+        # Compute forces
+        if do_forces:
+            grad = force_calculator(self.kernel)
+        else:
+            grad = None
+
+        return self._get_properties(self.reference, self.kernel, grad)
+
+    def _get_properties(self, ref, kernel, grad):
+        """ Analyze calculation results and return molecular properties
+
+        Args:
+            ref (pyscf.Kernel): Reference kernel (can be None)
+            kernel (pyscf.Kernel): Theory kernel
+            grad (pyscf.Gradient): Gradient calculation
+
+        Returns:
+            dict: Molecular property names and values
+        """
         result = {}
 
-        # Compute wfn (with reference, if required)
-        if self.reference:
-            kernel, failures = self._converge(self.reference, dm0=dm0)
-            result['reference_energy'] = (kernel.e_tot * u.hartree).defunits()
-            # TODO: These objects can't be pickled ... need to fix that.
-            # result['_converged_kernel'] = kernel
-            # result['_convergence_failures'] = failures
-        kernel, failures = self._converge(self.kernel, dm0=dm0)
-        result['potential_energy'] = (kernel.e_tot * u.hartree).defunits()
-        # result['_converged_kernel'] = kernel
-        # result['_convergence_failures'] = failures
-
-        # A little bit of wfn analysis
         if self.reference is not None:
-            orb_calc = self.reference
+            result['reference_energy'] = (ref.e_tot*u.hartree).defunits()
+            # TODO: check sign on correlation energy. Is this true for anything besides MP2?
+            result['correlation_energy'] = (kernel.e_corr *u.hartree).defunits()
+            result['potential_energy'] = result['correlation_energy'] + result['reference_energy']
+            orb_calc = ref
         else:
-            orb_calc = self.kernel
+            result['potential_energy'] = (kernel.e_tot*u.hartree).defunits()
+            orb_calc = kernel
+
+        if grad is not None:
+            f_e = -1.0 * grad.grad_elec() * self.FORCE_UNITS
+            f_n = -1.0 * grad.grad_nuc() * self.FORCE_UNITS
+            result['electronic_forces'] = f_e.defunits()
+            result['nuclear_forces'] = f_n.defunits()
+            result['forces'] = result['electronic_forces'] + result['nuclear_forces']
+
         ao_matrices = self._get_ao_matrices(orb_calc)
         scf_matrices = self._get_scf_matrices(orb_calc, ao_matrices)
         ao_pop, atom_pop = orb_calc.mulliken_pop(verbose=-1)
@@ -153,15 +193,6 @@ class PySCFPotential(QMBase):
             cmos.append(orbitals.Orbital(coeffs, wfn=el_state, occupation=occ))
         el_state.add_orbitals(cmos, orbtype='canonical')
 
-        # Calculate the forces
-        if do_forces:
-            g = force_calculator(self.kernel)
-            f_e = -1.0 * g.grad_elec() * self.FORCE_UNITS
-            f_n = -1.0 * g.grad_nuc() * self.FORCE_UNITS
-            result['electronic_forces'] = f_e.defunits()
-            result['nuclear_forces'] = f_n.defunits()
-            result['forces'] = result['electronic_forces'] + result['nuclear_forces']
-
         # Return the result
         result['wfn'] = el_state
         self.last_el_state = el_state
@@ -173,7 +204,6 @@ class PySCFPotential(QMBase):
         # TODO: spin, isotopic mass, symmetry
         if self._prepped and not force: return
         self.pyscfmol = self._build_mol()
-        self.kernel, self.reference = self._build_theories()
         self._prepped = True
 
     def _build_mol(self):
@@ -234,30 +264,20 @@ class PySCFPotential(QMBase):
 
         raise orbitals.ConvergenceError(method)
 
-    def _build_theories(self):
-        if self.params.theory in self.NEEDS_REFERENCE:
-            scf_ref = if_not_none(self.params.scf_reference, 'rhf')
-            reference = self.THEORIES[scf_ref](self.pyscfmol)
-            if 'scf_cycles' in self.params:
-                reference.max_cycle = self.params.scf_cycles
+    def _build_theory(self, name, refobj):
+        theory = self.THEORIES[name](refobj)
 
-            self._assign_functional(reference, scf_ref, self.params.get('functional', None))
-            reference.callback = StatusLogger('%s/%s reference procedure:' % (scf_ref, self.params.basis),
-                                              ['cycle', 'e_tot'], self.logger)
-        else:
-            reference = None
-
-        theory = self.THEORIES[self.params.theory](self.pyscfmol)
-        self._assign_functional(theory,
-                                self.params.theory,
-                                self.params.get('functional', None))
         theory.callback = StatusLogger('%s/%s procedure:' % (self.params.theory, self.params.basis),
                                        ['cycle', 'e_tot'],
                                        self.logger)
 
         if 'scf_cycles' in self.params:
             theory.max_cycle = self.params.scf_cycles
-        return theory, reference
+
+        if 'functional' in self.params:
+            self._assign_functional(theory, name, self.params.get('functional', None))
+
+        return theory
 
     def _assign_functional(self, kernel, theory, fname):
         if theory in self.NEEDS_FUNCTIONAL:
