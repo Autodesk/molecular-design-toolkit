@@ -63,7 +63,8 @@ class PySCFPotential(QMBase):
                              'uhf': 'pyscf.scf.UHF',
                              'mcscf': 'pyscf.mcscf.CASSCF', 'casscf': 'pyscf.mcscf.CASSCF',
                              'casci': 'pyscf.mcscf.CASCI',
-                             'mp2': 'mp.MP2'})
+                             'mp2': 'pyscf.mp.MP2',
+                             'dft': 'pyscf.dft.RKS', 'rks': 'pyscf.dft.RKS', 'ks': 'pyscf.dft.RKS'})
 
     FORCE_CALCULATORS = LazyClassMap({'rhf': 'pyscf.grad.RHF', 'hf': 'pyscf.grad.RHF'})
 
@@ -72,7 +73,10 @@ class PySCFPotential(QMBase):
                                            'nuclear_forces',
                                            'electronic_forces']
 
-    NEEDS_REFERENCE = set('mcscf casscf casci mp2')
+    NAME_MAP = {'b3lyp':'b3lyp'}
+
+    NEEDS_REFERENCE = set('mcscf casscf casci mp2'.split())
+    NEEDS_FUNCTIONAL = set('dft rks ks uks'.split())
 
     FORCE_UNITS = u.hartree / u.bohr
 
@@ -236,18 +240,33 @@ class PySCFPotential(QMBase):
             reference = self.THEORIES[scf_ref](self.pyscfmol)
             if 'scf_cycles' in self.params:
                 reference.max_cycle = self.params.scf_cycles
+
+            self._assign_functional(reference, scf_ref, self.params.get('functional', None))
             reference.callback = StatusLogger('%s/%s reference procedure:' % (scf_ref, self.params.basis),
                                               ['cycle', 'e_tot'], self.logger)
         else:
             reference = None
 
         theory = self.THEORIES[self.params.theory](self.pyscfmol)
+        self._assign_functional(theory,
+                                self.params.theory,
+                                self.params.get('functional', None))
         theory.callback = StatusLogger('%s/%s procedure:' % (self.params.theory, self.params.basis),
-                                          ['cycle', 'e_tot'], self.logger)
+                                       ['cycle', 'e_tot'],
+                                       self.logger)
 
         if 'scf_cycles' in self.params:
             theory.max_cycle = self.params.scf_cycles
         return theory, reference
+
+    def _assign_functional(self, kernel, theory, fname):
+        if theory in self.NEEDS_FUNCTIONAL:
+            if fname is not None:
+                kernel.xc = fname
+            else:
+                raise ValueError('No functional specified for reference theory "%s"' % theory)
+        elif fname is not None:
+            raise ValueError('Functional specified for non-DFT theory "%s"' % theory)
 
     def _get_ao_basis_functions(self):
         """ Convert pyscf basis functions into a list of atomic basis functions
