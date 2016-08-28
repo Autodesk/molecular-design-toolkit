@@ -11,8 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import  # prevent clashes between this module and the "pyscf"
-# package
+from __future__ import absolute_import  # prevent clashes between this and the "pyscf" package
 
 from cStringIO import StringIO
 
@@ -24,12 +23,6 @@ from .base import QMBase
 from moldesign import uibase
 from moldesign.utils import DotDict, if_not_none
 
-if not force_remote:
-    from pyscf import scf, mp, mcscf
-    import pyscf.grad
-else:
-    scf = mp = mcscf = None
-
 
 def exports(o):
     __all__.append(o.__name__)
@@ -37,26 +30,50 @@ def exports(o):
 __all__ = []
 
 
+class LazyClassMap(object):
+    """ For lazily importing classes from modules (when there's a lot of import overhead)
+
+    Class names should be stored as their *absolute import strings* so that they can be imported
+    only when needed
+
+    Example:
+        >>> myclasses = LazyClassMap({'od': 'collections.OrderedDict'})
+        >>> myclasss['od']()
+        OrderedDict()
+    """
+    def __init__(self, mapping):
+        self.mapping = mapping
+
+    def __getitem__(self, key):
+        import importlib
+        fields = self.mapping[key].split('.')
+        cls = fields[-1]
+        modname = '.'.join(fields[:-1])
+        mod = importlib.import_module(modname)
+        return getattr(mod, cls)
+
+
 @exports
 class PySCFPotential(QMBase):
     DEFAULT_PROPERTIES = ['potential_energy',
                           'wfn',
                           'mulliken']
+
+    THEORIES = LazyClassMap({'hf': 'pyscf.scf.RHF', 'rhf': 'pyscf.scf.RHF',
+                             'uhf': 'pyscf.scf.UHF',
+                             'mcscf': 'pyscf.mcscf.CASSCF', 'casscf': 'pyscf.mcscf.CASSCF',
+                             'casci': 'pyscf.mcscf.CASCI',
+                             'mp2': 'mp.MP2'})
+
+    FORCE_CALCULATORS = LazyClassMap({'rhf': 'pyscf.grad.RHF', 'hf': 'pyscf.grad.RHF'})
+
     ALL_PROPERTIES = DEFAULT_PROPERTIES + ['eri_tensor',
                                            'forces',
                                            'nuclear_forces',
                                            'electronic_forces']
 
-    # TODO: need to store theory name (and basis name) synonyms
-    if scf is not None:  # shielding these from failed imports
-        THEORIES = {'hf': scf.RHF, 'rhf': scf.RHF,
-                    'uhf': scf.UHF,
-                    'mcscf': mcscf.CASSCF, 'casscf': mcscf.CASSCF,
-                    'casci': mcscf.CASCI,
-                    'mp2': mp.MP2}
-        FORCE_CALCULATORS = {'rhf': pyscf.grad.RHF, 'hf': pyscf.grad.RHF}
-
     NEEDS_REFERENCE = set('mcscf casscf casci mp2')
+
     FORCE_UNITS = u.hartree / u.bohr
 
     def __init__(self, **kwargs):
