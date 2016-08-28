@@ -74,7 +74,8 @@ class Configurator(ipy.Box):
     def reset_values(self, *args):
         reset_params = set()
         for name, value in self.paramlist.iteritems():
-            self.selectors[name].selector.value = value
+            if value is not None:
+                self.selectors[name].selector.value = value
             reset_params.add(name)
 
         for paramdef in self.paramdefs:

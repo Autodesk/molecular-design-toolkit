@@ -13,15 +13,48 @@
 # limitations under the License.
 # TODO: look into http://molmod.github.io/
 
+"""
+"Generic" energy models - models that can be specified directly by name, without worrying about
+which specific implementation is used.
+
+Currently, everything here is an alias. However, more complicated logic (including runtime
+dispatch) may be used to determine the best implementation in a given situation
+"""
+
 from . import PySCFPotential
+from . import OpenMMPotential
+
 
 def exports(o):
     __all__.append(o.__name__)
     return o
 __all__ = []
 
+
+##################
+# ForceField
+@exports
+def ForceField(**kwargs):
+    return OpenMMPotential(**kwargs)
+
+
+##################
+# QM generics
 @exports
 def RHF(**kwargs):
     return PySCFPotential(theory='rhf', **kwargs)
 
 
+@exports
+def DFT(**kwargs):
+    return PySCFPotential(theory='dft', **kwargs)
+
+
+@exports
+def B3LYP(**kwargs):
+    return PySCFPotential(theory='dft', funtional='b3lyp', **kwargs)
+
+
+@exports
+def MP2(**kwargs):
+    return PySCFPotential(theory='mp2', **kwargs)

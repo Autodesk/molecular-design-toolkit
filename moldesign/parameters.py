@@ -78,8 +78,7 @@ model_parameters = named_dict([
 
 FORCEFIELDS = []
 PERIODICITIES = [False, 'box']
-QMTHEORIES = []
-BASISSETS = []
+
 
 mm_model_parameters = named_dict([
     Parameter('cutoff', 'Cutoff for nonbonded interactions', default=1.0*u.nm, type=u.nm),
@@ -97,10 +96,18 @@ mm_model_parameters = named_dict([
     Parameter('periodic', 'Periodicity', default=False, choices=PERIODICITIES)
 ])
 
+
+QMTHEORIES = ['rhf', 'rks', 'mp2', 'casscf', 'casci' 'fci']
+BASISSETS = ['3-21g', '4-31g', '6-31g', '6-31g*', '6-31g**',
+             '6-311g', '6-311g*', '6-311g+', '6-311g*+',
+             'sto-3g', 'sto-6g', 'minao', 'weigend',
+             'dz' 'dzp', 'dtz', 'dqz',
+             'aug-cc-pvdz', 'aug-cc-pvtz', 'aug-cc-pvqz']
+
 qm_model_parameters = named_dict([
     Parameter('theory', 'QM theory', choices=QMTHEORIES),
     Parameter('multiplicity', 'Spin multiplicity', default=1, type=int),
-    Parameter('basis_set', 'Basis set', choices=BASISSETS),
+    Parameter('basis', 'Basis set', choices=BASISSETS),
     Parameter('symmetry',  default=None, choices=[None, 'Auto', 'Loose']),
     Parameter('wfn_guess', 'Starting guess method:', default='huckel',
               choices=['huckel', 'guess']

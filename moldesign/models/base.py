@@ -16,7 +16,6 @@ import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
-from moldesign.parameters import mm_model_parameters as mmp, qm_model_parameters as qmp
 from moldesign.method import Method
 
 
@@ -123,7 +122,8 @@ class EnergyModelBase(Method):
 class MMBase(EnergyModelBase):
     """Common interface for molecular mechanics"""
 
-    PARAMETERS = EnergyModelBase.PARAMETERS + mmp.values()
+    PARAMETERS = (EnergyModelBase.PARAMETERS +
+                  mdt.parameters.mm_model_parameters.values())
 
     def __init__(self, *args, **kwargs):
         super(MMBase, self).__init__(*args, **kwargs)
@@ -133,6 +133,8 @@ class MMBase(EnergyModelBase):
 class QMBase(EnergyModelBase):
     """Common interface for quantum mechanics"""
 
+    PARAMETERS = mdt.parameters.qm_model_parameters.values()
+
     DEFAULT_PROPERTIES = ['potential_energy',
                           'nuclear_repulsion',
                           'dipole_moment',
@@ -140,8 +142,6 @@ class QMBase(EnergyModelBase):
                           'orbital_energies']
     ALL_PROPERTIES = DEFAULT_PROPERTIES
     # properties will be a pretty long list for most packages
-
-    PARAMETERS = qmp.values()
 
     def set_wfn_guess(self):
         raise NotImplementedError
