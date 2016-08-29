@@ -48,11 +48,7 @@ class BondSelector(SelBase):
 
         self.atom_list.observe(self.remove_bondlist_highlight, 'value')
 
-        self.select_all_bonds_button = ipy.Button(description='Select all bonds')
-        self.select_all_bonds_button.on_click(self.select_all_bonds)
-
         self.subtools.children = [ipy.HBox([self.select_all_atoms_button,
-                                            self.select_all_bonds_button,
                                             self.select_none])]
         self.toolpane.children = (self.atom_listname,
                                   self.atom_list,
@@ -60,12 +56,17 @@ class BondSelector(SelBase):
                                   self.bond_list)
 
     def _atoms_to_bonds(self, atomIndices):
+        return list(self.selected_bonds(atomIndices))
+
+    def selected_bonds(self, *args, **kwargs):
+        atomIndices = kwargs.get('atomIndices', self.viewer.selected_atoms);
         bonds = set()
+
         for bond in self.mol.bonds:
             if bond.a1.index in atomIndices and bond.a2.index in atomIndices:
                 bonds.add(bond)
 
-        return list(bonds)
+        return bonds
 
     def _redraw_selection_state(self):
         currentset = set(self._bondset)
@@ -87,11 +88,7 @@ class BondSelector(SelBase):
     def bondkey(bond):
         return bond.name
 
-    def select_all_bonds(self, *args):
-        self.viewer.selected_bonds = self.mol.bonds
-
     def clear_selections(self, *args):
-        self.viewer.selected_bonds = []
         super(BondSelector, self).clear_selections(*args)
 
 
