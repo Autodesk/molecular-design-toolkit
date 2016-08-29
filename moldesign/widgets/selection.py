@@ -41,9 +41,9 @@ class BondSelector(SelBase):
                                             height=150)
 
         traitlets.directional_link(
-            (self.viewer, 'selected_bonds'),
+            (self.viewer, 'selected_atoms'),
             (self.bond_list, 'options'),
-            lambda selectedBonds: list(selectedBonds)
+            self._atoms_to_bonds
         )
 
         self.atom_list.observe(self.remove_bondlist_highlight, 'value')
@@ -58,6 +58,14 @@ class BondSelector(SelBase):
                                   self.atom_list,
                                   self.bond_listname,
                                   self.bond_list)
+
+    def _atoms_to_bonds(self, atomIndices):
+        bonds = set()
+        for bond in self.mol.bonds:
+            if bond.a1.index in atomIndices and bond.a2.index in atomIndices:
+                bonds.add(bond)
+
+        return list(bonds)
 
     def _redraw_selection_state(self):
         currentset = set(self._bondset)
