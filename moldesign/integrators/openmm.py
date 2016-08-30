@@ -16,7 +16,7 @@ import pyccc.exceptions
 
 from moldesign import units as u
 from moldesign import compute
-from moldesign.interfaces.openmm import OpenMMPickleMixin, force_remote, MdtReporter, pint2simtk, mm
+from moldesign.interfaces.openmm import force_remote, MdtReporter, pint2simtk, OpenMMPickleMixin
 
 from .base import IntegratorBase, LangevinBase
 
@@ -85,14 +85,17 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
 @exports
 class OpenMMVerlet(OpenMMBaseIntegrator):
     def get_openmm_integrator(self):
-        integrator = mm.VerletIntegrator(pint2simtk(self.params.timestep))
+        from simtk import openmm
+        integrator = openmm.VerletIntegrator(pint2simtk(self.params.timestep))
         return integrator
 
 
 @exports
 class OpenMMLangevin(LangevinBase, OpenMMBaseIntegrator):
     def get_openmm_integrator(self):
-        integrator = mm.LangevinIntegrator(
+        from simtk import openmm
+
+        integrator = openmm.LangevinIntegrator(
             pint2simtk(self.params.temperature),
             pint2simtk(self.params.collision_rate),
             pint2simtk(self.params.timestep))

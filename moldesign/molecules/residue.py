@@ -70,11 +70,11 @@ class Residue(Entity):
         else:
             assert atom.chain == self.chain, "Atom's chain does not match residue's chain"
 
-        if key is not None or atom.name not in self:
+        if key is not None or atom.name not in self.children:
             return super(Residue, self).add(atom, key=key)
         else:
             return super(Residue, self).add(atom, key='%s%s' % (atom.name, len(self)))
-    add.__doc__ = Entity.__doc__
+    add.__doc__ = Entity.add.__doc__
 
     @property
     def is_n_terminal(self):
