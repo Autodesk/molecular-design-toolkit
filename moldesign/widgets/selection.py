@@ -56,17 +56,7 @@ class BondSelector(SelBase):
                                   self.bond_list)
 
     def _atoms_to_bonds(self, atomIndices):
-        return list(self.selected_bonds(atomIndices))
-
-    def selected_bonds(self, *args, **kwargs):
-        atomIndices = kwargs.get('atomIndices', self.viewer.selected_atoms);
-        bonds = set()
-
-        for bond in self.mol.bonds:
-            if bond.a1.index in atomIndices and bond.a2.index in atomIndices:
-                bonds.add(bond)
-
-        return bonds
+        return list(self.viewer.get_selected_bonds(atomIndices))
 
     def _redraw_selection_state(self):
         currentset = set(self._bondset)

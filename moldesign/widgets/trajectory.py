@@ -35,8 +35,7 @@ class TrajectoryViewer(selector.SelectionGroup):
         self.viewer, self.view_container = self.make_viewer()
         for frame in self.traj.frames[1:]:
             self.viewer.append_frame(positions=frame.positions,
-                                     wfn=frame.get('wfn',None),
-                                     render=False)
+                                     wfn=frame.get('wfn',None))
         self.make_controls()
         self.pane.children = [self.view_container, self.controls]
         super(TrajectoryViewer, self).__init__([self.pane, AtomInspector()], **kwargs)
