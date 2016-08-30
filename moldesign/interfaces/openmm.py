@@ -23,9 +23,9 @@ from moldesign import units as u
 from moldesign import compute
 
 try:
-    imp.find_module('pyscf')
+    imp.find_module('simtk.openmm')
 except (ImportError, OSError) as exc:
-    print 'PySCF not installed; using remote docker container'
+    print 'OpenMM could not be imported; using remote docker container'
     force_remote = True
 else:
     force_remote = False

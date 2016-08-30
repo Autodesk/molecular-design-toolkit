@@ -12,21 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import imp
+
 import numpy as np
 
-try:
-    import pdbfixer as pf
-except ImportError:
-    force_remote = True
-    pf = None
-else:
-    force_remote = False
 
 import moldesign as mdt
 from moldesign import units as u
 from moldesign import compute
 
 from . import openmm as opm
+
+try:
+    imp.find_module('pdbfixer')
+except (ImportError, OSError) as exc:
+    print 'PDBFixer could not be imported; using remote docker container'
+    force_remote = True
+else:
+    force_remote = False
 
 
 @compute.runsremotely(enable=force_remote)
@@ -75,6 +78,8 @@ def add_water(mol, min_box_size=None, padding=None,
     Returns:
         moldesign.Molecule: new Molecule object containing both solvent and solute
     """
+    import pdbfixer
+
     if padding is None and min_box_size is None:
         raise ValueError('Solvate arguments: must pass padding or min_box_size or both.')
 
@@ -107,7 +112,7 @@ def add_water(mol, min_box_size=None, padding=None,
     # TODO: this is like 10 bad things at once. Should probably submit a
     #       PR to PDBFixer to make this a public staticmethod instead of a private instancemethod
     #       Alternatively, PR to create Fixers directly from Topology objs
-    ff = pf.PDBFixer.__dict__['_createForceField'](None, modeller.getTopology(), True)
+    ff = pdbfixer.PDBFixer.__dict__['_createForceField'](None, modeller.getTopology(), True)
 
     modeller.addSolvent(ff,
                         boxSize=opm.pint2simtk(boxsize),
@@ -123,8 +128,9 @@ def add_water(mol, min_box_size=None, padding=None,
 
 
 def _get_fixer(mol):
+    import pdbfixer
     mol.write('/tmp/tmp.pdb', format='pdb')
-    fixer = pf.PDBFixer('/tmp/tmp.pdb')
+    fixer = pdbfixer.PDBFixer('/tmp/tmp.pdb')
     return fixer
 
 def _get_mol(f):

@@ -115,7 +115,6 @@ class PySCFPotential(QMBase):
                                            refobj)
             kernel, failures = self._converge(reference, dm0=dm0)
             refobj = self.reference = kernel
-            kwargs = {}
         else:
             self.reference = None
 
@@ -126,7 +125,7 @@ class PySCFPotential(QMBase):
             theory.kernel()
             self.kernel = theory
         else:
-            self.kernel, failures = self._converge(theory, **kwargs)
+            self.kernel, failures = self._converge(theory, dm0=dm0)
 
         # Compute forces
         if do_forces:
