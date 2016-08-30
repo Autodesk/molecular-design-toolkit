@@ -178,7 +178,6 @@ class GeometryBuilder(ViewerToolBase):
 
         elif len(selectedAtomIndices) is 1:
             atom = self.get_selected_atom(self.mol.atoms, selectedAtomIndices)
-            self.selection_description.value = 'cool' + str(len(self.mol.atoms))
             self.adjust_button.disabled = False
 
             x, y, z = atom.position.value_in(u.angstrom)
@@ -210,11 +209,9 @@ class GeometryBuilder(ViewerToolBase):
             a1_neighbors = set([a for a in bond.a1.bond_graph if a is not bond.a2])
             maxo = max(a1_neighbors, key=lambda x: x.mass)
             bond_neighbors = self.get_bond_neighbors(bonds, bond)
-            self.selection_description.value = 'cozz' + str(bond_neighbors)
 
             # Bond angle
             if bond_neighbors['a2']:
-                self.selection_description.value = 'cooopaloopone'
                 self.dihedral_slider.enable()
                 self.angle_slider.enable()
                 self.angle_slider.value = geom.angle(bond.a1, bond.a2, bond_neighbors['a2']).value_in(u.degrees)
@@ -225,7 +222,6 @@ class GeometryBuilder(ViewerToolBase):
                         a1=bond.a1, a2=bond.a2, a3=bond_neighbors['a2'],
                         c1=self.viewer.HIGHLIGHT_COLOR, c2=self.NBR2HIGHLIGHT)
             else:
-                self.selection_description.value = 'cooopalooptwo'
                 self.dihedral_slider.disable()
                 self.angle_slider.disable()
                 self.angle_slider.description = 'no angle associated with this bond'
@@ -235,7 +231,6 @@ class GeometryBuilder(ViewerToolBase):
             if bond_neighbors['a2'] and bond_neighbors['a1']:
                 self.dihedral_slider.value = geom.dihedral(bond_neighbors['a1'], bond.a1, bond.a2, bond_neighbors['a2']).value_in(u.degrees)
                 # self.dihedral_slider.observe(self.set_dihedral, 'value')
-                self.dihedral_slider.disabled = False
                 self.dihedral_slider.description = '<b>Dihedral angle</b> <span style="color:{c0}">{a4.name}</span>' \
                                                    ' - <span style="color:{c1}">{a1.name}' \
                                                    ' - {a2.name}</span> ' \

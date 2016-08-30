@@ -31,7 +31,7 @@ def set_distance(a1, a2, newlength, adjustmol=True):
         newlength (u.Scalar[length]): new length to set
         adjustmol (bool): Adjust all atoms on either side of this bond?
     """
-    #T ODO: lots of room for optimization here
+    #TODO: lots of room for optimization here
     if adjustmol:
         assert a1.molecule is not None
         assert a1.molecule == a2.molecule
