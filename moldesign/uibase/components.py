@@ -145,6 +145,14 @@ class ReadoutFloatSlider(ipy.Box):
     def update_readout(self, *args):
         self.readout.value = self.formatstring.format(self.value)
 
+    def disable(self):
+        self.slider.disabled = True
+        self.readout.disabled = True
+
+    def enable(self):
+        self.slider.disabled = False
+        self.readout.disabled = False
+
     def parse_value(self, *args):
         try:
             f = float(self.readout.value)

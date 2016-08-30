@@ -126,15 +126,21 @@ class GeometryBuilder(ViewerToolBase):
         self.viewer.set_positions()
 
     def set_angle(self, *args):
-        bond = self.get_selected_bond(self.viewer.get_selected_bonds())
+        bonds = self.viewer.get_selected_bonds()
+        bond = self.get_selected_bond(bonds)
+        bond_neighbors = self.get_bond_neighbors(bonds, bond)
         angle = self.angle_slider.value
-        set_angle(bond.a1, bond.a2, bond.nbr_a2, angle*u.pi/180.0, adjustmol=self.adjust_button.value)
+
+        set_angle(bond.a1, bond.a2, bond_neighbors['a2'], angle*u.pi/180.0, adjustmol=self.adjust_button.value)
         self.viewer.set_positions()
 
     def set_dihedral(self, *args):
-        bond = self.get_selected_bond(self.viewer.get_selected_bonds())
+        bonds = self.viewer.get_selected_bonds()
+        bond = self.get_selected_bond(bonds)
+        bond_neighbors = self.get_bond_neighbors(bonds, bond)
         angle = self.dihedral_slider.value
-        set_dihedral(bond.nbr_a1, bond.a1, bond.a2, bond.nbr_a2, angle*u.pi/180.0,
+
+        set_dihedral(bond_neighbors['a1'], bond.a1, bond.a2, bond_neighbors['a2'], angle*u.pi/180.0,
                                              adjustmol=self.adjust_button.value)
         self.viewer.set_positions()
 
@@ -209,9 +215,10 @@ class GeometryBuilder(ViewerToolBase):
             # Bond angle
             if bond_neighbors['a2']:
                 self.selection_description.value = 'cooopaloopone'
+                self.dihedral_slider.enable()
+                self.angle_slider.enable()
                 self.angle_slider.value = geom.angle(bond.a1, bond.a2, bond_neighbors['a2']).value_in(u.degrees)
                 # self.angle_slider.observe(self.set_angle, 'value')
-                self.angle_slider.disabled = False
                 self.angle_slider.description = '<b>Bond angle</b> <span style="color:{c1}">{a1.name}' \
                                                 ' - {a2.name}</span> ' \
                                                 '- <span style="color:{c2}">{a3.name}</span>'.format(
@@ -219,9 +226,10 @@ class GeometryBuilder(ViewerToolBase):
                         c1=self.viewer.HIGHLIGHT_COLOR, c2=self.NBR2HIGHLIGHT)
             else:
                 self.selection_description.value = 'cooopalooptwo'
+                self.dihedral_slider.disable()
+                self.angle_slider.disable()
                 self.angle_slider.description = 'no angle associated with this bond'
                 # self.angle_slider.unobserve(self.set_angle)
-                self.angle_slider.disabled = True
 
             # Dihedral twist
             if bond_neighbors['a2'] and bond_neighbors['a1']:
