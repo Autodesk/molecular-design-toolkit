@@ -88,36 +88,18 @@ class SelBase(ViewerToolBase):
         self._atomset = collections.OrderedDict()
 
         self.atom_listname = ipy.HTML('<b>Selected atoms:</b>')
-        self.atom_list = ipy.SelectMultiple(options=collections.OrderedDict(),
-                                            height=150)
+        self.atom_list = ipy.SelectMultiple(options=list(self.viewer.selected_atoms), height=150)
+        traitlets.directional_link(
+            (self.viewer, 'selected_atoms'),
+            (self.atom_list, 'options'),
+            lambda selected_atoms: list(selected_atoms)
+        )
+
         self.select_all_atoms_button = ipy.Button(description='Select all atoms')
         self.select_all_atoms_button.on_click(self.select_all_atoms)
 
         self.select_none = ipy.Button(description='Clear all selections')
         self.select_none.on_click(self.clear_selections)
-
-        self.remove_button = ipy.Button(description='Unselect')
-        self.remove_button.on_click(self.handle_remove_button_click)
-
-    @property
-    def selected_atoms(self):
-        return self._atomset.keys()
-
-    @selected_atoms.setter
-    def selected_atoms(self, atoms):
-        self._atomset = collections.OrderedDict((atom,None) for atom in atoms)
-        self._redraw_selection_state()
-
-    def _redraw_selection_state(self):
-        self.atom_list.options = collections.OrderedDict((self.atomkey(atom), atom)
-                                                         for atom in self._atomset.keys())
-        self.viewer.highlight_atoms(self._atomset.keys(), render=False)
-
-    def toggle_atom(self, atom):
-        """Toggles atom's state in and out of the selection group"""
-        if atom in self._atomset: self._atomset.pop(atom)
-        else: self._atomset[atom] = None
-        self._redraw_selection_state()
 
     def remove_atomlist_highlight(self, *args):
         self.atom_list.value = tuple()
@@ -127,15 +109,10 @@ class SelBase(ViewerToolBase):
         return '%s (index %d)' % (atom.name, atom.index)
 
     def select_all_atoms(self, *args):
-        self.selected_atoms = self.mol.atoms
-
-    def handle_remove_button_click(self, *args):
-        if self.atom_list.value:
-            for atom in self.atom_list.value: self._atomset.pop(atom)
-            self._redraw_selection_state()
+        self.viewer.selected_atoms = set(i for i, atom in enumerate(self.mol.atoms))
 
     def clear_selections(self, *args):
-        self.selected_atoms = []
+        self.viewer.selected_atoms = set()
 
 
 class ReadoutFloatSlider(ipy.Box):

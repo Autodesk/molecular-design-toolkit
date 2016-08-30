@@ -14,6 +14,7 @@
 import collections
 
 import ipywidgets as ipy
+import traitlets
 
 from moldesign import viewer
 from moldesign.uibase.components import SelBase
@@ -31,7 +32,6 @@ class BondSelector(SelBase):
 
     def __init__(self, mol):
         super(BondSelector, self).__init__(mol)
-        self.viewer.atom_callbacks.append(self.toggle_atom)
         self.viewer.bond_callbacks.append(self.toggle_bond)
 
         self._bondset = collections.OrderedDict()
@@ -52,8 +52,7 @@ class BondSelector(SelBase):
         self.toolpane.children = (self.atom_listname,
                                   self.atom_list,
                                   self.bond_listname,
-                                  self.bond_list,
-                                  self.remove_button)
+                                  self.bond_list)
 
     def select_all_bonds(self, *args):
         self.selected_bonds = list(self.mol.bonds)
@@ -92,12 +91,6 @@ class BondSelector(SelBase):
         else: self._bondset[bond] = None  # select the bond
         self._redraw_selection_state()
 
-    def handle_remove_button_click(self, *args):
-        if self.bond_list.value:
-            for bond in self.bond_list.value: self._bondset.pop(bond)
-            self._redraw_selection_state()
-        super(BondSelector, self).handle_remove_button_click(*args)
-
     def select_all_bonds(self, *args):
         self.selected_bonds = list(self.mol.bonds)
 
@@ -116,16 +109,17 @@ class ResidueSelector(SelBase):
     """
     def __init__(self, mol):
         super(ResidueSelector, self).__init__(mol)
-        self.viewer.add_click_callback(self.atom_click)
 
         self._residue_selection = collections.OrderedDict()
         self._residueset = collections.OrderedDict()
-        self.selection_type = ipy.Dropdown(description='Clicks select:',value='Residue',
+        self.selection_type = ipy.Dropdown(description='Clicks select:',value=self.viewer.selection_type,
                                            options=('Atom', 'Residue', 'Chain'))
 
+        traitlets.link((self.selection_type, 'value'), (self.viewer, 'selection_type'))
+
         self.residue_listname = ipy.HTML('<b>Selected residues:</b>')
-        self.residue_list = ipy.SelectMultiple(options=collections.OrderedDict(),
-                                               height=150)
+        self.residue_list = ipy.SelectMultiple(options=list(), height=150)
+        traitlets.directional_link((self.viewer, 'selected_atoms'), (self.residue_list, 'options'), self._atoms_to_residues)
         self.residue_list.observe(self.remove_atomlist_highlight, 'value')
         self.atom_list.observe(self.remove_reslist_highlight, 'value')
 
@@ -134,8 +128,33 @@ class ResidueSelector(SelBase):
                                   self.atom_listname,
                                   self.atom_list,
                                   self.residue_listname,
-                                  self.residue_list,
-                                  self.remove_button]
+                                  self.residue_list]
+
+    # Returns a list of all residues indicated in the set of atoms
+    def _atoms_to_residues(self, selected_atoms):
+        # Get all residues and their total number of atoms
+        residues = dict()
+        for atom in self.mol.atoms:
+            if atom.residue.index in residues:
+                residues[atom.residue.index]['total'] += 1
+            else:
+                residues[atom.residue.index] = {
+                    'total': 1,
+                }
+
+        # Get the total number of selected atoms per residue and compare to total
+        selected_residues = set()
+        for atomIndex in selected_atoms:
+            atom = self.mol.atoms[atomIndex]
+            if 'selected_count' in residues[atom.residue.index]:
+                residues[atom.residue.index]['selected_count'] += 1
+            else:
+                residues[atom.residue.index]['selected_count'] = 1
+
+            if residues[atom.residue.index]['selected_count'] >= residues[atom.residue.index]['total']:
+                selected_residues.add(atom.residue.name)
+
+        return list(selected_residues)
 
     def _redraw_selection_state(self):
         # this is slow and crappy ...
@@ -177,16 +196,6 @@ class ResidueSelector(SelBase):
         self._residueset = newres
         self._redraw_selection_state()
 
-    def atom_click(self, atom):
-        if self.selection_type.value == 'Atom':
-            self.toggle_atom(atom)
-        elif self.selection_type.value == 'Residue':
-            self.toggle_residue(atom.residue, clickatom=atom)
-        elif self.selection_type.value == 'Chain':
-            self.toggle_chain(atom.chain, atom)
-        else:
-            raise ValueError('Unknown selecton_type %s' % self.selection_type.value)
-
     def toggle_residue(self, residue, clickatom=None, render=True):
         if clickatom is not None:
             deselect = (clickatom in self._atomset)
@@ -210,11 +219,3 @@ class ResidueSelector(SelBase):
     @staticmethod
     def reskey(residue):
         return '{res.name} in chain "{res.chain.name}"'.format(res=residue)
-
-    def handle_remove_button_click(self, *args):
-        if self.residue_list.value:
-            for res in self.residue_list.value:
-                self.toggle_residue(res, render=False)
-            self._redraw_selection_state()
-        else:
-            super(ResidueSelector, self).handle_remove_button_click(*args)
