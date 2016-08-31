@@ -56,7 +56,6 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
         kwargs.setdefault('height', self.DEFAULT_HEIGHT)
         kwargs.setdefault('width', self.DEFAULT_WIDTH)
         super(GeometryViewer, self).__init__(**kwargs)
-        self.set_click_callback(callback=self.handle_click)
         self.selection_group = None
         self.selection_id = None
         self.atom_highlights = []
@@ -331,14 +330,6 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
 
     def remove_click_callback(self, fn):
         self._callbacks.remove(fn)
-
-    def handle_click(self, trait_name, old, new):
-        # TODO: this should handle more than just atoms
-        atom = self.mol.atoms[new['index']]
-        if self.selection_group:
-            self.selection_group.update_selections(self, {'atoms': [atom]})
-        for callback in self._callbacks:
-            callback(atom)
 
     def append_frame(self, positions=None, wfn=None):
         # override base method - we'll handle frames entirely in python
