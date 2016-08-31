@@ -325,12 +325,6 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
         if self.atom_highlights:
             self.set_color(self.HIGHLIGHT_COLOR, self.atom_highlights, _store=False)
 
-    def label_atoms(self, atoms=None, **kwargs):
-        if atoms is None:
-            atoms = self.mol.atoms
-        for atom in atoms:
-            self.draw_label(atom.position, atom.name, **kwargs)
-
     def add_click_callback(self, fn):
         assert callable(fn)
         self._callbacks.add(fn)

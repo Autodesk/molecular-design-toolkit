@@ -154,10 +154,7 @@ class GeometryBuilder(ViewerToolBase):
         pass
 
     def label_atoms(self, *args):
-        if self.label_box.value:
-            self.viewer.label_atoms()
-        else:
-            self.viewer.remove_all_labels()
+        self.viewer.atom_labels_shown = self.label_box.value
 
     # Returns the first atom indicated by atomIndices
     @staticmethod
