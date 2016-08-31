@@ -32,39 +32,41 @@ class BondSelector(SelBase):
 
     def __init__(self, mol):
         super(BondSelector, self).__init__(mol)
-        self.viewer.bond_callbacks.append(self.toggle_bond)
 
         self._bondset = collections.OrderedDict()
         self._drawn_bond_state = set()
 
         self.bond_listname = ipy.HTML('<b>Selected bonds:</b>')
-        self.bond_list = ipy.SelectMultiple(options=collections.OrderedDict(),
+        self.bond_list = ipy.SelectMultiple(options=list(),
                                             height=150)
-        self.bond_list.observe(self.remove_atomlist_highlight, 'value')
+
+        traitlets.directional_link(
+            (self.viewer, 'selected_atoms'),
+            (self.bond_list, 'options'),
+            self._atoms_to_bonds
+        )
+
         self.atom_list.observe(self.remove_bondlist_highlight, 'value')
 
-        self.select_all_bonds_button = ipy.Button(description='Select all bonds')
-        self.select_all_bonds_button.on_click(self.select_all_bonds)
-
         self.subtools.children = [ipy.HBox([self.select_all_atoms_button,
-                                            self.select_all_bonds_button,
                                             self.select_none])]
         self.toolpane.children = (self.atom_listname,
                                   self.atom_list,
                                   self.bond_listname,
                                   self.bond_list)
 
-    def select_all_bonds(self, *args):
-        self.selected_bonds = list(self.mol.bonds)
+    def _atoms_to_bonds(self, atomIndices):
+        return list(self.selected_bonds(atomIndices))
 
-    @property
-    def selected_bonds(self):
-        return self._bondset.keys()
+    def selected_bonds(self, *args, **kwargs):
+        atomIndices = kwargs.get('atomIndices', self.viewer.selected_atoms);
+        bonds = set()
 
-    @selected_bonds.setter
-    def selected_bonds(self, newbonds):
-        self._bondset = collections.OrderedDict((b,None) for b in newbonds)
-        self._redraw_selection_state()
+        for bond in self.mol.bonds:
+            if bond.a1.index in atomIndices and bond.a2.index in atomIndices:
+                bonds.add(bond)
+
+        return bonds
 
     def _redraw_selection_state(self):
         currentset = set(self._bondset)
@@ -86,16 +88,7 @@ class BondSelector(SelBase):
     def bondkey(bond):
         return bond.name
 
-    def toggle_bond(self, bond):
-        if bond in self._bondset: self._bondset.pop(bond)  # unselect the bond
-        else: self._bondset[bond] = None  # select the bond
-        self._redraw_selection_state()
-
-    def select_all_bonds(self, *args):
-        self.selected_bonds = list(self.mol.bonds)
-
     def clear_selections(self, *args):
-        self.selected_bonds = []
         super(BondSelector, self).clear_selections(*args)
 
 
