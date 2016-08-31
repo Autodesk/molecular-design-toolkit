@@ -530,11 +530,14 @@ class MolTopologyMixin(object):
     def to_json(self):
         js = mdt.chemjson.jsonify(self,
             ('name'
-            'properties energy_model integrator').split())
+            'properties integrator').split())
         js['atoms'] = []
         js['bonds'] = []
         js['residues'] = []
         js['chains'] = []
+
+        if self.energy_model:
+            js['energy_model'] = self.energy_model.to_json()
 
         for i, atom in enumerate(self.atoms):
             momenta = []
