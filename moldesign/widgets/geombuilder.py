@@ -13,6 +13,7 @@
 # limitations under the License.
 import ipywidgets as ipy
 
+import traitlets
 from moldesign.geom import set_angle, set_dihedral, set_distance
 import moldesign.molecules.bonds
 from moldesign.viewer import BondClicker
@@ -43,7 +44,6 @@ class GeometryBuilder(ViewerToolBase):
         super(GeometryBuilder, self).__init__(mol)
 
         # All numbers here are assumed angstroms and radians for now ...
-        self._selection = utils.DotDict(blank=True, type=None)
         self._highlighted_bonds = []
         self._highlighted_atoms = []
 
@@ -56,13 +56,14 @@ class GeometryBuilder(ViewerToolBase):
         self.label_box.observe(self.label_atoms, 'value')
 
         # Viewer
-        self.viewer.atom_callbacks.append(self.atom_click)
-        self.viewer.bond_callbacks.append(self.bond_click)
-
         self.selection_description = ipy.HTML()
-
         self.subtools.children = (ipy.HBox([self.clear_button, self.label_box]),
                                   self.selection_description)
+        traitlets.directional_link(
+            (self.viewer, 'selected_atoms'),
+            (self.selection_description, 'value'),
+            self.get_first_atom
+        )
 
         # Atom manipulation tools
         self.x_slider = ReadoutFloatSlider(min=-self.MAXDIST, max=self.MAXDIST,
@@ -103,25 +104,43 @@ class GeometryBuilder(ViewerToolBase):
         self.toolpane.children = (self.tool_holder,
                                   self.reset_button)
 
+        traitlets.directional_link(
+            (self.viewer, 'selected_atoms'),
+            (self.tool_holder, 'children'),
+            self._get_tool_state
+        )
+
+    def get_first_atom(self, atomIndices):
+        if len(atomIndices) < 1:
+            return ''
+        else:
+            atom = self.mol.atoms[next(iter(atomIndices))]
+            return u"<b>Atom</b> {atom.name} at coordinates " \
+                   u"x:{p[0]:.3f}, y:{p[1]:.3f}, z:{p[2]:.3f} \u212B".format(
+                       atom=atom, p=atom.position.value_in(u.angstrom))
+
     def set_distance(self, *args):
-        sel = self._selection
-        assert sel.type == 'bond'
+        bond = self.get_selected_bond(self.viewer.get_selected_bonds())
         dist_in_angstrom = self.length_slider.value
-        set_distance(sel.a1, sel.a2, dist_in_angstrom*u.angstrom, adjustmol=self.adjust_button.value)
+        set_distance(bond.a1, bond.a2, dist_in_angstrom*u.angstrom, adjustmol=self.adjust_button.value)
         self.viewer.set_positions()
 
     def set_angle(self, *args):
-        sel = self._selection
-        assert sel.type == 'bond'
+        bonds = self.viewer.get_selected_bonds()
+        bond = self.get_selected_bond(bonds)
+        bond_neighbors = self.get_bond_neighbors(bonds, bond)
         angle = self.angle_slider.value
-        set_angle(sel.a1, sel.a2, sel.nbr_a2, angle*u.pi/180.0, adjustmol=self.adjust_button.value)
+
+        set_angle(bond.a1, bond.a2, bond_neighbors['a2'], angle*u.pi/180.0, adjustmol=self.adjust_button.value)
         self.viewer.set_positions()
 
     def set_dihedral(self, *args):
-        sel = self._selection
-        assert sel.type == 'bond'
+        bonds = self.viewer.get_selected_bonds()
+        bond = self.get_selected_bond(bonds)
+        bond_neighbors = self.get_bond_neighbors(bonds, bond)
         angle = self.dihedral_slider.value
-        set_dihedral(sel.nbr_a1, sel.a1, sel.a2, sel.nbr_a2, angle*u.pi/180.0,
+
+        set_dihedral(bond_neighbors['a1'], bond.a1, bond.a2, bond_neighbors['a2'], angle*u.pi/180.0,
                                              adjustmol=self.adjust_button.value)
         self.viewer.set_positions()
 
@@ -135,54 +154,30 @@ class GeometryBuilder(ViewerToolBase):
         pass
 
     def label_atoms(self, *args):
-        if self.label_box.value:
-            self.viewer.label_atoms()
-        else:
-            self.viewer.remove_all_labels()
+        self.viewer.atom_labels_shown = self.label_box.value
 
-    def atom_click(self, atom):
-        sel = self._selection
-        if sel.blank:  # select this atom
-            sel.blank = False
-            sel.type = 'atom'
-            sel.atom = atom
+    # Returns the first atom indicated by atomIndices
+    @staticmethod
+    def get_selected_atom(atoms, atomIndices):
+        return atoms[next(iter(atomIndices))]
 
-        elif sel.type == 'atom':  # We've selected 2 atoms - i.e. a bond
-            if atom is sel.atom:  # clicked twice -> deselect the thing
-                return self.clear_selection()
+    # Returns the first bond indicated by bondIndices
+    @staticmethod
+    def get_selected_bond(bonds):
+        return next(iter(bonds))
 
-            elif atom in sel.atom.bond_graph:  # select the bond
-                return self.bond_click(moldesign.molecules.bonds.Bond(sel.atom, atom))  # turn this into a bond selection
-            else:  # select a new atom
-                self.clear_selection(render=False)
-                sel = self._selection
-                sel.blank = False
-                sel.type = 'atom'
-                sel.atom = atom
-
-        elif sel.type == 'bond':
-            if atom in sel.a1_neighbors:  # change the neighboring selection
-                sel.nbr_a1 = atom
-            elif atom in sel.a2_neighbors:
-                sel.nbr_a2 = atom
-            else:  # select a new atom
-                self.clear_selection(render=False)
-                return self.atom_click(atom)
-
-        self._redraw_selection()
-
-    def _set_tool_state(self):
+    def _get_tool_state(self, selectedAtomIndices):
         # start with everything disabled
         for tool in self.atom_tools.children + self.bond_tools.children: tool.disabled = True
 
-        if self._selection.blank:
-            self.tool_holder.children = (ipy.HTML('Please click on a bond or atom'),)
+        if len(selectedAtomIndices) <= 0:
+            return (ipy.HTML('Please click on a bond or atom'),)
 
-        elif self._selection.type == 'atom':
+        elif len(selectedAtomIndices) is 1:
+            atom = self.get_selected_atom(self.mol.atoms, selectedAtomIndices)
             self.adjust_button.disabled = False
 
-            self.tool_holder.children = (self.atom_tools,)
-            x, y, z = self._selection.atom.position.value_in(u.angstrom)
+            x, y, z = atom.position.value_in(u.angstrom)
             self.x_slider.value = x
             self.x_slider.disabled = False  # for now
 
@@ -194,42 +189,50 @@ class GeometryBuilder(ViewerToolBase):
 
             for tool in self.atom_tools.children: tool.disabled = True
 
-        elif self._selection.type == 'bond':
-            sel = self._selection
+            return (self.atom_tools,)
+
+        else:
+            bonds = self.viewer.get_selected_bonds()
+            bond = self.get_selected_bond(bonds)
             self.adjust_button.disabled = False
 
             # bond length
-            self.length_slider.value = sel.a1.distance(sel.a2).value_in(u.angstrom)
+            self.length_slider.value = bond.a1.distance(bond.a2).value_in(u.angstrom)
             self.length_slider.disabled = False
             self.length_slider.description = '<b>Bond distance</b> <span style="color:{c1}">{a1.name}' \
                                              ' - {a2.name}</span>'.format(
-                    a1=sel.a1, a2=sel.a2, c1=self.viewer.HIGHLIGHT_COLOR)
+                    a1=bond.a1, a2=bond.a2, c1=self.viewer.HIGHLIGHT_COLOR)
+
+            a1_neighbors = set([a for a in bond.a1.bond_graph if a is not bond.a2])
+            maxo = max(a1_neighbors, key=lambda x: x.mass)
+            bond_neighbors = self.get_bond_neighbors(bonds, bond)
 
             # Bond angle
-            if sel.nbr_a2:
-                self.angle_slider.value = geom.angle(sel.a1, sel.a2, sel.nbr_a2).value_in(u.degrees)
+            if bond_neighbors['a2']:
+                self.dihedral_slider.enable()
+                self.angle_slider.enable()
+                self.angle_slider.value = geom.angle(bond.a1, bond.a2, bond_neighbors['a2']).value_in(u.degrees)
                 # self.angle_slider.observe(self.set_angle, 'value')
-                self.angle_slider.disabled = False
                 self.angle_slider.description = '<b>Bond angle</b> <span style="color:{c1}">{a1.name}' \
                                                 ' - {a2.name}</span> ' \
                                                 '- <span style="color:{c2}">{a3.name}</span>'.format(
-                        a1=sel.a1, a2=sel.a2, a3=sel.nbr_a2,
+                        a1=bond.a1, a2=bond.a2, a3=bond_neighbors['a2'],
                         c1=self.viewer.HIGHLIGHT_COLOR, c2=self.NBR2HIGHLIGHT)
             else:
+                self.dihedral_slider.disable()
+                self.angle_slider.disable()
                 self.angle_slider.description = 'no angle associated with this bond'
                 # self.angle_slider.unobserve(self.set_angle)
-                self.angle_slider.disabled = True
 
             # Dihedral twist
-            if sel.nbr_a2 and sel.nbr_a1:
-                self.dihedral_slider.value = geom.dihedral(sel.nbr_a1, sel.a1, sel.a2, sel.nbr_a2).value_in(u.degrees)
+            if bond_neighbors['a2'] and bond_neighbors['a1']:
+                self.dihedral_slider.value = geom.dihedral(bond_neighbors['a1'], bond.a1, bond.a2, bond_neighbors['a2']).value_in(u.degrees)
                 # self.dihedral_slider.observe(self.set_dihedral, 'value')
-                self.dihedral_slider.disabled = False
                 self.dihedral_slider.description = '<b>Dihedral angle</b> <span style="color:{c0}">{a4.name}</span>' \
                                                    ' - <span style="color:{c1}">{a1.name}' \
                                                    ' - {a2.name}</span> ' \
                                                    '- <span style="color:{c2}">{a3.name}</span>'.format(
-                        a4=sel.nbr_a1, a1=sel.a1, a2=sel.a2, a3=sel.nbr_a2,
+                        a4=bond_neighbors['a1'], a1=bond.a1, a2=bond.a2, a3=bond_neighbors['a2'],
                         c0=self.NBR1HIGHLIGHT, c1=self.viewer.HIGHLIGHT_COLOR,
                         c2=self.NBR2HIGHLIGHT)
             else:
@@ -237,95 +240,37 @@ class GeometryBuilder(ViewerToolBase):
                 # self.dihedral_slider.unobserve(self.set_dihedral)
                 self.dihedral_slider.disabled = True
 
-            self.tool_holder.children = [self.bond_tools]
+            return [self.bond_tools]
 
-        else:
-            raise ValueError('Unknown selection type %s' % self._selection.type)
+    @staticmethod
+    def get_bond_neighbors(bonds, bond):
+        neighbors = { 'a1': None, 'a2': None }
+        a1_neighbors = set([a for a in bond.a1.bond_graph if a is not bond.a2])
+        a2_neighbors = set([a for a in bond.a2.bond_graph if a is not bond.a1])
 
-    def bond_click(self, bond):
-        sel = self._selection
-        if sel.type == 'bond':  # check if this bond is already selected
-            a1, a2 = bond.a1, bond.a2
-            if (a1 is sel.a1 and a2 is sel.a2) or (a1 is sel.a2 and a2 is sel.a1):
-                return self.clear_selection()
+        if a1_neighbors:
+            neighbors['a1'] = max(a1_neighbors, key=lambda x: x.mass)
+        if a2_neighbors:
+            neighbors['a2'] = max(a2_neighbors, key=lambda x: x.mass)
 
-        self.clear_selection(render=False)
-        sel = self._selection
-        sel.blank = False
-        sel.type = 'bond'
-        sel.bond = bond
-        sel.a1 = bond.a1
-        sel.a2 = bond.a2
-        sel.a1_neighbors = set([a for a in bond.a1.bond_graph if a is not bond.a2])
-        sel.a2_neighbors = set([a for a in bond.a2.bond_graph if a is not bond.a1])
-        sel.nbr_a1 = sel.nbr_a2 = None
-        if sel.a1_neighbors:
-            sel.nbr_a1 = max(sel.a1_neighbors, key=lambda x: x.mass)
-        if sel.a2_neighbors:
-            sel.nbr_a2 = max(sel.a2_neighbors, key=lambda x: x.mass)
-        self._redraw_selection()
+        return neighbors
 
-    def _highlight_atoms(self, atoms, color=None, render=True):
+    def _highlight_atoms(self, atoms, color=None):
         color = utils.if_not_none(color, self.viewer.HIGHLIGHT_COLOR)
         self._highlighted_atoms += atoms
         self.viewer.add_style('vdw', atoms=atoms,
                               radius=self.viewer.ATOMRADIUS * 1.1,
                               color=color,
-                              opacity=self.HIGHLIGHTOPACITY,
-                              render=render)
+                              opacity=self.HIGHLIGHTOPACITY)
 
-    def _unhighlight_atoms(self, atoms, render=True):
+    def _unhighlight_atoms(self, atoms):
         self.viewer.set_style('vdw', atoms=atoms,
-                              radius=self.viewer.ATOMRADIUS,
-                              render=render)
+                              radius=self.viewer.ATOMRADIUS)
 
-    def _redraw_selection(self):
-        # unhighlight any previous selections
-        if self._highlighted_atoms:
-            self._unhighlight_atoms(self._highlighted_atoms, render=False)
-        self._highlighted_atoms = []
-        for bond in self._highlighted_bonds:
-            self.viewer.unset_bond_color(bond, render=False)
-        self._highlighted_bonds = []
-
-        # Set the selection view
-        sel = self._selection
-        if sel.type == 'atom':
-            self._highlight_atoms([sel.atom], render=False)
-            self.selection_description.value = \
-                u"<b>Atom</b> {atom.name} at coordinates " \
-                u"x:{p[0]:.3f}, y:{p[1]:.3f}, z:{p[2]:.3f} \u212B".format(
-                        atom=sel.atom, p=sel.atom.position.value_in(u.angstrom))
-
-        elif sel.type == 'bond':
-            self.selection_description.value = "<b>Bond:</b> %s - %s" % (sel.a1.name, sel.a2.name)
-            self._highlighted_bonds = [sel.bond]
-            self.viewer.set_bond_color(self.viewer.HIGHLIGHT_COLOR, sel.bond, render=False)
-            self._highlight_atoms([sel.a1, sel.a2], render=False)
-
-            if sel.nbr_a1 is not None:
-                nmdtond = moldesign.molecules.bonds.Bond(sel.a1, sel.nbr_a1)
-                self._highlight_atoms([sel.nbr_a1], color=self.NBR1HIGHLIGHT, render=False)
-                self.viewer.set_bond_color(self.NBR1HIGHLIGHT, nmdtond, render=False)
-                self._highlighted_bonds.append(nmdtond)
-            if sel.nbr_a2 is not None:
-                nmdtond = moldesign.molecules.bonds.Bond(sel.a2, sel.nbr_a2)
-                self._highlight_atoms([sel.nbr_a2], color=self.NBR2HIGHLIGHT, render=False)
-                self.viewer.set_bond_color(self.NBR2HIGHLIGHT, nmdtond, render=False)
-                self._highlighted_bonds.append(nmdtond)
-
-        elif sel.type is not None:
-            raise ValueError('Unknown selection type %s' % self._selection.type)
-
-        self._set_tool_state()
-
-    def clear_selection(self, render=True, *args):
-        self._selection = utils.DotDict(blank=True, type=None)
-        self.selection_description.value = ""
-        if render: self._redraw_selection()
+    def clear_selection(self, *args):
+        self.viewer.selected_atoms = set()
 
     def reset_geometry(self, *args):
-        self.clear_selection(render=False)
+        self.clear_selection()
         self.mol.positions = self.original_position
         self.viewer.set_positions()
-        self._redraw_selection()

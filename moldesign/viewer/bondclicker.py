@@ -34,14 +34,13 @@ class BondClicker(GeometryViewer):
         self._bonds = {}
         self._bond_shapes = {}
         self._bond_colors = {}
-        super(BondClicker, self).__init__(mol=mol, render=False, **kwargs)
+        super(BondClicker, self).__init__(mol=mol, **kwargs)
         self.atom_callbacks = []
         self.bond_callbacks = []
         self.click_callbacks = []
         self.draw_all_bonds()
 
     def set_positions(self, *args, **kwargs):
-        render = kwargs.get('render',True)
         super(BondClicker, self).set_positions(*args, **kwargs)
         self.draw_all_bonds()
 
@@ -50,11 +49,11 @@ class BondClicker(GeometryViewer):
         for bond in self.mol.bonds:
             self.draw_bond(bond, batch=batch)
 
-    def set_bond_color(self, color, bond, render=True):
+    def set_bond_color(self, color, bond):
         self._bond_colors[bond] = color
         self.draw_bond(bond)
 
-    def unset_bond_color(self, bond, render=True):
+    def unset_bond_color(self, bond):
         self._bond_colors.pop(bond, None)
         self.draw_bond(bond)
 
@@ -66,7 +65,7 @@ class BondClicker(GeometryViewer):
 
         if bond in self._bond_shapes:  # i.e., we need to remove and redraw this bond
             for shape in self._bond_shapes[bond]:
-                self.remove(shape, render=False, batch=batch)
+                self.remove(shape, batch=batch)
 
         assert 'clickable' not in shape_args
         color = self._bond_colors.get(bond, self.BONDCOLOR)
