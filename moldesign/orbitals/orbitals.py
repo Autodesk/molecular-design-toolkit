@@ -62,8 +62,7 @@ class Orbital(object):
     :math:`\left| \mu \right \rangle` are stored at ``self.basis``
     """
     def __init__(self, coeffs, basis=None, wfn=None,
-                 occupation=None, name='unnamed',
-                 **kwargs):
+                 occupation=None, name='unnamed'):
         """ Initialization:
 
         Args:
@@ -90,10 +89,6 @@ class Orbital(object):
         if self.basis is not None:
             assert len(self.coeffs) == len(self.basis)
 
-        # Assign arbitrary attributes
-        for k, v in kwargs.iteritems():
-            setattr(self, k, v)
-
     def overlap(self, other):
         """ Calculate overlap with another orbital
 
@@ -114,7 +109,7 @@ class Orbital(object):
         Returns:
             u.Scalar[energy]: fock matrix element
         """
-        return self.wfn.fock_ao.dot(other.coeffs).ldot(self.coeffs)  # use ldot to preserve units
+        return self.wfn.fock_ao.dot(other.coeffs).ldot(self.coeffs)  # uses ldot to preserve units
 
     @property
     def energy(self):
@@ -149,8 +144,7 @@ class MolecularOrbitals(object):
     """
     def __init__(self, orbitals, wfn=None, basis=None,
                  canonical=False,
-                 orbtype=None,
-                 **kwargs):
+                 orbtype=None):
         """ Initialization:
 
         Args:
@@ -194,9 +188,6 @@ class MolecularOrbitals(object):
         if canonical:
             self._set_cmo_names()
 
-        for k, v in kwargs.iteritems():
-            setattr(self, k, v)
-
     def align_phases(self, other, threshold=0.5, assert_same_type=True):
         """ Flip the signs of these orbitals to bring them into maximum coincidence
         with another set of orbitals
@@ -226,7 +217,7 @@ class MolecularOrbitals(object):
             other (MolecularOrbitals):
 
         Returns:
-            numpy.array: overlaps between the two sets of orbitals.
+            numpy.ndarray: overlaps between the two sets of orbitals
 
         Example:
             >>> canonical = mol.wfn.canonical
@@ -235,7 +226,7 @@ class MolecularOrbitals(object):
             >>> overlaps[i, j] == canonical.orbitals[i].overlap(atomic.orbitals[j])
             True
         """
-        return self.dot(self.aobasis.overlaps.dot(other.T))
+        return self.coeffs.dot(self.wfn.aobasis.overlaps.dot(other.coeffs.T))
 
     def __iter__(self):
         return iter(self.orbitals)
@@ -250,8 +241,9 @@ class MolecularOrbitals(object):
         return '<%d %s %s in %s>' % (len(self), self.orbtype,
                                      self.__class__.__name__, str(self.wfn))
 
-    def __getitem__(self, item):
-        return self.orbitals[item]
+    def _to_ao_density_matrix(self):
+        c = self.coeffs * self.occupations[:, None]/2.0
+        return 2.0*c.T.dot(c)
 
     @property
     def energies(self):
@@ -259,6 +251,12 @@ class MolecularOrbitals(object):
 
         This is just the diagonal of the fock matrix"""
         return self.fock.diagonal()
+
+    @property
+    def occupations(self):
+        """ np.ndarray: orbital occupation numbers
+        """
+        return np.array([orb.occupation for orb in self.orbitals])
 
     @property
     def fock(self):
