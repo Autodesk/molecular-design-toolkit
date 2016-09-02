@@ -178,6 +178,11 @@ class Trajectory(object):
     def draw_orbitals(self, align=True):
         """TrajectoryOrbViewer: create a trajectory visualization"""
         from moldesign import widgets
+        for frame in self:
+            if 'wfn' not in frame:
+                raise ValueError("Can't draw orbitals - orbital information missing in at least "
+                                 "one frame. It must be calculated with a QM method.")
+
         if align: self.align_orbital_phases()
         self._viz = widgets.trajectory.TrajectoryOrbViewer(self)
         return self._viz

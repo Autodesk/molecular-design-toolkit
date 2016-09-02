@@ -690,6 +690,9 @@ class MolSimulationMixin(object):
         Returns:
             moldesign.trajectory.Trajectory
         """
+        if self.integrator is None:
+            raise ValueError('Cannot simulate; no integrator set for %s' % self)
+
         init_time = self.time
         traj = self.integrator.run(run_for)
         print 'Done - integrated "%s" from %s to %s' % (self, init_time, self.time)
@@ -711,7 +714,11 @@ class MolSimulationMixin(object):
         Returns:
             MolecularProperties
         """
-        if requests is None: requests = []
+        if self.energy_model is None:
+            raise ValueError('Cannot calculate properties; no energy model set for %s' % self)
+
+        if requests is None:
+            requests = []
 
         # Figure out what needs to be calculated,
         # and either launch the job or set the result
@@ -807,6 +814,9 @@ class MolSimulationMixin(object):
         Returns:
             moldesign.trajectory.Trajectory
         """
+        if self.energy_model is None:
+            raise ValueError('Cannot minimize molecule; no energy model set for %s' % self)
+
         try:
             trajectory = self.energy_model.minimize(**kwargs)
         except NotImplementedError:
