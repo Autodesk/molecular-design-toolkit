@@ -23,7 +23,7 @@ from moldesign import units as u
 from moldesign import compute
 
 try:
-    imp.find_module('simtk.openmm')
+    imp.find_module('simtk')
 except (ImportError, OSError) as exc:
     print 'OpenMM could not be imported; using remote docker container'
     force_remote = True
@@ -49,8 +49,8 @@ class OpenMMPickleMixin(object):
         self.__dict__.update(state)
 
 
-# This is a factory for the MdtReporter class. It's here so that we don't have to import simtk.openmm.app
-# at the module level
+# This is a factory for the MdtReporter class. It's here so that we don't have to import
+# simtk.openmm.app at the module level
 def MdtReporter(mol, report_interval):
     from simtk.openmm.app import StateDataReporter
 

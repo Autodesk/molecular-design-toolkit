@@ -1,6 +1,7 @@
 0.7.3 (WIP)
 ===========
 NEW MODELING FEATURES
+ - #33 - Add DFT and MP2 for PySCF model
  - GAFF parameterizer for small molecules -- ``params = mdt.parameterize(mol)``
  - AM1-BCC and Gasteiger partial charge calculators: ``mdt.calc_am1_bcc_charges`` and
     ``mdt.calc_gasteiger_charges``
@@ -8,6 +9,7 @@ NEW MODELING FEATURES
  - #72 - Add ``moldesign.guess_formal_charges`` and ``moldesign.add_missing_data``
 
 CHANGES
+ - #78 - ``moldesign`` now imports much more quickly
  - Add Example 4 on MD with a small molecule ligand
  - Create changelog and version check to the ``mdt.about()`` (aka ``mdt.configure``) widget
  - Change moldesign.tools and moldesign.helpers modules into more rationally organized subpackages

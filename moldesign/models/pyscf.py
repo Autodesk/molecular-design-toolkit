@@ -51,32 +51,31 @@ class LazyClassMap(object):
         mod = importlib.import_module(modname)
         return getattr(mod, cls)
 
+# PySCF metadata constants
+THEORIES = LazyClassMap({'hf': 'pyscf.scf.RHF', 'rhf': 'pyscf.scf.RHF',
+                         'uhf': 'pyscf.scf.UHF',
+                         'mcscf': 'pyscf.mcscf.CASSCF', 'casscf': 'pyscf.mcscf.CASSCF',
+                         'casci': 'pyscf.mcscf.CASCI',
+                         'mp2': 'pyscf.mp.MP2',
+                         'dft': 'pyscf.dft.RKS', 'rks': 'pyscf.dft.RKS', 'ks': 'pyscf.dft.RKS'})
+
+NEEDS_REFERENCE = set('mcscf casscf casci mp2'.split())
+NEEDS_FUNCTIONAL = set('dft rks ks uks'.split())
+IS_SCF = set('rhf uhf hf casscf mcscf dft rks ks'.split())
+FORCE_CALCULATORS = LazyClassMap({'rhf': 'pyscf.grad.RHF', 'hf': 'pyscf.grad.RHF'})
+
 
 @exports
 class PySCFPotential(QMBase):
     DEFAULT_PROPERTIES = ['potential_energy',
                           'wfn',
                           'mulliken']
-
-    THEORIES = LazyClassMap({'hf': 'pyscf.scf.RHF', 'rhf': 'pyscf.scf.RHF',
-                             'uhf': 'pyscf.scf.UHF',
-                             'mcscf': 'pyscf.mcscf.CASSCF', 'casscf': 'pyscf.mcscf.CASSCF',
-                             'casci': 'pyscf.mcscf.CASCI',
-                             'mp2': 'pyscf.mp.MP2',
-                             'dft': 'pyscf.dft.RKS', 'rks': 'pyscf.dft.RKS', 'ks': 'pyscf.dft.RKS'})
-
-    FORCE_CALCULATORS = LazyClassMap({'rhf': 'pyscf.grad.RHF', 'hf': 'pyscf.grad.RHF'})
-
     ALL_PROPERTIES = DEFAULT_PROPERTIES + ['eri_tensor',
                                            'forces',
                                            'nuclear_forces',
                                            'electronic_forces']
-
-    NAME_MAP = {'b3lyp': 'b3lyp'}
-
-    NEEDS_REFERENCE = set('mcscf casscf casci mp2'.split())
-    NEEDS_FUNCTIONAL = set('dft rks ks uks'.split())
-    IS_SCF = set('rhf uhf hf casscf mcscf dft rks ks'.split())
+    PARAM_SUPPORT = {'theory': ['rhf', 'rks', 'mp2'],
+                     'functional': ['b3lyp', 'blyp', 'pbe0', 'x3lyp', 'MPW3LYP5']}
 
     FORCE_UNITS = u.hartree / u.bohr
 
@@ -90,27 +89,26 @@ class PySCFPotential(QMBase):
         self.logger = uibase.Logger('PySCF interface')
 
     @compute.runsremotely(enable=force_remote, is_imethod=True)
-    def calculate(self, requests=None, guess=None):
+    def calculate(self, requests=None):
         self.logger = uibase.Logger('PySCF calc')
         do_forces = 'forces' in requests
-        if do_forces and self.params.theory not in self.FORCE_CALCULATORS:
+        if do_forces and self.params.theory not in FORCE_CALCULATORS:
             raise ValueError('Forces are only available for the following theories:'
-                             ','.join(self.FORCE_CALCULATORS))
+                             ','.join(FORCE_CALCULATORS))
         if do_forces:
-            force_calculator = self.FORCE_CALCULATORS[self.params.theory]
+            force_calculator = FORCE_CALCULATORS[self.params.theory]
 
-        # Set up initial guess
-        if guess is not None:
-            dm0 = guess.density_matrix
-        elif self.last_el_state is not None:
-            dm0 = self.last_el_state.density_matrix
-        else:
-            dm0 = None
         self.prep(force=True)  # rebuild every time
 
-        # Compute reference WFN
+        # Set up initial guess
+        if self.params.wfn_guess == 'stored':
+            dm0 = self.params.initial_guess.density_matrix_a0
+        else:
+            dm0 = None
+
+        # Compute reference WFN (if needed)
         refobj = self.pyscfmol
-        if self.params.theory in self.NEEDS_REFERENCE:
+        if self.params.theory in NEEDS_REFERENCE:
             reference = self._build_theory(self.params.get('reference', 'rhf'),
                                            refobj)
             kernel, failures = self._converge(reference, dm0=dm0)
@@ -121,19 +119,25 @@ class PySCFPotential(QMBase):
         # Compute WFN
         theory = self._build_theory(self.params['theory'],
                                     refobj)
-        if self.params['theory'] not in self.IS_SCF:
+        if self.params['theory'] not in IS_SCF:
             theory.kernel()
             self.kernel = theory
         else:
             self.kernel, failures = self._converge(theory, dm0=dm0)
 
-        # Compute forces
+        # Compute forces (if requested)
         if do_forces:
             grad = force_calculator(self.kernel)
         else:
             grad = None
 
-        return self._get_properties(self.reference, self.kernel, grad)
+        props = self._get_properties(self.reference, self.kernel, grad)
+
+        if self.params.store_orb_guesses:
+            self.params.wfn_guess = 'stored'
+            self.params.initial_guess = props['wfn']
+
+        return props
 
     def _get_properties(self, ref, kernel, grad):
         """ Analyze calculation results and return molecular properties
@@ -173,16 +177,11 @@ class PySCFPotential(QMBase):
         basis = orbitals.basis.BasisSet(self.mol,
                                         orbitals=self._get_ao_basis_functions(),
                                         h1e=ao_matrices.h1e.defunits(),
-                                        overlaps=ao_matrices.sao,
+                                        overlaps=scf_matrices.pop('sao'),
                                         name=self.params.basis)
         el_state = orbitals.wfn.ElectronicWfn(self.mol,
                                               self.pyscfmol.nelectron,
-                                              theory=self.params.theory,
-                                              aobasis=basis,
-                                              ao_population=ao_pop,
-                                              nuclear_repulsion=(self.pyscfmol.energy_nuc()*
-                                                                 u.hartree).defunits(),
-                                              **scf_matrices)
+                                              aobasis=basis)
 
         # Build and store the canonical orbitals
         cmos = []
@@ -264,7 +263,7 @@ class PySCFPotential(QMBase):
         raise orbitals.ConvergenceError(method)
 
     def _build_theory(self, name, refobj):
-        theory = self.THEORIES[name](refobj)
+        theory = THEORIES[name](refobj)
 
         theory.callback = StatusLogger('%s/%s procedure:' % (self.params.theory, self.params.basis),
                                        ['cycle', 'e_tot'],
@@ -279,13 +278,13 @@ class PySCFPotential(QMBase):
         return theory
 
     def _assign_functional(self, kernel, theory, fname):
-        if theory in self.NEEDS_FUNCTIONAL:
+        if theory in NEEDS_FUNCTIONAL:
             if fname is not None:
                 kernel.xc = fname
             else:
                 raise ValueError('No functional specified for reference theory "%s"' % theory)
-        elif fname is not None:
-            raise ValueError('Functional specified for non-DFT theory "%s"' % theory)
+        #elif fname is not None:
+            #raise ValueError('Functional specified for non-DFT theory "%s"' % theory)
 
     def _get_ao_basis_functions(self):
         """ Convert pyscf basis functions into a list of atomic basis functions
@@ -347,11 +346,10 @@ class PySCFPotential(QMBase):
         return DotDict(h1e=h1e, sao=sao)
 
     def _get_scf_matrices(self, mf, ao_mats):
-        # TODO: density matrix units??? (dimensionless in this wfn, I think ...)
         dm = mf.make_rdm1()
         veff = mf.get_veff(dm=dm) * u.hartree
         fock = ao_mats.h1e + veff
-        scf_matrices = dict(density_matrix=dm,
+        scf_matrices = dict(density_matrix_ao=dm,
                             h2e=veff,
                             fock_ao=fock)
         scf_matrices.update(ao_mats)

@@ -47,12 +47,12 @@ def RHF(**kwargs):
 
 @exports
 def DFT(**kwargs):
-    return PySCFPotential(theory='dft', **kwargs)
+    return PySCFPotential(theory='rks', **kwargs)
 
 
 @exports
 def B3LYP(**kwargs):
-    return PySCFPotential(theory='dft', funtional='b3lyp', **kwargs)
+    return PySCFPotential(theory='rks', funtional='b3lyp', **kwargs)
 
 
 @exports
