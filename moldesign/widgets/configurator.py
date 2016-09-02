@@ -16,7 +16,7 @@ import collections
 
 import ipywidgets as ipy
 
-from moldesign.uibase import UnitText
+from moldesign.uibase import UnitText, ReadOnlyRepr
 from moldesign import utils
 
 
@@ -81,65 +81,75 @@ class Configurator(ipy.Box):
         for paramdef in self.paramdefs:
             if paramdef.name not in reset_params:  # if it's not set already, make it the default
                 self.selectors[paramdef.name].default()
+        self.show_relevant_fields()
 
     def apply_values(self, *args):
         for paramname, selector in self.selectors.iteritems():
             self.paramlist[paramname] = selector.selector.value
         self.currentconfig.value = str(self.paramlist).replace(', ', ',\n   ')
+        self.show_relevant_fields()
+
+    def show_relevant_fields(self):
+        for s in self.selectors.itervalues():
+            if s.paramdef.relevance is not None:
+                if s.paramdef.relevance(self.paramlist):
+                    s.layout.visibility = 'visible'
+                else:
+                    s.layout.visibility = 'hidden'
 
 
 class ParamSelector(ipy.Box):
 
-    WIDGETKWARGS = {'width':'200px'}
+    WIDGETKWARGS = {'width': '200px'}
 
-    def __init__(self, param):
+    def __init__(self, paramdef):
         super(ParamSelector, self).__init__(layout=ipy.Layout(display='flex',
                                                               flex_flow='nowrap',
                                                               align_content='baseline'))
 
-        self.param = param
+        self.paramdef = paramdef
 
         children = []
-        self.name = ipy.HTML("<p style='text-align:right'>%s:</p>" % param.displayname,
+        self.name = ipy.HTML("<p style='text-align:right'>%s:</p>" % paramdef.displayname,
                              width='200px')
         children.append(self.name)
 
-        if param.choices:
-            self.selector = ipy.Dropdown(options=param.choices, **self.WIDGETKWARGS)
-        elif param.type == bool:
+        if paramdef.choices:
+            self.selector = ipy.Dropdown(options=paramdef.choices, **self.WIDGETKWARGS)
+        elif paramdef.type == bool:
             self.selector = ipy.ToggleButtons(options=[True, False], **self.WIDGETKWARGS)
-        elif param.units:
-            self.selector = UnitText(units=param.units, **self.WIDGETKWARGS)
-        elif param.type == float:
+        elif paramdef.units:
+            self.selector = UnitText(units=paramdef.units, **self.WIDGETKWARGS)
+        elif paramdef.type == float:
             self.selector = ipy.FloatText(**self.WIDGETKWARGS)
-        elif param.type == int:
+        elif paramdef.type == int:
             self.selector = ipy.IntText(**self.WIDGETKWARGS)
-        elif param.type == str:
+        elif paramdef.type == str:
             self.selector = ipy.Text(**self.WIDGETKWARGS)
         else:
-            self.selector = ipy.HTML('<i>unknown datatype</i>')
+            self.selector = ReadOnlyRepr(**self.WIDGETKWARGS)
         children.append(self.selector)
 
         children = [self.name, self.selector]
 
         self.default_button = None
-        if param.default:
+        if paramdef.default:
             self.default_button = ipy.Button(description='Default',
-                                             tooltip='Set to default: %s' % self.param.default,
+                                             tooltip='Set to default: %s' % self.paramdef.default,
                                              width='75px')
             self.default_button.on_click(self.default)
             children.append(self.default_button)
             self.default()
 
         self.help_link = None
-        if param.help_url:
-            self.help_link = ipy.HTML('<a href="%s" target="_blank">?</a>' % param.help_url)
+        if paramdef.help_url:
+            self.help_link = ipy.HTML('<a href="%s" target="_blank">?</a>' % paramdef.help_url)
             children.append(self.help_link)
 
         self.children = children
 
     def default(self, *args):
-        self.selector.value = self.param.default
+        self.selector.value = self.paramdef.default
 
     @property
     def value(self):

@@ -13,6 +13,8 @@
 # limitations under the License.
 from bisect import bisect_left, bisect_right
 
+import collections
+
 
 class Categorizer(dict):
     """
@@ -52,6 +54,34 @@ class DotDict(dict):
 
     def __setattr__(self, item, val):
         self[item] = val
+
+    def __dir__(self):
+        return dir(self.__class__) + self.keys()
+
+
+class OrderedDotDict(collections.OrderedDict):
+    """Dict with items accessible as attributes"""
+    def __getstate__(self):
+        retval = dict(__dict__=self.__dict__.copy(),
+                      items=self.items())
+        return retval
+
+    def __setstate__(self, d):
+        self.__dict__.update(d['__dict__'])
+        self.update(d['items'])
+
+    def __getattr__(self, item):
+        try:
+            return self[item]
+        except KeyError:
+            raise AttributeError("'%s' object has no attribute '%s'"
+                                 % (self.__class__.__name__, item))
+
+    def __setattr__(self, item, val):
+        if item.startswith('_OrderedDict__') or item.startswith('__'):
+            self.__dict__[item] = val
+        else:
+            self[item] = val
 
     def __dir__(self):
         return dir(self.__class__) + self.keys()
