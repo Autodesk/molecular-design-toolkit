@@ -111,6 +111,6 @@ class OrbitalUIPane(Selector, ipy.Box):
         viewer = self.viz.viewer
         viewer.orbital_spec['npts'] = int(self.orb_resolution.value)
         if viewer.current_orbital is not None:
-            viewer.draw_orbital(viewer.current_orbital, render=True, **viewer.orbital_spec)
+            viewer.draw_orbital(viewer.current_orbital, **viewer.orbital_spec)
 
 

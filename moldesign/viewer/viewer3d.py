@@ -220,10 +220,7 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
         coords = grid.xyzlist().reshape(3, grid.npoints ** 3).T
         values = orbital(coords)
         grid.fxyz = values.reshape(npts, npts, npts)
-        maxrange = max(r[1]-r[0] for r in (grid.xr, grid.yr, grid.zr))
 
-        # try not to clip the orbitals
-        self.viewer('adjustClipping', [0.6* maxrange.value_in(u.angstrom)])
         return grid
 
     def get_orbnames(self):
