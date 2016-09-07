@@ -101,14 +101,12 @@ class MinimizerBase(object):
         self.mol.calculate(requests=self.request_list)
         grad = -self.mol.forces
 
-        if self.constraint_restraints:
-            for constraint in self.mol.constraints:
-                grad -= self.restraint_multiplier * constraint.restraint_penalty_force()
-
         grad = grad.reshape(self.mol.num_atoms * 3)
         self._last_grad = grad
-        if self._strip_units: return grad.defunits().magnitude
-        else: return grad.defunits()
+        if self._strip_units:
+            return grad.defunits().magnitude
+        else:
+            return grad.defunits()
 
     def __call__(self):
         """ Run the minimization

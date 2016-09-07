@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import
+
 import scipy.optimize
 
 from .base import MinimizerBase
 from . import toplevel
-from moldesign import utils
 
 
 def exports(o):
@@ -24,8 +25,7 @@ def exports(o):
 __all__ = []
 
 
-@exports
-class BFGS(MinimizerBase):
+class ScipyMinimizer(MinimizerBase):
     """ SciPy's implementation of the BFGS method, with gradients if available.
 
     Args:
@@ -35,9 +35,11 @@ class BFGS(MinimizerBase):
         This implementation will fail rapidly if large forces are present (>> 1 eV/angstrom).
     """
     _strip_units = True
+    _METHOD_NAME = None
 
     def run(self):
-        print 'Starting geometry optimization: scipy.fmin_bfgs with %s gradients' % self.gradtype
+        print 'Starting geometry optimization: SciPy/%s with %s gradients'%(
+            self._METHOD_NAME, self.gradtype)
         options = {'disp': True}
         if self.nsteps is not None:
             options['maxiter'] = self.nsteps
@@ -50,28 +52,51 @@ class BFGS(MinimizerBase):
 
         result = scipy.optimize.minimize(self.objective,
                                          self._coords_to_vector(self.mol.positions),
-                                         method='bfgs',
+                                         method=self._METHOD_NAME,
                                          jac=grad,
                                          callback=self.callback,
-                                         options=options)
+                                         options=options,
+                                         constraints=self._make_constraints())
 
         options['maxiter'] = max(options['maxiter']/5, 2)  # reduce number of steps if we need to enforce constraints
-        for i in xrange(3):  # try to satisfy constraints
-            if all(c.satisfied() for c in self.mol.constraints): break
-            self.restraint_multiplier += 0.5
-            print 'Constraints not satisfied - new restraint multiplier %f ...' % \
-                  self.restraint_multiplier
-            result = scipy.optimize.minimize(self.objective,
-                                 self._coords_to_vector(self.mol.positions),
-                                 method='bfgs',
-                                 jac=grad,
-                                 callback=self.callback,
-                                 options=options)
-        if not all(c.satisfied() for c in self.mol.constraints):
-            print 'WARNING! Constraints not satisfied'
         self.traj.info = result
+
+    def _make_constraints(self):
+        constraints = []
+        for constraint in self.mol.constraints:
+            fun, jac = self._make_constraint_funs(constraint)
+            constraints.append(dict(type='eq',
+                                    fun=fun,
+                                    jac=jac))
+        return constraints
+
+    def _make_constraint_funs(self, const):
+        def fun(v):
+            self._sync_positions(v)
+            return const.error().defunits_value()
+
+        def jac(v):
+            self._sync_positions(v)
+            return const.gradient().defunits_value().reshape(self.mol.num_atoms*3)
+
+        return fun, jac
+
+
+@exports
+class BFGS(ScipyMinimizer):
+    _METHOD_NAME = 'bfgs'
 
 
 bfgs = BFGS._as_function('bfgs')
 exports(bfgs)
 toplevel(bfgs)
+
+
+@exports
+class SLSQP(ScipyMinimizer):
+    _METHOD_NAME = 'SLSQP'
+
+
+slsqp = SLSQP._as_function('slsqp')
+exports(slsqp)
+toplevel(slsqp)

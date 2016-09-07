@@ -802,9 +802,9 @@ class MolSimulationMixin(object):
                      allexcept=['self'],
                      inject_kwargs={'assert_converged': False})
     def minimize(self, assert_converged=False, **kwargs):
-        """ Run a minimization based on the potential model.
+        """Perform an energy minimization (aka geometry optimization or relaxation).
 
-        If force_tolerance is not specified, the program defaults are used.
+        If ``force_tolerance`` is not specified, the program defaults are used.
         If specified, the largest force component must be less than force_tolerance
         and the RMSD must be less than 1/3 of it. (based on GAMESS OPTTOL keyword)
 
@@ -827,7 +827,6 @@ class MolSimulationMixin(object):
             raise NotImplementedError()
 
         return trajectory
-
 
     def _reset_methods(self):
         """
@@ -895,6 +894,8 @@ class Molecule(AtomContainer,
             (they will be copied automatically if they already belong to another molecule)
         pdbname (str): Name of the PDB file
         charge (units.Scalar[charge]): molecule's formal charge
+        electronic_state_index (int): index of the molecule's electronic state
+
 
     Examples:
         Use the ``Molecule`` class to create copies of other molecules and substructures thereof:
@@ -958,7 +959,8 @@ class Molecule(AtomContainer,
                  name=None, bond_graph=None,
                  copy_atoms=False,
                  pdbname=None,
-                 charge=None):
+                 charge=None,
+                 electronic_state_index=0):
         # NEW_FEATURE: deal with random number generators per-geometry
         # NEW_FEATURE: per-geometry output logging
         super(Molecule, self).__init__()
@@ -988,6 +990,7 @@ class Molecule(AtomContainer,
         self.constraints = []
         self.energy_model = None
         self.integrator = None
+        self.electronic_state_index = electronic_state_index
 
         self.charge = utils.if_not_none(charge, sum(atom.formal_charge for atom in self.atoms))
 

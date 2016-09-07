@@ -195,9 +195,8 @@ class MdtQuantity(ureg.Quantity):
     # backwards-compatible name
     value_in = ureg.Quantity.m_as
 
-
     def defunits_value(self):
-        return self.defunits()._magnitude
+        return self.defunits().magnitude
 
     # defunits = ureg.Quantity.to_base_units  # replacing this with the new pint implementation
     def defunits(self):

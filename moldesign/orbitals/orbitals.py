@@ -241,6 +241,9 @@ class MolecularOrbitals(object):
         return '<%d %s %s in %s>' % (len(self), self.orbtype,
                                      self.__class__.__name__, str(self.wfn))
 
+    def __getitem__(self, item):
+        return self.orbitals[item]
+
     def _to_ao_density_matrix(self):
         c = self.coeffs * self.occupations[:, None]/2.0
         return 2.0*c.T.dot(c)

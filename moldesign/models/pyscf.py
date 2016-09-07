@@ -52,6 +52,12 @@ class LazyClassMap(object):
         mod = importlib.import_module(modname)
         return getattr(mod, cls)
 
+    def __contains__(self, item):
+        return item in self.mapping
+
+    def __iter__(self):
+        return iter(self.mapping)
+
 # PySCF metadata constants
 THEORIES = LazyClassMap({'hf': 'pyscf.scf.RHF', 'rhf': 'pyscf.scf.RHF',
                          'uhf': 'pyscf.scf.UHF',
@@ -63,7 +69,8 @@ THEORIES = LazyClassMap({'hf': 'pyscf.scf.RHF', 'rhf': 'pyscf.scf.RHF',
 NEEDS_REFERENCE = set('mcscf casscf casci mp2'.split())
 NEEDS_FUNCTIONAL = set('dft rks ks uks'.split())
 IS_SCF = set('rhf uhf hf dft rks ks'.split())
-FORCE_CALCULATORS = LazyClassMap({'rhf': 'pyscf.grad.RHF', 'hf': 'pyscf.grad.RHF'})
+FORCE_CALCULATORS = LazyClassMap({'rhf': 'pyscf.grad.RHF', 'hf': 'pyscf.grad.RHF',
+                                  'rks': 'pyscf.grad.RKS', 'ks': 'pyscf.grad.RKS'})
 
 
 @exports
@@ -191,9 +198,9 @@ class PySCFPotential(QMBase):
             result['state_energies'] = (casresult[0] * u.hartree).defunits()
             result['ci_vectors'] = map(self._parse_fci_vector, casresult[2])
 
-            # potential_energy is ALWAYS the energy of the ground state
+            # potential_energy is the energy of the molecule's assigned state
             result['state_averaged_energy'] = result['potential_energy']
-            result['potential_energy'] = result['state_energies'][0]
+            result['potential_energy'] = result['state_energies'][self.mol.electronic_state_index]
             # TODO: add 'reference wavefunction' to result
             ao_obj = ref
         else:
@@ -313,7 +320,7 @@ class PySCFPotential(QMBase):
         else:
             theory = THEORIES[name](refobj)
 
-        theory.callback = StatusLogger('%s/%s procedure:' % (self.params.theory, self.params.basis),
+        theory.callback = StatusLogger('%s procedure:' % self.theoryname,
                                        ['cycle', 'e_tot'],
                                        self.logger)
 
@@ -330,6 +337,21 @@ class PySCFPotential(QMBase):
                ('1', '0'): 'a',
                ('0', '1'): 'b',
                ('1', '1'): '2'}
+
+    @property
+    def theoryname(self):
+        p = self.params
+        if p.theory == 'rks':
+            th = 'RKS(%s)' % p.functional.upper()
+        elif p.theory in ('casscf', 'casci'):
+            th = '%s(%d,%d)' % (p.theory.upper(), p.active_orbitals, p.active_electrons)
+            if p.theory == 'casscf' and p.state_average > 1:
+                th += ' SA-%d' % p.state_average
+        else:
+            th = p.theory.upper()
+
+        return '%s/%s' % (th, p.basis)
+
 
     def _parse_fci_vector(self, ci_vecmat):
         """ Translate the PySCF FCI matrix into a dictionary of configurations and weights

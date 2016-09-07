@@ -65,7 +65,7 @@ class GeometryConstraint(object):
         .. math::
             \nabla G(\mathbf r)
         """
-        grad = np.zeros(self.mol.ndims)
+        grad = np.zeros((self.mol.num_atoms, 3))
         atomvecs = self.atomgrad(*self.atoms)
         assert len(atomvecs) == len(self.atoms)
         grad = grad * atomvecs[0].get_units()
