@@ -15,6 +15,8 @@ from __future__ import absolute_import
 
 import scipy.optimize
 
+from moldesign import units as u
+
 from .base import MinimizerBase
 from . import toplevel
 
@@ -36,6 +38,8 @@ class ScipyMinimizer(MinimizerBase):
     """
     _strip_units = True
     _METHOD_NAME = None
+    _TAKES_FTOL = False
+    _TAKES_GTOL = False
 
     def run(self):
         print 'Starting geometry optimization: SciPy/%s with %s gradients'%(
@@ -48,7 +52,14 @@ class ScipyMinimizer(MinimizerBase):
         else: grad = None
 
         if self.force_tolerance is not None:
-            options['gtol'] = self.force_tolerance.defunits().magnitude
+            if self._TAKES_GTOL:
+                options['gtol'] = self.force_tolerance.defunits().magnitude
+            elif self._TAKES_FTOL:
+                print ('WARNING: this method does not use force to measure convergence; '
+                       'approximating force_tolerance keyword')
+                options['ftol'] = (self.force_tolerance * u.angstrom / 50.0).defunits_value()
+            else:
+                print ('WARNING: no convergence criteria for this method; using defaults')
 
         result = scipy.optimize.minimize(self.objective,
                                          self._coords_to_vector(self.mol.positions),
@@ -58,7 +69,6 @@ class ScipyMinimizer(MinimizerBase):
                                          options=options,
                                          constraints=self._make_constraints())
 
-        options['maxiter'] = max(options['maxiter']/5, 2)  # reduce number of steps if we need to enforce constraints
         self.traj.info = result
 
     def _make_constraints(self):
@@ -85,6 +95,7 @@ class ScipyMinimizer(MinimizerBase):
 @exports
 class BFGS(ScipyMinimizer):
     _METHOD_NAME = 'bfgs'
+    _TAKES_GTOL = True
 
 
 bfgs = BFGS._as_function('bfgs')
@@ -95,6 +106,7 @@ toplevel(bfgs)
 @exports
 class SLSQP(ScipyMinimizer):
     _METHOD_NAME = 'SLSQP'
+    _TAKES_FTOL = True
 
 
 slsqp = SLSQP._as_function('slsqp')

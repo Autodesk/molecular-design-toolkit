@@ -13,12 +13,12 @@
 # limitations under the License.
 
 from .base import MinimizerBase
-from . import toplevel, BFGS, GradientDescent
+from . import toplevel, BFGS, GradientDescent, SLSQP
 
 from moldesign import utils
 from moldesign import units as u
 
-BFGSTHRESH = 1.5 * u.eV / u.angstrom
+GDTHRESH = 1.5*u.eV/u.angstrom
 
 def exports(o):
     __all__.append(o.__name__)
@@ -29,45 +29,65 @@ __all__ = []
 @exports
 class SmartMin(MinimizerBase):
     """ Uses gradient descent until forces fall below a threshold,
-    then switches to BFGS.
+    then switches to BFGS (unconstrained) or SLSQP (constrained).
 
     Args:
-        bfgs_threshold (u.Scalar[force]): Maximum force on a single atom
+        gd_threshold (u.Scalar[force]): Use gradient descent if there are any forces larger
+           than this; use an approximate hessian method (BFGS or SLSQP) otherwise
 
     Note:
         Not really that smart.
     """
+    # TODO: use non-gradient methods if forces aren't available
 
     _strip_units = True
 
     @utils.args_from(MinimizerBase,
-                     inject_kwargs={'bfgs_threshold': BFGSTHRESH})
+                     inject_kwargs={'gd_threshold': GDTHRESH})
     def __init__(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
         super(SmartMin, self).__init__(*args, **kwargs)
-        self.bfgs_threshold = kwargs.get('bfgs_threshold', BFGSTHRESH)
+        self.gd_threshold = kwargs.get('gd_threshold', GDTHRESH)
 
     def run(self):
+        # If forces are already low, go directly to the quadratic convergence methods and return
+        forces = self.mol.calculate_forces()
+        if forces.max() <= self.gd_threshold:
+            spmin = self._make_quadratic_method()
+            spmin.run()
+            self.traj = spmin.traj
+            self.current_step = spmin.current_step
+            return
+
+        # Otherwise, remove large forces with gradient descent; exit if we pass the cycle limit
         descent_kwargs = self.kwargs.copy()
-        descent_kwargs['force_tolerance'] = self.bfgs_threshold
+        descent_kwargs['force_tolerance'] = self.gd_threshold
         descender = GradientDescent(*self.args, **descent_kwargs)
         descender.run()
-
         if descender.current_step >= self.nsteps:
             self.traj = descender.traj
             return
 
-        bfgs_kwargs = self.kwargs.copy()
-        bfgs_kwargs['_restart_from'] = descender.current_step
-        bfgs_kwargs['_restart_energy'] = descender._initial_energy
-        bfgs_kwargs.setdefault('frame_interval', descender.frame_interval)
-        bfgsmin = BFGS(*self.args, **bfgs_kwargs)
-        bfgsmin.current_step = descender.current_step
-        bfgsmin.run()
+        # Finally, use a quadratic method to converge the optimization
+        kwargs = dict(_restart_from=descender.current_step,
+                      _restart_energy=descender._initial_energy)
+        kwargs['frame_interval'] = self.kwargs.get('frame_interval',
+                                                   descender.frame_interval)
+        spmin = self._make_quadratic_method(kwargs)
+        spmin.current_step = descender.current_step
+        spmin.run()
+        self.traj = descender.traj + spmin.traj
+        self.current_step = spmin.current_step
 
-        self.traj = descender.traj + bfgsmin.traj
-        self.current_step = bfgsmin.current_step
+    def _make_quadratic_method(self, kwargs):
+        kw = self.kwargs.copy()
+        kw.update(kwargs)
+        if self.mol.constraints:
+            spmin = SLSQP(*self.args, **kw)
+        else:
+            spmin = BFGS(*self.args, **kw)
+        return spmin
 
 
 minimize = SmartMin._as_function('minimize')
