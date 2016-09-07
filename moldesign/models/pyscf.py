@@ -15,6 +15,7 @@ from __future__ import absolute_import  # prevent clashes between this and the "
 
 from cStringIO import StringIO
 
+import itertools
 from moldesign import units as u, compute, orbitals
 from moldesign.interfaces.pyscf_interface import force_remote, mol_to_pyscf, \
     StatusLogger, SPHERICAL_NAMES
@@ -61,7 +62,7 @@ THEORIES = LazyClassMap({'hf': 'pyscf.scf.RHF', 'rhf': 'pyscf.scf.RHF',
 
 NEEDS_REFERENCE = set('mcscf casscf casci mp2'.split())
 NEEDS_FUNCTIONAL = set('dft rks ks uks'.split())
-IS_SCF = set('rhf uhf hf casscf mcscf dft rks ks'.split())
+IS_SCF = set('rhf uhf hf dft rks ks'.split())
 FORCE_CALCULATORS = LazyClassMap({'rhf': 'pyscf.grad.RHF', 'hf': 'pyscf.grad.RHF'})
 
 
@@ -102,7 +103,7 @@ class PySCFPotential(QMBase):
 
         # Set up initial guess
         if self.params.wfn_guess == 'stored':
-            dm0 = self.params.initial_guess.density_matrix_a0
+            dm0 = self.params.initial_guess.density_matrix_ao
         else:
             dm0 = None
 
@@ -155,8 +156,13 @@ class PySCFPotential(QMBase):
         if self.reference is not None:
             result['reference_energy'] = (ref.e_tot*u.hartree).defunits()
             # TODO: check sign on correlation energy. Is this true for anything besides MP2?
-            result['correlation_energy'] = (kernel.e_corr *u.hartree).defunits()
-            result['potential_energy'] = result['correlation_energy'] + result['reference_energy']
+            if hasattr(kernel, 'e_corr'):
+                result['correlation_energy'] = (kernel.e_corr *u.hartree).defunits()
+                result['potential_energy'] = result['correlation_energy'] +\
+                                             result['reference_energy']
+            else:
+                result['potential_energy'] = (kernel.e_tot*u.hartree).defunits()
+
             orb_calc = ref
         else:
             result['potential_energy'] = (kernel.e_tot*u.hartree).defunits()
@@ -169,9 +175,36 @@ class PySCFPotential(QMBase):
             result['nuclear_forces'] = f_n.defunits()
             result['forces'] = result['electronic_forces'] + result['nuclear_forces']
 
-        ao_matrices = self._get_ao_matrices(orb_calc)
+        if self.params.theory in ('casscf', 'mcscf'):
+            from pyscf.mcscf import CASCI
+            casobj = CASCI(ref,
+                           self.params.active_orbitals,
+                           self.params.active_electrons)
+        elif self.params.theory == 'casci':
+            casobj = kernel
+
+        if self.params.theory in ('casscf', 'mcscf', 'casci'):
+            orb_calc = kernel  # get the orbs directly from the post-HF theory
+            casobj.fcisolver.nroots = self.params.get('num_states',
+                                                      self.params.state_average)
+            casresult = casobj.kernel()
+            result['state_energies'] = (casresult[0] * u.hartree).defunits()
+            result['ci_vectors'] = map(self._parse_fci_vector, casresult[2])
+
+            # potential_energy is ALWAYS the energy of the ground state
+            result['state_averaged_energy'] = result['potential_energy']
+            result['potential_energy'] = result['state_energies'][0]
+            # TODO: add 'reference wavefunction' to result
+            ao_obj = ref
+        else:
+            ao_obj = orb_calc
+
+        ao_matrices = self._get_ao_matrices(ao_obj)
         scf_matrices = self._get_scf_matrices(orb_calc, ao_matrices)
-        ao_pop, atom_pop = orb_calc.mulliken_pop(verbose=-1)
+        if hasattr(orb_calc, 'mulliken_pop'):
+            ao_pop, atom_pop = orb_calc.mulliken_pop(verbose=-1)
+            result['mulliken'] = DotDict({a: p for a, p in zip(self.mol.atoms, atom_pop)})
+            result['mulliken'].type = 'atomic'
 
         # Build the electronic state object
         basis = orbitals.basis.BasisSet(self.mol,
@@ -181,25 +214,31 @@ class PySCFPotential(QMBase):
                                         name=self.params.basis)
         el_state = orbitals.wfn.ElectronicWfn(self.mol,
                                               self.pyscfmol.nelectron,
-                                              aobasis=basis)
+                                              aobasis=basis,
+                                              fock_ao=scf_matrices['fock_ao'],
+                                              density_matrix_ao=scf_matrices['density_matrix_ao'])
 
         # Build and store the canonical orbitals
         cmos = []
-        for coeffs, energy, occ in zip(orb_calc.mo_coeff.T,
-                                       orb_calc.mo_energy * u.hartree,
-                                       orb_calc.get_occ()):
-            cmos.append(orbitals.Orbital(coeffs, wfn=el_state, occupation=occ))
+        for iorb, (coeffs, energy) in enumerate(zip(orb_calc.mo_coeff.T,
+                                                    orb_calc.mo_energy * u.hartree)):
+            cmos.append(orbitals.Orbital(coeffs, wfn=el_state))
+        if hasattr(orb_calc, 'get_occ'):
+            for orb, occ in zip(cmos, orb_calc.get_occ()):
+                orb.occupation = occ
         el_state.add_orbitals(cmos, orbtype='canonical')
 
         # Return the result
         result['wfn'] = el_state
         self.last_el_state = el_state
-        result['mulliken'] = DotDict({a: p for a, p in zip(self.mol.atoms, atom_pop)})
-        result['mulliken'].type = 'atomic'
         return result
 
     def prep(self, force=False):
         # TODO: spin, isotopic mass, symmetry
+        for p in 'basis theory'.split():
+            if self.params.get(p, None) is None:
+                raise ValueError('Parameter "%s" is required' % p)
+
         if self._prepped and not force: return
         self.pyscfmol = self._build_mol()
         self._prepped = True
@@ -263,7 +302,16 @@ class PySCFPotential(QMBase):
         raise orbitals.ConvergenceError(method)
 
     def _build_theory(self, name, refobj):
-        theory = THEORIES[name](refobj)
+        if name in ('mscscf', 'casci', 'casscf'):
+            theory = THEORIES[name](refobj,
+                                    self.params.active_orbitals,
+                                    self.params.active_electrons)
+
+            if name != 'casci':
+                theory = theory.state_average_([1.0/self.params.state_average
+                                                for i in xrange(self.params.state_average)])
+        else:
+            theory = THEORIES[name](refobj)
 
         theory.callback = StatusLogger('%s/%s procedure:' % (self.params.theory, self.params.basis),
                                        ['cycle', 'e_tot'],
@@ -273,18 +321,56 @@ class PySCFPotential(QMBase):
             theory.max_cycle = self.params.scf_cycles
 
         if 'functional' in self.params:
-            self._assign_functional(theory, name, self.params.get('functional', None))
+            self._assign_functional(theory, name,
+                                    self.params.get('functional', None))
 
         return theory
 
-    def _assign_functional(self, kernel, theory, fname):
+    _OCCMAP = {('0', '0'): '0',
+               ('1', '0'): 'a',
+               ('0', '1'): 'b',
+               ('1', '1'): '2'}
+
+    def _parse_fci_vector(self, ci_vecmat):
+        """ Translate the PySCF FCI matrix into a dictionary of configurations and weights
+
+        Args:
+            ci_vecmat (np.ndarray): ci vector from a PySCF FCI calculation
+
+        Returns:
+            Mapping[str, float]: dictionary of configuration weights (normalized) organized by
+                configuration label. Configurations labeled by their active space orbital
+                occupations: 0 (unoccupied), a (alpha electron only), b (beta electron only), or '2'
+                (doubly occupied)
+
+        Example:
+            >>> import numpy as np
+            >>> model = PySCFPotential(active_orbitals=2, active_electrons=2)
+            >>> model._parse_fci_vector(np.array([[1.0, 2.0],[3.0, 4.0]]))
+            {'20': 1.0,
+             'ba': 2.0,
+             'ab': 3.0,
+             '02': 4.0}
+        """
+        from pyscf.fci import cistring
+        conf_bin = cistring.gen_strings4orblist(range(self.params.active_orbitals),
+                                                self.params.active_electrons/2)
+        civecs = {}
+        for i, ca in enumerate(conf_bin):
+            for j, cb in enumerate(conf_bin):
+                astring = bin(ca)[2:].zfill(self.params.active_orbitals)
+                bstring = bin(cb)[2:].zfill(self.params.active_orbitals)
+                s = ''.join(reversed([self._OCCMAP[a, b] for a, b in zip(astring, bstring)]))
+                civecs[s] = ci_vecmat[i, j]
+        return civecs
+
+    @staticmethod
+    def _assign_functional(kernel, theory, fname):
         if theory in NEEDS_FUNCTIONAL:
             if fname is not None:
                 kernel.xc = fname
             else:
                 raise ValueError('No functional specified for reference theory "%s"' % theory)
-        #elif fname is not None:
-            #raise ValueError('Functional specified for non-DFT theory "%s"' % theory)
 
     def _get_ao_basis_functions(self):
         """ Convert pyscf basis functions into a list of atomic basis functions
@@ -298,7 +384,6 @@ class PySCFPotential(QMBase):
 
         Returns:
             List[moldesign.Gaussians.AtomicBasisFunction]
-
         """
         bfs = []
         pmol = self.pyscfmol
@@ -354,3 +439,4 @@ class PySCFPotential(QMBase):
                             fock_ao=fock)
         scf_matrices.update(ao_mats)
         return scf_matrices
+

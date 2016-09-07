@@ -141,7 +141,7 @@ mm_model_parameters = named_dict([
 ])
 
 
-QMTHEORIES = ['rhf', 'rks', 'mp2', 'casscf', 'casci' 'fci']
+QMTHEORIES = ['rhf', 'rks', 'mp2', 'casscf', 'casci', 'fci']
 BASISSETS = ['3-21g', '4-31g', '6-31g', '6-31g*', '6-31g**',
              '6-311g', '6-311g*', '6-311g+', '6-311g*+',
              'sto-3g', 'sto-6g', 'minao', 'weigend',
@@ -157,6 +157,12 @@ qm_model_parameters = named_dict([
     Parameter('functional', 'DFT Functional', default='b3lyp',
               choices=FUNCTIONALS,  # TODO: allow separate x and c functionals
               relevance=WhenParam('theory', isin, 'dft rks ks uks'.split())),
+    Parameter('active_electrons', 'Active electrons', type=int,
+              relevance=WhenParam('theory', isin, ['casscf', 'mcscf', 'casci'])),
+    Parameter('active_orbitals', 'Active orbitals', type=int,
+              relevance=WhenParam('theory', isin, ['casscf', 'mcscf', 'casci'])),
+    Parameter('state_average', 'States to average for SCF', type=int, default=1,
+              relevance=WhenParam('theory', isin, ['casscf', 'mcscf'])),
     Parameter('basis', 'Basis set', choices=BASISSETS),
     Parameter('wfn_guess', 'Starting guess method', default='huckel',
               choices=['huckel', 'minao', 'stored']),
