@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from .base import MinimizerBase
-from . import toplevel, BFGS, GradientDescent, SLSQP
+from . import toplevel, BFGS, GradientDescent, SequentialLeastSquares
 
 from moldesign import utils
 from moldesign import units as u
@@ -84,7 +84,7 @@ class SmartMin(MinimizerBase):
         kw = self.kwargs.copy()
         kw.update(kwargs)
         if self.mol.constraints:
-            spmin = SLSQP(*self.args, **kw)
+            spmin = SequentialLeastSquares(*self.args, **kw)
         else:
             spmin = BFGS(*self.args, **kw)
         return spmin

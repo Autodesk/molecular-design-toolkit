@@ -104,11 +104,11 @@ toplevel(bfgs)
 
 
 @exports
-class SLSQP(ScipyMinimizer):
+class SequentialLeastSquares(ScipyMinimizer):
     _METHOD_NAME = 'SLSQP'
     _TAKES_FTOL = True
 
 
-slsqp = SLSQP._as_function('slsqp')
-exports(slsqp)
-toplevel(slsqp)
+sequential_least_squares = SequentialLeastSquares._as_function('sequential_least_squares')
+exports(sequential_least_squares)
+toplevel(sequential_least_squares)
