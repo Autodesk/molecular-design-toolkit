@@ -41,7 +41,7 @@ class BondSelector(SelBase):
                                             height=150)
 
         traitlets.directional_link(
-            (self.viewer, 'selected_atoms'),
+            (self.viewer, 'selected_atom_indices'),
             (self.bond_list, 'options'),
             self._atoms_to_bonds
         )
@@ -102,7 +102,7 @@ class ResidueSelector(SelBase):
 
         self.residue_listname = ipy.HTML('<b>Selected residues:</b>')
         self.residue_list = ipy.SelectMultiple(options=list(), height=150)
-        traitlets.directional_link((self.viewer, 'selected_atoms'), (self.residue_list, 'options'), self._atoms_to_residues)
+        traitlets.directional_link((self.viewer, 'selected_atom_indices'), (self.residue_list, 'options'), self._atoms_to_residues)
         self.residue_list.observe(self.remove_atomlist_highlight, 'value')
         self.atom_list.observe(self.remove_reslist_highlight, 'value')
 
@@ -114,7 +114,7 @@ class ResidueSelector(SelBase):
                                   self.residue_list]
 
     # Returns a list of all residues indicated in the set of atoms
-    def _atoms_to_residues(self, selected_atoms):
+    def _atoms_to_residues(self, selected_atom_indices):
         # Get all residues and their total number of atoms
         residues = dict()
         for atom in self.mol.atoms:
@@ -127,7 +127,7 @@ class ResidueSelector(SelBase):
 
         # Get the total number of selected atoms per residue and compare to total
         selected_residues = set()
-        for atomIndex in selected_atoms:
+        for atomIndex in selected_atom_indices:
             atom = self.mol.atoms[atomIndex]
             if 'selected_count' in residues[atom.residue.index]:
                 residues[atom.residue.index]['selected_count'] += 1

@@ -67,7 +67,6 @@ class ChemicalGraphViewer(MolViz2DBaseWidget, ColorMixin):
         self.selection_group = None
         self.selection_id = None
         super(ChemicalGraphViewer, self).__init__(self.atoms, **kwargs)
-        self.set_click_callback(callback=self.handle_click)
         if display: dsp.display(self)
 
     def __reduce__(self):
@@ -100,11 +99,6 @@ class ChemicalGraphViewer(MolViz2DBaseWidget, ColorMixin):
 
     def unset_color(self, atoms=None, render=None):
         self.set_color('white', atoms)
-
-    def handle_click(self, trait_name, old, new):
-        clicked_atoms = [self.atoms[new]]
-        if self.selection_group:
-            self.selection_group.update_selections(self, {'atoms': clicked_atoms})
 
     def handle_selection_event(self, selection):
         """ Highlight atoms in response to a selection event

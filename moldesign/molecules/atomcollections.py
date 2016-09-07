@@ -21,6 +21,7 @@ import moldesign as mdt
 from moldesign import units as u
 from moldesign import utils, external, mathutils
 from . import toplevel
+from traitlets import link
 
 
 class AtomContainer(object):
@@ -239,6 +240,7 @@ class AtomContainer(object):
                                 show_hydrogens=show_2dhydrogens)
             viz3d = self.draw3d(width=width, height=height,
                                 display=False)
+            link((viz3d, 'selected_atom_indices'), (viz2d, 'selected_atom_indices'))
             views = ipy.HBox([viz2d, viz3d])
         else:
             views = self.draw3d(display=False)
