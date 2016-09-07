@@ -15,6 +15,9 @@ registered_types = {}
 #       honored, test that it calcultes what it says it does, test that properties have the right
 #       units and array shapes, etc.
 
+# step for numerical derivative testing
+NUMDX = 0.0000005 * u.angstrom
+
 
 def typedfixture(*types, **kwargs):
     """This is a decorator that lets us associate fixtures with one or more arbitrary types.
@@ -119,6 +122,48 @@ def test_dihedral_sign_convention(four_particle_45_twist):
                                    315.0,
                                    decimal=8)
 
+
+def test_dihedral_gradient(four_particle_45_twist):
+    mol = four_particle_45_twist
+    calc_grad = u.array(mdt.dihedral_gradient(*mol.atoms)).defunits()
+    grads = np.zeros((4, 3)) * u.radian / u.angstrom
+    for iatom, atom in enumerate(mol.atoms):
+        apos = atom.position
+        for idim in xrange(3):
+            atom.position[idim] += NUMDX
+            dplus = mdt.dihedral(*mol.atoms)
+            atom.position[idim] -= 2.0 * NUMDX
+            dminus = mdt.dihedral(*mol.atoms)
+            grads[iatom, idim] = (dplus-dminus) / (2.0*NUMDX)
+            atom.position = apos
+
+    np.testing.assert_allclose(calc_grad.defunits_value(),
+                               grads.defunits_value(),
+                               atol=5.0*NUMDX.defunits_value())
+
+
+def test_dihedral_gradient_sign_convention(four_particle_45_twist):
+    mol = four_particle_45_twist
+    mol.atoms[-1].y += 0.4 * u.nm
+
+    calc_grad = u.array(mdt.dihedral_gradient(*mol.atoms)).defunits()
+    grads = np.zeros((4, 3)) * u.radian / u.angstrom
+    for iatom, atom in enumerate(mol.atoms):
+        apos = atom.position
+        for idim in xrange(3):
+            atom.position[idim] += NUMDX
+            dplus = mdt.dihedral(*mol.atoms)
+            atom.position[idim] -= 2.0 * NUMDX
+            dminus = mdt.dihedral(*mol.atoms)
+            grads[iatom, idim] = (dplus-dminus) / (2.0*NUMDX)
+            atom.position = apos
+
+    np.testing.assert_allclose(calc_grad.defunits_value(),
+                               grads.defunits_value(),
+                               atol=5.0*NUMDX.defunits_value())
+
+
+
 ########################
 # Angles               #
 ########################
@@ -129,7 +174,24 @@ def test_angle_measure(three_particle_right_angle):
                                    decimal=8)
 
 
+def test_angle_gradient(three_particle_right_angle):
+    mol = three_particle_right_angle
 
+    calc_grad = u.array(mdt.angle_gradient(*mol.atoms)).defunits()
+    grads = np.zeros((3, 3)) * u.radian / u.angstrom
+    for iatom, atom in enumerate(mol.atoms):
+        apos = atom.position
+        for idim in xrange(3):
+            atom.position[idim] += NUMDX
+            dplus = mdt.angle(*mol.atoms)
+            atom.position[idim] -= 2.0 * NUMDX
+            dminus = mdt.angle(*mol.atoms)
+            grads[iatom, idim] = (dplus-dminus) / (2.0*NUMDX)
+            atom.position = apos
+
+    np.testing.assert_allclose(calc_grad.defunits_value(),
+                               grads.defunits_value(),
+                               atol=5.0*NUMDX.defunits_value())
 
 
 ########################
@@ -183,3 +245,25 @@ def test_center_of_mass(four_particle_45_twist):
     desired_com_angstroms = np.array([0.1+0.4, -0.4, 0.0]) * 10.0 / 6.0
     np.testing.assert_almost_equal(mol.center_of_mass.defunits_value(),
                                    desired_com_angstroms)
+
+
+def test_distance_gradient(three_particle_right_angle):
+    mol = three_particle_right_angle
+
+    atoms = mol.atoms[:2]
+
+    calc_grad = u.array(mdt.distance_gradient(*atoms))
+    grads = np.zeros((2, 3))
+    for iatom, atom in enumerate(atoms):
+        apos = atom.position
+        for idim in xrange(3):
+            atom.position[idim] += NUMDX
+            dplus = mdt.distance(*atoms)
+            atom.position[idim] -= 2.0 * NUMDX
+            dminus = mdt.distance(*atoms)
+            grads[iatom, idim] = (dplus-dminus) / (2.0*NUMDX)
+            atom.position = apos
+
+    np.testing.assert_allclose(calc_grad,
+                               grads,
+                               atol=5.0*NUMDX.defunits_value())

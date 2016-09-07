@@ -96,4 +96,4 @@ def dihedral_gradient(a1, a2, a3, a4):
     vec2 = vec1 * (pijkj - 1.0) - vec4 * pklkj
     vec3 = vec4 * (pklkj - 1.0) - vec1 * pijkj
 
-    return vec1 * u.radians, vec2 * u.radians, vec3 * u.radians, vec4 * u.radians
+    return -vec1 * u.radians, -vec2 * u.radians, -vec3 * u.radians, -vec4 * u.radians
