@@ -46,7 +46,7 @@ class MdtQuantity(ureg.Quantity):
     This is a 'patched' version of pint's quantities that can be pickled (slightly hacky)
     and supports more numpy operations.
     Users should never need to instantiate this directly - instead, construct
-    BuckyBall quantities by multiplying numbers/arrays with the pre-defined units
+    MDT quantities by multiplying numbers/arrays with the pre-defined units
 
     Examples:
         >>> 5.0 * units.femtoseconds
@@ -96,8 +96,7 @@ class MdtQuantity(ureg.Quantity):
                 if self.dimensionless:  # case 1: this is OK if self is dimensionless
                     self.magnitude[key] = value
                 else:  # case 2: User tried to pass a number without units
-                    raise DimensionalityError('%s cannot be assigned to array with dimensions %s' %
-                                              (value, self.units))
+                    raise DimensionalityError(self.units, ureg.dimensionless)
             else:  # case 3: attribute error is unrelated to this
                 raise
 
@@ -156,7 +155,8 @@ class MdtQuantity(ureg.Quantity):
         return units * np.linalg.norm(self._magnitude)
 
     def dot(self, other):
-        """Compute norm but respect units
+        """ Dot product that correctly multiplies units
+
         Returns:
             MdtQuantity
         """

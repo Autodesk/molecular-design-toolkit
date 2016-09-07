@@ -80,7 +80,8 @@ class SmartMin(MinimizerBase):
         self.traj = descender.traj + spmin.traj
         self.current_step = spmin.current_step
 
-    def _make_quadratic_method(self, kwargs):
+    def _make_quadratic_method(self, kwargs=None):
+        if kwargs is None: kwargs = {}
         kw = self.kwargs.copy()
         kw.update(kwargs)
         if self.mol.constraints:

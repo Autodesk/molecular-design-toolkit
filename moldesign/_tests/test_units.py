@@ -66,8 +66,66 @@ def test_scalar_comparisons_to_zero_ignore_units():
     assert num > 0.0 * units.angstrom
     assert num > 0.0 * units.nm
 
+    with pytest.raises(units.DimensionalityError):
+        num > 0.0 * units.fs
+
 
 def test_array_comparisons_to_zero_ignore_units():
     num = [1, -2, 0]*units.angstrom
     assert ((num > 0) == [True, False, False]).all()
     assert ((num == 0) == [False, False, True]).all()
+
+
+def test_dimensionless_array_operations():
+    arr = np.arange(5) * units.ureg.dimensionless
+    assert (arr == [0, 1, 2, 3, 4]).all()
+
+    arr[1:5] = [100, 101, 102, 103]
+    assert (arr == [0, 100, 101, 102, 103]).all()
+
+    assert arr[4].units == units.ureg.dimensionless
+    assert arr[:3].units == units.ureg.dimensionless
+
+
+def test_dimensionless_array_unit_checks():
+    arr = np.arange(5) * units.ureg.dimensionless
+
+    with pytest.raises(units.DimensionalityError):
+        arr[0] = 5.0 * units.angstrom
+
+    with pytest.raises(units.DimensionalityError):
+        arr[:] = np.arange(5, 10) * units.angstrom
+
+    arr[:] = np.arange(5, 10)
+    assert (arr == np.arange(5, 10)).all()
+
+    arr[:] = np.arange(10, 15) * units.ureg.dimensionless
+    assert (arr == np.arange(10, 15)).all()
+
+
+def test_array_unit_checks():
+    arr = np.arange(5) * units.ureg.nm / units.ureg.fs
+
+    with pytest.raises(units.DimensionalityError):
+        arr[0] = 5.0 * units.angstrom
+
+    with pytest.raises(units.DimensionalityError):
+        arr[3] = 5.0
+
+    with pytest.raises(units.DimensionalityError):
+        arr[:] = np.arange(5, 10) * units.fs
+
+    arr[2:3] = np.arange(5, 6) * units.ureg.angstrom / units.ureg.fs
+    np.testing.assert_allclose(arr[2:3].magnitude,
+                               np.arange(5, 6)/10.0)
+
+    arr[:] = np.arange(10, 15) * units.ureg.micrometers / units.ureg.picoseconds
+    np.testing.assert_allclose(arr.magnitude,
+                               np.arange(10, 15))
+
+def test_default_unit_conversions():
+    assert abs(10.0 - (1.0*units.nm).defunits_value()) < 1e-10
+    assert abs(1000.0 - (1.0*units.ps).defunits_value()) < 1e-10
+    assert abs(1.0 - 6.022140857e23/((1.0*units.ureg.grams).defunits_value())) < 1e-6
+    assert abs(103.642685491 - (1.0*units.angstrom**2*units.dalton/units.fs**2).defunits_value()
+               ) < 1e-7

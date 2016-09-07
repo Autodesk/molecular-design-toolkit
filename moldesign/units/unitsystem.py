@@ -67,9 +67,10 @@ class UnitSystem(object):
         self._momentum = f
 
     def convert(self, quantity):
-        """
-        Convert a quantity into this unit system
-        @param quantity: moldesign.external.pint.Quantity
+        """ Convert a quantity into this unit system
+
+        Args:
+            quantity (MdtQuantity): quantity to convert
         """
         baseunit = self.get_baseunit(quantity)
         if isinstance(baseunit, int):
