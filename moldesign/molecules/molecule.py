@@ -205,7 +205,7 @@ class MolPropertyMixin(object):
 
         for constraint in self.constraints:  # TODO: deal with more double-counting cases
             if const_hbonds:
-                if isinstance(constraint, mdt.DistanceConstraint):
+                if isinstance(constraint, mdt.geom.DistanceConstraint):
                     # don't double-count constrained hbonds
                     if constraint.a1.atnum == 1 or constraint.a2.atnum == 1: continue
             df -= constraint.dof
@@ -995,7 +995,12 @@ class Molecule(AtomContainer,
         self.integrator = None
         self.electronic_state_index = electronic_state_index
 
-        self.charge = utils.if_not_none(charge, sum(atom.formal_charge for atom in self.atoms))
+        if charge is not None:
+            self.charge = charge
+            if not hasattr(charge, 'units'):  # assume fundamental charge units if not explicitly set
+                self.charge *= u.q_e
+        else:
+            self.charge = sum(atom.formal_charge for atom in self.atoms)
 
         # Builds the internal memory structures
         self.chains = Instance(molecule=self)

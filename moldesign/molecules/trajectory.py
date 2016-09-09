@@ -401,7 +401,7 @@ class Trajectory(object):
     #                 allexcept=['traj'],
     #                 append_docstring_description=True)
     def write(self, *args, **kwargs):
-        return mdt.converters.write_trajectory(self, *args, **kwargs)
+        return mdt.fileio.write_trajectory(self, *args, **kwargs)
 
     def plot(self, x, y, **kwargs):
         """ Create a matplotlib plot of property x against property y

@@ -153,7 +153,7 @@ class Residue(Entity):
         The topologies here assume pH7.4 and may need to be corrected for other pHs
 
         See Also:
-            :ref:`moldesign.Chain.assign_biopolymer_bonds`
+            :ref:`moldesign.Chain.assign_biopolymer_bonds` for assigning inter-residue bonds
 
         Raises:
             ValueError: if ``residue.resname`` is not in bioresidue templates
