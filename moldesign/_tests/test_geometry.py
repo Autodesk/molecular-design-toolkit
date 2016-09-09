@@ -9,6 +9,8 @@ import numpy as np
 import moldesign as mdt
 from moldesign import units as u
 
+from . import helpers
+
 registered_types = {}
 
 # TODO: automated method testing based on its metadata - i.e. test to make sure parameters are
@@ -16,7 +18,6 @@ registered_types = {}
 #       units and array shapes, etc.
 
 # step for numerical derivative testing
-NUMDX = 0.0000005 * u.angstrom
 
 
 def typedfixture(*types, **kwargs):
@@ -122,46 +123,30 @@ def test_dihedral_sign_convention(four_particle_45_twist):
                                    315.0,
                                    decimal=8)
 
+# TODO: test behavior at discontinuities (180, -180)
 
 def test_dihedral_gradient(four_particle_45_twist):
     mol = four_particle_45_twist
-    calc_grad = u.array(mdt.dihedral_gradient(*mol.atoms)).defunits()
-    grads = np.zeros((4, 3)) * u.radian / u.angstrom
-    for iatom, atom in enumerate(mol.atoms):
-        apos = atom.position
-        for idim in xrange(3):
-            atom.position[idim] += NUMDX
-            dplus = mdt.dihedral(*mol.atoms)
-            atom.position[idim] -= 2.0 * NUMDX
-            dminus = mdt.dihedral(*mol.atoms)
-            grads[iatom, idim] = (dplus-dminus) / (2.0*NUMDX)
-            atom.position = apos
+
+    dihe = mdt.DihedralMonitor(*mol.atoms)
+    calc_grad = dihe.gradient()
+    num_grad = helpers.num_grad(mol, lambda: dihe.value)
 
     np.testing.assert_allclose(calc_grad.defunits_value(),
-                               grads.defunits_value(),
-                               atol=5.0*NUMDX.defunits_value())
+                               num_grad.defunits_value(),
+                               atol=5.0*helpers.DEFSTEP.defunits_value())
 
 
 def test_dihedral_gradient_sign_convention(four_particle_45_twist):
     mol = four_particle_45_twist
     mol.atoms[-1].y += 0.4 * u.nm
+    dihe = mdt.DihedralMonitor(*mol.atoms)
+    calc_grad = dihe.gradient()
+    num_grad = helpers.num_grad(mol, lambda: dihe.value)
 
-    calc_grad = u.array(mdt.dihedral_gradient(*mol.atoms)).defunits()
-    grads = np.zeros((4, 3)) * u.radian / u.angstrom
-    for iatom, atom in enumerate(mol.atoms):
-        apos = atom.position
-        for idim in xrange(3):
-            atom.position[idim] += NUMDX
-            dplus = mdt.dihedral(*mol.atoms)
-            atom.position[idim] -= 2.0 * NUMDX
-            dminus = mdt.dihedral(*mol.atoms)
-            grads[iatom, idim] = (dplus-dminus) / (2.0*NUMDX)
-            atom.position = apos
-
-    np.testing.assert_allclose(calc_grad.defunits_value(),
-                               grads.defunits_value(),
-                               atol=5.0*NUMDX.defunits_value())
-
+    np.testing.assert_allclose(calc_grad,
+                               num_grad,
+                               atol=5.0*helpers.DEFSTEP.defunits_value())
 
 
 ########################
@@ -177,21 +162,14 @@ def test_angle_measure(three_particle_right_angle):
 def test_angle_gradient(three_particle_right_angle):
     mol = three_particle_right_angle
 
-    calc_grad = u.array(mdt.angle_gradient(*mol.atoms)).defunits()
-    grads = np.zeros((3, 3)) * u.radian / u.angstrom
-    for iatom, atom in enumerate(mol.atoms):
-        apos = atom.position
-        for idim in xrange(3):
-            atom.position[idim] += NUMDX
-            dplus = mdt.angle(*mol.atoms)
-            atom.position[idim] -= 2.0 * NUMDX
-            dminus = mdt.angle(*mol.atoms)
-            grads[iatom, idim] = (dplus-dminus) / (2.0*NUMDX)
-            atom.position = apos
+    ang = mdt.AngleMonitor(*mol.atoms)
+    assert abs(ang.value.value_in(u.degrees) - 90.0) <= 1.0e-8
+    calc_grad = ang.gradient()
+    num_grad = helpers.num_grad(mol, lambda:ang.value)
 
     np.testing.assert_allclose(calc_grad.defunits_value(),
-                               grads.defunits_value(),
-                               atol=5.0*NUMDX.defunits_value())
+                               num_grad.defunits_value(),
+                               atol=5.0*helpers.DEFSTEP.defunits_value())
 
 
 ########################
@@ -250,24 +228,15 @@ def test_center_of_mass(four_particle_45_twist):
 def test_distance_gradient(three_particle_right_angle):
     mol = three_particle_right_angle
 
-    atoms = mol.atoms[:2]
+    dist = mdt.DistanceMonitor(*mol.atoms[:2])
+    assert dist.value == mol.atoms[0].distance(mol.atoms[1])
 
-    calc_grad = u.array(mdt.distance_gradient(*atoms))
-    grads = np.zeros((2, 3))
-    for iatom, atom in enumerate(atoms):
-        apos = atom.position
-        for idim in xrange(3):
-            atom.position[idim] += NUMDX
-            dplus = mdt.distance(*atoms)
-            atom.position[idim] -= 2.0 * NUMDX
-            dminus = mdt.distance(*atoms)
-            grads[iatom, idim] = (dplus-dminus) / (2.0*NUMDX)
-            atom.position = apos
+    calc_grad = dist.gradient()
+    num_grad = helpers.num_grad(mol, lambda:dist.value)
 
-    np.testing.assert_allclose(calc_grad,
-                               grads,
-                               atol=5.0*NUMDX.defunits_value())
-
+    np.testing.assert_allclose(calc_grad.defunits_value(),
+                               num_grad.defunits_value(),
+                               atol=5.0*helpers.DEFSTEP.defunits_value())
 
 #########################
 # Utilities             #

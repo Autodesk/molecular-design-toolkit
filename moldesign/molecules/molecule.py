@@ -398,6 +398,8 @@ class MolDrawingMixin(object):
             mdt.orbitals.OrbitalViewer
         """
         from moldesign.widgets.orbitals import OrbitalViewer
+        if 'wfn' not in self.properties:
+            self.calculate_wfn()
         return OrbitalViewer(self, **kwargs)
 
 

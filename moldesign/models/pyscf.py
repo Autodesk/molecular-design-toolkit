@@ -93,7 +93,6 @@ class PySCFPotential(QMBase):
         self.reference = None
         self.kernel = None
         self.logs = StringIO()
-        self.last_el_state = None
         self.logger = uibase.Logger('PySCF interface')
 
     @compute.runsremotely(enable=force_remote, is_imethod=True)
@@ -237,7 +236,6 @@ class PySCFPotential(QMBase):
 
         # Return the result
         result['wfn'] = el_state
-        self.last_el_state = el_state
         return result
 
     def prep(self, force=False):

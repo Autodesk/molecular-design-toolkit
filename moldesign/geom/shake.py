@@ -19,7 +19,7 @@ from moldesign import units as u
 from .constraints import FixedCoordinate, FixedPosition
 
 
-def shake_position(mol, prev_positions, max_cycles=100, use_masses=True):
+def shake_positions(mol, prev_positions, max_cycles=100, use_masses=True):
     """ Satisfy all molecular constraints using the SHAKE algorithm
 
     Args:
@@ -35,6 +35,7 @@ def shake_position(mol, prev_positions, max_cycles=100, use_masses=True):
             Eur Phys J Spec Top. 2011 Nov 1; 200(1): 211.
             doi:10.1140/epjst/e2011-01525-9
     """
+    # TODO: store constraint forces in the molecule
     constraints = []
     for c in mol.constraints:  # Replace FixedPosition with 3 FixedCoordinates - it's better behaved
         if isinstance(c, FixedPosition):
@@ -79,8 +80,8 @@ def shake_position(mol, prev_positions, max_cycles=100, use_masses=True):
         multipliers = np.linalg.solve(A, values)
 
         # reapply units and adjust positions
-        delta = multipliers.dot(prevgrad).reshape(mol.num_atoms, 3) * \
-                u.default.mass * u.default.length
+        delta = multipliers.dot(prevgrad).reshape(mol.num_atoms, 3) * (
+            u.default.mass * u.default.length)
 
         mol.positions -= delta/dim_masses
 
