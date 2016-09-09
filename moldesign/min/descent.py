@@ -57,19 +57,6 @@ class GradientDescent(MinimizerBase):
         self._last_energy = None
 
     def run(self):
-        self.run_once()
-        self.nsteps = max(self.nsteps / 5, 2)
-        for i in xrange(3):  # try to satisfy constraints
-            if all(c.satisfied() for c in self.mol.constraints): break
-            self.restraint_multiplier += 0.5
-            print '\nWarning: constraints not satisfied - new restraint multiplier %f ...' % \
-                  self.restraint_multiplier
-            self.run_once()
-
-        if not all(c.satisfied() for c in self.mol.constraints):
-            print 'WARNING! Constraints not satisfied'
-
-    def run_once(self):
         print 'Starting geometry optimization: built-in gradient descent'
         lastproperties = self.mol.calculate()
         lastenergy = self.objective(self._coords_to_vector(self.mol.positions))

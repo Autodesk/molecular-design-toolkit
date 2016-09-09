@@ -70,8 +70,6 @@ def shake_position(mol, prev_positions, max_cycles=100, use_masses=True):
         else:
             return  # e.g., we're done
 
-        print ' '.join([str(c.error()) for c in constraints])
-
         # Get constraint derivatives
         # Note: we remove units here because pint does not handle arrays with heterogeneous units
         values = np.array([c.error().defunits_value() for c in constraints])

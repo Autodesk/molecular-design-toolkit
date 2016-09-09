@@ -39,7 +39,47 @@ class Monitor(object):
 
     @mdt.utils.kwargs_from(constraints.GeometryConstraint)
     def constrain(self, **kwargs):
-        return self.CONSTRAINT(*self.atoms, **kwargs)
+        """ Constrain this coordinate.
+
+        This will add a new item to the parent molecule's constraint list.
+
+        Args:
+            **kwargs (dict): kwargs for constraints.GeometryConstraint
+
+        Returns:
+            constraints.GeometryConstraint: the constraint object
+        """
+        c = self.CONSTRAINT(*self.atoms, **kwargs)
+        mol = self.atoms[0].molecule
+        for atom in mol.atoms[1:]:
+            if atom.molecule is not mol:
+                raise ValueError("Can't create constraint; atoms are not part of the same Molecule")
+        mol.constraints.append(c)
+        return c
+
+    def __call__(self, obj):
+        """ Calculate this value for the given trajectory
+
+        Args:
+            obj (mdt.Molecule or mdt.Trajectory): molecule or trajectory to measure
+
+        Returns:
+            moldesign.units.Quantity: this coordinate's value (for a molecule), or a list of values
+               (for a trajectory)
+
+        Note:
+            Atoms are identified by their index only; the atoms defined in the Monitor must have
+            the same indices as those in the passed object
+        """
+        return self.GETTER(*(obj.atoms[a.index] for a in self.atoms))
+
+    def __str__(self):
+        return '%s: %s' % (type(self).__name__, self.value)
+
+    def __repr__(self):
+        return '<%s for atoms %s: %s>' % (type(self).__name__,
+                                                ','.join(str(atom.index) for atom in self.atoms),
+                                                self.value)
 
 
 @toplevel
@@ -57,7 +97,7 @@ class AngleMonitor(Monitor):
     GETTER = staticmethod(coords.angle)
     SETTER = staticmethod(setcoord.set_angle)
     GRAD = staticmethod(grads.angle_gradient)
-    COSTRAINT = constraints.AngleConstraint
+    CONSTRAINT = constraints.AngleConstraint
 
 
 @toplevel
