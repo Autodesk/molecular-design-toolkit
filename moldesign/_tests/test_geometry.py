@@ -267,3 +267,27 @@ def test_distance_gradient(three_particle_right_angle):
     np.testing.assert_allclose(calc_grad,
                                grads,
                                atol=5.0*NUMDX.defunits_value())
+
+
+#########################
+# Utilities             #
+#########################
+def test_sub_angles():
+    from moldesign.geom import sub_angles
+    np.testing.assert_allclose(sub_angles(np.pi*u.radian, np.pi/2.0*u.radian),
+                               np.pi/2.0 * u.radian)
+
+    np.testing.assert_allclose(sub_angles(360*u.degrees, 179*u.degrees),
+                               -179*u.degrees)
+
+    np.testing.assert_allclose(sub_angles(360*u.degrees, 3*u.degrees),
+                               -3*u.degrees)
+
+    np.testing.assert_allclose(sub_angles(720*u.degrees, -360*u.degrees),
+                               0*u.degrees)
+
+    np.testing.assert_allclose(sub_angles(180*u.degrees, 270*u.degrees),
+                               -90*u.degrees)
+
+    np.testing.assert_allclose(sub_angles(270*u.degrees, 0*u.degrees),
+                               -90*u.degrees)

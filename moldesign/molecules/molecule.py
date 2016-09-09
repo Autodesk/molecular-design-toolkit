@@ -126,7 +126,7 @@ class MolConstraintMixin(object):
             angle ([angle]): angle value (default: current angle)
 
         Returns:
-            moldesign.geometry.AngleConstraint: constraint object
+            moldesign.geom.AngleConstraint: constraint object
         """
         from moldesign import geom
         self.constraints.append(
@@ -921,6 +921,7 @@ class Molecule(AtomContainer,
             accessed as ``mol.chains[list_index]`` or ``mol.chains[chain_name]``
         name (str): A descriptive name for molecule
         charge (units.Scalar[charge]): molecule's formal charge
+        constraints (List[moldesign.geom.GeometryConstraint]): list of constraints
         ndims (int): length of the positions, momenta, and forces arrays (usually 3*self.num_atoms)
         num_atoms (int): number of atoms (synonym: natoms)
         num_bonds (int): number of bonds (synonym: nbonds)
