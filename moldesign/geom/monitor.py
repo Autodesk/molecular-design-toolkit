@@ -102,6 +102,11 @@ class AngleMonitor(Monitor):
 
 @toplevel
 class DihedralMonitor(Monitor):
+    def __init__(self, *atoms):
+        if len(atoms) in (1, 2):
+            atoms = coords._infer_dihedral(*atoms)
+        super(DihedralMonitor, self).__init__(*atoms)
+
     NUM_ATOMS = 4
     GETTER = staticmethod(coords.dihedral)
     SETTER = staticmethod(setcoord.set_dihedral)
