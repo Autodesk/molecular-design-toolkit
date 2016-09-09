@@ -21,6 +21,8 @@ from cStringIO import StringIO
 
 import numpy as np
 
+import moldesign as mdt
+
 BioAssembly = collections.namedtuple('BioAssembly', 'desc chains transforms')
 
 
@@ -133,8 +135,10 @@ def get_conect_records(pdbfile):
     conect = {}
     for line in pdbfile:
         fields = line.split()
-        if len(fields) == 0: continue
-        if fields[0] != 'CONECT': continue
+        if len(fields) == 0:
+            continue
+        if fields[0] != 'CONECT':
+            continue
 
         atombonds = conect.setdefault(int(fields[1]), {})
         for f in fields[2:6]:  # TODO: check the end bound
@@ -224,7 +228,6 @@ def assign_biopolymer_bonds(mol):
     References:
         http://www.wwpdb.org/data/ccd
     """
-
     for chain in mol.chains:
         try:
             chain.assign_biopolymer_bonds()
@@ -236,3 +239,59 @@ def assign_biopolymer_bonds(mol):
         except KeyError:
             print('WARNING: failed to assign bonds for %s; use '
                   '``residue.assign_distance.bonds`` to guess the topology') % str(residue)
+
+
+def assign_unique_hydrogen_names(mol):
+    """ Assign unique names to all hydrogens, based on either:
+    1) information in the Chemical Component Database, or
+    2) newly generated, unique names
+
+    Args:
+        mol (moldesign.Molecule):
+    """
+
+    for residue in mol.residues:
+        if residue.resname in mdt.data.RESIDUE_BONDS:
+            _assign_hydrogen_names_from_ccd(residue)
+        else:
+            _assign_unique_hydrogen_names_in_order(residue)
+
+        residue.rebuild()
+
+
+def _assign_hydrogen_names_from_ccd(residue):
+    ccd_bonds = mdt.data.RESIDUE_BONDS[residue.resname]
+    taken = set(atom.name for atom in residue.atoms)
+
+    if 'H' not in taken:
+        return  # nothing to do
+    if 'H' in ccd_bonds:
+        taken.remove('H')  # someone will actually need to be named "H'
+
+    for atom in residue:
+        if atom.atnum != 1 or atom.name != 'H':
+            continue
+        assert atom.num_bonds == 1, 'Hydrogen has more than one bond'
+        bond = atom.bonds[0]
+        other = bond.partner(atom).name
+        for partner in ccd_bonds[other]:
+            if partner[0] == 'H' and partner not in taken:
+                assert ccd_bonds[other][partner] == 1, 'Hydrogen bond order is not 1'
+                atom.name = partner
+                taken.add(partner)
+                break
+
+
+def _assign_unique_hydrogen_names_in_order(residue):
+    n_hydrogen = 1
+    namecounts = collections.Counter(x.name for x in residue.atoms)
+    if namecounts.get('H', 0) > 1:
+        used_names = set(atom.name for atom in residue.atoms)
+        for atom in residue.atoms:
+            if atom.name == 'H':
+                name = 'H%d' % n_hydrogen
+                while name in used_names:
+                    n_hydrogen += 1
+                    name = 'H%d' % n_hydrogen
+                atom.name = name
+                used_names.add(name)

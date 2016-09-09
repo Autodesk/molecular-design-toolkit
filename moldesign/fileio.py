@@ -209,7 +209,8 @@ def read_pdb(f, assign_ccd_bonds=True):
         atom = serials[atomserial]
         for nbrserial, order in nbrs.iteritems():
             nbr = serials[nbrserial]
-            mol.newbond(atom, nbr, order)
+            if nbr not in atom.bond_graph:  # we already got it from CCD
+                mol.newbond(atom, nbr, order)
 
     if assemblies:
         pdb.warn_assemblies(mol, assemblies)

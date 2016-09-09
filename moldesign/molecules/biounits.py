@@ -90,6 +90,9 @@ class ChildList(AtomContainer):
         """
         return AtomList(self.iteratoms())
 
+    def rebuild(self):
+        self._childbyname = {obj.name: obj for obj in self._childinorder}
+
 
 def _sortkey(x):
     return x.pdbindex
@@ -114,6 +117,7 @@ class Entity(AtomContainer):
     __iter__ = utils.Alias('children.__iter__')
     atoms = utils.Alias('children.atoms')
     iteratoms = utils.Alias('children.iteratoms')
+    rebuild = utils.Alias('children.rebuild')
 
     def __init__(self, name=None, molecule=None, index=None, pdbname=None, pdbindex=None,
                  **kwargs):

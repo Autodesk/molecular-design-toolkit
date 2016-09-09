@@ -15,6 +15,7 @@ from __future__ import absolute_import
 
 import os
 import string
+import collections
 
 import moldesign.molecules.atomcollections
 
@@ -164,10 +165,10 @@ def add_hydrogen(mol):
     Returns:
         moldesign.Molecule: New molecule with all valences saturated
     """
-    # TODO: pH, formal charges
     pbmol = mol_to_pybel(mol)
     pbmol.addh()
     newmol = pybel_to_mol(pbmol)
+    mdt.helpers.assign_unique_hydrogen_names(newmol)
     return newmol
 
 
@@ -198,15 +199,15 @@ def mol_to_pybel(mdtmol):
         if atom.residue and atom.residue not in resmap:
             obres = obmol.NewResidue()
             resmap[atom.residue] = obres
-            obres.SetChain(atom.chain.name[0])
-            obres.SetName(atom.residue.pdbname)
+            obres.SetChain(bytes(atom.chain.name[0]))
+            obres.SetName(bytes(atom.residue.pdbname))
             obres.SetNum(atom.residue.pdbindex)
         else:
             obres = resmap[atom.residue]
 
         obres.AddAtom(obatom)
         obres.SetHetAtom(obatom, not atom.residue.is_standard_residue)
-        obres.SetAtomID(obatom, atom.name)
+        obres.SetAtomID(obatom, bytes(atom.name))
         obres.SetSerialNum(obatom,
                            mdt.utils.if_not_none(atom.pdbindex, atom.index+1))
 
