@@ -13,8 +13,6 @@
 # limitations under the License.
 from __future__ import absolute_import
 
-import scipy.optimize
-
 from moldesign import units as u
 
 from .base import MinimizerBase
@@ -42,6 +40,8 @@ class ScipyMinimizer(MinimizerBase):
     _TAKES_GTOL = False
 
     def run(self):
+        import scipy.optimize
+
         print 'Starting geometry optimization: SciPy/%s with %s gradients'%(
             self._METHOD_NAME, self.gradtype)
         options = {'disp': True}

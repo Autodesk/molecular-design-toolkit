@@ -135,8 +135,8 @@ class MinimizerBase(object):
 
         self.mol.calculate(self.request_list)
         self.traj.new_frame(minimization_step=self.current_step,
-                       annotation='minimization steps:%d (energy=%s)' %
-                                  (self.current_step, self.mol.potential_energy))
+                            annotation='minimization steps:%d (energy=%s)'%
+                                       (self.current_step, self.mol.potential_energy))
         if self.nsteps is None:
             message = ['Minimization step %d' % self.current_step]
         else:
@@ -150,7 +150,7 @@ class MinimizerBase(object):
             force = self._last_grad
 
             message.append(u'RMS \u2207E={rmsf.magnitude:.3e}, '
-                           u'max \u2207E={mf.magnitude:.3e}{mf.units}'.format(
+                           u'max \u2207E={mf.magnitude:.3e} {mf.units}'.format(
                 rmsf=np.sqrt(force.dot(force) / self.mol.ndims),
                 mf=np.abs(force).max()))
 

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import numpy as np
-import scipy.spatial.distance
 
 import moldesign as mdt
 from moldesign import units as u
@@ -83,6 +82,7 @@ class MolecularSymmetry(object):
         Symmetrize the molecule based on the symmetry operation
         This will work as long as the symmetry operation brings each atom closest to a symmetry relation.
         """
+        import scipy.spatial.distance
 
         # First, apply the transformation
         oriented_coords = self.orientation

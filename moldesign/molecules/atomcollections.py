@@ -15,7 +15,6 @@
 import copy
 
 import numpy as np
-from scipy.spatial import distance as spd
 
 import moldesign as mdt
 from moldesign import units as u
@@ -104,13 +103,15 @@ class AtomContainer(object):
             >>> dists = self.calc_distance_array(other)
             >>> dists[i, j] == self.atoms[i].distance(other.atoms[j])
         """
+        from scipy.spatial.distance import cdist
+
         other = utils.if_not_none(other, self)
         try:
             other_positions = other.positions.defunits_value()
         except AttributeError:
             other_positions = np.array([other.position.defunits_value()])
 
-        distances = spd.cdist(self.positions.defunits_value(), other_positions)
+        distances = cdist(self.positions.defunits_value(), other_positions)
         return distances * u.default.length
 
     def calc_displacements(self):
