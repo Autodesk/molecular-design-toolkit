@@ -34,16 +34,24 @@ class StyledTab(ipy.Tab):
 
 
 class AtomInspector(ipy.HTML, Selector):
-    def handle_selection_event(self, selection):
-        if 'atoms' not in selection: return
-        atoms = selection['atoms']
+    """
+    Turn atom indices into a value to display
+    """
+    def indices_to_value(self, atom_indices, atoms):
+        indicated_atoms = map(lambda index: atoms[index], atom_indices)
+        return self.atoms_to_value(indicated_atoms)
+
+    """
+    Turn atom objects into a value to display
+    """
+    def atoms_to_value(self, atoms):
         if len(atoms) == 0:
-            self.value = 'No selection'
+            return 'No selection'
         elif len(atoms) == 1:
             atom = atoms[0]
             res = atom.residue
             chain = res.chain
-            self.value = (
+            return (
                 "<b>Molecule</b>: %s<br>" % atom.molecule.name +
                 "<b>Chain</b> %s<br>" % chain.name +
                 "<b>Residue</b> %s, index %d<br>" % (res.name, res.index) +
@@ -52,7 +60,7 @@ class AtomInspector(ipy.HTML, Selector):
             atstrings = ['<b>%s</b> / res <b>%s</b> / chain <b>%s</b>' %
                          (a.name, a.residue.resname, a.chain.name)
                          for a in atoms]
-            self.value = '<br>'.join(atstrings)
+            return '<br>'.join(atstrings)
 
 
 class ViewerToolBase(ipy.Box):
