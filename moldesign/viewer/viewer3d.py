@@ -62,7 +62,6 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
         self.frame_change_callback = None
         self.wfns = []
         self._cached_orbitals = set()
-        self._callbacks = set()
         self._axis_objects = None
         self._frame_positions = []
         self._colored_as = {}
@@ -320,13 +319,6 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
     def _redraw_highlights(self):
         if self.atom_highlights:
             self.set_color(self.HIGHLIGHT_COLOR, self.atom_highlights, _store=False)
-
-    def add_click_callback(self, fn):
-        assert callable(fn)
-        self._callbacks.add(fn)
-
-    def remove_click_callback(self, fn):
-        self._callbacks.remove(fn)
 
     def append_frame(self, positions=None, wfn=None):
         # override base method - we'll handle frames entirely in python
