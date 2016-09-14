@@ -60,7 +60,7 @@ class GeometryBuilder(ViewerToolBase):
         self.subtools.children = (ipy.HBox([self.clear_button, self.label_box]),
                                   self.selection_description)
         traitlets.directional_link(
-            (self.viewer, 'selected_atoms'),
+            (self.viewer, 'selected_atom_indices'),
             (self.selection_description, 'value'),
             self.get_first_atom
         )
@@ -105,7 +105,7 @@ class GeometryBuilder(ViewerToolBase):
                                   self.reset_button)
 
         traitlets.directional_link(
-            (self.viewer, 'selected_atoms'),
+            (self.viewer, 'selected_atom_indices'),
             (self.tool_holder, 'children'),
             self._get_tool_state
         )
@@ -268,7 +268,7 @@ class GeometryBuilder(ViewerToolBase):
                               radius=self.viewer.ATOMRADIUS)
 
     def clear_selection(self, *args):
-        self.viewer.selected_atoms = set()
+        self.viewer.selected_atom_indices = set()
 
     def reset_geometry(self, *args):
         self.clear_selection()
