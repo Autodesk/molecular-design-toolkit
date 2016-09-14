@@ -96,11 +96,11 @@ class SelBase(ViewerToolBase):
         self._atomset = collections.OrderedDict()
 
         self.atom_listname = ipy.HTML('<b>Selected atoms:</b>')
-        self.atom_list = ipy.SelectMultiple(options=list(self.viewer.selected_atoms), height=150)
+        self.atom_list = ipy.SelectMultiple(options=list(self.viewer.selected_atom_indices), height=150)
         traitlets.directional_link(
-            (self.viewer, 'selected_atoms'),
+            (self.viewer, 'selected_atom_indices'),
             (self.atom_list, 'options'),
-            lambda selected_atoms: list(selected_atoms)
+            lambda selected_atom_indices: [self.mol.atoms[atom_index] for atom_index in selected_atom_indices]
         )
 
         self.select_all_atoms_button = ipy.Button(description='Select all atoms')
@@ -117,10 +117,10 @@ class SelBase(ViewerToolBase):
         return '%s (index %d)' % (atom.name, atom.index)
 
     def select_all_atoms(self, *args):
-        self.viewer.selected_atoms = set(i for i, atom in enumerate(self.mol.atoms))
+        self.viewer.selected_atom_indices = set(i for i, atom in enumerate(self.mol.atoms))
 
     def clear_selections(self, *args):
-        self.viewer.selected_atoms = set()
+        self.viewer.selected_atom_indices = set()
 
 
 class ReadoutFloatSlider(ipy.Box):
