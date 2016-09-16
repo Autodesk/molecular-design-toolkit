@@ -167,7 +167,7 @@ class ResidueSelector(SelBase):
 
     @property
     def selected_residues(self):
-        return self._residueset.keys()
+        return self._atoms_to_residues(self.viewer.selected_atom_indices)
 
     @selected_residues.setter
     def selected_residues(self, residues):
