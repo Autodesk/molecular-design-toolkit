@@ -28,9 +28,6 @@ class Selector(object):
         self.selection_id = None
         super(Selector, self).__init__(*args, **kwargs)
 
-    def handle_selection_event(self, selection):
-        raise NotImplementedError()
-
     def fire_selection_event(self, new_selection):
         self.selection_group.update_selections(self, new_selection)
 
