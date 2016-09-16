@@ -93,8 +93,6 @@ class ResidueSelector(SelBase):
     def __init__(self, mol):
         super(ResidueSelector, self).__init__(mol)
 
-        self._residue_selection = collections.OrderedDict()
-        self._residueset = collections.OrderedDict()
         self.selection_type = ipy.Dropdown(description='Clicks select:',value=self.viewer.selection_type,
                                            options=('Atom', 'Residue', 'Chain'))
 
@@ -139,58 +137,16 @@ class ResidueSelector(SelBase):
 
         return list(selected_residues)
 
-    def _redraw_selection_state(self):
-        # this is slow and crappy ...
-        super(ResidueSelector, self)._redraw_selection_state()
-
-        # Update the residue list
-        def pop_residue(r):
-            resopts.pop(self.reskey(r))
-            self._residueset.pop(r)
-
-        resopts = self.residue_list.options.copy()
-        atomcounts = collections.Counter()
-        for atom in self._atomset: atomcounts[atom.residue] += 1
-        for res in atomcounts:
-            if res.num_atoms == atomcounts[res]:  # i.e., this residue IS fully selected
-                if res not in self._residueset:
-                    resopts[self.reskey(res)] = res
-                    self._residueset[res] = None
-            else:  # i.e., this residue should NOT be selected
-                if res in self._residueset: pop_residue(res)
-
-        for res in self._residueset:
-            if res not in atomcounts:
-                pop_residue(res)
-
-        self.residue_list.options = resopts
-
     @property
     def selected_residues(self):
         return self._atoms_to_residues(self.viewer.selected_atom_indices)
 
     @selected_residues.setter
     def selected_residues(self, residues):
-        newres = set(residues)
+        self.viewer.select_residues(residues)
 
-        for res in newres.symmetric_difference(self._residueset):
-            self.toggle_residue(res, render=False)
-
-        self._residueset = newres
-        self._redraw_selection_state()
-
-    def toggle_residue(self, residue, clickatom=None, render=True):
-        if clickatom is not None:
-            deselect = (clickatom in self._atomset)
-        else:
-            deselect = (residue in self._residueset)
-
-        if deselect:
-            for atom in residue.atoms: self._atomset.pop(atom, None)
-        else:
-            for atom in residue.atoms: self._atomset[atom] = None
-
-        if render: self._redraw_selection_state()
+    def toggle_residue(self, residue):
+        self.viewer.toggle_residues([residue])
 
     def remove_reslist_highlight(self, *args):
         self.atom_list.value = tuple()
