@@ -371,8 +371,10 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
             orb_changed = True
             self.current_orbital = selection['orbname']
 
+        isoval = self.orbital_spec['isoval'] if 'isoval' in self.orbital_spec else None
+
         if ('orbital_isovalue' in selection) and (
-                    selection['orbital_isovalue'] != self.orbital_spec['isoval']):
+                    selection['orbital_isovalue'] != isoval):
             orb_changed = True
             self.orbital_spec['isoval'] = selection['orbital_isovalue']
 
