@@ -28,8 +28,6 @@ __all__ = []
 
 @exports
 class BondSelector(SelBase):
-    VIEWERTYPE = viewer.BondClicker
-
     def __init__(self, mol):
         super(BondSelector, self).__init__(mol)
 
@@ -63,8 +61,6 @@ class BondSelector(SelBase):
 
         to_turn_on = currentset.difference(self._drawn_bond_state)
         to_turn_off = self._drawn_bond_state.difference(currentset)
-        for bond in to_turn_off: self.viewer.unset_bond_color(bond, render=False)
-        for b in to_turn_on: self.viewer.set_bond_color(self.viewer.HIGHLIGHT_COLOR, b, render=False)
 
         self.bond_list.options = collections.OrderedDict((self.bondkey(bond), bond) for bond in self._bondset)
         super(BondSelector, self)._redraw_selection_state()

@@ -134,19 +134,6 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
         atomsel = {'index': idxes}
         return atomsel
 
-    def _set_bonds(self):
-        """
-        Sends bond structure to the drawing software
-        This is necessary for formats like PDB, where the bond structure is set implicitly
-        """
-        bonds = []
-        for atom in self.mol.atoms:
-            nbrs = atom.bond_graph.keys()
-            bonds.append({'index': atom.index,
-                          'nbr': [n.index for n in nbrs],
-                          'order': [atom.bond_graph[n] for n in nbrs]})
-        self.viewer('setBonds', [bonds])
-
     @utils.doc_inherit
     def set_color(self, color, atoms=None, _store=True):
         if _store:

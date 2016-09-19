@@ -16,7 +16,6 @@ import ipywidgets as ipy
 import traitlets
 from moldesign.geom import set_angle, set_dihedral, set_distance
 import moldesign.molecules.bonds
-from moldesign.viewer import BondClicker
 from moldesign import units as u
 
 from moldesign import geom, utils
@@ -31,8 +30,6 @@ __all__ = []
 
 @exports
 class GeometryBuilder(ViewerToolBase):
-    VIEWERTYPE = BondClicker
-
     MAXDIST = 20.0  # TODO: we need to set this dynamically
     NBR2HIGHLIGHT = '#C5AED8'
     NBR1HIGHLIGHT = '#AFC6A8'
