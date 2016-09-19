@@ -57,8 +57,8 @@ class AtomInspector(ipy.HTML, Selector):
                 "<b>Residue</b> %s, index %d<br>" % (res.name, res.index) +
                 "<b>Atom</b> %s (%s), index %d<br>" % (atom.name, atom.symbol, atom.index))
         elif len(atoms) > 1:
-            atstrings = ['<b>%s</b> / res <b>%s</b> / chain <b>%s</b>' %
-                         (a.name, a.residue.resname, a.chain.name)
+            atstrings = ['<b>%s</b>, index %s / res <b>%s</b>, index %s / chain <b>%s</b>' %
+                         (a.name, a.index, a.residue.resname, a.residue.index, a.chain.name)
                          for a in atoms]
             return '<br>'.join(atstrings)
 
