@@ -24,18 +24,6 @@ from moldesign import units as u
 from moldesign import utils
 
 
-class ForceField(object):
-    """Generalized force field type (blank for now)"""
-class BasisSet(object):
-    """Generalized basis set type (blank for now"""
-class ElectronicWfn(object):
-    """Generalized orbital storage (blank for now)"""
-class QMTheory(object):
-    """Generalized QM type (blank for now)"""
-class SymmetryGroup(object):
-    """Generalized symmetry type (blank for now)"""
-
-
 def isin(a, b): return a in b
 
 

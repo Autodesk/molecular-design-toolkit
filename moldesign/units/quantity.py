@@ -154,6 +154,9 @@ class MdtQuantity(ureg.Quantity):
         units = self.get_units()
         return units * np.linalg.norm(self._magnitude)
 
+    def normalized(self):
+        return self/self.norm()
+
     def dot(self, other):
         """ Dot product that correctly multiplies units
 

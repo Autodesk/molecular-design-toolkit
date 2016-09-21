@@ -29,12 +29,13 @@ class ElectronicWfn(object):
     Args:
         mol (moldesign.Molecule): Molecule this wavefunction belongs to
         num_electrons (int): number of electrons in this wavefunction
-        theory (moldesign.models.base.EnergyModelBase): The model this wavefunction was created with
+        model (moldesign.models.base.EnergyModelBase): The model this wavefunction was created with
         aobasis (moldesign.orbitals.BasisSet): The basis functions for the enclosed orbitals
         nbasis (int): number of AO basis functions
         fock_ao (moldesign.units.Array[energy]): fock matrix in the AO basis
         positions (moldesign.units.Array[length]): positions of the nuclei for this wfn
         civectors (np.ndarray): CI vectors (if applicable)
+        description (str): text describing the wfn (e.g. 'RHF/STO-3G', 'CAS(2,2)/SA3/6-31G**')
         density_matrix_ao (np.ndarray): density matrix in the ao basis
     """
 
@@ -43,6 +44,7 @@ class ElectronicWfn(object):
                  aobasis=None, fock_ao=None,
                  positions=None,
                  civectors=None,
+                 description=None,
                  density_matrix_ao=None):
         self.mol = mol
         self.model = model
@@ -59,6 +61,7 @@ class ElectronicWfn(object):
         self.lumo = self.homo + 1
         self._has_canonical = False
         self.density_matrix_ao = density_matrix_ao
+        self.description = description
 
         if positions is None:
             self.positions = mol.positions.copy()
@@ -76,10 +79,6 @@ class ElectronicWfn(object):
 
     def __str__(self):
         return '%s wfn' % self.description
-
-    @property
-    def description(self):
-        return '%s/%s' % (self.model, self.aobasis.basisname)
 
     def set_canonical_mos(self, orbs):
         if orbs.wfn is None:

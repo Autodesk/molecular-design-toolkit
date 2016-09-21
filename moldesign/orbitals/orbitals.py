@@ -46,9 +46,6 @@ ANGULAR_NAME_TO_COMPONENT = {'': (0, 0), 'x': (1, -1), 'y': (1, 1), 'z': (1, 0),
                              'yz^2': (3, -1)}
 
 
-class ConvergenceError(Exception): pass
-
-
 class Orbital(object):
     r"""
     Stores a single orbital and its meta-data

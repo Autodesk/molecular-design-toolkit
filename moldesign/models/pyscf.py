@@ -15,8 +15,9 @@ from __future__ import absolute_import  # prevent clashes between this and the "
 
 from cStringIO import StringIO
 
-import itertools
-from moldesign import units as u, compute, orbitals
+import moldesign as mdt
+from moldesign import units as u
+from moldesign import compute, orbitals
 from moldesign.interfaces.pyscf_interface import force_remote, mol_to_pyscf, \
     StatusLogger, SPHERICAL_NAMES
 from .base import QMBase
@@ -222,7 +223,8 @@ class PySCFPotential(QMBase):
                                               self.pyscfmol.nelectron,
                                               aobasis=basis,
                                               fock_ao=scf_matrices['fock_ao'],
-                                              density_matrix_ao=scf_matrices['density_matrix_ao'])
+                                              density_matrix_ao=scf_matrices['density_matrix_ao'],
+                                              description=self.theoryname)
 
         # Build and store the canonical orbitals
         cmos = []
@@ -304,7 +306,7 @@ class PySCFPotential(QMBase):
         if method.converged:
             return method, failed
 
-        raise orbitals.ConvergenceError(method)
+        raise mdt.QMConvergenceError(method)
 
     def _build_theory(self, name, refobj):
         if name in ('mscscf', 'casci', 'casscf'):

@@ -50,6 +50,7 @@ from . import viewer
 
 
 # Populate the top-level namespace (imports everything from each <submodule>.__all__ variable)
+from .exceptions import *
 from .fileio import *
 from .forcefields import *
 from .geom import *

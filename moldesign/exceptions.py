@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-class NoConvergence(Exception):
-    """ Raised when an iterative property calculation fails to converge """
+
+class ConvergenceFailure(Exception):
+    """ Raised when an iterative calculation fails to converge """
     pass
 
 
@@ -27,3 +28,7 @@ class UnhandledValenceError(Exception):
         self.message = 'Atom %s has unhandled valence: %d' % (atom, atom.valence)
 
 
+class QMConvergenceError(Exception):
+    """ Raised when an iterative QM calculation (typically SCF) fails to converge
+    """
+    pass
