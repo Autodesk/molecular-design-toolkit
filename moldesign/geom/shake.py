@@ -18,6 +18,8 @@ from moldesign import units as u
 
 from .constraints import FixedCoordinate, FixedPosition
 
+# TODO: create dynamics wrapper that uses timestep to explicitly calculate constraint forces
+
 
 def shake_positions(mol, prev_positions, max_cycles=100, use_masses=True):
     """ Satisfy all molecular constraints using the SHAKE algorithm
@@ -35,7 +37,6 @@ def shake_positions(mol, prev_positions, max_cycles=100, use_masses=True):
             Eur Phys J Spec Top. 2011 Nov 1; 200(1): 211.
             doi:10.1140/epjst/e2011-01525-9
     """
-    # TODO: store constraint forces in the molecule
     constraints = []
     for c in mol.constraints:  # Replace FixedPosition with 3 FixedCoordinates - it's better behaved
         if isinstance(c, FixedPosition):
@@ -86,8 +87,8 @@ def shake_positions(mol, prev_positions, max_cycles=100, use_masses=True):
         mol.positions -= delta/dim_masses
 
     else:
-        raise mdt.exceptions.NoConvergence('SHAKE did not converge after %d iterations' %
-                                           max_cycles)
+        raise mdt.ConvergenceFailure('SHAKE did not converge after %d iterations'%
+                                     max_cycles)
 
 
 def _clean_grad_array(a):

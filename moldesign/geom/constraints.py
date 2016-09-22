@@ -20,9 +20,9 @@ from .coords import *
 from .grads import *
 from .grads import _atom_grad_to_mol_grad
 
-DIST_TOLERANCE = 1.0e-3 * u.angstrom
+DIST_TOLERANCE = 1.0e-6 * u.angstrom
 DIST_FORCE_CONSTANT = 1000.0 * u.kcalpermol / (u.angstrom**2)
-ANGLE_TOLERANCE = 0.75 * u.degrees
+ANGLE_TOLERANCE = 1.0e-4 * u.degrees
 ANGLE_FORCE_CONSTANT = 1500.0 * u.kcalpermol / (u.radians**2)
 
 

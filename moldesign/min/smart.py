@@ -50,11 +50,10 @@ class SmartMin(MinimizerBase):
         self.kwargs = kwargs
         super(SmartMin, self).__init__(*args, **kwargs)
 
-
     def run(self):
         # If forces are already low, go directly to the quadratic convergence methods and return
         forces = self.mol.calculate_forces()
-        if forces.max() <= self.gd_threshold:
+        if abs(forces).max() <= self.gd_threshold:
             spmin = self._make_quadratic_method()
             spmin.run()
             self.traj = spmin.traj
