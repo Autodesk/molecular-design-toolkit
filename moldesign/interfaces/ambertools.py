@@ -272,18 +272,25 @@ def assign_forcefield(mol, **kwargs):
 def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
     """Parameterize ``mol``, typically using GAFF parameters.
 
-    Note: this requires partial charges to alread
+    This will both assign a forcefield to the molecule (at ``mol.ff``) and produce the parameters
+    so that they can be used in other systems (e.g., so that this molecule can be simulated
+    embedded in a larger protein)
+
+    Note:
+        'am1-bcc' and 'gasteiger' partial charges will be automatically computed if necessary.
+        Other charge types must be precomputed.
 
     Args:
         mol (moldesign.Molecule):
-        charges (str): what kind of partial charges to use? These will be taken from
+        charges (str or dict): what partial charges to use? Can be a dict (``{atom:charge}``) OR
+            a string, in which case charges will be read from
            ``mol.properties.[charges name]``; typical values will be 'esp', 'mulliken',
            'am1-bcc', etc. Use 'zero' to set all charges to 0 (for QM/MM and testing)
-           'am1-bcc' will be calculated automatically if not available.
         ffname (str): Name of the gaff-like forcefield file (default: gaff2)
 
     Returns:
-        ExtraAmberParameters: Parameters for the molecule
+        ExtraAmberParameters: Parameters for the molecule; this object can be used to create
+            forcefield parameters for other systems that contain this molecule
     """
     assert mol.num_residues == 1
     resname = mol.residues[0].resname
@@ -294,14 +301,16 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
         calc_gasteiger_charges(mol)
 
     if charges == 'zero':
-        charges = [0.0 for atom in mol.atoms]
+        charge_array = [0.0 for atom in mol.atoms]
+    elif isinstance(charges, basestring):
+        charge_array = u.array([mol.properties[charges][atom] for atom in mol.atoms])
+        if not charge_array.dimensionless:  # implicitly convert floats to fundamental charge units
+            charge_array = charge_array.to(u.q_e).magnitude
     else:
-        charges = u.array([mol.properties[charges][atom] for atom in mol.atoms])
-        if not charges.dimensionless:  # implicitly convert floats to fundamental charge units
-            charges = charges.to(u.q_e).magnitude
+        charge_array = [charges[atom] for atom in mol.atoms]
 
     inputs = {'mol.mol2': mol.write(format='mol2'),
-              'mol.charges': '\n'.join(map(str, charges))}
+              'mol.charges': '\n'.join(map(str, charge_array))}
 
     cmds = ['antechamber -i mol.mol2 -fi mol2 -o mol_charged.mol2 -fo mol2 -c rc -cf mol.charges',
             'parmchk -i mol_charged.mol2 -f mol2 -o mol.frcmod', 'tleap -f leap.in']
@@ -318,6 +327,8 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
         param = ExtraAmberParameters(j.get_output('mol.lib'),
                                      j.get_output('mol.frcmod'),
                                      j)
+        tempmol = mdt.assign_forcefield(mol, parameters=param)
+        mol.ff = tempmol.ff
         return param
 
     job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),

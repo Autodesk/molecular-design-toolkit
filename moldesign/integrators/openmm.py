@@ -39,14 +39,16 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
         self._prepped = True
 
     def run(self, run_for, wait=False):
-        # TODO: like model.minimize, this is a hacky wrapper that we need to replace with
-        # something more generalizable
+        if not self.model._constraints_ok:
+            raise NotImplementedError('OpenMM only supports position and bond constraints')
+
         try:
             traj = self._run(run_for)
         except pyccc.exceptions.ProgramFailure:
-            raise pyccc.exceptions.ProgramFailure('OpenMM crashed silently. Please examine the output. '
-                                       'This may be due to large forces from, for example, '
-                                       'an insufficiently minimized starting geometry.')
+            raise pyccc.exceptions.ProgramFailure(
+                    'OpenMM crashed silently. Please examine the output. '
+                    'This may be due to large forces from, for example, '
+                    'an insufficiently minimized starting geometry.')
         if force_remote or (not wait):
             self.mol.energy_model._sync_remote(traj.mol)
             traj.mol = self.mol

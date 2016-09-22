@@ -55,6 +55,7 @@ class Monitor(object):
             if atom.molecule is not mol:
                 raise ValueError("Can't create constraint; atoms are not part of the same Molecule")
         mol.constraints.append(c)
+        mol._reset_methods()
         return c
 
     def __call__(self, obj):

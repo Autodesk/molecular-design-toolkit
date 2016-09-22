@@ -86,10 +86,10 @@ class GradientDescent(MinimizerBase):
 
                 # move direction may be different than gradient direction due to constraints
                 move_vec = (newpos-current).normalized()
-                if grad.dot(move_vec) >= 0.0:  # move flipped direction! Why?
+                if grad.dot(move_vec) >= 0.0:  # move flipped direction!
                     if self._constraint_convergence(newpos, current, grad):
-                        return  # we're converged
-                    else:  # move was too big, keep going
+                        return  # flip was because we're converged
+                    else:  # flip was because move was too big
                         newenergy = np.inf * u.default.energy
                         continue
 

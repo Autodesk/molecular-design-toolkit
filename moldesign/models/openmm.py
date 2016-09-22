@@ -46,6 +46,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
     def __init__(self, **kwargs):
         super(OpenMMPotential, self).__init__(**kwargs)
         self.sim = None
+        self._constraints_ok = True  # can OpenMM support these constraints?
 
     def get_openmm_simulation(self):
         if opm.force_remote:
@@ -98,14 +99,20 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         print 'Created OpenMM kernel (Platform: %s)' % self.sim.context.getPlatform().getName()
         self._prep_integrator = self.mol.integrator
 
+    def reset_constraints(self):
+        self._set_constraints()
+
     def minimize(self, **kwargs):
-        traj = self._minimize(**kwargs)
+        if self._constraints_ok:
+            traj = self._minimize(**kwargs)
 
-        if opm.force_remote or (not kwargs.get('wait', False)):
-            self._sync_remote(traj.mol)
-            traj.mol = self.mol
+            if opm.force_remote or (not kwargs.get('wait', False)):
+                self._sync_remote(traj.mol)
+                traj.mol = self.mol
 
-        return traj
+            return traj
+        else:
+            return super(OpenMMPotential, self).minimize(**kwargs)
 
     def _sync_remote(self, mol):
         # TODO: this is a hack to update the object after a minimization
@@ -178,6 +185,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
     #################################################
     # "Private" methods for managing OpenMM are below
     def _set_constraints(self):
+        self._constraints_ok = True
         system = self.mm_system
         fixed_atoms = set()
 
@@ -197,7 +205,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                                      opm.pint2simtk(constraint.value))
 
             else:
-                raise ValueError('OpenMM interface does not support "%s" constraints.' % constraint.desc)
+                self._constraints_ok = False
 
         # Workaround for OpenMM issue: can't have an atom that's both fixed *and* has a distance constraint.
         # If both atoms in the distance constraint are also fixed, then we can just remove the constraint
@@ -211,9 +219,9 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                 if (ai in fixed_atoms) and (aj in fixed_atoms):
                     system.removeConstraint(ic)
                     num_constraints -= 1
-                elif (ai in fixed_atoms) or (aj in fixed_atoms):  #only one is fixed
+                elif (ai in fixed_atoms) or (aj in fixed_atoms):  # only one is fixed
                     raise ValueError('In OpenMM, fixed atoms cannot be part of a constrained '
-                                     'bond (%s)'%moldesign.molecules.bonds.Bond(ai, aj))
+                                     'bond (%s)' % moldesign.molecules.bonds.Bond(ai, aj))
                 else:
                     ic += 1
 
