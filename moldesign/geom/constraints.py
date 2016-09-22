@@ -101,6 +101,12 @@ class GeometryConstraint(object):
         return 'Constraint: {self.desc}({atoms}) -> {self.value})>'.format(
             atoms=','.join([a.name for a in self.atoms]), self=self)
 
+    def _constraintsig(self):
+        """ Returns a unique key that lets us figure out if we have duplicate or conflicting
+        constraints
+        """
+        return tuple([self.desc] + [atom.index for atom in self.atoms])
+
 
 class DistanceConstraint(GeometryConstraint):
     desc = 'distance'
@@ -243,3 +249,6 @@ class FixedCoordinate(GeometryConstraint):
 
     def atomgrad(self, atom=None):
         return [self.vector] * u.ureg.dimensionless  # that was easy
+
+    def _constraintsig(self):
+        return super(FixedCoordinate, self)._constraintsig() + (self.vector,)

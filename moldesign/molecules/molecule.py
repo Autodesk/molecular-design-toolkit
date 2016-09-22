@@ -15,6 +15,7 @@
 import numpy as np
 
 import moldesign as mdt
+import operator
 from moldesign import helpers, utils, data
 from moldesign.exceptions import NotCalculatedError
 from moldesign import units as u
@@ -62,7 +63,7 @@ class MolConstraintMixin(object):
         Note:
             This does NOT clear integrator options - such as "constrain H bonds"
         """
-        self.constraints = []
+        self.constraints.clear()
         self._reset_methods()
 
     def constrain_atom(self, atom, pos=None):
@@ -557,6 +558,11 @@ class MolTopologyMixin(object):
             assert atom.molecule is self, "Atom %s does not belong to %s" % (atom, self)
         return atom
 
+    def rebuild(self):
+        self.chains = Instance(molecule=self)
+        self.residues = []
+        self._rebuild_topology()
+
     def _rebuild_topology(self, bond_graph=None):
         """ Build the molecule's bond graph based on its atoms' bonds
 
@@ -836,6 +842,7 @@ class MolSimulationMixin(object):
         need to know about
         """
         # TODO: what should this do with the property object?
+        # TODO: handle duplicate constraints (this happens a lot, and is bad)
         if self.energy_model is not None:
             self.energy_model._prepped = False
         if self.integrator is not None:
@@ -990,7 +997,7 @@ class Molecule(AtomContainer,
         self._defres = None
         self._defchain = None
         self.pdbname = pdbname
-        self.constraints = []
+        self.constraints = utils.ExclusiveList(key=operator.methodcaller('_constraintsig'))
         self.energy_model = None
         self.integrator = None
         self.electronic_state_index = electronic_state_index
