@@ -15,8 +15,7 @@
 import numpy as np
 
 import moldesign as mdt
-import operator
-from moldesign import helpers, utils, data
+from moldesign import helpers, utils
 from moldesign.exceptions import NotCalculatedError
 from moldesign import units as u
 from moldesign.compute import DummyJob
@@ -960,8 +959,6 @@ class Molecule(AtomContainer,
             - :class:`moldesign.molecules.MolConstraintMixin`
             - :class:`moldesign.molecules.MolReprMixin`
     """
-
-    # TODO: UML diagrams, describe structure
     positions = ProtectedArray('_positions')
     momenta = ProtectedArray('_momenta')
 
@@ -971,8 +968,6 @@ class Molecule(AtomContainer,
                  pdbname=None,
                  charge=None,
                  electronic_state_index=0):
-        # NEW_FEATURE: deal with random number generators per-geometry
-        # NEW_FEATURE: per-geometry output logging
         super(Molecule, self).__init__()
 
         # copy atoms from another object (i.e., a molecule)
@@ -997,7 +992,7 @@ class Molecule(AtomContainer,
         self._defres = None
         self._defchain = None
         self.pdbname = pdbname
-        self.constraints = utils.ExclusiveList(key=operator.methodcaller('_constraintsig'))
+        self.constraints = utils.ExclusiveList(key=utils.methodcaller('_constraintsig'))
         self.energy_model = None
         self.integrator = None
         self.electronic_state_index = electronic_state_index
@@ -1024,7 +1019,6 @@ class Molecule(AtomContainer,
         self._properties = MolecularProperties(self)
         self.ff = utils.DotDict()
 
-    # TODO: underscores or not? Buckyball needs a global rule
     def newbond(self, a1, a2, order):
         """ Create a new bond
 
@@ -1036,7 +1030,6 @@ class Molecule(AtomContainer,
         Returns:
             moldesign.Bond
         """
-        # TODO: this should signal to the energy model that the bond structure has changed
         assert a1.molecule == a2.molecule == self
         return a1.bond_to(a2, order)
 
