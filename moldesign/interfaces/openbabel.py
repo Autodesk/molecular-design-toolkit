@@ -15,8 +15,8 @@ from __future__ import absolute_import
 
 import os
 import string
-import collections
 
+import collections
 import moldesign.molecules.atomcollections
 
 try:
@@ -167,7 +167,7 @@ def add_hydrogen(mol):
     """
     pbmol = mol_to_pybel(mol)
     pbmol.addh()
-    newmol = pybel_to_mol(pbmol)
+    newmol = pybel_to_mol(pbmol, reorder_atoms_by_residue=True)
     mdt.helpers.assign_unique_hydrogen_names(newmol)
     return newmol
 
@@ -227,7 +227,7 @@ def mol_to_pybel(mdtmol):
     return pbmol
 
 
-def pybel_to_mol(pbmol, atom_names=True, **kwargs):
+def pybel_to_mol(pbmol, atom_names=True, reorder_atoms_by_residue=False, **kwargs):
     """ Translate a pybel molecule object into a moldesign object.
 
     Note:
@@ -236,6 +236,8 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
     Args:
         pbmol (pybel.Molecule): molecule to translate
         atom_names (bool): use pybel's atom names (default True)
+        reorder_atoms_by_residue (bool): change atom order so that all atoms in a residue are stored
+            contiguously
         **kwargs (dict): keyword arguments to  moldesign.Molecule __init__ method
 
     Returns:
@@ -316,6 +318,12 @@ def pybel_to_mol(pbmol, atom_names=True, **kwargs):
             newtopo[a2] = {}
         newtopo[a1][a2] = order
         newtopo[a2][a1] = order
+
+    if reorder_atoms_by_residue:
+        resorder = {}
+        for atom in newatoms:
+            resorder.setdefault(atom.residue, len(resorder))
+        newatoms.sort(key=lambda a: resorder[a.residue])
 
     return mdt.Molecule(newatoms,
                         bond_graph=newtopo,
