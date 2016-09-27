@@ -72,3 +72,10 @@ class MP2(PySCFPotential):
     def __init__(self, *args, **kwargs):
         kwargs['theory'] = 'mp2'
         super(MP2, self).__init__(*args, **kwargs)
+
+@exports
+class CASSCF(PySCFPotential):
+    @utils.doc_inherit
+    def __init__(self, *args, **kwargs):
+        kwargs['theory'] = 'casscf'
+        super(CASSCF, self).__init__(*args, **kwargs)

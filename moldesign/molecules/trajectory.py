@@ -283,7 +283,7 @@ class Trajectory(object):
         if item in self._property_keys:  # return a list of properties for each frame
             return self.slice_frames(item)
         else:
-            raise AttributeError
+            raise AttributeError('Frame %s has no attribute %s' % (self, item))
 
     def rmsd(self, atoms=None, reference=None):
         r""" Calculate root-mean-square displacement for each frame in the trajectory.

@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import  # prevent clashes between this and the "pyscf" package
-
 from cStringIO import StringIO
+
+import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
@@ -203,6 +204,22 @@ class PySCFPotential(QMBase):
             result['potential_energy'] = result['state_energies'][self.mol.electronic_state_index]
             # TODO: add 'reference wavefunction' to result
             ao_obj = ref
+            dips, tdips = _get_multiconf_dipoles(self.pyscfmol, casobj, len(casobj.ci))
+            result['state_dipole_moments'] = dips
+            result['transition_dipole_moments'] = tdips
+            result['dipole_moment'] = dips[0]
+
+            # TODO: this is general, put it somewhere else
+            oscs = {}
+            nstates = len(result['state_energies'])
+            for i in xrange(nstates):
+                for j in xrange(i+1, nstates):
+                    excitation_energy = result['state_energies'][j]-result['state_energies'][i]
+                    tdip = result['transition_dipole_moments'][i, j].norm()
+                    oscs[i, j] = (2.0*tdip ** 2*u.m_e*excitation_energy/
+                                  (3.0*u.q_e ** 2*u.hbar ** 2)).to(u.ureg.dimensionless).magnitude
+                    oscs[j, i] = -oscs[i, j]
+            result['oscillator_strengths'] = oscs
         else:
             ao_obj = orb_calc
 
@@ -212,6 +229,9 @@ class PySCFPotential(QMBase):
             ao_pop, atom_pop = orb_calc.mulliken_pop(verbose=-1)
             result['mulliken'] = DotDict({a: p for a, p in zip(self.mol.atoms, atom_pop)})
             result['mulliken'].type = 'atomic'
+
+        if hasattr(orb_calc, 'dip_moment'):
+            result['dipole_moment'] = orb_calc.dip_moment() * u.debye
 
         # Build the electronic state object
         basis = orbitals.basis.BasisSet(self.mol,
@@ -352,7 +372,6 @@ class PySCFPotential(QMBase):
 
         return '%s/%s' % (th, p.basis)
 
-
     def _parse_fci_vector(self, ci_vecmat):
         """ Translate the PySCF FCI matrix into a dictionary of configurations and weights
 
@@ -462,3 +481,50 @@ class PySCFPotential(QMBase):
         scf_matrices.update(ao_mats)
         return scf_matrices
 
+
+def _get_multiconf_dipoles(basis, mcstate, nstates):
+    """ Compute dipoles and transition dipoles. Adapted from PySCF examples
+
+    Note:
+        Dipole moments are computed using the center of the nuclear charge as the origin. Dipole
+        moments will need to be annotated or translated appropriately for charges systems.
+
+    Args:
+        basis ():
+        mcstate ():
+        nstates ():
+
+    Returns:
+        List[u.Vector[dipole]]: Dipole moments for each state
+        Mapping[Tuple[int, int], u.Vector[dipole]]: mapping from pairs of state ids to transition
+           dipole moments
+
+    References:
+        https://github.com/sunqm/pyscf/blob/e4d824853c49b7c19eb35cd6f9fe6ea675de932d/examples/1-advanced/030-transition_dipole.py
+    """
+    nuc_charges = [basis.atom_charge(i) for i in xrange(basis.natm)]
+    nuc_coords = [basis.atom_coord(i) for i in xrange(basis.natm)]
+    nuc_charge_center = np.einsum('z,zx->x', nuc_charges, nuc_coords)/sum(nuc_charges)
+    basis.set_common_orig_(nuc_charge_center)
+    nuc_dip = np.einsum('i,ix->x', nuc_charges, nuc_coords-nuc_charge_center) * u.a0 * u.q_e
+
+    dip_ints = basis.intor('cint1e_r_sph', comp=3)
+    orbcas = mcstate.mo_coeff[:, mcstate.ncore:mcstate.ncore+mcstate.ncas]
+
+    dipoles, transitions = [], {}
+    for istate in xrange(nstates):
+        for fstate in xrange(istate, nstates):
+            t_dm1 = mcstate.fcisolver.trans_rdm1(mcstate.ci[istate], mcstate.ci[fstate],
+                                                 mcstate.ncas, mcstate.nelecas)
+            t_dm1_ao = reduce(np.dot, (orbcas, t_dm1, orbcas.T))
+            moment = np.einsum('xij,ji->x', dip_ints, t_dm1_ao) * u.a0 * u.q_e
+
+            if istate == fstate:
+                dipoles.append(moment)
+            else:
+                transitions[istate, fstate] = transitions[fstate, istate] = moment
+
+    for idip, d in enumerate(dipoles):
+        dipoles[idip] = nuc_dip - d
+
+    return dipoles, transitions

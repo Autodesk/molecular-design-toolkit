@@ -34,7 +34,11 @@ class WhenParam(object):
         self.checkval = checkval
 
     def __call__(self, paramset):
-        """Returns:
+        """
+        Args:
+            paramset (dict):
+
+        Returns:
             bool: True if the parameter is releveant, false otherwise
         """
         #TODO: anything relevant to an irrelevant parameter is also irrelevant
@@ -145,9 +149,9 @@ qm_model_parameters = named_dict([
     Parameter('functional', 'DFT Functional', default='b3lyp',
               choices=FUNCTIONALS,  # TODO: allow separate x and c functionals
               relevance=WhenParam('theory', isin, 'dft rks ks uks'.split())),
-    Parameter('active_electrons', 'Active electrons', type=int,
+    Parameter('active_electrons', 'Active electrons', type=int, default=2,
               relevance=WhenParam('theory', isin, ['casscf', 'mcscf', 'casci'])),
-    Parameter('active_orbitals', 'Active orbitals', type=int,
+    Parameter('active_orbitals', 'Active orbitals', type=int, default=2,
               relevance=WhenParam('theory', isin, ['casscf', 'mcscf', 'casci'])),
     Parameter('state_average', 'States to average for SCF', type=int, default=1,
               relevance=WhenParam('theory', isin, ['casscf', 'mcscf'])),
