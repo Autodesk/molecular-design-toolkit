@@ -1,6 +1,11 @@
-# Molecular Design Toolkit
-[![PyPI version](https://badge.fury.io/py/moldesign.svg)](https://badge.fury.io/py/moldesign)
+<img src="moldesign/_notebooks/img/Header.png">
+[![PyPI version](https://badge.fury.io/py/moldesign.svg)](https://badge.fury.io/py/moldesign) <a href="https://badge.fury.io/gh/Autodesk%2Fmolecular-design-toolkit" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: rgb(70, 61, 84);">
+                                    <img src="https://badge.fury.io/gh/Autodesk%2Fmolecular-design-toolkit.svg" alt="GitHub version" height="20">&nbsp;
+                                </a> <a href="https://github.com/autodesk/molecular-design-toolkit/blob/master/LICENSE" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: rgb(70, 61, 84);"><img src="https://img.shields.io/badge/license-Apache%202-blue.svg"> </a> [![Gitter](https://badges.gitter.im/molecular-design-toolkit/Lobby.svg)](https://gitter.im/molecular-design-toolkit/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+                                
+**Try it now:** [![Binder](http://mybinder.org/badge.svg)](http://mybinder.org:/repo/avirshup/mdt-gallery-test)
 
+# Molecular Design Toolkit
 Molecular modeling without the pain - a Python 2.7 library offering integrated simulation, visualization, analysis, and cloud computing. 
 
 The toolkit aims to lower the barriers between you and your science by integrating mature, open source simulation packages with a readable abstract API, Jupyter notebook visualization, and native cloud computing.
@@ -12,7 +17,9 @@ pip install moldesign
 python -m moldesign intro
 ```
 
-See [the documentation](docs/install.rst) for development instructions and other use cases.
+Note: depending on how python is installed on your system, some users may need to install the package as root: `sudo pip install moldesign`.
+
+The best way to get started is to play with the examples that `python -m moldesign intro` will pull up. See [the documentation](https://autodesk.github.io/molecular-design-toolkit/) for complete API docs, development instructions and other installation scenarios.
 
 ## Code Example
 
