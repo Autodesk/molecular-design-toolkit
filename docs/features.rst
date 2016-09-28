@@ -6,21 +6,12 @@ Molecular Design Toolkit Features
 
 
 
-Simulation methods
-------------------
-
-Energy models
-^^^^^^^^^^^^^
-
-**Methods**
-
- - :meth:`Molecule.calculate` Calculate molecular properties using the assigned energy model
-
- - :meth:`Molecule.minimize` Perform an energy minimization using the assigned energy model
-
-**Classical**
+Molecular Mechanics
+-------------------
 
  - :class:`models.Forcefield` Generic Forcefield energy model (automatically chosen implementation)
+
+ - :class:`models.GAFF` Amber force field for small organic molecules
 
  - :class:`models.OpenMMEnergyModel` OpenMM energy kernel for Amber/CHARMM-like forcefields
 
@@ -30,11 +21,15 @@ Energy models
 
  - :class:`models.HarmonicOscillator` A 1-D Harmonic oscillator centered at x=0 (for testing and toy models)
 
-**Quantum**
 
- - :class:`models.RHF` Generic restricted Hartree-Fock (automatically chosen implementation)
+Quantum Chemistry
+-----------------
 
- - :class:`models.DFT` Generic density functional theories (automatically chosen implementation)
+ - :class:`models.RHF` Restricted Hartree-Fock (automatically chosen implementation)
+
+ - :class:`models.DFT` Density functional theories (automatically chosen implementation)
+
+ - :class:`models.CASSCF` Complete-active space MCSCF (automatically chosen implementation)
 
  - :class:`models.Semiempirical` Generic semiempirical theories (automatically chosen implementation)
 
@@ -43,8 +38,8 @@ Energy models
  - :class:`models.SQM` SQM semi-empirical energy kernel (from AmberTools), includes implementations for a large number of semiempirical models, including MNDO, AM1, PM3, PM6, DFTB
 
 
-Integrators
-^^^^^^^^^^^
+Molecular Dynamics
+^^^^^^^^^^^^^^^^^^
 
  - :class:`integrators.VelocityVerlet` Generic Velocity Verlet dynamics (automatically chosen implementation)
 
@@ -57,8 +52,8 @@ Integrators
  - :class:`integrators.SurfaceHopping` Multi-state surface hopping dynamics using fewest switched. Implementation: internal.
 
 
-Interactive Widgets
--------------------
+Interactive visualization
+-------------------------
 
  - :class:`viewer.Configurator` Automatically generates user interfaces for configuring simulations
 
@@ -107,8 +102,8 @@ Simulation results are stored in numpy arrays with an explicit unit system based
  - :meth:`Trajectory.time` :meth:`Trajectory.potential_energy` :meth:`Trajectory.kinetic_temperature` ``...`` - Return timeseries of times, energies, temperatures, etc. over the course of a trajectory
 
 
-Conversions
------------
+Interfaces
+----------
 
 **Files and databases**
 

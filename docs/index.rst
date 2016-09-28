@@ -1,56 +1,47 @@
-===========================================
-Molecular Design Toolkit: API documentation
-===========================================
+Molecular Design Toolkit |version|
+##################################
 
-These pages provide reference API documentation for the Molecular Design Toolkit.
+Molecular science is hard - the software shouldn't make it harder. The `Molecular Design Toolkit <http://moldesign.bionano.autodesk.com/>`_ offers access to a large and still-growing set of computational modeling methods from a science-focused, Python API. When you
+call MDT functions from a Jupyter notebook, you'll also be get inline 2D and 3D visualization,
+plotting support, and interactivity.
 
-Just getting started? We recommend trying out `the tutorials and
-walkthroughs <http://bionano.autodesk.com/MolecularDesignToolkit/explore.html>`_ before diving into the API.
+`Try a live demo now. <http://mybinder.org/repo/avirshup/mdt-gallery-test>`_
 
-
-Quick install
--------------
-Get the latest stable version:
-
-.. code-block:: bash
-
-   $ pip install moldesign
-
-**Note:** some users may need to run the installation as root, i.e. ``sudo pip install moldesign``
-
-Or get the source code on github:
-
-.. code-block:: bash
-
-   $ git clone github.com/autodesk/molecular-design-toolkit
+MDT is free, open source, and is built for scientific collaboration.
 
 
-Get started
------------
-At the command line, run
 
-.. code-block:: bash
+.. toctree::
+   :maxdepth: 2
+   :numbered:
+   :caption: Getting started
 
-   $ python -m moldesign intro
-
-
-Explore the API
----------------
-The Jupyter online documentation system is a powerful tool for discovering functionality.
-
-To get a list of all members of a module or class, type ``modulename.``, then hit `tab`.
-
-.. image:: img/tab_autocomplete.png
-
-To get online documentation about a function or method, type the method's name, then hit `shift+tab`
-
-.. image:: img/shifttab_online.png
-
-To get the complete docstring for any object, type its name then a question mark.
-
-.. image:: img/questiondoc.png
+   quickstart
+   features
+   install
 
 
-Get help
---------
-Click a link in the navigation menu (to your left) for in-depth documentation.
+.. toctree::
+   :maxdepth: 2
+   :numbered:
+   :caption: Recipes
+
+   creating_and_converting
+   structure
+   biomolecule
+   geometry
+   properties
+   dynamics
+   visualization
+
+
+.. toctree::
+   :maxdepth: 2
+   :numbered:
+   :caption: API Reference
+
+   api/general
+   api/atoms
+
+* :ref:`Alphabetical index <genindex>`
+* :ref:`Search <search>`
