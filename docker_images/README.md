@@ -2,7 +2,7 @@
 
 The Molecular Design Toolkit uses a lot of functionality from other open source chemistry packages, such as molecular dynamics from OpenMM, Quantum chemistry from OpenMM, etc., etc.
 
-To make these calculations 1) easy, 2) portable, and 3) reproducible, users don't need to compile any of these things by themselves. Instead, they're provided as docker images, which (as of this writing) are freely available under Autodesk's account on http://dockerhub.com . User's probably won't need to pull the images manually - they'll be automatically pulled whenever they're needed.
+To make these calculations 1) easy, 2) portable, and 3) reproducible, users don't need to compile any of these by themselves. Instead, they're provided as docker images, which (as of this writing) are freely available from a Dockerhub repository (see https://hub.docker.com/r/autodesk/moldesign/). Users probably won't need to pull the images manually - they'll be automatically pulled whenever they're needed.
 
 
 # About the images

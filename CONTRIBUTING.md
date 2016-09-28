@@ -39,16 +39,16 @@ If you're interested in getting started, here are some ideas:
  * **Best practices** - put together template notebooks that will help users get started with a particular workflow, from modeling proteins from crystal structures to exploring electronic structure
  * **Interesting use cases** - Contribute a notebook that shows off a cool bit of science or design.
 
-**Bug fixes:** Found a typo in the code? Found that a function fails under certain conditions? Know how to fix it? Great! Go for it. Please do [open an issue](https://github.com/autodesk/moldesign/issues) so that we know you're working on it, and submit a pull request when you're ready.
+**Bug fixes:** Found a typo in the code? Found that a function fails under certain conditions? Know how to fix it? Great! Go for it. Please do [open an issue](https://github.com/autodesk/molecular-design-toolkit/issues) so that we know you're working on it, and submit a pull request when you're ready.
 
-**Features:** The chemical modeling universe is vast, and we want toolkit users to have access to a lot of it. Whether you want free energy perturbation, or Boyes' localization, or 3D structural alignment - we want it too! As always, please [open an issue](https://github.com/autodesk/moldesign/issues) so that we know what you're working on.
+**Features:** The chemical modeling universe is vast, and we want toolkit users to have access to a lot of it. Whether you want free energy perturbation, or Boyes' localization, or 3D structural alignment - we want it too! As always, please [open an issue](https://github.com/autodesk/molecular-design-toolkit/issues) so that we know what you're working on.
 
 
 **Whatever:** There's ALWAYS something to do, whether supporting other languages (e.g., Spanish or Bahasa Indonesia, not Fortran or C++); improving 3D viewer performance; improving documentation; adding Python 3.X support; or integrating with other IDE technologies.
 
 ### Pull requests are always welcome
 
-All PRs should be documented as [GitHub issues](https://github.com/autodesk/moldesign/issues), ideally BEFORE you start working on them.
+All PRs should be documented as [GitHub issues](https://github.com/autodesk/molecular-design-toolkit/issues), ideally BEFORE you start working on them.
 
 ### Design and cleanup proposals
 
@@ -57,7 +57,7 @@ Good API design is at the heart of this project, and you don't need to do any pr
  * You could describe how a user will run a Hamiltonian replica exchange calculation (should it be a class or a function? What are the method names? How does the user specify the temperatures?).
  * You can also propose redesigns for existing features - maybe you think `mdt.add_hydrogens(mol)` should be renamed to `mol.add_hydrogens()`, or you want to propose a better way to access trajectory data.
 
-To get started, as always: [open an issue](https://github.com/autodesk/moldesign/issues). For information on making these types of
+To get started, as always: [open an issue](https://github.com/autodesk/molecular-design-toolkit/issues). For information on making these types of
 contributions, see [the development guide](DEVELOPMENT.md).
 
 
@@ -84,7 +84,7 @@ If MDT isn't working like you expect, please open a new issue! We appreciate any
 Providing the following information will increase the chances of your issue being dealt with quickly:
 
 * **Overview of the Issue** - Please describe the issue, and include any relevant exception messages or screenshots.
-* **Environment** - Include the output of `moldesign.print_environment()`, and for UI issues, let us know which browser you're using.
+* **Environment** - Include the relevant output of `pip freeze` as well as your system and python version info.
 * **Help us reproduce the issue** - Please include code that will help us reproduce the issue. For complex situations, attach a notebook file.
 * **Related Issues** - Please link to other issues in this project (or even other projects) that appear to be related 
 
