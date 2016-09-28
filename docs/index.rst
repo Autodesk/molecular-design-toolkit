@@ -16,6 +16,8 @@ Get the latest stable version:
 
    $ pip install moldesign
 
+**Note:** some users may need to run the installation as root, i.e. ``sudo pip install moldesign``
+
 Or get the source code on github:
 
 .. code-block:: bash

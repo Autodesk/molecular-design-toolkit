@@ -27,6 +27,39 @@ At this point, you should have everything you need to install MDT.
 
     pip install moldesign
 
+**Note:** Depending on their specific python installation, some users may need to run the installation as root, i.e. ``sudo pip install moldesign``
+
+
+
+Updating
+^^^^^^^^
+
+To update to the most recent version of the toolkit, type
+
+.. code-block:: bash
+
+    pip install -U moldesign
+
+However, note that this will update ``moldesign`` and *all of its dependencies* (including `numpy`, `jupyter`, `setuptools`, etc.)  to their latest versions, which you may or may not want. To update only the ``moldesign`` suite, please run
+
+.. code-block:: bash
+
+    pip install --no-deps -U moldesign pyccc nbmolviz
+
+
+Common problems
+^^^^^^^^^^^^^^^
+
+**Permissions**
+Depending on how python is installed on your system, you may need to run this installation as root, e.g. ``sudo pip install moldesign``.
+
+**MacOS default Python**
+We've encountered issues trying to install Jupyter with MacOS's built-in python distribution. We highly recommend using `Homebrew <http://brew.sh/>` to install a friendlier version of Python that doesn't require root permissions; see http://docs.python-guide.org/en/latest/starting/install/osx/ for instructions.
+
+**Python version**
+The toolkit is not yet compatible with Python 3. For now, make sure you're using Python 2 to install and run everything.
+
+
 Notebook extensions
 ^^^^^^^^^^^^^^^^^^^
 MDT will automatically install and enable the ``nbmolviz`` and ``widgetsnbextensions`` for Jupyter if they're not already enabled (these extensions provide the interactive molecular visualization framework). You can list the installed extensions by running
