@@ -17,6 +17,7 @@ Set up physical constants and unit systems
 import operator
 import copy
 from os.path import join, abspath, dirname
+import numbers
 
 import numpy as np
 from pint import UnitRegistry, set_application_registry, DimensionalityError
@@ -95,7 +96,9 @@ class MdtQuantity(ureg.Quantity):
             if not hasattr(value, 'value_in'):  # deal with missing `value_in` method
                 if self.dimensionless:  # case 1: this is OK if self is dimensionless
                     self.magnitude[key] = value
-                else:  # case 2: User tried to pass a number without units
+                elif not isinstance(value, numbers.Number):  # case 2: this is not a number
+                    raise TypeError('"%s" is not a valid numeric value' % value)
+                else:  # case 3: wrong units
                     raise DimensionalityError(self.units, ureg.dimensionless)
             else:  # case 3: attribute error is unrelated to this
                 raise

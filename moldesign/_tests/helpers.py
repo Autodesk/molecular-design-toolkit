@@ -32,7 +32,7 @@ def _make_mol_with_n_hydrogens(n):
     return mdt.Molecule([mdt.Atom('H') for i in xrange(n)])
 
 
-class ZeroEnergy(mdt.models.EnergyModelBase):
+class ZeroEnergy(mdt.models.base.EnergyModelBase):
     """ All 0, all the time
     """
     def prep(self):
