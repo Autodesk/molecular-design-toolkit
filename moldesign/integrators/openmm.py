@@ -39,6 +39,8 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
         self._prepped = True
 
     def run(self, run_for, wait=False):
+        self.prep()
+
         if not self.model._constraints_ok:
             raise NotImplementedError('OpenMM only supports position and bond constraints')
 

@@ -155,18 +155,20 @@ def guess_bond_orders(mol):
 
 
 @runsremotely(enable=force_remote)
-def add_hydrogen(mol):
-    """Add hydrogens to saturate atomic valences. (Does not assign formal charges or correct
-        for pH).
+def add_hydrogen(mol, ph=None):
+    """Add hydrogens to saturate atomic valences.
 
     Args:
         mol (moldesign.Molecule): Molecule to saturate
+        ph (float): Assign formal charges and protonation using pH model; if None (the default),
+            neutral protonation will be assigned where possible.
 
     Returns:
         moldesign.Molecule: New molecule with all valences saturated
     """
     pbmol = mol_to_pybel(mol)
-    pbmol.addh()
+    pbmol.OBMol.AddHydrogens(False,
+                             ph is not None,)
     newmol = pybel_to_mol(pbmol, reorder_atoms_by_residue=True)
     mdt.helpers.assign_unique_hydrogen_names(newmol)
     return newmol
