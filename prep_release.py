@@ -13,21 +13,28 @@ import atexit
 version = sys.argv[1]
 
 
+def run(cmd, display=True):
+    print '\n>>> %s' % cmd
+    if display:
+        return subprocess.check_call(cmd, shell=True)
+    else:
+        return subprocess.check_output(cmd, shell=True)
+
+
+
 DOCKER_REPO = 'autodesk/moldesign:'
-DOCKER_RUN_SOCKET = 'docker run -v /var/run/docker.sock:/var/run/docker.sock'.split()
+DOCKER_RUN_SOCKET = 'docker run -v /var/run/docker.sock:/var/run/docker.sock'
 COMPLETE_MDT = '%smoldesign_complete-%s' % (DOCKER_REPO, version)
 MINIMAL_MDT = '%smoldesign_minimal-%s' % (DOCKER_REPO, version)
-TEST_CMD = ('"pip install pytest pytest-xdist '
+TEST_CMD = ('bash -c "pip install pytest pytest-xdist '
             "&& mkdir ~/.moldesign "
             "&& echo 'engine_type: docker' > ~/.moldesign/moldesign.yml "
             "&& cd /opt/molecular-design-toolkit/moldesign/_tests "
             '&& py.test -n 4"')
 
 
-tags = set(subprocess.check_output('git tag --list',
-                                   shell=True).splitlines())
-rootdir = subprocess.check_output('git rev-parse --show-toplevel',
-                                  shell=True).strip()
+tags = set(run('git tag --list', display=False).splitlines())
+rootdir = run('git rev-parse --show-toplevel', display=False).strip()
 
 assert os.path.abspath(rootdir) == os.path.abspath(os.path.curdir), \
     "This command must be run at root of the repository directory"
@@ -38,14 +45,14 @@ major, minor, patch = map(int, version.split('.'))
 
 
 # Set the tag!
-subprocess.check_call('git tag %s' % version, shell=True)
+run('git tag %s' % version)
 print 'Tag set: %s' % version
 
 
 def untag():
     print 'Failed. Removing version tag %s' % version
     if not untag.success:
-        subprocess.check_call('git tag -d %s' % version, shell=True)
+        run('git tag -d %s' % version)
 
 untag.success = False
 
@@ -58,32 +65,32 @@ assert moldesign.__version__ == version, 'Package has incorrect version: %s' % m
 
 
 # build docker images
-subprocess.check_call('cd docker_images '
-                      '&& ./docker-make.py --all --tag %s --repo autodesk/moldesign:' % version,
-                      shell=True)
+run('cd docker_images '
+    '&& ./docker-make.py --all --tag %s --repo autodesk/moldesign:' % version)
 
 
 # Check dockerfile version tag
-infolines = subprocess.check_output('docker run moldesign python -c'.split() +
-                                    ['"import moldesign; print moldesign.__version__"']
-                                    ).splitlines()
+infolines = run(('docker run %s python -c '
+                 '"import moldesign; print moldesign.__version__"') % COMPLETE_MDT,
+                display=False).splitlines()
 assert infolines[-1].strip() == version, \
     "moldesign in docker container reported wrong version: %s" % infolines[-1].strip()
 
 
 # Check the remote image config version tag
-infolines = subprocess.check_output('docker run moldesign python -c'.split() +
-        ['"import moldesign; print moldesign.compute.config.CONFIG_DEFAULTS.default_version_tag"']
-        ).splitlines()
+infolines = run(('docker run %s python -c '
+                 '"import moldesign; '
+                 'print moldesign.compute.CONFIG_DEFAULTS.default_version_tag"') % COMPLETE_MDT,
+                display=False).splitlines()
 assert infolines[-1].strip() == version, \
     "moldesign.compute.config defaults to wrong image version: %s" % infolines[-1].strip()
 
 
 # Run tests in "complete" image
-subprocess.check_call(DOCKER_RUN_SOCKET + [COMPLETE_MDT, TEST_CMD])
+run(' '.join([DOCKER_RUN_SOCKET, COMPLETE_MDT, TEST_CMD]))
 
 # Run tests in "complete" image
-subprocess.check_call(DOCKER_RUN_SOCKET + [MINIMAL_MDT, TEST_CMD])
+subprocess.check_call(' '.join([DOCKER_RUN_SOCKET, MINIMAL_MDT, TEST_CMD]))
 
 untag.success = True
 

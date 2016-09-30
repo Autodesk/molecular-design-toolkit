@@ -11,3 +11,5 @@ _test.py
 ./build/
 *.egg-info
 docker_images
+prep_release.py
+

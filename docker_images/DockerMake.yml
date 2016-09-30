@@ -87,11 +87,11 @@ moldesign:
   - biopython
  build_directory: ../
  build: |
-  COPY . /opt/molecular_design_toolkit
+  COPY . /opt/molecular-design-toolkit
   RUN apt-get update && apt-get install -y git \
-   && cd /opt && mv molecular_design_toolkit molecular_design_toolkit_dirty \
-   && git clone molecular_design_toolkit_dirty molecular_design_toolkit \
-   && cd molecular_design_toolkit && python setup.py sdist \
+   && cd /opt && mv molecular-design-toolkit molecular-design-toolkit_dirty \
+   && git clone molecular-design-toolkit_dirty molecular-design-toolkit \
+   && cd molecular-design-toolkit && python setup.py sdist \
    && pip install dist/* \
    && apt-get -y remove --purge git \
    && apt-get -y autoremove --purge \
