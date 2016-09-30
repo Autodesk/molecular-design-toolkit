@@ -97,3 +97,8 @@ class BasisSet(MolecularOrbitals):
     @property
     def fock(self):
         return self.wfn.fock_ao
+
+    @property
+    def density_matrix(self):
+        return self.wfn.density_matrix_ao
+

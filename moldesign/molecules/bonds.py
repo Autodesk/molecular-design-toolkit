@@ -27,7 +27,8 @@ class Bond(object):
 
     Notes:
         Comparisons and hashes involving bonds will return True if the atoms involved in the bonds
-            are the same. Bond orders are not compared.
+        are the same. Bond orders are not compared.
+
         These objects are used to represent and pass bond data only - they are not used for storage.
 
     Attributes:

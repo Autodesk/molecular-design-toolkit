@@ -96,13 +96,21 @@ def _join_bonds(b1, b2):
 
 @toplevel
 #@singledispatch
-def dihedral(a1, a2, a3=None, a4=None):
+def dihedral(a1, a2=None, a3=None, a4=None):
     """Twist angle of bonds a1-a2 and a4-a3 around around the central bond a2-a3
 
+    Can be called as ``dihedral(a1, a2, a3, a4)``
+              OR     ``dihedral(a2, a2)``
+              OR     ``dihedral(bond)``
+
     Args:
+        a1 (mdt.Bond): the central bond in the dihedral. OR
         a1,a2 (mdt.Atom): the atoms describing the dihedral
         a3,a4 (mdt.Atom): (optional) if not passed, ``a1`` and ``a2`` will be treated as the
             central atoms in this bond, and a3 and a4 will be inferred.
+
+    Returns:
+        (units.Scalar[angle]): angle -  [0, 2 pi) radians
     """
     if a3 is a4 is None:  # infer the first and last atoms
         a1, a2, a3, a4 = _infer_dihedral(a1, a2)
@@ -144,10 +152,13 @@ def dihedral(a1, a2, a3=None, a4=None):
     return (theta * u.radians) % (2.0 * u.pi * u.radians)
 
 
-def _infer_dihedral(a2, a3):
+def _infer_dihedral(a2, a3=None):
     """ Given two atoms defining the central bond in a dihedral, pick the first and last atoms
     in a heuristic way (see :meth:`_pick_atom`) to get a unique-ish definition.
     """
+    if a3 is None:  # assume bond-like
+        bond = a2
+        a2, a3 = bond.a1, bond.a2
     a1 = _pick_atom(a2, a3)
     a4 = _pick_atom(a3, a2)
     return a1, a2, a3, a4

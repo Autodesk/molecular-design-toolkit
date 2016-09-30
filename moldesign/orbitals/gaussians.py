@@ -11,12 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Note: this code is currently unused and untested and will be refactored soon"""
 import numpy as np
 
 from .orbitals import Orbital, SHELLS, SPHERICALNAMES
 
 
 class AbstractFunction(object):
+    """ Abstract base class for basis functions
+    """
     def normalize(self):
         """ Give this function unit norm by adjusting its coefficient
         """

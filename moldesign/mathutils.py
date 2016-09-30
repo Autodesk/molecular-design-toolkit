@@ -66,7 +66,7 @@ def safe_arccos(costheta):
 
 
 def sub_angles(a, b):
-    """ Subtract two angles, keeping the result within [0,360)
+    """ Subtract two angles, keeping the result within [-180,180)
     """
     c = a - b
     return (c + 180.0 * u.degrees) % (360.0 * u.degrees) - (180.0 * u.degrees)

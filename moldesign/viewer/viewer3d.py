@@ -39,7 +39,7 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
     DEFAULT_COLOR_MAP = colormap
     DEFAULT_WIDTH = 625
     DEFAULT_HEIGHT = 400
-    DEF_PADDING = 1.75 * u.angstrom
+    DEF_PADDING = 2.25 * u.angstrom
 
     def __reduce__(self):
         """prevent these from being pickled for now"""
@@ -96,7 +96,7 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
                     cartoon_atoms.extend(residue.atoms)
                 elif residue.type in ('water', 'solvent'):
                     line_atoms.extend(residue.atoms)
-                elif residue.type in ('dna', 'rna') and self.mol.numatoms > 1000:
+                elif residue.type in ('dna', 'rna') and self.mol.num_atoms > 1000:
                     cartoon_atoms.extend(residue.atoms)
                 else:  # includes DNA, RNA if molecule is small enough
                     stick_atoms.extend(residue.atoms)
@@ -113,16 +113,13 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
                 self.stick(atoms=stick_atoms, render=False)
 
         # Deal with unbonded atoms (they only show up in VDW rep)
-        if self.mol.numatoms > 1000:
-            print 'WARN: large structure; waters not shown by default.'
-            lone = [atom for atom in self.mol.atoms if
-                    atom.num_bonds == 0 and atom.residue.type != 'water']
-            self.hide(atoms=[atom for atom in self.mol.atoms if atom.num_bonds == 0 and
-                             atom.residue.type == 'water'])
-        else:
-            self.show_unbonded()
+        if self.mol.num_atoms < 1000:
+            lone = [atom for atom in self.mol.atoms if atom.num_bonds == 0]
+            if lone:
+                self.vdw(atoms=lone, render=False, radius=0.5)
 
-        if render: self.render()
+        if render:
+            self.render()
 
     def show_unbonded(self, radius=0.5):
         lone = [atom for atom in self.mol.atoms if atom.num_bonds == 0]

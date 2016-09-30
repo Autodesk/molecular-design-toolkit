@@ -14,21 +14,7 @@
 from cStringIO import StringIO
 
 import numpy as np
-
-try:
-    from pyscf import gto, scf, mp, mcscf, ao2mo
-    import pyscf.grad
-    from pyscf.dft import numint
-except ImportError:
-    force_remote = True
-    gto = scf = mp = mcscf = ao2mo = numint = None
-except OSError as exc:  # TODO: on OSX, this does ... something
-    print 'WARNING: PySCF error on import - %s: %s' % (type(exc), exc)
-    print 'WARNING: Using containerized version of PySCF, not the local installation'
-    force_remote = True
-    gto = scf = mp = mcscf = ao2mo = numint = None
-else:
-    force_remote = False
+import imp
 
 import moldesign.units as u
 from moldesign import compute
@@ -36,8 +22,18 @@ from moldesign.utils import if_not_none, redirect_stderr
 from moldesign import orbitals
 
 
+try:
+    imp.find_module('pyscf')
+except (ImportError, OSError) as exc:
+    print 'PySCF not installed; using remote docker container'
+    force_remote = True
+else:
+    force_remote = False
+
+
 def mol_to_pyscf(mol, basis, symmetry=None, charge=0, positions=None):
     """Convert an MDT molecule to a PySCF "Mole" object"""
+    from pyscf import gto
     pyscfmol = gto.Mole()
 
     positions = if_not_none(positions, mol.atoms.position)
@@ -91,6 +87,8 @@ class StatusLogger(object):
 def get_eris_in_basis(basis, orbs):
     """ Get electron repulsion integrals transformed in (in form eri[i,j,k,l] = (ij|kl))
     """
+    from pyscf import ao2mo
+
     pmol = mol_to_pyscf(basis.wfn.molecule, basis=basis.basisname)
     eri = ao2mo.full(pmol, orbs.T, compact=True) * u.hartree
     eri.defunits_inplace()
@@ -112,6 +110,8 @@ def basis_values(mol, basis, coords, coeffs=None, positions=None):
         Array[length]: if ``coeffs`` is not passed, an array of basis fn values at each
                coordinate. Otherwise, a list of orbital values at each coordinate
     """
+    from pyscf.dft import numint
+
     # TODO: more than just create the basis by name ...
     pmol = mol_to_pyscf(mol, basis=basis.basisname, positions=positions)
     aovals = numint.eval_ao(pmol, np.ascontiguousarray(coords.value_in(u.bohr)))

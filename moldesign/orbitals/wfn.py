@@ -29,29 +29,39 @@ class ElectronicWfn(object):
     Args:
         mol (moldesign.Molecule): Molecule this wavefunction belongs to
         num_electrons (int): number of electrons in this wavefunction
-        theory (moldesign.models.base.EnergyModelBase): The model this wavefunction was created with
+        model (moldesign.models.base.EnergyModelBase): The model this wavefunction was created with
         aobasis (moldesign.orbitals.BasisSet): The basis functions for the enclosed orbitals
+        nbasis (int): number of AO basis functions
         fock_ao (moldesign.units.Array[energy]): fock matrix in the AO basis
         positions (moldesign.units.Array[length]): positions of the nuclei for this wfn
         civectors (np.ndarray): CI vectors (if applicable)
-        **kwargs (dict): arbitrary metadata
+        description (str): text describing the wfn (e.g. 'RHF/STO-3G', 'CAS(2,2)/SA3/6-31G**')
+        density_matrix_ao (np.ndarray): density matrix in the ao basis
     """
 
     def __init__(self, mol, num_electrons,
                  model=None,
                  aobasis=None, fock_ao=None,
                  positions=None,
-                 civectors=None, **kwargs):
+                 civectors=None,
+                 description=None,
+                 density_matrix_ao=None):
         self.mol = mol
         self.model = model
         self.civectors = civectors
         self.aobasis = aobasis
+        if aobasis:
+            self.nbasis = len(self.aobasis)
+        else:
+            self.nbasis = None
         self.orbitals = DotDict()
         self.fock_ao = fock_ao
         self.num_electrons = num_electrons
         self.homo = self.num_electrons/2 - 1
         self.lumo = self.homo + 1
         self._has_canonical = False
+        self.density_matrix_ao = density_matrix_ao
+        self.description = description
 
         if positions is None:
             self.positions = mol.positions.copy()
@@ -64,24 +74,16 @@ class ElectronicWfn(object):
             for orb in self.aobasis.orbitals:
                 orb.wfn = self
 
-        for arg, val in kwargs.iteritems():
-            setattr(self, arg, val)
-
     def __repr__(self):
         return '<ElectronicWfn (%s) of %s>' % (self.description, str(self.mol))
 
     def __str__(self):
         return '%s wfn' % self.description
 
-    @property
-    def description(self):
-        return '%s/%s' % (self.model, self.aobasis.basisname)
-
     def set_canonical_mos(self, orbs):
-        if orbs.wfn is None: orbs.wfn = self
-        if self.fock_ao is None and orbs.energy is not None:
-            fock_cmo = orbs.energy * np.identity(len(self.aobasis))
-            self.fock_ao = orbs.to_ao(fock_cmo)
+        if orbs.wfn is None:
+            orbs.wfn = self
+
         self._has_canonical = True
 
     def align_orbital_phases(self, other, assert_same=True):

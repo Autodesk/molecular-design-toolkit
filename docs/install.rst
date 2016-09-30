@@ -27,6 +27,39 @@ At this point, you should have everything you need to install MDT.
 
     pip install moldesign
 
+**Note:** Depending on their specific python installation, some users may need to run the installation as root, i.e. ``sudo pip install moldesign``
+
+
+
+Updating
+^^^^^^^^
+
+To update to the most recent version of the toolkit, type
+
+.. code-block:: bash
+
+    pip install -U moldesign
+
+However, note that this will update ``moldesign`` and *all of its dependencies* (including `numpy`, `jupyter`, `setuptools`, etc.)  to their latest versions, which you may or may not want. To update only the ``moldesign`` suite, please run
+
+.. code-block:: bash
+
+    pip install --no-deps -U moldesign pyccc nbmolviz
+
+
+Common problems
+^^^^^^^^^^^^^^^
+
+**Permissions**
+Depending on how python is installed on your system, you may need to run this installation as root, e.g. ``sudo pip install moldesign``.
+
+**MacOS default Python**
+We've encountered issues trying to install Jupyter with MacOS's built-in python distribution. We highly recommend using `Homebrew <http://brew.sh/>` to install a friendlier version of Python that doesn't require root permissions; see http://docs.python-guide.org/en/latest/starting/install/osx/ for instructions.
+
+**Python version**
+The toolkit is not yet compatible with Python 3. For now, make sure you're using Python 2 to install and run everything.
+
+
 Notebook extensions
 ^^^^^^^^^^^^^^^^^^^
 MDT will automatically install and enable the ``nbmolviz`` and ``widgetsnbextensions`` for Jupyter if they're not already enabled (these extensions provide the interactive molecular visualization framework). You can list the installed extensions by running
@@ -74,7 +107,8 @@ If you run into problems, see the `documentation <http://sunqm.net/pyscf/>`_ and
 Changing where your jobs run
 ============================
 
-The toolkit is built to run jobs using the `Docker containerization technology <https://www.docker.com/>`_ (which *has nothing to do with molecular docking*).  Docker eliminates the need to configure or compile
+The toolkit is built to run jobs using the `Docker containerization technology <https://www.docker.com/>`_
+(which *has nothing to do with molecular docking*).  Docker eliminates the need to configure or compile
 software on different computers.
 
 By default, MDT is configured to use a free cloud-based docker cluster provided by Autodesk
@@ -82,30 +116,52 @@ Research. If you'd like to run jobs on your local machine, you'll need to instal
 things.
 
 
-Running jobs locally
---------------------
 
-Using a docker-machine
-^^^^^^^^^^^^^^^^^^^^^^
-A recent version of Docker (>1.11) is required.
+Running locally with Docker
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+First, create or edit a file at ``$HOME/.moldesign/moldesign.yml`` with the line
 
-*Mac or Windows*: Download and install the `Docker Toolbox <https://www.docker
-.com/products/docker-toolbox>`_.
+.. code-block:: yaml
 
-*Linux*: `Follow the instructions for your distribution <https://docs.docker
-.com/engine/installation/linux/>`_.
+    engine_type: docker
 
-Next, create a docker-machine (ideally, it should have at least 4 GB of RAM and 40 GB of disk
-space):
+Next, install Docker if necessary (version 1.11 or higher is required):
 
-.. code-block:: bash
+- *Mac*: Download and install `Docker for Mac <https://docs.docker.com/docker-for-mac/>`_.
+- *Windows*: Download and install `Docker for Windows <https://docs.docker.com/docker-for-windows/>`_.
+- *Linux*: `Follow the instructions for your distribution <https://docs.docker.com/engine/installation/linux/>`_.
 
-    $ docker-machine create --driver virtualbox --virtualbox-memory "4096" --virtualbox-disk-size "40000"
+Once Docker is up and running, make sure to allocate enough RAM - 4 GB will work well for the
+included example jobs.
+
+Running locally with CloudComputeCannon
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Our group has also developed
+`CloudComputeCannon <https://www.npmjs.com/package/cloud-compute-cannon>`_, a lightweight,
+Docker-based job scheduling system which is more suitable for production than a bare Docker engine.
+
+You'll need Docker installed locally (see steps above). To install CCC:
+
+1. `Install the Node.js <https://nodejs.org/en/>`_ javascript interpreter if necessary.
+2. Update NPM if necessary: ``npm install npm -g``
+3. Do a global install of cloud compute cannon: ``npm install -g cloud-compute-cannon``
+
+To run it:
+
+- To **start** the CCC scheduler, make sure Docker is running locally, then run ``ccc server-install``
+- To **stop** the CCC scheduler, run ``ccc server-stop``
+
+Finally, update your MDT configuration to point to the CCC server by default by putting these lines in
+``$HOME/.moldesign/moldesign.yml``:
+
+.. code-block:: yaml
+
+    engine_type: cloudcomputecannon
+    default_ccc_server: localhost:9000
 
 
-Running jobs on AWS
---------------------
-coming soon
+
+
 
 System-specific installation
 ============================

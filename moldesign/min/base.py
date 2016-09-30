@@ -23,12 +23,10 @@ from moldesign import units as u
 class MinimizerBase(object):
 
     _strip_units = True  # callbacks expect and return dimensionless quantities scaled to default unit system
-    constraint_restraints = True  # if True, add restraint penalties for both constraints and restraints
 
     def __init__(self, mol, nsteps=20,
                  force_tolerance=data.DEFAULT_FORCE_TOLERANCE,
                  frame_interval=None,
-                 restraint_multiplier=1.0,
                  _restart_from=0,
                  _restart_energy=None):
         self.mol = mol
@@ -51,7 +49,6 @@ class MinimizerBase(object):
 
         # Figure out whether we'll use gradients
         self.request_list = ['potential_energy']
-        self.restraint_multiplier = restraint_multiplier
         if 'forces' in mol.energy_model.ALL_PROPERTIES:
             self.gradtype = 'analytical'
             self.request_list.append('forces')
@@ -72,7 +69,7 @@ class MinimizerBase(object):
     def _coords_to_vector(self, coords):
         """ Convert position array to a flat vector
         """
-        vec = coords.reshape(self.mol.num_atoms * 3)
+        vec = coords.reshape(self.mol.num_atoms * 3).copy()
         if self._strip_units:
             return vec.magnitude
         else:
@@ -82,12 +79,12 @@ class MinimizerBase(object):
         """ Callback function to calculate the objective function
         """
         self._sync_positions(vector)
-        self.mol.calculate(requests=self.request_list)
-        pot = self.mol.potential_energy
+        try:
+            self.mol.calculate(requests=self.request_list)
+        except mdt.QMConvergenceError:  # returning infinity can help rescue some line searches
+            return np.inf
 
-        if self.constraint_restraints:
-            for constraint in self.mol.constraints:
-                pot += self.restraint_multiplier * constraint.restraint_penalty()
+        pot = self.mol.potential_energy
 
         if self._initial_energy is None: self._initial_energy = pot
         self._last_energy = pot
@@ -101,14 +98,12 @@ class MinimizerBase(object):
         self.mol.calculate(requests=self.request_list)
         grad = -self.mol.forces
 
-        if self.constraint_restraints:
-            for constraint in self.mol.constraints:
-                grad -= self.restraint_multiplier * constraint.restraint_penalty_force()
-
         grad = grad.reshape(self.mol.num_atoms * 3)
         self._last_grad = grad
-        if self._strip_units: return grad.defunits().magnitude
-        else: return grad.defunits()
+        if self._strip_units:
+            return grad.defunits().magnitude
+        else:
+            return grad.defunits()
 
     def __call__(self):
         """ Run the minimization
@@ -137,8 +132,8 @@ class MinimizerBase(object):
 
         self.mol.calculate(self.request_list)
         self.traj.new_frame(minimization_step=self.current_step,
-                       annotation='minimization steps:%d (energy=%s)' %
-                                  (self.current_step, self.mol.potential_energy))
+                            annotation='minimization steps:%d (energy=%s)'%
+                                       (self.current_step, self.mol.potential_energy))
         if self.nsteps is None:
             message = ['Minimization step %d' % self.current_step]
         else:
@@ -152,17 +147,17 @@ class MinimizerBase(object):
             force = self._last_grad
 
             message.append(u'RMS \u2207E={rmsf.magnitude:.3e}, '
-                           u'max \u2207E={mf.magnitude:.3e}{mf.units}'.format(
+                           u'max \u2207E={mf.magnitude:.3e} {mf.units}'.format(
                 rmsf=np.sqrt(force.dot(force) / self.mol.ndims),
                 mf=np.abs(force).max()))
 
-        if self.constraint_restraints and self.mol.constraints:
+        if self.mol.constraints:
             nsatisfied = 0
             for c in self.mol.constraints:
                 if c.satisfied(): nsatisfied += 1
             message.append('constraints:%d/%d' % (nsatisfied, len(self.mol.constraints)))
 
-        print ', '.join(message)
+        print(', '.join(message))
         sys.stdout.flush()
 
     @classmethod

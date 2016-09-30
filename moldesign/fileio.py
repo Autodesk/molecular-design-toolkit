@@ -11,50 +11,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
-import cStringIO as StringIO
-import cPickle as pkl # TODO: if cpickle fails, retry with regular pickle to get a better traceback
-import gzip
 import bz2
-import string
+import cPickle as pkl # TODO: if cpickle fails, retry with regular pickle to get a better traceback
+import cStringIO as StringIO
 import functools
+import gzip
+import os
 
-import moldesign as mdt
-import moldesign.interfaces.openbabel as obabel
-import moldesign.molecules.atomcollections
-from moldesign.interfaces.opsin_interface import name_to_smiles
-import moldesign.interfaces.biopython_interface as biopy
-from moldesign import chemjson
-
-# These routines are imported here solely to make them available in this namespace
-from moldesign.interfaces.openbabel import mol_to_pybel
+from moldesign.interfaces import biopython_interface
+import moldesign.interfaces.openbabel as openbabel_interface
 from moldesign.interfaces.openmm import amber_to_mol as read_amber
-from moldesign.interfaces.ambertools import build_bdna
-
+from moldesign.helpers import pdb
+from moldesign import chemjson
 
 def exports(o, name=None):
     __all__.append(o.__name__)
     return o
-__all__ = ['read_amber', 'mol_to_pybel', 'build_bdna', 'from_smiles']
+
+__all__ = ['from_smiles', 'read_amber']
 
 
-
-# NOTE - all extensions MUST be lower case here
-PICKLE_EXTENSIONS = set("p pkl pickle mdt".split())
-COMPRESSION = {'gz': gzip.open,
-               'gzip': gzip.open,
-               'bz2': bz2.BZ2File,
-               'bzip2': bz2.BZ2File,
-               None: open}
-READERS = {'pdb': biopy.parse_pdb,
-           'cif': biopy.parse_pdb,
-           'json': chemjson.reader}
-WRITERS = {'json': chemjson.writer}
-for ext in PICKLE_EXTENSIONS:
-    READERS[ext] = pkl.load
-    WRITERS[ext] = functools.partial(pkl.dump, protocol=2)
-
-from_smiles = obabel.from_smiles
+from_smiles = openbabel_interface.from_smiles
 
 
 @exports
@@ -82,7 +59,7 @@ def read(f, format=None):
     filename = None
 
     # Open a file-like object
-    if isinstance(f, str) and os.path.exists(f):  # it's a path to a file
+    if isinstance(f, basestring) and os.path.exists(f):  # it's a path to a file
         filename = f
         format, compression = _get_format(filename, format)
         fileobj = COMPRESSION[compression](filename, mode='r')
@@ -90,7 +67,7 @@ def read(f, format=None):
         fileobj = f.open('r')
     elif hasattr(f, 'read'):  # it's already file-like
         fileobj = f
-    elif isinstance(f, str):  # it's just a string
+    elif isinstance(f, basestring):  # it's just a string
         fileobj = StringIO.StringIO(f)
     else:
         raise ValueError('Parameter to moldesign.read (%s) not ' % str(f) +
@@ -99,7 +76,7 @@ def read(f, format=None):
     if format in READERS:
         mol = READERS[format](fileobj)
     else:  # default to openbabel if there's not an explicit reader for this format
-        mol = obabel.read_stream(fileobj, format)
+        mol = openbabel_interface.read_stream(fileobj, format)
 
     if filename is not None:
         mol.name = filename
@@ -125,7 +102,15 @@ def write(obj, filename=None, format=None, mode='w'):
     Returns:
         str: if filename is none, return the output file as a string (otherwise returns ``None``)
     """
-    # TODO: handle writing and return file-like objects
+    # TODO: handle writing and returning file-like objects instead of strings
+
+    # lets users call mdt.write(obj, 'pdb') and get a string (without needing the "format" keyword
+    if (format is None and
+                filename is not None and
+                len(filename) < 5 and
+                '.' not in filename):
+        filename, format = None, filename
+
     format, compression = _get_format(filename, format)
 
     # First, create an object to write to (either file handle or file-like buffer)
@@ -140,7 +125,7 @@ def write(obj, filename=None, format=None, mode='w'):
     if format in WRITERS:
         WRITERS[format](obj, fileobj)
     else:
-        fileobj.write(obabel.write_string(obj, format))
+        fileobj.write(openbabel_interface.write_string(obj, format))
 
     # Return a string if necessary
     if return_string:
@@ -168,7 +153,6 @@ def write_trajectory(traj, filename=None, format=None, overwrite=True):
     if format.lower() in PICKLE_EXTENSIONS:
         write(traj, filename=filename, format=format)
 
-
     # for traditional molecular file formats, write the frames one after another
     else:
         tempmol = traj._tempmol
@@ -190,6 +174,73 @@ def write_trajectory(traj, filename=None, format=None, overwrite=True):
             fileobj.close()
 
 
+def read_pdb(f, assign_ccd_bonds=True):
+    """ Read a PDB file and return a molecule.
+
+    This uses the biopython parser to get the molecular structure, but uses internal parsers
+    to create bonds and biomolecular assembly data.
+
+    Note:
+        Users won't typically use this routine; instead, they'll use ``moldesign.read``, which will
+        delegate to this routine when appropriate.
+
+    Args:
+        f (filelike): filelike object giving access to the PDB file (must implement seek)
+        assign_ccd_bonds (bool): Use the PDB Chemical Component Dictionary (CCD) to create bond
+            topology (note that bonds from CONECT records will always be created as well)
+
+    Returns:
+        moldesign.Molecule: the parsed molecule
+    """
+    assemblies = pdb.get_pdb_assemblies(f)
+    f.seek(0)
+    mol = biopython_interface.parse_pdb(f)
+    mol.properties.bioassemblies = assemblies
+    f.seek(0)
+    conect_graph = pdb.get_conect_records(f)
+
+    # Assign bonds from residue templates
+    if assign_ccd_bonds:
+        pdb.assign_biopolymer_bonds(mol)
+
+    # Create bonds from CONECT records
+    serials = {atom.pdbindex: atom for atom in mol.atoms}
+    for atomserial, nbrs in conect_graph.iteritems():
+        atom = serials[atomserial]
+        for nbrserial, order in nbrs.iteritems():
+            nbr = serials[nbrserial]
+            if nbr not in atom.bond_graph:  # we already got it from CCD
+                mol.newbond(atom, nbr, order)
+
+    if assemblies:
+        pdb.warn_assemblies(mol, assemblies)
+
+    return mol
+
+
+def read_mmcif(f):
+    """ Read an mmCIF file and return a molecule.
+
+    This uses OpenBabel's basic structure parser along with biopython's mmCIF bioassembly parser
+
+    Note:
+        Users won't typically use this routine; instead, they'll use ``moldesign.read``, which will
+        delegate to this routine when appropriate.
+
+    Args:
+        f (filelike): file-like object that accesses the mmCIF file (must implement seek)
+
+    Returns:
+        moldesign.Molecule: the parsed molecular structure
+    """
+    mol = openbabel_interface.read_stream(f, 'cif')
+    f.seek(0)
+    assemblies = biopython_interface.get_mmcif_assemblies(f)
+    if assemblies:
+        pdb.warn_assemblies(mol, assemblies)
+    mol.properties.bioassemblies = assemblies
+    return mol
+
 
 @exports
 def mol_to_openmm_sim(mol):
@@ -200,7 +251,7 @@ def mol_to_openmm_sim(mol):
 
 
 @exports
-def from_pdb(pdbcode):
+def from_pdb(pdbcode, usecif=False):
     """ Import the given molecular geometry from PDB.org
         
     See Also:
@@ -208,16 +259,35 @@ def from_pdb(pdbcode):
 
     Args:
         pdbcode (str): 4-character PDB code (e.g. 3AID, 1BNA, etc.)
+        usecif (bool): If False (the default), use the PDB-formatted file (default).
+           If True, use the mmCIF-format file from RCSB.org.
 
     Returns:
         moldesign.Molecule: molecule object
     """
-    import urllib2
-    assert len(pdbcode) == 4, "%s is not a valid pdb ID." % pdbcode
-    request = urllib2.urlopen('http://www.rcsb.org/pdb/files/%s.pdb' % pdbcode)
-    ":type: urllib2.req"
-    filestring = request.read()
-    mol = read(filestring, format='pdb')
+    import requests
+    assert len(pdbcode) == 4, "%s is not a valid PDB ID." % pdbcode
+
+    fileext = 'cif' if usecif else 'pdb'
+    request = requests.get('http://www.rcsb.org/pdb/files/%s.%s' % (pdbcode, fileext))
+
+    if request.status_code == 404 and not usecif:  # if not found, try the cif-format version
+        print 'WARNING: %s.pdb not found in rcsb.org database. Trying %s.cif...' % (
+            pdbcode, pdbcode),
+        retval = from_pdb(pdbcode, usecif=True)
+        print 'success.'
+        return retval
+
+    elif request.status_code != 200:
+        raise ValueError('Failed to download %s.%s from rcsb.org: %s %s' % (
+            pdbcode, fileext, request.status_code, request.reason))
+
+    if usecif:
+        filestring = request.text
+    else:
+        filestring = request.text.encode('ascii')
+
+    mol = read(filestring, format=fileext)
     mol.name = pdbcode
     return mol
 
@@ -232,65 +302,12 @@ def from_name(name):
     Returns:
         moldesign.Molecule: molecule object
     """
+    from moldesign.interfaces.opsin_interface import name_to_smiles
+
     # TODO: fallback to http://cactus.nci.nih.gov/chemical/structure
     smi = name_to_smiles(name)
     mol = from_smiles(smi, name)
     return mol
-
-
-@exports
-def build_assembly(mol, assembly_name):
-    """ Create biological assembly using a bioassembly specification.
-
-    This routine builds a biomolecular assembly using the specification from a PDB header (if
-    present, this data can be found in the  "REMARK 350" lines in the PDB file). Assemblies are
-    author-assigned structures created by copying, translating, and rotating a subset of the
-    chains in the PDB file.
-
-    See Also:
-        http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies
-        
-    Args:
-        mol (moldesign.Molecule): Molecule with assembly data (assembly data will be created by the
-            PDB parser at ``molecule.properties.bioassembly``)
-        assembly_name (str): name of the biomolecular assembly to build.
-
-    Returns:
-        mol (moldesign.Molecule): molecule containing the complete assembly
-
-    Raises:
-        AttributeError: If the molecule does not contain any biomolecular assembly data
-        KeyError: If the specified assembly is not present
-    """
-    if 'bioassemblies' not in mol.properties:
-        raise AttributeError('This molecule does not contain any biomolecular assembly data')
-    try:
-        asm = mol.properties.bioassemblies[assembly_name]
-    except KeyError:
-        raise KeyError(('The specified assembly name ("%s") was not found. The following '
-                        'assemblies are present: %s') %
-                       (assembly_name,
-                        ', '.join(mol.properties.bioassemblies.keys())))
-
-    # Make sure each chain gets a unique name - up to all the letters in the alphabet, anyway
-    used_chain_names = set()
-    alpha = iter(string.ascii_uppercase)
-
-    # Create the new molecule by copying, transforming, and renaming the original chains
-    all_atoms = moldesign.molecules.atomcollections.AtomList()
-    for i, t in enumerate(asm.transforms):
-        for chain_name in asm.chains:
-            chain = mol.chains[chain_name].copy()
-            chain.transform(t)
-
-            while chain.name in used_chain_names:
-                chain.name = alpha.next()
-            used_chain_names.add(chain.name)
-            chain.pdbname = chain.pdbindex = chain.name
-            all_atoms.extend(chain.atoms)
-    newmol = mdt.Molecule(all_atoms,
-                          name="%s (bioassembly %s)" % (mol.name, assembly_name))
-    return newmol
 
 
 def _get_format(filename, format):
@@ -327,3 +344,26 @@ def _get_format(filename, format):
         format = suffix
 
     return format, compressor
+
+####################################
+#   FILE EXTENSION HANDLERS        #
+####################################
+
+# All extensions MUST be lower case
+READERS = {'json': chemjson.reader,
+           'pdb': read_pdb,
+           'cif': read_mmcif,
+           'mmcif': read_mmcif}
+
+WRITERS = {'json': chemjson.writer}
+
+PICKLE_EXTENSIONS = set("p pkl pickle mdt".split())
+COMPRESSION = {'gz': gzip.open,
+               'gzip': gzip.open,
+               'bz2': bz2.BZ2File,
+               'bzip2': bz2.BZ2File,
+               None: open}
+
+for ext in PICKLE_EXTENSIONS:
+    READERS[ext] = pkl.load
+    WRITERS[ext] = functools.partial(pkl.dump, protocol=2)

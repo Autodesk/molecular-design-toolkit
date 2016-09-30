@@ -1,6 +1,6 @@
-Atoms, molecules, and biomolecules
-----------------------------------
-The Molecular design toolkit is built around familiar physical objects. Below is a quick rundown of
+Molecular structure
+-------------------
+MDT is built around familiar physical objects. Below is a quick rundown of
 those objects and how they relate to one another.
 
 For most of the examples here, we'll look at a benzene molecule, which you can create as follows:
@@ -165,29 +165,6 @@ Note:
    Traceback (most recent call last):
     ...
    NotCalculatedError: The 'potential_energy' property hasn't been calculated yet. ...
-
-
-Primary structure
-"""""""""""""""""
-**Class documentation:** :class:`moldesign.Chain`, :class:`moldesign.Residue`
-
-Biomolecules also contain primary structure information such as :class:`Chains <moldesign.Chain>`
-and :class:`Residues <moldesign.Residue>`. Chains can be accessed by name OR by index:
-
-   >>> chain1 = molecule.chains['A']
-   >>> chain2 = molecule.chains[0]
-   >>> chain1 is chain2
-   True
-
-Each chain contains :class:`residues <moldesign.Residue>`. In a chain, residues can similarly be
-accessed through a flat list or by name:
-
-   >>> res0 = molecule.residues[0]
-   >>> resA = molecule.chains['A'].residues['PRO1']
-   >>> res0 is resA
-   True
-
-A flat list of all residues in a molecule is also available at `molecule.residues`.
 
 
 Electronic structure

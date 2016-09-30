@@ -71,20 +71,20 @@ BACKBONES = {'dna': set(("P OP1 OP2 O5' O4' C5' C4' C3' O3' C2' C1' H1' H2'' H2'
                         "HO5' HO3'").split()),
              'protein': set("N CA C O OXT H HA HA2 HA3 H2 H3".split())}
 
-RESTYPES = dict(
-    protein=set(('ALA ARG ASN ASP ASX CYS GLU GLN GLX GLY HIS ILE LEU LYS MET ' +
-                 'PHE PRO SER THR TRP TYR VAL').split()),
-    water={'HOH', 'H2O'},
-    solvent=set(),
-    dna=set(DBASES),
-    rna=set(RBASES),
-    unknown=set())
-
 RESIDUE_ONE_LETTER = dict(ALA="A", ASX="B", CYS="C", ASP="D",
                           GLU="E", PHE="F", GLY="G", HIS="H", ILE="I",
                           LYS="K", LEU="L", MET="M", ASN="N", PRO="P",
                           GLN="Q", ARG="R", SER="S", THR="T", VAL="V",
                           TRP="W", XAA="X", TYR="Y", GLX="Z")
+
+BIOPOLYMER_TYPES = set('dna rna protein'.split())
+
+CHAIN_MONOMER_NAMES = {'dna': 'dna base',
+                       'protein': 'amino acid',
+                       'unkonwn': 'small molecule',
+                       'water': 'water',
+                       'solvent': 'solvent',
+                       'ion': 'ion'}
 
 # This is a very big dict, so we load it as a compressed database
 _bondfilename = os.path.join(PACKAGEPATH, '_static_data/residue_bonds')
@@ -126,6 +126,28 @@ NUCLEIC_NAMES = {
     'T': 'Thymine',
     'U': 'Uracil'}
 
+IONS = {'NA': 'Na+',
+        'K': 'K+',
+        'MG': 'Mg+2',
+        'CA': 'Ca+2',
+        'F': 'F-',
+        'Cl': 'Cl-',
+        'Br': 'Br-',
+        'I': 'I-'}
+
+RESTYPES = dict(
+    protein=set(AMINO_NAMES),
+    water={'HOH', 'H2O'},
+    solvent=set(),
+    dna=set(DBASES),
+    rna=set(RBASES),
+    unknown=set(),
+    ions=set(IONS))
+
+RESIDUE_TYPES = {}
+for typename, namelist in RESTYPES.iteritems():
+    for resname in namelist: RESIDUE_TYPES[resname] = typename
+
 RESIDUE_DESCRIPTIONS = dict(AMINO_NAMES)
 for base, name in AMINO_NAMES.iteritems():
     RESIDUE_DESCRIPTIONS['N' + name] = name + ' (N-terminal)'
@@ -163,19 +185,37 @@ def print_environment():
     """For reporting bugs - spits out the user's environment"""
     import sys
     version = {}
-    for pkg in 'moldesign IPython ipywidgets jupyter matplotlib numpy docker pyccc ' \
-               'nbmolviz jupyter_client jupyter_core pint Bio openbabel simtk pyscf'.split():
+    for pkg in 'moldesign IPython ipywidgets jupyter matplotlib numpy docker pyccc distutils' \
+               'nbmolviz jupyter_client jupyter_core pint Bio openbabel simtk pyscf pip setuptools'\
+            .split():
         try:
             module = __import__(pkg)
-        except ImportError:
-            version[pkg] = 'FAILED'
+        except ImportError as e:
+            version[pkg] = str(e)
         else:
             try:
                 version[pkg] = module.__version__
-            except AttributeError:
-                version[pkg] = '???'
+            except AttributeError as e:
+                version[pkg] = str(e)
     env = {'platform': sys.platform,
-           'version': sys.version}
+           'version': sys.version,
+           'prefix': sys.prefix}
+
+    try:
+        import platform
+        env['machine'] = platform.machine()
+        env['linux'] = platform.linux_distribution()
+        env['mac'] = platform.mac_ver()
+        env['windows'] = platform.win32_ver()
+        env['impl'] = platform.python_implementation()
+        env['arch'] = platform.architecture()
+        env['system'] = platform.system()
+        env['python_build'] = platform.python_build()
+        env['platform_version'] = platform.version()
+
+    except Exception as e:
+        env['platform_exception'] = str(e)
+
 
     print json.dumps({'env': env,
                       'versions': version})

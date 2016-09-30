@@ -204,7 +204,15 @@ def _capture_logging_displays(display=False, **kwargs):
 
 
 def _finalize_logging_displays(display=True, **kwargs):
-    pass
+    import pyccc.ui
+    global _current_tabs
+
+    if not _current_tabs: return
+
+    for display in _current_tabs.children:
+        if isinstance(display, pyccc.ui.JobStatusDisplay):
+            display.update()
+
 
 # FOR NOW, *always* enable the logging widgets
 enable_logging_widgets(True)

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .quantity import *
 from .constants import *
 
 
@@ -68,13 +67,18 @@ class UnitSystem(object):
         self._momentum = f
 
     def convert(self, quantity):
-        """
-        Convert a quantity into this unit system
-        @param quantity: moldesign.external.pint.Quantity
+        """ Convert a quantity into this unit system
+
+        Args:
+            quantity (MdtQuantity): quantity to convert
         """
         baseunit = self.get_baseunit(quantity)
-        result = quantity.to(baseunit)
-        return result
+        if isinstance(baseunit, int):
+            assert baseunit == 1
+            return quantity * ureg.dimensionless
+        else:
+            result = quantity.to(baseunit)
+            return result
 
     def get_baseunit(self, quantity):
         # TODO: this needs to deal with angles
