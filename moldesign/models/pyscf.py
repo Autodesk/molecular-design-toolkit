@@ -89,6 +89,7 @@ class PySCFPotential(QMBase):
 
     FORCE_UNITS = u.hartree / u.bohr
 
+    @mdt.utils.kwargs_from(QMBase)
     def __init__(self, **kwargs):
         super(PySCFPotential, self).__init__(**kwargs)
         self.pyscfmol = None
@@ -334,7 +335,7 @@ class PySCFPotential(QMBase):
                                     self.params.active_orbitals,
                                     self.params.active_electrons)
 
-            if name != 'casci':
+            if name != 'casci' and self.params.state_average > 1:
                 theory = theory.state_average_([1.0/self.params.state_average
                                                 for i in xrange(self.params.state_average)])
         else:
