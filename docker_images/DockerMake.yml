@@ -253,7 +253,7 @@ openmm: # NEWFEATURE: add GPU support (opencl/cuda)
   - python_install
  build: |
   RUN mkdir -p /src
-  ADD OpenMM-7.0.0-Linux.zip /src/OpenMM.zip
+  ADD OpenMM-7.0.1-Linux.zip /src/OpenMM.zip
   RUN apt-get update \
    && apt-get install -y \
        gcc \
