@@ -18,6 +18,7 @@ import functools
 import gzip
 import os
 
+import moldesign as mdt
 from moldesign.interfaces import biopython_interface
 import moldesign.interfaces.openbabel as openbabel_interface
 from moldesign.interfaces.openmm import amber_to_mol as read_amber
@@ -242,6 +243,15 @@ def read_mmcif(f):
     return mol
 
 
+def read_xyz(f):
+    tempmol = openbabel_interface.read_stream(f, 'xyz')
+    for atom in tempmol.atoms:
+        atom.residue = None
+        atom.chain = None
+    return mdt.Molecule(tempmol.atoms)
+
+
+
 @exports
 def mol_to_openmm_sim(mol):
     try:
@@ -353,7 +363,8 @@ def _get_format(filename, format):
 READERS = {'json': chemjson.reader,
            'pdb': read_pdb,
            'cif': read_mmcif,
-           'mmcif': read_mmcif}
+           'mmcif': read_mmcif,
+           'xyz': read_xyz}
 
 WRITERS = {'json': chemjson.writer}
 
