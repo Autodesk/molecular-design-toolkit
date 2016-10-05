@@ -89,8 +89,8 @@ assert infolines[-1].strip() == version, \
 # Run tests in "complete" image
 run(' '.join([DOCKER_RUN_SOCKET, COMPLETE_MDT, TEST_CMD]))
 
-# Run tests in "complete" image
-subprocess.check_call(' '.join([DOCKER_RUN_SOCKET, MINIMAL_MDT, TEST_CMD]))
+# Run tests in "minimal" image
+run(' '.join([DOCKER_RUN_SOCKET, MINIMAL_MDT, TEST_CMD]))
 
 untag.success = True
 
