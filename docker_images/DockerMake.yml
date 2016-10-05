@@ -8,6 +8,7 @@ _ALL_:
  - python_install
  - moldesign_complete
  - moldesign_notebook
+ - moldesign_minimal
 
 
 ##################################################
