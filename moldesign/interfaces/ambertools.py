@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import collections
-import warnings
+import re
+
+import traitlets
 
 import moldesign as mdt
 import pyccc
@@ -259,8 +261,15 @@ def assign_forcefield(mol, **kwargs):
     else:
         newmol = None
 
-    report = ParameterizationDisplay(job, mol, molout=newmol)
-    uibase.display_log(report, title='ERRORS/WARNINGS', show=True)
+    errors = _parse_tleap_errors(job, mol)
+
+    try:
+        report = ParameterizationDisplay(errors, mol, molout=newmol)
+        uibase.display_log(report, title='ERRORS/WARNINGS', show=True)
+    except traitlets.TraitError:
+        print 'Forcefield assignment: %s' % ('Success' if newmol is not None else 'Failure')
+        for err in errors:
+            print err.desc
 
     if newmol is not None:
         return newmol
@@ -293,6 +302,9 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
             forcefield parameters for other systems that contain this molecule
     """
     assert mol.num_residues == 1
+    if mol.residues[0].resname is None:
+        mol.residues[0].resname = 'UNL'
+        print 'Assigned residue name "UNL" to %s' % mol
     resname = mol.residues[0].resname
 
     if charges == 'am1-bcc' and 'am1-bcc' not in mol.properties:
@@ -340,3 +352,65 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
     return mdt.compute.run_job(job, _return_result=True, **kwargs)
 
 
+ATOMSPEC = re.compile(r'\.R<(\S+) (\d+)>\.A<(\S+) (\d+)>')
+
+
+def _parse_tleap_errors(job, molin):
+    from moldesign.widgets.parameterization import UnusualBond, UnknownAtom, UnknownResidue
+
+    # TODO: special messages for known problems (e.g. histidine)
+    msg = []
+    unknown_res = set()  # so we can print only one error per unkonwn residue
+    lineiter = iter(job.stdout.split('\n'))
+    offset = utils.if_not_none(molin.residues[0].pdbindex, 0)
+    reslookup = {str(i+offset): r for i,r in enumerate(molin.residues)}
+
+    def _atom_from_re(s):
+        resname, residx, atomname, atomidx = s
+        r = reslookup[residx]
+        a = r[atomname]
+        return a
+
+    def unusual_bond(l):
+        atomre1, atomre2 = ATOMSPEC.findall(l)
+        try:
+            a1, a2 = _atom_from_re(atomre1), _atom_from_re(atomre2)
+        except KeyError:
+            a1 = a2 = None
+        r1 = reslookup[atomre1[1]]
+        r2 = reslookup[atomre2[1]]
+        return UnusualBond(l, (a1, a2), (r1, r2))
+
+    while True:
+        try:
+            line = lineiter.next()
+        except StopIteration:
+            break
+
+        fields = line.split()
+        if fields[0:2] == ['Unknown','residue:']:
+            # EX: "Unknown residue: 3TE   number: 499   type: Terminal/beginning"
+            res = molin.residues[int(fields[4])]
+            unknown_res.add(res)
+            msg.append(UnknownResidue(line,res))
+
+        elif fields[:4] == 'Warning: Close contact of'.split():
+            # EX: "Warning: Close contact of 1.028366 angstroms between .R<DC5 1>.A<HO5' 1> and .R<DC5 81>.A<P 9>"
+            msg.append(unusual_bond(line))
+
+        elif fields[:6] == 'WARNING: There is a bond of'.split():
+            # Matches two lines, EX:
+            # "WARNING: There is a bond of 34.397700 angstroms between:"
+            # "-------  .R<DG 92>.A<O3' 33> and .R<DG 93>.A<P 1>"
+            nextline = lineiter.next()
+            msg.append(unusual_bond(line + nextline))
+
+        elif fields[:5] == 'Created a new atom named:'.split():
+            # EX: "Created a new atom named: P within residue: .R<DC5 81>"
+            residue = reslookup[fields[-1][:-1]]
+            if residue in unknown_res: continue  # suppress atoms from an unknown res ...
+            atom = residue[fields[5]]
+            msg.append(UnknownAtom(line, residue, atom))
+
+
+    return msg

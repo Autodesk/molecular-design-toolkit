@@ -2,10 +2,10 @@ import moldesign as mdt
 from moldesign import units as u
 import numpy as np
 
-DEFSTEP = 0.0000005*u.angstrom
+DEFSTEP = 0.000005*u.angstrom
 
 
-def num_grad(mol, fn, step=DEFSTEP, fnargs=None, fnkwargs=None):
+def num_grad(mol, fn, step=DEFSTEP, atoms=None, fnargs=None, fnkwargs=None):
     grad = None
     origpos = mol.positions.copy()
     if fnargs is None:
@@ -13,7 +13,10 @@ def num_grad(mol, fn, step=DEFSTEP, fnargs=None, fnkwargs=None):
     if fnkwargs is None:
         fnkwargs = dict()
 
-    for iatom, atom in enumerate(mol.atoms):
+    if atoms is None:
+        atoms = mol.atoms
+
+    for iatom, atom in enumerate(atoms):
         for idim in xrange(3):
             atom.position[idim] += step
             vplus = fn(*fnargs, **fnkwargs)
@@ -22,7 +25,7 @@ def num_grad(mol, fn, step=DEFSTEP, fnargs=None, fnkwargs=None):
             mol.positions = origpos  # reset positions
 
             if grad is None:
-                grad = np.zeros(mol.positions.shape) * vplus.units/mol.positions.units
+                grad = np.zeros((len(atoms), 3)) * vplus.units/mol.positions.units
             grad[iatom, idim] = (vplus - vminus) / (2.0*step)
 
     return grad

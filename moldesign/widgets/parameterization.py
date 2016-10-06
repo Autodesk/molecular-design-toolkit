@@ -31,14 +31,11 @@ from moldesign import units as u
 
 
 class ParameterizationDisplay(ipy.Box):
-    ATOMSPEC = re.compile(r'\.R<(\S+) (\d+)>\.A<(\S+) (\d+)>')
 
-    def __init__(self, job, molin, molout=None):
+    def __init__(self, errormessages, molin, molout=None):
         self.molin = molin
         self.molout = molout
-        self.job = job
-        self.msg = []
-        self.parse_errors(self.job)
+        self.msg = errormessages
 
         self.status = ipy.HTML('<h4>Forcefield assignment: %s</h4>' %
                                ('Success' if molout else 'FAILED'))
@@ -67,56 +64,6 @@ class ParameterizationDisplay(ipy.Box):
         new.show(self.viewer)
         self.errmsg.value = new.desc
 
-    def parse_errors(self, job):
-        # TODO: special messages for known problems (e.g. histidine)
-        unknown_res = set()
-        lineiter = iter(job.stdout.split('\n'))
-        reslookup = {str(i + self.molin.residues[0].pdbindex): r for i,r in enumerate(self.molin.residues)}
-
-        def _atom_from_re(s):
-            resname, residx, atomname, atomidx = s
-            r = reslookup[residx]
-            a = r[atomname]
-            return a
-
-        def unusual_bond(l):
-            atomre1, atomre2 = self.ATOMSPEC.findall(l)
-            try:
-                a1, a2 = _atom_from_re(atomre1), _atom_from_re(atomre2)
-            except KeyError:
-                a1 = a2 = None
-            r1 = reslookup[atomre1[1]]
-            r2 = reslookup[atomre2[1]]
-            self.msg.append(UnusualBond(l, (a1, a2), (r1, r2)))
-
-        while True:
-            try: line = lineiter.next()
-            except StopIteration: break
-
-            fields = line.split()
-            if fields[0:2] == ['Unknown','residue:']:
-                # EX: "Unknown residue: 3TE   number: 499   type: Terminal/beginning"
-                res = self.molin.residues[int(fields[4])]
-                self.msg.append(UnknownResidue(line,res))
-                unknown_res.add(res)
-
-            elif fields[:4] == 'Warning: Close contact of'.split():
-                # EX: "Warning: Close contact of 1.028366 angstroms between .R<DC5 1>.A<HO5' 1> and .R<DC5 81>.A<P 9>"
-                unusual_bond(line)
-
-            elif fields[:6] == 'WARNING: There is a bond of'.split():
-                # Matches two lines, EX:
-                # "WARNING: There is a bond of 34.397700 angstroms between:"
-                # "-------  .R<DG 92>.A<O3' 33> and .R<DG 93>.A<P 1>"
-                nextline = lineiter.next()
-                unusual_bond(line + nextline)
-
-            elif fields[:5] == 'Created a new atom named:'.split():
-                # EX: "Created a new atom named: P within residue: .R<DC5 81>"
-                residue = reslookup[fields[-1][:-1]]
-                if residue in unknown_res: continue  # suppress atoms from an unknown res ...
-                atom = residue[fields[5]]
-                self.msg.append(UnknownAtom(line, residue, atom))
 
 
 class ForceFieldMessage(object):
