@@ -9,5 +9,7 @@ from .atomcollections import *
 from .bonds import *
 from .atoms import *
 from .biounits import *
+from .residue import *
+from .chain import *
 from .molecule import *
 from .trajectory import *

@@ -1,0 +1,361 @@
+# Copyright 2016 Autodesk Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import moldesign as mdt
+from moldesign import utils, data
+
+from . import Entity, AtomList, toplevel
+
+
+@toplevel
+class Residue(Entity):
+    """ A biomolecular residue - most often an amino acid, a nucleic base, or a solvent
+    molecule. In PDB structures, also often refers to non-biochemical molecules.
+
+    Its children are almost always residues.
+
+    Attributes:
+        parent (mdt.Molecule): the molecule this residue belongs to
+        chain (Chain): the chain this residue belongs to
+    """
+
+    def copy(self):
+        newatoms = super(Residue, self).copy()
+        return newatoms[0].residue
+    copy.__doc__ = Entity.copy.__doc__
+
+    def to_json(self):
+        js = mdt.chemjson.jsonify(self, 'index resname name pdbindex'.split())
+        js['chain'] = self.chain.index
+        js['atoms'] = [atom.index for atom in self.atoms]
+        return js
+
+    @utils.args_from(Entity)
+    def __init__(self, **kwargs):
+        """ Initialization
+        Args:
+            **kwargs ():
+        """
+        self.chain = kwargs.get('chain', None)
+        super(Residue, self).__init__(**kwargs)
+        if self.index is None and self.molecule is not None:
+            self.index = self.molecule.residues.index(self)
+        self.chainindex = None
+        self._backbone = None
+        self._sidechain = None
+        self._template_name = None
+        if self.name is None: self.name = self.pdbname + str(self.pdbindex)
+
+    @property
+    def atoms(self):
+        return self.children
+
+    def add(self, atom, key=None):
+        """Deals with atom name clashes within a residue - common for small molecules"""
+        if atom.residue is not None:
+            assert atom.residue is self, 'Atom already assigned to a residue'
+        atom.residue = self
+        if atom.chain is None:
+            atom.chain = self.chain
+        else:
+            assert atom.chain == self.chain, "Atom's chain does not match residue's chain"
+
+        if key is not None or atom.name not in self.children:
+            return super(Residue, self).add(atom, key=key)
+        else:
+            return super(Residue, self).add(atom, key='%s%s' % (atom.name, len(self)))
+    add.__doc__ = Entity.add.__doc__
+
+    @property
+    def is_n_terminal(self):
+        """bool: this is the last residue in a peptide
+
+        Raises:
+            ValueError: if this residue is not an amino acid
+        """
+        if self.type != 'protein':
+            raise ValueError('%s is not a recognized peptide monomer' % self)
+        return self._is_starting_residue
+
+    @property
+    def is_c_terminal(self):
+        """bool: this is the first residue in a peptide
+
+        Raises:
+            ValueError: if this residue is not an amino acid
+        """
+        if self.type != 'protein':
+            raise ValueError('%s is not a recognized peptide monomer' % self)
+        return self._is_ending_residue
+
+    @property
+    def is_5prime_end(self):
+        """bool: this is the first base in a strand
+
+        Raises:
+            ValueError: if this residue is not a DNA base
+        """
+        if self.type != 'dna':
+            raise ValueError('%s is not a recognized nucleic acid monomer' % self)
+        return self._is_starting_residue
+
+    @property
+    def is_3prime_end(self):
+        """bool: this is the last base in a strand
+
+        Raises:
+            ValueError: if this residue is not a DNA base
+        """
+        if self.type != 'dna':
+            raise ValueError('%s is not a recognized nucleic acid monomer' % self)
+        return self._is_ending_residue
+
+    @property
+    def is_monomer(self):
+        """bool: this residue is not part of a biopolymer
+        """
+        return self._is_ending_residue and self._is_starting_residue
+
+    @property
+    def _is_ending_residue(self):
+        """bool: this is the last residue in a polymer"""
+        try:
+            nextres = self.next_residue
+        except StopIteration:
+            return True
+        else:
+            return False
+
+    @property
+    def _is_starting_residue(self):
+        """bool: this is the first residue in a polymer"""
+        try:
+            prevres = self.prev_residue
+        except StopIteration:
+            return True
+        else:
+            return False
+
+    def assign_template_bonds(self):
+        """Assign bonds from bioresidue templates.
+
+        Only assigns bonds that are internal to this residue (does not connect different residues).
+        The topologies here assume pH7.4 and may need to be corrected for other pHs
+
+        See Also:
+            :ref:`moldesign.Chain.assign_biopolymer_bonds` for assigning inter-residue bonds
+
+        Raises:
+            ValueError: if ``residue.resname`` is not in bioresidue templates
+            KeyError: if an atom in this residue is not recognized """
+        try:
+            resname = self.resname
+            if self.type == 'protein':
+                if self.is_n_terminal:
+                    resname = self.resname + '_LSN3'  # the protonated form (with NH3+ on the end)
+                elif self.is_c_terminal:
+                    resname = self.resname + '_LEO2H'  # deprotonated form (COO-)
+                elif self.is_monomer:
+                    resname = self.resname + '_LFZW'  # free zwitterion form
+
+            bonds_by_name = data.RESIDUE_BONDS[resname]
+            self._template_name = resname
+        except KeyError:
+            if len(self) == 1:
+                print 'INFO: no bonds assigned to residue %s' % self
+                return
+            else:
+                raise ValueError("No bonding template for residue '%s'" % resname)
+
+        # intra-residue bonds
+        bond_graph = {atom: {} for atom in self}
+        for atom in self:
+            for nbrname, order in bonds_by_name.get(atom.name, {}).iteritems():
+                try:
+                    nbr = self[nbrname]
+                except KeyError:  # missing atoms are normal (often hydrogen)
+                    pass
+                else:
+                    bond_graph[atom][nbr] = bond_graph[nbr][atom] = order
+
+        # copy bonds into the right structure (do this last to avoid mangling the graph)
+        for atom in bond_graph:
+            atom.bond_graph.update(bond_graph[atom])
+
+    @property
+    def next_residue(self):
+        """Residue:
+            The next residue in the chain (in the C-direction for proteins, 3'
+            direction for nucleic acids)
+
+        Raises:
+            NotImplementedError: If we don't know how to deal with this type of biopolymer
+            StopIteration: If there isn't a next residue (i.e. it's a 3'- or C-terminus)
+        """
+        if self.chain.type == 'protein':
+            return self._get_neighbor('C', 'C-terminus')
+        elif self.chain.type == 'dna':
+            return self._get_neighbor("O3'", "3' end")
+        else:
+            raise NotImplementedError('We only deal with dna and amino acids right now')
+
+    @property
+    def prev_residue(self):
+        """Residue: The next residue in the chain (in the N-direction for proteins, 5' direction for
+            nucleic acids)
+
+        Raises:
+            NotImplementedError: If we don't know how to deal with this type of biopolymer
+            StopIteration: If there isn't a previous residue (i.e. it's a 5'- or N-terminus)
+        """
+        if self.chain.type == 'protein':
+            return self._get_neighbor('N', 'N-terminus')
+        elif self.chain.type == 'dna':
+            return self._get_neighbor("P", "5' end")
+        else:
+            raise NotImplementedError('We only deal with dna and amino acids right now')
+
+    def _get_neighbor(self, atomname, name):
+        """Return the first residue found that's bound to the passed atom name
+        """
+        conn_atom = self[atomname]
+        for nbr in conn_atom.bond_graph:
+            if nbr.residue is not self:
+                return nbr.residue
+        else:
+            raise StopIteration('%s reached' % name)
+
+    @property
+    def resname(self):
+        """str: Synonym for pdbname"""
+        return self.pdbname
+
+    @resname.setter
+    def resname(self, val):
+        self.pdbname = val
+
+    @property
+    def type(self):
+        """str: Classification of the residue (protein, solvent, dna, water, unknown)"""
+        return data.RESIDUE_TYPES.get(self.resname, 'unknown')
+
+    @property
+    def code(self):
+        """str: one-letter amino acid code or two letter nucleic acid code, or '?' otherwise"""
+        return data.RESIDUE_ONE_LETTER.get(self.pdbname, '?')
+
+    @property
+    def atomnames(self):
+        """Residue: synonym for ```self``` for for the sake of readability:
+            ```molecule.chains['A'].residues[123].atomnames['CA']```
+        """
+        return self
+
+    @property
+    def backbone(self):
+        """ AtomList: all backbone atoms for nucleic and protein residues
+            (indentified using PDB names); returns None for other residue types
+        """
+        if self._backbone is None:
+            if self.type not in data.BACKBONES:
+                return None
+            self._backbone = AtomList()
+            for name in data.BACKBONES[self.type]:
+                try: self._backbone.append(self[name])
+                except KeyError: pass
+        return self._backbone
+
+    @property
+    def sidechain(self):
+        """ AtomList: all sidechain atoms for nucleic and protein residues
+            (defined as non-backbone atoms); returns None for other residue types
+        """
+        if self._sidechain is None:
+            if self.backbone is None:
+                return None
+            bb = set(self.backbone)
+            self._sidechain = [atom for atom in self if atom not in bb]
+        return self._sidechain
+
+    @property
+    def is_standard_residue(self):
+        """ bool: this residue is a "standard residue" for the purposes of a PDB entry.
+
+        In PDB files, this will be stored using 'ATOM' if this is a standard residue
+        and 'HETATM' records if not.
+
+        Note:
+            We currently define "standard" residues as those whose 3 letter residue code appears in
+            the ``moldesign.data.RESIDUE_DESCRIPTIONS`` dictionary. Although this seems to work
+            well, we'd welcome a PR with a less hacky method.
+
+        References:
+            PDB format guide: http://www.wwpdb.org/documentation/file-format
+        """
+        return self.resname in mdt.data.RESIDUE_DESCRIPTIONS
+
+    def __str__(self):
+        return 'Residue %s (index %d, chain %s)' % (self.name, self.index,
+                                                    self.chain.name)
+
+    def _repr_markdown_(self):
+        return self.markdown_summary()
+
+    def markdown_summary(self):
+        """ Markdown-formatted information about this residue
+
+        Returns:
+            str: markdown-formatted string
+        """
+        if self.molecule is None:
+            lines = ["<h3>Residue %s</h3>" % self.name]
+        else:
+            lines = ["<h3>Residue %s (index %d)</h3>" % (self.name, self.index)]
+
+        if self.type == 'protein':
+            lines.append('**Residue codes**: %s / %s' % (self.resname, self.code))
+        else:
+            lines.append("**Residue code**: %s" % self.resname)
+        lines.append('**Type**: %s' % self.type)
+        if self.resname in data.RESIDUE_DESCRIPTIONS:
+            lines.append('**Description**: %s' % data.RESIDUE_DESCRIPTIONS[self.resname])
+
+        lines.append('**<p>Chain:** %s' % self.chain.name)
+
+        lines.append('**Sequence number**: %d' % self.pdbindex)
+
+        terminus = None
+        if self.type == 'dna':
+            if self.is_3prime_end:
+                terminus = "3' end"
+            elif self.is_5prime_end:
+                terminus = "5' end"
+        elif self.type == 'protein':
+            if self.is_n_terminal:
+                terminus = 'N-terminus'
+            elif self.is_c_terminal:
+                terminus = 'C-terminus'
+        if terminus is not None:
+            lines.append('**Terminal residue**: %s of chain %s' % (terminus, self.chain.name))
+
+        if self.molecule is not None:
+            lines.append("**Molecule**: %s" % self.molecule.name)
+
+        lines.append("**<p>Number of atoms**: %s" % self.num_atoms)
+        if self.backbone:
+            lines.append("**Backbone atoms:** %s" % ', '.join(x.name for x in self.backbone))
+            lines.append("**Sidechain atoms:** %s" % ', '.join(x.name for x in self.sidechain))
+        else:
+            lines.append("**Atom:** %s" % ', '.join(x.name for x in self.atoms))
+
+        return '<br>'.join(lines)

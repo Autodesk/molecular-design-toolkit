@@ -15,7 +15,6 @@
 import copy
 
 import numpy as np
-from scipy.spatial import distance as spd
 
 import moldesign as mdt
 from moldesign import units as u
@@ -55,6 +54,12 @@ class AtomContainer(object):
     def heavy_atoms(self):
         """ AtomList: a list of all heavy atoms (i.e., non-hydrogen) in this object """
         return AtomList([a for a in self.atoms if a.atnum != 1])
+
+    @property
+    def mass(self):
+        """ u.Scalar[mass]: total mass of this object
+        """
+        return sum(a.mass for a in self.atoms)
 
     def get_atoms(self, **queries):
         """Allows keyword-based atom queries.
@@ -99,14 +104,16 @@ class AtomContainer(object):
             >>> dists = self.calc_distance_array(other)
             >>> dists[i, j] == self.atoms[i].distance(other.atoms[j])
         """
+        from scipy.spatial.distance import cdist
+
         other = utils.if_not_none(other, self)
         try:
-            other_positions = other.positions.value_in(u.ang)
+            other_positions = other.positions.defunits_value()
         except AttributeError:
-            other_positions = np.array([other.position.value_in(u.ang)])
+            other_positions = np.array([other.position.defunits_value()])
 
-        distances = spd.cdist(self.position.value_in(u.ang), other_positions)
-        return distances * u.ang
+        distances = cdist(self.positions.defunits_value(), other_positions)
+        return distances * u.default.length
 
     def calc_displacements(self):
         """ Calculate an array of displacements between all atoms in this object
@@ -164,7 +171,7 @@ class AtomContainer(object):
     def num_atoms(self):
         """ int: number of atoms in this object """
         return len(self.atoms)
-    natoms = numatoms = num_atoms
+    natoms = num_atoms
 
     @property
     def center_of_mass(self):
@@ -306,6 +313,8 @@ class AtomContainer(object):
         Returns:
             AtomList: list of copied atoms
         """
+        from . import ChildList
+
         oldatoms = self.atoms
         old_bond_graph = {a: {} for a in self.atoms}
         for atom in self.atoms:
@@ -326,7 +335,7 @@ class AtomContainer(object):
                 if atom.chain not in replaced:
                     chain = copy.copy(atom.chain)
                     chain.molecule = None
-                    chain.children = {}
+                    chain.children = ChildList(chain)
                     replaced[atom.chain] = chain
                 else:
                     chain = replaced[atom.chain]
@@ -338,7 +347,7 @@ class AtomContainer(object):
                     res = copy.copy(atom.residue)
                     res.molecule = None
                     res.chain = atom.chain
-                    res.children = {}
+                    res.children = ChildList(res)
 
                     res.chain.add(res)
                     replaced[atom.residue] = res

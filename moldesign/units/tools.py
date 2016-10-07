@@ -17,12 +17,15 @@ from .quantity import *
 
 
 def units_transfer(from_var, to_var, force=False):
-    """
-    Give the "to_var" object the same units as "from_var"
-    :param from_var:
-    :param to_var:
-    :param force: Transfer the units even if from_var and to_var have incompatible units
-    :return:
+    """ Give the "to_var" object the same units as "from_var"
+
+    Args:
+        from_var (MdtQuantity): use this quantities units
+        to_var (MdtQuantity): apply units to this quantity
+        force (bool):  Transfer the units even if from_var and to_var have incompatible units
+
+    Returns:
+        MdtQuantity: to_var with from_var's units
     """
 
     # If from_var is not a Quantity-like object, return a normal python scalar
@@ -63,22 +66,30 @@ def array(qlist, baseunit=None):
     """ Facilitates creating an array with units - like numpy.array, but it also checks
      units for all components of the array
 
-    :param qlist: List-like object of quantity objects
-    :param baseunit: (optional) unit to standardize with
-    :return: Quantity object
+     Args:
+         qlist (List[MdtQuantity]): List-like object of quantity objects
+         baseunit (MdtUnit) unit to standardize with
+
+    Returns:
+        MdtQuantity: array with standardized units
     """
     if hasattr(qlist, 'units') and hasattr(qlist, 'magnitude'):
         return MdtQuantity(qlist)
 
     if baseunit is None:
         baseunit = get_units(qlist)
-        if baseunit == 1.0: return np.array(qlist)
+        try:
+            if baseunit == 1.0:
+                return np.array(qlist)
+        except DimensionalityError:
+            pass
 
     try:
-        newlist = [array(item, baseunit=baseunit).magnitude for item in qlist]
+        newlist = [array(item, baseunit=baseunit).value_in(baseunit) for item in qlist]
         return baseunit * newlist
     except TypeError as exc:
         return qlist.to(baseunit)
+
 
 #@utils.args_from(np.broadcast_to)
 def broadcast_to(arr, *args, **kwargs):

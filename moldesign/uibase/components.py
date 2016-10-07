@@ -176,6 +176,24 @@ class ReadoutFloatSlider(ipy.Box):
         self.slider.value = f
 
 
+class ReadOnlyRepr(ipy.Box):
+    """ When a value is assigned, displays its __repr__ instead
+    """
+    def __init__(self, *args, **kwargs):
+        super(ReadOnlyRepr, self).__init__(*args, **kwargs)
+        self.textbox = ipy.Text()
+        self.textbox.disabled = True
+        self.children = [self.textbox]
+
+    @property
+    def value(self):
+        return self.textbox.value
+
+    @value.setter
+    def value(self, v):
+        self.textbox.value = repr(v)
+
+
 class UnitText(ipy.Box):
     """Widget for a user to input a quantity with physical units.
 
@@ -209,7 +227,8 @@ class UnitText(ipy.Box):
         self.validated = ipy.HTML(self.INVALID)
         self.children = [self.textbox, self.validated]
         self._is_valid = False
-        if value is not None: self.value = value
+        if value is not None:
+            self.value = value
 
     def _validate(self, change):
         self._validated_value = None

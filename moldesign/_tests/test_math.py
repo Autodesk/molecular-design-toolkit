@@ -1,9 +1,13 @@
+""" Tests internal math routines
+"""
+
 import random
 
 import numpy as np
 import numpy.testing as npt
 import pytest
 
+import moldesign
 from moldesign import units as u
 
 registered_types = {}

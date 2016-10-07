@@ -14,11 +14,9 @@
 import ipywidgets as ipy
 
 import traitlets
-from moldesign.geom import set_angle, set_dihedral, set_distance
-import moldesign.molecules.bonds
+import moldesign as mdt
+from moldesign import utils
 from moldesign import units as u
-
-from moldesign import geom, utils
 
 from moldesign.uibase import ViewerToolBase, ReadoutFloatSlider
 
@@ -119,7 +117,7 @@ class GeometryBuilder(ViewerToolBase):
     def set_distance(self, *args):
         bond = self.get_selected_bond(self.viewer.get_selected_bonds())
         dist_in_angstrom = self.length_slider.value
-        set_distance(bond.a1, bond.a2, dist_in_angstrom*u.angstrom, adjustmol=self.adjust_button.value)
+        mdt.set_distance(bond.a1, bond.a2, dist_in_angstrom*u.angstrom, adjustmol=self.adjust_button.value)
         self.viewer.set_positions()
 
     def set_angle(self, *args):
@@ -128,7 +126,7 @@ class GeometryBuilder(ViewerToolBase):
         bond_neighbors = self.get_bond_neighbors(bonds, bond)
         angle = self.angle_slider.value
 
-        set_angle(bond.a1, bond.a2, bond_neighbors['a2'], angle*u.pi/180.0, adjustmol=self.adjust_button.value)
+        mdt.set_angle(bond.a1, bond.a2, bond_neighbors['a2'], angle*u.pi/180.0, adjustmol=self.adjust_button.value)
         self.viewer.set_positions()
 
     def set_dihedral(self, *args):
@@ -137,7 +135,7 @@ class GeometryBuilder(ViewerToolBase):
         bond_neighbors = self.get_bond_neighbors(bonds, bond)
         angle = self.dihedral_slider.value
 
-        set_dihedral(bond_neighbors['a1'], bond.a1, bond.a2, bond_neighbors['a2'], angle*u.pi/180.0,
+        mdt.set_dihedral(bond_neighbors['a1'], bond.a1, bond.a2, bond_neighbors['a2'], angle*u.pi/180.0,
                                              adjustmol=self.adjust_button.value)
         self.viewer.set_positions()
 
@@ -208,7 +206,7 @@ class GeometryBuilder(ViewerToolBase):
             if bond_neighbors['a2']:
                 self.dihedral_slider.enable()
                 self.angle_slider.enable()
-                self.angle_slider.value = geom.angle(bond.a1, bond.a2, bond_neighbors['a2']).value_in(u.degrees)
+                self.angle_slider.value = mdt.angle(bond.a1, bond.a2, bond_neighbors['a2']).value_in(u.degrees)
                 # self.angle_slider.observe(self.set_angle, 'value')
                 self.angle_slider.description = '<b>Bond angle</b> <span style="color:{c1}">{a1.name}' \
                                                 ' - {a2.name}</span> ' \
@@ -223,7 +221,7 @@ class GeometryBuilder(ViewerToolBase):
 
             # Dihedral twist
             if bond_neighbors['a2'] and bond_neighbors['a1']:
-                self.dihedral_slider.value = geom.dihedral(bond_neighbors['a1'], bond.a1, bond.a2, bond_neighbors['a2']).value_in(u.degrees)
+                self.dihedral_slider.value = mdt.dihedral(bond_neighbors['a1'], bond.a1, bond.a2, bond_neighbors['a2']).value_in(u.degrees)
                 # self.dihedral_slider.observe(self.set_dihedral, 'value')
                 self.dihedral_slider.description = '<b>Dihedral angle</b> <span style="color:{c0}">{a4.name}</span>' \
                                                    ' - <span style="color:{c1}">{a1.name}' \

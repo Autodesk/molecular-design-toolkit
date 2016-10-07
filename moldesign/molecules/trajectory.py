@@ -164,16 +164,25 @@ class Trajectory(object):
         """overrides len(trajectory) to return number of frames"""
         return len(self.frames)
 
-    def draw3d(self):
-        """TrajectoryViewer: create a trajectory visualization"""
-        from moldesign import widgets
-        self._viz = widgets.trajectory.TrajectoryViewer(self)
+    @utils.kwargs_from(mdt.widgets.trajectory.TrajectoryViewer)
+    def draw3d(self, **kwargs):
+        """TrajectoryViewer: create a trajectory visualization
+
+        Args:
+            **kwargs (dict): kwargs for :class:`moldesign.widgets.trajectory.TrajectoryViewer`
+        """
+        self._viz = mdt.widgets.trajectory.TrajectoryViewer(self, **kwargs)
         return self._viz
     draw = draw3d  # synonym for backwards compatibility
 
     def draw_orbitals(self, align=True):
         """TrajectoryOrbViewer: create a trajectory visualization"""
         from moldesign import widgets
+        for frame in self:
+            if 'wfn' not in frame:
+                raise ValueError("Can't draw orbitals - orbital information missing in at least "
+                                 "one frame. It must be calculated with a QM method.")
+
         if align: self.align_orbital_phases()
         self._viz = widgets.trajectory.TrajectoryOrbViewer(self)
         return self._viz
@@ -274,7 +283,7 @@ class Trajectory(object):
         if item in self._property_keys:  # return a list of properties for each frame
             return self.slice_frames(item)
         else:
-            raise AttributeError
+            raise AttributeError('Frame %s has no attribute %s' % (self, item))
 
     def rmsd(self, atoms=None, reference=None):
         r""" Calculate root-mean-square displacement for each frame in the trajectory.
@@ -392,7 +401,7 @@ class Trajectory(object):
     #                 allexcept=['traj'],
     #                 append_docstring_description=True)
     def write(self, *args, **kwargs):
-        return mdt.converters.write_trajectory(self, *args, **kwargs)
+        return mdt.fileio.write_trajectory(self, *args, **kwargs)
 
     def plot(self, x, y, **kwargs):
         """ Create a matplotlib plot of property x against property y

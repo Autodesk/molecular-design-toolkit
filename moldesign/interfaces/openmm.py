@@ -12,30 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import itertools
+import imp
 
 import numpy as np
 
 import pyccc
+import moldesign as mdt
 from moldesign.utils import from_filepath
+from moldesign import units as u
+from moldesign import compute
 
 try:
-    import simtk.openmm as mm
-    from simtk import unit as stku
-    from simtk.openmm import app
-except ImportError:
-    mm = stku = app = None
+    imp.find_module('simtk')
+except (ImportError, OSError) as exc:
+    print 'OpenMM could not be imported; using remote docker container'
     force_remote = True
 else:
     force_remote = False
-
-from pyccc import LocalFile
-
-import moldesign as mdt
-from moldesign import units as u
-
-from moldesign import compute
-
-from moldesign.molecules import Trajectory, Molecule
 
 
 class OpenMMPickleMixin(object):
@@ -48,6 +41,7 @@ class OpenMMPickleMixin(object):
         return mystate
 
     def __setstate__(self, state):
+        from simtk.openmm import app
         if 'sim_args' in state:
             assert 'sim' not in state
             args = state.pop('sim_args')
@@ -55,12 +49,12 @@ class OpenMMPickleMixin(object):
         self.__dict__.update(state)
 
 
-# This class needs special treatment because it inherits from an
-# openmm class, but OpenMM may not be present in the user's environment
-if force_remote:
-    MdtReporter = None
-else:
-    class MdtReporter(app.StateDataReporter):
+# This is a factory for the MdtReporter class. It's here so that we don't have to import
+# simtk.openmm.app at the module level
+def MdtReporter(mol, report_interval):
+    from simtk.openmm.app import StateDataReporter
+
+    class MdtReporter(StateDataReporter):
         """
         We'll use this class to capture all the information we need about a trajectory
         It's pretty basic - the assumption is that there will be more processing on the client side
@@ -70,7 +64,7 @@ else:
         def __init__(self, mol, report_interval):
             self.mol = mol
             self.report_interval = report_interval
-            self.trajectory = Trajectory(mol)
+            self.trajectory = mdt.Trajectory(mol)
             self.annotation = None
             self._row_format = ("{:<%d}" % 10) + 3*("{:>%d}" % self.LEN)
             self._printed_header = False
@@ -133,6 +127,8 @@ else:
             steps = self.report_interval - simulation.currentStep % self.report_interval
             return (steps, True, True, True, True)
 
+    return MdtReporter(mol, report_interval)
+
 
 PINT_NAMES = {'mole': u.avogadro,
               'degree': u.degrees,
@@ -146,6 +142,8 @@ def simtk2pint(quantity, flat=False):
     :param quantity:
     :param flat: if True, flatten 3xN arrays to 3N
     """
+    from simtk import unit as stku
+
     mag = quantity._value
 
     if quantity.unit == stku.radian:
@@ -170,6 +168,8 @@ def pint2simtk(quantity):
     Note SimTK appears limited, esp for energy units. May need to have pint convert
     to SI first
     """
+    from simtk import unit as stku
+
     SIMTK_NAMES = {'ang': stku.angstrom,
                    'fs': stku.femtosecond,
                    'nm': stku.nanometer,
@@ -187,6 +187,8 @@ def pint2simtk(quantity):
 
 @compute.runsremotely(enable=force_remote)
 def _amber_to_mol(prmtop_file, inpcrd_file):
+    from simtk.openmm import app
+
     prmtop = from_filepath(app.AmberPrmtopFile, prmtop_file)
     inpcrd = from_filepath(app.AmberInpcrdFile, inpcrd_file)
 
@@ -199,9 +201,9 @@ def _amber_to_mol(prmtop_file, inpcrd_file):
 if force_remote:
     def amber_to_mol(prmtop_file, inpcrd_file):
         if not isinstance(prmtop_file, pyccc.FileContainer):
-            prmtop_file = LocalFile(prmtop_file)
+            prmtop_file = pyccc.LocalFile(prmtop_file)
         if not isinstance(inpcrd_file, pyccc.FileContainer):
-            inpcrd_file = LocalFile(inpcrd_file)
+            inpcrd_file = pyccc.LocalFile(inpcrd_file)
         return _amber_to_mol(prmtop_file, inpcrd_file)
 else:
     amber_to_mol = _amber_to_mol
@@ -219,6 +221,8 @@ def topology_to_mol(topo, name=None, positions=None, velocities=None, assign_bon
              do not store bond orders)
 
     """
+    from simtk import unit as stku
+
     # Atoms
     atommap = {}
     newatoms = []
@@ -276,7 +280,7 @@ def topology_to_mol(topo, name=None, positions=None, velocities=None, assign_bon
     if name is None:
         name = 'Unnamed molecule from OpenMM'
 
-    newmol = Molecule(newatoms, bond_graph=bonds, name=name)
+    newmol = mdt.Molecule(newatoms, bond_graph=bonds, name=name)
 
     if assign_bond_orders:
         for residue in newmol.residues:
@@ -288,5 +292,34 @@ def topology_to_mol(topo, name=None, positions=None, velocities=None, assign_bon
     return newmol
 
 
-def mol_to_toplogy(mol):
-    raise NotImplementedError
+def mol_to_topology(mol):
+    """ Create an openmm topology object from an MDT molecule
+
+    Args:
+        mol (moldesign.Molecule): molecule to copy topology from
+
+    Returns:
+        simtk.openmm.app.Topology: topology of the molecule
+
+    """
+    from simtk.openmm import app
+
+    top = app.Topology()
+    chainmap = {chain: top.addChain(chain.name) for chain in mol.chains}
+    resmap = {res: top.addResidue(res.resname, chainmap[res.chain], str(res.pdbindex))
+              for res in mol.residues}
+    atommap = {atom: top.addAtom(atom.name,
+                                 app.Element.getBySymbol(atom.element),
+                                 resmap[atom.residue],
+                                 id=str(atom.pdbindex))
+               for atom in mol.atoms}
+    for bond in mol.bonds:
+        top.addBond(atommap[bond.a1], atommap[bond.a2])
+
+    return top
+
+
+def mol_to_modeller(mol):
+    from simtk.openmm import app
+    return app.Modeller(mol_to_topology(mol), pint2simtk(mol.positions))
+

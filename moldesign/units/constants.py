@@ -47,6 +47,8 @@ amu = da = dalton = ureg.amu
 kelvin = ureg.kelvin
 nm = ureg.nanometers
 ang = angstrom = ureg.ang
+molar = ureg.mole / ureg.liter
+debye = ureg.debye
 
 # sets default unit systems
 def_length = angstrom

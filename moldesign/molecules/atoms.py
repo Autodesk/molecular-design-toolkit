@@ -198,6 +198,7 @@ class AtomReprMixin(object):
 
         lines.append('**Atomic number**: %d' % self.atnum)
         lines.append("**Mass**: %s" % self.mass)
+        lines.append('**Formal charge**: %s' % self.formal_charge)
 
         if self.molecule is not None:
             if self.molecule.is_biomolecule:
@@ -311,7 +312,7 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
     #################################################################
     # Methods for BUILDING the atom and indexing it in a molecule
     def __init__(self, name=None, atnum=None, mass=None, chain=None, residue=None,
-                 pdbname=None, pdbindex=None, element=None):
+                 formal_charge=None, pdbname=None, pdbindex=None, element=None):
 
         # Allow user to instantiate an atom as Atom(6) or Atom('C')
         if atnum is None and element is None:
@@ -330,13 +331,14 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
         if mass is None: self.mass = data.ATOMIC_MASSES[self.atnum]
         else: self.mass = mass
 
+        self.formal_charge = utils.if_not_none(formal_charge, 0.0 * u.q_e)
         self.residue = residue
         self.chain = chain
         self.molecule = None
         self.index = None
         self._position = np.zeros(3) * u.default.length
         self._momentum = np.zeros(3) * (u.default.length*
-                                                u.default.mass/u.default.time)
+                                       u.default.mass/u.default.time)
         self._bond_graph = {}
 
     def to_json(self, parent=None):
@@ -400,7 +402,6 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
         """
         if self.molecule is other.molecule:
             self.bond_graph[other] = other.bond_graph[self] = order
-            if self.molecule is not None: self.molecule.num_bonds += 1
         else:  # allow unassigned atoms to be bonded to anything for building purposes
             self.bond_graph[other] = order
         return Bond(self, other, order)
@@ -475,6 +476,13 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
         """ int: the number of other atoms this atom is bonded to
         """
         return len(self.bond_graph)
+    nbonds = num_bonds
+
+    @property
+    def valence(self):
+        """ int: the sum of this atom's bond orders
+        """
+        return sum(v for v in self.bond_graph.itervalues())
 
     @property
     def symbol(self):

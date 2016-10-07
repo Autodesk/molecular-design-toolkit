@@ -29,4 +29,8 @@ def name_to_smiles(name,
                           name="opsin, %s" % name)
     mdt.uibase.display_log(job.get_display_object(), "opsin, %s"%name)
     job.wait()
-    return job.get_output('output.txt').read().strip()
+    smistring = job.get_output('output.txt').read().strip()
+    if not smistring:
+        raise ValueError('Could not parse chemical name "%s"' % name)
+    else:
+        return smistring

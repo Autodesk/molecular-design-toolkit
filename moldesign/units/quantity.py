@@ -14,8 +14,10 @@
 """
 Set up physical constants and unit systems
 """
+import operator
 import copy
 from os.path import join, abspath, dirname
+import numbers
 
 import numpy as np
 from pint import UnitRegistry, set_application_registry, DimensionalityError
@@ -45,7 +47,7 @@ class MdtQuantity(ureg.Quantity):
     This is a 'patched' version of pint's quantities that can be pickled (slightly hacky)
     and supports more numpy operations.
     Users should never need to instantiate this directly - instead, construct
-    BuckyBall quantities by multiplying numbers/arrays with the pre-defined units
+    MDT quantities by multiplying numbers/arrays with the pre-defined units
 
     Examples:
         >>> 5.0 * units.femtoseconds
@@ -94,9 +96,10 @@ class MdtQuantity(ureg.Quantity):
             if not hasattr(value, 'value_in'):  # deal with missing `value_in` method
                 if self.dimensionless:  # case 1: this is OK if self is dimensionless
                     self.magnitude[key] = value
-                else:  # case 2: User tried to pass a number without units
-                    raise DimensionalityError('%s cannot be assigned to array with dimensions %s' %
-                                              (value, self.units))
+                elif not isinstance(value, numbers.Number):  # case 2: this is not a number
+                    raise TypeError('"%s" is not a valid numeric value' % value)
+                else:  # case 3: wrong units
+                    raise DimensionalityError(self.units, ureg.dimensionless)
             else:  # case 3: attribute error is unrelated to this
                 raise
 
@@ -109,19 +112,7 @@ class MdtQuantity(ureg.Quantity):
                 'units': str(self.units)}
 
     def __eq__(self, other):
-        """ Bug fixes and behavior changes for pint's implementation
-        These get removed as they are fixed in pint
-
-        Notes:
-            - Allow equality test between compatible units
-            - Allow comparisons to 0 to ignore units
-        """
-        if hasattr(other, 'value_in'):
-            return self.magnitude == other.value_in(self.units)
-        elif other == 0.0:  # ignore units
-            return self.magnitude == other
-        else:
-            return super(MdtQuantity, self).__eq__(other)
+        return self.compare(other, operator.eq)
 
     @property
     def shape(self):
@@ -133,12 +124,18 @@ class MdtQuantity(ureg.Quantity):
 
     def compare(self, other, op):
         """ Augments the :class:`pint._Quantity` method with the following features:
-          - Comparisons to 0 ignore units
+          - Comparisons to dimensionless 0 can proceed without unit checking
         """
-        if other == 0.0:
-            return op(self.magnitude, other)
+        other = MdtQuantity(other)
+        try:
+            iszero = other.magnitude == 0.0 and other.dimensionless
+        except ValueError:
+            iszero = False
+
+        if iszero:
+            return op(self.magnitude, other.magnitude)
         else:
-            return super(MdtQuantity, self).compare(other, op)
+            return op(self.magnitude, other.value_in(self.units))
 
     def get_units(self):
         """
@@ -160,8 +157,12 @@ class MdtQuantity(ureg.Quantity):
         units = self.get_units()
         return units * np.linalg.norm(self._magnitude)
 
+    def normalized(self):
+        return self/self.norm()
+
     def dot(self, other):
-        """Compute norm but respect units
+        """ Dot product that correctly multiplies units
+
         Returns:
             MdtQuantity
         """
@@ -197,12 +198,11 @@ class MdtQuantity(ureg.Quantity):
         m = s_mag % o_mag
         return m * my_units
 
-    def value_in(self, units):
-        val = self.to(units)
-        return val._magnitude
+    # backwards-compatible name
+    value_in = ureg.Quantity.m_as
 
     def defunits_value(self):
-        return self.defunits()._magnitude
+        return self.defunits().magnitude
 
     # defunits = ureg.Quantity.to_base_units  # replacing this with the new pint implementation
     def defunits(self):

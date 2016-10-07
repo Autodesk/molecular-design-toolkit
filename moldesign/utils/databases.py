@@ -16,6 +16,8 @@ import dumbdbm
 import json
 import zlib
 
+from . import Alias
+
 
 class CompressedJsonDbm(object):
     """ Quick-and-dirty interface to a DBM file
@@ -43,6 +45,8 @@ class CompressedJsonDbm(object):
     def __setitem__(self, key, value):
         gzvalue = zlib.compress(json.dumps(value))
         self.db[key] = gzvalue
+
+    __contains__ = Alias('db.__contains__')
 
 
 class ReadOnlyDumb(dumbdbm._Database):

@@ -17,6 +17,7 @@ import base64
 
 import collections
 import ipywidgets as ipy
+from pip._vendor.packaging import version
 
 import moldesign as mdt
 from moldesign import compute, uibase
@@ -35,15 +36,16 @@ about = configure
 __packageall.append('about')
 
 
-
 class MDTConfig(ipy.Box):
     def __init__(self):
         super(MDTConfig, self).__init__(display='flex', flex_flow='column')
 
         self.compute_config = ComputeConfig()
-        self.tab_list = uibase.StyledTab([ipy.Box(),self.compute_config])
+        self.changelog = ChangeLog()
+        self.tab_list = uibase.StyledTab([ipy.Box(), self.compute_config, self.changelog])
         self.tab_list.set_title(0, '^')
         self.tab_list.set_title(1, 'Compute configuration')
+        self.tab_list.set_title(2, "What's new")
 
         self.children = [self.make_header(), self.tab_list]
 
@@ -69,6 +71,55 @@ class MDTConfig(ipy.Box):
     def _makelink(url, text):
         return '<a href="{url}" target="_blank" title="{text}">{text}</a>'.format(url=url,
                                                                                   text=text)
+
+
+class ChangeLog(ipy.Box):
+    def __init__(self):
+        super(ChangeLog, self).__init__(orientation='vertical')
+        try:
+            current = version.parse(mdt.__version__)
+            latest = self.version_check()
+            if current >= latest:
+                versiontext = 'Up to date. Latest release: %s' % latest
+            else:
+                versiontext = ('New release available! '
+                               '(Current: %s, latest: %s <br>' % (current, latest) +
+                               '<b>Install it:</b> '
+                               '<span style="font-family:monospace">pip install -U moldesign'
+                               '</span>')
+        except Exception as e:
+            versiontext = '<b>Failed update check</b>: %s' % e
+
+        self.version = ipy.HTML(versiontext)
+        self.textarea = ipy.Textarea(width='700px', height='300px')
+
+        p1 = os.path.join(mdt.PACKAGEPATH, "HISTORY.rst")
+        p2 = os.path.join(mdt.PACKAGEPATH, "..", "HISTORY.rst")
+        if os.path.exists(p1):
+            path = p1
+        elif os.path.exists(p2):
+            path = p2
+        else:
+            path = None
+
+        if path is not None:
+            with open(path, 'r') as infile:
+                self.textarea.value = infile.read()
+        else:
+            self.textarea.value = 'HISTORY.rst not found'
+
+        self.textarea.disabled = True
+        self.children = (self.version, self.textarea)
+
+    @staticmethod
+    def version_check():
+        """
+        References:
+            http://code.activestate.com/recipes/577708-check-for-package-updates-on-pypi-works-best-in-pi/
+        """
+        import xmlrpclib
+        pypi = xmlrpclib.ServerProxy('https://pypi.python.org/pypi')
+        return pypi.package_releases('moldesign')
 
 
 class ComputeConfig(ipy.Box):

@@ -25,9 +25,15 @@ class TrajectoryViewer(selector.SelectionGroup):
     """ 3D representation, with animation controls, for a trajectory.
 
     Users will typically instantiate this using ``trajectory.draw()``
+
+    Args:
+        display (bool): immediately display this to the notebook (default: False)
+        **kwargs (dict): keyword arguments for :class:`ipywidgets.Box`
     """
 
-    def __init__(self, trajectory, **kwargs):
+    def __init__(self, trajectory, display=False, **kwargs):
+        from IPython.display import display as displaynow
+
         self.default_fps = 10
         self.traj = trajectory
         self.pane = ipy.VBox()
@@ -35,11 +41,13 @@ class TrajectoryViewer(selector.SelectionGroup):
         self.viewer, self.view_container = self.make_viewer()
         for frame in self.traj.frames[1:]:
             self.viewer.append_frame(positions=frame.positions,
-                                     wfn=frame.get('wfn',None))
+                                     wfn=frame.get('wfn', None))
         self.make_controls()
         self.pane.children = [self.view_container, self.controls]
         super(TrajectoryViewer, self).__init__([self.pane, AtomInspector()], **kwargs)
         self.update_selections('initialization', {'framenum': 0})
+        if display:
+            displaynow(self)
 
     def make_viewer(self):
         viewer = self.traj._tempmol.draw3d(style='licorice')
@@ -85,7 +93,6 @@ class TrajectoryOrbViewer(TrajectoryViewer):
     def make_viewer(self):
         viewframe = self.traj._tempmol.draw_orbitals()
         return viewframe.viewer, viewframe
-
 
 
 class FrameInspector(ipy.HTML, selector.Selector):

@@ -18,44 +18,66 @@ This module stores definitions of common parameters for common techniques.
 These are used to standardize our interfaces to other codes, and automatically generate interactive
 notebook interfaces to configure various techniques.
 """
+import operator as op
 
 from moldesign import units as u
-from moldesign.utils import if_not_none, DotDict
+from moldesign import utils
 
 
-class ForceField(object):
-    """Generalized force field type (blank for now)"""
-class BasisSet(object):
-    """Generalized basis set type (blank for now"""
-class ElectronicWfn(object):
-    """Generalized orbital storage (blank for now)"""
-class QMTheory(object):
-    """Generalized QM type (blank for now)"""
-class SymmetryGroup(object):
-    """Generalized symmetry type (blank for now)"""
+def isin(a, b): return a in b
+
+
+class WhenParam(object):
+    def __init__(self, parameter, operator, checkval):
+        self.operator = operator
+        self.parameter = parameter
+        self.checkval = checkval
+
+    def __call__(self, paramset):
+        """
+        Args:
+            paramset (dict):
+
+        Returns:
+            bool: True if the parameter is releveant, false otherwise
+        """
+        #TODO: anything relevant to an irrelevant parameter is also irrelevant
+        return self.operator(paramset[self.parameter], self.checkval)
 
 
 class Parameter(object):
+    """ A generic parameter for a computational method
+
+    Args:
+        name (str): the arguments name (this is also its key in the method's ``params`` dictionary)
+        short_description (str): A more readable description of about 100 characters
+        type: The type of the param, including units if applicable.
+            This may be a type (``int``, ``str``, etc.); if the quantity has physical units, you may
+            also pass an example of this quantity (e.g., ``1.0 * units.angstrom``)
+        default: the default value, or None if the user is required to set this parameter manually
+        choices (list): A list of allowable values for the parameter
+        help_url (str): URL for detailed help (not currently implemented)
+        relevance (WhenParam): specifies when a given parameter will affect the dynamics
+
+    Examples:
+        >>> Parameter('timestep', 'Dynamics timestep', type=1.0*u.fs, default=2.0*u.fs)
+        <Parameter "timestep", type: float, units: fs>
+        >>> Parameter('functional', 'DFT XC functional', choices=['b3lyp', 'pbe0'],
+        >>>           relevance=WhenParam('theory', op.eq, 'rks'))
+        <Parameter "functional", type: str>
+    """
     def __init__(self, name,
                  short_description=None,
                  type=None,
                  default=None,
                  choices=None,
-                 select_multiple=False,
-                 help_url=None):
-        """
-        A method's parameter
-        :param default: the default value. If this does not match any spec in choices, it must be set.
-        :param choices: A list of allowable values for the parameter
-        :param types: a list of types for the parameter (does not check choices if parameter is one of these types)
-        :param number: Number of values (>1 should be passed in list). '+' indicates arbitrary list size
-        :return:
-        """
+                 help_url=None,
+                 relevance=None):
         self.name = name
-        self.displayname = if_not_none(short_description, name)
+        self.displayname = utils.if_not_none(short_description, name)
         self.value = None
         self.default = default
-        self.choices = if_not_none(choices, [])
+        self.choices = utils.if_not_none(choices, [])
         self.type = type
         self.help_url = help_url
         if isinstance(type, u.MdtQuantity):
@@ -65,12 +87,25 @@ class Parameter(object):
             self.units = type
         else:
             self.units = None
-        self.select_multiple = select_multiple
+        self.relevance = relevance
+
+    def __str__(self):
+        s = '%s "%s", type: %s' % (type(self).__name__, self.name, self.type.__name__)
+        if self.units is not None:
+            s += ', units: %s' % self.units
+        return s
+
+    def __repr__(self):
+        try:
+            return '<%s>' % self
+        except:
+            return '<%s at %x - exc in __repr__>' % (type(self), id(self))
+
 
 
 # TODO - make this ordered as well as dotted
 def named_dict(l):
-    return DotDict({i.name: i for i in l})
+    return utils.OrderedDotDict((i.name, i) for i in l)
 
 model_parameters = named_dict([
     Parameter('subsystem')
@@ -78,11 +113,11 @@ model_parameters = named_dict([
 
 FORCEFIELDS = []
 PERIODICITIES = [False, 'box']
-QMTHEORIES = []
-BASISSETS = []
+
 
 mm_model_parameters = named_dict([
-    Parameter('cutoff', 'Cutoff for nonbonded interactions', default=1.0*u.nm, type=u.nm),
+    Parameter('cutoff', 'Cutoff for nonbonded interactions',
+              default=1.0*u.nm, type=u.nm),
     Parameter('nonbonded', 'Nonbonded interaction method', default='cutoff', type=str,
               choices=['cutoff', 'pme', 'ewald']),
     Parameter('implicit_solvent',
@@ -97,14 +132,40 @@ mm_model_parameters = named_dict([
     Parameter('periodic', 'Periodicity', default=False, choices=PERIODICITIES)
 ])
 
+
+QMTHEORIES = ['rhf', 'rks', 'mp2', 'casscf', 'casci', 'fci']
+BASISSETS = ['3-21g', '4-31g', '6-31g', '6-31g*', '6-31g**',
+             '6-311g', '6-311g*', '6-311g+', '6-311g*+',
+             'sto-3g', 'sto-6g', 'minao', 'weigend',
+             'dz' 'dzp', 'dtz', 'dqz',
+             'aug-cc-pvdz', 'aug-cc-pvtz', 'aug-cc-pvqz']
+FUNCTIONALS = ['b3lyp', 'blyp', 'pbe0', 'x3lyp', 'mpw3lyp5']
+# This is a VERY limited set to start with; all hybrid functionals for now
+# Need to think more about interface and what to offer by default
+# PySCF xcs are at https://github.com/sunqm/pyscf/blob/master/dft/libxc.py for now
+
 qm_model_parameters = named_dict([
     Parameter('theory', 'QM theory', choices=QMTHEORIES),
+    Parameter('functional', 'DFT Functional', default='b3lyp',
+              choices=FUNCTIONALS,  # TODO: allow separate x and c functionals
+              relevance=WhenParam('theory', isin, 'dft rks ks uks'.split())),
+    Parameter('active_electrons', 'Active electrons', type=int, default=2,
+              relevance=WhenParam('theory', isin, ['casscf', 'mcscf', 'casci'])),
+    Parameter('active_orbitals', 'Active orbitals', type=int, default=2,
+              relevance=WhenParam('theory', isin, ['casscf', 'mcscf', 'casci'])),
+    Parameter('state_average', 'States to average for SCF', type=int, default=1,
+              relevance=WhenParam('theory', isin, ['casscf', 'mcscf'])),
+    Parameter('basis', 'Basis set', choices=BASISSETS),
+    Parameter('wfn_guess', 'Starting guess method', default='huckel',
+              choices=['huckel', 'minao', 'stored']),
+    Parameter('store_orb_guesses', 'Automatically use orbitals for next initial guess',
+              default=True, type=bool),
     Parameter('multiplicity', 'Spin multiplicity', default=1, type=int),
-    Parameter('basis_set', 'Basis set', choices=BASISSETS),
-    Parameter('symmetry',  default=None, choices=[None, 'Auto', 'Loose']),
-    Parameter('wfn_guess', 'Starting guess method:', default='huckel',
-              choices=['huckel', 'guess']
-              )])
+    Parameter('symmetry', 'Symmetry detection',
+              default=None, choices=[None, 'Auto', 'Loose']),
+    Parameter('initial_guess', 'Wfn for initial guess',
+              relevance=WhenParam('wfn_guess', op.eq, 'stored'))
+              ])
 
 integrator_parameters = named_dict([
     Parameter('timestep', 'Dynamics timestep', default=1.0*u.fs, type=u.default.time),

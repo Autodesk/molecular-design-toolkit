@@ -33,6 +33,11 @@ class Method(object):
     """ list: list of Parameters that can be used to configure this method
     """
 
+    PARAM_SUPPORT = {}
+    """ Mapping(str, list): List of supported values for parameters (if a parameter is not found,
+     it's assumed that all possible values are supported)
+    """
+
     def __reduce__(self):
         return _make_method, (self.__class__, self.params, self.mol)
 
