@@ -1,24 +1,29 @@
 Molecular structure
 -------------------
-MDT is built around familiar physical objects. Below is a quick rundown of
+MDT is built around python objects that try to mirror their physical counterparts. For instance,
+a ``Molecule``'s atoms are a list at ``molecule.atoms``; its mass is stored at ``molecule.mass`` and
+its charge at ``molecule.charge``. ``Atoms``, similarly,
+have an atomic number (``atom.atnum``), a mass (``atom.mass``), a position (``atom.position``), and
+a momentum (``atom.momentum``).
+
+These properties are interrelated - for instance, changing an atom's mass will also affect its
+molecule's total mass. As much as possible, MDT will automatically take care of this bookkeeping
+for you.
+
+Below is a quick rundown of
 those objects and how they relate to one another.
 
 For most of the examples here, we'll look at a benzene molecule, which you can create as follows:
    >>> import moldesign as mdt, moldesign.units as u
    >>> benzene = mdt.from_name('benzene')
-   >>> benzene.draw()
 
-   .. image:: img/struc_benzene.png
-
-
-.. contents::
-  :depth: 2
 
 Atoms
 """""
-**Class documentation:** :class:`moldesign.Atom`
 
-An atom object contains physical information,
+.. image:: img/atoms.png
+
+An :class:`Atom <moldesign.Atom>` object contains physical information,
 
    >>> atom = mdt.Atom('C')
    >>> atom.atomic_number
@@ -28,7 +33,7 @@ An atom object contains physical information,
    >>> atom.position
    [0.0, 0.0, 0.0] * u.angstrom
 
-bond topology,
+the bonds it's involved in,
 
     >>> atom = benzene.atoms[0]
     >>> atom.bonds
@@ -40,10 +45,12 @@ bond topology,
       <Atom C4 (elem C), index 4 in molecule Molecule: benzene>: 1,
       <Atom H9 (elem H), index 9 in molecule Molecule: benzene>: 1}
 
-and contains references to the residue, chain, and molecule it belongs to.
+and contains references to the larger structures it belongs to.
 
    >>> mol = mdt.from_pdb('3fpp')
    >>> atom = mol.atoms[0]
+   >>> atom
+   <Atom N (elem N), index 0 (res PRO43 chain A) in molecule Molecule: 3fpp>
    >>> atom.molecule
    <3fpp (Molecule), 4097 atoms>
    >>> atom.residue
@@ -53,26 +60,36 @@ and contains references to the residue, chain, and molecule it belongs to.
 
 Bonds
 """""
-**Class documentation:** :class:`moldesign.Bond`
 
-**Data structure documentation:** :meth:`moldesign.Molecule.bond_graph`
+.. image:: img/bonds.png
 
-The molecule's bonding topology can be accessed as an iterator over
-:class:`bonds<moldesign.Bond>`:
+An iterator over a molecule's :class:`bonds <moldesign.Bond>` is stored at ``molecule.bonds``:
 
     >>> list(benzene.bonds)
     [<Bond: C4 (#4) - H10 (#10) (order: 1)>,
      <Bond: C4 (#4) - C5 (#5) (order: 2)>,
-     <Bond: C3 (#3) - H9 (#9) (order: 1)>,
-     <Bond: C3 (#3) - C4 (#4) (order: 1)>,
-     <Bond: C5 (#5) - H11 (#11) (order: 1)>,
-     <Bond: C0 (#0) - C1 (#1) (order: 2)>,
-     <Bond: C0 (#0) - C5 (#5) (order: 1)>,
-     <Bond: C0 (#0) - H6 (#6) (order: 1)>,
-     <Bond: C1 (#1) - H7 (#7) (order: 1)>,
-     <Bond: C1 (#1) - C2 (#2) (order: 1)>,
-     <Bond: C2 (#2) - C3 (#3) (order: 2)>,
-     <Bond: C2 (#2) - H8 (#8) (order: 1)>]
+     ...]
+
+Each bond contains references to the two bonded atoms, and the Lewis structure bond order:
+
+   >>> bond = list(benzene.bonds)[0]
+   >>> bond
+   <Bond: C3 (#3) - C4 (#4) (order: 1)>
+   >>> bond.a1
+   <Atom C3 (elem C), index 3 in molecule Molecule: benzene>
+   >>> bond.a2
+   <Atom C4 (elem C), index 4 in molecule Molecule: benzene>
+   >>> bond.order
+   1
+
+If you have one atom in a bond, and need to get the *other* atom, use the :meth:`bond.partner <moldesign.Bond.partner>` method:
+
+   >>> atom = benzene.atoms[0]
+   >>> atom
+   <Atom C0 (elem C), index 0 in molecule Molecule: benzene>
+   >>> bond = atom.bonds[0]
+   >>> bond.partner(atom)
+   <Atom C1 (elem C), index 1 in molecule Molecule: benzene>
 
 Bonding information can also be accessed as a :meth:`bond graph<moldesign.Molecule.bond_graph>`:
 
@@ -89,10 +106,11 @@ Bonding information can also be accessed as a :meth:`bond graph<moldesign.Molecu
 
 Molecules
 """""""""
-**Class documentation:** :class:`moldesign.Molecule`
 
-You'll spend most of your time in MDT working with :class:`Molecules <moldesign.Molecule>`. They
-contain all the information necessary to describe a molecular system.
+.. image:: img/molecule.png
+
+
+You'll spend most of your time in MDT working with :class:`Molecules <moldesign.Molecule>` - which, technically, represent completely molecular systems.
 
 Each :class:`Molecule <moldesign.Molecule>` contains a list of :class:`Atoms <moldesign.Atom>`.
 
@@ -102,51 +120,46 @@ Each :class:`Molecule <moldesign.Molecule>` contains a list of :class:`Atoms <mo
    >>> atom.index
    3
 
-
-Coordinates
-"""""""""""
 The 3D positions and momenta of all atoms in a molecule are stored as an Nx3 array:
 
    >>> benzene.positions
-   [[-0.76003939,  1.16931777,  0.02273989],
-    [ 0.63314801,  1.24365634, -0.01297972],
-    [ 1.39390687,  0.07715829, -0.01219047],
-    [ 0.76420701, -1.16771399,  0.02607069],
-    ...                                   ] * u.angstrom
-
-These coordinates can also be accessed and modified through individual atoms, both through a 3D
-position vector at ``atom.position``, and through individual elements ``atom.x, atom.y, atom.z``.
-
-    >>> atom = benzene.atoms[2]
-    >>> atom.position == benzene.positions[2,:]
-    True
-    >>> atom.position.x = 100.0 * u.angstrom
-    >>> benzene.position[2]
-        [ 100.0  0.07715829 -0.01219047] * u.angstrom
-
-Note that changes to `atom.position` are automatically reflected in `molecule.positions`, and
-vice versa. ``atom.momentum``, ``atom.px, atom.py, atom.pz``, and ``molecule.momenta`` are
-similarly linked.
+   <Quantity([[-0.76003939  1.16931777  0.02273989]
+    [ 0.63314801  1.24365634 -0.01297972]
+    ..., 'ang')>
+   >>> benzene.momenta
+   <Quantity([[ 0.  0.  0.]
+    [ 0.  0.  0.]
+    ..., 'amu * ang / fs')>
 
 
 Molecular properties
 """"""""""""""""""""
+   .. image:: img/properties.png
+
 :class:`Molecular properties<moldesign.molecules.molecule.MolecularProperties>` are quantities
 that have been calculated by an :class:`energy model<moldesign.models.base.EnergyModelBase>` at the
 molecule's current position.
 
-    >>> benzene.set_potential_model(mdt.models.RHF, basis='3-21g')
-    >>> benzene.calculate()
-    >>> benzene.potential_energy
-    -6201.2054456 * u.eV
-    >>> benzene.calculate_forces()
-    >>> benzene.forces
-    [[ 0.25704289, -0.3918098 , -0.10710722],
-     [-0.24434863, -0.15226163,  0.05302621],
-     [-0.2362215 , -0.16058291,  0.05744945],
-     [-0.25672489,  0.3913183 , -0.10966027],
-     ...                                   ] * u.eV/u.angstrom
 
+For instance: if forces on the molecule have been calcualted, they are stored in an Nx3 array similarly to positions and momenta. However, they must first be calculated by an :class:`EnergyModel <moldesign.models.base.EnergyModelBase>`:
+
+   >>> benzene.forces
+   Traceback ...
+   NotCalculatedError: The 'forces' property hasn't been calculated yet. Calculate it with the molecule.calculate_forces() method
+   >>> benzene.set_energy_model(mdt.models.GAFF, charges='am1-bcc')
+   >>> benzene.calculate_forces()
+   >>> benzene.forces
+   <Quantity([[ -1.25171801e-01   1.93601314e-01   9.20898239e-04]
+    ..., 'eV / ang')>
+
+
+Any quantities calculated by the energy model are stored in ``molecule.properties``:
+
+   >>> benzene.properties
+   {'am1-bcc': ...,
+    'forces': ...,
+    'potential_energy': ...,
+    'positions': ...}
 
 Properties almost always include ``potential_energy``; other common properties include
 ``forces``, ``wfn``, and ``dipole``. Calling ``mol.calculate()`` will only calculate the model's
@@ -155,7 +168,8 @@ if available, can be requested via ``mol.calculate(requests=[prop1, prop2, ...])
 
 Note:
    These properties are only accessible if they correspond to the molecule's current position -
-   MDT will throw a NotCalculatedError if the molecule has moved.
+   MDT will raise ``NotCalculatedError`` if you try to access properties at a new position without
+   explicitly asking for a calculation.
 
    >>> benzene.calculate()
    >>> benzene.potential_energy
@@ -165,13 +179,15 @@ Note:
    Traceback (most recent call last):
     ...
    NotCalculatedError: The 'potential_energy' property hasn't been calculated yet. ...
+   >>> benzene.calculate_potential_energy()
+   -6200.9382913 * u.eV
 
 
 Electronic structure
 """"""""""""""""""""
-**Class documentation:** :class:`moldesign.orbitals.wfn.ElectronicWfn`
+   .. image:: img/wfn.png
 
-If you've run an quantum chemistry calculation on a molecule, its electronic structure will also
+If you've run an quantum chemistry calculation on a molecule, its :class:`electronic structure <moldesign.orbitals.wfn.ElectronicWfn>` will also
 be available. This information is accessible through:
 :class:`mol.wfn (see its documentation for more details) <moldesign.orbitals.ElectronicWfn>`.
     >>> mol.set_energy_model(mdt.models.RHF, basis='sto-3g')
