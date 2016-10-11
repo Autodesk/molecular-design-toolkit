@@ -42,7 +42,7 @@ ready-to-plot data structures, and interactive user interfaces. MDT is free, ope
 
    api/datastructures
    api/molecule
-   api/residue
+   api/biopolymer
    api/wfn
 
 
@@ -51,12 +51,12 @@ ready-to-plot data structures, and interactive user interfaces. MDT is free, ope
    :numbered:
    :caption: Simulation and tools API
 
-   Tools <_moldesign_api/moldesign.tools>
-   Geometry <_moldesign_api/moldesign.geom>
-   Units <_moldesign_api/moldesign.units>
-   Energy models <_moldesign_api/moldesign.models>
-   Integrators <_moldesign_api/moldesign.integrators>
-   External interfaces <_moldesign_api/moldesign.interfaces>
+   _mdt_api/moldesign.geom.rst
+   _mdt_api/moldesign.widgets.rst
+   _mdt_api/moldesign.tools.rst
+   _mdt_api/moldesign.models.rst
+   _mdt_api/moldesign.integrators.rst
+   _mdt_api/moldesign.data.rst
 
 
 

@@ -54,7 +54,7 @@ help:
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILDDIR) moldesign_api
+	rm -rf $(BUILDDIR) _moldesign_api
 
 moldesign_api:
 	./autogen_api.sh

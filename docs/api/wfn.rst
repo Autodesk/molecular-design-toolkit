@@ -1,10 +1,6 @@
-===============================
-Electronic wavefunction objects
-===============================
-
-.. toctree::
-   :maxdepth: 2
-   :numbered:
+===========================
+Electronic wavefunction API
+===========================
 
 
 Electronic Wavefunctions
