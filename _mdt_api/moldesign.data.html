@@ -1,0 +1,557 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>6. Data API &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/>
+        <link rel="prev" title="5. Integrators API" href="moldesign.integrators.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">6. Data API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#classes">6.1. Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cycliclist-class">6.1.1. <code class="docutils literal"><span class="pre">CyclicList</span></code> class</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#functions">6.2. Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#print-environment-function">6.2.1. <code class="docutils literal"><span class="pre">print_environment</span></code> function</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data">6.3. Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#all-bases">6.3.1. <code class="docutils literal"><span class="pre">ALL_BASES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#amino-names">6.3.2. <code class="docutils literal"><span class="pre">AMINO_NAMES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#atomic-masses">6.3.3. <code class="docutils literal"><span class="pre">ATOMIC_MASSES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#atomic-numbers">6.3.4. <code class="docutils literal"><span class="pre">ATOMIC_NUMBERS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#backbones">6.3.5. <code class="docutils literal"><span class="pre">BACKBONES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bases">6.3.6. <code class="docutils literal"><span class="pre">BASES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#biopolymer-types">6.3.7. <code class="docutils literal"><span class="pre">BIOPOLYMER_TYPES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chain-monomer-names">6.3.8. <code class="docutils literal"><span class="pre">CHAIN_MONOMER_NAMES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#color-list">6.3.9. <code class="docutils literal"><span class="pre">COLOR_LIST</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dbases">6.3.10. <code class="docutils literal"><span class="pre">DBASES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#default-force-tolerance">6.3.11. <code class="docutils literal"><span class="pre">DEFAULT_FORCE_TOLERANCE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#elements">6.3.12. <code class="docutils literal"><span class="pre">ELEMENTS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ions">6.3.13. <code class="docutils literal"><span class="pre">IONS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nucleic-names">6.3.14. <code class="docutils literal"><span class="pre">NUCLEIC_NAMES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#packagepath">6.3.15. <code class="docutils literal"><span class="pre">PACKAGEPATH</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rbases">6.3.16. <code class="docutils literal"><span class="pre">RBASES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#residue-bonds">6.3.17. <code class="docutils literal"><span class="pre">RESIDUE_BONDS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#residue-descriptions">6.3.18. <code class="docutils literal"><span class="pre">RESIDUE_DESCRIPTIONS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#residue-one-letter">6.3.19. <code class="docutils literal"><span class="pre">RESIDUE_ONE_LETTER</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#residue-types">6.3.20. <code class="docutils literal"><span class="pre">RESIDUE_TYPES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#restypes">6.3.21. <code class="docutils literal"><span class="pre">RESTYPES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#symbols">6.3.22. <code class="docutils literal"><span class="pre">SYMBOLS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bondfilename">6.3.23. <code class="docutils literal"><span class="pre">_bondfilename</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#atnum">6.3.24. <code class="docutils literal"><span class="pre">atnum</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#b">6.3.25. <code class="docutils literal"><span class="pre">b</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#base">6.3.26. <code class="docutils literal"><span class="pre">base</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#color-rotation">6.3.27. <code class="docutils literal"><span class="pre">color_rotation</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mass">6.3.28. <code class="docutils literal"><span class="pre">mass</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#name">6.3.29. <code class="docutils literal"><span class="pre">name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#namelist">6.3.30. <code class="docutils literal"><span class="pre">namelist</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#resname">6.3.31. <code class="docutils literal"><span class="pre">resname</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#typename">6.3.32. <code class="docutils literal"><span class="pre">typename</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>6. Data API</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_mdt_api/moldesign.data.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="data-api">
+<h1>6. Data API<a class="headerlink" href="#data-api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="classes">
+<h2>6.1. Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="cycliclist-class">
+<h3>6.1.1. <code class="docutils literal"><span class="pre">CyclicList</span></code> class<a class="headerlink" href="#cycliclist-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.data.CyclicList">
+<em class="property">class </em><code class="descclassname">moldesign.data.</code><code class="descname">CyclicList</code><a class="reference internal" href="../_modules/moldesign/data.html#CyclicList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.data.CyclicList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">list</span></code></a></p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="functions">
+<h2>6.2. Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="print-environment-function">
+<h3>6.2.1. <code class="docutils literal"><span class="pre">print_environment</span></code> function<a class="headerlink" href="#print-environment-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.data.print_environment">
+<code class="descclassname">moldesign.data.</code><code class="descname">print_environment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/data.html#print_environment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.data.print_environment" title="Permalink to this definition">¶</a></dt>
+<dd><p>For reporting bugs - spits out the user&#8217;s environment</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="data">
+<h2>6.3. Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="all-bases">
+<h3>6.3.1. <code class="docutils literal"><span class="pre">ALL_BASES</span></code><a class="headerlink" href="#all-bases" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.ALL_BASES">
+<code class="descclassname">data.</code><code class="descname">ALL_BASES</code><em class="property"> = ['C', 'T', 'G', 'U', 'A', 'I', 'C5', 'T5', 'G5', 'U5', 'A5', 'I5', 'C3', 'T3', 'G3', 'U3', 'A3', 'I3']</em><a class="headerlink" href="#moldesign.data.ALL_BASES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="amino-names">
+<h3>6.3.2. <code class="docutils literal"><span class="pre">AMINO_NAMES</span></code><a class="headerlink" href="#amino-names" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.AMINO_NAMES">
+<code class="descclassname">data.</code><code class="descname">AMINO_NAMES</code><em class="property"> = {'ILE': 'Isoleucine', 'GLN': 'Glutamine', 'GLX': 'GLU/GLN ambiguous', 'GLY': 'Glycine', 'GLU': 'Glutamic acid', 'CYS': 'Cysteine', 'ASP': 'Aspartic acid', 'SER': 'Serine', 'LYS': 'Lysine', 'PRO': 'Proline', 'ASX': 'ASP/ASN ambiguous', 'HID': 'Histidine delta tautomer', 'HIE': 'Histidine epsilon tautomer', 'ASN': 'Asparagine', 'HIP': 'Histidine ion', 'VAL': 'Valine', 'THR': 'Threonine', 'HIS': 'Histidine', 'TRP': 'Tryptophan', 'UNK': 'Undetermined', 'PHE': 'Phenylalanine', 'ALA': 'Alanine', 'MET': 'Methionine', 'LEU': 'Leucine', 'ARG': 'Arginine', 'TYR': 'Tyrosine'}</em><a class="headerlink" href="#moldesign.data.AMINO_NAMES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="atomic-masses">
+<h3>6.3.3. <code class="docutils literal"><span class="pre">ATOMIC_MASSES</span></code><a class="headerlink" href="#atomic-masses" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.ATOMIC_MASSES">
+<code class="descclassname">data.</code><code class="descname">ATOMIC_MASSES</code><em class="property"> = {1: &lt;Quantity(1.007825, 'amu')&gt;, 2: &lt;Quantity(4.002603, 'amu')&gt;, 3: &lt;Quantity(7.016004, 'amu')&gt;, 4: &lt;Quantity(9.012182, 'amu')&gt;, 5: &lt;Quantity(11.009305, 'amu')&gt;, 6: &lt;Quantity(12.0, 'amu')&gt;, 7: &lt;Quantity(14.003074, 'amu')&gt;, 8: &lt;Quantity(15.994915, 'amu')&gt;, 9: &lt;Quantity(18.998403, 'amu')&gt;, 10: &lt;Quantity(19.99244, 'amu')&gt;, 11: &lt;Quantity(22.98977, 'amu')&gt;, 12: &lt;Quantity(23.985042, 'amu')&gt;, 13: &lt;Quantity(26.981538, 'amu')&gt;, 14: &lt;Quantity(27.976927, 'amu')&gt;, 15: &lt;Quantity(30.973762, 'amu')&gt;, 16: &lt;Quantity(31.972071, 'amu')&gt;, 17: &lt;Quantity(34.968853, 'amu')&gt;, 18: &lt;Quantity(39.962383, 'amu')&gt;, 19: &lt;Quantity(38.963707, 'amu')&gt;, 20: &lt;Quantity(39.962591, 'amu')&gt;, 21: &lt;Quantity(44.95591, 'amu')&gt;, 22: &lt;Quantity(47.947947, 'amu')&gt;, 23: &lt;Quantity(50.943964, 'amu')&gt;, 24: &lt;Quantity(51.940512, 'amu')&gt;, 25: &lt;Quantity(54.93805, 'amu')&gt;, 26: &lt;Quantity(55.934942, 'amu')&gt;, 27: &lt;Quantity(58.9332, 'amu')&gt;, 28: &lt;Quantity(57.935348, 'amu')&gt;, 29: &lt;Quantity(62.929601, 'amu')&gt;, 30: &lt;Quantity(63.929147, 'amu')&gt;, 31: &lt;Quantity(68.925581, 'amu')&gt;, 32: &lt;Quantity(73.921178, 'amu')&gt;, 33: &lt;Quantity(74.921596, 'amu')&gt;, 34: &lt;Quantity(79.916522, 'amu')&gt;, 35: &lt;Quantity(78.918338, 'amu')&gt;, 36: &lt;Quantity(83.911507, 'amu')&gt;, 37: &lt;Quantity(84.911789, 'amu')&gt;, 38: &lt;Quantity(87.905614, 'amu')&gt;, 39: &lt;Quantity(88.905848, 'amu')&gt;, 40: &lt;Quantity(89.904704, 'amu')&gt;, 41: &lt;Quantity(92.906378, 'amu')&gt;, 42: &lt;Quantity(97.905408, 'amu')&gt;, 43: &lt;Quantity(97.907216, 'amu')&gt;, 44: &lt;Quantity(101.90435, 'amu')&gt;, 45: &lt;Quantity(102.905504, 'amu')&gt;, 46: &lt;Quantity(107.903894, 'amu')&gt;, 47: &lt;Quantity(106.905093, 'amu')&gt;, 48: &lt;Quantity(113.903358, 'amu')&gt;, 49: &lt;Quantity(114.903878, 'amu')&gt;, 50: &lt;Quantity(119.902197, 'amu')&gt;, 51: &lt;Quantity(120.903818, 'amu')&gt;, 52: &lt;Quantity(129.906223, 'amu')&gt;, 53: &lt;Quantity(126.904468, 'amu')&gt;, 54: &lt;Quantity(131.904154, 'amu')&gt;, 'H': &lt;Quantity(1.007825, 'amu')&gt;, 'P': &lt;Quantity(30.973762, 'amu')&gt;, 'Ge': &lt;Quantity(73.921178, 'amu')&gt;, 'Ga': &lt;Quantity(68.925581, 'amu')&gt;, 'Rb': &lt;Quantity(84.911789, 'amu')&gt;, 'Mg': &lt;Quantity(23.985042, 'amu')&gt;, 'Pd': &lt;Quantity(107.903894, 'amu')&gt;, 'Xe': &lt;Quantity(131.904154, 'amu')&gt;, 'Rh': &lt;Quantity(102.905504, 'amu')&gt;, 'Mo': &lt;Quantity(97.905408, 'amu')&gt;, 'He': &lt;Quantity(4.002603, 'amu')&gt;, 'C': &lt;Quantity(12.0, 'amu')&gt;, 'Be': &lt;Quantity(9.012182, 'amu')&gt;, 'K': &lt;Quantity(38.963707, 'amu')&gt;, 'Mn': &lt;Quantity(54.93805, 'amu')&gt;, 'O': &lt;Quantity(15.994915, 'amu')&gt;, 'S': &lt;Quantity(31.972071, 'amu')&gt;, 'Zn': &lt;Quantity(63.929147, 'amu')&gt;, 'Zr': &lt;Quantity(89.904704, 'amu')&gt;, 'Ni': &lt;Quantity(57.935348, 'amu')&gt;, 'Na': &lt;Quantity(22.98977, 'amu')&gt;, 'Nb': &lt;Quantity(92.906378, 'amu')&gt;, 'Ne': &lt;Quantity(19.99244, 'amu')&gt;, 'Fe': &lt;Quantity(55.934942, 'amu')&gt;, 'B': &lt;Quantity(11.009305, 'amu')&gt;, 'Br': &lt;Quantity(78.918338, 'amu')&gt;, 'F': &lt;Quantity(18.998403, 'amu')&gt;, 'Sr': &lt;Quantity(87.905614, 'amu')&gt;, 'N': &lt;Quantity(14.003074, 'amu')&gt;, 'Kr': &lt;Quantity(83.911507, 'amu')&gt;, 'Si': &lt;Quantity(27.976927, 'amu')&gt;, 'Sn': &lt;Quantity(119.902197, 'amu')&gt;, 'V': &lt;Quantity(50.943964, 'amu')&gt;, 'Sc': &lt;Quantity(44.95591, 'amu')&gt;, 'Sb': &lt;Quantity(120.903818, 'amu')&gt;, 'Se': &lt;Quantity(79.916522, 'amu')&gt;, 'Co': &lt;Quantity(58.9332, 'amu')&gt;, 'Cl': &lt;Quantity(34.968853, 'amu')&gt;, 'Ca': &lt;Quantity(39.962591, 'amu')&gt;, 'Cd': &lt;Quantity(113.903358, 'amu')&gt;, 'Ru': &lt;Quantity(101.90435, 'amu')&gt;, 'Cr': &lt;Quantity(51.940512, 'amu')&gt;, 'Cu': &lt;Quantity(62.929601, 'amu')&gt;, 'Li': &lt;Quantity(7.016004, 'amu')&gt;, 'Ti': &lt;Quantity(47.947947, 'amu')&gt;, 'Te': &lt;Quantity(129.906223, 'amu')&gt;, 'Tc': &lt;Quantity(97.907216, 'amu')&gt;, 'I': &lt;Quantity(126.904468, 'amu')&gt;, 'Y': &lt;Quantity(88.905848, 'amu')&gt;, 'Ag': &lt;Quantity(106.905093, 'amu')&gt;, 'Al': &lt;Quantity(26.981538, 'amu')&gt;, 'As': &lt;Quantity(74.921596, 'amu')&gt;, 'Ar': &lt;Quantity(39.962383, 'amu')&gt;, 'In': &lt;Quantity(114.903878, 'amu')&gt;, -1: &lt;Quantity(-1.0, 'amu')&gt;}</em><a class="headerlink" href="#moldesign.data.ATOMIC_MASSES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="atomic-numbers">
+<h3>6.3.4. <code class="docutils literal"><span class="pre">ATOMIC_NUMBERS</span></code><a class="headerlink" href="#atomic-numbers" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.ATOMIC_NUMBERS">
+<code class="descclassname">data.</code><code class="descname">ATOMIC_NUMBERS</code><em class="property"> = {'Ru': 44, 'Re': 75, 'Rf': 104, 'Rg': 111, 'Ra': 88, 'Rb': 37, 'Rn': 86, 'Rh': 45, 'Be': 4, 'Ba': 56, 'Bh': 107, 'Bi': 83, 'Bk': 97, 'Br': 35, 'Uuh': 116, 'H': 1, 'P': 15, 'Os': 76, 'Hg': 80, 'Ge': 32, 'Gd': 64, 'Ga': 31, 'Pr': 59, 'Pt': 78, 'Pu': 94, 'C': 6, 'Pb': 82, 'Pa': 91, 'Pd': 46, 'Xe': 54, 'Po': 84, 'Pm': 61, 'Hs': 108, 'Uuq': 114, 'Uup': 115, 'Uus': 117, 'Uuo': 118, 'Ho': 67, 'Hf': 72, 'Mo': 42, 'He': 2, 'Md': 101, 'Mg': 12, 'K': 19, 'Mn': 25, 'O': 8, 'Mt': 109, 'S': 16, 'W': 74, 'Zn': 30, 'Eu': 63, 'Es': 99, 'Er': 68, 'Ni': 28, 'No': 102, 'Na': 11, 'Nb': 41, 'Nd': 60, 'Ne': 10, 'Np': 93, 'Fr': 87, 'Fe': 26, 'Fm': 100, 'B': 5, 'F': 9, 'Sr': 38, 'N': 7, 'Kr': 36, 'Si': 14, 'Sn': 50, 'Sm': 62, 'V': 23, 'Sc': 21, 'Sb': 51, 'Sg': 106, 'Se': 34, 'Co': 27, 'Cn': 112, 'Cm': 96, 'Cl': 17, 'Ca': 20, 'Cf': 98, 'Ce': 58, 'Cd': 48, 'Tm': 69, 'Cs': 55, 'Cr': 24, 'Cu': 29, 'La': 57, 'Li': 3, 'Tl': 81, 'Lu': 71, 'Lr': 103, 'Th': 90, 'Ti': 22, 'Te': 52, 'Tb': 65, 'Tc': 43, 'Ta': 73, 'Yb': 70, 'Db': 105, 'Zr': 40, 'Dy': 66, 'Ds': 110, 'I': 53, 'U': 92, 'Y': 39, 'Ac': 89, 'Ag': 47, 'Uut': 113, 'Ir': 77, 'Am': 95, 'Al': 13, 'As': 33, 'Ar': 18, 'Au': 79, 'At': 85, 'In': 49}</em><a class="headerlink" href="#moldesign.data.ATOMIC_NUMBERS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="backbones">
+<h3>6.3.5. <code class="docutils literal"><span class="pre">BACKBONES</span></code><a class="headerlink" href="#backbones" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.BACKBONES">
+<code class="descclassname">data.</code><code class="descname">BACKBONES</code><em class="property"> = {'protein': set(['C', 'HA3', 'OXT', 'H', 'CA', 'O', 'N', 'H2', 'H3', 'HA2', 'HA']), 'dna': set([&quot;H4'&quot;, &quot;HO3'&quot;, &quot;H5'&quot;, 'OP1', 'OP2', &quot;H2''&quot;, &quot;C1'&quot;, &quot;C3'&quot;, &quot;O5'&quot;, &quot;O4'&quot;, &quot;C5'&quot;, 'P', &quot;H5''&quot;, &quot;C4'&quot;, &quot;C2'&quot;, &quot;H3'&quot;, &quot;H2'&quot;, &quot;HO5'&quot;, &quot;O3'&quot;, &quot;H1'&quot;])}</em><a class="headerlink" href="#moldesign.data.BACKBONES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="bases">
+<h3>6.3.6. <code class="docutils literal"><span class="pre">BASES</span></code><a class="headerlink" href="#bases" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.BASES">
+<code class="descclassname">data.</code><code class="descname">BASES</code><em class="property"> = ['C', 'T', 'G', 'U', 'A', 'I']</em><a class="headerlink" href="#moldesign.data.BASES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="biopolymer-types">
+<h3>6.3.7. <code class="docutils literal"><span class="pre">BIOPOLYMER_TYPES</span></code><a class="headerlink" href="#biopolymer-types" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.BIOPOLYMER_TYPES">
+<code class="descclassname">data.</code><code class="descname">BIOPOLYMER_TYPES</code><em class="property"> = set(['rna', 'dna', 'protein'])</em><a class="headerlink" href="#moldesign.data.BIOPOLYMER_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="chain-monomer-names">
+<h3>6.3.8. <code class="docutils literal"><span class="pre">CHAIN_MONOMER_NAMES</span></code><a class="headerlink" href="#chain-monomer-names" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.CHAIN_MONOMER_NAMES">
+<code class="descclassname">data.</code><code class="descname">CHAIN_MONOMER_NAMES</code><em class="property"> = {'solvent': 'solvent', 'water': 'water', 'ion': 'ion', 'dna': 'dna base', 'protein': 'amino acid', 'unkonwn': 'small molecule'}</em><a class="headerlink" href="#moldesign.data.CHAIN_MONOMER_NAMES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="color-list">
+<h3>6.3.9. <code class="docutils literal"><span class="pre">COLOR_LIST</span></code><a class="headerlink" href="#color-list" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.COLOR_LIST">
+<code class="descclassname">data.</code><code class="descname">COLOR_LIST</code><em class="property"> = ['lightgreen', 'lightblue', 'lightgrey', 'yellow', 'orange', 'purple', 'IndianRed', 'PaleTurquoise', 'OldLace', 'Thistle', 'pink']</em><a class="headerlink" href="#moldesign.data.COLOR_LIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="dbases">
+<h3>6.3.10. <code class="docutils literal"><span class="pre">DBASES</span></code><a class="headerlink" href="#dbases" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.DBASES">
+<code class="descclassname">data.</code><code class="descname">DBASES</code><em class="property"> = ['DC', 'DT', 'DG', 'DU', 'DA', 'DI', 'DC5', 'DT5', 'DG5', 'DU5', 'DA5', 'DI5', 'DC3', 'DT3', 'DG3', 'DU3', 'DA3', 'DI3']</em><a class="headerlink" href="#moldesign.data.DBASES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="default-force-tolerance">
+<h3>6.3.11. <code class="docutils literal"><span class="pre">DEFAULT_FORCE_TOLERANCE</span></code><a class="headerlink" href="#default-force-tolerance" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.DEFAULT_FORCE_TOLERANCE">
+<code class="descclassname">data.</code><code class="descname">DEFAULT_FORCE_TOLERANCE</code><em class="property"> = &lt;Quantity(0.00514220566583, 'eV / ang')&gt;</em><a class="headerlink" href="#moldesign.data.DEFAULT_FORCE_TOLERANCE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="elements">
+<h3>6.3.12. <code class="docutils literal"><span class="pre">ELEMENTS</span></code><a class="headerlink" href="#elements" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.ELEMENTS">
+<code class="descclassname">data.</code><code class="descname">ELEMENTS</code><em class="property"> = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N', 8: 'O', 9: 'F', 10: 'Ne', 11: 'Na', 12: 'Mg', 13: 'Al', 14: 'Si', 15: 'P', 16: 'S', 17: 'Cl', 18: 'Ar', 19: 'K', 20: 'Ca', 21: 'Sc', 22: 'Ti', 23: 'V', 24: 'Cr', 25: 'Mn', 26: 'Fe', 27: 'Co', 28: 'Ni', 29: 'Cu', 30: 'Zn', 31: 'Ga', 32: 'Ge', 33: 'As', 34: 'Se', 35: 'Br', 36: 'Kr', 37: 'Rb', 38: 'Sr', 39: 'Y', 40: 'Zr', 41: 'Nb', 42: 'Mo', 43: 'Tc', 44: 'Ru', 45: 'Rh', 46: 'Pd', 47: 'Ag', 48: 'Cd', 49: 'In', 50: 'Sn', 51: 'Sb', 52: 'Te', 53: 'I', 54: 'Xe', 55: 'Cs', 56: 'Ba', 57: 'La', 58: 'Ce', 59: 'Pr', 60: 'Nd', 61: 'Pm', 62: 'Sm', 63: 'Eu', 64: 'Gd', 65: 'Tb', 66: 'Dy', 67: 'Ho', 68: 'Er', 69: 'Tm', 70: 'Yb', 71: 'Lu', 72: 'Hf', 73: 'Ta', 74: 'W', 75: 'Re', 76: 'Os', 77: 'Ir', 78: 'Pt', 79: 'Au', 80: 'Hg', 81: 'Tl', 82: 'Pb', 83: 'Bi', 84: 'Po', 85: 'At', 86: 'Rn', 87: 'Fr', 88: 'Ra', 89: 'Ac', 90: 'Th', 91: 'Pa', 92: 'U', 93: 'Np', 94: 'Pu', 95: 'Am', 96: 'Cm', 97: 'Bk', 98: 'Cf', 99: 'Es', 100: 'Fm', 101: 'Md', 102: 'No', 103: 'Lr', 104: 'Rf', 105: 'Db', 106: 'Sg', 107: 'Bh', 108: 'Hs', 109: 'Mt', 110: 'Ds', 111: 'Rg', 112: 'Cn', 113: 'Uut', 114: 'Uuq', 115: 'Uup', 116: 'Uuh', 117: 'Uus', 118: 'Uuo'}</em><a class="headerlink" href="#moldesign.data.ELEMENTS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="ions">
+<h3>6.3.13. <code class="docutils literal"><span class="pre">IONS</span></code><a class="headerlink" href="#ions" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.IONS">
+<code class="descclassname">data.</code><code class="descname">IONS</code><em class="property"> = {'MG': 'Mg+2', 'Br': 'Br-', 'F': 'F-', 'I': 'I-', 'NA': 'Na+', 'K': 'K+', 'Cl': 'Cl-', 'CA': 'Ca+2'}</em><a class="headerlink" href="#moldesign.data.IONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="nucleic-names">
+<h3>6.3.14. <code class="docutils literal"><span class="pre">NUCLEIC_NAMES</span></code><a class="headerlink" href="#nucleic-names" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.NUCLEIC_NAMES">
+<code class="descclassname">data.</code><code class="descname">NUCLEIC_NAMES</code><em class="property"> = {'A': 'Adenine', 'C': 'Cytosine', 'G': 'Guanine', 'I': 'Inosine', 'U': 'Uracil', 'T': 'Thymine'}</em><a class="headerlink" href="#moldesign.data.NUCLEIC_NAMES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="packagepath">
+<h3>6.3.15. <code class="docutils literal"><span class="pre">PACKAGEPATH</span></code><a class="headerlink" href="#packagepath" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.PACKAGEPATH">
+<code class="descclassname">data.</code><code class="descname">PACKAGEPATH</code><em class="property"> = '/Users/aaronvirshup/mycode/molecular-design-toolkit/moldesign'</em><a class="headerlink" href="#moldesign.data.PACKAGEPATH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="rbases">
+<h3>6.3.16. <code class="docutils literal"><span class="pre">RBASES</span></code><a class="headerlink" href="#rbases" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.RBASES">
+<code class="descclassname">data.</code><code class="descname">RBASES</code><em class="property"> = ['RC', 'RT', 'RG', 'RU', 'RA', 'RI', 'RC5', 'RT5', 'RG5', 'RU5', 'RA5', 'RI5', 'RC3', 'RT3', 'RG3', 'RU3', 'RA3', 'RI3']</em><a class="headerlink" href="#moldesign.data.RBASES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="residue-bonds">
+<h3>6.3.17. <code class="docutils literal"><span class="pre">RESIDUE_BONDS</span></code><a class="headerlink" href="#residue-bonds" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.RESIDUE_BONDS">
+<code class="descclassname">data.</code><code class="descname">RESIDUE_BONDS</code><em class="property"> = &lt;moldesign.utils.databases.CompressedJsonDbm object&gt;</em><a class="headerlink" href="#moldesign.data.RESIDUE_BONDS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="residue-descriptions">
+<h3>6.3.18. <code class="docutils literal"><span class="pre">RESIDUE_DESCRIPTIONS</span></code><a class="headerlink" href="#residue-descriptions" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.RESIDUE_DESCRIPTIONS">
+<code class="descclassname">data.</code><code class="descname">RESIDUE_DESCRIPTIONS</code><em class="property"> = {'CLysine': 'Lysine (C-terminal)', 'ILE': 'Isoleucine', 'NSerine': 'Serine (N-terminal)', 'GLN': 'Glutamine', 'CUndetermined': 'Undetermined (C-terminal)', 'GLX': 'GLU/GLN ambiguous', 'GLY': 'Glycine', 'CCysteine': 'Cysteine (C-terminal)', 'RU3': &quot;Uracil (RNA, 3'-end)&quot;, 'GLU': 'Glutamic acid', 'CValine': 'Valine (C-terminal)', 'RT': 'Thymine (RNA)', 'RU': 'Uracil (RNA)', 'ASP': 'Aspartic acid', 'DC5': &quot;Cytosine (DNA, 5'-end)&quot;, 'SER': 'Serine', 'LYS': 'Lysine', 'CGLU/GLN ambiguous': 'GLU/GLN ambiguous (C-terminal)', 'PRO': 'Proline', 'ASX': 'ASP/ASN ambiguous', 'CAspartic acid': 'Aspartic acid (C-terminal)', 'RG': 'Guanine (RNA)', 'NHistidine ion': 'Histidine ion (N-terminal)', 'RC': 'Cytosine (RNA)', 'NValine': 'Valine (N-terminal)', 'NLysine': 'Lysine (N-terminal)', 'ASN': 'Asparagine', 'CHistidine delta tautomer': 'Histidine delta tautomer (C-terminal)', 'RA': 'Adenine (RNA)', 'CLeucine': 'Leucine (C-terminal)', 'VAL': 'Valine', 'DU5': &quot;Uracil (DNA, 5'-end)&quot;, 'RI5': &quot;Inosine (RNA, 5'-end)&quot;, 'CMethionine': 'Methionine (C-terminal)', 'THR': 'Threonine', 'NGlycine': 'Glycine (N-terminal)', 'CASP/ASN ambiguous': 'ASP/ASN ambiguous (C-terminal)', 'CAsparagine': 'Asparagine (C-terminal)', 'NArginine': 'Arginine (N-terminal)', 'RA5': &quot;Adenine (RNA, 5'-end)&quot;, 'CHistidine epsilon tautomer': 'Histidine epsilon tautomer (C-terminal)', 'T': 'Thymine', 'NTryptophan': 'Tryptophan (N-terminal)', 'DG5': &quot;Guanine (DNA, 5'-end)&quot;, 'UNK': 'Undetermined', 'DC3': &quot;Cytosine (DNA, 3'-end)&quot;, 'DG3': &quot;Guanine (DNA, 3'-end)&quot;, 'NASP/ASN ambiguous': 'ASP/ASN ambiguous (N-terminal)', 'DU3': &quot;Uracil (DNA, 3'-end)&quot;, 'CGlycine': 'Glycine (C-terminal)', 'NAlanine': 'Alanine (N-terminal)', 'CGlutamic acid': 'Glutamic acid (C-terminal)', 'CPhenylalanine': 'Phenylalanine (C-terminal)', 'CTryptophan': 'Tryptophan (C-terminal)', 'PHE': 'Phenylalanine', 'ALA': 'Alanine', 'MET': 'Methionine', 'CProline': 'Proline (C-terminal)', 'LEU': 'Leucine', 'NThreonine': 'Threonine (N-terminal)', 'RI': 'Inosine (RNA)', 'TYR': 'Tyrosine', 'NAsparagine': 'Asparagine (N-terminal)', 'DI': 'Inosine (DNA)', 'DG': 'Guanine (DNA)', 'DU': 'Uracil (DNA)', 'NIsoleucine': 'Isoleucine (N-terminal)', 'DA': 'Adenine (DNA)', 'NProline': 'Proline (N-terminal)', 'NHistidine epsilon tautomer': 'Histidine epsilon tautomer (N-terminal)', 'NLeucine': 'Leucine (N-terminal)', 'DT': 'Thymine (DNA)', 'CArginine': 'Arginine (C-terminal)', 'NGLU/GLN ambiguous': 'GLU/GLN ambiguous (N-terminal)', 'HIP': 'Histidine ion', 'HIS': 'Histidine', 'DI3': &quot;Inosine (DNA, 3'-end)&quot;, 'CIsoleucine': 'Isoleucine (C-terminal)', 'HID': 'Histidine delta tautomer', 'HIE': 'Histidine epsilon tautomer', 'RC3': &quot;Cytosine (RNA, 3'-end)&quot;, 'RI3': &quot;Inosine (RNA, 3'-end)&quot;, 'RU5': &quot;Uracil (RNA, 5'-end)&quot;, 'CAlanine': 'Alanine (C-terminal)', 'A': 'Adenine', 'CYS': 'Cysteine', 'NAspartic acid': 'Aspartic acid (N-terminal)', 'G': 'Guanine', 'I': 'Inosine', 'CThreonine': 'Threonine (C-terminal)', 'NCysteine': 'Cysteine (N-terminal)', 'CGlutamine': 'Glutamine (C-terminal)', 'DA5': &quot;Adenine (DNA, 5'-end)&quot;, 'NGlutamine': 'Glutamine (N-terminal)', 'NHistidine': 'Histidine (N-terminal)', 'U': 'Uracil', 'RT3': &quot;Thymine (RNA, 3'-end)&quot;, 'DA3': &quot;Adenine (DNA, 3'-end)&quot;, 'CSerine': 'Serine (C-terminal)', 'TRP': 'Tryptophan', 'CHistidine': 'Histidine (C-terminal)', 'RT5': &quot;Thymine (RNA, 5'-end)&quot;, 'RG3': &quot;Guanine (RNA, 3'-end)&quot;, 'NTyrosine': 'Tyrosine (N-terminal)', 'RG5': &quot;Guanine (RNA, 5'-end)&quot;, 'CHistidine ion': 'Histidine ion (C-terminal)', 'CTyrosine': 'Tyrosine (C-terminal)', 'C': 'Cytosine', 'RC5': &quot;Cytosine (RNA, 5'-end)&quot;, 'NHistidine delta tautomer': 'Histidine delta tautomer (N-terminal)', 'NGlutamic acid': 'Glutamic acid (N-terminal)', 'NUndetermined': 'Undetermined (N-terminal)', 'NMethionine': 'Methionine (N-terminal)', 'NPhenylalanine': 'Phenylalanine (N-terminal)', 'ARG': 'Arginine', 'DT3': &quot;Thymine (DNA, 3'-end)&quot;, 'DI5': &quot;Inosine (DNA, 5'-end)&quot;, 'DC': 'Cytosine (DNA)', 'DT5': &quot;Thymine (DNA, 5'-end)&quot;, 'RA3': &quot;Adenine (RNA, 3'-end)&quot;}</em><a class="headerlink" href="#moldesign.data.RESIDUE_DESCRIPTIONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="residue-one-letter">
+<h3>6.3.19. <code class="docutils literal"><span class="pre">RESIDUE_ONE_LETTER</span></code><a class="headerlink" href="#residue-one-letter" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.RESIDUE_ONE_LETTER">
+<code class="descclassname">data.</code><code class="descname">RESIDUE_ONE_LETTER</code><em class="property"> = {'ILE': 'I', 'GLN': 'Q', 'THR': 'T', 'GLX': 'Z', 'GLY': 'G', 'ASP': 'D', 'TRP': 'W', 'XAA': 'X', 'GLU': 'E', 'CYS': 'C', 'HIS': 'H', 'SER': 'S', 'LYS': 'K', 'PRO': 'P', 'ASX': 'B', 'PHE': 'F', 'ALA': 'A', 'MET': 'M', 'LEU': 'L', 'ARG': 'R', 'VAL': 'V', 'ASN': 'N', 'TYR': 'Y'}</em><a class="headerlink" href="#moldesign.data.RESIDUE_ONE_LETTER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="residue-types">
+<h3>6.3.20. <code class="docutils literal"><span class="pre">RESIDUE_TYPES</span></code><a class="headerlink" href="#residue-types" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.RESIDUE_TYPES">
+<code class="descclassname">data.</code><code class="descname">RESIDUE_TYPES</code><em class="property"> = {'ILE': 'protein', 'ASN': 'protein', 'GLN': 'protein', 'DI': 'dna', 'DG': 'dna', 'UNK': 'protein', 'DA3': 'dna', 'ASP': 'protein', 'DC': 'dna', 'DA': 'dna', 'GLX': 'protein', 'GLY': 'protein', 'RU3': 'rna', 'DT': 'dna', 'DU': 'dna', 'GLU': 'protein', 'RU5': 'rna', 'RT': 'rna', 'RU': 'rna', 'HIS': 'protein', 'SER': 'protein', 'LYS': 'protein', 'LEU': 'protein', 'NA': 'ions', 'PRO': 'protein', 'ASX': 'protein', 'ALA': 'protein', 'RG': 'rna', 'HID': 'protein', 'RA': 'rna', 'Br': 'ions', 'RC3': 'rna', 'DU3': 'dna', 'CA': 'ions', 'HIE': 'protein', 'CYS': 'protein', 'HIP': 'protein', 'VAL': 'protein', 'F': 'ions', 'I': 'ions', 'RC': 'rna', 'K': 'ions', 'RI5': 'rna', 'RI3': 'rna', 'HOH': 'water', 'THR': 'protein', 'RT5': 'rna', 'DA5': 'dna', 'RA5': 'rna', 'RA3': 'rna', 'RT3': 'rna', 'DG5': 'dna', 'TRP': 'protein', 'DC5': 'dna', 'DC3': 'dna', 'DG3': 'dna', 'MG': 'ions', 'RG3': 'rna', 'RG5': 'rna', 'Cl': 'ions', None: 'placeholder', 'RC5': 'rna', 'PHE': 'protein', 'DU5': 'dna', 'MET': 'protein', 'H2O': 'water', 'TYR': 'protein', 'ARG': 'protein', 'DT3': 'dna', 'DI5': 'dna', 'RI': 'rna', 'DT5': 'dna', 'DI3': 'dna'}</em><a class="headerlink" href="#moldesign.data.RESIDUE_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="restypes">
+<h3>6.3.21. <code class="docutils literal"><span class="pre">RESTYPES</span></code><a class="headerlink" href="#restypes" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.RESTYPES">
+<code class="descclassname">data.</code><code class="descname">RESTYPES</code><em class="property"> = {'water': set(['H2O', 'HOH']), 'ions': set(['MG', 'F', 'I', 'NA', 'K', 'Cl', 'Br', 'CA']), 'solvent': set([]), 'dna': set(['DC5', 'DI', 'DG', 'DA3', 'DC', 'DC3', 'DA', 'DG3', 'DA5', 'DG5', 'DT3', 'DI5', 'DT', 'DU', 'DU3', 'DU5', 'DT5', 'DI3']), 'unknown': set([]), 'rna': set(['RT', 'RU', 'RG3', 'RG5', 'RC5', 'RI5', 'RI3', 'RA3', 'RC3', 'RT5', 'RA5', 'RG', 'RA', 'RT3', 'RC', 'RU3', 'RI', 'RU5']), 'protein': set(['HIP', 'ILE', 'GLN', 'THR', 'GLX', 'GLY', 'HIS', 'TRP', 'UNK', 'GLU', 'CYS', 'ASP', 'SER', 'LYS', 'PRO', 'ASX', 'PHE', 'ALA', 'MET', 'HID', 'HIE', 'ARG', 'VAL', 'ASN', 'TYR', 'LEU'])}</em><a class="headerlink" href="#moldesign.data.RESTYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="symbols">
+<h3>6.3.22. <code class="docutils literal"><span class="pre">SYMBOLS</span></code><a class="headerlink" href="#symbols" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.SYMBOLS">
+<code class="descclassname">data.</code><code class="descname">SYMBOLS</code><em class="property"> = {1: 'H', 2: 'He', 3: 'Li', 4: 'Be', 5: 'B', 6: 'C', 7: 'N', 8: 'O', 9: 'F', 10: 'Ne', 11: 'Na', 12: 'Mg', 13: 'Al', 14: 'Si', 15: 'P', 16: 'S', 17: 'Cl', 18: 'Ar', 19: 'K', 20: 'Ca', 21: 'Sc', 22: 'Ti', 23: 'V', 24: 'Cr', 25: 'Mn', 26: 'Fe', 27: 'Co', 28: 'Ni', 29: 'Cu', 30: 'Zn', 31: 'Ga', 32: 'Ge', 33: 'As', 34: 'Se', 35: 'Br', 36: 'Kr', 37: 'Rb', 38: 'Sr', 39: 'Y', 40: 'Zr', 41: 'Nb', 42: 'Mo', 43: 'Tc', 44: 'Ru', 45: 'Rh', 46: 'Pd', 47: 'Ag', 48: 'Cd', 49: 'In', 50: 'Sn', 51: 'Sb', 52: 'Te', 53: 'I', 54: 'Xe', 55: 'Cs', 56: 'Ba', 57: 'La', 58: 'Ce', 59: 'Pr', 60: 'Nd', 61: 'Pm', 62: 'Sm', 63: 'Eu', 64: 'Gd', 65: 'Tb', 66: 'Dy', 67: 'Ho', 68: 'Er', 69: 'Tm', 70: 'Yb', 71: 'Lu', 72: 'Hf', 73: 'Ta', 74: 'W', 75: 'Re', 76: 'Os', 77: 'Ir', 78: 'Pt', 79: 'Au', 80: 'Hg', 81: 'Tl', 82: 'Pb', 83: 'Bi', 84: 'Po', 85: 'At', 86: 'Rn', 87: 'Fr', 88: 'Ra', 89: 'Ac', 90: 'Th', 91: 'Pa', 92: 'U', 93: 'Np', 94: 'Pu', 95: 'Am', 96: 'Cm', 97: 'Bk', 98: 'Cf', 99: 'Es', 100: 'Fm', 101: 'Md', 102: 'No', 103: 'Lr', 104: 'Rf', 105: 'Db', 106: 'Sg', 107: 'Bh', 108: 'Hs', 109: 'Mt', 110: 'Ds', 111: 'Rg', 112: 'Cn', 113: 'Uut', 114: 'Uuq', 115: 'Uup', 116: 'Uuh', 117: 'Uus', 118: 'Uuo'}</em><a class="headerlink" href="#moldesign.data.SYMBOLS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="bondfilename">
+<h3>6.3.23. <code class="docutils literal"><span class="pre">_bondfilename</span></code><a class="headerlink" href="#bondfilename" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data._bondfilename">
+<code class="descclassname">data.</code><code class="descname">_bondfilename</code><em class="property"> = '/Users/aaronvirshup/mycode/molecular-design-toolkit/moldesign/_static_data/residue_bonds'</em><a class="headerlink" href="#moldesign.data._bondfilename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="atnum">
+<h3>6.3.24. <code class="docutils literal"><span class="pre">atnum</span></code><a class="headerlink" href="#atnum" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.atnum">
+<code class="descclassname">data.</code><code class="descname">atnum</code><em class="property"> = 54</em><a class="headerlink" href="#moldesign.data.atnum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="b">
+<h3>6.3.25. <code class="docutils literal"><span class="pre">b</span></code><a class="headerlink" href="#b" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.b">
+<code class="descclassname">data.</code><code class="descname">b</code><em class="property"> = 'I3'</em><a class="headerlink" href="#moldesign.data.b" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="base">
+<h3>6.3.26. <code class="docutils literal"><span class="pre">base</span></code><a class="headerlink" href="#base" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.base">
+<code class="descclassname">data.</code><code class="descname">base</code><em class="property"> = 'T'</em><a class="headerlink" href="#moldesign.data.base" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="color-rotation">
+<h3>6.3.27. <code class="docutils literal"><span class="pre">color_rotation</span></code><a class="headerlink" href="#color-rotation" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.color_rotation">
+<code class="descclassname">data.</code><code class="descname">color_rotation</code><em class="property"> = [u'#90ee90', u'#add8e6', u'#d3d3d3', u'#ffff00', u'#ffa500', u'#800080', u'#cd5c5c', u'#afeeee', u'#fdf5e6', u'#d8bfd8', u'#ffc0cb']</em><a class="headerlink" href="#moldesign.data.color_rotation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="mass">
+<h3>6.3.28. <code class="docutils literal"><span class="pre">mass</span></code><a class="headerlink" href="#mass" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.mass">
+<code class="descclassname">data.</code><code class="descname">mass</code><em class="property"> = &lt;Quantity(131.904154, 'amu')&gt;</em><a class="headerlink" href="#moldesign.data.mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="name">
+<h3>6.3.29. <code class="docutils literal"><span class="pre">name</span></code><a class="headerlink" href="#name" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.name">
+<code class="descclassname">data.</code><code class="descname">name</code><em class="property"> = 'Thymine'</em><a class="headerlink" href="#moldesign.data.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="namelist">
+<h3>6.3.30. <code class="docutils literal"><span class="pre">namelist</span></code><a class="headerlink" href="#namelist" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.namelist">
+<code class="descclassname">data.</code><code class="descname">namelist</code><em class="property"> = set(['HIP', 'ILE', 'GLN', 'THR', 'GLX', 'GLY', 'HIS', 'TRP', 'UNK', 'GLU', 'CYS', 'ASP', 'SER', 'LYS', 'PRO', 'ASX', 'PHE', 'ALA', 'MET', 'HID', 'HIE', 'ARG', 'VAL', 'ASN', 'TYR', 'LEU'])</em><a class="headerlink" href="#moldesign.data.namelist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="resname">
+<h3>6.3.31. <code class="docutils literal"><span class="pre">resname</span></code><a class="headerlink" href="#resname" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.resname">
+<code class="descclassname">data.</code><code class="descname">resname</code><em class="property"> = 'LEU'</em><a class="headerlink" href="#moldesign.data.resname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="typename">
+<h3>6.3.32. <code class="docutils literal"><span class="pre">typename</span></code><a class="headerlink" href="#typename" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.data.typename">
+<code class="descclassname">data.</code><code class="descname">typename</code><em class="property"> = 'protein'</em><a class="headerlink" href="#moldesign.data.typename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="moldesign.integrators.html" class="btn btn-neutral" title="5. Integrators API" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

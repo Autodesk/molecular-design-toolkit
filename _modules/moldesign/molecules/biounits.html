@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>moldesign.molecules.biounits &mdash; Molecular Design Toolkit 0.7.0 documentation</title>
+  <title>moldesign.molecules.biounits &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Molecular Design Toolkit 0.7.0 documentation" href="../../../index.html"/>
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.3
               </div>
             
           
@@ -80,13 +80,37 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents</span></p>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
 </ul>
 
             
@@ -100,7 +124,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../contents.html">Molecular Design Toolkit</a>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
       </nav>
 
 
@@ -115,7 +139,7 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
       
           <li><a href="../../index.html">Module code</a> &raquo;</li>
       
@@ -145,25 +169,114 @@
 <span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+
 <span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
-<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">data</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">utils</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">toplevel</span><span class="p">,</span> <span class="n">AtomList</span><span class="p">,</span> <span class="n">AtomContainer</span>
 
 
+<div class="viewcode-block" id="ChildList"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.ChildList">[docs]</a><span class="k">class</span> <span class="nc">ChildList</span><span class="p">(</span><span class="n">AtomContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A list of biochemical objects that can be accessed by name or by index.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__len__</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">Alias</span><span class="p">(</span><span class="s1">&#39;_childinorder.__len__&#39;</span><span class="p">)</span>
+    <span class="n">__iter__</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">Alias</span><span class="p">(</span><span class="s1">&#39;_childinorder.__iter__&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_childinorder</span><span class="o">.</span><span class="n">_items</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&lt;Children of </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&lt;ChildList @ </span><span class="si">%x</span><span class="s1"> (__repr__ failed)&gt;&#39;</span> <span class="o">%</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ChildList</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_childbyname</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_childinorder</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">SortedCollection</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">_sortkey</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_childbyname</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_childbyname</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_childinorder</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_childbyname</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> already exists in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_childbyname</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_childinorder</span><span class="o">.</span><span class="n">insert_right</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_childbyname</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_childinorder</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_childbyname&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Uninitialized&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_childbyname</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;ChildList object in </span><span class="si">%s</span><span class="s1"> has no attribute </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">item</span><span class="p">))</span>
+
+<div class="viewcode-block" id="ChildList.iteratoms"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.ChildList.iteratoms">[docs]</a>    <span class="k">def</span> <span class="nf">iteratoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterate over all atoms</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            Atom: all atoms in this entity and/or its children</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Atom</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">child</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">child</span><span class="o">.</span><span class="n">iteratoms</span><span class="p">():</span>
+                    <span class="k">yield</span> <span class="n">atom</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; AtomList: a sorted list of all atoms in this entity and/or its children</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">AtomList</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iteratoms</span><span class="p">())</span>
+
+<div class="viewcode-block" id="ChildList.rebuild"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.ChildList.rebuild">[docs]</a>    <span class="k">def</span> <span class="nf">rebuild</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_childbyname</span> <span class="o">=</span> <span class="p">{</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">obj</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_childinorder</span><span class="p">}</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_sortkey</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">pdbindex</span>
+
+
 <span class="nd">@toplevel</span>
-<div class="viewcode-block" id="Entity"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Entity">[docs]</a><span class="k">class</span> <span class="nc">Entity</span><span class="p">(</span><span class="n">AtomContainer</span><span class="p">,</span> <span class="n">utils</span><span class="o">.</span><span class="n">DictLike</span><span class="p">):</span>
+<div class="viewcode-block" id="Entity"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.Entity">[docs]</a><span class="k">class</span> <span class="nc">Entity</span><span class="p">(</span><span class="n">AtomContainer</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generalized storage mechanism for hierarchical representation of biomolecules,</span>
 <span class="sd">    e.g. by residue, chain, etc. Permits other groupings, provided that everything is</span>
 <span class="sd">    tree-like.</span>
 
-<span class="sd">    All children of a given entity must have unique keys. An individual child can be retrieved with</span>
+<span class="sd">    All children of a given entity must have unique names. An individual child can be retrieved with</span>
 <span class="sd">    ``entity.childname`` or ``entity[&#39;childname&#39;]`` or ``entity[index]``</span>
 
 <span class="sd">    Yields:</span>
 <span class="sd">        Entity or mdt.Atom: this entity&#39;s children, in order</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__getitem__</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">Alias</span><span class="p">(</span><span class="s1">&#39;children.__getitem__&#39;</span><span class="p">)</span>
+    <span class="n">__len__</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">Alias</span><span class="p">(</span><span class="s1">&#39;children.__len__&#39;</span><span class="p">)</span>
+    <span class="n">__iter__</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">Alias</span><span class="p">(</span><span class="s1">&#39;children.__iter__&#39;</span><span class="p">)</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">Alias</span><span class="p">(</span><span class="s1">&#39;children.atoms&#39;</span><span class="p">)</span>
+    <span class="n">iteratoms</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">Alias</span><span class="p">(</span><span class="s1">&#39;children.iteratoms&#39;</span><span class="p">)</span>
+    <span class="n">rebuild</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">Alias</span><span class="p">(</span><span class="s1">&#39;children.rebuild&#39;</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">molecule</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pdbname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pdbindex</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;  Initialization:</span>
@@ -176,6 +289,7 @@
 <span class="sd">            pdbindex (str): Index of this entity in PDB format</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Entity</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">ChildList</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span> <span class="o">=</span> <span class="n">molecule</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
@@ -183,18 +297,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pdbname</span> <span class="o">=</span> <span class="n">pdbname</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pdbindex</span> <span class="o">=</span> <span class="n">pdbindex</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_indexlist</span> <span class="o">=</span> <span class="bp">None</span>
-
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; u.Scalar[mass]: total mass of this object</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Entity.add"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Entity.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Entity.add"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.Entity.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add a child to this entity.</span>
 
 <span class="sd">        Raises:</span>
@@ -204,40 +310,24 @@
 <span class="sd">            item (Entity or mdt.Atom): the child object to add</span>
 <span class="sd">            key (str): Key to retrieve this item (default: ``item.name`` )</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_indexlist</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">key</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">name</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> already exists in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
-        <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span></div>
 
-    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-        <span class="c1"># TODO: O(N) lookup is bad</span>
-        <span class="k">return</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span>
+    <span class="n">__setitem__</span> <span class="o">=</span> <span class="n">add</span>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">+</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">+</span>
+                <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;children&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Uninitialized&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Entity</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">orig</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexlist</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
-            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">orig</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">indexlist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; list: list of all children, in order</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indexlist</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_indexlist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indexlist</span>
-
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indexlist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indexlist</span><span class="p">:</span> <span class="k">yield</span> <span class="n">item</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span> <span class="k">yield</span> <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> has no attribute &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Explicitly hash by object id</span>
@@ -270,440 +360,21 @@
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
                 <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="n">val</span><span class="p">:</span>
                     <span class="n">retlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">retlist</span>
-
-<div class="viewcode-block" id="Entity.iteratoms"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Entity.iteratoms">[docs]</a>    <span class="k">def</span> <span class="nf">iteratoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Iterate over all atoms (i.e. leaf nodes)</span>
-
-<span class="sd">        Yields:</span>
-<span class="sd">            Atom: all atoms in this entity and/or its children</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">itervalues</span><span class="p">():</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span><span class="s1">&#39;itervalues&#39;</span><span class="p">):</span>
-                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">itervalues</span><span class="p">():</span> <span class="k">yield</span> <span class="n">x</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">item</span></div>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; AtomList: a sorted list of all atoms in this entity and/or its children</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">atoms</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iteratoms</span><span class="p">(),</span>
-                                <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">atoms</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">natoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; int: number of atoms contained in this entity and its children</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
-    <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">numatoms</span> <span class="o">=</span> <span class="n">natoms</span></div>
+        <span class="k">return</span> <span class="n">retlist</span></div>
 
 
 <span class="nd">@toplevel</span>
-<div class="viewcode-block" id="Instance"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Instance">[docs]</a><span class="k">class</span> <span class="nc">Instance</span><span class="p">(</span><span class="n">Entity</span><span class="p">):</span>
+<div class="viewcode-block" id="Instance"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.Instance">[docs]</a><span class="k">class</span> <span class="nc">Instance</span><span class="p">(</span><span class="n">Entity</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; The singleton biomolecular container for each ``Molecule``. Its children are generally</span>
 <span class="sd">    PDB chains. Users won&#39;t ever really see this object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;biounit container (chains: </span><span class="si">%s</span><span class="s2">) for molecule </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;Molecule instance: </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span></div>
 
 
-<span class="nd">@toplevel</span>
-<div class="viewcode-block" id="Residue"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Residue">[docs]</a><span class="k">class</span> <span class="nc">Residue</span><span class="p">(</span><span class="n">Entity</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A biomolecular residue - most often an amino acid, a nucleic base, or a solvent</span>
-<span class="sd">    molecule. In PDB structures, also often refers to non-biochemical molecules.</span>
-
-<span class="sd">    Its children are almost always residues.</span>
-
-<span class="sd">    Attributes:</span>
-<span class="sd">        parent (mdt.Molecule): the molecule this residue belongs to</span>
-<span class="sd">        chain (Chain): the chain this residue belongs to</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-<div class="viewcode-block" id="Residue.copy"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Residue.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">newatoms</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">Residue</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">newatoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span></div>
-    <span class="n">copy</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">Entity</span><span class="o">.</span><span class="n">copy</span><span class="o">.</span><span class="n">__doc__</span>
-
-    <span class="nd">@utils.args_from</span><span class="p">(</span><span class="n">Entity</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Initialization</span>
-<span class="sd">        Args:</span>
-<span class="sd">            **kwargs ():</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;chain&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Residue</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">chainindex</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_backbone</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sidechain</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_template_name</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdbname</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdbindex</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Residue.add"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Residue.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Deals with atom name clashes within a residue - common for small molecules&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Atom already assigned to a residue&#39;</span>
-        <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="bp">self</span>
-        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">chain</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">atom</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">atom</span><span class="o">.</span><span class="n">chain</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span> <span class="s2">&quot;Atom&#39;s chain does not match residue&#39;s chain&quot;</span>
-
-        <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Residue</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Residue</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span></div>
-    <span class="n">add</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">Entity</span><span class="o">.</span><span class="n">__doc__</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_n_terminal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;bool: this is the last residue in a peptide</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            ValueError: if this residue is not an amino acid</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s1">&#39;protein&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This residue is not a recognized peptide monomer&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_starting_residue</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_c_terminal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;bool: this is the first residue in a peptide</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            ValueError: if this residue is not an amino acid</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s1">&#39;protein&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This residue is not a recognized peptide monomer&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_ending_residue</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_5prime_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;bool: this is the first base in a strand</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            ValueError: if this residue is not a DNA base</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s1">&#39;dna&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This residue is not a recognized nucleic acid monomer&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_starting_residue</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_3prime_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;bool: this is the last base in a strand</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            ValueError: if this residue is not a DNA base</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s1">&#39;dna&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;This residue is not a recognized nucleic acid monomer&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_ending_residue</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_monomer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;bool: this residue is not part of a biopolymer</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_ending_residue</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_starting_residue</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_is_ending_residue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;bool: this is the last residue in the chain&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">otherres</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">:]:</span>
-            <span class="k">if</span> <span class="n">otherres</span><span class="o">.</span><span class="n">chain</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">True</span>
-            <span class="k">elif</span> <span class="n">otherres</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">False</span>
-        <span class="k">return</span> <span class="bp">True</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_is_starting_residue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;bool: this is the first residue of its type in the chain&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">otherres</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="n">otherres</span><span class="o">.</span><span class="n">chain</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">True</span>
-            <span class="k">elif</span> <span class="n">otherres</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">False</span>
-
-        <span class="k">return</span> <span class="bp">True</span>
-
-<div class="viewcode-block" id="Residue.assign_template_bonds"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Residue.assign_template_bonds">[docs]</a>    <span class="k">def</span> <span class="nf">assign_template_bonds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Assign bonds from bioresidue templates.</span>
-
-<span class="sd">        Only assigns bonds that are internal to this residue (does not connect different residues).</span>
-<span class="sd">        The topologies here assume pH7.4 and may need to be corrected for other pHs</span>
-
-<span class="sd">        See Also:</span>
-<span class="sd">            :ref:`moldesign.Chain.assign_biopolymer_bonds`</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            ValueError: if ``residue.resname`` is not in bioresidue templates</span>
-<span class="sd">            KeyError: if an atom in this residue is not recognized &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">resname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_n_terminal</span><span class="p">:</span>
-                    <span class="n">resname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span> <span class="o">+</span> <span class="s1">&#39;_LSN3&#39;</span>  <span class="c1"># the protonated form (with NH3+ on the end)</span>
-                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_c_terminal</span><span class="p">:</span>
-                    <span class="n">resname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span> <span class="o">+</span> <span class="s1">&#39;_LEO2H&#39;</span>  <span class="c1"># deprotonated form (COO-)</span>
-                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_monomer</span><span class="p">:</span>
-                    <span class="n">resname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span> <span class="o">+</span> <span class="s1">&#39;_LFZW&#39;</span>  <span class="c1"># free zwitterion form</span>
-
-            <span class="n">bonds_by_name</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">RESIDUE_BONDS</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_template_name</span> <span class="o">=</span> <span class="n">resname</span>
-        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No bonding template for residue &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">resname</span><span class="p">)</span>
-
-        <span class="c1"># intra-residue bonds</span>
-        <span class="n">bond_graph</span> <span class="o">=</span> <span class="p">{</span><span class="n">atom</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">}</span>
-        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">nbrname</span><span class="p">,</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">bonds_by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">nbr</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">nbrname</span><span class="p">]</span>
-                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>  <span class="c1"># missing atom in this structure is normal (often hydrogen)</span>
-                    <span class="k">pass</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">bond_graph</span><span class="p">[</span><span class="n">atom</span><span class="p">][</span><span class="n">nbr</span><span class="p">]</span> <span class="o">=</span> <span class="n">bond_graph</span><span class="p">[</span><span class="n">nbr</span><span class="p">][</span><span class="n">atom</span><span class="p">]</span> <span class="o">=</span> <span class="n">order</span>
-
-        <span class="c1"># copy bonds into the right structure (do this last to avoid mangling the graph)</span>
-        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">bond_graph</span><span class="p">:</span>
-            <span class="n">atom</span><span class="o">.</span><span class="n">bond_graph</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">bond_graph</span><span class="p">[</span><span class="n">atom</span><span class="p">])</span></div>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">next_residue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Residue:</span>
-<span class="sd">            The next residue in the chain (in the C-direction for proteins, 3&#39;</span>
-<span class="sd">            direction for nucleic acids)</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            NotImplementedError: If we don&#39;t know how to deal with this type of biopolymer</span>
-<span class="sd">            StopIteration: If there isn&#39;t a next residue (i.e. it&#39;s a 3&#39;- or C-terminus)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_neighbor</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;C-terminus&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;dna&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_neighbor</span><span class="p">(</span><span class="s2">&quot;O3&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;3&#39; end&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;We only deal with dna and amino acids right now&#39;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">prev_residue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Residue:</span>
-<span class="sd">            The next residue in the chain (in the N-direction for proteins, 5&#39; direction for nucleic acids)</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            NotImplementedError: If we don&#39;t know how to deal with this type of biopolymer</span>
-<span class="sd">            StopIteration: If there isn&#39;t a previous residue (i.e. it&#39;s a 5&#39;- or N-terminus)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_neighbor</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;N-terminus&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;dna&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_neighbor</span><span class="p">(</span><span class="s2">&quot;P&quot;</span><span class="p">,</span> <span class="s2">&quot;5&#39; end&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;We only deal with dna and amino acids right now&#39;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_get_neighbor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomname</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return the first residue found that&#39;s bound to the passed atom name</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">conn_atom</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">atomname</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">nbr</span> <span class="ow">in</span> <span class="n">conn_atom</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">nbr</span><span class="o">.</span><span class="n">residue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">nbr</span><span class="o">.</span><span class="n">residue</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> reached&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">resname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;str: Synonym for pdbname&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdbname</span>
-
-    <span class="nd">@resname.setter</span>
-    <span class="k">def</span> <span class="nf">resname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pdbname</span> <span class="o">=</span> <span class="n">val</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;str: Classification of the residue (protein, solvent, dna, water, unknown)&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">restype</span><span class="p">,</span> <span class="n">names</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">RESTYPES</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdbname</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">restype</span>
-        <span class="k">return</span> <span class="s1">&#39;unknown&#39;</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">code</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;str: one-letter amino acid code or two letter nucleic acid code, or &#39;?&#39; otherwise&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">RESIDUE_ONE_LETTER</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdbname</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">atomnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Residue: synonym for ```self``` for for the sake of readability:</span>
-<span class="sd">            ```molecule.chains[&#39;A&#39;].residues[123].atomnames[&#39;CA&#39;]```</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">backbone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; AtomList: all backbone atoms for nucleic and protein residues</span>
-<span class="sd">            (indentified using PDB names); returns None for other residue types</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backbone</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">BACKBONES</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">None</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_backbone</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">BACKBONES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">]:</span>
-                <span class="k">try</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backbone</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
-                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span> <span class="k">pass</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backbone</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sidechain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; AtomList: all sidechain atoms for nucleic and protein residues</span>
-<span class="sd">            (defined as non-backbone atoms); returns None for other residue types</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sidechain</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backbone</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">None</span>
-            <span class="n">bb</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backbone</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_sidechain</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">atom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bb</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sidechain</span>
-
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;Residue </span><span class="si">%s</span><span class="s1"> (index </span><span class="si">%d</span><span class="s1">, chain </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
-                                                    <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_repr_markdown_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">markdown_summary</span><span class="p">()</span>
-
-<div class="viewcode-block" id="Residue.markdown_summary"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Residue.markdown_summary">[docs]</a>    <span class="k">def</span> <span class="nf">markdown_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Markdown-formatted information about this residue</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            str: markdown-formatted string</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&lt;h3&gt;Residue </span><span class="si">%s</span><span class="s2">&lt;/h3&gt;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&lt;h3&gt;Residue </span><span class="si">%s</span><span class="s2"> (index </span><span class="si">%d</span><span class="s2">)&lt;/h3&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;**Residue codes**: </span><span class="si">%s</span><span class="s1"> / </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;**Residue code**: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;**Type**: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resname</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">RESIDUE_DESCRIPTIONS</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;**Description**: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">data</span><span class="o">.</span><span class="n">RESIDUE_DESCRIPTIONS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">resname</span><span class="p">])</span>
-
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;**&lt;p&gt;Chain:** </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;**Sequence number**: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdbindex</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;**Molecule**: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;**&lt;p&gt;Number of atoms**: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backbone</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;**Backbone atoms:** </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">backbone</span><span class="p">))</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;**Sidechain atoms:** </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sidechain</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;**Atom:** </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="s1">&#39;&lt;br&gt;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div></div>
-
-
-<span class="nd">@toplevel</span>
-<div class="viewcode-block" id="Chain"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Chain">[docs]</a><span class="k">class</span> <span class="nc">Chain</span><span class="p">(</span><span class="n">Entity</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Biomolecular chain class - its children are almost always residues.</span>
-
-<span class="sd">    Attributes:</span>
-<span class="sd">        parent (mdt.Molecule): the molecule this residue belongs to</span>
-<span class="sd">        chain (Chain): the chain this residue belongs to</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nd">@utils.args_from</span><span class="p">(</span><span class="n">Entity</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdbname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Chain</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">pdbname</span><span class="o">=</span><span class="n">pdbname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdbname</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdbindex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdbindex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdbname</span>
-
-<div class="viewcode-block" id="Chain.copy"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Chain.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">newatoms</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">Chain</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">newatoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">chain</span></div>
-    <span class="n">copy</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">Entity</span><span class="o">.</span><span class="n">copy</span><span class="o">.</span><span class="n">__doc__</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">residues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Chain: synonym for &#39;self&#39; to enhance readability,</span>
-<span class="sd">            e.g. ```molecule.chains[&#39;A&#39;].residue[123]```&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span>
-
-<div class="viewcode-block" id="Chain.add"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.Chain.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">residue</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="bp">self</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Residue is not a member of this chain&quot;</span>
-
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Chain</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">residue</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Chain.assign_biopolymer_bonds"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Chain.assign_biopolymer_bonds">[docs]</a>    <span class="k">def</span> <span class="nf">assign_biopolymer_bonds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Connect bonds between residues in this chain. Does not .</span>
-
-<span class="sd">        See Also:</span>
-<span class="sd">            :ref:`moldesign.Residue.assign_template_bonds`</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            ValueError: if ``residue.resname`` is not in bioresidue templates</span>
-<span class="sd">            KeyError: if an atom in this residue is not recognized &quot;&quot;&quot;</span>
-        <span class="n">residues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">residues</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">pdbindex</span><span class="p">))</span>
-        <span class="n">bond_graph</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">ires</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-            <span class="n">r1</span> <span class="o">=</span> <span class="n">residues</span><span class="p">[</span><span class="n">ires</span><span class="p">]</span>
-            <span class="n">r2</span> <span class="o">=</span> <span class="n">residues</span><span class="p">[</span><span class="n">ires</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
-
-            <span class="c1"># don&#39;t assign bonds unless these are contiguous bioresidues</span>
-            <span class="k">if</span> <span class="n">r1</span><span class="o">.</span><span class="n">pdbindex</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">!=</span> <span class="n">r2</span><span class="o">.</span><span class="n">pdbindex</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="n">restype</span> <span class="o">=</span> <span class="n">r1</span><span class="o">.</span><span class="n">type</span>
-            <span class="k">if</span> <span class="n">r2</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">restype</span><span class="p">:</span>
-                <span class="k">continue</span>
-
-            <span class="c1"># Create the bonds</span>
-            <span class="k">if</span> <span class="n">restype</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span><span class="p">:</span>
-                <span class="n">bond_graph</span><span class="p">[</span><span class="n">r1</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">r2</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]:</span> <span class="mi">1</span><span class="p">}</span>
-                <span class="n">bond_graph</span><span class="p">[</span><span class="n">r2</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">r1</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">]:</span> <span class="mi">1</span><span class="p">}</span>
-            <span class="k">elif</span> <span class="n">restype</span> <span class="o">==</span> <span class="s1">&#39;dna&#39;</span><span class="p">:</span>
-                <span class="n">bond_graph</span><span class="p">[</span><span class="n">r1</span><span class="p">[</span><span class="s2">&quot;O3&#39;&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">r2</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]:</span> <span class="mi">1</span><span class="p">}</span>
-                <span class="n">bond_graph</span><span class="p">[</span><span class="n">r2</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">r1</span><span class="p">[</span><span class="s2">&quot;O3&#39;&quot;</span><span class="p">]:</span> <span class="mi">1</span><span class="p">}</span>
-            <span class="k">elif</span> <span class="n">restype</span> <span class="o">==</span> <span class="s1">&#39;rna&#39;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;RNA not yet implemented&#39;</span><span class="p">)</span>
-
-        <span class="c1"># copy bonds into the right structure (do this last to avoid mangling the graph)</span>
-        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">bond_graph</span><span class="p">:</span>
-            <span class="n">atom</span><span class="o">.</span><span class="n">bond_graph</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">bond_graph</span><span class="p">[</span><span class="n">atom</span><span class="p">])</span></div>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;str: this chain&#39;s residue sequence with one-letter residue codes</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">missing</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>  <span class="c1"># don&#39;t do this</span>
-        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">last_idx</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">.</span><span class="n">pdbindex</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;dna&#39;</span><span class="p">,</span> <span class="s1">&#39;rna&#39;</span><span class="p">):</span> <span class="k">continue</span>
-            <span class="k">if</span> <span class="n">last_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">num_missing</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">pdbindex</span> <span class="o">-</span> <span class="n">last_idx</span> <span class="o">-</span> <span class="mi">1</span>
-                <span class="k">if</span> <span class="n">num_missing</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">missing</span> <span class="o">*</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">pdbindex</span> <span class="o">-</span> <span class="n">last_idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">code</span> <span class="o">!=</span> <span class="s1">&#39;?&#39;</span><span class="p">:</span>
-                <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">outputs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;,&#39;</span><span class="p">:</span>
-                    <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
-                <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">pdbname</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span>
-            <span class="n">last_idx</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">pdbindex</span>
-        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;Chain </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
 </pre></div>
 
            </div>
@@ -737,7 +408,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.7.0',
+            VERSION:'0.7.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -1,0 +1,373 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.tools.topology &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.tools.topology</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.tools.topology</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains various utility functions that are exposed to API users</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">toplevel</span><span class="p">,</span> <span class="n">__all__</span> <span class="k">as</span> <span class="n">_pkgall</span>
+
+<span class="kn">from</span> <span class="nn">moldesign.interfaces.openbabel</span> <span class="kn">import</span> <span class="n">add_hydrogen</span><span class="p">,</span> <span class="n">guess_bond_orders</span>
+<span class="kn">from</span> <span class="nn">moldesign.interfaces.pdbfixer_interface</span> <span class="kn">import</span> <span class="n">mutate</span><span class="p">,</span> <span class="n">add_water</span>
+<span class="kn">from</span> <span class="nn">moldesign.interfaces.ambertools</span> <span class="kn">import</span> <span class="n">assign_forcefield</span><span class="p">,</span> <span class="n">parameterize</span>
+<span class="kn">from</span> <span class="nn">moldesign.interfaces.ambertools</span> <span class="kn">import</span> <span class="n">calc_am1_bcc_charges</span><span class="p">,</span> <span class="n">calc_gasteiger_charges</span>
+
+<span class="n">_pkgall</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="s1">&#39;add_hydrogen guess_bond_orders mutate add_water&#39;</span>
+                <span class="s1">&#39; assign_forcefield parameterize calc_am1_bcc_charges calc_gasteiger_charges&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+
+<span class="n">ATNUM_VALENCE_CHARGE</span> <span class="o">=</span> <span class="p">{</span><span class="mi">6</span><span class="p">:</span> <span class="p">{</span><span class="mi">3</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                        <span class="mi">7</span><span class="p">:</span> <span class="p">{</span><span class="mi">2</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                        <span class="mi">8</span><span class="p">:</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                        <span class="mi">9</span><span class="p">:</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}</span>
+
+<span class="n">ION_CHARGE</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>  <span class="c1"># H</span>
+              <span class="mi">11</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>  <span class="c1"># Na+</span>
+              <span class="mi">19</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>  <span class="c1"># K+</span>
+              <span class="mi">12</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>  <span class="c1"># Mg 2+</span>
+              <span class="mi">20</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>  <span class="c1"># Ca 2+</span>
+              <span class="mi">9</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># F-</span>
+              <span class="mi">17</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># Cl-</span>
+              <span class="mi">35</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># Br-</span>
+              <span class="mi">53</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span>  <span class="c1"># I-</span>
+
+
+<span class="nd">@toplevel</span>
+<div class="viewcode-block" id="assign_formal_charges"><a class="viewcode-back" href="../../../toplevel.html#moldesign.assign_formal_charges">[docs]</a><span class="k">def</span> <span class="nf">assign_formal_charges</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">ignore_nonzero</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Assign formal charges to C,N,O,F atoms in this molecule based on valence</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): Molecule to assign formal charges to. The formal charges of its</span>
+<span class="sd">           atoms and its total charge will be adjusted in place.</span>
+<span class="sd">        ignore_nonzero (bool): If formal charge is already set to a nonzero value, ignore this atom</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This method ONLY applies to C,N, O and F, based on a simple valence model.</span>
+<span class="sd">        These results should be manually inspected for consistency.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        UnhandledValenceError: for cases not handled by the simple valence model</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        These assignments are illustrated by the formal charge patterns in</span>
+<span class="sd">            http://www.chem.ucla.edu/~harding/tutorials/formalcharge.pdf</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">moldesign.exceptions</span> <span class="kn">import</span> <span class="n">UnhandledValenceError</span>
+
+    <span class="c1"># TODO: scrape formal charge data from the PDB chem comp dictionary</span>
+
+    <span class="c1"># cache these values in case we fail to assign charges</span>
+    <span class="n">totalcharge</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">charge</span>
+    <span class="n">oldcharges</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">formal_charge</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ignore_nonzero</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">formal_charge</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">v</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">valence</span>
+        <span class="n">newcharge</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atnum</span> <span class="ow">in</span> <span class="n">ATNUM_VALENCE_CHARGE</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ATNUM_VALENCE_CHARGE</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">atnum</span><span class="p">]:</span>
+                <span class="n">newcharge</span> <span class="o">=</span> <span class="n">ATNUM_VALENCE_CHARGE</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">atnum</span><span class="p">][</span><span class="n">v</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">oldcharge</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">oldcharges</span><span class="p">,</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+                    <span class="n">a</span><span class="o">.</span><span class="n">oldcharge</span> <span class="o">=</span> <span class="n">oldcharge</span>
+                <span class="n">mol</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="n">totalcharge</span>
+                <span class="k">raise</span> <span class="n">UnhandledValenceError</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">ION_CHARGE</span> <span class="ow">and</span> <span class="n">v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">newcharge</span> <span class="o">=</span> <span class="n">ION_CHARGE</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">atnum</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">newcharge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">mol</span><span class="o">.</span><span class="n">charge</span> <span class="o">+=</span> <span class="n">newcharge</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">q_e</span> <span class="o">-</span> <span class="n">atom</span><span class="o">.</span><span class="n">formal_charge</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">formal_charge</span> <span class="o">=</span> <span class="n">newcharge</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">q_e</span></div>
+
+
+<span class="nd">@toplevel</span>
+<div class="viewcode-block" id="add_missing_data"><a class="viewcode-back" href="../../../toplevel.html#moldesign.add_missing_data">[docs]</a><span class="k">def</span> <span class="nf">add_missing_data</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Add missing hydrogens, bond orders, and formal charges to a structure (often from the PDB)</span>
+
+<span class="sd">    Specifically, this is a convenience function that runs:</span>
+<span class="sd">    ``mdt.guess_bond_orders``, ``mdt.add_hydrogen``, and ``mdt.assign_formal_charges``</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This does NOT add missing residues to biochemical structures. This functionality will be</span>
+<span class="sd">        available as :meth:`moldesign.add_missing_residues`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): molecule to clean</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        moldesign.Molecule: cleaned version of the molecule</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">add_hydrogen</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">guess_bond_orders</span><span class="p">(</span><span class="n">mol</span><span class="p">))</span>
+    <span class="n">assign_formal_charges</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">m</span></div>
+
+
+<span class="nd">@toplevel</span>
+<div class="viewcode-block" id="guess_histidine_states"><a class="viewcode-back" href="../../../toplevel.html#moldesign.guess_histidine_states">[docs]</a><span class="k">def</span> <span class="nf">guess_histidine_states</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Attempt to assign protonation states to histidine residues.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This function is highly unlikely to give accurate results! It is intended for convenience</span>
+<span class="sd">        when histidine states can easily be guessed from already-present hydrogens or when they are</span>
+<span class="sd">        judged to be relatively unimportant.</span>
+
+<span class="sd">    This can be done simply by renaming HIS residues:</span>
+<span class="sd">      1. If HE2 and HD1 are present, the residue is renamed to HIP</span>
+<span class="sd">      2. If only HE2 is present, the residue is renamed to HIE</span>
+<span class="sd">      3. Otherwise, the residue is renamed to HID (the most common form)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): molecule to change (in place)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">residue</span><span class="o">.</span><span class="n">resname</span> <span class="o">==</span> <span class="s1">&#39;HIS&#39;</span><span class="p">:</span>
+            <span class="n">oldname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;HE2&#39;</span> <span class="ow">in</span> <span class="n">residue</span> <span class="ow">and</span> <span class="s1">&#39;HD1&#39;</span> <span class="ow">in</span> <span class="n">residue</span><span class="p">:</span>
+                <span class="n">residue</span><span class="o">.</span><span class="n">resname</span> <span class="o">=</span> <span class="s1">&#39;HIP&#39;</span>
+            <span class="k">elif</span> <span class="s1">&#39;HE2&#39;</span> <span class="ow">in</span> <span class="n">residue</span><span class="p">:</span>
+                <span class="n">residue</span><span class="o">.</span><span class="n">resname</span> <span class="o">=</span> <span class="s1">&#39;HIE&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">residue</span><span class="o">.</span><span class="n">resname</span> <span class="o">=</span> <span class="s1">&#39;HID&#39;</span>
+            <span class="k">print</span> <span class="s1">&#39;Renaming </span><span class="si">%s</span><span class="s1"> from HIS to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">oldname</span><span class="p">,</span> <span class="n">residue</span><span class="o">.</span><span class="n">resname</span><span class="p">)</span></div>
+
+
+
+
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

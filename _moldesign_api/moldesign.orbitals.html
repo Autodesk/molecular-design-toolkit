@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>moldesign.orbitals package &mdash; Molecular Design Toolkit 0.7.0 documentation</title>
+  <title>moldesign.orbitals package &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
   
 
   
@@ -30,10 +30,7 @@
   
 
   
-    <link rel="top" title="Molecular Design Toolkit 0.7.0 documentation" href="../index.html"/>
-        <link rel="up" title="moldesign package" href="moldesign.html"/>
-        <link rel="next" title="moldesign.uibase package" href="moldesign.uibase.html"/>
-        <link rel="prev" title="moldesign.molecules package" href="moldesign.molecules.html"/> 
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -51,7 +48,7 @@
           
 
           
-            <a href="../contents.html" class="icon icon-home"> Molecular Design Toolkit
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
           
 
           
@@ -61,7 +58,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.3
               </div>
             
           
@@ -82,49 +79,37 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../howdoi.html">How do I ...?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../structure.html">Atoms, molecules, and biomolecules</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="moldesign.html">Complete API reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="moldesign.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="moldesign.compute.html">moldesign.compute package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.external.html">moldesign.external package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.forcefields.html">moldesign.forcefields package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.geom.html">moldesign.geom package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.integrators.html">moldesign.integrators package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.interfaces.html">moldesign.interfaces package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.min.html">moldesign.min package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.models.html">moldesign.models package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.molecules.html">moldesign.molecules package</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">moldesign.orbitals package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#moldesign-orbitals-basis-module">moldesign.orbitals.basis module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.orbitals.gaussians">moldesign.orbitals.gaussians module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.orbitals.orbitals">moldesign.orbitals.orbitals module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.orbitals.wfn">moldesign.orbitals.wfn module</a></li>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
 </ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.uibase.html">moldesign.uibase package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.units.html">moldesign.units package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.utils.html">moldesign.utils package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.viewer.html">moldesign.viewer package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.widgets.html">moldesign.widgets package</a></li>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
 </ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.converters">moldesign.converters module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.data">moldesign.data module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.exceptions">moldesign.exceptions module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.helpers">moldesign.helpers module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.mathutils">moldesign.mathutils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.method">moldesign.method module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.parameters">moldesign.parameters module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.tools">moldesign.tools module</a></li>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/wfn.html">4. Electronic wavefunction API</a></li>
 </ul>
-</li>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.data.html">6. Data API</a></li>
 </ul>
 
             
@@ -138,7 +123,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../contents.html">Molecular Design Toolkit</a>
+        <a href="../index.html">Molecular Design Toolkit</a>
       </nav>
 
 
@@ -153,9 +138,7 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../contents.html">Docs</a> &raquo;</li>
-      
-          <li><a href="moldesign.html">moldesign package</a> &raquo;</li>
+    <li><a href="../index.html">Docs</a> &raquo;</li>
       
     <li>moldesign.orbitals package</li>
       <li class="wy-breadcrumbs-aside">
@@ -180,6 +163,11 @@
 <p>Stores a basis, typically of atomic orbitals.</p>
 <p>This is a special orbital type</p>
 <dl class="attribute">
+<dt id="moldesign.orbitals.BasisSet.density_matrix">
+<code class="descname">density_matrix</code><a class="headerlink" href="#moldesign.orbitals.BasisSet.density_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="moldesign.orbitals.BasisSet.fock">
 <code class="descname">fock</code><a class="headerlink" href="#moldesign.orbitals.BasisSet.fock" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -197,6 +185,11 @@
 <dd><p>Bases: <a class="reference internal" href="#moldesign.orbitals.orbitals.MolecularOrbitals" title="moldesign.orbitals.orbitals.MolecularOrbitals"><code class="xref py py-class docutils literal"><span class="pre">moldesign.orbitals.orbitals.MolecularOrbitals</span></code></a></p>
 <p>Stores a basis, typically of atomic orbitals.</p>
 <p>This is a special orbital type</p>
+<dl class="attribute">
+<dt id="moldesign.orbitals.basis.BasisSet.density_matrix">
+<code class="descname">density_matrix</code><a class="headerlink" href="#moldesign.orbitals.basis.BasisSet.density_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="moldesign.orbitals.basis.BasisSet.fock">
 <code class="descname">fock</code><a class="headerlink" href="#moldesign.orbitals.basis.BasisSet.fock" title="Permalink to this definition">¶</a></dt>
@@ -223,10 +216,12 @@
 </div>
 <div class="section" id="module-moldesign.orbitals.gaussians">
 <span id="moldesign-orbitals-gaussians-module"></span><h2>moldesign.orbitals.gaussians module<a class="headerlink" href="#module-moldesign.orbitals.gaussians" title="Permalink to this headline">¶</a></h2>
+<p>Note: this code is currently unused and untested and will be refactored soon</p>
 <dl class="class">
 <dt id="moldesign.orbitals.gaussians.AbstractFunction">
 <em class="property">class </em><code class="descclassname">moldesign.orbitals.gaussians.</code><code class="descname">AbstractFunction</code><a class="reference internal" href="../_modules/moldesign/orbitals/gaussians.html#AbstractFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.gaussians.AbstractFunction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Abstract base class for basis functions</p>
 <dl class="attribute">
 <dt id="moldesign.orbitals.gaussians.AbstractFunction.norm">
 <code class="descname">norm</code><a class="headerlink" href="#moldesign.orbitals.gaussians.AbstractFunction.norm" title="Permalink to this definition">¶</a></dt>
@@ -494,15 +489,9 @@ angle, F_{kl}, etc.</p>
 <li>adiabatic electronic states are indexed using capital letters, _N_, _L_, _M_, etc.</li>
 </ul>
 </div></blockquote>
-<dl class="exception">
-<dt id="moldesign.orbitals.orbitals.ConvergenceError">
-<em class="property">exception </em><code class="descclassname">moldesign.orbitals.orbitals.</code><code class="descname">ConvergenceError</code><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#ConvergenceError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.ConvergenceError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/exceptions.html#exceptions.Exception" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></a></p>
-</dd></dl>
-
 <dl class="class">
 <dt id="moldesign.orbitals.orbitals.MolecularOrbitals">
-<em class="property">class </em><code class="descclassname">moldesign.orbitals.orbitals.</code><code class="descname">MolecularOrbitals</code><span class="sig-paren">(</span><em>orbitals</em>, <em>wfn=None</em>, <em>basis=None</em>, <em>canonical=False</em>, <em>orbtype=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#MolecularOrbitals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.MolecularOrbitals" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">moldesign.orbitals.orbitals.</code><code class="descname">MolecularOrbitals</code><span class="sig-paren">(</span><em>orbitals</em>, <em>wfn=None</em>, <em>basis=None</em>, <em>canonical=False</em>, <em>orbtype=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#MolecularOrbitals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.MolecularOrbitals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Stores a wfn of molecular orbitals in an AO wfn
 Orbitals are accessed as orbs[orbital index, ao index]</p>
@@ -600,6 +589,12 @@ molecular orbital _i_.</p>
 <dd><p><em>u.Array[energy]</em> &#8211; 2-electron matrix elements for these orbitals</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="moldesign.orbitals.orbitals.MolecularOrbitals.occupations">
+<code class="descname">occupations</code><a class="headerlink" href="#moldesign.orbitals.orbitals.MolecularOrbitals.occupations" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>np.ndarray</em> &#8211; orbital occupation numbers</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="moldesign.orbitals.orbitals.MolecularOrbitals.overlap">
 <code class="descname">overlap</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#MolecularOrbitals.overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.MolecularOrbitals.overlap" title="Permalink to this definition">¶</a></dt>
@@ -610,9 +605,9 @@ molecular orbital _i_.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<a class="reference internal" href="#moldesign.orbitals.orbitals.MolecularOrbitals" title="moldesign.orbitals.orbitals.MolecularOrbitals"><em>MolecularOrbitals</em></a>) &#8211; </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">overlaps between the two sets of orbitals.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">overlaps between the two sets of orbitals</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.array</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">numpy.ndarray</td>
 </tr>
 </tbody>
 </table>
@@ -683,7 +678,7 @@ molecular orbital _i_.</p>
 
 <dl class="class">
 <dt id="moldesign.orbitals.orbitals.Orbital">
-<em class="property">class </em><code class="descclassname">moldesign.orbitals.orbitals.</code><code class="descname">Orbital</code><span class="sig-paren">(</span><em>coeffs</em>, <em>basis=None</em>, <em>wfn=None</em>, <em>occupation=None</em>, <em>name='unnamed'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#Orbital"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.Orbital" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">moldesign.orbitals.orbitals.</code><code class="descname">Orbital</code><span class="sig-paren">(</span><em>coeffs</em>, <em>basis=None</em>, <em>wfn=None</em>, <em>occupation=None</em>, <em>name='unnamed'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/orbitals.html#Orbital"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.orbitals.Orbital" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Stores a single orbital and its meta-data
 Generally wants to be part of a set of MolecularOrbitals</p>
@@ -747,7 +742,7 @@ Generally wants to be part of a set of MolecularOrbitals</p>
 <span id="moldesign-orbitals-wfn-module"></span><h2>moldesign.orbitals.wfn module<a class="headerlink" href="#module-moldesign.orbitals.wfn" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="moldesign.orbitals.wfn.ElectronicWfn">
-<em class="property">class </em><code class="descclassname">moldesign.orbitals.wfn.</code><code class="descname">ElectronicWfn</code><span class="sig-paren">(</span><em>mol</em>, <em>num_electrons</em>, <em>model=None</em>, <em>aobasis=None</em>, <em>fock_ao=None</em>, <em>positions=None</em>, <em>civectors=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/wfn.html#ElectronicWfn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.wfn.ElectronicWfn" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">moldesign.orbitals.wfn.</code><code class="descname">ElectronicWfn</code><span class="sig-paren">(</span><em>mol</em>, <em>num_electrons</em>, <em>model=None</em>, <em>aobasis=None</em>, <em>fock_ao=None</em>, <em>positions=None</em>, <em>civectors=None</em>, <em>description=None</em>, <em>density_matrix_ao=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/orbitals/wfn.html#ElectronicWfn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.orbitals.wfn.ElectronicWfn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Stores the results of a quantum chemistry calculation.</p>
 <p>This is necessarily pretty flexible, but generally stores an LCAO wfn and one or more sets of
@@ -758,14 +753,16 @@ orbitals. Can also store CI vectors, etc.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule this wavefunction belongs to</li>
+<li><strong>mol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule this wavefunction belongs to</li>
 <li><strong>num_electrons</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of electrons in this wavefunction</li>
-<li><strong>theory</strong> (<a class="reference internal" href="moldesign.models.html#moldesign.models.base.EnergyModelBase" title="moldesign.models.base.EnergyModelBase"><em>moldesign.models.base.EnergyModelBase</em></a>) &#8211; The model this wavefunction was created with</li>
+<li><strong>model</strong> (<a class="reference internal" href="moldesign.models.html#moldesign.models.base.EnergyModelBase" title="moldesign.models.base.EnergyModelBase"><em>moldesign.models.base.EnergyModelBase</em></a>) &#8211; The model this wavefunction was created with</li>
 <li><strong>aobasis</strong> (<a class="reference internal" href="#moldesign.orbitals.BasisSet" title="moldesign.orbitals.BasisSet"><em>moldesign.orbitals.BasisSet</em></a>) &#8211; The basis functions for the enclosed orbitals</li>
+<li><strong>nbasis</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of AO basis functions</li>
 <li><strong>fock_ao</strong> (<em>moldesign.units.Array[energy]</em>) &#8211; fock matrix in the AO basis</li>
 <li><strong>positions</strong> (<em>moldesign.units.Array[length]</em>) &#8211; positions of the nuclei for this wfn</li>
 <li><strong>civectors</strong> (<em>np.ndarray</em>) &#8211; CI vectors (if applicable)</li>
-<li><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; arbitrary metadata</li>
+<li><strong>description</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; text describing the wfn (e.g. &#8216;RHF/STO-3G&#8217;, &#8216;CAS(2,2)/SA3/6-31G**&#8217;)</li>
+<li><strong>density_matrix_ao</strong> (<em>np.ndarray</em>) &#8211; density matrix in the ao basis</li>
 </ul>
 </td>
 </tr>
@@ -783,11 +780,6 @@ orbitals. Can also store CI vectors, etc.</p>
 :type other: ElectronicWfn
 :param assert_same: raise an exception if the two wavefunctions do not have the same kinds of orbitals</p>
 </dd></dl>
-
-<dl class="attribute">
-<dt id="moldesign.orbitals.wfn.ElectronicWfn.description">
-<code class="descname">description</code><a class="headerlink" href="#moldesign.orbitals.wfn.ElectronicWfn.description" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="moldesign.orbitals.wfn.ElectronicWfn.molecular_orbitals">
@@ -814,15 +806,6 @@ orbitals. Can also store CI vectors, etc.</p>
            </div>
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="moldesign.uibase.html" class="btn btn-neutral float-right" title="moldesign.uibase package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="moldesign.molecules.html" class="btn btn-neutral" title="moldesign.molecules package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>
@@ -851,7 +834,7 @@ orbitals. Can also store CI vectors, etc.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.7.0',
+            VERSION:'0.7.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

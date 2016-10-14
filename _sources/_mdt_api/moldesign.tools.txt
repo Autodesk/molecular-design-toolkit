@@ -1,0 +1,90 @@
+=========
+Tools API
+=========
+
+Functions
+=========
+
+``add_hydrogen`` function
+-------------------------
+
+.. autofunction:: moldesign.add_hydrogen
+
+``add_missing_data`` function
+-----------------------------
+
+.. autofunction:: moldesign.add_missing_data
+
+``add_water`` function
+----------------------
+
+.. autofunction:: moldesign.add_water
+
+``assign_forcefield`` function
+------------------------------
+
+.. autofunction:: moldesign.assign_forcefield
+
+``assign_formal_charges`` function
+----------------------------------
+
+.. autofunction:: moldesign.assign_formal_charges
+
+``build_assembly`` function
+---------------------------
+
+.. autofunction:: moldesign.build_assembly
+
+``build_bdna`` function
+-----------------------
+
+.. autofunction:: moldesign.build_bdna
+
+``build_dna_helix`` function
+----------------------------
+
+.. autofunction:: moldesign.build_dna_helix
+
+``calc_am1_bcc_charges`` function
+---------------------------------
+
+.. autofunction:: moldesign.calc_am1_bcc_charges
+
+``calc_gasteiger_charges`` function
+-----------------------------------
+
+.. autofunction:: moldesign.calc_gasteiger_charges
+
+``guess_bond_orders`` function
+------------------------------
+
+.. autofunction:: moldesign.guess_bond_orders
+
+``guess_histidine_states`` function
+-----------------------------------
+
+.. autofunction:: moldesign.guess_histidine_states
+
+``mutate`` function
+-------------------
+
+.. autofunction:: moldesign.mutate
+
+``parameterize`` function
+-------------------------
+
+.. autofunction:: moldesign.parameterize
+
+Unexported API
+==============
+
+``ATNUM_VALENCE_CHARGE`` 
+-------------------------
+
+.. autoattribute:: moldesign.tools.ATNUM_VALENCE_CHARGE
+
+``ION_CHARGE`` 
+---------------
+
+.. autoattribute:: moldesign.tools.ION_CHARGE
+

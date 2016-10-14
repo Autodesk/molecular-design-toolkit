@@ -1,0 +1,378 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>2. Molecular Design Toolkit Features &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="index.html"/>
+        <link rel="next" title="3. Installing MDT" href="install.html"/>
+        <link rel="prev" title="1. Quickstart" href="quickstart.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">2. Molecular Design Toolkit Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#molecular-mechanics">2.1. Molecular Mechanics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quantum-chemistry">2.2. Quantum Chemistry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#molecular-dynamics">2.2.1. Molecular Dynamics</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#interactive-visualization">2.3. Interactive visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-analysis">2.4. Data analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interfaces">2.5. Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tools">2.6. Tools</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>2. Molecular Design Toolkit Features</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/features.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="molecular-design-toolkit-features">
+<h1><a class="toc-backref" href="#id1">2. Molecular Design Toolkit Features</a><a class="headerlink" href="#molecular-design-toolkit-features" title="Permalink to this headline">¶</a></h1>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#molecular-design-toolkit-features" id="id1">Molecular Design Toolkit Features</a><ul>
+<li><a class="reference internal" href="#molecular-mechanics" id="id2">Molecular Mechanics</a></li>
+<li><a class="reference internal" href="#quantum-chemistry" id="id3">Quantum Chemistry</a><ul>
+<li><a class="reference internal" href="#molecular-dynamics" id="id4">Molecular Dynamics</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#interactive-visualization" id="id5">Interactive visualization</a></li>
+<li><a class="reference internal" href="#data-analysis" id="id6">Data analysis</a></li>
+<li><a class="reference internal" href="#interfaces" id="id7">Interfaces</a></li>
+<li><a class="reference internal" href="#tools" id="id8">Tools</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="molecular-mechanics">
+<h2><a class="toc-backref" href="#id2">2.1. Molecular Mechanics</a><a class="headerlink" href="#molecular-mechanics" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><code class="xref py py-class docutils literal"><span class="pre">models.Forcefield</span></code> Generic Forcefield energy model (automatically chosen implementation)</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">models.GAFF</span></code> Amber force field for small organic molecules</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">models.OpenMMEnergyModel</span></code> OpenMM energy kernel for Amber/CHARMM-like forcefields</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">models.SanderEnergyModel</span></code> Sander energy kernel (from AmberTools) for Amber/CHARMM-like forcefields</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">models.Spring</span></code> A single harmonic bond 2 atoms (for testing and toy models)</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">models.HarmonicOscillator</span></code> A 1-D Harmonic oscillator centered at x=0 (for testing and toy models)</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="quantum-chemistry">
+<h2><a class="toc-backref" href="#id3">2.2. Quantum Chemistry</a><a class="headerlink" href="#quantum-chemistry" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><code class="xref py py-class docutils literal"><span class="pre">models.RHF</span></code> Restricted Hartree-Fock (automatically chosen implementation)</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">models.DFT</span></code> Density functional theories (automatically chosen implementation)</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">models.CASSCF</span></code> Complete-active space MCSCF (automatically chosen implementation)</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">models.Semiempirical</span></code> Generic semiempirical theories (automatically chosen implementation)</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">models.PySCF</span></code> PySCF <em>ab initio</em> QM energy kernel, includes implementations for a large number of quantum energy models, including RHF, DFT, CASCI, CASSCF, MP2, and coupled cluster</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">models.SQM</span></code> SQM semi-empirical energy kernel (from AmberTools), includes implementations for a large number of semiempirical models, including MNDO, AM1, PM3, PM6, DFTB</li>
+</ul>
+</div></blockquote>
+<div class="section" id="molecular-dynamics">
+<h3><a class="toc-backref" href="#id4">2.2.1. Molecular Dynamics</a><a class="headerlink" href="#molecular-dynamics" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><code class="xref py py-class docutils literal"><span class="pre">integrators.VelocityVerlet</span></code> Generic Velocity Verlet dynamics (automatically chosen implementation)</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">integrators.Langevin</span></code> Generic Langevin type (automatically chosen implementation)</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">integrators.OpenMMVerlet</span></code> Velocity Verlet dynamics for use with OpenMM energy models</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">integrators.OpenMMLangevin</span></code> Velocity Langevin dynamics for use with OpenMM energy models</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">integrators.SurfaceHopping</span></code> Multi-state surface hopping dynamics using fewest switched. Implementation: internal.</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="interactive-visualization">
+<h2><a class="toc-backref" href="#id5">2.3. Interactive visualization</a><a class="headerlink" href="#interactive-visualization" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><code class="xref py py-class docutils literal"><span class="pre">viewer.Configurator</span></code> Automatically generates user interfaces for configuring simulations</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">viewer.GeometryViewer</span></code> 3D molecular viewer</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">viewer.ChemicalGraphViewer</span></code> 2D molecular viewer</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">widgets.OrbitalViewer</span></code> 3D molecular orbital viewer</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">widgets.BondSelector</span></code> widget for building lists of atoms and/or bonds</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">widgets.ResidueSelector</span></code> widget for building lists of atoms and/or residues</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">widgets.GeometryBuilder</span></code> widget for manipulating internal coordinates</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">widgets.Symmetrizer</span></code> widget for displaying and manipulating molecular symmetry groups</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">widgets.ParameterizationDisplay</span></code> 3D display of issues when assigning forcefield parameters</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="data-analysis">
+<h2><a class="toc-backref" href="#id6">2.4. Data analysis</a><a class="headerlink" href="#data-analysis" title="Permalink to this headline">¶</a></h2>
+<p>Simulation results are stored in numpy arrays with an explicit unit system based on <code class="docutils literal"><span class="pre">pint</span></code> for easy analysis and comparison. A few are shown here as examples:</p>
+<p><strong>Static properties</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="xref py py-meth docutils literal"><span class="pre">Molecule.potential_energy()</span></code>, <code class="xref py py-meth docutils literal"><span class="pre">Molecule.forces()</span></code>, <code class="xref py py-meth docutils literal"><span class="pre">Molecule.dipole_moment()</span></code>, <code class="xref py py-meth docutils literal"><span class="pre">Molecule.wfn()</span></code> Molecular properties calcualted by energy models: the potential energy, force array, dipole moment vector, and electronic wavefunction, respectively.</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">orbitals.ElectronWfn</span></code> A data structure storic electronic wavefunction information, as calculated by a quantum energy model.</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">ElectronWfn.aobasis.fock()</span></code> <code class="xref py py-meth docutils literal"><span class="pre">ElectronWfn.aobasis.overlaps()</span></code> The Fock and overlap matrices in the AO basis</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">ElectronWfn.canonical.fock()</span></code> <code class="xref py py-meth docutils literal"><span class="pre">ElectronWfn.canonical.overlaps()</span></code> The Fock and overlap matrices in the canonical orbital basis</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">ElectronWfn.canonical.coeffs()</span></code> The canonical orbital coefficients in the AO basis</li>
+</ul>
+</div></blockquote>
+<p><strong>Trajectory properties</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="xref py py-class docutils literal"><span class="pre">Trajectory</span></code> A data structure storing a series of molecular structures with associated properties</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">Trajectory.rmsd()</span></code> Calculate a timeseries of RMSD values over the course of a trajectory</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">Trajectory.distance()</span></code>, <code class="xref py py-meth docutils literal"><span class="pre">Trajectory.angle()</span></code>, <code class="xref py py-meth docutils literal"><span class="pre">Trajectory.dihedral()</span></code> Return a timeseries of distances, angles, or dihedral angles over the course of a trajectory</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">Trajectory.time()</span></code> <code class="xref py py-meth docutils literal"><span class="pre">Trajectory.potential_energy()</span></code> <code class="xref py py-meth docutils literal"><span class="pre">Trajectory.kinetic_temperature()</span></code> <code class="docutils literal"><span class="pre">...</span></code> - Return timeseries of times, energies, temperatures, etc. over the course of a trajectory</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="interfaces">
+<h2><a class="toc-backref" href="#id7">2.5. Interfaces</a><a class="headerlink" href="#interfaces" title="Permalink to this headline">¶</a></h2>
+<p><strong>Files and databases</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="xref py py-meth docutils literal"><span class="pre">read()</span></code>, <code class="xref py py-meth docutils literal"><span class="pre">write()</span></code> read/write molecular file formats. Supports PDB, mmCIF, SDF, XYZ, MOL2, and pickled objects. Implementations: OpenBabel, BioPython, or internal.</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">from_smiles()</span></code> Convert a SMILES string into an MDT molecule with a 3D structure. Implementation: OpenBabel.</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">from_name()</span></code> Convert an IUPAC chemical name into an MDT molecule with a 3D structure. Implementation: Opsin.</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">from_pdb()</span></code> Download and create a molecule object from a PDB code. Implementation: BioPython.</li>
+</ul>
+</div></blockquote>
+<p><strong>Python objects</strong></p>
+<p>MDT molecules can also be converted into objects for a variety of other Python chemistry libraries:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="xref py py-meth docutils literal"><span class="pre">interfaces.mol_to_pybel()</span></code>, <code class="xref py py-meth docutils literal"><span class="pre">interfaces.pybel_to_mol()</span></code> Convert an MDT molecule to/from a <cite>pybel</cite> (i.e. OpenBabel) molecule object.</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">interfaces.mol_to_pyscf()</span></code>, <code class="xref py py-meth docutils literal"><span class="pre">interfaces.pyscf_to_mol()</span></code> Convert an MDT molecule to/from a PySCF molecule object.</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">interfaces.topology_to_mol()</span></code>, <code class="xref py py-meth docutils literal"><span class="pre">interfaces.mol_to_topology()</span></code>  Convert an OpenMM topology object to/from an MDT molecule</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="tools">
+<h2><a class="toc-backref" href="#id8">2.6. Tools</a><a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h2>
+<p><strong>Topology manipulation</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="xref py py-meth docutils literal"><span class="pre">add_hydrogen()</span></code> Saturate a molecule&#8217;s valence with hydrogens. Implementation: OpenBabel.</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">guess_bond_orders()</span></code> Assign bond orders based on geometry and/or topology. Implementation: OpenBabel.</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">mutate_residues()</span></code> Mutate DNA bases and amino acid residues. Implementation: PDBFixer.</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">add_water_box()</span></code> Add water box with optional ions. Implementation: PDBFixer.</li>
+</ul>
+</div></blockquote>
+<p><strong>Forcefields</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="xref py py-meth docutils literal"><span class="pre">assign_forcefield()</span></code> Returns a new molecule with forcefield assignments and any missing atoms. Implementation: AmberTools/tLeap.</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">parameterize()</span></code> Assign forcefield parameters to a molecule. Implementation: Ambertools/antechamber.</li>
+<li><code class="xref py py-meth docutils literal"><span class="pre">calc_am1_bcc_charges()</span></code> <code class="xref py py-meth docutils literal"><span class="pre">calc_gasteiger_charges()</span></code> <code class="xref py py-meth docutils literal"><span class="pre">calc_esp_charges()</span></code> Calculate partial charges for use with a forcefield. Implementation: Ambertools/antechamber and Ambertools/SQM</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="install.html" class="btn btn-neutral float-right" title="3. Installing MDT" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="quickstart.html" class="btn btn-neutral" title="1. Quickstart" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

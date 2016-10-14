@@ -1,0 +1,589 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.interfaces.openbabel &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.interfaces.openbabel</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.interfaces.openbabel</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">string</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">moldesign.molecules.atomcollections</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pybel</span> <span class="kn">as</span> <span class="nn">pb</span>
+    <span class="kn">import</span> <span class="nn">openbabel</span> <span class="kn">as</span> <span class="nn">ob</span>
+    <span class="c1"># WARNING: this is the real library, not our interface - this works because of absolute</span>
+    <span class="c1"># imports. We should probably rename this interface</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">force_remote</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="k">else</span><span class="p">:</span>  <span class="c1"># this should be configurable</span>
+    <span class="n">force_remote</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c1"># debugging</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">from</span> <span class="nn">moldesign.compute.runsremotely</span> <span class="kn">import</span> <span class="n">runsremotely</span>
+<span class="kn">import</span> <span class="nn">moldesign.molecules.atoms</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+
+
+<div class="viewcode-block" id="read_file"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.read_file">[docs]</a><span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Read a molecule from a file</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Currently only reads the first conformation in a file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename (str): path to file</span>
+<span class="sd">        name (str): name to assign to molecule</span>
+<span class="sd">        format (str): File format: pdb, sdf, mol2, bbll, etc.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        moldesign.Molecule: parsed result</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: check for openbabel molecule name?</span>
+    <span class="k">if</span> <span class="n">format</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">format</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">force_remote</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+            <span class="n">mol</span> <span class="o">=</span> <span class="n">read_string</span><span class="p">(</span><span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">format</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mol</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pbmol</span> <span class="o">=</span> <span class="n">pb</span><span class="o">.</span><span class="n">readfile</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="n">format</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">name</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">pybel_to_mol</span><span class="p">(</span><span class="n">pbmol</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="k">return</span> <span class="n">mol</span></div>
+
+
+<div class="viewcode-block" id="read_stream"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.read_stream">[docs]</a><span class="k">def</span> <span class="nf">read_stream</span><span class="p">(</span><span class="n">filelike</span><span class="p">,</span> <span class="n">format</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Read a molecule from a file-like object</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Currently only reads the first conformation in a file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filelike: a file-like object to read a file from</span>
+<span class="sd">        format (str): File format: pdb, sdf, mol2, bbll, etc.</span>
+<span class="sd">        name (str): name to assign to molecule</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        moldesign.Molecule: parsed result</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">molstring</span> <span class="o">=</span> <span class="n">filelike</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">read_string</span><span class="p">(</span><span class="n">molstring</span><span class="p">,</span> <span class="n">format</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+
+
+<span class="nd">@runsremotely</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="n">force_remote</span><span class="p">)</span>
+<div class="viewcode-block" id="read_string"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.read_string">[docs]</a><span class="k">def</span> <span class="nf">read_string</span><span class="p">(</span><span class="n">molstring</span><span class="p">,</span> <span class="n">format</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Read a molecule from a file-like object</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Currently only reads the first conformation in a file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        molstring (str): string containing file contents</span>
+<span class="sd">        format (str): File format: pdb, sdf, mol2, bbll, etc.</span>
+<span class="sd">        name (str): name to assign to molecule</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        moldesign.Molecule: parsed result</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pbmol</span> <span class="o">=</span> <span class="n">pb</span><span class="o">.</span><span class="n">readstring</span><span class="p">(</span><span class="n">format</span><span class="p">,</span> <span class="n">molstring</span><span class="p">)</span>
+    <span class="n">mol</span> <span class="o">=</span> <span class="n">pybel_to_mol</span><span class="p">(</span><span class="n">pbmol</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mol</span></div>
+
+
+<span class="nd">@runsremotely</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="n">force_remote</span><span class="p">)</span>
+<div class="viewcode-block" id="write_string"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.write_string">[docs]</a><span class="k">def</span> <span class="nf">write_string</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">format</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a file from the passed molecule</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): molecule to write</span>
+<span class="sd">        format (str): File format: pdb, sdf, mol2, bbll, etc.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: contents of the file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pbmol</span> <span class="o">=</span> <span class="n">mol_to_pybel</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+    <span class="n">outstr</span> <span class="o">=</span> <span class="n">pbmol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="n">format</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">outstr</span></div>
+
+
+<div class="viewcode-block" id="write_file"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.write_file">[docs]</a><span class="k">def</span> <span class="nf">write_file</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Write molecule to a file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): molecule to write</span>
+<span class="sd">        filename (str): File to write to</span>
+<span class="sd">        mode (str): Writing mode (e.g. &#39;w&#39; to overwrite, the default, or &#39;a&#39; to append)</span>
+<span class="sd">        format (str): File format: pdb, sdf, mol2, bbll, etc.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">format</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">format</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">outstr</span> <span class="o">=</span> <span class="n">write_string</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">format</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">outstr</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span> <span class="k">as</span> <span class="n">wrf</span><span class="p">:</span>
+            <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="n">wrf</span><span class="p">,</span> <span class="n">outstr</span></div>
+
+
+<span class="nd">@runsremotely</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="n">force_remote</span><span class="p">)</span>
+<div class="viewcode-block" id="guess_bond_orders"><a class="viewcode-back" href="../../../toplevel.html#moldesign.guess_bond_orders">[docs]</a><span class="k">def</span> <span class="nf">guess_bond_orders</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Use OpenBabel to guess bond orders using geometry and functional group templates.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): Molecule to perceive the bonds of</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        moldesign.Molecule: New molecule with assigned bonds</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: pH, formal charges</span>
+    <span class="n">pbmol</span> <span class="o">=</span> <span class="n">mol_to_pybel</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+    <span class="n">pbmol</span><span class="o">.</span><span class="n">OBMol</span><span class="o">.</span><span class="n">PerceiveBondOrders</span><span class="p">()</span>
+    <span class="n">newmol</span> <span class="o">=</span> <span class="n">pybel_to_mol</span><span class="p">(</span><span class="n">pbmol</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newmol</span></div>
+
+
+<span class="nd">@runsremotely</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="n">force_remote</span><span class="p">)</span>
+<div class="viewcode-block" id="add_hydrogen"><a class="viewcode-back" href="../../../toplevel.html#moldesign.add_hydrogen">[docs]</a><span class="k">def</span> <span class="nf">add_hydrogen</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">ph</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add hydrogens to saturate atomic valences.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): Molecule to saturate</span>
+<span class="sd">        ph (float): Assign formal charges and protonation using pH model; if None (the default),</span>
+<span class="sd">            neutral protonation will be assigned where possible.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        moldesign.Molecule: New molecule with all valences saturated</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pbmol</span> <span class="o">=</span> <span class="n">mol_to_pybel</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+    <span class="n">pbmol</span><span class="o">.</span><span class="n">OBMol</span><span class="o">.</span><span class="n">AddHydrogens</span><span class="p">(</span><span class="bp">False</span><span class="p">,</span>
+                             <span class="n">ph</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,)</span>
+    <span class="n">newmol</span> <span class="o">=</span> <span class="n">pybel_to_mol</span><span class="p">(</span><span class="n">pbmol</span><span class="p">,</span> <span class="n">reorder_atoms_by_residue</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">mdt</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">assign_unique_hydrogen_names</span><span class="p">(</span><span class="n">newmol</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">newmol</span></div>
+
+
+<div class="viewcode-block" id="mol_to_pybel"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.mol_to_pybel">[docs]</a><span class="k">def</span> <span class="nf">mol_to_pybel</span><span class="p">(</span><span class="n">mdtmol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Translate a moldesign molecule object into a pybel molecule object.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        The focus is on translating topology and biomolecular structure -</span>
+<span class="sd">        we don&#39;t translate any metadata.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mdtmol (moldesign.Molecule): molecule to translate</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pybel.Molecule: translated molecule</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">obmol</span> <span class="o">=</span> <span class="n">ob</span><span class="o">.</span><span class="n">OBMol</span><span class="p">()</span>
+    <span class="n">obmol</span><span class="o">.</span><span class="n">BeginModify</span><span class="p">()</span>
+    <span class="n">atommap</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">resmap</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mdtmol</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+        <span class="n">obatom</span> <span class="o">=</span> <span class="n">obmol</span><span class="o">.</span><span class="n">NewAtom</span><span class="p">()</span>
+        <span class="n">obatom</span><span class="o">.</span><span class="n">SetAtomicNum</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">atnum</span><span class="p">)</span>
+        <span class="n">atommap</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span> <span class="o">=</span> <span class="n">obatom</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)</span>
+        <span class="n">obatom</span><span class="o">.</span><span class="n">SetVector</span><span class="p">(</span><span class="o">*</span><span class="n">pos</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">resmap</span><span class="p">:</span>
+            <span class="n">obres</span> <span class="o">=</span> <span class="n">obmol</span><span class="o">.</span><span class="n">NewResidue</span><span class="p">()</span>
+            <span class="n">resmap</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="p">]</span> <span class="o">=</span> <span class="n">obres</span>
+            <span class="n">obres</span><span class="o">.</span><span class="n">SetChain</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span>
+                    <span class="n">mdt</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="p">))</span>
+            <span class="n">obres</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span>
+                    <span class="n">mdt</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">pdbname</span><span class="p">,</span> <span class="s1">&#39;UNL&#39;</span><span class="p">)</span> <span class="p">))</span>
+            <span class="n">obres</span><span class="o">.</span><span class="n">SetNum</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">pdbindex</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">obres</span> <span class="o">=</span> <span class="n">resmap</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="p">]</span>
+
+        <span class="n">obres</span><span class="o">.</span><span class="n">AddAtom</span><span class="p">(</span><span class="n">obatom</span><span class="p">)</span>
+        <span class="n">obres</span><span class="o">.</span><span class="n">SetHetAtom</span><span class="p">(</span><span class="n">obatom</span><span class="p">,</span> <span class="ow">not</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">is_standard_residue</span><span class="p">)</span>
+        <span class="n">obres</span><span class="o">.</span><span class="n">SetAtomID</span><span class="p">(</span><span class="n">obatom</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">obres</span><span class="o">.</span><span class="n">SetSerialNum</span><span class="p">(</span><span class="n">obatom</span><span class="p">,</span>
+                           <span class="n">mdt</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">pdbindex</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mdtmol</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">:</span>
+        <span class="n">a1</span> <span class="o">=</span> <span class="n">atommap</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">nbr</span><span class="p">,</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">mdtmol</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">a2</span> <span class="o">=</span> <span class="n">atommap</span><span class="p">[</span><span class="n">nbr</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">a1</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">a2</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">():</span>
+                <span class="n">obmol</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">(),</span> <span class="n">a2</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">(),</span> <span class="n">order</span><span class="p">)</span>
+    <span class="n">obmol</span><span class="o">.</span><span class="n">EndModify</span><span class="p">()</span>
+    <span class="n">pbmol</span> <span class="o">=</span> <span class="n">pb</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">obmol</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atommap</span><span class="p">:</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">atommap</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
+        <span class="n">obatom</span> <span class="o">=</span> <span class="n">obmol</span><span class="o">.</span><span class="n">GetAtom</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="n">obatom</span><span class="o">.</span><span class="n">SetFormalCharge</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">formal_charge</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">q_e</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">pbmol</span></div>
+
+
+<div class="viewcode-block" id="pybel_to_mol"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.pybel_to_mol">[docs]</a><span class="k">def</span> <span class="nf">pybel_to_mol</span><span class="p">(</span><span class="n">pbmol</span><span class="p">,</span>
+                 <span class="n">atom_names</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                 <span class="n">reorder_atoms_by_residue</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                 <span class="n">primary_structure</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Translate a pybel molecule object into a moldesign object.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        The focus is on translating topology and biomolecular structure - we don&#39;t translate any metadata.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pbmol (pybel.Molecule): molecule to translate</span>
+<span class="sd">        atom_names (bool): use pybel&#39;s atom names (default True)</span>
+<span class="sd">        reorder_atoms_by_residue (bool): change atom order so that all atoms in a residue are stored</span>
+<span class="sd">            contiguously</span>
+<span class="sd">        primary_structure (bool): translate primary structure data as well as atomic data</span>
+<span class="sd">        **kwargs (dict): keyword arguments to  moldesign.Molecule __init__ method</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        moldesign.Molecule: translated molecule</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">newatom_map</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">newresidues</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">newchains</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">newatoms</span> <span class="o">=</span> <span class="n">moldesign</span><span class="o">.</span><span class="n">molecules</span><span class="o">.</span><span class="n">atomcollections</span><span class="o">.</span><span class="n">AtomList</span><span class="p">([])</span>
+    <span class="n">backup_chain_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">pybatom</span> <span class="ow">in</span> <span class="n">pbmol</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+        <span class="n">obres</span> <span class="o">=</span> <span class="n">pybatom</span><span class="o">.</span><span class="n">OBAtom</span><span class="o">.</span><span class="n">GetResidue</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">atom_names</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">obres</span><span class="o">.</span><span class="n">GetAtomID</span><span class="p">(</span><span class="n">pybatom</span><span class="o">.</span><span class="n">OBAtom</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="n">pybatom</span><span class="o">.</span><span class="n">atomicnum</span> <span class="o">==</span> <span class="mi">67</span><span class="p">:</span>
+            <span class="k">print</span> <span class="p">(</span><span class="s2">&quot;WARNING: openbabel parsed atom serial </span><span class="si">%d</span><span class="s2"> (name:</span><span class="si">%s</span><span class="s2">) as Holmium; &quot;</span>
+                   <span class="s2">&quot;correcting to hydrogen. &quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">pybatom</span><span class="o">.</span><span class="n">OBAtom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">(),</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">atnum</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">elif</span> <span class="n">pybatom</span><span class="o">.</span><span class="n">atomicnum</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s2">&quot;WARNING: openbabel failed to parse atom serial </span><span class="si">%d</span><span class="s2"> (name:</span><span class="si">%s</span><span class="s2">); guessing </span><span class="si">%s</span><span class="s2">. &quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">pybatom</span><span class="o">.</span><span class="n">OBAtom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">(),</span> <span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">atnum</span> <span class="o">=</span> <span class="n">moldesign</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ATOMIC_NUMBERS</span><span class="p">[</span><span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">atnum</span> <span class="o">=</span> <span class="n">pybatom</span><span class="o">.</span><span class="n">atomicnum</span>
+        <span class="n">mdtatom</span> <span class="o">=</span> <span class="n">moldesign</span><span class="o">.</span><span class="n">molecules</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="n">atnum</span><span class="o">=</span><span class="n">atnum</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                                                 <span class="n">formal_charge</span><span class="o">=</span><span class="n">pybatom</span><span class="o">.</span><span class="n">formalcharge</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">q_e</span><span class="p">,</span>
+                                                 <span class="n">pdbname</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">pdbindex</span><span class="o">=</span><span class="n">pybatom</span><span class="o">.</span><span class="n">OBAtom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">())</span>
+        <span class="n">newatom_map</span><span class="p">[</span><span class="n">pybatom</span><span class="o">.</span><span class="n">OBAtom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()]</span> <span class="o">=</span> <span class="n">mdtatom</span>
+        <span class="n">mdtatom</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">pybatom</span><span class="o">.</span><span class="n">coords</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span>
+
+        <span class="k">if</span> <span class="n">primary_structure</span><span class="p">:</span>
+            <span class="n">obres</span> <span class="o">=</span> <span class="n">pybatom</span><span class="o">.</span><span class="n">OBAtom</span><span class="o">.</span><span class="n">GetResidue</span><span class="p">()</span>
+            <span class="n">resname</span> <span class="o">=</span> <span class="n">obres</span><span class="o">.</span><span class="n">GetName</span><span class="p">()</span>
+            <span class="n">residx</span> <span class="o">=</span> <span class="n">obres</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
+            <span class="n">chain_id</span> <span class="o">=</span> <span class="n">obres</span><span class="o">.</span><span class="n">GetChain</span><span class="p">()</span>
+            <span class="n">chain_id_num</span> <span class="o">=</span> <span class="n">obres</span><span class="o">.</span><span class="n">GetChainNum</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">chain_id_num</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">newchains</span><span class="p">:</span>
+                <span class="c1"># create new chain</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">mdt</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">is_printable</span><span class="p">(</span><span class="n">chain_id</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">chain_id</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                    <span class="n">chain_id</span> <span class="o">=</span> <span class="n">backup_chain_names</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                    <span class="k">print</span> <span class="s1">&#39;WARNING: assigned name </span><span class="si">%s</span><span class="s1"> to unnamed chain object @ </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">chain_id</span><span class="p">,</span> <span class="nb">hex</span><span class="p">(</span><span class="n">chain_id_num</span><span class="p">))</span>
+                <span class="n">chn</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Chain</span><span class="p">(</span><span class="n">pdbname</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">chain_id</span><span class="p">))</span>
+                <span class="n">newchains</span><span class="p">[</span><span class="n">chain_id_num</span><span class="p">]</span> <span class="o">=</span> <span class="n">chn</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">chn</span> <span class="o">=</span> <span class="n">newchains</span><span class="p">[</span><span class="n">chain_id_num</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">residx</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">newresidues</span><span class="p">:</span>
+                <span class="c1"># Create new residue</span>
+                <span class="n">pdb_idx</span> <span class="o">=</span> <span class="n">obres</span><span class="o">.</span><span class="n">GetNum</span><span class="p">()</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Residue</span><span class="p">(</span><span class="n">pdbname</span><span class="o">=</span><span class="n">resname</span><span class="p">,</span>
+                                  <span class="n">pdbindex</span><span class="o">=</span><span class="n">pdb_idx</span><span class="p">)</span>
+                <span class="n">newresidues</span><span class="p">[</span><span class="n">residx</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+                <span class="n">chn</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">chn</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">newresidues</span><span class="p">[</span><span class="n">residx</span><span class="p">]</span>
+
+            <span class="c1"># Assign the atom</span>
+            <span class="k">if</span> <span class="n">mdtatom</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
+                <span class="n">mdtatom</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mdtatom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pybatom</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>  <span class="c1"># prevent name clashes</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mdtatom</span><span class="p">)</span>
+
+        <span class="n">newatoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mdtatom</span><span class="p">)</span>
+
+    <span class="n">newtopo</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">ibond</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">pbmol</span><span class="o">.</span><span class="n">OBMol</span><span class="o">.</span><span class="n">NumBonds</span><span class="p">()):</span>
+        <span class="n">obbond</span> <span class="o">=</span> <span class="n">pbmol</span><span class="o">.</span><span class="n">OBMol</span><span class="o">.</span><span class="n">GetBond</span><span class="p">(</span><span class="n">ibond</span><span class="p">)</span>
+        <span class="n">a1</span> <span class="o">=</span> <span class="n">newatom_map</span><span class="p">[</span><span class="n">obbond</span><span class="o">.</span><span class="n">GetBeginAtomIdx</span><span class="p">()]</span>
+        <span class="n">a2</span> <span class="o">=</span> <span class="n">newatom_map</span><span class="p">[</span><span class="n">obbond</span><span class="o">.</span><span class="n">GetEndAtomIdx</span><span class="p">()]</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="n">obbond</span><span class="o">.</span><span class="n">GetBondOrder</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">a1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">newtopo</span><span class="p">:</span>
+            <span class="n">newtopo</span><span class="p">[</span><span class="n">a1</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">a2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">newtopo</span><span class="p">:</span>
+            <span class="n">newtopo</span><span class="p">[</span><span class="n">a2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">newtopo</span><span class="p">[</span><span class="n">a1</span><span class="p">][</span><span class="n">a2</span><span class="p">]</span> <span class="o">=</span> <span class="n">order</span>
+        <span class="n">newtopo</span><span class="p">[</span><span class="n">a2</span><span class="p">][</span><span class="n">a1</span><span class="p">]</span> <span class="o">=</span> <span class="n">order</span>
+
+    <span class="k">if</span> <span class="n">reorder_atoms_by_residue</span> <span class="ow">and</span> <span class="n">primary_structure</span><span class="p">:</span>
+        <span class="n">resorder</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">newatoms</span><span class="p">:</span>
+            <span class="n">resorder</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">resorder</span><span class="p">))</span>
+        <span class="n">newatoms</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">resorder</span><span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">newatoms</span><span class="p">,</span>
+                        <span class="n">bond_graph</span><span class="o">=</span><span class="n">newtopo</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="nd">@runsremotely</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="n">force_remote</span><span class="p">)</span>
+<div class="viewcode-block" id="from_smiles"><a class="viewcode-back" href="../../../toplevel.html#moldesign.from_smiles">[docs]</a><span class="k">def</span> <span class="nf">from_smiles</span><span class="p">(</span><span class="n">smi</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Translate a smiles string to a 3D structure.</span>
+<span class="sd">    This method uses OpenBabel to generate a plausible 3D conformation of the 2D SMILES topology.</span>
+<span class="sd">    We only use the first result from the conformation generator.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        smi (str): smiles string</span>
+<span class="sd">        name (str): name to assign to molecule (default - the smiles string)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        moldesign.Molecule: the translated molecule</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">name</span> <span class="o">=</span> <span class="n">smi</span>
+    <span class="n">pbmol</span> <span class="o">=</span> <span class="n">pb</span><span class="o">.</span><span class="n">readstring</span><span class="p">(</span><span class="s1">&#39;smi&#39;</span><span class="p">,</span> <span class="n">smi</span><span class="p">)</span>
+    <span class="n">pbmol</span><span class="o">.</span><span class="n">addh</span><span class="p">()</span>
+    <span class="n">pbmol</span><span class="o">.</span><span class="n">make3D</span><span class="p">()</span>
+    <span class="n">mol</span> <span class="o">=</span> <span class="n">pybel_to_mol</span><span class="p">(</span><span class="n">pbmol</span><span class="p">,</span>
+                       <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                       <span class="n">atom_names</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                       <span class="n">primary_structure</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+        <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">elem</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mol</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

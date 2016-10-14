@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>moldesign.integrators.verlet &mdash; Molecular Design Toolkit 0.7.0 documentation</title>
+  <title>moldesign.integrators.verlet &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Molecular Design Toolkit 0.7.0 documentation" href="../../../index.html"/>
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.3
               </div>
             
           
@@ -80,13 +80,37 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents</span></p>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
 </ul>
 
             
@@ -100,7 +124,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../contents.html">Molecular Design Toolkit</a>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
       </nav>
 
 
@@ -115,7 +139,7 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
       
           <li><a href="../../index.html">Module code</a> &raquo;</li>
       
@@ -159,13 +183,13 @@
 
 
 <span class="nd">@exports</span>
-<div class="viewcode-block" id="VelocityVerlet"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.integrators.html#moldesign.integrators.verlet.VelocityVerlet">[docs]</a><span class="k">class</span> <span class="nc">VelocityVerlet</span><span class="p">(</span><span class="n">IntegratorBase</span><span class="p">):</span>
+<div class="viewcode-block" id="VelocityVerlet"><a class="viewcode-back" href="../../../_mdt_api/moldesign.integrators.html#moldesign.integrators.VelocityVerlet">[docs]</a><span class="k">class</span> <span class="nc">VelocityVerlet</span><span class="p">(</span><span class="n">IntegratorBase</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">VelocityVerlet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="c1"># TODO: raise exception if any constraints are requested ...</span>
 
-<div class="viewcode-block" id="VelocityVerlet.run"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.integrators.html#moldesign.integrators.verlet.VelocityVerlet.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_for</span><span class="p">):</span>
+<div class="viewcode-block" id="VelocityVerlet.run"><a class="viewcode-back" href="../../../_mdt_api/moldesign.integrators.html#moldesign.integrators.VelocityVerlet.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_for</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Users won&#39;t call this directly - instead, use mol.run</span>
 <span class="sd">        Propagate position, momentum by a single timestep using velocity verlet</span>
@@ -190,11 +214,11 @@
                 <span class="n">next_trajectory_frame</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">frame_interval</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">traj</span></div>
 
-<div class="viewcode-block" id="VelocityVerlet.prep"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.integrators.html#moldesign.integrators.verlet.VelocityVerlet.prep">[docs]</a>    <span class="k">def</span> <span class="nf">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="VelocityVerlet.prep"><a class="viewcode-back" href="../../../_mdt_api/moldesign.integrators.html#moldesign.integrators.VelocityVerlet.prep">[docs]</a>    <span class="k">def</span> <span class="nf">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">timestep</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_prepped</span> <span class="o">=</span> <span class="bp">True</span></div>
 
-<div class="viewcode-block" id="VelocityVerlet.step"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.integrators.html#moldesign.integrators.verlet.VelocityVerlet.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="VelocityVerlet.step"><a class="viewcode-back" href="../../../_mdt_api/moldesign.integrators.html#moldesign.integrators.VelocityVerlet.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Move momenta from t-dt to t-dt/2</span>
         <span class="n">phalf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">momenta</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">timestep</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">calc_forces</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
@@ -238,7 +262,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.7.0',
+            VERSION:'0.7.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

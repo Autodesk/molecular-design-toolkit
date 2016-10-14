@@ -1,0 +1,336 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>3. Biomolecular structure &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="index.html"/>
+        <link rel="next" title="4. Geometry tools" href="geometry.html"/>
+        <link rel="prev" title="2. Molecular structure" href="structure.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">3. Biomolecular structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#residues">3.1. Residues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chains">3.2. Chains</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#biomolecular-assemblies">3.3. Biomolecular assemblies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>3. Biomolecular structure</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/biomolecule.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="biomolecular-structure">
+<h1>3. Biomolecular structure<a class="headerlink" href="#biomolecular-structure" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="residues">
+<h2>3.1. Residues<a class="headerlink" href="#residues" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/residues.png" src="_images/residues.png" />
+<p><a class="reference internal" href="toplevel.html#moldesign.Residue" title="moldesign.Residue"><code class="xref py py-class docutils literal"><span class="pre">Residues</span></code></a> are generally named according to their PDB metadata. The 3-letter residue code is stored
+at <code class="docutils literal"><span class="pre">residue.resname</span></code> while the 1-letter amino acid code (if available) is stored at <code class="docutils literal"><span class="pre">residue.code</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_pdb</span><span class="p">(</span><span class="s1">&#39;3aid&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residue</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residue</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;THR4&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residue</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;protein&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residue</span><span class="o">.</span><span class="n">pdbindex</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residue</span><span class="o">.</span><span class="n">resname</span>
+<span class="go">&#39;THR&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residue</span><span class="o">.</span><span class="n">code</span>
+<span class="go">&#39;T&#39;</span>
+</pre></div>
+</div>
+<p>Residues contain a collection of atoms <code class="docutils literal"><span class="pre">residue.atoms</span></code>; these atoms can be accessed like a list
+or by name:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">residue</span><span class="o">.</span><span class="n">atoms</span>
+<span class="go">&lt;Children of Residue THR4 (index 3, chain A): [&lt;Atom N (elem N)... &gt;, ...]&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">&lt;Atom N (elem N), index 30 (res THR4 chain A) in molecule Molecule: 3aid&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="s1">&#39;CA&#39;</span><span class="p">]</span>
+<span class="go">&lt;Atom CA (elem C), index 31 (res THR4 chain A) in molecule Molecule: 3aid&gt;</span>
+</pre></div>
+</div>
+<p>Lists of backbone and sidechain atoms are also available:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">residue</span><span class="o">.</span><span class="n">backbone</span>
+<span class="go">[&lt;Atom C (elem C), index 32 ... &gt;, ... ]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residue</span><span class="o">.</span><span class="n">sidechain</span>
+<span class="go">[Atom CB (elem C), index 34 ...&gt;, ... ]</span>
+</pre></div>
+</div>
+<p>Finally, you can navigate up and down the chain to find the residue&#8217;s neighbors:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">residue</span><span class="o">.</span><span class="n">next_residue</span>
+<span class="go">&lt;Residue LEU5 (index 4, chain A) in Molecule: 3aid&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residue</span><span class="o">.</span><span class="n">prev_residue</span>
+<span class="go">&lt;Residue ILE3 (index 2, chain A) in Molecule: 3aid&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">residue</span><span class="o">.</span><span class="n">is_n_terminal</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="chains">
+<h2>3.2. Chains<a class="headerlink" href="#chains" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><img alt="_images/chains.png" src="_images/chains.png" />
+</div></blockquote>
+<p><a class="reference internal" href="toplevel.html#moldesign.Chain" title="moldesign.Chain"><code class="xref py py-class docutils literal"><span class="pre">Chains</span></code></a> store collections of
+and <a class="reference internal" href="toplevel.html#moldesign.Residue" title="moldesign.Residue"><code class="xref py py-class docutils literal"><span class="pre">Residues</span></code></a>. A molecule&#8217;s chains can be accessed by name OR index:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">chain</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chain</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;A&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;B&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chain</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&#39;protein&#39;</span>
+</pre></div>
+</div>
+<p>Each chain contains a collection of <a class="reference internal" href="toplevel.html#moldesign.Residue" title="moldesign.Residue"><code class="xref py py-class docutils literal"><span class="pre">residues</span></code></a> at <code class="docutils literal"><span class="pre">chain.residues</span></code>.
+In a chain, residues can again be accessed by name or index:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">chain</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="s1">&#39;PRO1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;PRO1&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chain</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;PRO1&#39;</span>
+</pre></div>
+</div>
+<p>The first and last residues in a protein are available (for DNA, use <code class="docutils literal"><span class="pre">chain.threeprime_end</span></code> and
+<code class="docutils literal"><span class="pre">chain.fiveprime_end</span></code>):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">chain</span><span class="o">.</span><span class="n">n_terminal</span>
+<span class="go">&lt;Residue PRO1 (index 0, chain A) in Molecule: 3aid&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">chain</span><span class="o">.</span><span class="n">c_terminal</span>
+<span class="go">&lt;Residue PHE99 (index 98, chain A) in Molecule: 3aid&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="biomolecular-assemblies">
+<h2>3.3. Biomolecular assemblies<a class="headerlink" href="#biomolecular-assemblies" title="Permalink to this headline">¶</a></h2>
+<p>Many biomolecules in the PDB only contain a subset of the total biomolecular structure - the
+remaining parts of the structure can be generated via <a class="reference external" href="http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies">symmetry transformations</a>.</p>
+<p>When you read in such a structure, MDT will issue a warning.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_pdb</span><span class="p">(</span><span class="s1">&#39;3FPP&#39;</span><span class="p">)</span>
+<span class="go">WARNING: This PDB file contains the following biomolecular assemblies:</span>
+<span class="go">WARNING: Assembly &quot;1&quot;: 3 copies of chains A, B</span>
+<span class="go">WARNING: Use ``mdt.build_assembly([molecule],[assembly_name])`` to build one of the above assemblies</span>
+</pre></div>
+</div>
+<p>To create the full assembly, run</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">assembly</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">build_assembly</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assembly</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/howdoi_pdb_assm.png" src="_images/howdoi_pdb_assm.png" />
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="geometry.html" class="btn btn-neutral float-right" title="4. Geometry tools" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="structure.html" class="btn btn-neutral" title="2. Molecular structure" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

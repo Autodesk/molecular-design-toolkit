@@ -1,0 +1,301 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.tools.build &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.tools.build</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.tools.build</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="kn">import</span> <span class="nn">string</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">import</span> <span class="nn">moldesign.molecules</span>
+
+<span class="kn">from</span> <span class="nn">moldesign.interfaces.ambertools</span> <span class="kn">import</span> <span class="n">build_bdna</span><span class="p">,</span> <span class="n">build_dna_helix</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">toplevel</span><span class="p">,</span> <span class="n">__all__</span> <span class="k">as</span> <span class="n">_pkgall</span>
+
+<span class="n">_pkgall</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;build_bdna&#39;</span><span class="p">,</span> <span class="s1">&#39;build_dna_helix&#39;</span><span class="p">])</span>
+
+
+<span class="nd">@toplevel</span>
+<div class="viewcode-block" id="build_assembly"><a class="viewcode-back" href="../../../toplevel.html#moldesign.build_assembly">[docs]</a><span class="k">def</span> <span class="nf">build_assembly</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">assembly_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create biological assembly using a bioassembly specification.</span>
+
+<span class="sd">    This routine builds a biomolecular assembly using the specification from a PDB header (if</span>
+<span class="sd">    present, this data can be found in the  &quot;REMARK 350&quot; lines in the PDB file). Assemblies are</span>
+<span class="sd">    author-assigned structures created by copying, translating, and rotating a subset of the</span>
+<span class="sd">    chains in the PDB file.</span>
+
+<span class="sd">    See Also:</span>
+<span class="sd">        http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): Molecule with assembly data (assembly data will be created by the</span>
+<span class="sd">            PDB parser at ``molecule.properties.bioassembly``)</span>
+<span class="sd">        assembly_name (str OR int): id of the biomolecular assembly to build.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        mol (moldesign.Molecule): molecule containing the complete assembly</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        AttributeError: If the molecule does not contain any biomolecular assembly data</span>
+<span class="sd">        KeyError: If the specified assembly is not present</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">assembly_name</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span> <span class="n">assembly_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">assembly_name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;bioassemblies&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;This molecule does not contain any biomolecular assembly data&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">asm</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">bioassemblies</span><span class="p">[</span><span class="n">assembly_name</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">((</span><span class="s1">&#39;The specified assembly name (&quot;</span><span class="si">%s</span><span class="s1">&quot;) was not found. The following &#39;</span>
+                        <span class="s1">&#39;assemblies are present: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">%</span>
+                       <span class="p">(</span><span class="n">assembly_name</span><span class="p">,</span>
+                        <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">bioassemblies</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+
+    <span class="c1"># Make sure each chain gets a unique name - up to all the letters in the alphabet, anyway</span>
+    <span class="n">used_chain_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="p">)</span>
+
+    <span class="c1"># Create the new molecule by copying, transforming, and renaming the original chains</span>
+    <span class="n">all_atoms</span> <span class="o">=</span> <span class="n">moldesign</span><span class="o">.</span><span class="n">molecules</span><span class="o">.</span><span class="n">atomcollections</span><span class="o">.</span><span class="n">AtomList</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">asm</span><span class="o">.</span><span class="n">transforms</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">chain_name</span> <span class="ow">in</span> <span class="n">asm</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
+            <span class="n">chain</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="n">chain_name</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">chain</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+            <span class="k">while</span> <span class="n">chain</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">used_chain_names</span><span class="p">:</span>
+                <span class="n">chain</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="n">used_chain_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">chain</span><span class="o">.</span><span class="n">pdbname</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">pdbindex</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">all_atoms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="n">newmol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">all_atoms</span><span class="p">,</span>
+                          <span class="n">name</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> (bioassembly </span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">assembly_name</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">newmol</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

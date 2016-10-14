@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>moldesign.orbitals.wfn &mdash; Molecular Design Toolkit 0.7.0 documentation</title>
+  <title>moldesign.orbitals.wfn &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Molecular Design Toolkit 0.7.0 documentation" href="../../../index.html"/>
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.3
               </div>
             
           
@@ -80,13 +80,37 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents</span></p>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
 </ul>
 
             
@@ -100,7 +124,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../contents.html">Molecular Design Toolkit</a>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
       </nav>
 
 
@@ -115,7 +139,7 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
       
           <li><a href="../../index.html">Module code</a> &raquo;</li>
       
@@ -163,29 +187,39 @@
 <span class="sd">    Args:</span>
 <span class="sd">        mol (moldesign.Molecule): Molecule this wavefunction belongs to</span>
 <span class="sd">        num_electrons (int): number of electrons in this wavefunction</span>
-<span class="sd">        theory (moldesign.models.base.EnergyModelBase): The model this wavefunction was created with</span>
+<span class="sd">        model (moldesign.models.base.EnergyModelBase): The model this wavefunction was created with</span>
 <span class="sd">        aobasis (moldesign.orbitals.BasisSet): The basis functions for the enclosed orbitals</span>
+<span class="sd">        nbasis (int): number of AO basis functions</span>
 <span class="sd">        fock_ao (moldesign.units.Array[energy]): fock matrix in the AO basis</span>
 <span class="sd">        positions (moldesign.units.Array[length]): positions of the nuclei for this wfn</span>
 <span class="sd">        civectors (np.ndarray): CI vectors (if applicable)</span>
-<span class="sd">        **kwargs (dict): arbitrary metadata</span>
+<span class="sd">        description (str): text describing the wfn (e.g. &#39;RHF/STO-3G&#39;, &#39;CAS(2,2)/SA3/6-31G**&#39;)</span>
+<span class="sd">        density_matrix_ao (np.ndarray): density matrix in the ao basis</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">num_electrons</span><span class="p">,</span>
                  <span class="n">model</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">aobasis</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">fock_ao</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">positions</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">civectors</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                 <span class="n">civectors</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">description</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">density_matrix_ao</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">civectors</span> <span class="o">=</span> <span class="n">civectors</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">aobasis</span> <span class="o">=</span> <span class="n">aobasis</span>
+        <span class="k">if</span> <span class="n">aobasis</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nbasis</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aobasis</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nbasis</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span> <span class="o">=</span> <span class="n">DotDict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fock_ao</span> <span class="o">=</span> <span class="n">fock_ao</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_electrons</span> <span class="o">=</span> <span class="n">num_electrons</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">homo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_electrons</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lumo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">homo</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_has_canonical</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">density_matrix_ao</span> <span class="o">=</span> <span class="n">density_matrix_ao</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
 
         <span class="k">if</span> <span class="n">positions</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -198,24 +232,16 @@
             <span class="k">for</span> <span class="n">orb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">aobasis</span><span class="o">.</span><span class="n">orbitals</span><span class="p">:</span>
                 <span class="n">orb</span><span class="o">.</span><span class="n">wfn</span> <span class="o">=</span> <span class="bp">self</span>
 
-        <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;&lt;ElectronicWfn (</span><span class="si">%s</span><span class="s1">) of </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> wfn&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aobasis</span><span class="o">.</span><span class="n">basisname</span><span class="p">)</span>
-
 <div class="viewcode-block" id="ElectronicWfn.set_canonical_mos"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.wfn.ElectronicWfn.set_canonical_mos">[docs]</a>    <span class="k">def</span> <span class="nf">set_canonical_mos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orbs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">orbs</span><span class="o">.</span><span class="n">wfn</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">orbs</span><span class="o">.</span><span class="n">wfn</span> <span class="o">=</span> <span class="bp">self</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fock_ao</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">orbs</span><span class="o">.</span><span class="n">energy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">fock_cmo</span> <span class="o">=</span> <span class="n">orbs</span><span class="o">.</span><span class="n">energy</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aobasis</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fock_ao</span> <span class="o">=</span> <span class="n">orbs</span><span class="o">.</span><span class="n">to_ao</span><span class="p">(</span><span class="n">fock_cmo</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">orbs</span><span class="o">.</span><span class="n">wfn</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">orbs</span><span class="o">.</span><span class="n">wfn</span> <span class="o">=</span> <span class="bp">self</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_has_canonical</span> <span class="o">=</span> <span class="bp">True</span></div>
 
 <div class="viewcode-block" id="ElectronicWfn.align_orbital_phases"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.wfn.ElectronicWfn.align_orbital_phases">[docs]</a>    <span class="k">def</span> <span class="nf">align_orbital_phases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">assert_same</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
@@ -284,7 +310,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.7.0',
+            VERSION:'0.7.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

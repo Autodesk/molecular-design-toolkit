@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>moldesign.compute package &mdash; Molecular Design Toolkit 0.7.0 documentation</title>
+  <title>moldesign.compute package &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
   
 
   
@@ -30,10 +30,7 @@
   
 
   
-    <link rel="top" title="Molecular Design Toolkit 0.7.0 documentation" href="../index.html"/>
-        <link rel="up" title="moldesign package" href="moldesign.html"/>
-        <link rel="next" title="moldesign.external package" href="moldesign.external.html"/>
-        <link rel="prev" title="moldesign package" href="moldesign.html"/> 
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -51,7 +48,7 @@
           
 
           
-            <a href="../contents.html" class="icon icon-home"> Molecular Design Toolkit
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
           
 
           
@@ -61,7 +58,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.3
               </div>
             
           
@@ -82,48 +79,37 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../howdoi.html">How do I ...?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../structure.html">Atoms, molecules, and biomolecules</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="moldesign.html">Complete API reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="moldesign.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">moldesign.compute package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.compute.compute">moldesign.compute.compute module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.compute.configuration">moldesign.compute.configuration module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.compute.runsremotely">moldesign.compute.runsremotely module</a></li>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
 </ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.external.html">moldesign.external package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.forcefields.html">moldesign.forcefields package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.geom.html">moldesign.geom package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.integrators.html">moldesign.integrators package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.interfaces.html">moldesign.interfaces package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.min.html">moldesign.min package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.models.html">moldesign.models package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.molecules.html">moldesign.molecules package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.orbitals.html">moldesign.orbitals package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.uibase.html">moldesign.uibase package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.units.html">moldesign.units package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.utils.html">moldesign.utils package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.viewer.html">moldesign.viewer package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.widgets.html">moldesign.widgets package</a></li>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
 </ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.converters">moldesign.converters module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.data">moldesign.data module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.exceptions">moldesign.exceptions module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.helpers">moldesign.helpers module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.mathutils">moldesign.mathutils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.method">moldesign.method module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.parameters">moldesign.parameters module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.tools">moldesign.tools module</a></li>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/wfn.html">4. Electronic wavefunction API</a></li>
 </ul>
-</li>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.data.html">6. Data API</a></li>
 </ul>
 
             
@@ -137,7 +123,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../contents.html">Molecular Design Toolkit</a>
+        <a href="../index.html">Molecular Design Toolkit</a>
       </nav>
 
 
@@ -152,9 +138,7 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../contents.html">Docs</a> &raquo;</li>
-      
-          <li><a href="moldesign.html">moldesign package</a> &raquo;</li>
+    <li><a href="../index.html">Docs</a> &raquo;</li>
       
     <li>moldesign.compute package</li>
       <li class="wy-breadcrumbs-aside">
@@ -263,7 +247,7 @@ Useful as a return value for processes that return a job object.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>job</strong> (<em>pyccc.Job</em>) &#8211; The job to run</li>
 <li><strong>engine</strong> (<em>pyccc.Engine</em>) &#8211; Engine to run this job on (default:
-<code class="docutils literal"><span class="pre">moldesign.compute.default_engine</span></code>)</li>
+<code class="docutils literal"><span class="pre">moldesign.compute.get_engine()</span></code>)</li>
 <li><strong>image</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; URL for the docker image</li>
 <li><strong>wait</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if True, block until this function completes and return the function&#8217;s
 return value. Otherwise, return a job object immediately that can be queried later.</li>
@@ -289,7 +273,7 @@ return value. Otherwise, return a job object immediately that can be queried lat
 
 <dl class="data">
 <dt id="moldesign.compute.configuration.DEF_CONFIG">
-<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">DEF_CONFIG</code><em class="property"> = {'default_repository': 'docker-hub.autodesk.com/virshua/moldesign:', 'default_ccc_host': 'cloudcomputecannon.bionano.autodesk.com:9000', 'default_python_image': 'moldesign_complete', 'default_version_tag': 'latest', 'default_docker_host': 'unix://var/run/docker.sock', 'engine_type': 'docker-machine'}</em><a class="headerlink" href="#moldesign.compute.configuration.DEF_CONFIG" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">DEF_CONFIG</code><em class="property"> = {'default_repository': 'docker.io/autodesk/moldesign:', 'default_ccc_host': 'cloudcomputecannon.bionano.autodesk.com:9000', 'default_python_image': None, 'default_version_tag': '0.7.3', 'default_docker_host': 'unix://var/run/docker.sock', 'engine_type': 'ccc'}</em><a class="headerlink" href="#moldesign.compute.configuration.DEF_CONFIG" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>dict</em> &#8211; default configuration to be written to moldesign.yml if it doesn&#8217;t exist</p>
 </dd></dl>
 
@@ -302,13 +286,14 @@ return value. Otherwise, return a job object immediately that can be queried lat
 
 <dl class="data">
 <dt id="moldesign.compute.configuration.config">
-<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">config</code><em class="property"> = {'default_repository': 'docker-hub.autodesk.com/virshua/moldesign:', 'default_engine': 'docker-machine', 'default_ccc_host': 'cloudcomputecannon.bionano.autodesk.com:9000', 'default_docker_machine': 'sizing', 'default_python_image': 'moldesign_complete', 'default_version_tag': 'latest', 'default_docker_host': 'unix://var/run/docker.sock', 'engine_type': 'docker-machine'}</em><a class="headerlink" href="#moldesign.compute.configuration.config" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">config</code><em class="property"> = {'default_repository': 'docker.io/autodesk/moldesign:', 'default_ccc_host': 'cloudcomputecannon.bionano.autodesk.com:9000', 'default_python_image': 'docker.io/autodesk/moldesign:moldesign_complete-0.7.3', 'default_version_tag': '0.7.3', 'default_docker_host': 'unix://var/run/docker.sock', 'default_docker_machine': 'default', 'engine_type': 'docker'}</em><a class="headerlink" href="#moldesign.compute.configuration.config" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>dict</em> &#8211; dictionary of parameters (read from user&#8217;s moldesign.yml at startup)</p>
 <p>This dictionary configures how MDT interacts with &#8220;computational engines&#8221; - the systems that run
 jobs, usually using docker images.</p>
 <p class="rubric">Notes</p>
 <p>Values in this dictionary can be configured at runtime; however, after changing them,
-you should update the compute configuration by running <code class="docutils literal"><span class="pre">moldesign.compute.reset_from_config()</span></code></p>
+you should update the compute configuration by running
+<code class="docutils literal"><span class="pre">moldesign.compute.reset_compute_engine()</span></code></p>
 <p>Configuration is specified using the following keys:</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -322,7 +307,8 @@ default: &#8216;docker.io/autodesk/moldesign:&#8217;</li>
 <li><strong>default_python_image</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Image to run python commands in
 (default: <code class="docutils literal"><span class="pre">docker.io/autodesk/moldesign:moldesign_complete-[VERSION]</span></code>, where
 [VERSION] is the version of MDT)</li>
-<li><strong>default_version_tag</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Default version tag for docker images (default: &#8216;latest&#8217;)</li>
+<li><strong>default_version_tag</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Default version tag for docker images
+(default: <code class="docutils literal"><span class="pre">moldesign.__version__</span></code>)</li>
 <li><strong>default_docker_machine</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of the docker machine to connect to; if
 <code class="docutils literal"><span class="pre">engine_type=='docker'</span></code>, EITHER this OR <code class="docutils literal"><span class="pre">default_docker_url</span></code> (but not both) must
 be set. (default: &#8216;default&#8217;)</li>
@@ -345,10 +331,14 @@ a given image is pulled from a URL of the form:</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="moldesign.compute.configuration.get_engine">
+<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">get_engine</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/configuration.html#get_engine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.configuration.get_engine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="moldesign.compute.configuration.init_config">
 <code class="descclassname">moldesign.compute.configuration.</code><code class="descname">init_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/configuration.html#init_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.configuration.init_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called at the end of package import to read initial configuration and setup cloud computing.</p>
-<p>At runtime, call <a class="reference internal" href="#moldesign.compute.configuration.reset_from_config" title="moldesign.compute.configuration.reset_from_config"><code class="xref py py-meth docutils literal"><span class="pre">reset_from_config()</span></code></a> to change the configuration</p>
 </dd></dl>
 
 <dl class="function">
@@ -357,20 +347,26 @@ a given image is pulled from a URL of the form:</p>
 <dd></dd></dl>
 
 <dl class="function">
-<dt id="moldesign.compute.configuration.reset_from_config">
-<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">reset_from_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/configuration.html#reset_from_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.configuration.reset_from_config" title="Permalink to this definition">¶</a></dt>
+<dt id="moldesign.compute.configuration.reset_compute_engine">
+<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">reset_compute_engine</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/configuration.html#reset_compute_engine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.configuration.reset_compute_engine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the configuration dict at <code class="docutils literal"><span class="pre">moldesign.compute.config</span></code> and set up compute engine</p>
+<p>Sets the module-level variable <code class="docutils literal"><span class="pre">default_engine</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">copy of the config dictionary (for posterity)</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">copy of the config dictionary used to set the engine</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="function">
+<dt id="moldesign.compute.configuration.write_config">
+<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">write_config</code><span class="sig-paren">(</span><em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/configuration.html#write_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.configuration.write_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="module-moldesign.compute.runsremotely">
@@ -394,15 +390,6 @@ a given image is pulled from a URL of the form:</p>
            </div>
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="moldesign.external.html" class="btn btn-neutral float-right" title="moldesign.external package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="moldesign.html" class="btn btn-neutral" title="moldesign package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>
@@ -431,7 +418,7 @@ a given image is pulled from a URL of the form:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.7.0',
+            VERSION:'0.7.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

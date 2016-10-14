@@ -1,0 +1,418 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Geometry methods &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>Geometry methods</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/geometry.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-moldesign.geom">
+<span id="geometry-methods"></span><h1>Geometry methods<a class="headerlink" href="#module-moldesign.geom" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="moldesign.geom.distance">
+<code class="descclassname">moldesign.geom.</code><code class="descname">distance</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/coords.html#distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return distance between two atoms</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; the two atoms</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the distance</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar[length]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.geom.angle">
+<code class="descclassname">moldesign.geom.</code><code class="descname">angle</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/coords.html#angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>The angle between bonds a2-a1 and a2-a3</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2,a3</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the angle</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the distance</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar[length]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.geom.dihedral">
+<code class="descclassname">moldesign.geom.</code><code class="descname">dihedral</code><span class="sig-paren">(</span><em>a1</em>, <em>a2=None</em>, <em>a3=None</em>, <em>a4=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/coords.html#dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.dihedral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Twist angle of bonds a1-a2 and a4-a3 around around the central bond a2-a3</p>
+<dl class="docutils">
+<dt>Can be called as <code class="docutils literal"><span class="pre">dihedral(a1,</span> <span class="pre">a2,</span> <span class="pre">a3,</span> <span class="pre">a4)</span></code></dt>
+<dd>OR     <code class="docutils literal"><span class="pre">dihedral(a2,</span> <span class="pre">a2)</span></code>
+OR     <code class="docutils literal"><span class="pre">dihedral(bond)</span></code></dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>a1</strong> (<em>mdt.Bond</em>) &#8211; the central bond in the dihedral. OR</li>
+<li><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the dihedral</li>
+<li><strong>a3,a4</strong> (<em>mdt.Atom</em>) &#8211; (optional) if not passed, <code class="docutils literal"><span class="pre">a1</span></code> and <code class="docutils literal"><span class="pre">a2</span></code> will be treated as the
+central atoms in this bond, and a3 and a4 will be inferred.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">angle -  [0, 2 pi) radians</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(units.Scalar[angle])</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.geom.distance_gradient">
+<code class="descclassname">moldesign.geom.</code><code class="descname">distance_gradient</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/grads.html#distance_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.distance_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gradient of the distance between two atoms,</p>
+<div class="math">
+\[\frac{\partial \mathbf{R}_1}{\partial \mathbf{r}} ||\mathbf{R}_1 - \mathbf{R}_2|| =
+   \frac{\mathbf{R}_1 - \mathbf{R}_2}{||\mathbf{R}_1 - \mathbf{R}_2||}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; the two atoms</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(gradient w.r.t. first atom, gradient w.r.t.
+second atom)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Tuple[u.Vector[length], u.Vector[length]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.geom.angle_gradient">
+<code class="descclassname">moldesign.geom.</code><code class="descname">angle_gradient</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/grads.html#angle_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.angle_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gradient of the angle between bonds a2-a1 and a2-a3</p>
+<div class="math">
+\[\nabla \theta_{ijkl} = \frac{\partial \theta_{ijkl}}{\partial \mathbf R}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2,a3</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the vector</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://salilab.org/modeller/9v6/manual/node436.html">https://salilab.org/modeller/9v6/manual/node436.html</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.geom.dihedral_gradient">
+<code class="descclassname">moldesign.geom.</code><code class="descname">dihedral_gradient</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>a4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/grads.html#dihedral_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.dihedral_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cartesian gradient of a dihedral coordinate,</p>
+<div class="math">
+\[\nabla \theta_{ijkl} = \frac{\partial \theta_{ijkl}}{\partial \mathbf R}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2,a3,a4</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the dihedral</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://salilab.org/modeller/9v6/manual/node436.html">https://salilab.org/modeller/9v6/manual/node436.html</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.geom.set_distance">
+<code class="descclassname">moldesign.geom.</code><code class="descname">set_distance</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>newlength</em>, <em>adjustmol=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/setcoord.html#set_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.set_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the distance between two atoms. They will be adjusted along the vector separating them.
+If the two atoms are A) bonded, B) not part of the same ring system, and C) <code class="docutils literal"><span class="pre">adjustmol</span></code> is
+True, then the entire molecule&#8217;s positions will be modified as well</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; atoms to adjust</li>
+<li><strong>newlength</strong> (<em>u.Scalar[length]</em>) &#8211; new length to set</li>
+<li><strong>adjustmol</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Adjust all atoms on either side of this bond?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.geom.set_angle">
+<code class="descclassname">moldesign.geom.</code><code class="descname">set_angle</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>theta</em>, <em>adjustmol=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/setcoord.html#set_angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.set_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the angle between bonds a1-a2 and a3-a2. The atoms will be adjusted along the
+gradient of the angle.
+If <code class="docutils literal"><span class="pre">adjustmol</span></code> is True and the topology is unambiguous, then the entire molecule&#8217;s positions
+will be modified as well</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a1,a2,a3</strong> (<em>mdt.Atom</em>) &#8211; atoms to adjust</li>
+<li><strong>theta</strong> (<em>u.Scalar[angle]</em>) &#8211; new angle to set</li>
+<li><strong>adjustmol</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Adjust all atoms on either side of this bond?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.geom.set_dihedral">
+<code class="descclassname">moldesign.geom.</code><code class="descname">set_dihedral</code><span class="sig-paren">(</span><em>a1</em>, <em>a2=None</em>, <em>a3=None</em>, <em>a4=None</em>, <em>theta=None</em>, <em>adjustmol=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/setcoord.html#set_dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.set_dihedral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the twist angle of atoms a1 and a4 around the central bond a2-a3. The atoms will be
+adjusted along the gradient of the angle.</p>
+<dl class="docutils">
+<dt>Can be called as <code class="docutils literal"><span class="pre">set_dihedral(a1,</span> <span class="pre">a2,</span> <span class="pre">a3,</span> <span class="pre">a4,</span> <span class="pre">theta,</span> <span class="pre">adjustmol=True)</span></code></dt>
+<dd>OR     <code class="docutils literal"><span class="pre">set_dihedral(a2,</span> <span class="pre">a2,</span> <span class="pre">theta,</span> <span class="pre">adjustmol=True)</span></code>
+OR     <code class="docutils literal"><span class="pre">set_dihedral(bond,</span> <span class="pre">theta,</span> <span class="pre">adjustmol=True)</span></code></dd>
+</dl>
+<p>If <code class="docutils literal"><span class="pre">adjustmol</span></code> is True and the topology is unambiguous, then the entire molecule&#8217;s positions
+will be modified as well</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a1</strong> (<em>mdt.Bond</em>) &#8211; central bond in dihedral</li>
+<li><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; atoms around central bond in dihedral</li>
+<li><strong>a4</strong> (<em>a3,</em>) &#8211; </li>
+<li><strong>theta</strong> (<em>u.Scalar[angle]</em>) &#8211; new angle to set</li>
+<li><strong>adjustmol</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; Adjust all atoms on either side of this bond?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

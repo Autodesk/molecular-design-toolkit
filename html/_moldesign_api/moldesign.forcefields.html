@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.forcefields package &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>moldesign.forcefields package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_moldesign_api/moldesign.forcefields.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-moldesign.forcefields">
+<span id="moldesign-forcefields-package"></span><h1>moldesign.forcefields package<a class="headerlink" href="#module-moldesign.forcefields" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-moldesign.forcefields.forcefield">
+<span id="moldesign-forcefields-forcefield-module"></span><h2>moldesign.forcefields.forcefield module<a class="headerlink" href="#module-moldesign.forcefields.forcefield" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.forcefields.forcefield.FFParameters">
+<em class="property">class </em><code class="descclassname">moldesign.forcefields.forcefield.</code><code class="descname">FFParameters</code><span class="sig-paren">(</span><em>bonds</em>, <em>angles</em>, <em>dihedrals</em>, <em>partial_charges</em>, <em>lennard_jones</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/forcefield.html#FFParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.forcefield.FFParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>This object contains assigned force field parameters for a specific system
+The base focuses on the AMBER / CHARMM - type force</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.forcefields.forcefield.FFTerm">
+<em class="property">class </em><code class="descclassname">moldesign.forcefields.forcefield.</code><code class="descname">FFTerm</code><a class="reference internal" href="../_modules/moldesign/forcefields/forcefield.html#FFTerm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.forcefield.FFTerm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.forcefields.forcefield.ResidueTemplate">
+<em class="property">class </em><code class="descclassname">moldesign.forcefields.forcefield.</code><code class="descname">ResidueTemplate</code><span class="sig-paren">(</span><em>mol</em>, <em>charges</em>, <em>ffparams=None</em>, <em>minimized_mol=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/forcefield.html#ResidueTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.forcefield.ResidueTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="moldesign.forcefields.forcefield.ResidueTemplate.get_ffparams">
+<code class="descname">get_ffparams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/forcefield.html#ResidueTemplate.get_ffparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.forcefield.ResidueTemplate.get_ffparams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.forcefields.terms">
+<span id="moldesign-forcefields-terms-module"></span><h2>moldesign.forcefields.terms module<a class="headerlink" href="#module-moldesign.forcefields.terms" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.forcefields.terms.HarmonicAngleTerm">
+<em class="property">class </em><code class="descclassname">moldesign.forcefields.terms.</code><code class="descname">HarmonicAngleTerm</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>k</em>, <em>theta0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/terms.html#HarmonicAngleTerm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.terms.HarmonicAngleTerm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.forcefields.forcefield.FFTerm" title="moldesign.forcefields.forcefield.FFTerm"><code class="xref py py-class docutils literal"><span class="pre">moldesign.forcefields.forcefield.FFTerm</span></code></a></p>
+<dl class="method">
+<dt id="moldesign.forcefields.terms.HarmonicAngleTerm.coord">
+<code class="descname">coord</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/terms.html#HarmonicAngleTerm.coord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.terms.HarmonicAngleTerm.coord" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.forcefields.terms.HarmonicAngleTerm.energy">
+<code class="descname">energy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/terms.html#HarmonicAngleTerm.energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.terms.HarmonicAngleTerm.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.forcefields.terms.HarmonicBondTerm">
+<em class="property">class </em><code class="descclassname">moldesign.forcefields.terms.</code><code class="descname">HarmonicBondTerm</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>k</em>, <em>d0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/terms.html#HarmonicBondTerm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.terms.HarmonicBondTerm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.forcefields.forcefield.FFTerm" title="moldesign.forcefields.forcefield.FFTerm"><code class="xref py py-class docutils literal"><span class="pre">moldesign.forcefields.forcefield.FFTerm</span></code></a></p>
+<dl class="method">
+<dt id="moldesign.forcefields.terms.HarmonicBondTerm.coord">
+<code class="descname">coord</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/terms.html#HarmonicBondTerm.coord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.terms.HarmonicBondTerm.coord" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.forcefields.terms.HarmonicBondTerm.energy">
+<code class="descname">energy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/terms.html#HarmonicBondTerm.energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.terms.HarmonicBondTerm.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.forcefields.terms.LennardJonesSigmaEps">
+<em class="property">class </em><code class="descclassname">moldesign.forcefields.terms.</code><code class="descname">LennardJonesSigmaEps</code><span class="sig-paren">(</span><em>atom</em>, <em>sigma</em>, <em>epsilon</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/terms.html#LennardJonesSigmaEps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.terms.LennardJonesSigmaEps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.forcefields.forcefield.FFTerm" title="moldesign.forcefields.forcefield.FFTerm"><code class="xref py py-class docutils literal"><span class="pre">moldesign.forcefields.forcefield.FFTerm</span></code></a></p>
+<dl class="method">
+<dt id="moldesign.forcefields.terms.LennardJonesSigmaEps.get_epsilon">
+<code class="descname">get_epsilon</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/terms.html#LennardJonesSigmaEps.get_epsilon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.terms.LennardJonesSigmaEps.get_epsilon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.forcefields.terms.LennardJonesSigmaEps.get_sigma">
+<code class="descname">get_sigma</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/terms.html#LennardJonesSigmaEps.get_sigma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.terms.LennardJonesSigmaEps.get_sigma" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.forcefields.terms.PeriodicTorsionTerm">
+<em class="property">class </em><code class="descclassname">moldesign.forcefields.terms.</code><code class="descname">PeriodicTorsionTerm</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>a4</em>, <em>n</em>, <em>v_n</em>, <em>gamma</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/terms.html#PeriodicTorsionTerm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.terms.PeriodicTorsionTerm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.forcefields.forcefield.FFTerm" title="moldesign.forcefields.forcefield.FFTerm"><code class="xref py py-class docutils literal"><span class="pre">moldesign.forcefields.forcefield.FFTerm</span></code></a></p>
+<dl class="method">
+<dt id="moldesign.forcefields.terms.PeriodicTorsionTerm.coord">
+<code class="descname">coord</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/terms.html#PeriodicTorsionTerm.coord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.terms.PeriodicTorsionTerm.coord" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.forcefields.terms.PeriodicTorsionTerm.energy">
+<code class="descname">energy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/forcefields/terms.html#PeriodicTorsionTerm.energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.forcefields.terms.PeriodicTorsionTerm.energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

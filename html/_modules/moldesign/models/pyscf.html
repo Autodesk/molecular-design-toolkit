@@ -1,0 +1,751 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.models.pyscf &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.models.pyscf</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.models.pyscf</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>  <span class="c1"># prevent clashes between this and the &quot;pyscf&quot; package</span>
+<span class="kn">from</span> <span class="nn">cStringIO</span> <span class="kn">import</span> <span class="n">StringIO</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">compute</span><span class="p">,</span> <span class="n">orbitals</span>
+<span class="kn">from</span> <span class="nn">moldesign.interfaces.pyscf_interface</span> <span class="kn">import</span> <span class="n">force_remote</span><span class="p">,</span> <span class="n">mol_to_pyscf</span><span class="p">,</span> \
+    <span class="n">StatusLogger</span><span class="p">,</span> <span class="n">SPHERICAL_NAMES</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">QMBase</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">uibase</span>
+<span class="kn">from</span> <span class="nn">moldesign.utils</span> <span class="kn">import</span> <span class="n">DotDict</span>
+
+
+<span class="k">def</span> <span class="nf">exports</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+    <span class="n">__all__</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">o</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="k">class</span> <span class="nc">LazyClassMap</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; For lazily importing classes from modules (when there&#39;s a lot of import overhead)</span>
+
+<span class="sd">    Class names should be stored as their *absolute import strings* so that they can be imported</span>
+<span class="sd">    only when needed</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; myclasses = LazyClassMap({&#39;od&#39;: &#39;collections.OrderedDict&#39;})</span>
+<span class="sd">        &gt;&gt;&gt; myclasss[&#39;od&#39;]()</span>
+<span class="sd">        OrderedDict()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mapping</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span> <span class="o">=</span> <span class="n">mapping</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">importlib</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">cls</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">modname</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fields</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">modname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mapping</span><span class="p">)</span>
+
+<span class="c1"># PySCF metadata constants</span>
+<span class="n">THEORIES</span> <span class="o">=</span> <span class="n">LazyClassMap</span><span class="p">({</span><span class="s1">&#39;hf&#39;</span><span class="p">:</span> <span class="s1">&#39;pyscf.scf.RHF&#39;</span><span class="p">,</span> <span class="s1">&#39;rhf&#39;</span><span class="p">:</span> <span class="s1">&#39;pyscf.scf.RHF&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;uhf&#39;</span><span class="p">:</span> <span class="s1">&#39;pyscf.scf.UHF&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;mcscf&#39;</span><span class="p">:</span> <span class="s1">&#39;pyscf.mcscf.CASSCF&#39;</span><span class="p">,</span> <span class="s1">&#39;casscf&#39;</span><span class="p">:</span> <span class="s1">&#39;pyscf.mcscf.CASSCF&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;casci&#39;</span><span class="p">:</span> <span class="s1">&#39;pyscf.mcscf.CASCI&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;mp2&#39;</span><span class="p">:</span> <span class="s1">&#39;pyscf.mp.MP2&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;dft&#39;</span><span class="p">:</span> <span class="s1">&#39;pyscf.dft.RKS&#39;</span><span class="p">,</span> <span class="s1">&#39;rks&#39;</span><span class="p">:</span> <span class="s1">&#39;pyscf.dft.RKS&#39;</span><span class="p">,</span> <span class="s1">&#39;ks&#39;</span><span class="p">:</span> <span class="s1">&#39;pyscf.dft.RKS&#39;</span><span class="p">})</span>
+
+<span class="n">NEEDS_REFERENCE</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="s1">&#39;mcscf casscf casci mp2&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="n">NEEDS_FUNCTIONAL</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="s1">&#39;dft rks ks uks&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="n">IS_SCF</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="s1">&#39;rhf uhf hf dft rks ks&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="n">FORCE_CALCULATORS</span> <span class="o">=</span> <span class="n">LazyClassMap</span><span class="p">({</span><span class="s1">&#39;rhf&#39;</span><span class="p">:</span> <span class="s1">&#39;pyscf.grad.RHF&#39;</span><span class="p">,</span> <span class="s1">&#39;hf&#39;</span><span class="p">:</span> <span class="s1">&#39;pyscf.grad.RHF&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;rks&#39;</span><span class="p">:</span> <span class="s1">&#39;pyscf.grad.RKS&#39;</span><span class="p">,</span> <span class="s1">&#39;ks&#39;</span><span class="p">:</span> <span class="s1">&#39;pyscf.grad.RKS&#39;</span><span class="p">})</span>
+
+
+<span class="nd">@exports</span>
+<div class="viewcode-block" id="PySCFPotential"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.PySCFPotential">[docs]</a><span class="k">class</span> <span class="nc">PySCFPotential</span><span class="p">(</span><span class="n">QMBase</span><span class="p">):</span>
+    <span class="n">DEFAULT_PROPERTIES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;wfn&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;mulliken&#39;</span><span class="p">]</span>
+    <span class="n">ALL_PROPERTIES</span> <span class="o">=</span> <span class="n">DEFAULT_PROPERTIES</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;eri_tensor&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;forces&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;nuclear_forces&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;electronic_forces&#39;</span><span class="p">]</span>
+    <span class="n">PARAM_SUPPORT</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;theory&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;rhf&#39;</span><span class="p">,</span> <span class="s1">&#39;rks&#39;</span><span class="p">,</span> <span class="s1">&#39;mp2&#39;</span><span class="p">],</span>
+                     <span class="s1">&#39;functional&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;b3lyp&#39;</span><span class="p">,</span> <span class="s1">&#39;blyp&#39;</span><span class="p">,</span> <span class="s1">&#39;pbe0&#39;</span><span class="p">,</span> <span class="s1">&#39;x3lyp&#39;</span><span class="p">,</span> <span class="s1">&#39;MPW3LYP5&#39;</span><span class="p">]}</span>
+
+    <span class="n">FORCE_UNITS</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">hartree</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">bohr</span>
+
+    <span class="nd">@mdt.utils.kwargs_from</span><span class="p">(</span><span class="n">QMBase</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PySCFPotential</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pyscfmol</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logs</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">uibase</span><span class="o">.</span><span class="n">Logger</span><span class="p">(</span><span class="s1">&#39;PySCF interface&#39;</span><span class="p">)</span>
+
+    <span class="nd">@compute.runsremotely</span><span class="p">(</span><span class="n">enable</span><span class="o">=</span><span class="n">force_remote</span><span class="p">,</span> <span class="n">is_imethod</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="viewcode-block" id="PySCFPotential.calculate"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.PySCFPotential.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requests</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">uibase</span><span class="o">.</span><span class="n">Logger</span><span class="p">(</span><span class="s1">&#39;PySCF calc&#39;</span><span class="p">)</span>
+        <span class="n">do_forces</span> <span class="o">=</span> <span class="s1">&#39;forces&#39;</span> <span class="ow">in</span> <span class="n">requests</span>
+        <span class="k">if</span> <span class="n">do_forces</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">theory</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">FORCE_CALCULATORS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Forces are only available for the following theories:&#39;</span>
+                             <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">FORCE_CALCULATORS</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">do_forces</span><span class="p">:</span>
+            <span class="n">force_calculator</span> <span class="o">=</span> <span class="n">FORCE_CALCULATORS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">theory</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prep</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>  <span class="c1"># rebuild every time</span>
+
+        <span class="c1"># Set up initial guess</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">wfn_guess</span> <span class="o">==</span> <span class="s1">&#39;stored&#39;</span><span class="p">:</span>
+            <span class="n">dm0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">initial_guess</span><span class="o">.</span><span class="n">density_matrix_ao</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dm0</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c1"># Compute reference WFN (if needed)</span>
+        <span class="n">refobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pyscfmol</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">theory</span> <span class="ow">in</span> <span class="n">NEEDS_REFERENCE</span><span class="p">:</span>
+            <span class="n">reference</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_theory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;reference&#39;</span><span class="p">,</span> <span class="s1">&#39;rhf&#39;</span><span class="p">),</span>
+                                           <span class="n">refobj</span><span class="p">)</span>
+            <span class="n">kernel</span><span class="p">,</span> <span class="n">failures</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_converge</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">dm0</span><span class="o">=</span><span class="n">dm0</span><span class="p">)</span>
+            <span class="n">refobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> <span class="n">kernel</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c1"># Compute WFN</span>
+        <span class="n">theory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_theory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;theory&#39;</span><span class="p">],</span>
+                                    <span class="n">refobj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;theory&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">IS_SCF</span><span class="p">:</span>
+            <span class="n">theory</span><span class="o">.</span><span class="n">kernel</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span> <span class="o">=</span> <span class="n">theory</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">,</span> <span class="n">failures</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_converge</span><span class="p">(</span><span class="n">theory</span><span class="p">,</span> <span class="n">dm0</span><span class="o">=</span><span class="n">dm0</span><span class="p">)</span>
+
+        <span class="c1"># Compute forces (if requested)</span>
+        <span class="k">if</span> <span class="n">do_forces</span><span class="p">:</span>
+            <span class="n">grad</span> <span class="o">=</span> <span class="n">force_calculator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">grad</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">props</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_properties</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">,</span> <span class="n">grad</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">store_orb_guesses</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">wfn_guess</span> <span class="o">=</span> <span class="s1">&#39;stored&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">initial_guess</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="s1">&#39;wfn&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">props</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">grad</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Analyze calculation results and return molecular properties</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ref (pyscf.Kernel): Reference kernel (can be None)</span>
+<span class="sd">            kernel (pyscf.Kernel): Theory kernel</span>
+<span class="sd">            grad (pyscf.Gradient): Gradient calculation</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Molecular property names and values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;reference_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ref</span><span class="o">.</span><span class="n">e_tot</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">hartree</span><span class="p">)</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span>
+            <span class="c1"># TODO: check sign on correlation energy. Is this true for anything besides MP2?</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="s1">&#39;e_corr&#39;</span><span class="p">):</span>
+                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;correlation_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">kernel</span><span class="o">.</span><span class="n">e_corr</span> <span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">hartree</span><span class="p">)</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span>
+                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;correlation_energy&#39;</span><span class="p">]</span> <span class="o">+</span>\
+                                             <span class="n">result</span><span class="p">[</span><span class="s1">&#39;reference_energy&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result</span><span class="p">[</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">kernel</span><span class="o">.</span><span class="n">e_tot</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">hartree</span><span class="p">)</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span>
+
+            <span class="n">orb_calc</span> <span class="o">=</span> <span class="n">ref</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">kernel</span><span class="o">.</span><span class="n">e_tot</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">hartree</span><span class="p">)</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span>
+            <span class="n">orb_calc</span> <span class="o">=</span> <span class="n">kernel</span>
+
+        <span class="k">if</span> <span class="n">grad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">f_e</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">grad</span><span class="o">.</span><span class="n">grad_elec</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">FORCE_UNITS</span>
+            <span class="n">f_n</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">grad</span><span class="o">.</span><span class="n">grad_nuc</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">FORCE_UNITS</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;electronic_forces&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f_e</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;nuclear_forces&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f_n</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;forces&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;electronic_forces&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;nuclear_forces&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">theory</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;casscf&#39;</span><span class="p">,</span> <span class="s1">&#39;mcscf&#39;</span><span class="p">):</span>
+            <span class="kn">from</span> <span class="nn">pyscf.mcscf</span> <span class="kn">import</span> <span class="n">CASCI</span>
+            <span class="n">casobj</span> <span class="o">=</span> <span class="n">CASCI</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">active_orbitals</span><span class="p">,</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">active_electrons</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">theory</span> <span class="o">==</span> <span class="s1">&#39;casci&#39;</span><span class="p">:</span>
+            <span class="n">casobj</span> <span class="o">=</span> <span class="n">kernel</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">theory</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;casscf&#39;</span><span class="p">,</span> <span class="s1">&#39;mcscf&#39;</span><span class="p">,</span> <span class="s1">&#39;casci&#39;</span><span class="p">):</span>
+            <span class="n">orb_calc</span> <span class="o">=</span> <span class="n">kernel</span>  <span class="c1"># get the orbs directly from the post-HF theory</span>
+            <span class="n">casobj</span><span class="o">.</span><span class="n">fcisolver</span><span class="o">.</span><span class="n">nroots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;num_states&#39;</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">state_average</span><span class="p">)</span>
+            <span class="n">casresult</span> <span class="o">=</span> <span class="n">casobj</span><span class="o">.</span><span class="n">kernel</span><span class="p">()</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;state_energies&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">casresult</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">hartree</span><span class="p">)</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;ci_vectors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parse_fci_vector</span><span class="p">,</span> <span class="n">casresult</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+            <span class="c1"># potential_energy is the energy of the molecule&#39;s assigned state</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;state_averaged_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">]</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;state_energies&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">electronic_state_index</span><span class="p">]</span>
+            <span class="c1"># TODO: add &#39;reference wavefunction&#39; to result</span>
+            <span class="n">ao_obj</span> <span class="o">=</span> <span class="n">ref</span>
+            <span class="n">dips</span><span class="p">,</span> <span class="n">tdips</span> <span class="o">=</span> <span class="n">_get_multiconf_dipoles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pyscfmol</span><span class="p">,</span> <span class="n">casobj</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">casobj</span><span class="o">.</span><span class="n">ci</span><span class="p">))</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;state_dipole_moments&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dips</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;transition_dipole_moments&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tdips</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;dipole_moment&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dips</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># TODO: this is general, put it somewhere else</span>
+            <span class="n">oscs</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">nstates</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;state_energies&#39;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nstates</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">nstates</span><span class="p">):</span>
+                    <span class="n">excitation_energy</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;state_energies&#39;</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">-</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;state_energies&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">tdip</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;transition_dipole_moments&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+                    <span class="n">oscs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">tdip</span> <span class="o">**</span> <span class="mi">2</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">m_e</span><span class="o">*</span><span class="n">excitation_energy</span><span class="o">/</span>
+                                  <span class="p">(</span><span class="mf">3.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">q_e</span> <span class="o">**</span> <span class="mi">2</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">hbar</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">ureg</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span>
+                    <span class="n">oscs</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">oscs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;oscillator_strengths&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">oscs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ao_obj</span> <span class="o">=</span> <span class="n">orb_calc</span>
+
+        <span class="n">ao_matrices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_ao_matrices</span><span class="p">(</span><span class="n">ao_obj</span><span class="p">)</span>
+        <span class="n">scf_matrices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_scf_matrices</span><span class="p">(</span><span class="n">orb_calc</span><span class="p">,</span> <span class="n">ao_matrices</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">orb_calc</span><span class="p">,</span> <span class="s1">&#39;mulliken_pop&#39;</span><span class="p">):</span>
+            <span class="n">ao_pop</span><span class="p">,</span> <span class="n">atom_pop</span> <span class="o">=</span> <span class="n">orb_calc</span><span class="o">.</span><span class="n">mulliken_pop</span><span class="p">(</span><span class="n">verbose</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mulliken&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DotDict</span><span class="p">({</span><span class="n">a</span><span class="p">:</span> <span class="n">p</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">,</span> <span class="n">atom_pop</span><span class="p">)})</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mulliken&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;atomic&#39;</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">orb_calc</span><span class="p">,</span> <span class="s1">&#39;dip_moment&#39;</span><span class="p">):</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;dipole_moment&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">orb_calc</span><span class="o">.</span><span class="n">dip_moment</span><span class="p">()</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">debye</span>
+
+        <span class="c1"># Build the electronic state object</span>
+        <span class="n">basis</span> <span class="o">=</span> <span class="n">orbitals</span><span class="o">.</span><span class="n">basis</span><span class="o">.</span><span class="n">BasisSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span>
+                                        <span class="n">orbitals</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_ao_basis_functions</span><span class="p">(),</span>
+                                        <span class="n">h1e</span><span class="o">=</span><span class="n">ao_matrices</span><span class="o">.</span><span class="n">h1e</span><span class="o">.</span><span class="n">defunits</span><span class="p">(),</span>
+                                        <span class="n">overlaps</span><span class="o">=</span><span class="n">scf_matrices</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;sao&#39;</span><span class="p">),</span>
+                                        <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">basis</span><span class="p">)</span>
+        <span class="n">el_state</span> <span class="o">=</span> <span class="n">orbitals</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">ElectronicWfn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">pyscfmol</span><span class="o">.</span><span class="n">nelectron</span><span class="p">,</span>
+                                              <span class="n">aobasis</span><span class="o">=</span><span class="n">basis</span><span class="p">,</span>
+                                              <span class="n">fock_ao</span><span class="o">=</span><span class="n">scf_matrices</span><span class="p">[</span><span class="s1">&#39;fock_ao&#39;</span><span class="p">],</span>
+                                              <span class="n">density_matrix_ao</span><span class="o">=</span><span class="n">scf_matrices</span><span class="p">[</span><span class="s1">&#39;density_matrix_ao&#39;</span><span class="p">],</span>
+                                              <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">theoryname</span><span class="p">)</span>
+
+        <span class="c1"># Build and store the canonical orbitals</span>
+        <span class="n">cmos</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">iorb</span><span class="p">,</span> <span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">energy</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">orb_calc</span><span class="o">.</span><span class="n">mo_coeff</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+                                                    <span class="n">orb_calc</span><span class="o">.</span><span class="n">mo_energy</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">hartree</span><span class="p">)):</span>
+            <span class="n">cmos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">orbitals</span><span class="o">.</span><span class="n">Orbital</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">wfn</span><span class="o">=</span><span class="n">el_state</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">orb_calc</span><span class="p">,</span> <span class="s1">&#39;get_occ&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">orb</span><span class="p">,</span> <span class="n">occ</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cmos</span><span class="p">,</span> <span class="n">orb_calc</span><span class="o">.</span><span class="n">get_occ</span><span class="p">()):</span>
+                <span class="n">orb</span><span class="o">.</span><span class="n">occupation</span> <span class="o">=</span> <span class="n">occ</span>
+        <span class="n">el_state</span><span class="o">.</span><span class="n">add_orbitals</span><span class="p">(</span><span class="n">cmos</span><span class="p">,</span> <span class="n">orbtype</span><span class="o">=</span><span class="s1">&#39;canonical&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Return the result</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;wfn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">el_state</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+<div class="viewcode-block" id="PySCFPotential.prep"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.models.html#moldesign.models.PySCFPotential.prep">[docs]</a>    <span class="k">def</span> <span class="nf">prep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="c1"># TODO: spin, isotopic mass, symmetry</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="s1">&#39;basis theory&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Parameter &quot;</span><span class="si">%s</span><span class="s1">&quot; is required&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepped</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span> <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pyscfmol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_mol</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepped</span> <span class="o">=</span> <span class="bp">True</span></div>
+
+    <span class="k">def</span> <span class="nf">_build_mol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;TODO: where does charge go? Model or molecule?&quot;&quot;&quot;</span>
+        <span class="n">pyscfmol</span> <span class="o">=</span> <span class="n">mol_to_pyscf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">basis</span><span class="p">,</span>
+                                <span class="n">symmetry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;symmetry&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span>
+                                <span class="n">charge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_formal_charge</span><span class="p">())</span>
+        <span class="n">pyscfmol</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs</span>
+        <span class="k">return</span> <span class="n">pyscfmol</span>
+
+    <span class="k">def</span> <span class="nf">_converge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">dm0</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Automatically try a bunch of fallback methods for convergence</span>
+<span class="sd">        see also https://www.molpro.net/info/2015.1/doc/manual/node176.html#sec:difficulthf</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: make this user configurable</span>
+        <span class="c1"># TODO: generalize outside of pyscf</span>
+
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">kernel</span><span class="p">(</span><span class="n">dm0</span><span class="o">=</span><span class="n">dm0</span><span class="p">)</span>
+        <span class="n">failed</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># stop here if it converged</span>
+        <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">converged</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">method</span><span class="p">,</span> <span class="n">failed</span>
+
+        <span class="c1"># fallback 1: don&#39;t use previous density matrix OR change initial_guess</span>
+        <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dm0</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">method</span><span class="o">.</span><span class="n">init_guess</span> <span class="o">=</span> <span class="s1">&#39;atom&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">method</span><span class="o">.</span><span class="n">init_guess</span> <span class="o">=</span> <span class="s1">&#39;minao&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">handled</span><span class="p">(</span><span class="s1">&#39;SCF failed to converge. Retrying with initial guess </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">method</span><span class="o">.</span><span class="n">init_guess</span><span class="p">)</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">kernel</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">converged</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">method</span><span class="p">,</span> <span class="n">failed</span>
+
+        <span class="c1"># fallback 2: level shift, slower convergence</span>
+        <span class="c1"># this probably won&#39;t converge, but is intended to get us in the right basin for the next step</span>
+        <span class="c1"># NEWFEATURE: should dynamically adjust level shift instead of hardcoded cycles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">handled</span><span class="p">(</span><span class="s1">&#39;SCF failed to converge. Performing </span><span class="si">%d</span><span class="s1"> iterations with level shift of -0.5 hartree&#39;</span>
+                            <span class="o">%</span> <span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">max_cycle</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+        <span class="n">method</span><span class="o">.</span><span class="n">init_guess</span> <span class="o">=</span> <span class="s1">&#39;minao&#39;</span>
+        <span class="n">method</span><span class="o">.</span><span class="n">level_shift</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span>
+        <span class="n">method</span><span class="o">.</span><span class="n">max_cycle</span> <span class="o">/=</span> <span class="mi">2</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">kernel</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">converged</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">method</span><span class="p">,</span> <span class="n">failed</span>
+
+        <span class="c1"># fallback 2 cont.: remove level shift and try to converge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">handled</span><span class="p">(</span><span class="s1">&#39;Removing level shift and continuing&#39;</span><span class="p">)</span>
+        <span class="n">level_shift_dm</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">make_rdm1</span><span class="p">()</span>
+        <span class="n">method</span><span class="o">.</span><span class="n">level_shift</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">method</span><span class="o">.</span><span class="n">max_cycle</span> <span class="o">*=</span> <span class="mi">2</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">kernel</span><span class="p">(</span><span class="n">dm0</span><span class="o">=</span><span class="n">level_shift_dm</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">converged</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">method</span><span class="p">,</span> <span class="n">failed</span>
+
+        <span class="k">raise</span> <span class="n">mdt</span><span class="o">.</span><span class="n">QMConvergenceError</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_build_theory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">refobj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;mscscf&#39;</span><span class="p">,</span> <span class="s1">&#39;casci&#39;</span><span class="p">,</span> <span class="s1">&#39;casscf&#39;</span><span class="p">):</span>
+            <span class="n">theory</span> <span class="o">=</span> <span class="n">THEORIES</span><span class="p">[</span><span class="n">name</span><span class="p">](</span><span class="n">refobj</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">active_orbitals</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">active_electrons</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;casci&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">state_average</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">theory</span> <span class="o">=</span> <span class="n">theory</span><span class="o">.</span><span class="n">state_average_</span><span class="p">([</span><span class="mf">1.0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">state_average</span>
+                                                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">state_average</span><span class="p">)])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">theory</span> <span class="o">=</span> <span class="n">THEORIES</span><span class="p">[</span><span class="n">name</span><span class="p">](</span><span class="n">refobj</span><span class="p">)</span>
+
+        <span class="n">theory</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="n">StatusLogger</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> procedure:&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">theoryname</span><span class="p">,</span>
+                                       <span class="p">[</span><span class="s1">&#39;cycle&#39;</span><span class="p">,</span> <span class="s1">&#39;e_tot&#39;</span><span class="p">],</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;scf_cycles&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+            <span class="n">theory</span><span class="o">.</span><span class="n">max_cycle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">scf_cycles</span>
+
+        <span class="k">if</span> <span class="s1">&#39;functional&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_assign_functional</span><span class="p">(</span><span class="n">theory</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;functional&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">theory</span>
+
+    <span class="n">_OCCMAP</span> <span class="o">=</span> <span class="p">{(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">):</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
+               <span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">):</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span>
+               <span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">):</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span>
+               <span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">):</span> <span class="s1">&#39;2&#39;</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">theoryname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">theory</span> <span class="o">==</span> <span class="s1">&#39;rks&#39;</span><span class="p">:</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="s1">&#39;RKS(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">p</span><span class="o">.</span><span class="n">theory</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;casscf&#39;</span><span class="p">,</span> <span class="s1">&#39;casci&#39;</span><span class="p">):</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(</span><span class="si">%d</span><span class="s1">,</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">theory</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">p</span><span class="o">.</span><span class="n">active_orbitals</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">active_electrons</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">theory</span> <span class="o">==</span> <span class="s1">&#39;casscf&#39;</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">state_average</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">th</span> <span class="o">+=</span> <span class="s1">&#39; SA-</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="o">.</span><span class="n">state_average</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">theory</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">th</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">basis</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse_fci_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ci_vecmat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Translate the PySCF FCI matrix into a dictionary of configurations and weights</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ci_vecmat (np.ndarray): ci vector from a PySCF FCI calculation</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Mapping[str, float]: dictionary of configuration weights (normalized) organized by</span>
+<span class="sd">                configuration label. Configurations labeled by their active space orbital</span>
+<span class="sd">                occupations: 0 (unoccupied), a (alpha electron only), b (beta electron only), or &#39;2&#39;</span>
+<span class="sd">                (doubly occupied)</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">            &gt;&gt;&gt; model = PySCFPotential(active_orbitals=2, active_electrons=2)</span>
+<span class="sd">            &gt;&gt;&gt; model._parse_fci_vector(np.array([[1.0, 2.0],[3.0, 4.0]]))</span>
+<span class="sd">            {&#39;20&#39;: 1.0,</span>
+<span class="sd">             &#39;ba&#39;: 2.0,</span>
+<span class="sd">             &#39;ab&#39;: 3.0,</span>
+<span class="sd">             &#39;02&#39;: 4.0}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">pyscf.fci</span> <span class="kn">import</span> <span class="n">cistring</span>
+        <span class="n">conf_bin</span> <span class="o">=</span> <span class="n">cistring</span><span class="o">.</span><span class="n">gen_strings4orblist</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">active_orbitals</span><span class="p">),</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">active_electrons</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">civecs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ca</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">conf_bin</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">cb</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">conf_bin</span><span class="p">):</span>
+                <span class="n">astring</span> <span class="o">=</span> <span class="nb">bin</span><span class="p">(</span><span class="n">ca</span><span class="p">)[</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">active_orbitals</span><span class="p">)</span>
+                <span class="n">bstring</span> <span class="o">=</span> <span class="nb">bin</span><span class="p">(</span><span class="n">cb</span><span class="p">)[</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">active_orbitals</span><span class="p">)</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">reversed</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_OCCMAP</span><span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">astring</span><span class="p">,</span> <span class="n">bstring</span><span class="p">)]))</span>
+                <span class="n">civecs</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci_vecmat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">civecs</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_assign_functional</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="n">theory</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">theory</span> <span class="ow">in</span> <span class="n">NEEDS_FUNCTIONAL</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">kernel</span><span class="o">.</span><span class="n">xc</span> <span class="o">=</span> <span class="n">fname</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No functional specified for reference theory &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">theory</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_ao_basis_functions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Convert pyscf basis functions into a list of atomic basis functions</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            PySCF stores *shells* instead of a flat list, so we need to do a little hacky</span>
+<span class="sd">                guesswork to do this conversion. We include consistentcy checks with the annotated</span>
+<span class="sd">                list of basis functions stored from ``mole.cart_labels()``</span>
+<span class="sd">            As of PySCF v1.0, only cartesian orbitals appear to be supported, and that&#39;s all</span>
+<span class="sd">                supported here right now</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[moldesign.Gaussians.AtomicBasisFunction]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bfs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">pmol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pyscfmol</span>
+
+        <span class="n">orblabels</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">pmol</span><span class="o">.</span><span class="n">spheric_labels</span><span class="p">())</span>
+
+        <span class="k">for</span> <span class="n">ishell</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">pmol</span><span class="o">.</span><span class="n">nbas</span><span class="p">):</span>  <span class="c1"># loop over shells (n,l)</span>
+            <span class="n">atom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">pmol</span><span class="o">.</span><span class="n">bas_atom</span><span class="p">(</span><span class="n">ishell</span><span class="p">)]</span>
+            <span class="n">angular</span> <span class="o">=</span> <span class="n">pmol</span><span class="o">.</span><span class="n">bas_angular</span><span class="p">(</span><span class="n">ishell</span><span class="p">)</span>
+            <span class="n">num_momentum_states</span> <span class="o">=</span> <span class="n">angular</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">exps</span> <span class="o">=</span> <span class="n">pmol</span><span class="o">.</span><span class="n">bas_exp</span><span class="p">(</span><span class="n">ishell</span><span class="p">)</span>
+            <span class="n">num_contractions</span> <span class="o">=</span> <span class="n">pmol</span><span class="o">.</span><span class="n">bas_nctr</span><span class="p">(</span><span class="n">ishell</span><span class="p">)</span>
+            <span class="n">coeffs</span> <span class="o">=</span> <span class="n">pmol</span><span class="o">.</span><span class="n">bas_ctr_coeff</span><span class="p">(</span><span class="n">ishell</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">ictr</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">num_contractions</span><span class="p">):</span>  <span class="c1"># loop over contractions in shell</span>
+                <span class="k">for</span> <span class="n">ibas</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">num_momentum_states</span><span class="p">):</span>  <span class="c1"># loop over angular states in shell</span>
+                    <span class="n">label</span> <span class="o">=</span> <span class="n">orblabels</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                    <span class="n">sphere_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                    <span class="n">l</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">SPHERICAL_NAMES</span><span class="p">[</span><span class="n">sphere_label</span><span class="p">]</span>
+                    <span class="k">assert</span> <span class="n">l</span> <span class="o">==</span> <span class="n">angular</span>
+                    <span class="c1"># TODO: This is not really the principal quantum number</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">label</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()))</span>
+
+                    <span class="n">primitives</span> <span class="o">=</span> <span class="p">[</span><span class="n">orbitals</span><span class="o">.</span><span class="n">SphericalGaussian</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                                                       <span class="n">exp</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span>
+                                                       <span class="n">coeff</span><span class="o">=</span><span class="n">coeff</span><span class="p">[</span><span class="n">ictr</span><span class="p">])</span>
+                                  <span class="k">for</span> <span class="n">exp</span><span class="p">,</span> <span class="n">coeff</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">exps</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">)]</span>
+                    <span class="n">bfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">orbitals</span><span class="o">.</span><span class="n">AtomicBasisFunction</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">l</span><span class="o">=</span><span class="n">angular</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">,</span>
+                                                      <span class="n">primitives</span><span class="o">=</span><span class="n">primitives</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">bfs</span>
+
+    <span class="k">def</span> <span class="nf">_get_basis_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Translate basis_orbitals set name into a spec that pyscf recognizes</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: actually implement this</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">basis</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_ao_matrices</span><span class="p">(</span><span class="n">mf</span><span class="p">):</span>
+        <span class="n">h1e</span> <span class="o">=</span> <span class="n">mf</span><span class="o">.</span><span class="n">get_hcore</span><span class="p">()</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">hartree</span>
+        <span class="n">sao</span> <span class="o">=</span> <span class="n">mf</span><span class="o">.</span><span class="n">get_ovlp</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">DotDict</span><span class="p">(</span><span class="n">h1e</span><span class="o">=</span><span class="n">h1e</span><span class="p">,</span> <span class="n">sao</span><span class="o">=</span><span class="n">sao</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_scf_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mf</span><span class="p">,</span> <span class="n">ao_mats</span><span class="p">):</span>
+        <span class="n">dm</span> <span class="o">=</span> <span class="n">mf</span><span class="o">.</span><span class="n">make_rdm1</span><span class="p">()</span>
+        <span class="n">veff</span> <span class="o">=</span> <span class="n">mf</span><span class="o">.</span><span class="n">get_veff</span><span class="p">(</span><span class="n">dm</span><span class="o">=</span><span class="n">dm</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">hartree</span>
+        <span class="n">fock</span> <span class="o">=</span> <span class="n">ao_mats</span><span class="o">.</span><span class="n">h1e</span> <span class="o">+</span> <span class="n">veff</span>
+        <span class="n">scf_matrices</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">density_matrix_ao</span><span class="o">=</span><span class="n">dm</span><span class="p">,</span>
+                            <span class="n">h2e</span><span class="o">=</span><span class="n">veff</span><span class="p">,</span>
+                            <span class="n">fock_ao</span><span class="o">=</span><span class="n">fock</span><span class="p">)</span>
+        <span class="n">scf_matrices</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ao_mats</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">scf_matrices</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_multiconf_dipoles</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">mcstate</span><span class="p">,</span> <span class="n">nstates</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Compute dipoles and transition dipoles. Adapted from PySCF examples</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Dipole moments are computed using the center of the nuclear charge as the origin. Dipole</span>
+<span class="sd">        moments will need to be annotated or translated appropriately for charges systems.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        basis ():</span>
+<span class="sd">        mcstate ():</span>
+<span class="sd">        nstates ():</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[u.Vector[dipole]]: Dipole moments for each state</span>
+<span class="sd">        Mapping[Tuple[int, int], u.Vector[dipole]]: mapping from pairs of state ids to transition</span>
+<span class="sd">           dipole moments</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        https://github.com/sunqm/pyscf/blob/e4d824853c49b7c19eb35cd6f9fe6ea675de932d/examples/1-advanced/030-transition_dipole.py</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nuc_charges</span> <span class="o">=</span> <span class="p">[</span><span class="n">basis</span><span class="o">.</span><span class="n">atom_charge</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">basis</span><span class="o">.</span><span class="n">natm</span><span class="p">)]</span>
+    <span class="n">nuc_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">basis</span><span class="o">.</span><span class="n">atom_coord</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">basis</span><span class="o">.</span><span class="n">natm</span><span class="p">)]</span>
+    <span class="n">nuc_charge_center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;z,zx-&gt;x&#39;</span><span class="p">,</span> <span class="n">nuc_charges</span><span class="p">,</span> <span class="n">nuc_coords</span><span class="p">)</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">nuc_charges</span><span class="p">)</span>
+    <span class="n">basis</span><span class="o">.</span><span class="n">set_common_orig_</span><span class="p">(</span><span class="n">nuc_charge_center</span><span class="p">)</span>
+    <span class="n">nuc_dip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;i,ix-&gt;x&#39;</span><span class="p">,</span> <span class="n">nuc_charges</span><span class="p">,</span> <span class="n">nuc_coords</span><span class="o">-</span><span class="n">nuc_charge_center</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">a0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">q_e</span>
+
+    <span class="n">dip_ints</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">intor</span><span class="p">(</span><span class="s1">&#39;cint1e_r_sph&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">orbcas</span> <span class="o">=</span> <span class="n">mcstate</span><span class="o">.</span><span class="n">mo_coeff</span><span class="p">[:,</span> <span class="n">mcstate</span><span class="o">.</span><span class="n">ncore</span><span class="p">:</span><span class="n">mcstate</span><span class="o">.</span><span class="n">ncore</span><span class="o">+</span><span class="n">mcstate</span><span class="o">.</span><span class="n">ncas</span><span class="p">]</span>
+
+    <span class="n">dipoles</span><span class="p">,</span> <span class="n">transitions</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">istate</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nstates</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">fstate</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">istate</span><span class="p">,</span> <span class="n">nstates</span><span class="p">):</span>
+            <span class="n">t_dm1</span> <span class="o">=</span> <span class="n">mcstate</span><span class="o">.</span><span class="n">fcisolver</span><span class="o">.</span><span class="n">trans_rdm1</span><span class="p">(</span><span class="n">mcstate</span><span class="o">.</span><span class="n">ci</span><span class="p">[</span><span class="n">istate</span><span class="p">],</span> <span class="n">mcstate</span><span class="o">.</span><span class="n">ci</span><span class="p">[</span><span class="n">fstate</span><span class="p">],</span>
+                                                 <span class="n">mcstate</span><span class="o">.</span><span class="n">ncas</span><span class="p">,</span> <span class="n">mcstate</span><span class="o">.</span><span class="n">nelecas</span><span class="p">)</span>
+            <span class="n">t_dm1_ao</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">,</span> <span class="p">(</span><span class="n">orbcas</span><span class="p">,</span> <span class="n">t_dm1</span><span class="p">,</span> <span class="n">orbcas</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+            <span class="n">moment</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;xij,ji-&gt;x&#39;</span><span class="p">,</span> <span class="n">dip_ints</span><span class="p">,</span> <span class="n">t_dm1_ao</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">a0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">q_e</span>
+
+            <span class="k">if</span> <span class="n">istate</span> <span class="o">==</span> <span class="n">fstate</span><span class="p">:</span>
+                <span class="n">dipoles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">moment</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">transitions</span><span class="p">[</span><span class="n">istate</span><span class="p">,</span> <span class="n">fstate</span><span class="p">]</span> <span class="o">=</span> <span class="n">transitions</span><span class="p">[</span><span class="n">fstate</span><span class="p">,</span> <span class="n">istate</span><span class="p">]</span> <span class="o">=</span> <span class="n">moment</span>
+
+    <span class="k">for</span> <span class="n">idip</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dipoles</span><span class="p">):</span>
+        <span class="n">dipoles</span><span class="p">[</span><span class="n">idip</span><span class="p">]</span> <span class="o">=</span> <span class="n">nuc_dip</span> <span class="o">-</span> <span class="n">d</span>
+
+    <span class="k">return</span> <span class="n">dipoles</span><span class="p">,</span> <span class="n">transitions</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

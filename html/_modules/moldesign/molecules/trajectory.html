@@ -1,0 +1,681 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.molecules.trajectory &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.molecules.trajectory</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.molecules.trajectory</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">cStringIO</span> <span class="kn">import</span> <span class="n">StringIO</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">helpers</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+
+<span class="kn">from</span> <span class="nn">.molecule</span> <span class="kn">import</span> <span class="n">MolecularProperties</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">toplevel</span>
+
+
+<div class="viewcode-block" id="SubSelection"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.SubSelection">[docs]</a><span class="k">class</span> <span class="nc">SubSelection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Descriptors to get bits of the trajectory</span>
+<span class="sd">    trajectory.atoms[3].position -&gt; array of positions</span>
+<span class="sd">    trajectory.atoms[5].distance( mol.chains[&#39;B&#39;].residues[5] ) -&gt; array of distances</span>
+<span class="sd">    trajectory.chains[&#39;A&#39;].residue[23].com -&gt; array of COMs</span>
+<span class="sd">    NOT IMPLEMENTED YET</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="Frame"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.Frame">[docs]</a><span class="k">class</span> <span class="nc">Frame</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">DotDict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A snapshot of a molecule during its motion. This is really just a dictionary of properties.</span>
+<span class="sd">    These properties are those accessed as ``molecule.properties``, and can vary</span>
+<span class="sd">    substantially depending on the origin of the trajectory. They also include relevant dynamical</span>
+<span class="sd">    data and metadata (such as ``time``, ``momenta``, ``minimization_step``, etc.)</span>
+
+<span class="sd">    Properties can be accessed either as attributes (``frame.property_name``) or as keys</span>
+<span class="sd">    (``frame[&#39;property_name&#39;]``)</span>
+
+<span class="sd">    Some properties with specific meaning are described below:</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        annotation (str): text describing this frame (will be displayed automatically when</span>
+<span class="sd">            visualized)</span>
+<span class="sd">        minimization_step (int): for minimization trajectories</span>
+<span class="sd">        time (u.Scalar[time]): time during a dynamical trajectory</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; mol = mdt.from_name(&#39;benzene&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; mol.set_potential_model(moldesign.methods.models.RHF(basis=&#39;3-21g&#39;))</span>
+<span class="sd">        &gt;&gt;&gt; traj = mol.minimize()</span>
+<span class="sd">        &gt;&gt;&gt; starting_frame = traj.frames[0]</span>
+<span class="sd">        &gt;&gt;&gt; assert starting_frame.potential_energy &gt;= traj.frames[-1].potential_energy</span>
+<span class="sd">        &gt;&gt;&gt; assert starting_frame.minimization_step == 0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<span class="k">class</span> <span class="nc">_TrajAtom</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A helper class for querying individual atoms&#39; dynamics</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ATOMIC_ARRAYS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="s1">&#39;positions&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;momentum&#39;</span><span class="p">:</span> <span class="s1">&#39;momenta&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;force&#39;</span><span class="p">:</span> <span class="s1">&#39;forces&#39;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">traj</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">traj</span> <span class="o">=</span> <span class="n">traj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">real_atom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;traj&#39;</span><span class="p">,</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;real_atom&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;_TrajAtom.</span><span class="si">%s</span><span class="s1"> not assigned (pickle issue?)&#39;</span> <span class="o">%</span> <span class="n">item</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ATOMIC_ARRAYS</span><span class="p">:</span>
+            <span class="n">is_array</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ATOMIC_ARRAYS</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">is_array</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="k">try</span><span class="p">:</span>  <span class="c1"># try to get a time-dependent version</span>
+            <span class="n">trajslice</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c1"># not time-dependent - look for an atomic property</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">real_atom</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_array</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">trajslice</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">trajslice</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;atomic&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not an atomic quantity&#39;</span> <span class="o">%</span> <span class="n">item</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">f</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">real_atom</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">trajslice</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ATOMIC_ARRAYS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="p">)]</span>
+        <span class="n">attrs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">geom</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+
+<span class="nd">@toplevel</span>
+<div class="viewcode-block" id="Trajectory"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Trajectory">[docs]</a><span class="k">class</span> <span class="nc">Trajectory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A ``Trajectory`` stores information about a molecule&#39;s motion and how its properties</span>
+<span class="sd">    change as it moves.</span>
+
+<span class="sd">    A trajectory object contains</span>
+<span class="sd">      1. a reference to the :class:`moldesign.Molecule` it describes, and</span>
+<span class="sd">      2. a list of :class:`Frame` objects, each one containing a snapshot of the molecule at a</span>
+<span class="sd">    particular point in its motion.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): the trajectory will describe the motion of this molecule</span>
+<span class="sd">        unit_system (u.UnitSystem): convert all attributes to this unit system (default:</span>
+<span class="sd">            ``moldesign.units.default``)</span>
+<span class="sd">        first_frame(bool): Create the trajectory&#39;s first :class:`Frame` from the molecule&#39;s</span>
+<span class="sd">            current position</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        mol (moldesign.Molecule): the molecule object that this trajectory comes from</span>
+<span class="sd">        frames (List[Frame]): a list of the trajectory frames in the order they were created</span>
+<span class="sd">        info (str): text describing this trajectory</span>
+<span class="sd">        unit_system (u.UnitSystem): convert all attributes to this unit system</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">unit_system</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">first_frame</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="s2">&quot;Trajectory&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit_system</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">unit_system</span><span class="p">,</span> <span class="n">mdt</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_property_keys</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tempmol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">,</span> <span class="n">copy_atoms</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tempmol</span><span class="o">.</span><span class="n">dynamic_dof</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">dynamic_dof</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viz</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">_TrajAtom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">first_frame</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_frame</span><span class="p">()</span>
+
+    <span class="c1"># TODO: the current implementation does not support cases where the molecular topology changes</span>
+    <span class="c1"># TODO: allow caching to disk for very large trajectories</span>
+
+    <span class="n">MOL_ATTRIBUTES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;positions&#39;</span><span class="p">,</span> <span class="s1">&#39;momenta&#39;</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;List[str]: Always store these molecular attributes&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;int: number of frames in this trajectory&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;overrides len(trajectory) to return number of frames&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">)</span>
+
+    <span class="nd">@utils.kwargs_from</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">TrajectoryViewer</span><span class="p">)</span>
+<div class="viewcode-block" id="Trajectory.draw3d"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Trajectory.draw3d">[docs]</a>    <span class="k">def</span> <span class="nf">draw3d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;TrajectoryViewer: create a trajectory visualization</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs (dict): kwargs for :class:`moldesign.widgets.trajectory.TrajectoryViewer`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viz</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">TrajectoryViewer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz</span></div>
+    <span class="n">draw</span> <span class="o">=</span> <span class="n">draw3d</span>  <span class="c1"># synonym for backwards compatibility</span>
+
+<div class="viewcode-block" id="Trajectory.draw_orbitals"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Trajectory.draw_orbitals">[docs]</a>    <span class="k">def</span> <span class="nf">draw_orbitals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;TrajectoryOrbViewer: create a trajectory visualization&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">widgets</span>
+        <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;wfn&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">frame</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t draw orbitals - orbital information missing in at least &quot;</span>
+                                 <span class="s2">&quot;one frame. It must be calculated with a QM method.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">align</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_orbital_phases</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viz</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">trajectory</span><span class="o">.</span><span class="n">TrajectoryOrbViewer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viz</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;Trajectory for molecule &quot;</span><span class="si">%s</span><span class="s1">&quot; (</span><span class="si">%d</span><span class="s1"> frames)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_frames</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&lt;Trajectory object @ </span><span class="si">%s</span><span class="s1"> (exception in repr)&gt;&#39;</span> <span class="o">%</span> <span class="nb">hex</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">newtraj</span> <span class="o">=</span> <span class="n">Trajectory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">unit_system</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unit_system</span><span class="p">)</span>
+        <span class="n">newtraj</span><span class="o">.</span><span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">frames</span>
+        <span class="k">return</span> <span class="n">newtraj</span>
+
+<div class="viewcode-block" id="Trajectory.new_frame"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Trajectory.new_frame">[docs]</a>    <span class="k">def</span> <span class="nf">new_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">additional_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a new frame, EITHER from the parent molecule or from a list of properties</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            properties (dict): dictionary of properties (i.e. {&#39;positions&#39;:[...],</span>
+<span class="sd">            &#39;potential_energy&#39;:...})</span>
+<span class="sd">            **additional_data (dict): any additional data to be added to the trajectory frame</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: frame number (0-based)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: callbacks to update a status display - allows monitoring a running simulation</span>
+        <span class="k">if</span> <span class="n">properties</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">new_frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MOL_ATTRIBUTES</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>  <span class="c1"># take numpy arrays&#39; values, not a reference</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="n">new_frame</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="n">new_frame</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">additional_data</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_frame</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;Can&#39;t overwrite molecule&#39;s properties with additional_data key </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+            <span class="n">new_frame</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_property_keys</span><span class="p">(</span><span class="n">new_frame</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_frame</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_get_traj_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Atom</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">_TrajAtom</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Trajectory.distance"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.Trajectory.distance">[docs]</a>    <span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">):</span>
+        <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_traj_atom</span><span class="p">,</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Trajectory.angle"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.Trajectory.angle">[docs]</a>    <span class="k">def</span> <span class="nf">angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">):</span>
+        <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_traj_atom</span><span class="p">,</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Trajectory.dihedral"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.Trajectory.dihedral">[docs]</a>    <span class="k">def</span> <span class="nf">dihedral</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">a4</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_traj_atom</span><span class="p">,</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">dihedral</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_update_property_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_frame</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the internal list of molecular properties that can be sliced. If a frame is passed,</span>
+<span class="sd">        update from that frame&#39;s properties. Otherwise, update from the entire list of stored frames</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_property_keys</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_property_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">new_frame</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_property_keys</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_property_keys</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_frame</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_property_keys</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">))</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c1"># TODO: move slicing to frames, so that this will work with __getitem__ as well</span>
+        <span class="c1"># TODO: prevent identical recursion (so __getattr__(foo) can&#39;t call __getattr__(foo))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_property_keys</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_property_keys</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_property_keys</span><span class="p">:</span>  <span class="c1"># return a list of properties for each frame</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">slice_frames</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Frame </span><span class="si">%s</span><span class="s1"> has no attribute </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Trajectory.rmsd"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Trajectory.rmsd">[docs]</a>    <span class="k">def</span> <span class="nf">rmsd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot; Calculate root-mean-square displacement for each frame in the trajectory.</span>
+
+<span class="sd">        The RMSD between times :math:`t` and :math:`t0` is given by</span>
+
+<span class="sd">        :math:`\text{RMSD}(t;t_0) =\sqrt{\sum_{i \in \text{atoms}} \left( \mathbf{R}_i(t) -</span>
+<span class="sd">        \mathbf{R}_i(t_0) \right)^2}`,</span>
+
+<span class="sd">        where :math:`\mathbf{R}_i(t)` is the position of atom *i* at time *t*.</span>
+
+
+<span class="sd">        Args:</span>
+<span class="sd">            atoms (list[mdt.Atom]): list of atoms to calculate the RMSD for (all atoms in the</span>
+<span class="sd">                ``Molecule``)</span>
+<span class="sd">            reference (u.Vector[length]): Reference positions for RMSD. (default:</span>
+<span class="sd">                ``traj.frames[0].positions``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            u.Vector[length]: list of RMSD displacements for each frame in the trajectory</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">reference</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">refpos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">positions</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">refpos</span> <span class="o">=</span> <span class="n">reference</span><span class="o">.</span><span class="n">positions</span>
+
+        <span class="n">atoms</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">])</span>
+
+        <span class="n">rmsds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">:</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="p">(</span><span class="n">refpos</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span> <span class="o">-</span> <span class="n">f</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="n">indices</span><span class="p">])</span>
+            <span class="n">rmsds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">diff</span><span class="o">*</span><span class="n">diff</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rmsds</span><span class="p">)</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Trajectory.slice_frames"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Trajectory.slice_frames">[docs]</a>    <span class="k">def</span> <span class="nf">slice_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">missing</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return an array of giving the value of ``key`` at each frame.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str): name of the property, e.g., time, potential_energy, annotation, etc</span>
+<span class="sd">            missing: value to return if a given frame does not have this property</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            moldesign.units.Vector: vector containing the value at each frame, or the value given</span>
+<span class="sd">                in the ``missing`` keyword) (len= `len(self)` )</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">has_units</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">u</span><span class="o">.</span><span class="n">MdtQuantity</span><span class="p">):</span>
+                <span class="n">has_units</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">has_units</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">frame</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kinetic_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">convert_units</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">energies</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;momenta&#39;</span> <span class="ow">in</span> <span class="n">frame</span><span class="p">:</span>
+                <span class="n">energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">helpers</span><span class="o">.</span><span class="n">kinetic_energy</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">momenta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">dim_masses</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">convert_units</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">energies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">convert_units</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">energies</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">energies</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kinetic_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">convert_units</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">temps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">energies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kinetic_energy</span>
+        <span class="n">dof</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">dynamic_dof</span>
+        <span class="k">for</span> <span class="n">energy</span><span class="p">,</span> <span class="n">frame</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">energies</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">energy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">temps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">helpers</span><span class="o">.</span><span class="n">kinetic_temperature</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">dof</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">convert_units</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">temps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">convert_units</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">temps</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">temps</span>
+
+    <span class="n">DONOTAPPLY</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;kinetic_energy&#39;</span><span class="p">])</span>
+
+<div class="viewcode-block" id="Trajectory.apply_frame"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Trajectory.apply_frame">[docs]</a>    <span class="k">def</span> <span class="nf">apply_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reconstruct the underlying molecule with the given frame.</span>
+<span class="sd">        Right now, any data not passed is ignored, which may result in properties that aren&#39;t synced up</span>
+<span class="sd">        with each other ...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: need to prevent multiple things using the _tempmol from conflicting with each other</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tempmol</span>
+        <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MOL_ATTRIBUTES</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">prop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DONOTAPPLY</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">frame</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">prop</span><span class="p">,</span> <span class="n">frame</span><span class="p">[</span><span class="n">prop</span><span class="p">])</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">MolecularProperties</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">frame</span><span class="p">:</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span></div>
+
+    <span class="c1"># TODO: need to fix this - it creates import problems</span>
+    <span class="c1">#@utils.args_from(mdt.converters.write_trajectory,</span>
+    <span class="c1">#                 allexcept=[&#39;traj&#39;],</span>
+    <span class="c1">#                 append_docstring_description=True)</span>
+<div class="viewcode-block" id="Trajectory.write"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.Trajectory.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">fileio</span><span class="o">.</span><span class="n">write_trajectory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Trajectory.plot"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Trajectory.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a matplotlib plot of property x against property y</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x,y (str): names of the properties</span>
+<span class="sd">            **kwargs (dict): kwargs for :meth:`matplotlib.pylab.plot`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[matplotlib.lines.Lines2D]: the lines that were plotted</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pylab</span>
+        <span class="n">xl</span> <span class="o">=</span> <span class="n">yl</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">strx</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+            <span class="n">xl</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> / </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">strx</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">stry</span> <span class="o">=</span> <span class="n">y</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="n">yl</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> / </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">stry</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+        <span class="n">plt</span> <span class="o">=</span> <span class="n">pylab</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">pylab</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">xl</span><span class="p">);</span> <span class="n">pylab</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">yl</span><span class="p">);</span> <span class="n">pylab</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">plt</span></div>
+
+<div class="viewcode-block" id="Trajectory.align_orbital_phases"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Trajectory.align_orbital_phases">[docs]</a>    <span class="k">def</span> <span class="nf">align_orbital_phases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_frame</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Try to remove orbital sign flips between frames.</span>
+<span class="sd">        If `reference_frame` is not passed, we&#39;ll start with frame 0 and</span>
+<span class="sd">        align successive pairs of orbitals.</span>
+<span class="sd">        If `reference_frame` is an int, we&#39;ll move forwards and backwards from that frame number.</span>
+<span class="sd">        Otherwise, we&#39;ll try to align every orbital frame to those in reference_frame</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reference_frame (int or Frame): ``Frame`` containing the orbitals to align with</span>
+<span class="sd">                (default: align each frame with the previous one)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">reference_frame</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">iframe</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">relative_alignment</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">reference_frame</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="n">iframe</span> <span class="o">=</span> <span class="n">reference_frame</span>
+            <span class="n">relative_alignment</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">relative_alignment</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="k">if</span> <span class="n">relative_alignment</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">iframe</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_frames</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">align_orbital_phases</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">wfn</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">iframe</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">align_orbital_phases</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">wfn</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames</span><span class="p">:</span>
+                <span class="n">frame</span><span class="o">.</span><span class="n">wfn</span><span class="o">.</span><span class="n">align_orbital_phases</span><span class="p">(</span><span class="n">reference_frame</span><span class="o">.</span><span class="n">wfn</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

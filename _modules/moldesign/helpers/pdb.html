@@ -1,0 +1,557 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.helpers.pdb &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.helpers.pdb</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.helpers.pdb</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="sd">&quot;&quot;&quot; PDB file parsing utilities</span>
+
+<span class="sd">We don&#39;t yet (and hopefully will never need) an internal PDB parser or writer. For now,</span>
+<span class="sd">routines in this module read and write data that&#39;s not necessarily parsed by other implementations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">from</span> <span class="nn">cStringIO</span> <span class="kn">import</span> <span class="n">StringIO</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+
+<span class="n">BioAssembly</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;BioAssembly&#39;</span><span class="p">,</span> <span class="s1">&#39;desc chains transforms&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="insert_ter_records"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.helpers.html#moldesign.helpers.pdb.insert_ter_records">[docs]</a><span class="k">def</span> <span class="nf">insert_ter_records</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">pdbfile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Inserts TER records to indicate the end of the biopolymeric part of a chain</span>
+
+<span class="sd">    Many common PDB writers - including OpenBabel - don&#39;t insert TER records. This can</span>
+<span class="sd">    cause a problem for situations such as forcefield assignment. This routine is one</span>
+<span class="sd">    solution to that problem.</span>
+
+<span class="sd">    What it does:</span>
+<span class="sd">    This routine inserts &#39;TER&#39; records</span>
+<span class="sd">    1) after any protein residue not bound to the next residue via backbone peptide bond, and</span>
+<span class="sd">    2) after any DNA residue not bound to the next residue via a backbone phosphate bond</span>
+
+<span class="sd">    In the input PDB file, the ATOM records be formatted with the proper columns (see</span>
+<span class="sd">    http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM) and</span>
+<span class="sd">    the chain names and residue numbers must match ``chain.pdbname`` and ``residue.pdbindex``,</span>
+<span class="sd">    respectively.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): the MDT version of the molecule that pdbfile describes</span>
+<span class="sd">        pdbfile (TextIO OR str): pdb file (file-like or string)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        cStringIO.StringIO OR str: copy of the pdb file with added TER records - it will be</span>
+<span class="sd">         returned as the same type passed (i.e., as a filelike buffer or as a string)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">is_string</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pdbfile</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="n">pdbfile</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">(</span><span class="n">pdbfile</span><span class="p">)</span>
+        <span class="n">is_string</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="c1"># First, identify where to insert records (if anywhere)</span>
+    <span class="n">ter_residues</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">chain</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span><span class="p">:</span>
+            <span class="n">ter_residues</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">chain</span><span class="o">.</span><span class="n">pdbname</span><span class="p">,</span> <span class="n">chain</span><span class="o">.</span><span class="n">c_terminal</span><span class="o">.</span><span class="n">pdbindex</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">chain</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;dna&#39;</span><span class="p">:</span>
+            <span class="n">ter_residues</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">chain</span><span class="o">.</span><span class="n">pdbname</span><span class="p">,</span> <span class="n">chain</span><span class="o">.</span><span class="n">threeprime_end</span><span class="o">.</span><span class="n">pdbindex</span><span class="p">))</span>
+
+    <span class="c1"># insert the records (if necessary)</span>
+    <span class="n">newf</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+    <span class="n">pdbfile</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">watchres</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">pdbfile</span><span class="p">:</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">fields</span> <span class="ow">and</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;ATOM&#39;</span><span class="p">,</span><span class="s1">&#39;HETATM&#39;</span><span class="p">):</span>  <span class="c1"># line is an atom record</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">21</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">22</span><span class="p">:</span><span class="mi">26</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()))</span>
+            <span class="k">if</span> <span class="n">watchres</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">res</span> <span class="o">!=</span> <span class="n">watchres</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="n">newf</span><span class="p">,</span> <span class="s1">&#39;TER&#39;</span>
+                    <span class="n">watchres</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">if</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">ter_residues</span><span class="p">:</span>
+                <span class="n">watchres</span> <span class="o">=</span> <span class="n">res</span>
+
+        <span class="k">elif</span> <span class="n">watchres</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>  <span class="c1"># line is not an atom record</span>
+            <span class="n">watchres</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;TER&#39;</span><span class="p">:</span>
+                <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="n">newf</span><span class="p">,</span> <span class="s1">&#39;TER&#39;</span>
+
+        <span class="n">newf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+    <span class="n">newf</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_string</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">newf</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">newf</span></div>
+
+<div class="viewcode-block" id="warn_assemblies"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.helpers.html#moldesign.helpers.pdb.warn_assemblies">[docs]</a><span class="k">def</span> <span class="nf">warn_assemblies</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">assemblies</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Print a warning message if the PDB structure contains a biomolecular assembly</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Don&#39;t warn if the only assembly is the asymmetric unit</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">assemblies</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">assemblies</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transforms</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s2">&quot;WARNING: This PDB file contains the following biomolecular assemblies:&quot;</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">asm</span> <span class="ow">in</span> <span class="n">assemblies</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">print</span> <span class="s1">&#39;WARNING: Assembly &quot;</span><span class="si">%s</span><span class="s1">&quot;: </span><span class="si">%d</span><span class="s1"> copies of chains </span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span>
+                <span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">asm</span><span class="o">.</span><span class="n">transforms</span><span class="p">),</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">asm</span><span class="o">.</span><span class="n">chains</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s1">&#39;WARNING: Use ``mdt.build_assembly([molecule],[assembly_name])``&#39;</span> \
+                  <span class="s1">&#39; to build one of the above assemblies&#39;</span></div>
+
+
+<div class="viewcode-block" id="guess_atnum_from_name"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.helpers.html#moldesign.helpers.pdb.guess_atnum_from_name">[docs]</a><span class="k">def</span> <span class="nf">guess_atnum_from_name</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Guess an atomic number given a name string (usually 1-3 characters).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s (str): atomic number</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: atomic number</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        KeyError: if atomic number can&#39;t be determined</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; guess_atnum_from_name(&#39;C&#39;)</span>
+<span class="sd">        6</span>
+<span class="sd">        &gt;&gt;&gt; guess_atnum_from_name(&#39;C1&#39;)</span>
+<span class="sd">        6</span>
+<span class="sd">        &gt;&gt;&gt; guess_atnum_from_name(&#39;cl3&#39;)</span>
+<span class="sd">        17</span>
+<span class="sd">        &gt;&gt;&gt; guess_atnum_from_name(&#39;CL&#39;)</span>
+<span class="sd">        17</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>  <span class="c1"># the unmodified string</span>
+        <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ATOMIC_NUMBERS</span><span class="p">[</span><span class="n">s</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="n">cleaned</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">c</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="n">c</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+                      <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                      <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isalpha</span><span class="p">())</span>
+
+    <span class="k">try</span><span class="p">:</span>  <span class="c1"># just the letters, with proper capitalization</span>
+        <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ATOMIC_NUMBERS</span><span class="p">[</span><span class="n">cleaned</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># otherwise, just the first letter</span>
+    <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ATOMIC_NUMBERS</span><span class="p">[</span><span class="n">cleaned</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span></div>
+
+
+<div class="viewcode-block" id="get_conect_records"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.helpers.html#moldesign.helpers.pdb.get_conect_records">[docs]</a><span class="k">def</span> <span class="nf">get_conect_records</span><span class="p">(</span><span class="n">pdbfile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse a PDB file, return CONECT records</span>
+
+<span class="sd">    Bond orders are assigned as 1 by default. Repeated CONECT records are interpreted as</span>
+<span class="sd">    higher order bonds.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        pdbfile (file): file-like object</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt; CONECT   1   2   3</span>
+<span class="sd">        &gt; CONECT   1   2</span>
+<span class="sd">        &gt; CONECT   2   1   1</span>
+<span class="sd">        &gt; CONECT   3   1</span>
+<span class="sd">        These records are interpreted as a double-bond between atoms 1 and 2</span>
+<span class="sd">        and a single bond between atoms 1 and 3</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This only returns the covalent CONECT records (the first 4 entries) - it doesn&#39;t</span>
+<span class="sd">        return salt bridges or hydrogen bonds</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: CONECT records using serial numbers -</span>
+<span class="sd">             ``{serial1: {serial2:order. serial3:order, }, ...}``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">conect</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">pdbfile</span><span class="p">:</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;CONECT&#39;</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">atombonds</span> <span class="o">=</span> <span class="n">conect</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="p">{})</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">6</span><span class="p">]:</span>  <span class="c1"># TODO: check the end bound</span>
+            <span class="n">serial</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">serial</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">atombonds</span><span class="p">:</span>
+                <span class="n">atombonds</span><span class="p">[</span><span class="n">serial</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">atombonds</span><span class="p">[</span><span class="n">serial</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">conect</span></div>
+
+
+<div class="viewcode-block" id="get_pdb_assemblies"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.helpers.html#moldesign.helpers.pdb.get_pdb_assemblies">[docs]</a><span class="k">def</span> <span class="nf">get_pdb_assemblies</span><span class="p">(</span><span class="n">fileobj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse a PDB file, return biomolecular assembly specifications</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fileobj (file-like): File-like object for the PDB file</span>
+<span class="sd">            (this object will be rewound before returning)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Mapping[str, BioAssembly]: dict mapping assembly ids to BioAssembly instances</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">assemblies</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">lineiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">fileobj</span><span class="p">)</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>  <span class="c1"># first, search for assembly transformations</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">lineiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+        <span class="c1"># Conditions that indicate we&#39;re past the &quot;REMARK 350&quot; section</span>
+        <span class="k">if</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;ATOM&#39;</span><span class="p">,</span> <span class="s1">&#39;HETATM&#39;</span><span class="p">,</span> <span class="s1">&#39;CONECT&#39;</span><span class="p">):</span>
+            <span class="k">break</span>
+        <span class="k">if</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;REMARK&#39;</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">350</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="c1"># look for start of a assembly transformation, i.e. &quot;REMARK 350 BIOMOLECULE: [name]  &quot;</span>
+        <span class="k">if</span> <span class="n">fields</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;REMARK 350 BIOMOLECULE:&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="n">assembly_name</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">assemblies</span><span class="p">[</span><span class="n">assembly_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_read_pdb_assembly</span><span class="p">(</span><span class="n">lineiter</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">assemblies</span></div>
+
+
+<span class="k">def</span> <span class="nf">_read_pdb_assembly</span><span class="p">(</span><span class="n">lineiter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper for get_pdb_assemblies</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># First, there&#39;s description lines: &quot;REMARK 350 AUTHOR DETERMINED BIOLOGICAL UNIT: OCTAMERIC&quot;</span>
+    <span class="n">description_lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="n">lineiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">while</span> <span class="n">fields</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;REMARK 350 APPLY THE FOLLOWING TO CHAINS:&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+        <span class="n">description_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;REMARK 350 &#39;</span><span class="p">):])</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">lineiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">description_lines</span><span class="p">))</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="c1"># Next, we get the chains in this assembly: &quot;REMARK 350 APPLY THE FOLLOWING TO CHAINS:  C, D&quot;</span>
+    <span class="k">assert</span> <span class="n">fields</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;REMARK 350 APPLY THE FOLLOWING TO CHAINS:&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">chain_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">[</span><span class="mi">7</span><span class="p">:]]</span>
+    <span class="k">while</span> <span class="n">fields</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;,&#39;</span><span class="p">:</span>  <span class="c1"># deal with multi-line lists of chains</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">lineiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;AND&#39;</span><span class="p">,</span> <span class="s1">&#39;CHAINS:&#39;</span><span class="p">]</span>
+        <span class="n">chain_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">[</span><span class="mi">4</span><span class="p">:])</span>
+
+    <span class="n">transforms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>  <span class="c1"># loop over each assembly transformation</span>
+        <span class="c1"># example: &quot;REMARK 350   BIOMT1   1  1.000000  0.000000  0.000000        0.00000 &quot;</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+        <span class="n">t</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="k">for</span> <span class="n">idim</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">lineiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">idim</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">BioAssembly</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">chain_names</span><span class="p">,</span> <span class="n">transforms</span><span class="p">)</span>
+
+            <span class="k">assert</span> <span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">transforms</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+            <span class="k">assert</span> <span class="n">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;BIOMT</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">idim</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">t</span><span class="p">[</span><span class="n">idim</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">fields</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span>
+
+        <span class="n">transforms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="assign_biopolymer_bonds"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.helpers.html#moldesign.helpers.pdb.assign_biopolymer_bonds">[docs]</a><span class="k">def</span> <span class="nf">assign_biopolymer_bonds</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Assign bonds to all standard residues using the PDB chemical component dictionary</span>
+
+<span class="sd">    Any unrecognized residues are ignored.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        http://www.wwpdb.org/data/ccd</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">chain</span><span class="o">.</span><span class="n">assign_biopolymer_bonds</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;WARNING: failed to assign backbone bonds for </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">residue</span><span class="o">.</span><span class="n">assign_template_bonds</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;WARNING: failed to assign bonds for </span><span class="si">%s</span><span class="s1">; use &#39;</span>
+                  <span class="s1">&#39;``residue.assign_distance.bonds`` to guess the topology&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="assign_unique_hydrogen_names"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.helpers.html#moldesign.helpers.pdb.assign_unique_hydrogen_names">[docs]</a><span class="k">def</span> <span class="nf">assign_unique_hydrogen_names</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Assign unique names to all hydrogens, based on either:</span>
+<span class="sd">    1) information in the Chemical Component Database, or</span>
+<span class="sd">    2) newly generated, unique names</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule):</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">residue</span><span class="o">.</span><span class="n">resname</span> <span class="ow">in</span> <span class="n">mdt</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">RESIDUE_BONDS</span><span class="p">:</span>
+            <span class="n">_assign_hydrogen_names_from_ccd</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_assign_unique_hydrogen_names_in_order</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span>
+
+        <span class="n">residue</span><span class="o">.</span><span class="n">rebuild</span><span class="p">()</span></div>
+
+
+<span class="k">def</span> <span class="nf">_assign_hydrogen_names_from_ccd</span><span class="p">(</span><span class="n">residue</span><span class="p">):</span>
+    <span class="n">ccd_bonds</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">RESIDUE_BONDS</span><span class="p">[</span><span class="n">residue</span><span class="o">.</span><span class="n">resname</span><span class="p">]</span>
+    <span class="n">taken</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;H&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">taken</span><span class="p">:</span>
+        <span class="k">return</span>  <span class="c1"># nothing to do</span>
+    <span class="k">if</span> <span class="s1">&#39;H&#39;</span> <span class="ow">in</span> <span class="n">ccd_bonds</span><span class="p">:</span>
+        <span class="n">taken</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>  <span class="c1"># someone will actually need to be named &quot;H&#39;</span>
+
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atnum</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">assert</span> <span class="n">atom</span><span class="o">.</span><span class="n">num_bonds</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Hydrogen has more than one bond&#39;</span>
+        <span class="n">bond</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">bonds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">other</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">partner</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">for</span> <span class="n">partner</span> <span class="ow">in</span> <span class="n">ccd_bonds</span><span class="p">[</span><span class="n">other</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">partner</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;H&#39;</span> <span class="ow">and</span> <span class="n">partner</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">taken</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">ccd_bonds</span><span class="p">[</span><span class="n">other</span><span class="p">][</span><span class="n">partner</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Hydrogen bond order is not 1&#39;</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">partner</span>
+                <span class="n">taken</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">partner</span><span class="p">)</span>
+                <span class="k">break</span>
+
+
+<span class="k">def</span> <span class="nf">_assign_unique_hydrogen_names_in_order</span><span class="p">(</span><span class="n">residue</span><span class="p">):</span>
+    <span class="n">n_hydrogen</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">namecounts</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">namecounts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">used_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;H</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n_hydrogen</span>
+                <span class="k">while</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">used_names</span><span class="p">:</span>
+                    <span class="n">n_hydrogen</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;H</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n_hydrogen</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+                <span class="n">used_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>moldesign.geom.coords &mdash; Molecular Design Toolkit 0.7.0 documentation</title>
+  <title>moldesign.geom.coords &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Molecular Design Toolkit 0.7.0 documentation" href="../../../index.html"/>
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.3
               </div>
             
           
@@ -80,13 +80,37 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents</span></p>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
 </ul>
 
             
@@ -100,7 +124,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../contents.html">Molecular Design Toolkit</a>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
       </nav>
 
 
@@ -115,7 +139,7 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
       
           <li><a href="../../index.html">Module code</a> &raquo;</li>
       
@@ -145,9 +169,11 @@
 <span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
+<span class="c1">#from singledispatch import singledispatch</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="c1">#from moldesign.molecules import Bond</span>
 <span class="kn">from</span> <span class="nn">moldesign.mathutils</span> <span class="kn">import</span> <span class="n">normalized</span><span class="p">,</span> <span class="n">safe_arccos</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">toplevel</span>
@@ -159,7 +185,8 @@
 <span class="c1"># NEWFEATURE: pyramidalization aka out-of-plane bending</span>
 
 <span class="nd">@toplevel</span>
-<div class="viewcode-block" id="distance"><a class="viewcode-back" href="../../../toplevel.html#moldesign.distance">[docs]</a><span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">):</span>
+<span class="c1">#@singledispatch</span>
+<div class="viewcode-block" id="distance"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.distance">[docs]</a><span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Return distance between two atoms</span>
 
 <span class="sd">    Args:</span>
@@ -168,14 +195,27 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        u.Scalar[length]: the distance</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">a1</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">a2</span><span class="p">)</span></div>
+    <span class="n">diffvec</span> <span class="o">=</span> <span class="n">a1</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">a2</span><span class="o">.</span><span class="n">position</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">diffvec</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">diffvec</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diffvec</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">diffvec</span><span class="o">*</span><span class="n">diffvec</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span></div>
+
+
+<span class="c1"># @distance.register(Bond)</span>
+<span class="c1"># def distance(bond):</span>
+<span class="c1">#     return distance(bond.a1, bond.a2)</span>
 
 
 <span class="nd">@toplevel</span>
-<div class="viewcode-block" id="angle"><a class="viewcode-back" href="../../../toplevel.html#moldesign.angle">[docs]</a><span class="k">def</span> <span class="nf">angle</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">):</span>
+<span class="c1">#@singledispatch</span>
+<div class="viewcode-block" id="angle"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.angle">[docs]</a><span class="k">def</span> <span class="nf">angle</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; The angle between bonds a2-a1 and a2-a3</span>
+
 <span class="sd">    Args:</span>
-<span class="sd">        a1,a2,a3 (mdt.Atom): the atoms describing the vector</span>
+<span class="sd">        a1,a2,a3 (mdt.Atom): the atoms describing the angle</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        u.Scalar[length]: the distance</span>
@@ -184,40 +224,160 @@
     <span class="n">r23</span> <span class="o">=</span> <span class="p">(</span><span class="n">a3</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">a2</span><span class="o">.</span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">defunits_value</span><span class="p">()</span>
     <span class="n">e12</span> <span class="o">=</span> <span class="n">normalized</span><span class="p">(</span><span class="n">r21</span><span class="p">)</span>
     <span class="n">e23</span> <span class="o">=</span> <span class="n">normalized</span><span class="p">(</span><span class="n">r23</span><span class="p">)</span>
-    <span class="n">costheta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e12</span><span class="p">,</span> <span class="n">e23</span><span class="p">)</span>
+
+    <span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">e12</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">costheta</span> <span class="o">=</span> <span class="p">(</span><span class="n">e12</span><span class="o">*</span><span class="n">e23</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">costheta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e12</span><span class="p">,</span> <span class="n">e23</span><span class="p">)</span>
     <span class="n">theta</span> <span class="o">=</span> <span class="n">safe_arccos</span><span class="p">(</span><span class="n">costheta</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">theta</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">radians</span></div>
 
+<span class="c1">#</span>
+<span class="c1"># @angle.register(Bond)</span>
+<span class="c1"># def angle(b1, b2):</span>
+<span class="c1">#     a1, a2, a3 = _join_bonds(b1, b2)</span>
+<span class="c1">#     return angle(a1, a2, a3)</span>
+
+
+<span class="k">def</span> <span class="nf">_join_bonds</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Return a1, a2, a3, where a2 is the atom shared by both bonds</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">a3</span> <span class="o">=</span> <span class="n">b2</span><span class="o">.</span><span class="n">partner</span><span class="p">(</span><span class="n">b1</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">b1</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">b1</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">b2</span><span class="o">.</span><span class="n">partner</span><span class="p">(</span><span class="n">b1</span><span class="o">.</span><span class="n">a1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">b1</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">b1</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">a3</span>
+
 
 <span class="nd">@toplevel</span>
-<div class="viewcode-block" id="dihedral"><a class="viewcode-back" href="../../../toplevel.html#moldesign.dihedral">[docs]</a><span class="k">def</span> <span class="nf">dihedral</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">):</span>
+<span class="c1">#@singledispatch</span>
+<div class="viewcode-block" id="dihedral"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.dihedral">[docs]</a><span class="k">def</span> <span class="nf">dihedral</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">a3</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">a4</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Twist angle of bonds a1-a2 and a4-a3 around around the central bond a2-a3</span>
 
+<span class="sd">    Can be called as ``dihedral(a1, a2, a3, a4)``</span>
+<span class="sd">              OR     ``dihedral(a2, a2)``</span>
+<span class="sd">              OR     ``dihedral(bond)``</span>
+
 <span class="sd">    Args:</span>
-<span class="sd">        a1,a2,a3,a4 (mdt.Atom): the atoms describing the dihedral</span>
+<span class="sd">        a1 (mdt.Bond): the central bond in the dihedral. OR</span>
+<span class="sd">        a1,a2 (mdt.Atom): the atoms describing the dihedral</span>
+<span class="sd">        a3,a4 (mdt.Atom): (optional) if not passed, ``a1`` and ``a2`` will be treated as the</span>
+<span class="sd">            central atoms in this bond, and a3 and a4 will be inferred.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (units.Scalar[angle]): angle -  [0, 2 pi) radians</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">a3</span> <span class="ow">is</span> <span class="n">a4</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>  <span class="c1"># infer the first and last atoms</span>
+        <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">_infer_dihedral</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
+
     <span class="n">r21</span> <span class="o">=</span> <span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">a2</span><span class="o">.</span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">defunits_value</span><span class="p">()</span>  <span class="c1"># remove units immediately to improve speed</span>
     <span class="n">r34</span> <span class="o">=</span> <span class="p">(</span><span class="n">a4</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">a3</span><span class="o">.</span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">defunits_value</span><span class="p">()</span>
+
+    <span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">r21</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">center_bond</span> <span class="o">=</span> <span class="p">(</span><span class="n">a2</span><span class="o">.</span><span class="n">position</span> <span class="o">-</span> <span class="n">a3</span><span class="o">.</span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">defunits_value</span><span class="p">()</span>
     <span class="n">plane_normal</span> <span class="o">=</span> <span class="n">normalized</span><span class="p">(</span><span class="n">center_bond</span><span class="p">)</span>
-    <span class="n">r21_proj</span> <span class="o">=</span> <span class="n">r21</span> <span class="o">-</span> <span class="n">plane_normal</span> <span class="o">*</span> <span class="n">r21</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">plane_normal</span><span class="p">)</span>
-    <span class="n">r34_proj</span> <span class="o">=</span> <span class="n">r34</span> <span class="o">-</span> <span class="n">plane_normal</span> <span class="o">*</span> <span class="n">r34</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">plane_normal</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">r21_proj</span> <span class="o">=</span> <span class="n">r21</span> <span class="o">-</span> <span class="n">plane_normal</span> <span class="o">*</span> <span class="n">r21</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">plane_normal</span><span class="p">)</span>
+        <span class="n">r34_proj</span> <span class="o">=</span> <span class="n">r34</span> <span class="o">-</span> <span class="n">plane_normal</span> <span class="o">*</span> <span class="n">r34</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">plane_normal</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="n">r21_proj</span> <span class="o">=</span> <span class="n">r21</span> <span class="o">-</span> <span class="n">plane_normal</span> <span class="o">*</span> <span class="p">(</span><span class="n">r21</span><span class="o">*</span><span class="n">plane_normal</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="bp">None</span><span class="p">]</span>
+        <span class="n">r34_proj</span> <span class="o">=</span> <span class="n">r34</span> <span class="o">-</span> <span class="n">plane_normal</span> <span class="o">*</span> <span class="p">(</span><span class="n">r34</span><span class="o">*</span><span class="n">plane_normal</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="bp">None</span><span class="p">]</span>
+
     <span class="n">va</span> <span class="o">=</span> <span class="n">normalized</span><span class="p">(</span><span class="n">r21_proj</span><span class="p">)</span>
     <span class="n">vb</span> <span class="o">=</span> <span class="n">normalized</span><span class="p">(</span><span class="n">r34_proj</span><span class="p">)</span>
-    <span class="n">costheta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">va</span><span class="p">,</span> <span class="n">vb</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">costheta</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mf">0.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">radians</span>
-    <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">costheta</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">radians</span>
+
+    <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">costheta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">va</span><span class="p">,</span> <span class="n">vb</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">costheta</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mf">0.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">radians</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">costheta</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">u</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">radians</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">abstheta</span> <span class="o">=</span> <span class="n">safe_arccos</span><span class="p">(</span><span class="n">costheta</span><span class="p">)</span>
-        <span class="n">cross</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">va</span><span class="p">,</span> <span class="n">vb</span><span class="p">)</span>
+        <span class="n">costheta</span> <span class="o">=</span> <span class="p">(</span><span class="n">va</span><span class="o">*</span><span class="n">vb</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">abstheta</span> <span class="o">=</span> <span class="n">safe_arccos</span><span class="p">(</span><span class="n">costheta</span><span class="p">)</span>
+    <span class="n">cross</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">va</span><span class="p">,</span> <span class="n">vb</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">dim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">theta</span> <span class="o">=</span> <span class="n">abstheta</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cross</span><span class="p">,</span> <span class="n">plane_normal</span><span class="p">))</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">theta</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">radians</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">radians</span><span class="p">)</span></div>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">abstheta</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">((</span><span class="n">cross</span><span class="o">*</span><span class="n">plane_normal</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">theta</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">radians</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">radians</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_infer_dihedral</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Given two atoms defining the central bond in a dihedral, pick the first and last atoms</span>
+<span class="sd">    in a heuristic way (see :meth:`_pick_atom`) to get a unique-ish definition.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">a3</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>  <span class="c1"># assume bond-like</span>
+        <span class="n">bond</span> <span class="o">=</span> <span class="n">a2</span>
+        <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">a2</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="n">_pick_atom</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span>
+    <span class="n">a4</span> <span class="o">=</span> <span class="n">_pick_atom</span><span class="p">(</span><span class="n">a3</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span>
+
+
+<span class="k">def</span> <span class="nf">_pick_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">nbr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Pick an atom bonded to ``atom`` that:</span>
+<span class="sd">      A) is not nbr</span>
+<span class="sd">      B) has the largest atomic number</span>
+<span class="sd">      C) has the lowest index</span>
+
+<span class="sd">    This gives us a unique definition for dihedrals when only passing 2 atoms</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">newat</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="s1">&#39;traj&#39;</span><span class="p">):</span>
+        <span class="n">istraj</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">traj</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">traj</span>
+        <span class="n">atom</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">real_atom</span>
+        <span class="n">nbr</span> <span class="o">=</span> <span class="n">nbr</span><span class="o">.</span><span class="n">real_atom</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">istraj</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+        <span class="n">pt</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">partner</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pt</span> <span class="o">==</span> <span class="n">nbr</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">elif</span> <span class="n">newat</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">newat</span> <span class="o">=</span> <span class="n">pt</span>
+        <span class="k">elif</span> <span class="n">newat</span><span class="o">.</span><span class="n">atnum</span> <span class="o">&lt;</span> <span class="n">pt</span><span class="o">.</span><span class="n">atnum</span><span class="p">:</span>
+            <span class="n">newat</span> <span class="o">=</span> <span class="n">pt</span>
+        <span class="k">elif</span> <span class="n">newat</span><span class="o">.</span><span class="n">atnum</span> <span class="o">==</span> <span class="n">pt</span><span class="o">.</span><span class="n">atnum</span> <span class="ow">and</span> <span class="n">newat</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="n">pt</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="n">newat</span> <span class="o">=</span> <span class="n">pt</span>
+
+    <span class="k">if</span> <span class="n">newat</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not part of a dihedral&#39;</span> <span class="o">%</span> <span class="n">atom</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">istraj</span><span class="p">:</span>
+        <span class="n">newat</span> <span class="o">=</span> <span class="n">traj</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">newat</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">newat</span>
 
 
 
 
+<span class="c1">#</span>
+<span class="c1"># @dihedral.register(Bond)</span>
+<span class="c1"># def dihedral(b1, b2=None, b3=None):</span>
+<span class="c1">#     if b2 is b3 is None:</span>
+<span class="c1">#         return dihedral(b1.a1, b1.a2)</span>
+<span class="c1">#</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         a1, a2, a3 = _join_bonds(b1, b2)</span>
+<span class="c1">#         a22, a33, a4 = _join_bonds(b2, b3)</span>
+<span class="c1">#</span>
+<span class="c1">#         assert a22 == a2</span>
+<span class="c1">#         assert a33 == a3</span>
+<span class="c1">#</span>
+<span class="c1">#         return dihedral(a1, a2, a3, a4)</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
 </pre></div>
 
            </div>
@@ -251,7 +411,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.7.0',
+            VERSION:'0.7.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

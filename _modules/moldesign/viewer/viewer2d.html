@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>moldesign.viewer.viewer2d &mdash; Molecular Design Toolkit 0.7.0 documentation</title>
+  <title>moldesign.viewer.viewer2d &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Molecular Design Toolkit 0.7.0 documentation" href="../../../index.html"/>
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.3
               </div>
             
           
@@ -80,13 +80,37 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents</span></p>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
 </ul>
 
             
@@ -100,7 +124,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../contents.html">Molecular Design Toolkit</a>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
       </nav>
 
 
@@ -115,7 +139,7 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
       
           <li><a href="../../index.html">Module code</a> &raquo;</li>
       
@@ -151,16 +175,15 @@
 
 <span class="kn">from</span> <span class="nn">nbmolviz.widget2d</span> <span class="kn">import</span> <span class="n">MolViz2DBaseWidget</span>
 
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
 <span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">import</span> <span class="nn">moldesign.units</span> <span class="kn">as</span> <span class="nn">u</span>
-<span class="kn">from</span> <span class="nn">moldesign.data</span> <span class="kn">import</span> <span class="n">color_rotation</span>
-<span class="kn">from</span> <span class="nn">moldesign.molecules</span> <span class="kn">import</span> <span class="n">AtomList</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">toplevel</span><span class="p">,</span> <span class="n">ColorMixin</span>
 
 
 <span class="nd">@toplevel</span>
-<div class="viewcode-block" id="ChemicalGraphViewer"><a class="viewcode-back" href="../../../toplevel.html#moldesign.ChemicalGraphViewer">[docs]</a><span class="k">class</span> <span class="nc">ChemicalGraphViewer</span><span class="p">(</span><span class="n">MolViz2DBaseWidget</span><span class="p">,</span> <span class="n">ColorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="ChemicalGraphViewer"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.ChemicalGraphViewer">[docs]</a><span class="k">class</span> <span class="nc">ChemicalGraphViewer</span><span class="p">(</span><span class="n">MolViz2DBaseWidget</span><span class="p">,</span> <span class="n">ColorMixin</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Create a JSON-format graph representing the chemical structure and draw it using the</span>
 <span class="sd">    NBMolViz 2D widget.</span>
 
@@ -186,7 +209,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">AtomList</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span>
@@ -195,7 +218,15 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Refusing to draw more than 200 atoms in 2D visualization. &#39;</span>
                              <span class="s1">&#39;Override this with _forcebig=True&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">formal_charge</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="n">_charge_str</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">formal_charge</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="n">names</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">atom_indices</span> <span class="o">=</span> <span class="p">{</span><span class="n">atom</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selection_group</span> <span class="o">=</span> <span class="bp">None</span>
@@ -209,10 +240,10 @@
 <span class="sd">        so we send NOTHING&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">make_none</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">()</span>
 
-<div class="viewcode-block" id="ChemicalGraphViewer.to_graph"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.ChemicalGraphViewer.to_graph">[docs]</a>    <span class="k">def</span> <span class="nf">to_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">):</span>
+<div class="viewcode-block" id="ChemicalGraphViewer.to_graph"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.ChemicalGraphViewer.to_graph">[docs]</a>    <span class="k">def</span> <span class="nf">to_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">):</span>
         <span class="n">nodes</span><span class="p">,</span> <span class="n">links</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">atom1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
-            <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">atom</span><span class="o">=</span><span class="n">atom1</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">i1</span><span class="p">))</span>
+            <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">atom</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="n">i1</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">i1</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">atom1</span><span class="o">.</span><span class="n">atnum</span> <span class="o">==</span> <span class="mi">6</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">carbon_labels</span><span class="p">:</span>
                 <span class="n">nodes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;atom&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
                                   <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
@@ -227,20 +258,20 @@
         <span class="n">graph</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nodes</span><span class="o">=</span><span class="n">nodes</span><span class="p">,</span> <span class="n">links</span><span class="o">=</span><span class="n">links</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">graph</span></div>
 
-<div class="viewcode-block" id="ChemicalGraphViewer.get_atom_index"><a class="viewcode-back" href="../../../toplevel.html#moldesign.ChemicalGraphViewer.get_atom_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_atom_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+<div class="viewcode-block" id="ChemicalGraphViewer.get_atom_index"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.ChemicalGraphViewer.get_atom_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_atom_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the atom&#39;s index in this object&#39;s storage</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_indices</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="ChemicalGraphViewer.unset_color"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.ChemicalGraphViewer.unset_color">[docs]</a>    <span class="k">def</span> <span class="nf">unset_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ChemicalGraphViewer.unset_color"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.ChemicalGraphViewer.unset_color">[docs]</a>    <span class="k">def</span> <span class="nf">unset_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">atoms</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ChemicalGraphViewer.handle_click"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.ChemicalGraphViewer.handle_click">[docs]</a>    <span class="k">def</span> <span class="nf">handle_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trait_name</span><span class="p">,</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
+<div class="viewcode-block" id="ChemicalGraphViewer.handle_click"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.ChemicalGraphViewer.handle_click">[docs]</a>    <span class="k">def</span> <span class="nf">handle_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trait_name</span><span class="p">,</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
         <span class="n">clicked_atoms</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">new</span><span class="p">]]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection_group</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">selection_group</span><span class="o">.</span><span class="n">update_selections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;atoms&#39;</span><span class="p">:</span> <span class="n">clicked_atoms</span><span class="p">})</span></div>
 
-<div class="viewcode-block" id="ChemicalGraphViewer.handle_selection_event"><a class="viewcode-back" href="../../../toplevel.html#moldesign.ChemicalGraphViewer.handle_selection_event">[docs]</a>    <span class="k">def</span> <span class="nf">handle_selection_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+<div class="viewcode-block" id="ChemicalGraphViewer.handle_selection_event"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.ChemicalGraphViewer.handle_selection_event">[docs]</a>    <span class="k">def</span> <span class="nf">handle_selection_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Highlight atoms in response to a selection event</span>
 
 <span class="sd">        Args:</span>
@@ -251,8 +282,22 @@
                 <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">selection</span><span class="p">[</span><span class="s1">&#39;atoms&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_indices</span><span class="p">])</span></div></div>
 
 
+<span class="k">def</span> <span class="nf">_charge_str</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">q_e</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">elif</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;+&#39;</span>
+    <span class="k">elif</span> <span class="n">q</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;-&#39;</span>
+    <span class="k">elif</span> <span class="n">q</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;+</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">q</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+
+
 <span class="nd">@toplevel</span>
-<div class="viewcode-block" id="DistanceGraphViewer"><a class="viewcode-back" href="../../../toplevel.html#moldesign.DistanceGraphViewer">[docs]</a><span class="k">class</span> <span class="nc">DistanceGraphViewer</span><span class="p">(</span><span class="n">ChemicalGraphViewer</span><span class="p">):</span>
+<div class="viewcode-block" id="DistanceGraphViewer"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.DistanceGraphViewer">[docs]</a><span class="k">class</span> <span class="nc">DistanceGraphViewer</span><span class="p">(</span><span class="n">ChemicalGraphViewer</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Create a 2D graph that includes edges with 3D information. This gives a 2D chemical that</span>
 <span class="sd">    shows contacts from 3D space.</span>
 
@@ -286,7 +331,7 @@
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;charge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">charge</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">DistanceGraphViewer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="DistanceGraphViewer.to_graph"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.DistanceGraphViewer.to_graph">[docs]</a>    <span class="k">def</span> <span class="nf">to_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">):</span>
+<div class="viewcode-block" id="DistanceGraphViewer.to_graph"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.DistanceGraphViewer.to_graph">[docs]</a>    <span class="k">def</span> <span class="nf">to_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">):</span>
         <span class="n">graph</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DistanceGraphViewer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_graph</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
 
         <span class="c1"># Deal with covalent bonds</span>
@@ -319,7 +364,7 @@
 
         <span class="k">return</span> <span class="n">graph</span></div>
 
-<div class="viewcode-block" id="DistanceGraphViewer.draw_contacts"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.DistanceGraphViewer.draw_contacts">[docs]</a>    <span class="k">def</span> <span class="nf">draw_contacts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">2.25</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
+<div class="viewcode-block" id="DistanceGraphViewer.draw_contacts"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.DistanceGraphViewer.draw_contacts">[docs]</a>    <span class="k">def</span> <span class="nf">draw_contacts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">2.25</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
                       <span class="n">label</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">atom1</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="n">atom2</span><span class="o">.</span><span class="n">index</span><span class="p">:</span> <span class="k">continue</span>
@@ -396,7 +441,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.7.0',
+            VERSION:'0.7.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

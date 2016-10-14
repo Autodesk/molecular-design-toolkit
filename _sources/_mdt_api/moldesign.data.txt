@@ -1,0 +1,186 @@
+========
+Data API
+========
+
+Classes
+=======
+
+``CyclicList`` class
+--------------------
+
+.. autoclass:: moldesign.data.CyclicList
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Functions
+=========
+
+``print_environment`` function
+------------------------------
+
+.. autofunction:: moldesign.data.print_environment
+
+Data
+====
+
+``ALL_BASES`` 
+--------------
+
+.. autoattribute:: moldesign.data.ALL_BASES
+
+``AMINO_NAMES`` 
+----------------
+
+.. autoattribute:: moldesign.data.AMINO_NAMES
+
+``ATOMIC_MASSES`` 
+------------------
+
+.. autoattribute:: moldesign.data.ATOMIC_MASSES
+
+``ATOMIC_NUMBERS`` 
+-------------------
+
+.. autoattribute:: moldesign.data.ATOMIC_NUMBERS
+
+``BACKBONES`` 
+--------------
+
+.. autoattribute:: moldesign.data.BACKBONES
+
+``BASES`` 
+----------
+
+.. autoattribute:: moldesign.data.BASES
+
+``BIOPOLYMER_TYPES`` 
+---------------------
+
+.. autoattribute:: moldesign.data.BIOPOLYMER_TYPES
+
+``CHAIN_MONOMER_NAMES`` 
+------------------------
+
+.. autoattribute:: moldesign.data.CHAIN_MONOMER_NAMES
+
+``COLOR_LIST`` 
+---------------
+
+.. autoattribute:: moldesign.data.COLOR_LIST
+
+``DBASES`` 
+-----------
+
+.. autoattribute:: moldesign.data.DBASES
+
+``DEFAULT_FORCE_TOLERANCE`` 
+----------------------------
+
+.. autoattribute:: moldesign.data.DEFAULT_FORCE_TOLERANCE
+
+``ELEMENTS`` 
+-------------
+
+.. autoattribute:: moldesign.data.ELEMENTS
+
+``IONS`` 
+---------
+
+.. autoattribute:: moldesign.data.IONS
+
+``NUCLEIC_NAMES`` 
+------------------
+
+.. autoattribute:: moldesign.data.NUCLEIC_NAMES
+
+``PACKAGEPATH`` 
+----------------
+
+.. autoattribute:: moldesign.data.PACKAGEPATH
+
+``RBASES`` 
+-----------
+
+.. autoattribute:: moldesign.data.RBASES
+
+``RESIDUE_BONDS`` 
+------------------
+
+.. autoattribute:: moldesign.data.RESIDUE_BONDS
+
+``RESIDUE_DESCRIPTIONS`` 
+-------------------------
+
+.. autoattribute:: moldesign.data.RESIDUE_DESCRIPTIONS
+
+``RESIDUE_ONE_LETTER`` 
+-----------------------
+
+.. autoattribute:: moldesign.data.RESIDUE_ONE_LETTER
+
+``RESIDUE_TYPES`` 
+------------------
+
+.. autoattribute:: moldesign.data.RESIDUE_TYPES
+
+``RESTYPES`` 
+-------------
+
+.. autoattribute:: moldesign.data.RESTYPES
+
+``SYMBOLS`` 
+------------
+
+.. autoattribute:: moldesign.data.SYMBOLS
+
+``_bondfilename`` 
+------------------
+
+.. autoattribute:: moldesign.data._bondfilename
+
+``atnum`` 
+----------
+
+.. autoattribute:: moldesign.data.atnum
+
+``b`` 
+------
+
+.. autoattribute:: moldesign.data.b
+
+``base`` 
+---------
+
+.. autoattribute:: moldesign.data.base
+
+``color_rotation`` 
+-------------------
+
+.. autoattribute:: moldesign.data.color_rotation
+
+``mass`` 
+---------
+
+.. autoattribute:: moldesign.data.mass
+
+``name`` 
+---------
+
+.. autoattribute:: moldesign.data.name
+
+``namelist`` 
+-------------
+
+.. autoattribute:: moldesign.data.namelist
+
+``resname`` 
+------------
+
+.. autoattribute:: moldesign.data.resname
+
+``typename`` 
+-------------
+
+.. autoattribute:: moldesign.data.typename
+

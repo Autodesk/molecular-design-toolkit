@@ -1,0 +1,767 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>3. Tools API &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/>
+        <link rel="next" title="4. Energy models API" href="moldesign.models.html"/>
+        <link rel="prev" title="2. Widgets API" href="moldesign.widgets.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">3. Tools API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#functions">3.1. Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#add-hydrogen-function">3.1.1. <code class="docutils literal"><span class="pre">add_hydrogen</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-missing-data-function">3.1.2. <code class="docutils literal"><span class="pre">add_missing_data</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-water-function">3.1.3. <code class="docutils literal"><span class="pre">add_water</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#assign-forcefield-function">3.1.4. <code class="docutils literal"><span class="pre">assign_forcefield</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#assign-formal-charges-function">3.1.5. <code class="docutils literal"><span class="pre">assign_formal_charges</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build-assembly-function">3.1.6. <code class="docutils literal"><span class="pre">build_assembly</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build-bdna-function">3.1.7. <code class="docutils literal"><span class="pre">build_bdna</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build-dna-helix-function">3.1.8. <code class="docutils literal"><span class="pre">build_dna_helix</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#calc-am1-bcc-charges-function">3.1.9. <code class="docutils literal"><span class="pre">calc_am1_bcc_charges</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#calc-gasteiger-charges-function">3.1.10. <code class="docutils literal"><span class="pre">calc_gasteiger_charges</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#guess-bond-orders-function">3.1.11. <code class="docutils literal"><span class="pre">guess_bond_orders</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#guess-histidine-states-function">3.1.12. <code class="docutils literal"><span class="pre">guess_histidine_states</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mutate-function">3.1.13. <code class="docutils literal"><span class="pre">mutate</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parameterize-function">3.1.14. <code class="docutils literal"><span class="pre">parameterize</span></code> function</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#unexported-api">3.2. Unexported API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#atnum-valence-charge">3.2.1. <code class="docutils literal"><span class="pre">ATNUM_VALENCE_CHARGE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ion-charge">3.2.2. <code class="docutils literal"><span class="pre">ION_CHARGE</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>3. Tools API</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_mdt_api/moldesign.tools.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tools-api">
+<h1>3. Tools API<a class="headerlink" href="#tools-api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="functions">
+<h2>3.1. Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="add-hydrogen-function">
+<h3>3.1.1. <code class="docutils literal"><span class="pre">add_hydrogen</span></code> function<a class="headerlink" href="#add-hydrogen-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.add_hydrogen">
+<code class="descclassname">moldesign.</code><code class="descname">add_hydrogen</code><span class="sig-paren">(</span><em>mol</em>, <em>ph=None</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openbabel.html#add_hydrogen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.add_hydrogen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add hydrogens to saturate atomic valences.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to saturate</li>
+<li><strong>ph</strong> (<em>float</em>) &#8211; Assign formal charges and protonation using pH model; if None (the default),
+neutral protonation will be assigned where possible.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">New molecule with all valences saturated</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="add-missing-data-function">
+<h3>3.1.2. <code class="docutils literal"><span class="pre">add_missing_data</span></code> function<a class="headerlink" href="#add-missing-data-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.add_missing_data">
+<code class="descclassname">moldesign.</code><code class="descname">add_missing_data</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/tools/topology.html#add_missing_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.add_missing_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add missing hydrogens, bond orders, and formal charges to a structure (often from the PDB)</p>
+<p>Specifically, this is a convenience function that runs:
+<code class="docutils literal"><span class="pre">mdt.guess_bond_orders</span></code>, <code class="docutils literal"><span class="pre">mdt.add_hydrogen</span></code>, and <code class="docutils literal"><span class="pre">mdt.assign_formal_charges</span></code></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This does NOT add missing residues to biochemical structures. This functionality will be
+available as <code class="xref py py-meth docutils literal"><span class="pre">moldesign.add_missing_residues()</span></code></p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule to clean</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">cleaned version of the molecule</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="add-water-function">
+<h3>3.1.3. <code class="docutils literal"><span class="pre">add_water</span></code> function<a class="headerlink" href="#add-water-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.add_water">
+<code class="descclassname">moldesign.</code><code class="descname">add_water</code><span class="sig-paren">(</span><em>mol</em>, <em>min_box_size=None</em>, <em>padding=None</em>, <em>ion_concentration=None</em>, <em>neutralize=True</em>, <em>positive_ion='Na+'</em>, <em>negative_ion='Cl-'</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/pdbfixer_interface.html#add_water"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.add_water" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solvate a molecule in a water box with optional ions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; solute molecule</li>
+<li><strong>min_box_size</strong> (<em>u.Scalar[length] or u.Vector[length]</em>) &#8211; size of the water box - either
+a vector of x,y,z dimensions, or just a uniform cube length. Either this or
+<code class="docutils literal"><span class="pre">padding</span></code> (or both) must be passed</li>
+<li><strong>padding</strong> (<em>u.Scalar[length]</em>) &#8211; distance to edge of water box from the solute in each dimension</li>
+<li><strong>neutralize</strong> (<em>bool</em>) &#8211; add ions to neutralize solute charge (in
+addition to specified ion concentration)</li>
+<li><strong>positive_ion</strong> (<em>str</em>) &#8211; type of positive ions to add, if needed. Allowed values
+(from OpenMM modeller) are Cs, K, Li, Na (the default) and Rb</li>
+<li><strong>negative_ion</strong> (<em>str</em>) &#8211; type of negative ions to add, if needed. Allowed values
+(from OpenMM modeller) are Cl (the default), Br, F, and I</li>
+<li><strong>ion_concentration</strong> (<em>float or u.Scalar[molarity]</em>) &#8211; ionic concentration in addition to
+whatever is needed to neutralize the solute. (if float is passed, we assume the
+number is Molar)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">new Molecule object containing both solvent and solute</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="assign-forcefield-function">
+<h3>3.1.4. <code class="docutils literal"><span class="pre">assign_forcefield</span></code> function<a class="headerlink" href="#assign-forcefield-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.assign_forcefield">
+<code class="descclassname">moldesign.</code><code class="descname">assign_forcefield</code><span class="sig-paren">(</span><em>mol</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#assign_forcefield"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.assign_forcefield" title="Permalink to this definition">¶</a></dt>
+<dd><p>run_tleap(mol, forcefields=None, parameters=None, engine=None, image=None, wait=True, jobname=None, display=True)
+Drives tleap to create a prmtop and inpcrd file. Specifically uses the AmberTools 16
+tleap distribution.</p>
+<p>Defaults are as recommended in the ambertools manual.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to set up</li>
+<li><strong>forcefields</strong> (<em>List[str]</em>) &#8211; list of the names of forcefields to use
+(see AmberTools manual for descriptions)</li>
+<li><strong>parameters</strong> (<em>List[ExtraAmberParameters]</em>) &#8211; (optional) list of amber parameters
+for non-standard residues</li>
+<li><strong>engine</strong> (<em>pyccc.Engine</em>) &#8211; Engine to run this job on (default:
+<code class="docutils literal"><span class="pre">moldesign.compute.get_engine()</span></code>)</li>
+<li><strong>image</strong> (<em>str</em>) &#8211; URL for the docker image</li>
+<li><strong>wait</strong> (<em>bool</em>) &#8211; if True, block until this function completes and return the function&#8217;s
+return value. Otherwise, return a job object immediately that can be queried later.</li>
+<li><strong>jobname</strong> &#8211; argument for <a class="reference internal" href="../_moldesign_api/moldesign.compute.html#moldesign.compute.compute.run_job" title="moldesign.compute.compute.run_job"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.compute.compute.run_job()</span></code></a></li>
+<li><strong>display</strong> (<em>bool</em>) &#8211; if True, show logging output for this job</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p>Ambertools Manual, <a class="reference external" href="http://ambermd.org/doc12/Amber16.pdf">http://ambermd.org/doc12/Amber16.pdf</a>. See page 33 for forcefield
+recommendations.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="assign-formal-charges-function">
+<h3>3.1.5. <code class="docutils literal"><span class="pre">assign_formal_charges</span></code> function<a class="headerlink" href="#assign-formal-charges-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.assign_formal_charges">
+<code class="descclassname">moldesign.</code><code class="descname">assign_formal_charges</code><span class="sig-paren">(</span><em>mol</em>, <em>ignore_nonzero=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/tools/topology.html#assign_formal_charges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.assign_formal_charges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign formal charges to C,N,O,F atoms in this molecule based on valence</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to assign formal charges to. The formal charges of its
+atoms and its total charge will be adjusted in place.</li>
+<li><strong>ignore_nonzero</strong> (<em>bool</em>) &#8211; If formal charge is already set to a nonzero value, ignore this atom</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method ONLY applies to C,N, O and F, based on a simple valence model.
+These results should be manually inspected for consistency.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">UnhandledValenceError</span></code> &#8211; for cases not handled by the simple valence model</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<dl class="docutils">
+<dt>These assignments are illustrated by the formal charge patterns in</dt>
+<dd><a class="reference external" href="http://www.chem.ucla.edu/~harding/tutorials/formalcharge.pdf">http://www.chem.ucla.edu/~harding/tutorials/formalcharge.pdf</a></dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="build-assembly-function">
+<h3>3.1.6. <code class="docutils literal"><span class="pre">build_assembly</span></code> function<a class="headerlink" href="#build-assembly-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.build_assembly">
+<code class="descclassname">moldesign.</code><code class="descname">build_assembly</code><span class="sig-paren">(</span><em>mol</em>, <em>assembly_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/tools/build.html#build_assembly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.build_assembly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create biological assembly using a bioassembly specification.</p>
+<p>This routine builds a biomolecular assembly using the specification from a PDB header (if
+present, this data can be found in the  &#8220;REMARK 350&#8221; lines in the PDB file). Assemblies are
+author-assigned structures created by copying, translating, and rotating a subset of the
+chains in the PDB file.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies">http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/biological-assemblies</a></p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule with assembly data (assembly data will be created by the
+PDB parser at <code class="docutils literal"><span class="pre">molecule.properties.bioassembly</span></code>)</li>
+<li><strong>assembly_name</strong> (<em>str OR int</em>) &#8211; id of the biomolecular assembly to build.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>mol</strong> &#8211; molecule containing the complete assembly</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code> &#8211; If the molecule does not contain any biomolecular assembly data</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code> &#8211; If the specified assembly is not present</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="build-bdna-function">
+<h3>3.1.7. <code class="docutils literal"><span class="pre">build_bdna</span></code> function<a class="headerlink" href="#build-bdna-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.build_bdna">
+<code class="descclassname">moldesign.</code><code class="descname">build_bdna</code><span class="sig-paren">(</span><em>sequence</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#build_bdna"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.build_bdna" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses Ambertools&#8217; Nucleic Acid Builder to build a 3D double-helix B-DNA structure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sequence</strong> (<em>str</em>) &#8211; DNA sequence for one of the strands (a complementary sequence will
+automatically be created)</li>
+<li><strong>engine</strong> (<em>pyccc.Engine</em>) &#8211; Engine to run this job on (default:
+<code class="docutils literal"><span class="pre">moldesign.compute.get_engine()</span></code>)</li>
+<li><strong>image</strong> (<em>str</em>) &#8211; URL for the docker image</li>
+<li><strong>wait</strong> (<em>bool</em>) &#8211; if True, block until this function completes and return the function&#8217;s
+return value. Otherwise, return a job object immediately that can be queried later.</li>
+<li><strong>jobname</strong> &#8211; argument for <a class="reference internal" href="../_moldesign_api/moldesign.compute.html#moldesign.compute.compute.run_job" title="moldesign.compute.compute.run_job"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.compute.compute.run_job()</span></code></a></li>
+<li><strong>display</strong> (<em>bool</em>) &#8211; if True, show logging output for this job</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">B-DNA double helix</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="build-dna-helix-function">
+<h3>3.1.8. <code class="docutils literal"><span class="pre">build_dna_helix</span></code> function<a class="headerlink" href="#build-dna-helix-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.build_dna_helix">
+<code class="descclassname">moldesign.</code><code class="descname">build_dna_helix</code><span class="sig-paren">(</span><em>sequence</em>, <em>helix_type='B'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#build_dna_helix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.build_dna_helix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses Ambertools&#8217; Nucleic Acid Builder to build a 3D DNA double-helix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sequence</strong> (<em>str</em>) &#8211; DNA sequence for one of the strands (a complementary sequence will
+automatically be created)</li>
+<li><strong>helix_type</strong> (<em>str</em>) &#8211; Type of helix - &#8216;A&#8217;=Arnott A-DNA
+&#8216;B&#8217;=B-DNA (from standard templates and helical params),
+&#8216;LB&#8217;=Langridge B-DNA,
+&#8216;AB&#8217;=Arnott B-DNA,
+&#8216;SB&#8217;=Sasisekharan left-handed B-DNA</li>
+<li><strong>engine</strong> (<em>pyccc.Engine</em>) &#8211; Engine to run this job on (default:
+<code class="docutils literal"><span class="pre">moldesign.compute.get_engine()</span></code>)</li>
+<li><strong>image</strong> (<em>str</em>) &#8211; URL for the docker image</li>
+<li><strong>wait</strong> (<em>bool</em>) &#8211; if True, block until this function completes and return the function&#8217;s
+return value. Otherwise, return a job object immediately that can be queried later.</li>
+<li><strong>jobname</strong> &#8211; argument for <a class="reference internal" href="../_moldesign_api/moldesign.compute.html#moldesign.compute.compute.run_job" title="moldesign.compute.compute.run_job"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.compute.compute.run_job()</span></code></a></li>
+<li><strong>display</strong> (<em>bool</em>) &#8211; if True, show logging output for this job</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>All helix types except &#8216;B&#8217; are taken from fiber diffraction data (see the refernce for details)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">B-DNA double helix</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p>See NAB / AmberTools documentation: <a class="reference external" href="http://ambermd.org/doc12/Amber16.pdf">http://ambermd.org/doc12/Amber16.pdf</a>, pg 771-2</p>
+</dd></dl>
+
+</div>
+<div class="section" id="calc-am1-bcc-charges-function">
+<h3>3.1.9. <code class="docutils literal"><span class="pre">calc_am1_bcc_charges</span></code> function<a class="headerlink" href="#calc-am1-bcc-charges-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.calc_am1_bcc_charges">
+<code class="descclassname">moldesign.</code><code class="descname">calc_am1_bcc_charges</code><span class="sig-paren">(</span><em>mol</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#calc_am1_bcc_charges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.calc_am1_bcc_charges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate am1 bcc charges</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; assign partial charges to this molecule
+(they will be stored at <code class="docutils literal"><span class="pre">mol.properties['am1-bcc']</span></code>)</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This will implicity run an AM1 energy minimization before calculating the final
+partial charges. For more control over this process, use the
+<code class="docutils literal"><span class="pre">moldesign.models.SQMPotential</span></code> energy model to calculate the charges.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">AM1-BCC partial charges on each atom</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Mapping[moldesign.Atom, units.Scalar[charge]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="calc-gasteiger-charges-function">
+<h3>3.1.10. <code class="docutils literal"><span class="pre">calc_gasteiger_charges</span></code> function<a class="headerlink" href="#calc-gasteiger-charges-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.calc_gasteiger_charges">
+<code class="descclassname">moldesign.</code><code class="descname">calc_gasteiger_charges</code><span class="sig-paren">(</span><em>mol</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#calc_gasteiger_charges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.calc_gasteiger_charges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate gasteiger charges</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; assign partial charges to this molecule</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>gasteiger partial charges on each atom</dt>
+<dd>(they will be stored at <code class="docutils literal"><span class="pre">mol.properties['gasteiger']</span></code>)</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Mapping[moldesign.Atom, units.Scalar[charge]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="guess-bond-orders-function">
+<h3>3.1.11. <code class="docutils literal"><span class="pre">guess_bond_orders</span></code> function<a class="headerlink" href="#guess-bond-orders-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.guess_bond_orders">
+<code class="descclassname">moldesign.</code><code class="descname">guess_bond_orders</code><span class="sig-paren">(</span><em>mol</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openbabel.html#guess_bond_orders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.guess_bond_orders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use OpenBabel to guess bond orders using geometry and functional group templates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to perceive the bonds of</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">New molecule with assigned bonds</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="guess-histidine-states-function">
+<h3>3.1.12. <code class="docutils literal"><span class="pre">guess_histidine_states</span></code> function<a class="headerlink" href="#guess-histidine-states-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.guess_histidine_states">
+<code class="descclassname">moldesign.</code><code class="descname">guess_histidine_states</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/tools/topology.html#guess_histidine_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.guess_histidine_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempt to assign protonation states to histidine residues.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function is highly unlikely to give accurate results! It is intended for convenience
+when histidine states can easily be guessed from already-present hydrogens or when they are
+judged to be relatively unimportant.</p>
+</div>
+<dl class="docutils">
+<dt>This can be done simply by renaming HIS residues:</dt>
+<dd><ol class="first last arabic simple">
+<li>If HE2 and HD1 are present, the residue is renamed to HIP</li>
+<li>If only HE2 is present, the residue is renamed to HIE</li>
+<li>Otherwise, the residue is renamed to HID (the most common form)</li>
+</ol>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule to change (in place)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="mutate-function">
+<h3>3.1.13. <code class="docutils literal"><span class="pre">mutate</span></code> function<a class="headerlink" href="#mutate-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.mutate">
+<code class="descclassname">moldesign.</code><code class="descname">mutate</code><span class="sig-paren">(</span><em>mol</em>, <em>mutationmap</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/pdbfixer_interface.html#mutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.mutate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="parameterize-function">
+<h3>3.1.14. <code class="docutils literal"><span class="pre">parameterize</span></code> function<a class="headerlink" href="#parameterize-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.parameterize">
+<code class="descclassname">moldesign.</code><code class="descname">parameterize</code><span class="sig-paren">(</span><em>mol</em>, <em>charges='esp'</em>, <em>ffname='gaff2'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#parameterize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.parameterize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameterize <code class="docutils literal"><span class="pre">mol</span></code>, typically using GAFF parameters.</p>
+<p>This will both assign a forcefield to the molecule (at <code class="docutils literal"><span class="pre">mol.ff</span></code>) and produce the parameters
+so that they can be used in other systems (e.g., so that this molecule can be simulated
+embedded in a larger protein)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">&#8216;am1-bcc&#8217; and &#8216;gasteiger&#8217; partial charges will be automatically computed if necessary.
+Other charge types must be precomputed.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; </li>
+<li><strong>charges</strong> (<em>str or dict</em>) &#8211; <dl class="docutils">
+<dt>what partial charges to use? Can be a dict (<code class="docutils literal"><span class="pre">{atom:charge}</span></code>) OR</dt>
+<dd>a string, in which case charges will be read from</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">mol.properties.[charges</span> <span class="pre">name]</span></code>; typical values will be &#8216;esp&#8217;, &#8216;mulliken&#8217;,
+&#8216;am1-bcc&#8217;, etc. Use &#8216;zero&#8217; to set all charges to 0 (for QM/MM and testing)</p>
+</li>
+<li><strong>ffname</strong> (<em>str</em>) &#8211; Name of the gaff-like forcefield file (default: gaff2)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Parameters for the molecule; this object can be used to create</dt>
+<dd><p class="first last">forcefield parameters for other systems that contain this molecule</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../_moldesign_api/moldesign.interfaces.html#moldesign.interfaces.ambertools.ExtraAmberParameters" title="moldesign.interfaces.ambertools.ExtraAmberParameters">ExtraAmberParameters</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="unexported-api">
+<h2>3.2. Unexported API<a class="headerlink" href="#unexported-api" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="atnum-valence-charge">
+<h3>3.2.1. <code class="docutils literal"><span class="pre">ATNUM_VALENCE_CHARGE</span></code><a class="headerlink" href="#atnum-valence-charge" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="moldesign.tools.ATNUM_VALENCE_CHARGE">
+<code class="descclassname">moldesign.tools.</code><code class="descname">ATNUM_VALENCE_CHARGE</code><em class="property"> = {8: {1: -1, 2: 0, 3: 1}, 9: {1: 0, 2: 1}, 6: {3: -1, 4: 0}, 7: {2: -1, 3: 0, 4: 1}}</em><a class="headerlink" href="#moldesign.tools.ATNUM_VALENCE_CHARGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>dict() -&gt; new empty dictionary
+dict(mapping) -&gt; new dictionary initialized from a mapping object&#8217;s</p>
+<blockquote>
+<div>(key, value) pairs</div></blockquote>
+<dl class="docutils">
+<dt>dict(iterable) -&gt; new dictionary initialized as if via:</dt>
+<dd><p class="first">d = {}
+for k, v in iterable:</p>
+<blockquote class="last">
+<div>d[k] = v</div></blockquote>
+</dd>
+<dt>dict(<a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs) -&gt; new dictionary initialized with the name=value pairs</dt>
+<dd>in the keyword argument list.  For example:  dict(one=1, two=2)</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="ion-charge">
+<h3>3.2.2. <code class="docutils literal"><span class="pre">ION_CHARGE</span></code><a class="headerlink" href="#ion-charge" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="moldesign.tools.ION_CHARGE">
+<code class="descclassname">moldesign.tools.</code><code class="descname">ION_CHARGE</code><em class="property"> = {1: 1, 19: 1, 20: 2, 53: -1, 35: -1, 17: -1, 9: -1, 11: 1, 12: 2}</em><a class="headerlink" href="#moldesign.tools.ION_CHARGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>dict() -&gt; new empty dictionary
+dict(mapping) -&gt; new dictionary initialized from a mapping object&#8217;s</p>
+<blockquote>
+<div>(key, value) pairs</div></blockquote>
+<dl class="docutils">
+<dt>dict(iterable) -&gt; new dictionary initialized as if via:</dt>
+<dd><p class="first">d = {}
+for k, v in iterable:</p>
+<blockquote class="last">
+<div>d[k] = v</div></blockquote>
+</dd>
+<dt>dict(<a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs) -&gt; new dictionary initialized with the name=value pairs</dt>
+<dd>in the keyword argument list.  For example:  dict(one=1, two=2)</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="moldesign.models.html" class="btn btn-neutral float-right" title="4. Energy models API" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="moldesign.widgets.html" class="btn btn-neutral" title="2. Widgets API" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

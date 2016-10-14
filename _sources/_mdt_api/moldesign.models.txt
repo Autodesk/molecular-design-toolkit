@@ -1,0 +1,95 @@
+=================
+Energy models API
+=================
+
+Classes
+=======
+
+``B3LYP`` class
+---------------
+
+.. autoclass:: moldesign.models.B3LYP
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``CASSCF`` class
+----------------
+
+.. autoclass:: moldesign.models.CASSCF
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``DFT`` class
+-------------
+
+.. autoclass:: moldesign.models.DFT
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``ForceField`` class
+--------------------
+
+.. autoclass:: moldesign.models.ForceField
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``GAFF`` class
+--------------
+
+.. autoclass:: moldesign.models.GAFF
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``HarmonicOscillator`` class
+----------------------------
+
+.. autoclass:: moldesign.models.HarmonicOscillator
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``MP2`` class
+-------------
+
+.. autoclass:: moldesign.models.MP2
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``OpenMMPotential`` class
+-------------------------
+
+.. autoclass:: moldesign.models.OpenMMPotential
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``PySCFPotential`` class
+------------------------
+
+.. autoclass:: moldesign.models.PySCFPotential
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``RHF`` class
+-------------
+
+.. autoclass:: moldesign.models.RHF
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``Spring`` class
+----------------
+
+.. autoclass:: moldesign.models.Spring
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

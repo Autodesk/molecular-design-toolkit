@@ -1,0 +1,550 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.widgets.geombuilder &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.widgets.geombuilder</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.widgets.geombuilder</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="kn">as</span> <span class="nn">ipy</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">moldesign.viewer</span> <span class="kn">import</span> <span class="n">BondClicker</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+
+<span class="kn">from</span> <span class="nn">moldesign.uibase</span> <span class="kn">import</span> <span class="n">ViewerToolBase</span><span class="p">,</span> <span class="n">ReadoutFloatSlider</span>
+
+<span class="k">def</span> <span class="nf">exports</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+    <span class="n">__all__</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">o</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="nd">@exports</span>
+<div class="viewcode-block" id="GeometryBuilder"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder">[docs]</a><span class="k">class</span> <span class="nc">GeometryBuilder</span><span class="p">(</span><span class="n">ViewerToolBase</span><span class="p">):</span>
+    <span class="n">VIEWERTYPE</span> <span class="o">=</span> <span class="n">BondClicker</span>
+
+    <span class="n">MAXDIST</span> <span class="o">=</span> <span class="mf">20.0</span>  <span class="c1"># TODO: we need to set this dynamically</span>
+    <span class="n">NBR2HIGHLIGHT</span> <span class="o">=</span> <span class="s1">&#39;#C5AED8&#39;</span>
+    <span class="n">NBR1HIGHLIGHT</span> <span class="o">=</span> <span class="s1">&#39;#AFC6A8&#39;</span>
+    <span class="n">HIGHLIGHTOPACITY</span> <span class="o">=</span> <span class="mf">0.6</span>
+    <span class="n">POSFMT</span> <span class="o">=</span> <span class="s1">u&#39;{:.3f} </span><span class="se">\u212B</span><span class="s1">&#39;</span>
+    <span class="n">DEGFMT</span> <span class="o">=</span> <span class="s1">u&#39;{:.1f}</span><span class="se">\u00B0</span><span class="s1">&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GeometryBuilder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+
+        <span class="c1"># All numbers here are assumed angstroms and radians for now ...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">DotDict</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_highlighted_bonds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_highlighted_atoms</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">original_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_button</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Clear selection&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clear_selection</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_box</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Label atoms&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_box</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_atoms</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Viewer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">atom_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_click</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">bond_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_click</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection_description</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">HTML</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">subtools</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">clear_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_box</span><span class="p">]),</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">selection_description</span><span class="p">)</span>
+
+        <span class="c1"># Atom manipulation tools</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_slider</span> <span class="o">=</span> <span class="n">ReadoutFloatSlider</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="bp">self</span><span class="o">.</span><span class="n">MAXDIST</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MAXDIST</span><span class="p">,</span>
+                                           <span class="n">description</span><span class="o">=</span><span class="s1">&#39;&lt;b&gt;x&lt;/b&gt;&#39;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POSFMT</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_atom_x</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_slider</span> <span class="o">=</span> <span class="n">ReadoutFloatSlider</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="bp">self</span><span class="o">.</span><span class="n">MAXDIST</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MAXDIST</span><span class="p">,</span>
+                                           <span class="n">description</span><span class="o">=</span><span class="s1">&#39;&lt;b&gt;y&lt;/b&gt;&#39;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POSFMT</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_atom_y</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_slider</span> <span class="o">=</span> <span class="n">ReadoutFloatSlider</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="bp">self</span><span class="o">.</span><span class="n">MAXDIST</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MAXDIST</span><span class="p">,</span>
+                                           <span class="n">description</span><span class="o">=</span><span class="s1">&#39;&lt;b&gt;z&lt;/b&gt;&#39;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POSFMT</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_atom_z</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Bond manipulation tools</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adjust_button</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Adjust entire molecule&#39;</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;end&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">length_slider</span> <span class="o">=</span> <span class="n">ReadoutFloatSlider</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MAXDIST</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POSFMT</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_distance</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">angle_slider</span> <span class="o">=</span> <span class="n">ReadoutFloatSlider</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">179.0</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">DEGFMT</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">angle_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_angle</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_slider</span> <span class="o">=</span> <span class="n">ReadoutFloatSlider</span><span class="p">(</span><span class="nb">min</span><span class="o">=-</span><span class="mf">90.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">360.0</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">4.0</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">DEGFMT</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_dihedral</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_tools</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">VBox</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">adjust_button</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">length_slider</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">angle_slider</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_slider</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom_tools</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">VBox</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">adjust_button</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">x_slider</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">y_slider</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">z_slider</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_button</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Reset geometry&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reset_geometry</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tool_holder</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">VBox</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolpane</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tool_holder</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">reset_button</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GeometryBuilder.set_distance"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.set_distance">[docs]</a>    <span class="k">def</span> <span class="nf">set_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
+        <span class="k">assert</span> <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;bond&#39;</span>
+        <span class="n">dist_in_angstrom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">length_slider</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">mdt</span><span class="o">.</span><span class="n">set_distance</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">dist_in_angstrom</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span> <span class="n">adjustmol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adjust_button</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">set_positions</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GeometryBuilder.set_angle"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.set_angle">[docs]</a>    <span class="k">def</span> <span class="nf">set_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
+        <span class="k">assert</span> <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;bond&#39;</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angle_slider</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">mdt</span><span class="o">.</span><span class="n">set_angle</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">,</span> <span class="n">angle</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">adjustmol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adjust_button</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">set_positions</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GeometryBuilder.set_dihedral"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.set_dihedral">[docs]</a>    <span class="k">def</span> <span class="nf">set_dihedral</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
+        <span class="k">assert</span> <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;bond&#39;</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_slider</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">mdt</span><span class="o">.</span><span class="n">set_dihedral</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">,</span> <span class="n">angle</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">180.0</span><span class="p">,</span>
+                                             <span class="n">adjustmol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adjust_button</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">set_positions</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GeometryBuilder.set_atom_x"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.set_atom_x">[docs]</a>    <span class="k">def</span> <span class="nf">set_atom_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="GeometryBuilder.set_atom_y"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.set_atom_y">[docs]</a>    <span class="k">def</span> <span class="nf">set_atom_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="GeometryBuilder.set_atom_z"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.set_atom_z">[docs]</a>    <span class="k">def</span> <span class="nf">set_atom_z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="GeometryBuilder.label_atoms"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.label_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">label_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_box</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">label_atoms</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">remove_all_labels</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GeometryBuilder.atom_click"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.atom_click">[docs]</a>    <span class="k">def</span> <span class="nf">atom_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+        <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
+        <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">blank</span><span class="p">:</span>  <span class="c1"># select this atom</span>
+            <span class="n">sel</span><span class="o">.</span><span class="n">blank</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;atom&#39;</span>
+            <span class="n">sel</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="n">atom</span>
+
+        <span class="k">elif</span> <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;atom&#39;</span><span class="p">:</span>  <span class="c1"># We&#39;ve selected 2 atoms - i.e. a bond</span>
+            <span class="k">if</span> <span class="n">atom</span> <span class="ow">is</span> <span class="n">sel</span><span class="o">.</span><span class="n">atom</span><span class="p">:</span>  <span class="c1"># clicked twice -&gt; deselect the thing</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clear_selection</span><span class="p">()</span>
+
+            <span class="k">elif</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">sel</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">:</span>  <span class="c1"># select the bond</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_click</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">Bond</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="n">atom</span><span class="p">))</span>  <span class="c1"># turn this into a bond selection</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># select a new atom</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">clear_selection</span><span class="p">(</span><span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
+                <span class="n">sel</span><span class="o">.</span><span class="n">blank</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;atom&#39;</span>
+                <span class="n">sel</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="n">atom</span>
+
+        <span class="k">elif</span> <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;bond&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">sel</span><span class="o">.</span><span class="n">a1_neighbors</span><span class="p">:</span>  <span class="c1"># change the neighboring selection</span>
+                <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span> <span class="o">=</span> <span class="n">atom</span>
+            <span class="k">elif</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2_neighbors</span><span class="p">:</span>
+                <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span> <span class="o">=</span> <span class="n">atom</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># select a new atom</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">clear_selection</span><span class="p">(</span><span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_click</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_redraw_selection</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_tool_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># start with everything disabled</span>
+        <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_tools</span><span class="o">.</span><span class="n">children</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_tools</span><span class="o">.</span><span class="n">children</span><span class="p">:</span> <span class="n">tool</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span><span class="o">.</span><span class="n">blank</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tool_holder</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;Please click on a bond or atom&#39;</span><span class="p">),)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;atom&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adjust_button</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">False</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">tool_holder</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_tools</span><span class="p">,)</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_slider</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c1"># for now</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">y</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_slider</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c1"># for now</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">z_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">z</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">z_slider</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c1"># for now</span>
+
+            <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_tools</span><span class="o">.</span><span class="n">children</span><span class="p">:</span> <span class="n">tool</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;bond&#39;</span><span class="p">:</span>
+            <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adjust_button</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">False</span>
+
+            <span class="c1"># bond length</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">length_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">length_slider</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">length_slider</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;&lt;b&gt;Bond distance&lt;/b&gt; &lt;span style=&quot;color:{c1}&quot;&gt;{a1.name}&#39;</span> \
+                                             <span class="s1">&#39; - {a2.name}&lt;/span&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">a1</span><span class="o">=</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="o">=</span><span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">c1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">HIGHLIGHT_COLOR</span><span class="p">)</span>
+
+            <span class="c1"># Bond angle</span>
+            <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">angle_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">)</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
+                <span class="c1"># self.angle_slider.observe(self.set_angle, &#39;value&#39;)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">angle_slider</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">angle_slider</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;&lt;b&gt;Bond angle&lt;/b&gt; &lt;span style=&quot;color:{c1}&quot;&gt;{a1.name}&#39;</span> \
+                                                <span class="s1">&#39; - {a2.name}&lt;/span&gt; &#39;</span> \
+                                                <span class="s1">&#39;- &lt;span style=&quot;color:{c2}&quot;&gt;{a3.name}&lt;/span&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">a1</span><span class="o">=</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="o">=</span><span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="o">=</span><span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">,</span>
+                        <span class="n">c1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">HIGHLIGHT_COLOR</span><span class="p">,</span> <span class="n">c2</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">NBR2HIGHLIGHT</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">angle_slider</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;no angle associated with this bond&#39;</span>
+                <span class="c1"># self.angle_slider.unobserve(self.set_angle)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">angle_slider</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">True</span>
+
+            <span class="c1"># Dihedral twist</span>
+            <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span> <span class="ow">and</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">dihedral</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">)</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
+                <span class="c1"># self.dihedral_slider.observe(self.set_dihedral, &#39;value&#39;)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_slider</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_slider</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;&lt;b&gt;Dihedral angle&lt;/b&gt; &lt;span style=&quot;color:{c0}&quot;&gt;{a4.name}&lt;/span&gt;&#39;</span> \
+                                                   <span class="s1">&#39; - &lt;span style=&quot;color:{c1}&quot;&gt;{a1.name}&#39;</span> \
+                                                   <span class="s1">&#39; - {a2.name}&lt;/span&gt; &#39;</span> \
+                                                   <span class="s1">&#39;- &lt;span style=&quot;color:{c2}&quot;&gt;{a3.name}&lt;/span&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">a4</span><span class="o">=</span><span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span><span class="p">,</span> <span class="n">a1</span><span class="o">=</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="o">=</span><span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="o">=</span><span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">,</span>
+                        <span class="n">c0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">NBR1HIGHLIGHT</span><span class="p">,</span> <span class="n">c1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">HIGHLIGHT_COLOR</span><span class="p">,</span>
+                        <span class="n">c2</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">NBR2HIGHLIGHT</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_slider</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;not a torsion bond&#39;</span>
+                <span class="c1"># self.dihedral_slider.unobserve(self.set_dihedral)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_slider</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">True</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">tool_holder</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_tools</span><span class="p">]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown selection type </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GeometryBuilder.bond_click"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.bond_click">[docs]</a>    <span class="k">def</span> <span class="nf">bond_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond</span><span class="p">):</span>
+        <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
+        <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;bond&#39;</span><span class="p">:</span>  <span class="c1"># check if this bond is already selected</span>
+            <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">a2</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">a1</span> <span class="ow">is</span> <span class="n">sel</span><span class="o">.</span><span class="n">a1</span> <span class="ow">and</span> <span class="n">a2</span> <span class="ow">is</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">a1</span> <span class="ow">is</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span> <span class="ow">and</span> <span class="n">a2</span> <span class="ow">is</span> <span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clear_selection</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_selection</span><span class="p">(</span><span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
+        <span class="n">sel</span><span class="o">.</span><span class="n">blank</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;bond&#39;</span>
+        <span class="n">sel</span><span class="o">.</span><span class="n">bond</span> <span class="o">=</span> <span class="n">bond</span>
+        <span class="n">sel</span><span class="o">.</span><span class="n">a1</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">a1</span>
+        <span class="n">sel</span><span class="o">.</span><span class="n">a2</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">a2</span>
+        <span class="n">sel</span><span class="o">.</span><span class="n">a1_neighbors</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">bond</span><span class="o">.</span><span class="n">a1</span><span class="o">.</span><span class="n">bond_graph</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">bond</span><span class="o">.</span><span class="n">a2</span><span class="p">])</span>
+        <span class="n">sel</span><span class="o">.</span><span class="n">a2_neighbors</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">bond</span><span class="o">.</span><span class="n">a2</span><span class="o">.</span><span class="n">bond_graph</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">bond</span><span class="o">.</span><span class="n">a1</span><span class="p">])</span>
+        <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span> <span class="o">=</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">a1_neighbors</span><span class="p">:</span>
+            <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a1_neighbors</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2_neighbors</span><span class="p">:</span>
+            <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a2_neighbors</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_redraw_selection</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_highlight_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">HIGHLIGHT_COLOR</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_highlighted_atoms</span> <span class="o">+=</span> <span class="n">atoms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">add_style</span><span class="p">(</span><span class="s1">&#39;vdw&#39;</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="n">atoms</span><span class="p">,</span>
+                              <span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">ATOMRADIUS</span> <span class="o">*</span> <span class="mf">1.1</span><span class="p">,</span>
+                              <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                              <span class="n">opacity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">HIGHLIGHTOPACITY</span><span class="p">,</span>
+                              <span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_unhighlight_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s1">&#39;vdw&#39;</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="n">atoms</span><span class="p">,</span>
+                              <span class="n">radius</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">ATOMRADIUS</span><span class="p">,</span>
+                              <span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_redraw_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># unhighlight any previous selections</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_highlighted_atoms</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_unhighlight_atoms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_highlighted_atoms</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_highlighted_atoms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_highlighted_bonds</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">unset_bond_color</span><span class="p">(</span><span class="n">bond</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_highlighted_bonds</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Set the selection view</span>
+        <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
+        <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;atom&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_highlight_atoms</span><span class="p">([</span><span class="n">sel</span><span class="o">.</span><span class="n">atom</span><span class="p">],</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selection_description</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> \
+                <span class="s2">u&quot;&lt;b&gt;Atom&lt;/b&gt; {atom.name} at coordinates &quot;</span> \
+                <span class="s2">u&quot;x:{p[0]:.3f}, y:{p[1]:.3f}, z:{p[2]:.3f} </span><span class="se">\u212B</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">atom</span><span class="o">=</span><span class="n">sel</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">sel</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;bond&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selection_description</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&lt;b&gt;Bond:&lt;/b&gt; </span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_highlighted_bonds</span> <span class="o">=</span> <span class="p">[</span><span class="n">sel</span><span class="o">.</span><span class="n">bond</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">set_bond_color</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">HIGHLIGHT_COLOR</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">bond</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_highlight_atoms</span><span class="p">([</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">],</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">nmdtond</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Bond</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_highlight_atoms</span><span class="p">([</span><span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">NBR1HIGHLIGHT</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">set_bond_color</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NBR1HIGHLIGHT</span><span class="p">,</span> <span class="n">nmdtond</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_highlighted_bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nmdtond</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">nmdtond</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Bond</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_highlight_atoms</span><span class="p">([</span><span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">NBR2HIGHLIGHT</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">set_bond_color</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NBR2HIGHLIGHT</span><span class="p">,</span> <span class="n">nmdtond</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_highlighted_bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nmdtond</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown selection type </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_tool_state</span><span class="p">()</span>
+
+<div class="viewcode-block" id="GeometryBuilder.clear_selection"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.clear_selection">[docs]</a>    <span class="k">def</span> <span class="nf">clear_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">DotDict</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection_description</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">render</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redraw_selection</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GeometryBuilder.reset_geometry"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.reset_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">reset_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_selection</span><span class="p">(</span><span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_position</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">set_positions</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_redraw_selection</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,658 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.models package &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>moldesign.models package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_moldesign_api/moldesign.models.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-moldesign.models">
+<span id="moldesign-models-package"></span><h1>moldesign.models package<a class="headerlink" href="#module-moldesign.models" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-moldesign.models.amber">
+<span id="moldesign-models-amber-module"></span><h2>moldesign.models.amber module<a class="headerlink" href="#module-moldesign.models.amber" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.models.amber.GAFF">
+<em class="property">class </em><code class="descclassname">moldesign.models.amber.</code><code class="descname">GAFF</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/amber.html#GAFF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.amber.GAFF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.models.ForceField" title="moldesign.models.models.ForceField"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.models.ForceField</span></code></a></p>
+<p>Model the energy using the GAFF forcefield</p>
+<p>This is implemented as a special case of the ForceField energy model; it automates small
+parameterization process</p>
+<dl class="attribute">
+<dt id="moldesign.models.amber.GAFF.PARAMETERS">
+<code class="descname">PARAMETERS</code><em class="property"> = [&lt;Parameter &quot;partial_charges&quot;, type: str&gt;, &lt;Parameter &quot;gaff_version&quot;, type: str&gt;, &lt;Parameter &quot;cutoff&quot;, type: float, units: nanometer&gt;, &lt;Parameter &quot;nonbonded&quot;, type: str&gt;, &lt;Parameter &quot;implicit_solvent&quot;, type: str&gt;, &lt;Parameter &quot;solute_dielectric&quot;, type: float&gt;, &lt;Parameter &quot;solvent_dielectric&quot;, type: float&gt;, &lt;Parameter &quot;ewald_error&quot;, type: float&gt;, &lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2ac390 - exc in __repr__&gt;]</em><a class="headerlink" href="#moldesign.models.amber.GAFF.PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.amber.GAFF.prep">
+<code class="descname">prep</code><span class="sig-paren">(</span><em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/amber.html#GAFF.prep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.amber.GAFF.prep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.models.base">
+<span id="moldesign-models-base-module"></span><h2>moldesign.models.base module<a class="headerlink" href="#module-moldesign.models.base" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.models.base.EnergyModelBase">
+<em class="property">class </em><code class="descclassname">moldesign.models.base.</code><code class="descname">EnergyModelBase</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/base.html#EnergyModelBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.base.EnergyModelBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="moldesign.html#moldesign.method.Method" title="moldesign.method.Method"><code class="xref py py-class docutils literal"><span class="pre">moldesign.method.Method</span></code></a></p>
+<p>Base class for all energy models</p>
+<dl class="attribute">
+<dt id="moldesign.models.base.EnergyModelBase.ALL_PROPERTIES">
+<code class="descname">ALL_PROPERTIES</code><em class="property"> = ['potential_energy', 'forces']</em><a class="headerlink" href="#moldesign.models.base.EnergyModelBase.ALL_PROPERTIES" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>List[str]</em> &#8211; List of all the properties that this model can calculate</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.base.EnergyModelBase.DEFAULT_PROPERTIES">
+<code class="descname">DEFAULT_PROPERTIES</code><em class="property"> = ['potential_energy', 'forces']</em><a class="headerlink" href="#moldesign.models.base.EnergyModelBase.DEFAULT_PROPERTIES" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>List[str]</em> &#8211; list of the properties that are always calculated by this method</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.base.EnergyModelBase.PARAMETERS">
+<code class="descname">PARAMETERS</code><em class="property"> = []</em><a class="headerlink" href="#moldesign.models.base.EnergyModelBase.PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.base.EnergyModelBase.calculate">
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>requests</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/base.html#EnergyModelBase.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.base.EnergyModelBase.calculate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the the default properties and any additiona requests</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>requests</strong> (<em>List[str]</em>) &#8211; the requested properties to calculate</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A dict of calculated properties (or a job object that will return them)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">utils.DotDict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.base.EnergyModelBase.finite_difference_force">
+<code class="descname">finite_difference_force</code><span class="sig-paren">(</span><em>direction=0</em>, <em>stepsize=&lt;Quantity(0.025</em>, <em>'ang')&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/base.html#EnergyModelBase.finite_difference_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.base.EnergyModelBase.finite_difference_force" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute force using a finite difference with the given step size.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>direction</strong> (<em>int</em>) &#8211; EITHER +1, -1, (for one-sided finite differences) or
+0 (for central  difference - better but twice as expensive)</li>
+<li><strong>step</strong> (<em>u.Scalar[lenght]</em>) &#8211; step size to take in each direction</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">force vector, len= <cite>self.mol.ndims</cite></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">u.Vector[force]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.base.EnergyModelBase.get_formal_charge">
+<code class="descname">get_formal_charge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/base.html#EnergyModelBase.get_formal_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.base.EnergyModelBase.get_formal_charge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the formal charge of the molecular system.
+This can be set either as a molecular attribute OR in the parameters of the energy model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the formal charge used for this model</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar[charge]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.base.EnergyModelBase.minimize">
+<code class="descname">minimize</code><span class="sig-paren">(</span><em>method='bfgs'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/base.html#EnergyModelBase.minimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.base.EnergyModelBase.minimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the energy model provides its own minimizer, it should be hooked up here</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.base.EnergyModelBase.prep">
+<code class="descname">prep</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/base.html#EnergyModelBase.prep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.base.EnergyModelBase.prep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare to run. Possibly do a test to ensure that the model is ready.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.models.base.MMBase">
+<em class="property">class </em><code class="descclassname">moldesign.models.base.</code><code class="descname">MMBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/base.html#MMBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.base.MMBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.base.EnergyModelBase" title="moldesign.models.base.EnergyModelBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.base.EnergyModelBase</span></code></a></p>
+<p>Common interface for molecular mechanics</p>
+<dl class="attribute">
+<dt id="moldesign.models.base.MMBase.PARAMETERS">
+<code class="descname">PARAMETERS</code><em class="property"> = [&lt;Parameter &quot;cutoff&quot;, type: float, units: nanometer&gt;, &lt;Parameter &quot;nonbonded&quot;, type: str&gt;, &lt;Parameter &quot;implicit_solvent&quot;, type: str&gt;, &lt;Parameter &quot;solute_dielectric&quot;, type: float&gt;, &lt;Parameter &quot;solvent_dielectric&quot;, type: float&gt;, &lt;Parameter &quot;ewald_error&quot;, type: float&gt;, &lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2ac390 - exc in __repr__&gt;]</em><a class="headerlink" href="#moldesign.models.base.MMBase.PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.models.base.QMBase">
+<em class="property">class </em><code class="descclassname">moldesign.models.base.</code><code class="descname">QMBase</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/base.html#QMBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.base.QMBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.base.EnergyModelBase" title="moldesign.models.base.EnergyModelBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.base.EnergyModelBase</span></code></a></p>
+<p>Common interface for quantum mechanics</p>
+<dl class="attribute">
+<dt id="moldesign.models.base.QMBase.ALL_PROPERTIES">
+<code class="descname">ALL_PROPERTIES</code><em class="property"> = ['potential_energy', 'nuclear_repulsion', 'dipole_moment', 'orbitals', 'orbital_energies']</em><a class="headerlink" href="#moldesign.models.base.QMBase.ALL_PROPERTIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.base.QMBase.DEFAULT_PROPERTIES">
+<code class="descname">DEFAULT_PROPERTIES</code><em class="property"> = ['potential_energy', 'nuclear_repulsion', 'dipole_moment', 'orbitals', 'orbital_energies']</em><a class="headerlink" href="#moldesign.models.base.QMBase.DEFAULT_PROPERTIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.base.QMBase.PARAMETERS">
+<code class="descname">PARAMETERS</code><em class="property"> = [&lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2ac3d0 - exc in __repr__&gt;, &lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2ac450 - exc in __repr__&gt;, &lt;Parameter &quot;active_electrons&quot;, type: int&gt;, &lt;Parameter &quot;active_orbitals&quot;, type: int&gt;, &lt;Parameter &quot;state_average&quot;, type: int&gt;, &lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2ac790 - exc in __repr__&gt;, &lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2acad0 - exc in __repr__&gt;, &lt;Parameter &quot;store_orb_guesses&quot;, type: bool&gt;, &lt;Parameter &quot;multiplicity&quot;, type: int&gt;, &lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2acf50 - exc in __repr__&gt;, &lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2ace90 - exc in __repr__&gt;]</em><a class="headerlink" href="#moldesign.models.base.QMBase.PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.base.QMBase.set_wfn_guess">
+<code class="descname">set_wfn_guess</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/base.html#QMBase.set_wfn_guess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.base.QMBase.set_wfn_guess" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.models.base.QMMMBase">
+<em class="property">class </em><code class="descclassname">moldesign.models.base.</code><code class="descname">QMMMBase</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/base.html#QMMMBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.base.QMMMBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.base.EnergyModelBase" title="moldesign.models.base.EnergyModelBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.base.EnergyModelBase</span></code></a></p>
+<dl class="attribute">
+<dt id="moldesign.models.base.QMMMBase.ALL_PROPERTIES">
+<code class="descname">ALL_PROPERTIES</code><em class="property"> = ['potential_energy', 'qm_energy', 'mm_energy', 'interaction_energyqm_dipole_moment', 'orbitals', 'orbital_energies']</em><a class="headerlink" href="#moldesign.models.base.QMMMBase.ALL_PROPERTIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.base.QMMMBase.DEFAULT_PROPERTIES">
+<code class="descname">DEFAULT_PROPERTIES</code><em class="property"> = ['potential_energy', 'qm_energy', 'mm_energy', 'interaction_energyqm_dipole_moment', 'orbitals', 'orbital_energies']</em><a class="headerlink" href="#moldesign.models.base.QMMMBase.DEFAULT_PROPERTIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.base.QMMMBase.PARAMETERS">
+<code class="descname">PARAMETERS</code><em class="property"> = [&lt;Parameter &quot;cutoff&quot;, type: float, units: nanometer&gt;, &lt;Parameter &quot;nonbonded&quot;, type: str&gt;, &lt;Parameter &quot;implicit_solvent&quot;, type: str&gt;, &lt;Parameter &quot;solute_dielectric&quot;, type: float&gt;, &lt;Parameter &quot;solvent_dielectric&quot;, type: float&gt;, &lt;Parameter &quot;ewald_error&quot;, type: float&gt;, &lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2ac390 - exc in __repr__&gt;, &lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2ac3d0 - exc in __repr__&gt;, &lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2ac450 - exc in __repr__&gt;, &lt;Parameter &quot;active_electrons&quot;, type: int&gt;, &lt;Parameter &quot;active_orbitals&quot;, type: int&gt;, &lt;Parameter &quot;state_average&quot;, type: int&gt;, &lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2ac790 - exc in __repr__&gt;, &lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2acad0 - exc in __repr__&gt;, &lt;Parameter &quot;store_orb_guesses&quot;, type: bool&gt;, &lt;Parameter &quot;multiplicity&quot;, type: int&gt;, &lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2acf50 - exc in __repr__&gt;, &lt;&lt;class 'moldesign.parameters.Parameter'&gt; at 10d2ace90 - exc in __repr__&gt;]</em><a class="headerlink" href="#moldesign.models.base.QMMMBase.PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.models.models">
+<span id="moldesign-models-models-module"></span><h2>moldesign.models.models module<a class="headerlink" href="#module-moldesign.models.models" title="Permalink to this headline">¶</a></h2>
+<p>&#8220;Generic&#8221; energy models - models that can be specified directly by name, without worrying about
+which specific implementation is used.</p>
+<p>Currently, everything here is an alias. However, more complicated logic (including runtime
+dispatch) may be used to determine the best implementation in a given situation</p>
+<dl class="class">
+<dt id="moldesign.models.models.ForceField">
+<em class="property">class </em><code class="descclassname">moldesign.models.models.</code><code class="descname">ForceField</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/models.html#ForceField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.models.ForceField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.openmm.OpenMMPotential" title="moldesign.models.openmm.OpenMMPotential"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.openmm.OpenMMPotential</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.models.models.RHF">
+<em class="property">class </em><code class="descclassname">moldesign.models.models.</code><code class="descname">RHF</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/models.html#RHF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.models.RHF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.pyscf.PySCFPotential" title="moldesign.models.pyscf.PySCFPotential"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.pyscf.PySCFPotential</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.models.models.DFT">
+<em class="property">class </em><code class="descclassname">moldesign.models.models.</code><code class="descname">DFT</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/models.html#DFT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.models.DFT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.pyscf.PySCFPotential" title="moldesign.models.pyscf.PySCFPotential"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.pyscf.PySCFPotential</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.models.models.B3LYP">
+<em class="property">class </em><code class="descclassname">moldesign.models.models.</code><code class="descname">B3LYP</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/models.html#B3LYP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.models.B3LYP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.pyscf.PySCFPotential" title="moldesign.models.pyscf.PySCFPotential"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.pyscf.PySCFPotential</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.models.models.MP2">
+<em class="property">class </em><code class="descclassname">moldesign.models.models.</code><code class="descname">MP2</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/models.html#MP2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.models.MP2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.pyscf.PySCFPotential" title="moldesign.models.pyscf.PySCFPotential"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.pyscf.PySCFPotential</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.models.models.CASSCF">
+<em class="property">class </em><code class="descclassname">moldesign.models.models.</code><code class="descname">CASSCF</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/models.html#CASSCF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.models.CASSCF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.pyscf.PySCFPotential" title="moldesign.models.pyscf.PySCFPotential"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.pyscf.PySCFPotential</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.models.openmm">
+<span id="moldesign-models-openmm-module"></span><h2>moldesign.models.openmm module<a class="headerlink" href="#module-moldesign.models.openmm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.models.openmm.OpenMMPotential">
+<em class="property">class </em><code class="descclassname">moldesign.models.openmm.</code><code class="descname">OpenMMPotential</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/openmm.html#OpenMMPotential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.openmm.OpenMMPotential" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.base.MMBase" title="moldesign.models.base.MMBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.base.MMBase</span></code></a>, <a class="reference internal" href="moldesign.interfaces.html#moldesign.interfaces.openmm.OpenMMPickleMixin" title="moldesign.interfaces.openmm.OpenMMPickleMixin"><code class="xref py py-class docutils literal"><span class="pre">moldesign.interfaces.openmm.OpenMMPickleMixin</span></code></a></p>
+<p>Creates an OpenMM &#8220;context&#8221; to drive energy calculations.
+Note that, while a dummy integrator is assigned, a different context will
+be created for any MD calculations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><strong>sim</strong> &#8211; openmm simulation object</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="moldesign.models.openmm.OpenMMPotential.DEFAULT_PROPERTIES">
+<code class="descname">DEFAULT_PROPERTIES</code><em class="property"> = ['potential_energy', 'forces']</em><a class="headerlink" href="#moldesign.models.openmm.OpenMMPotential.DEFAULT_PROPERTIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.openmm.OpenMMPotential.calculate">
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>self</em>, <em>requests=None</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/openmm.html#OpenMMPotential.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.openmm.OpenMMPotential.calculate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drive a calculation and, when finished, update the parent molecule with the results.
+TODO: this update is SYNCHRONOUS, unlike other <cite>calculate</cite> methods that run remotely.
+TODO: Probably need to update DummyJob (call it localjob, syncjob?) to handle this
+:param requests: list of quantities to calculate
+:return: PythonJob-like object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.openmm.OpenMMPotential.get_forcefield">
+<code class="descname">get_forcefield</code><span class="sig-paren">(</span><em>self</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/openmm.html#OpenMMPotential.get_forcefield"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.openmm.OpenMMPotential.get_forcefield" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the force field parameters for this molecule.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last docutils">
+<dt>The returned object is for introspection only; it can&#8217;t be used (yet) to modify the energy model, and</dt>
+<dd>it doesn&#8217;t include the entire force field (most notably missing are periodic replicate forces,
+1-4 nonbonded attenuation, and implicit solvent effects)</dd>
+</dl>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">moldesign.forcefield.ForceField</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.openmm.OpenMMPotential.get_openmm_simulation">
+<code class="descname">get_openmm_simulation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/openmm.html#OpenMMPotential.get_openmm_simulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.openmm.OpenMMPotential.get_openmm_simulation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.openmm.OpenMMPotential.minimize">
+<code class="descname">minimize</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/openmm.html#OpenMMPotential.minimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.openmm.OpenMMPotential.minimize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.openmm.OpenMMPotential.prep">
+<code class="descname">prep</code><span class="sig-paren">(</span><em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/openmm.html#OpenMMPotential.prep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.openmm.OpenMMPotential.prep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drive the construction of the openmm simulation
+This will rebuild this OpenMM simulation if: A) it&#8217;s not built yet, or B)
+there&#8217;s a new integrator</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.openmm.OpenMMPotential.reset_constraints">
+<code class="descname">reset_constraints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/openmm.html#OpenMMPotential.reset_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.openmm.OpenMMPotential.reset_constraints" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.models.pyscf">
+<span id="moldesign-models-pyscf-module"></span><h2>moldesign.models.pyscf module<a class="headerlink" href="#module-moldesign.models.pyscf" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.models.pyscf.PySCFPotential">
+<em class="property">class </em><code class="descclassname">moldesign.models.pyscf.</code><code class="descname">PySCFPotential</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/pyscf.html#PySCFPotential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.pyscf.PySCFPotential" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.base.QMBase" title="moldesign.models.base.QMBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.base.QMBase</span></code></a></p>
+<dl class="attribute">
+<dt id="moldesign.models.pyscf.PySCFPotential.ALL_PROPERTIES">
+<code class="descname">ALL_PROPERTIES</code><em class="property"> = ['potential_energy', 'wfn', 'mulliken', 'eri_tensor', 'forces', 'nuclear_forces', 'electronic_forces']</em><a class="headerlink" href="#moldesign.models.pyscf.PySCFPotential.ALL_PROPERTIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.pyscf.PySCFPotential.DEFAULT_PROPERTIES">
+<code class="descname">DEFAULT_PROPERTIES</code><em class="property"> = ['potential_energy', 'wfn', 'mulliken']</em><a class="headerlink" href="#moldesign.models.pyscf.PySCFPotential.DEFAULT_PROPERTIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.pyscf.PySCFPotential.FORCE_UNITS">
+<code class="descname">FORCE_UNITS</code><em class="property"> = &lt;Unit('hartree / bohr')&gt;</em><a class="headerlink" href="#moldesign.models.pyscf.PySCFPotential.FORCE_UNITS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.pyscf.PySCFPotential.PARAM_SUPPORT">
+<code class="descname">PARAM_SUPPORT</code><em class="property"> = {'theory': ['rhf', 'rks', 'mp2'], 'functional': ['b3lyp', 'blyp', 'pbe0', 'x3lyp', 'MPW3LYP5']}</em><a class="headerlink" href="#moldesign.models.pyscf.PySCFPotential.PARAM_SUPPORT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.pyscf.PySCFPotential.calculate">
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>self</em>, <em>requests=None</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/pyscf.html#PySCFPotential.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.pyscf.PySCFPotential.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.pyscf.PySCFPotential.prep">
+<code class="descname">prep</code><span class="sig-paren">(</span><em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/pyscf.html#PySCFPotential.prep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.pyscf.PySCFPotential.prep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.pyscf.PySCFPotential.theoryname">
+<code class="descname">theoryname</code><a class="headerlink" href="#moldesign.models.pyscf.PySCFPotential.theoryname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.models.sqm">
+<span id="moldesign-models-sqm-module"></span><h2>moldesign.models.sqm module<a class="headerlink" href="#module-moldesign.models.sqm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.models.sqm.SQMPotential">
+<em class="property">class </em><code class="descclassname">moldesign.models.sqm.</code><code class="descname">SQMPotential</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/sqm.html#SQMPotential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.sqm.SQMPotential" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.base.QMBase" title="moldesign.models.base.QMBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.base.QMBase</span></code></a></p>
+<dl class="attribute">
+<dt id="moldesign.models.sqm.SQMPotential.ALL_PROPERTIES">
+<code class="descname">ALL_PROPERTIES</code><em class="property"> = ['potential_energy', 'wfn', 'mulliken']</em><a class="headerlink" href="#moldesign.models.sqm.SQMPotential.ALL_PROPERTIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.sqm.SQMPotential.DEFAULT_PROPERTIES">
+<code class="descname">DEFAULT_PROPERTIES</code><em class="property"> = ['potential_energy', 'wfn', 'mulliken']</em><a class="headerlink" href="#moldesign.models.sqm.SQMPotential.DEFAULT_PROPERTIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.sqm.SQMPotential.FORCE_UNITS">
+<code class="descname">FORCE_UNITS</code><em class="property"> = &lt;Unit('hartree / bohr')&gt;</em><a class="headerlink" href="#moldesign.models.sqm.SQMPotential.FORCE_UNITS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.sqm.SQMPotential.THEORIES">
+<code class="descname">THEORIES</code><em class="property"> = ['MNDO', 'MNDO/d', 'AM1', 'AM1/d', 'PM3', 'PDDG', 'PDDG/MNDO', 'PDDG/PM3', 'RM1', 'PM3CARB1', 'PM3-MAIS', 'PM6', 'DFTB']</em><a class="headerlink" href="#moldesign.models.sqm.SQMPotential.THEORIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.sqm.SQMPotential.calculate">
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>requests=None</em>, <em>guess=None</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/sqm.html#SQMPotential.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.sqm.SQMPotential.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.models.toys">
+<span id="moldesign-models-toys-module"></span><h2>moldesign.models.toys module<a class="headerlink" href="#module-moldesign.models.toys" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.models.toys.Spring">
+<em class="property">class </em><code class="descclassname">moldesign.models.toys.</code><code class="descname">Spring</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/toys.html#Spring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.toys.Spring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.base.EnergyModelBase" title="moldesign.models.base.EnergyModelBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.base.EnergyModelBase</span></code></a></p>
+<p>Two atoms attached by a spring</p>
+<dl class="attribute">
+<dt id="moldesign.models.toys.Spring.ALL_PROPERTIES">
+<code class="descname">ALL_PROPERTIES</code><em class="property"> = ['potential_energy', 'force']</em><a class="headerlink" href="#moldesign.models.toys.Spring.ALL_PROPERTIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.toys.Spring.DEFAULT_PROPERTIES">
+<code class="descname">DEFAULT_PROPERTIES</code><em class="property"> = ['potential_energy', 'force']</em><a class="headerlink" href="#moldesign.models.toys.Spring.DEFAULT_PROPERTIES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.models.toys.Spring.PARAMETERS">
+<code class="descname">PARAMETERS</code><em class="property"> = [&lt;Parameter &quot;k&quot;, type: float, units: eV / ang ** 2&gt;, &lt;Parameter &quot;d0&quot;, type: float, units: ang&gt;]</em><a class="headerlink" href="#moldesign.models.toys.Spring.PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.toys.Spring.calculate">
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>requests</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/toys.html#Spring.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.toys.Spring.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.toys.Spring.prep">
+<code class="descname">prep</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/toys.html#Spring.prep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.toys.Spring.prep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.models.toys.HarmonicOscillator">
+<em class="property">class </em><code class="descclassname">moldesign.models.toys.</code><code class="descname">HarmonicOscillator</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/toys.html#HarmonicOscillator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.toys.HarmonicOscillator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.models.base.EnergyModelBase" title="moldesign.models.base.EnergyModelBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.models.base.EnergyModelBase</span></code></a></p>
+<p>Applies a harmonic potential (centered at 0) to the x-component of every atom</p>
+<dl class="attribute">
+<dt id="moldesign.models.toys.HarmonicOscillator.PARAMETERS">
+<code class="descname">PARAMETERS</code><em class="property"> = [&lt;Parameter &quot;k&quot;, type: float, units: eV / ang ** 2&gt;]</em><a class="headerlink" href="#moldesign.models.toys.HarmonicOscillator.PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.models.toys.HarmonicOscillator.calculate">
+<code class="descname">calculate</code><span class="sig-paren">(</span><em>requests</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/models/toys.html#HarmonicOscillator.calculate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.models.toys.HarmonicOscillator.calculate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

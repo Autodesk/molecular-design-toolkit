@@ -1,0 +1,1008 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.viewer package &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>moldesign.viewer package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_moldesign_api/moldesign.viewer.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-moldesign.viewer">
+<span id="moldesign-viewer-package"></span><h1>moldesign.viewer package<a class="headerlink" href="#module-moldesign.viewer" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="moldesign.viewer.ChemicalGraphViewer">
+<em class="property">class </em><code class="descclassname">moldesign.viewer.</code><code class="descname">ChemicalGraphViewer</code><span class="sig-paren">(</span><em>mol</em>, <em>carbon_labels=True</em>, <em>names=None</em>, <em>display=False</em>, <em>_forcebig=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.ChemicalGraphViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">nbmolviz.widget2d.MolViz2DBaseWidget</span></code>, <a class="reference internal" href="#moldesign.viewer.common.ColorMixin" title="moldesign.viewer.common.ColorMixin"><code class="xref py py-class docutils literal"><span class="pre">moldesign.viewer.common.ColorMixin</span></code></a></p>
+<p>Create a JSON-format graph representing the chemical structure and draw it using the
+NBMolViz 2D widget.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<em>moldesign.molecules.AtomContainer</em>) &#8211; A collection of atoms (eg a list of atoms,
+a residue, a molecule. etc)</li>
+<li><strong>carbon_labels</strong> (<em>bool</em>) &#8211; If True, draw atom names for carbons</li>
+<li><strong>names</strong> (<em>List[str]</em>) &#8211; (optional) a list of strings to label the atoms in the drawing
+(default: <code class="docutils literal"><span class="pre">[atom.name</span> <span class="pre">for</span> <span class="pre">atom</span> <span class="pre">in</span> <span class="pre">mol.atoms]</span></code>)</li>
+<li><strong>display</strong> (<em>bool</em>) &#8211; immediately display this drawing</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="moldesign.viewer.ChemicalGraphViewer.MAXATOMS">
+<code class="descname">MAXATOMS</code><em class="property"> = 200</em><a class="headerlink" href="#moldesign.viewer.ChemicalGraphViewer.MAXATOMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.ChemicalGraphViewer.get_atom_index">
+<code class="descname">get_atom_index</code><span class="sig-paren">(</span><em>atom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer.get_atom_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.ChemicalGraphViewer.get_atom_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the atom&#8217;s index in this object&#8217;s storage</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.ChemicalGraphViewer.handle_click">
+<code class="descname">handle_click</code><span class="sig-paren">(</span><em>trait_name</em>, <em>old</em>, <em>new</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer.handle_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.ChemicalGraphViewer.handle_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.ChemicalGraphViewer.handle_selection_event">
+<code class="descname">handle_selection_event</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer.handle_selection_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.ChemicalGraphViewer.handle_selection_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Highlight atoms in response to a selection event</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>selection</strong> (<em>dict</em>) &#8211; Selection event from <code class="xref py py-mod docutils literal"><span class="pre">moldesign.uibase.selectors</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.ChemicalGraphViewer.to_graph">
+<code class="descname">to_graph</code><span class="sig-paren">(</span><em>atoms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer.to_graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.ChemicalGraphViewer.to_graph" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.ChemicalGraphViewer.unset_color">
+<code class="descname">unset_color</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>render=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer.unset_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.ChemicalGraphViewer.unset_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.viewer.DistanceGraphViewer">
+<em class="property">class </em><code class="descclassname">moldesign.viewer.</code><code class="descname">DistanceGraphViewer</code><span class="sig-paren">(</span><em>atoms</em>, <em>distance_sensitivity=(&lt;Quantity(3.0</em>, <em>'ang')&gt;</em>, <em>&lt;Quantity(7.0</em>, <em>'ang')&gt;)</em>, <em>bond_edge_weight=1.0</em>, <em>minimum_edge_weight=0.2</em>, <em>nonbond_weight_factor=0.66</em>, <em>angstrom_to_px=22.0</em>, <em>charge=-300</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#DistanceGraphViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.DistanceGraphViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.viewer.viewer2d.ChemicalGraphViewer" title="moldesign.viewer.viewer2d.ChemicalGraphViewer"><code class="xref py py-class docutils literal"><span class="pre">moldesign.viewer.viewer2d.ChemicalGraphViewer</span></code></a></p>
+<p>Create a 2D graph that includes edges with 3D information. This gives a 2D chemical that
+shows contacts from 3D space.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<em>moldesign.molecules.AtomContainer</em>) &#8211; A collection of atoms (eg a list of atoms,
+a residue, a molecule. etc)</li>
+<li><strong>distance_sensitivity</strong> (<em>Tuple[u.Scalar[length]]</em>) &#8211; a tuple containing the minimum and
+maximum 3D distances to create edges for (default: <code class="docutils literal"><span class="pre">(3.0*u.ang,</span> <span class="pre">7.0*u.ang)</span></code>)</li>
+<li><strong>bond_edge_weight</strong> (<em>float</em>) &#8211; edge weight for covalent bonds</li>
+<li><strong>nonbond_weight_factor</strong> (<em>float</em>) &#8211; scale non-covalent edge weights by this factor</li>
+<li><strong>angstrom_to_px</strong> (<em>int</em>) &#8211; number of pixels per angstrom</li>
+<li><strong>charge</strong> (<em>int</em>) &#8211; the force-directed layout repulsive &#8220;charge&#8221;</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldesign.viewer.DistanceGraphViewer.draw_contacts">
+<code class="descname">draw_contacts</code><span class="sig-paren">(</span><em>group1</em>, <em>group2</em>, <em>radius=&lt;Quantity(2.25</em>, <em>'ang')&gt;</em>, <em>label=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#DistanceGraphViewer.draw_contacts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.DistanceGraphViewer.draw_contacts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.DistanceGraphViewer.to_graph">
+<code class="descname">to_graph</code><span class="sig-paren">(</span><em>atoms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#DistanceGraphViewer.to_graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.DistanceGraphViewer.to_graph" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.viewer.GeometryViewer">
+<em class="property">class </em><code class="descclassname">moldesign.viewer.</code><code class="descname">GeometryViewer</code><span class="sig-paren">(</span><em>mol=None</em>, <em>style=None</em>, <em>display=False</em>, <em>render=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">nbmolviz.drivers3d.MolViz_3DMol</span></code>, <a class="reference internal" href="#moldesign.viewer.common.ColorMixin" title="moldesign.viewer.common.ColorMixin"><code class="xref py py-class docutils literal"><span class="pre">moldesign.viewer.common.ColorMixin</span></code></a></p>
+<p>Viewer for static and multiple-frame geometries</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><a class="reference internal" href="moldesign.molecules.html#moldesign.molecules.Trajectory.mol" title="moldesign.molecules.Trajectory.mol"><strong>mol</strong></a> &#8211; Buckyball molecule</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.DEFAULT_COLOR_MAP">
+<code class="descname">DEFAULT_COLOR_MAP</code><span class="sig-paren">(</span><em>cats</em>, <em>mplmap='auto'</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.viewer.GeometryViewer.DEFAULT_COLOR_MAP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.GeometryViewer.DEFAULT_HEIGHT">
+<code class="descname">DEFAULT_HEIGHT</code><em class="property"> = 400</em><a class="headerlink" href="#moldesign.viewer.GeometryViewer.DEFAULT_HEIGHT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.GeometryViewer.DEFAULT_WIDTH">
+<code class="descname">DEFAULT_WIDTH</code><em class="property"> = 625</em><a class="headerlink" href="#moldesign.viewer.GeometryViewer.DEFAULT_WIDTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.GeometryViewer.DEF_PADDING">
+<code class="descname">DEF_PADDING</code><em class="property"> = &lt;Quantity(2.25, 'ang')&gt;</em><a class="headerlink" href="#moldesign.viewer.GeometryViewer.DEF_PADDING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.GeometryViewer.DISTANCE_UNITS">
+<code class="descname">DISTANCE_UNITS</code><em class="property"> = &lt;Unit('ang')&gt;</em><a class="headerlink" href="#moldesign.viewer.GeometryViewer.DISTANCE_UNITS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.GeometryViewer.HIGHLIGHT_COLOR">
+<code class="descname">HIGHLIGHT_COLOR</code><em class="property"> = '#1FF3FE'</em><a class="headerlink" href="#moldesign.viewer.GeometryViewer.HIGHLIGHT_COLOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.add_click_callback">
+<code class="descname">add_click_callback</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.add_click_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.add_click_callback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.append_frame">
+<code class="descname">append_frame</code><span class="sig-paren">(</span><em>positions=None</em>, <em>wfn=None</em>, <em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.append_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.append_frame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.autostyle">
+<code class="descname">autostyle</code><span class="sig-paren">(</span><em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.autostyle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.autostyle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.calc_orb_grid">
+<code class="descname">calc_orb_grid</code><span class="sig-paren">(</span><em>orbname</em>, <em>npts</em>, <em>framenum</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.calc_orb_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.calc_orb_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate orbitals on a grid</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>orbname</strong> &#8211; Either orbital index (for canonical orbitals) or a tuple ( [orbital type],
+[orbital index] ) where [orbital type] is a keyword (e.g., canonical, natural, nbo,
+ao, etc)</li>
+<li><strong>npts</strong> (<em>int</em>) &#8211; resolution in each dimension of the grid</li>
+<li><strong>framenum</strong> (<em>int</em>) &#8211; wavefunction for which frame number?</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">orbital values on a grid</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">moldesign.viewer.VolumetricGrid</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.draw_atom_vectors">
+<code class="descname">draw_atom_vectors</code><span class="sig-paren">(</span><em>vecs</em>, <em>rescale_to=1.75</em>, <em>scale_factor=None</em>, <em>opacity=0.85</em>, <em>radius=0.11</em>, <em>render=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.draw_atom_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.draw_atom_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>For displaying atom-centered vector data (e.g., momenta, forces)
+:param rescale_to: rescale to this length (in angstroms) (not used if scale_factor is passed)
+:param scale_factor: Scaling factor for arrows: dimensions of [vecs dimensions] / [length]
+:param render: render immediately
+:param kwargs: keyword arguments for self.draw_arrow</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.draw_axis">
+<code class="descname">draw_axis</code><span class="sig-paren">(</span><em>on=True</em>, <em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.draw_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.draw_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.draw_forces">
+<code class="descname">draw_forces</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.draw_forces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.draw_forces" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.draw_momenta">
+<code class="descname">draw_momenta</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.draw_momenta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.draw_momenta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.get_input_file">
+<code class="descname">get_input_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.get_input_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.get_input_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.get_orbnames">
+<code class="descname">get_orbnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.get_orbnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.get_orbnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.get_positions">
+<code class="descname">get_positions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.get_positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.get_positions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.handle_click">
+<code class="descname">handle_click</code><span class="sig-paren">(</span><em>trait_name</em>, <em>old</em>, <em>new</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.handle_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.handle_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.handle_selection_event">
+<code class="descname">handle_selection_event</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.handle_selection_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.handle_selection_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deals with an external selection event
+:param selection:todo
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.highlight_atoms">
+<code class="descname">highlight_atoms</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.highlight_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.highlight_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atoms</strong> (<em>list[Atoms]</em>) &#8211; list of atoms to highlight. If None, remove all highlights</li>
+<li><strong>render</strong> (<em>bool</em>) &#8211; render this change immediately</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.label_atoms">
+<code class="descname">label_atoms</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>render=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.label_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.label_atoms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.GeometryViewer.orbital_is_selected">
+<code class="descname">orbital_is_selected</code><a class="headerlink" href="#moldesign.viewer.GeometryViewer.orbital_is_selected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.redraw_orbs">
+<code class="descname">redraw_orbs</code><span class="sig-paren">(</span><em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.redraw_orbs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.redraw_orbs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.remove_click_callback">
+<code class="descname">remove_click_callback</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.remove_click_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.remove_click_callback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.set_color">
+<code class="descname">set_color</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.set_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.set_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.set_colors">
+<code class="descname">set_colors</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.set_colors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.set_colors" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>colormap</strong> (<em>Mapping[str,List[Atoms]]</em>) &#8211; mapping of colors to atoms</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.show_frame">
+<code class="descname">show_frame</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.show_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.show_frame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.show_unbonded">
+<code class="descname">show_unbonded</code><span class="sig-paren">(</span><em>radius=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.show_unbonded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.show_unbonded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.GeometryViewer.unset_color">
+<code class="descname">unset_color</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.unset_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.GeometryViewer.unset_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.GeometryViewer.wfn">
+<code class="descname">wfn</code><a class="headerlink" href="#moldesign.viewer.GeometryViewer.wfn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-moldesign.viewer.bondclicker">
+<span id="moldesign-viewer-bondclicker-module"></span><h2>moldesign.viewer.bondclicker module<a class="headerlink" href="#module-moldesign.viewer.bondclicker" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.viewer.bondclicker.BondClicker">
+<em class="property">class </em><code class="descclassname">moldesign.viewer.bondclicker.</code><code class="descname">BondClicker</code><span class="sig-paren">(</span><em>mol</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/bondclicker.html#BondClicker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.bondclicker.BondClicker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.viewer.viewer3d.GeometryViewer" title="moldesign.viewer.viewer3d.GeometryViewer"><code class="xref py py-class docutils literal"><span class="pre">moldesign.viewer.viewer3d.GeometryViewer</span></code></a></p>
+<p>Allow the user to highlight bonds - this is a hack around 3dmol.js to allow
+clickable bonds.</p>
+<dl class="attribute">
+<dt id="moldesign.viewer.bondclicker.BondClicker.ATOMRADIUS">
+<code class="descname">ATOMRADIUS</code><em class="property"> = 0.35</em><a class="headerlink" href="#moldesign.viewer.bondclicker.BondClicker.ATOMRADIUS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.bondclicker.BondClicker.BONDCOLOR">
+<code class="descname">BONDCOLOR</code><em class="property"> = '#C8C8C8'</em><a class="headerlink" href="#moldesign.viewer.bondclicker.BondClicker.BONDCOLOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.bondclicker.BondClicker.DOUBLEOFFSET">
+<code class="descname">DOUBLEOFFSET</code><em class="property"> = 0.16</em><a class="headerlink" href="#moldesign.viewer.bondclicker.BondClicker.DOUBLEOFFSET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.bondclicker.BondClicker.DOUBLERADIUS">
+<code class="descname">DOUBLERADIUS</code><em class="property"> = 0.13</em><a class="headerlink" href="#moldesign.viewer.bondclicker.BondClicker.DOUBLERADIUS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.bondclicker.BondClicker.SINGLERADIUS">
+<code class="descname">SINGLERADIUS</code><em class="property"> = 0.18</em><a class="headerlink" href="#moldesign.viewer.bondclicker.BondClicker.SINGLERADIUS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.bondclicker.BondClicker.TRIPLEOFFSET">
+<code class="descname">TRIPLEOFFSET</code><em class="property"> = 0.14</em><a class="headerlink" href="#moldesign.viewer.bondclicker.BondClicker.TRIPLEOFFSET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.bondclicker.BondClicker.TRIPLERADIUS">
+<code class="descname">TRIPLERADIUS</code><em class="property"> = 0.12</em><a class="headerlink" href="#moldesign.viewer.bondclicker.BondClicker.TRIPLERADIUS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.bondclicker.BondClicker.draw_all_bonds">
+<code class="descname">draw_all_bonds</code><span class="sig-paren">(</span><em>render=True</em>, <em>batch=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/bondclicker.html#BondClicker.draw_all_bonds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.bondclicker.BondClicker.draw_all_bonds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.bondclicker.BondClicker.draw_bond">
+<code class="descname">draw_bond</code><span class="sig-paren">(</span><em>bond</em>, <em>render=True</em>, <em>batch=False</em>, <em>**shape_args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/bondclicker.html#BondClicker.draw_bond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.bondclicker.BondClicker.draw_bond" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.bondclicker.BondClicker.handle_click">
+<code class="descname">handle_click</code><span class="sig-paren">(</span><em>trait_name</em>, <em>old</em>, <em>new</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/bondclicker.html#BondClicker.handle_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.bondclicker.BondClicker.handle_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.bondclicker.BondClicker.set_bond_color">
+<code class="descname">set_bond_color</code><span class="sig-paren">(</span><em>color</em>, <em>bond</em>, <em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/bondclicker.html#BondClicker.set_bond_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.bondclicker.BondClicker.set_bond_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.bondclicker.BondClicker.set_positions">
+<code class="descname">set_positions</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/bondclicker.html#BondClicker.set_positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.bondclicker.BondClicker.set_positions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.bondclicker.BondClicker.unset_bond_color">
+<code class="descname">unset_bond_color</code><span class="sig-paren">(</span><em>bond</em>, <em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/bondclicker.html#BondClicker.unset_bond_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.bondclicker.BondClicker.unset_bond_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.viewer.common">
+<span id="moldesign-viewer-common-module"></span><h2>moldesign.viewer.common module<a class="headerlink" href="#module-moldesign.viewer.common" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.viewer.common.ColorMixin">
+<em class="property">class </em><code class="descclassname">moldesign.viewer.common.</code><code class="descname">ColorMixin</code><a class="reference internal" href="../_modules/moldesign/viewer/common.html#ColorMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.common.ColorMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="moldesign.viewer.common.ColorMixin.color_by">
+<code class="descname">color_by</code><span class="sig-paren">(</span><em>atom_callback</em>, <em>atoms=None</em>, <em>mplmap='auto'</em>, <em>render=True</em>, <em>force_cmap=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/common.html#ColorMixin.color_by"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.common.ColorMixin.color_by" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Color atoms according to either:</dt>
+<dd><ul class="first last simple">
+<li>an atomic attribute (e.g., &#8216;chain&#8217;, &#8216;residue&#8217;, &#8216;mass&#8217;)</li>
+<li>a callback function that accepts an atom and returns a color or a category</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atom_callback</strong> (<em>callable OR str</em>) &#8211; callable f(atom) returns color OR
+category OR an atom attribute (e.g., <code class="docutils literal"><span class="pre">atnum,</span> <span class="pre">mass,</span> <span class="pre">residue.type</span></code>)</li>
+<li><strong>atoms</strong> (<em>moldesign.molecules.AtomContainer</em>) &#8211; atoms to color (default: self.atoms)</li>
+<li><strong>mplmap</strong> (<em>str</em>) &#8211; name of the matplotlib colormap to use if colors aren&#8217;t explicitly
+specified)</li>
+<li><strong>force_cmap</strong> (<em>bool</em>) &#8211; force the use of a colormap</li>
+<li><strong>render</strong> (<em>bool</em>) &#8211; draw these changes immediately</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>If you&#8217;d like to explicitly specify colors, the callback can return color
+specifications as an HTML string (<code class="docutils literal"><span class="pre">'#1234AB'</span></code>), a hexadecimal integer (
+<code class="docutils literal"><span class="pre">0x12345AB</span></code>), or a CSS3 color keyword (<code class="docutils literal"><span class="pre">'green'</span></code>, <code class="docutils literal"><span class="pre">'purple'</span></code>, etc., see
+<a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value">https://developer.mozilla.org/en-US/docs/Web/CSS/color_value</a>)</p>
+<p>If the callback returns an integer, it may be interpreted as a color spec (since RGB
+colors are just hexadecimal integers). Use <code class="docutils literal"><span class="pre">force_cmap=True</span></code> to force the creation
+of a colormap.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">mapping of categories to colors</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.viewer.viewer2d">
+<span id="moldesign-viewer-viewer2d-module"></span><h2>moldesign.viewer.viewer2d module<a class="headerlink" href="#module-moldesign.viewer.viewer2d" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.viewer.viewer2d.ChemicalGraphViewer">
+<em class="property">class </em><code class="descclassname">moldesign.viewer.viewer2d.</code><code class="descname">ChemicalGraphViewer</code><span class="sig-paren">(</span><em>mol</em>, <em>carbon_labels=True</em>, <em>names=None</em>, <em>display=False</em>, <em>_forcebig=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer2d.ChemicalGraphViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">nbmolviz.widget2d.MolViz2DBaseWidget</span></code>, <a class="reference internal" href="#moldesign.viewer.common.ColorMixin" title="moldesign.viewer.common.ColorMixin"><code class="xref py py-class docutils literal"><span class="pre">moldesign.viewer.common.ColorMixin</span></code></a></p>
+<p>Create a JSON-format graph representing the chemical structure and draw it using the
+NBMolViz 2D widget.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<em>moldesign.molecules.AtomContainer</em>) &#8211; A collection of atoms (eg a list of atoms,
+a residue, a molecule. etc)</li>
+<li><strong>carbon_labels</strong> (<em>bool</em>) &#8211; If True, draw atom names for carbons</li>
+<li><strong>names</strong> (<em>List[str]</em>) &#8211; (optional) a list of strings to label the atoms in the drawing
+(default: <code class="docutils literal"><span class="pre">[atom.name</span> <span class="pre">for</span> <span class="pre">atom</span> <span class="pre">in</span> <span class="pre">mol.atoms]</span></code>)</li>
+<li><strong>display</strong> (<em>bool</em>) &#8211; immediately display this drawing</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="moldesign.viewer.viewer2d.ChemicalGraphViewer.MAXATOMS">
+<code class="descname">MAXATOMS</code><em class="property"> = 200</em><a class="headerlink" href="#moldesign.viewer.viewer2d.ChemicalGraphViewer.MAXATOMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer2d.ChemicalGraphViewer.get_atom_index">
+<code class="descname">get_atom_index</code><span class="sig-paren">(</span><em>atom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer.get_atom_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer2d.ChemicalGraphViewer.get_atom_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the atom&#8217;s index in this object&#8217;s storage</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer2d.ChemicalGraphViewer.handle_click">
+<code class="descname">handle_click</code><span class="sig-paren">(</span><em>trait_name</em>, <em>old</em>, <em>new</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer.handle_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer2d.ChemicalGraphViewer.handle_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer2d.ChemicalGraphViewer.handle_selection_event">
+<code class="descname">handle_selection_event</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer.handle_selection_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer2d.ChemicalGraphViewer.handle_selection_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Highlight atoms in response to a selection event</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>selection</strong> (<em>dict</em>) &#8211; Selection event from <code class="xref py py-mod docutils literal"><span class="pre">moldesign.uibase.selectors</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer2d.ChemicalGraphViewer.to_graph">
+<code class="descname">to_graph</code><span class="sig-paren">(</span><em>atoms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer.to_graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer2d.ChemicalGraphViewer.to_graph" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer2d.ChemicalGraphViewer.unset_color">
+<code class="descname">unset_color</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>render=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#ChemicalGraphViewer.unset_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer2d.ChemicalGraphViewer.unset_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.viewer.viewer2d.DistanceGraphViewer">
+<em class="property">class </em><code class="descclassname">moldesign.viewer.viewer2d.</code><code class="descname">DistanceGraphViewer</code><span class="sig-paren">(</span><em>atoms</em>, <em>distance_sensitivity=(&lt;Quantity(3.0</em>, <em>'ang')&gt;</em>, <em>&lt;Quantity(7.0</em>, <em>'ang')&gt;)</em>, <em>bond_edge_weight=1.0</em>, <em>minimum_edge_weight=0.2</em>, <em>nonbond_weight_factor=0.66</em>, <em>angstrom_to_px=22.0</em>, <em>charge=-300</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#DistanceGraphViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer2d.DistanceGraphViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.viewer.viewer2d.ChemicalGraphViewer" title="moldesign.viewer.viewer2d.ChemicalGraphViewer"><code class="xref py py-class docutils literal"><span class="pre">moldesign.viewer.viewer2d.ChemicalGraphViewer</span></code></a></p>
+<p>Create a 2D graph that includes edges with 3D information. This gives a 2D chemical that
+shows contacts from 3D space.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<em>moldesign.molecules.AtomContainer</em>) &#8211; A collection of atoms (eg a list of atoms,
+a residue, a molecule. etc)</li>
+<li><strong>distance_sensitivity</strong> (<em>Tuple[u.Scalar[length]]</em>) &#8211; a tuple containing the minimum and
+maximum 3D distances to create edges for (default: <code class="docutils literal"><span class="pre">(3.0*u.ang,</span> <span class="pre">7.0*u.ang)</span></code>)</li>
+<li><strong>bond_edge_weight</strong> (<em>float</em>) &#8211; edge weight for covalent bonds</li>
+<li><strong>nonbond_weight_factor</strong> (<em>float</em>) &#8211; scale non-covalent edge weights by this factor</li>
+<li><strong>angstrom_to_px</strong> (<em>int</em>) &#8211; number of pixels per angstrom</li>
+<li><strong>charge</strong> (<em>int</em>) &#8211; the force-directed layout repulsive &#8220;charge&#8221;</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldesign.viewer.viewer2d.DistanceGraphViewer.draw_contacts">
+<code class="descname">draw_contacts</code><span class="sig-paren">(</span><em>group1</em>, <em>group2</em>, <em>radius=&lt;Quantity(2.25</em>, <em>'ang')&gt;</em>, <em>label=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#DistanceGraphViewer.draw_contacts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer2d.DistanceGraphViewer.draw_contacts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer2d.DistanceGraphViewer.to_graph">
+<code class="descname">to_graph</code><span class="sig-paren">(</span><em>atoms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#DistanceGraphViewer.to_graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer2d.DistanceGraphViewer.to_graph" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.viewer.viewer2d.make_contact_view">
+<code class="descclassname">moldesign.viewer.viewer2d.</code><code class="descname">make_contact_view</code><span class="sig-paren">(</span><em>entity</em>, <em>view_radius=&lt;Quantity(5.0</em>, <em>'ang')&gt;</em>, <em>contact_radius=&lt;Quantity(2.25</em>, <em>'ang')&gt;</em>, <em>angstrom_to_px=44.0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer2d.html#make_contact_view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer2d.make_contact_view" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.viewer.viewer3d">
+<span id="moldesign-viewer-viewer3d-module"></span><h2>moldesign.viewer.viewer3d module<a class="headerlink" href="#module-moldesign.viewer.viewer3d" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer">
+<em class="property">class </em><code class="descclassname">moldesign.viewer.viewer3d.</code><code class="descname">GeometryViewer</code><span class="sig-paren">(</span><em>mol=None</em>, <em>style=None</em>, <em>display=False</em>, <em>render=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">nbmolviz.drivers3d.MolViz_3DMol</span></code>, <a class="reference internal" href="#moldesign.viewer.common.ColorMixin" title="moldesign.viewer.common.ColorMixin"><code class="xref py py-class docutils literal"><span class="pre">moldesign.viewer.common.ColorMixin</span></code></a></p>
+<p>Viewer for static and multiple-frame geometries</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><a class="reference internal" href="moldesign.molecules.html#moldesign.molecules.Trajectory.mol" title="moldesign.molecules.Trajectory.mol"><strong>mol</strong></a> &#8211; Buckyball molecule</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.DEFAULT_COLOR_MAP">
+<code class="descname">DEFAULT_COLOR_MAP</code><span class="sig-paren">(</span><em>cats</em>, <em>mplmap='auto'</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.DEFAULT_COLOR_MAP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.DEFAULT_HEIGHT">
+<code class="descname">DEFAULT_HEIGHT</code><em class="property"> = 400</em><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.DEFAULT_HEIGHT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.DEFAULT_WIDTH">
+<code class="descname">DEFAULT_WIDTH</code><em class="property"> = 625</em><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.DEFAULT_WIDTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.DEF_PADDING">
+<code class="descname">DEF_PADDING</code><em class="property"> = &lt;Quantity(2.25, 'ang')&gt;</em><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.DEF_PADDING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.DISTANCE_UNITS">
+<code class="descname">DISTANCE_UNITS</code><em class="property"> = &lt;Unit('ang')&gt;</em><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.DISTANCE_UNITS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.HIGHLIGHT_COLOR">
+<code class="descname">HIGHLIGHT_COLOR</code><em class="property"> = '#1FF3FE'</em><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.HIGHLIGHT_COLOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.add_click_callback">
+<code class="descname">add_click_callback</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.add_click_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.add_click_callback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.append_frame">
+<code class="descname">append_frame</code><span class="sig-paren">(</span><em>positions=None</em>, <em>wfn=None</em>, <em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.append_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.append_frame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.autostyle">
+<code class="descname">autostyle</code><span class="sig-paren">(</span><em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.autostyle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.autostyle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.calc_orb_grid">
+<code class="descname">calc_orb_grid</code><span class="sig-paren">(</span><em>orbname</em>, <em>npts</em>, <em>framenum</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.calc_orb_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.calc_orb_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate orbitals on a grid</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>orbname</strong> &#8211; Either orbital index (for canonical orbitals) or a tuple ( [orbital type],
+[orbital index] ) where [orbital type] is a keyword (e.g., canonical, natural, nbo,
+ao, etc)</li>
+<li><strong>npts</strong> (<em>int</em>) &#8211; resolution in each dimension of the grid</li>
+<li><strong>framenum</strong> (<em>int</em>) &#8211; wavefunction for which frame number?</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">orbital values on a grid</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">moldesign.viewer.VolumetricGrid</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.draw_atom_vectors">
+<code class="descname">draw_atom_vectors</code><span class="sig-paren">(</span><em>vecs</em>, <em>rescale_to=1.75</em>, <em>scale_factor=None</em>, <em>opacity=0.85</em>, <em>radius=0.11</em>, <em>render=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.draw_atom_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.draw_atom_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>For displaying atom-centered vector data (e.g., momenta, forces)
+:param rescale_to: rescale to this length (in angstroms) (not used if scale_factor is passed)
+:param scale_factor: Scaling factor for arrows: dimensions of [vecs dimensions] / [length]
+:param render: render immediately
+:param kwargs: keyword arguments for self.draw_arrow</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.draw_axis">
+<code class="descname">draw_axis</code><span class="sig-paren">(</span><em>on=True</em>, <em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.draw_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.draw_axis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.draw_forces">
+<code class="descname">draw_forces</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.draw_forces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.draw_forces" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.draw_momenta">
+<code class="descname">draw_momenta</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.draw_momenta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.draw_momenta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.get_input_file">
+<code class="descname">get_input_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.get_input_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.get_input_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.get_orbnames">
+<code class="descname">get_orbnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.get_orbnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.get_orbnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.get_positions">
+<code class="descname">get_positions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.get_positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.get_positions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.handle_click">
+<code class="descname">handle_click</code><span class="sig-paren">(</span><em>trait_name</em>, <em>old</em>, <em>new</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.handle_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.handle_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.handle_selection_event">
+<code class="descname">handle_selection_event</code><span class="sig-paren">(</span><em>selection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.handle_selection_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.handle_selection_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deals with an external selection event
+:param selection:todo
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.highlight_atoms">
+<code class="descname">highlight_atoms</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.highlight_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.highlight_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atoms</strong> (<em>list[Atoms]</em>) &#8211; list of atoms to highlight. If None, remove all highlights</li>
+<li><strong>render</strong> (<em>bool</em>) &#8211; render this change immediately</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.label_atoms">
+<code class="descname">label_atoms</code><span class="sig-paren">(</span><em>atoms=None</em>, <em>render=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.label_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.label_atoms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.orbital_is_selected">
+<code class="descname">orbital_is_selected</code><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.orbital_is_selected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.redraw_orbs">
+<code class="descname">redraw_orbs</code><span class="sig-paren">(</span><em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.redraw_orbs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.redraw_orbs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.remove_click_callback">
+<code class="descname">remove_click_callback</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.remove_click_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.remove_click_callback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.set_color">
+<code class="descname">set_color</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.set_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.set_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.set_colors">
+<code class="descname">set_colors</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.set_colors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.set_colors" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>colormap</strong> (<em>Mapping[str,List[Atoms]]</em>) &#8211; mapping of colors to atoms</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.show_frame">
+<code class="descname">show_frame</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.show_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.show_frame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.show_unbonded">
+<code class="descname">show_unbonded</code><span class="sig-paren">(</span><em>radius=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.show_unbonded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.show_unbonded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.unset_color">
+<code class="descname">unset_color</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/viewer/viewer3d.html#GeometryViewer.unset_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.unset_color" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.viewer.viewer3d.GeometryViewer.wfn">
+<code class="descname">wfn</code><a class="headerlink" href="#moldesign.viewer.viewer3d.GeometryViewer.wfn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

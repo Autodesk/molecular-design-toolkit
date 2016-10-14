@@ -1,0 +1,334 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.min.scipy &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.min.scipy</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.min.scipy</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">MinimizerBase</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">toplevel</span>
+
+
+<span class="k">def</span> <span class="nf">exports</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+    <span class="n">__all__</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">o</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="k">class</span> <span class="nc">ScipyMinimizer</span><span class="p">(</span><span class="n">MinimizerBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; SciPy&#39;s implementation of the BFGS method, with gradients if available.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        bfgs_threshold (u.Scalar[force]): Maximum force on a single atom</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This implementation will fail rapidly if large forces are present (&gt;&gt; 1 eV/angstrom).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_strip_units</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">_METHOD_NAME</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">_TAKES_FTOL</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">_TAKES_GTOL</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">scipy.optimize</span>
+
+        <span class="k">print</span> <span class="s1">&#39;Starting geometry optimization: SciPy/</span><span class="si">%s</span><span class="s1"> with </span><span class="si">%s</span><span class="s1"> gradients&#39;</span><span class="o">%</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_METHOD_NAME</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradtype</span><span class="p">)</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsteps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">options</span><span class="p">[</span><span class="s1">&#39;maxiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsteps</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradtype</span> <span class="o">==</span> <span class="s1">&#39;analytical&#39;</span><span class="p">:</span> <span class="n">grad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">grad</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_tolerance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TAKES_GTOL</span><span class="p">:</span>
+                <span class="n">options</span><span class="p">[</span><span class="s1">&#39;gtol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_tolerance</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span><span class="o">.</span><span class="n">magnitude</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_TAKES_FTOL</span><span class="p">:</span>
+                <span class="k">print</span> <span class="p">(</span><span class="s1">&#39;WARNING: this method does not use force to measure convergence; &#39;</span>
+                       <span class="s1">&#39;approximating force_tolerance keyword&#39;</span><span class="p">)</span>
+                <span class="n">options</span><span class="p">[</span><span class="s1">&#39;ftol&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">force_tolerance</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span> <span class="o">/</span> <span class="mf">50.0</span><span class="p">)</span><span class="o">.</span><span class="n">defunits_value</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span> <span class="p">(</span><span class="s1">&#39;WARNING: no convergence criteria for this method; using defaults&#39;</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objective</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">_coords_to_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="p">),</span>
+                                         <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_METHOD_NAME</span><span class="p">,</span>
+                                         <span class="n">jac</span><span class="o">=</span><span class="n">grad</span><span class="p">,</span>
+                                         <span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">,</span>
+                                         <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+                                         <span class="n">constraints</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_make_constraints</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">traj</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">_make_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">constraints</span><span class="p">:</span>
+            <span class="n">fun</span><span class="p">,</span> <span class="n">jac</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_constraint_funs</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
+            <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;eq&#39;</span><span class="p">,</span>
+                                    <span class="n">fun</span><span class="o">=</span><span class="n">fun</span><span class="p">,</span>
+                                    <span class="n">jac</span><span class="o">=</span><span class="n">jac</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">constraints</span>
+
+    <span class="k">def</span> <span class="nf">_make_constraint_funs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">const</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sync_positions</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">const</span><span class="o">.</span><span class="n">error</span><span class="p">()</span><span class="o">.</span><span class="n">defunits_value</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">jac</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sync_positions</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">const</span><span class="o">.</span><span class="n">gradient</span><span class="p">()</span><span class="o">.</span><span class="n">defunits_value</span><span class="p">()</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">num_atoms</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fun</span><span class="p">,</span> <span class="n">jac</span>
+
+
+<span class="nd">@exports</span>
+<div class="viewcode-block" id="BFGS"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.min.html#moldesign.min.scipy.BFGS">[docs]</a><span class="k">class</span> <span class="nc">BFGS</span><span class="p">(</span><span class="n">ScipyMinimizer</span><span class="p">):</span>
+    <span class="n">_METHOD_NAME</span> <span class="o">=</span> <span class="s1">&#39;bfgs&#39;</span>
+    <span class="n">_TAKES_GTOL</span> <span class="o">=</span> <span class="bp">True</span></div>
+
+
+<span class="n">bfgs</span> <span class="o">=</span> <span class="n">BFGS</span><span class="o">.</span><span class="n">_as_function</span><span class="p">(</span><span class="s1">&#39;bfgs&#39;</span><span class="p">)</span>
+<span class="n">exports</span><span class="p">(</span><span class="n">bfgs</span><span class="p">)</span>
+<span class="n">toplevel</span><span class="p">(</span><span class="n">bfgs</span><span class="p">)</span>
+
+
+<span class="nd">@exports</span>
+<div class="viewcode-block" id="SequentialLeastSquares"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.min.html#moldesign.min.scipy.SequentialLeastSquares">[docs]</a><span class="k">class</span> <span class="nc">SequentialLeastSquares</span><span class="p">(</span><span class="n">ScipyMinimizer</span><span class="p">):</span>
+    <span class="n">_METHOD_NAME</span> <span class="o">=</span> <span class="s1">&#39;SLSQP&#39;</span>
+    <span class="n">_TAKES_FTOL</span> <span class="o">=</span> <span class="bp">True</span></div>
+
+
+<span class="n">sequential_least_squares</span> <span class="o">=</span> <span class="n">SequentialLeastSquares</span><span class="o">.</span><span class="n">_as_function</span><span class="p">(</span><span class="s1">&#39;sequential_least_squares&#39;</span><span class="p">)</span>
+<span class="n">exports</span><span class="p">(</span><span class="n">sequential_least_squares</span><span class="p">)</span>
+<span class="n">toplevel</span><span class="p">(</span><span class="n">sequential_least_squares</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

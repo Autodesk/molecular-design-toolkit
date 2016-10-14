@@ -1,0 +1,618 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>2. Widgets API &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/>
+        <link rel="next" title="3. Tools API" href="moldesign.tools.html"/>
+        <link rel="prev" title="1. Geometry API" href="moldesign.geom.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">2. Widgets API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#classes">2.1. Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bondselector-class">2.1.1. <code class="docutils literal"><span class="pre">BondSelector</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changelog-class">2.1.2. <code class="docutils literal"><span class="pre">ChangeLog</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#computeconfig-class">2.1.3. <code class="docutils literal"><span class="pre">ComputeConfig</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#geometrybuilder-class">2.1.4. <code class="docutils literal"><span class="pre">GeometryBuilder</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mdtconfig-class">2.1.5. <code class="docutils literal"><span class="pre">MDTConfig</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#registryconfig-class">2.1.6. <code class="docutils literal"><span class="pre">RegistryConfig</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#residueselector-class">2.1.7. <code class="docutils literal"><span class="pre">ResidueSelector</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#symmetrizer-class">2.1.8. <code class="docutils literal"><span class="pre">Symmetrizer</span></code> class</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#functions">2.2. Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#about-function">2.2.1. <code class="docutils literal"><span class="pre">about</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configure-function">2.2.2. <code class="docutils literal"><span class="pre">configure</span></code> function</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data">2.3. Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#engines">2.3.1. <code class="docutils literal"><span class="pre">ENGINES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#engine-display">2.3.2. <code class="docutils literal"><span class="pre">ENGINE_DISPLAY</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>2. Widgets API</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_mdt_api/moldesign.widgets.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="widgets-api">
+<h1>2. Widgets API<a class="headerlink" href="#widgets-api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="classes">
+<h2>2.1. Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="bondselector-class">
+<h3>2.1.1. <code class="docutils literal"><span class="pre">BondSelector</span></code> class<a class="headerlink" href="#bondselector-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.widgets.BondSelector">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.</code><code class="descname">BondSelector</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#BondSelector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.BondSelector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.SelBase" title="moldesign.uibase.components.SelBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.uibase.components.SelBase</span></code></a></p>
+<dl class="attribute">
+<dt id="moldesign.widgets.BondSelector.VIEWERTYPE">
+<code class="descname">VIEWERTYPE</code><a class="headerlink" href="#moldesign.widgets.BondSelector.VIEWERTYPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">BondClicker</span></code></p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.widgets.BondSelector.bondkey">
+<em class="property">static </em><code class="descname">bondkey</code><span class="sig-paren">(</span><em>bond</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#BondSelector.bondkey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.BondSelector.bondkey" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.BondSelector.clear_selections">
+<code class="descname">clear_selections</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#BondSelector.clear_selections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.BondSelector.clear_selections" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.BondSelector.handle_remove_button_click">
+<code class="descname">handle_remove_button_click</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#BondSelector.handle_remove_button_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.BondSelector.handle_remove_button_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.BondSelector.remove_bondlist_highlight">
+<code class="descname">remove_bondlist_highlight</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#BondSelector.remove_bondlist_highlight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.BondSelector.remove_bondlist_highlight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.BondSelector.select_all_bonds">
+<code class="descname">select_all_bonds</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#BondSelector.select_all_bonds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.BondSelector.select_all_bonds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.BondSelector.selected_bonds">
+<code class="descname">selected_bonds</code><a class="headerlink" href="#moldesign.widgets.BondSelector.selected_bonds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.BondSelector.toggle_bond">
+<code class="descname">toggle_bond</code><span class="sig-paren">(</span><em>bond</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#BondSelector.toggle_bond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.BondSelector.toggle_bond" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="changelog-class">
+<h3>2.1.2. <code class="docutils literal"><span class="pre">ChangeLog</span></code> class<a class="headerlink" href="#changelog-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.widgets.ChangeLog">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.</code><code class="descname">ChangeLog</code><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#ChangeLog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ChangeLog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ipywidgets.widgets.widget_box.Box</span></code></p>
+<dl class="staticmethod">
+<dt id="moldesign.widgets.ChangeLog.version_check">
+<em class="property">static </em><code class="descname">version_check</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#ChangeLog.version_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ChangeLog.version_check" title="Permalink to this definition">¶</a></dt>
+<dd><p class="rubric">References</p>
+<p><a class="reference external" href="http://code.activestate.com/recipes/577708-check-for-package-updates-on-pypi-works-best-in-pi/">http://code.activestate.com/recipes/577708-check-for-package-updates-on-pypi-works-best-in-pi/</a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="computeconfig-class">
+<h3>2.1.3. <code class="docutils literal"><span class="pre">ComputeConfig</span></code> class<a class="headerlink" href="#computeconfig-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.widgets.ComputeConfig">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.</code><code class="descname">ComputeConfig</code><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#ComputeConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ComputeConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ipywidgets.widgets.widget_box.Box</span></code></p>
+<dl class="method">
+<dt id="moldesign.widgets.ComputeConfig.apply_config">
+<code class="descname">apply_config</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#ComputeConfig.apply_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ComputeConfig.apply_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.ComputeConfig.reset_config">
+<code class="descname">reset_config</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#ComputeConfig.reset_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ComputeConfig.reset_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset configuration in UI widget to the stored values</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.ComputeConfig.save_config">
+<code class="descname">save_config</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#ComputeConfig.save_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ComputeConfig.save_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.ComputeConfig.test_connection">
+<code class="descname">test_connection</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#ComputeConfig.test_connection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ComputeConfig.test_connection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.ComputeConfig.update_engine_display">
+<code class="descname">update_engine_display</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#ComputeConfig.update_engine_display"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ComputeConfig.update_engine_display" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="geometrybuilder-class">
+<h3>2.1.4. <code class="docutils literal"><span class="pre">GeometryBuilder</span></code> class<a class="headerlink" href="#geometrybuilder-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.widgets.GeometryBuilder">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.</code><code class="descname">GeometryBuilder</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.GeometryBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.ViewerToolBase" title="moldesign.uibase.components.ViewerToolBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.uibase.components.ViewerToolBase</span></code></a></p>
+<dl class="attribute">
+<dt id="moldesign.widgets.GeometryBuilder.DEGFMT">
+<code class="descname">DEGFMT</code><em class="property"> = u'{:.1f}\xb0'</em><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.DEGFMT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.GeometryBuilder.HIGHLIGHTOPACITY">
+<code class="descname">HIGHLIGHTOPACITY</code><em class="property"> = 0.6</em><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.HIGHLIGHTOPACITY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.GeometryBuilder.MAXDIST">
+<code class="descname">MAXDIST</code><em class="property"> = 20.0</em><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.MAXDIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.GeometryBuilder.NBR1HIGHLIGHT">
+<code class="descname">NBR1HIGHLIGHT</code><em class="property"> = '#AFC6A8'</em><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.NBR1HIGHLIGHT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.GeometryBuilder.NBR2HIGHLIGHT">
+<code class="descname">NBR2HIGHLIGHT</code><em class="property"> = '#C5AED8'</em><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.NBR2HIGHLIGHT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.GeometryBuilder.POSFMT">
+<code class="descname">POSFMT</code><em class="property"> = u'{:.3f} \u212b'</em><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.POSFMT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.GeometryBuilder.VIEWERTYPE">
+<code class="descname">VIEWERTYPE</code><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.VIEWERTYPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">BondClicker</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.GeometryBuilder.atom_click">
+<code class="descname">atom_click</code><span class="sig-paren">(</span><em>atom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.atom_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.atom_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.GeometryBuilder.bond_click">
+<code class="descname">bond_click</code><span class="sig-paren">(</span><em>bond</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.bond_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.bond_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.GeometryBuilder.clear_selection">
+<code class="descname">clear_selection</code><span class="sig-paren">(</span><em>render=True</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.clear_selection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.clear_selection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.GeometryBuilder.label_atoms">
+<code class="descname">label_atoms</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.label_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.label_atoms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.GeometryBuilder.reset_geometry">
+<code class="descname">reset_geometry</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.reset_geometry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.reset_geometry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.GeometryBuilder.set_angle">
+<code class="descname">set_angle</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.set_angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.set_angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.GeometryBuilder.set_atom_x">
+<code class="descname">set_atom_x</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.set_atom_x"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.set_atom_x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.GeometryBuilder.set_atom_y">
+<code class="descname">set_atom_y</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.set_atom_y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.set_atom_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.GeometryBuilder.set_atom_z">
+<code class="descname">set_atom_z</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.set_atom_z"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.set_atom_z" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.GeometryBuilder.set_dihedral">
+<code class="descname">set_dihedral</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.set_dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.set_dihedral" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.GeometryBuilder.set_distance">
+<code class="descname">set_distance</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/geombuilder.html#GeometryBuilder.set_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.GeometryBuilder.set_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="mdtconfig-class">
+<h3>2.1.5. <code class="docutils literal"><span class="pre">MDTConfig</span></code> class<a class="headerlink" href="#mdtconfig-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.widgets.MDTConfig">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.</code><code class="descname">MDTConfig</code><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#MDTConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.MDTConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ipywidgets.widgets.widget_box.Box</span></code></p>
+<dl class="method">
+<dt id="moldesign.widgets.MDTConfig.make_header">
+<code class="descname">make_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#MDTConfig.make_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.MDTConfig.make_header" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="registryconfig-class">
+<h3>2.1.6. <code class="docutils literal"><span class="pre">RegistryConfig</span></code> class<a class="headerlink" href="#registryconfig-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.widgets.RegistryConfig">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.</code><code class="descname">RegistryConfig</code><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#RegistryConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.RegistryConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ipywidgets.widgets.widget_box.Box</span></code></p>
+<dl class="method">
+<dt id="moldesign.widgets.RegistryConfig.apply_config">
+<code class="descname">apply_config</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#RegistryConfig.apply_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.RegistryConfig.apply_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.RegistryConfig.reset_config">
+<code class="descname">reset_config</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#RegistryConfig.reset_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.RegistryConfig.reset_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="residueselector-class">
+<h3>2.1.7. <code class="docutils literal"><span class="pre">ResidueSelector</span></code> class<a class="headerlink" href="#residueselector-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.widgets.ResidueSelector">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.</code><code class="descname">ResidueSelector</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#ResidueSelector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ResidueSelector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../_moldesign_api/moldesign.uibase.html#moldesign.uibase.components.SelBase" title="moldesign.uibase.components.SelBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.uibase.components.SelBase</span></code></a></p>
+<p>Selections at the atom/residue/chain level.
+Selecting a residue selects all of its atoms.
+Selecting all atoms of a residue is equivalent to selecting the residue.
+A residue is not selected if only some of its atoms are selected.</p>
+<dl class="method">
+<dt id="moldesign.widgets.ResidueSelector.atom_click">
+<code class="descname">atom_click</code><span class="sig-paren">(</span><em>atom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#ResidueSelector.atom_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ResidueSelector.atom_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.widgets.ResidueSelector.atomkey">
+<em class="property">static </em><code class="descname">atomkey</code><span class="sig-paren">(</span><em>atom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#ResidueSelector.atomkey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ResidueSelector.atomkey" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.ResidueSelector.handle_remove_button_click">
+<code class="descname">handle_remove_button_click</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#ResidueSelector.handle_remove_button_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ResidueSelector.handle_remove_button_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.ResidueSelector.remove_reslist_highlight">
+<code class="descname">remove_reslist_highlight</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#ResidueSelector.remove_reslist_highlight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ResidueSelector.remove_reslist_highlight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.widgets.ResidueSelector.reskey">
+<em class="property">static </em><code class="descname">reskey</code><span class="sig-paren">(</span><em>residue</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#ResidueSelector.reskey"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ResidueSelector.reskey" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.ResidueSelector.selected_residues">
+<code class="descname">selected_residues</code><a class="headerlink" href="#moldesign.widgets.ResidueSelector.selected_residues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.ResidueSelector.toggle_residue">
+<code class="descname">toggle_residue</code><span class="sig-paren">(</span><em>residue</em>, <em>clickatom=None</em>, <em>render=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/selection.html#ResidueSelector.toggle_residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.ResidueSelector.toggle_residue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="symmetrizer-class">
+<h3>2.1.8. <code class="docutils literal"><span class="pre">Symmetrizer</span></code> class<a class="headerlink" href="#symmetrizer-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.widgets.Symmetrizer">
+<em class="property">class </em><code class="descclassname">moldesign.widgets.</code><code class="descname">Symmetrizer</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/symmetry.html#Symmetrizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.Symmetrizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ipywidgets.widgets.widget_box.Box</span></code></p>
+<dl class="method">
+<dt id="moldesign.widgets.Symmetrizer.apply_selected_symmetry">
+<code class="descname">apply_selected_symmetry</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/symmetry.html#Symmetrizer.apply_selected_symmetry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.Symmetrizer.apply_selected_symmetry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.Symmetrizer.coords_changed">
+<code class="descname">coords_changed</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/symmetry.html#Symmetrizer.coords_changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.Symmetrizer.coords_changed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.Symmetrizer.reset_coords">
+<code class="descname">reset_coords</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/symmetry.html#Symmetrizer.reset_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.Symmetrizer.reset_coords" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.Symmetrizer.set_highest_symmetry">
+<code class="descname">set_highest_symmetry</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/symmetry.html#Symmetrizer.set_highest_symmetry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.Symmetrizer.set_highest_symmetry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.widgets.Symmetrizer.show_symmetry">
+<code class="descname">show_symmetry</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/symmetry.html#Symmetrizer.show_symmetry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.Symmetrizer.show_symmetry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.widgets.Symmetrizer.viewer">
+<code class="descname">viewer</code><em class="property"> = None</em><a class="headerlink" href="#moldesign.widgets.Symmetrizer.viewer" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>type viewer</em> &#8211; moldesign.viewer.GeometryViewer</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="functions">
+<h2>2.2. Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="about-function">
+<h3>2.2.1. <code class="docutils literal"><span class="pre">about</span></code> function<a class="headerlink" href="#about-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.widgets.about">
+<code class="descclassname">moldesign.widgets.</code><code class="descname">about</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.widgets.about" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="configure-function">
+<h3>2.2.2. <code class="docutils literal"><span class="pre">configure</span></code> function<a class="headerlink" href="#configure-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.widgets.configure">
+<code class="descclassname">moldesign.widgets.</code><code class="descname">configure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/widgets/computeconfig.html#configure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.widgets.configure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="data">
+<h2>2.3. Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="engines">
+<h3>2.3.1. <code class="docutils literal"><span class="pre">ENGINES</span></code><a class="headerlink" href="#engines" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.widgets.ENGINES">
+<code class="descclassname">widgets.</code><code class="descname">ENGINES</code><em class="property"> = OrderedDict([('free-compute-cannon', {'hostdescription': 'Autodesk-sponsored cloud compute server', 'displayname': 'Public CloudComputeCannon Demo', 'configkey': 'default_ccc_host', 'aliases': ('ccc', 'cloudcomputecannon')}), ('cloud-compute-cannon', {'hostdescription': 'Server address and port (e.g.,   &quot;192.168.0.1:9000&quot;)', 'displayname': 'CloudComputeCannon', 'configkey': 'default_ccc_host', 'aliases': ('ccc', 'cloudcomputecannon')}), ('docker', {'hostdescription': 'Docker host with port (e.g., &quot;localhost:2375&quot;)', 'displayname': 'Docker', 'configkey': 'default_docker_host', 'aliases': ('docker',)}), ('docker-machine', {'hostdescription': 'Name of docker-machine (e.g., &quot;default&quot;)', 'displayname': 'Docker Machine', 'configkey': 'default_docker_machine', 'aliases': ('docker-machine',)})])</em><a class="headerlink" href="#moldesign.widgets.ENGINES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="engine-display">
+<h3>2.3.2. <code class="docutils literal"><span class="pre">ENGINE_DISPLAY</span></code><a class="headerlink" href="#engine-display" title="Permalink to this headline">¶</a></h3>
+<dl class="attribute">
+<dt id="moldesign.widgets.ENGINE_DISPLAY">
+<code class="descclassname">widgets.</code><code class="descname">ENGINE_DISPLAY</code><em class="property"> = OrderedDict([('Public CloudComputeCannon Demo', 'free-compute-cannon'), ('CloudComputeCannon', 'cloud-compute-cannon'), ('Docker', 'docker'), ('Docker Machine', 'docker-machine')])</em><a class="headerlink" href="#moldesign.widgets.ENGINE_DISPLAY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="moldesign.tools.html" class="btn btn-neutral float-right" title="3. Tools API" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="moldesign.geom.html" class="btn btn-neutral" title="1. Geometry API" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,636 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.interfaces.ambertools &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.interfaces.ambertools</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.interfaces.ambertools</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">traitlets</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">import</span> <span class="nn">pyccc</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">compute</span><span class="p">,</span> <span class="n">uibase</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+
+<span class="n">IMAGE</span> <span class="o">=</span> <span class="s1">&#39;ambertools&#39;</span>
+
+<span class="n">AmberParameters</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;AmberParameters&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;prmtop inpcrd job&#39;</span><span class="p">)</span>
+<span class="n">ExtraAmberParameters</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;GAFFParameters&#39;</span><span class="p">,</span>
+                                              <span class="s1">&#39;lib frcmod job&#39;</span><span class="p">)</span>
+
+<span class="n">DNA_FF</span> <span class="o">=</span> <span class="p">{</span><span class="n">ff</span><span class="p">:</span> <span class="s1">&#39;leaprc.DNA.</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">ff</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;OL15&#39;</span><span class="p">,</span> <span class="s1">&#39;bsc1&#39;</span><span class="p">]}</span>
+<span class="n">RNA_FF</span> <span class="o">=</span> <span class="p">{</span><span class="n">ff</span><span class="p">:</span> <span class="s1">&#39;leaprc.RNA.</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">ff</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;OL3&#39;</span><span class="p">,</span> <span class="s1">&#39;YIL&#39;</span><span class="p">]}</span>
+<span class="n">PROTEIN_FF</span> <span class="o">=</span> <span class="p">{</span><span class="n">ff</span><span class="p">:</span> <span class="s1">&#39;leaprc.protein.</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">ff</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span>
+              <span class="p">[</span><span class="s1">&#39;ff14SB&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ff14SBonlysc&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ff14SB.redq&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ff15ipq&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ff15ipq-vac&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ff03.r1&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;ff03ua&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;fb15&#39;</span><span class="p">]}</span>
+<span class="n">LIPID_FF</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lipid14&#39;</span><span class="p">:</span> <span class="s1">&#39;leaprc.lipid14&#39;</span><span class="p">}</span>
+<span class="n">WATER_FF</span> <span class="o">=</span> <span class="p">{</span><span class="n">ff</span><span class="p">:</span> <span class="s1">&#39;leaprc.water.</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">ff</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span>
+            <span class="p">[</span><span class="s1">&#39;tip3p&#39;</span><span class="p">,</span> <span class="s1">&#39;tip4pew&#39;</span><span class="p">,</span> <span class="s1">&#39;spce&#39;</span><span class="p">,</span> <span class="s1">&#39;opc&#39;</span><span class="p">]}</span>
+<span class="n">CARB_FF</span> <span class="o">=</span> <span class="p">{</span><span class="n">ff</span><span class="p">:</span> <span class="s1">&#39;leaprc.</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">ff</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;GLYCAM_06EPb&#39;</span><span class="p">,</span> <span class="s1">&#39;GLYCAM_06j-1&#39;</span><span class="p">]}</span>
+<span class="n">ORGANIC_FF</span> <span class="o">=</span> <span class="p">{</span><span class="n">ff</span><span class="p">:</span> <span class="s1">&#39;leaprc.</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">ff</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;gaff&#39;</span><span class="p">,</span> <span class="s1">&#39;gaff2&#39;</span><span class="p">]}</span>
+<span class="n">OTHER_FF</span> <span class="o">=</span> <span class="p">{</span><span class="n">ff</span><span class="p">:</span> <span class="s1">&#39;leaprc.</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">ff</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;phosaa10&#39;</span><span class="p">,</span> <span class="s1">&#39;modrna08&#39;</span><span class="p">,</span> <span class="s1">&#39;xFPchromophores&#39;</span><span class="p">]}</span>
+<span class="n">LEAPRCFILES</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">ffiles</span> <span class="ow">in</span> <span class="p">(</span><span class="n">DNA_FF</span><span class="p">,</span> <span class="n">RNA_FF</span><span class="p">,</span> <span class="n">PROTEIN_FF</span><span class="p">,</span> <span class="n">LIPID_FF</span><span class="p">,</span> <span class="n">CARB_FF</span><span class="p">,</span> <span class="n">WATER_FF</span><span class="p">,</span> <span class="n">ORGANIC_FF</span><span class="p">,</span> <span class="n">OTHER_FF</span><span class="p">):</span>
+    <span class="n">LEAPRCFILES</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ffiles</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ParameterizationError"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.ParameterizationError">[docs]</a><span class="k">class</span> <span class="nc">ParameterizationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<span class="nd">@utils.kwargs_from</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">run_job</span><span class="p">)</span>
+<div class="viewcode-block" id="calc_am1_bcc_charges"><a class="viewcode-back" href="../../../toplevel.html#moldesign.calc_am1_bcc_charges">[docs]</a><span class="k">def</span> <span class="nf">calc_am1_bcc_charges</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate am1 bcc charges</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): assign partial charges to this molecule</span>
+<span class="sd">            (they will be stored at ``mol.properties[&#39;am1-bcc&#39;]``)</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This will implicity run an AM1 energy minimization before calculating the final</span>
+<span class="sd">        partial charges. For more control over this process, use the</span>
+<span class="sd">        ``moldesign.models.SQMPotential`` energy model to calculate the charges.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Mapping[moldesign.Atom, units.Scalar[charge]]: AM1-BCC partial charges on each atom</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_antechamber_calc_charges</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="s1">&#39;bcc&#39;</span><span class="p">,</span> <span class="s1">&#39;am1-bcc&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="nd">@utils.kwargs_from</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">run_job</span><span class="p">)</span>
+<div class="viewcode-block" id="calc_gasteiger_charges"><a class="viewcode-back" href="../../../toplevel.html#moldesign.calc_gasteiger_charges">[docs]</a><span class="k">def</span> <span class="nf">calc_gasteiger_charges</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate gasteiger charges</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): assign partial charges to this molecule</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Mapping[moldesign.Atom, units.Scalar[charge]]: gasteiger partial charges on each atom</span>
+<span class="sd">             (they will be stored at ``mol.properties[&#39;gasteiger&#39;]``)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_antechamber_calc_charges</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="s1">&#39;gas&#39;</span><span class="p">,</span> <span class="s1">&#39;gasteiger&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_antechamber_calc_charges</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">ambname</span><span class="p">,</span> <span class="n">chargename</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">charge</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;antechamber -fi pdb -i mol.pdb -fo mol2 -o out.mol2 -c </span><span class="si">%s</span><span class="s1"> -an n&#39;</span><span class="o">%</span><span class="n">ambname</span>
+    <span class="k">if</span> <span class="n">charge</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">command</span> <span class="o">+=</span> <span class="s1">&#39; -nc </span><span class="si">%d</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">charge</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">q_e</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">finish_job</span><span class="p">(</span><span class="n">job</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Callback to complete the job&quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="s1">&#39;out.mol2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="n">charges</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">DotDict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;atomic&#39;</span><span class="p">)</span>
+
+        <span class="n">line</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;@&lt;TRIPOS&gt;ATOM&#39;</span><span class="p">)]</span> <span class="o">!=</span> <span class="s1">&#39;@&lt;TRIPOS&gt;ATOM&#39;</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+
+        <span class="n">line</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()[:</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;@&lt;TRIPOS&gt;BOND&#39;</span><span class="p">)]</span> <span class="o">!=</span> <span class="s1">&#39;@&lt;TRIPOS&gt;BOND&#39;</span><span class="p">:</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">-</span><span class="mi">1</span>
+            <span class="k">assert</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">charges</span><span class="p">[</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">q_e</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+
+        <span class="n">mol</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">chargename</span><span class="p">]</span> <span class="o">=</span> <span class="n">charges</span>
+        <span class="k">return</span> <span class="n">charges</span>
+
+    <span class="n">job</span> <span class="o">=</span> <span class="n">pyccc</span><span class="o">.</span><span class="n">Job</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">get_image_path</span><span class="p">(</span><span class="n">IMAGE</span><span class="p">),</span>
+                    <span class="n">command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">chargename</span><span class="p">,</span> <span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                    <span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;mol.pdb&#39;</span><span class="p">:</span> <span class="n">mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;pdb&#39;</span><span class="p">)},</span>
+                    <span class="n">when_finished</span><span class="o">=</span><span class="n">finish_job</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">compute</span><span class="o">.</span><span class="n">run_job</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">_return_result</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="nd">@utils.kwargs_from</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">run_job</span><span class="p">)</span>
+<div class="viewcode-block" id="build_bdna"><a class="viewcode-back" href="../../../toplevel.html#moldesign.build_bdna">[docs]</a><span class="k">def</span> <span class="nf">build_bdna</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Uses Ambertools&#39; Nucleic Acid Builder to build a 3D double-helix B-DNA structure.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sequence (str): DNA sequence for one of the strands (a complementary sequence will</span>
+<span class="sd">            automatically be created)</span>
+<span class="sd">        **kwargs: arguments for :meth:`compute.run_job`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        moldesign.Molecule: B-DNA double helix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;DeprecationWarning: build_bdna is deprecated. &#39;</span>
+          <span class="s2">&quot;Use `build_dna_helix(sequence, helix_type=&#39;b&#39;)` instead&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">build_dna_helix</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">helix_type</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="nd">@utils.kwargs_from</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">run_job</span><span class="p">)</span>
+<div class="viewcode-block" id="build_dna_helix"><a class="viewcode-back" href="../../../toplevel.html#moldesign.build_dna_helix">[docs]</a><span class="k">def</span> <span class="nf">build_dna_helix</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">helix_type</span><span class="o">=</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Uses Ambertools&#39; Nucleic Acid Builder to build a 3D DNA double-helix.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sequence (str): DNA sequence for one of the strands (a complementary sequence will</span>
+<span class="sd">            automatically be created)</span>
+<span class="sd">        helix_type (str): Type of helix - &#39;A&#39;=Arnott A-DNA</span>
+<span class="sd">                                          &#39;B&#39;=B-DNA (from standard templates and helical params),</span>
+<span class="sd">                                          &#39;LB&#39;=Langridge B-DNA,</span>
+<span class="sd">                                          &#39;AB&#39;=Arnott B-DNA,</span>
+<span class="sd">                                          &#39;SB&#39;=Sasisekharan left-handed B-DNA</span>
+<span class="sd">        **kwargs: arguments for :meth:`compute.run_job`</span>
+
+<span class="sd">    All helix types except &#39;B&#39; are taken from fiber diffraction data (see the refernce for details)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        moldesign.Molecule: B-DNA double helix</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        See NAB / AmberTools documentation: http://ambermd.org/doc12/Amber16.pdf, pg 771-2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">infile</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;molecule m;&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">helix_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span>
+        <span class="n">infile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;m = bdna( &quot;</span><span class="si">%s</span><span class="s1">&quot; );&#39;</span> <span class="o">%</span> <span class="n">sequence</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">infile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;m = fd_helix( &quot;</span><span class="si">%s</span><span class="s1">dna&quot;,  &quot;</span><span class="si">%s</span><span class="s1">&quot;, &quot;dna&quot; );&#39;</span>
+                      <span class="o">%</span> <span class="p">(</span><span class="n">helix_type</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">sequence</span><span class="o">.</span><span class="n">lower</span><span class="p">()))</span>
+    <span class="n">infile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;putpdb( &quot;helix.pdb&quot;, m, &quot;-wwpdb&quot;);</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">finish_job</span><span class="p">(</span><span class="n">job</span><span class="p">):</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">fileio</span><span class="o">.</span><span class="n">read_pdb</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="s1">&#39;helix.pdb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(),</span> <span class="n">assign_ccd_bonds</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mol</span><span class="o">.</span><span class="n">num_chains</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">mol</span><span class="o">.</span><span class="n">num_residues</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="n">oldchain</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">oldchain</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">oldchain</span><span class="o">.</span><span class="n">pdbindex</span> <span class="o">=</span> <span class="n">oldchain</span><span class="o">.</span><span class="n">pdbname</span> <span class="o">=</span> <span class="s1">&#39;A&#39;</span>
+            <span class="n">newchain</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Chain</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">mol</span><span class="o">.</span><span class="n">num_residues</span><span class="o">//</span><span class="mi">2</span><span class="p">:]:</span>
+                <span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">newchain</span>
+                <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="p">:</span>
+                    <span class="n">atom</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">newchain</span>
+            <span class="n">mol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Molecule</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+        <span class="n">mdt</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">assign_biopolymer_bonds</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+
+        <span class="n">mol</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">-DNA Helix: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">helix_type</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">sequence</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mol</span>
+
+    <span class="n">job</span> <span class="o">=</span> <span class="n">pyccc</span><span class="o">.</span><span class="n">Job</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="s1">&#39;nab -o buildbdna build.nab &amp;&amp; ./buildbdna&#39;</span><span class="p">,</span>
+                    <span class="n">image</span><span class="o">=</span><span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">get_image_path</span><span class="p">(</span><span class="n">IMAGE</span><span class="p">),</span>
+                    <span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;build.nab&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">infile</span><span class="p">)},</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;NAB_build_dna&#39;</span><span class="p">,</span>
+                    <span class="n">when_finished</span><span class="o">=</span><span class="n">finish_job</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">run_job</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">_return_result</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="nd">@utils.kwargs_from</span><span class="p">(</span><span class="n">compute</span><span class="o">.</span><span class="n">run_job</span><span class="p">)</span>
+<div class="viewcode-block" id="run_tleap"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.interfaces.html#moldesign.run_tleap">[docs]</a><span class="k">def</span> <span class="nf">run_tleap</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">forcefields</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Drives tleap to create a prmtop and inpcrd file. Specifically uses the AmberTools 16</span>
+<span class="sd">    tleap distribution.</span>
+
+<span class="sd">    Defaults are as recommended in the ambertools manual.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): Molecule to set up</span>
+<span class="sd">        forcefields (List[str]): list of the names of forcefields to use</span>
+<span class="sd">            (see AmberTools manual for descriptions)</span>
+<span class="sd">        parameters (List[ExtraAmberParameters]): (optional) list of amber parameters</span>
+<span class="sd">            for non-standard residues</span>
+<span class="sd">        **kwargs: keyword arguments to :meth:`compute.run_job`</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        Ambertools Manual, http://ambermd.org/doc12/Amber16.pdf. See page 33 for forcefield</span>
+<span class="sd">        recommendations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Prepare input for tleap</span>
+    <span class="k">if</span> <span class="n">forcefields</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">forcefields</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">forcefields</span><span class="o">.</span><span class="n">ffdefaults</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="n">leapstr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;source </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">LEAPRCFILES</span><span class="p">[</span><span class="n">ff</span><span class="p">]</span> <span class="k">for</span> <span class="n">ff</span> <span class="ow">in</span> <span class="n">forcefields</span><span class="p">]</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;input.pdb&#39;</span><span class="p">:</span> <span class="n">mdt</span><span class="o">.</span><span class="n">helpers</span><span class="o">.</span><span class="n">insert_ter_records</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;pdb&#39;</span><span class="p">))}</span>
+
+    <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">ExtraAmberParameters</span><span class="p">):</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="p">[</span><span class="n">parameters</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">ipmtr</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
+            <span class="n">frcname</span> <span class="o">=</span> <span class="s1">&#39;res</span><span class="si">%d</span><span class="s1">.frcmod&#39;</span> <span class="o">%</span> <span class="n">ipmtr</span>
+            <span class="n">libname</span> <span class="o">=</span> <span class="s1">&#39;res</span><span class="si">%d</span><span class="s1">.lib&#39;</span> <span class="o">%</span> <span class="n">ipmtr</span>
+            <span class="n">inputs</span><span class="p">[</span><span class="n">frcname</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">frcmod</span>
+            <span class="n">inputs</span><span class="p">[</span><span class="n">libname</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">lib</span>
+            <span class="n">leapstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;loadamberparam </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">frcname</span><span class="p">)</span>
+            <span class="n">leapstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;loadoff </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">libname</span><span class="p">)</span>
+
+    <span class="n">leapstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;mol = loadpdb input.pdb</span><span class="se">\n</span><span class="s1">&#39;</span>
+                   <span class="s2">&quot;check mol</span><span class="se">\n</span><span class="s2">&quot;</span>
+                   <span class="s2">&quot;saveamberparm mol output.prmtop output.inpcrd</span><span class="se">\n</span><span class="s2">&quot;</span>
+                   <span class="s2">&quot;savepdb mol output.pdb</span><span class="se">\n</span><span class="s2">&quot;</span>
+                   <span class="s2">&quot;quit</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;input.leap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">leapstr</span><span class="p">)</span>
+
+    <span class="n">job</span> <span class="o">=</span> <span class="n">pyccc</span><span class="o">.</span><span class="n">Job</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">compute</span><span class="o">.</span><span class="n">get_image_path</span><span class="p">(</span><span class="n">IMAGE</span><span class="p">),</span>
+                    <span class="n">command</span><span class="o">=</span><span class="s1">&#39;tleap -f input.leap&#39;</span><span class="p">,</span>
+                    <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;tleap, </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">compute</span><span class="o">.</span><span class="n">run_job</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="nd">@utils.args_from</span><span class="p">(</span><span class="n">run_tleap</span><span class="p">)</span>
+<div class="viewcode-block" id="assign_forcefield"><a class="viewcode-back" href="../../../toplevel.html#moldesign.assign_forcefield">[docs]</a><span class="k">def</span> <span class="nf">assign_forcefield</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; see run_tleap docstring &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">moldesign.widgets.parameterization</span> <span class="kn">import</span> <span class="n">ParameterizationDisplay</span>
+    <span class="n">job</span> <span class="o">=</span> <span class="n">run_tleap</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;output.inpcrd&#39;</span> <span class="ow">in</span> <span class="n">job</span><span class="o">.</span><span class="n">get_output</span><span class="p">():</span>
+        <span class="n">prmtop</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="s1">&#39;output.prmtop&#39;</span><span class="p">)</span>
+        <span class="n">inpcrd</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="s1">&#39;output.inpcrd&#39;</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">AmberParameters</span><span class="p">(</span><span class="n">prmtop</span><span class="p">,</span> <span class="n">inpcrd</span><span class="p">,</span> <span class="n">job</span><span class="p">)</span>
+        <span class="n">newmol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">read_amber</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">prmtop</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">inpcrd</span><span class="p">)</span>
+        <span class="n">newmol</span><span class="o">.</span><span class="n">ff</span><span class="o">.</span><span class="n">amber_params</span> <span class="o">=</span> <span class="n">params</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">newmol</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">errors</span> <span class="o">=</span> <span class="n">_parse_tleap_errors</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">mol</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">report</span> <span class="o">=</span> <span class="n">ParameterizationDisplay</span><span class="p">(</span><span class="n">errors</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">molout</span><span class="o">=</span><span class="n">newmol</span><span class="p">)</span>
+        <span class="n">uibase</span><span class="o">.</span><span class="n">display_log</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;ERRORS/WARNINGS&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">traitlets</span><span class="o">.</span><span class="n">TraitError</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s1">&#39;Forcefield assignment: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;Success&#39;</span> <span class="k">if</span> <span class="n">newmol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="s1">&#39;Failure&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">err</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="k">print</span> <span class="n">err</span><span class="o">.</span><span class="n">desc</span>
+
+    <span class="k">if</span> <span class="n">newmol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">newmol</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ParameterizationError</span><span class="p">(</span><span class="s1">&#39;TLeap failed to assign force field parameters for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mol</span><span class="p">,</span> <span class="n">job</span><span class="p">)</span></div>
+
+
+<span class="nd">@utils.kwargs_from</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">run_job</span><span class="p">)</span>
+<div class="viewcode-block" id="parameterize"><a class="viewcode-back" href="../../../toplevel.html#moldesign.parameterize">[docs]</a><span class="k">def</span> <span class="nf">parameterize</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">charges</span><span class="o">=</span><span class="s1">&#39;esp&#39;</span><span class="p">,</span> <span class="n">ffname</span><span class="o">=</span><span class="s1">&#39;gaff2&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parameterize ``mol``, typically using GAFF parameters.</span>
+
+<span class="sd">    This will both assign a forcefield to the molecule (at ``mol.ff``) and produce the parameters</span>
+<span class="sd">    so that they can be used in other systems (e.g., so that this molecule can be simulated</span>
+<span class="sd">    embedded in a larger protein)</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        &#39;am1-bcc&#39; and &#39;gasteiger&#39; partial charges will be automatically computed if necessary.</span>
+<span class="sd">        Other charge types must be precomputed.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule):</span>
+<span class="sd">        charges (str or dict): what partial charges to use? Can be a dict (``{atom:charge}``) OR</span>
+<span class="sd">            a string, in which case charges will be read from</span>
+<span class="sd">           ``mol.properties.[charges name]``; typical values will be &#39;esp&#39;, &#39;mulliken&#39;,</span>
+<span class="sd">           &#39;am1-bcc&#39;, etc. Use &#39;zero&#39; to set all charges to 0 (for QM/MM and testing)</span>
+<span class="sd">        ffname (str): Name of the gaff-like forcefield file (default: gaff2)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ExtraAmberParameters: Parameters for the molecule; this object can be used to create</span>
+<span class="sd">            forcefield parameters for other systems that contain this molecule</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">mol</span><span class="o">.</span><span class="n">num_residues</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">mol</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">resname</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">resname</span> <span class="o">=</span> <span class="s1">&#39;UNL&#39;</span>
+        <span class="k">print</span> <span class="s1">&#39;Assigned residue name &quot;UNL&quot; to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mol</span>
+    <span class="n">resname</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">resname</span>
+
+    <span class="k">if</span> <span class="n">charges</span> <span class="o">==</span> <span class="s1">&#39;am1-bcc&#39;</span> <span class="ow">and</span> <span class="s1">&#39;am1-bcc&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
+        <span class="n">calc_am1_bcc_charges</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">charges</span> <span class="o">==</span> <span class="s1">&#39;gasteiger&#39;</span> <span class="ow">and</span> <span class="s1">&#39;gasteiger&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
+        <span class="n">calc_gasteiger_charges</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">charges</span> <span class="o">==</span> <span class="s1">&#39;zero&#39;</span><span class="p">:</span>
+        <span class="n">charge_array</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">charges</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="n">charge_array</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mol</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">charges</span><span class="p">][</span><span class="n">atom</span><span class="p">]</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">charge_array</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">:</span>  <span class="c1"># implicitly convert floats to fundamental charge units</span>
+            <span class="n">charge_array</span> <span class="o">=</span> <span class="n">charge_array</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">q_e</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">charge_array</span> <span class="o">=</span> <span class="p">[</span><span class="n">charges</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
+
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mol.mol2&#39;</span><span class="p">:</span> <span class="n">mol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;mol2&#39;</span><span class="p">),</span>
+              <span class="s1">&#39;mol.charges&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">charge_array</span><span class="p">))}</span>
+
+    <span class="n">cmds</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;antechamber -i mol.mol2 -fi mol2 -o mol_charged.mol2 -fo mol2 -c rc -cf mol.charges&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;parmchk -i mol_charged.mol2 -f mol2 -o mol.frcmod&#39;</span><span class="p">,</span> <span class="s1">&#39;tleap -f leap.in&#39;</span><span class="p">]</span>
+
+    <span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;leap.in&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;source leaprc.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">ffname</span><span class="p">,</span>
+                                   <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> = loadmol2 mol_charged.mol2&quot;</span> <span class="o">%</span> <span class="n">resname</span><span class="p">,</span>
+                                   <span class="s2">&quot;fmod = loadamberparams mol.frcmod&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;check </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">resname</span><span class="p">,</span>
+                                   <span class="s2">&quot;saveoff </span><span class="si">%s</span><span class="s2"> mol.lib&quot;</span> <span class="o">%</span> <span class="n">resname</span><span class="p">,</span>
+                                   <span class="s2">&quot;saveamberparm </span><span class="si">%s</span><span class="s2"> mol.prmtop mol.inpcrd&quot;</span> <span class="o">%</span> <span class="n">resname</span><span class="p">,</span>
+                                   <span class="s2">&quot;quit</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">finish_job</span><span class="p">(</span><span class="n">j</span><span class="p">):</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="n">ExtraAmberParameters</span><span class="p">(</span><span class="n">j</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="s1">&#39;mol.lib&#39;</span><span class="p">),</span>
+                                     <span class="n">j</span><span class="o">.</span><span class="n">get_output</span><span class="p">(</span><span class="s1">&#39;mol.frcmod&#39;</span><span class="p">),</span>
+                                     <span class="n">j</span><span class="p">)</span>
+        <span class="n">tempmol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">assign_forcefield</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">param</span><span class="p">)</span>
+        <span class="n">mol</span><span class="o">.</span><span class="n">ff</span> <span class="o">=</span> <span class="n">tempmol</span><span class="o">.</span><span class="n">ff</span>
+        <span class="k">return</span> <span class="n">param</span>
+
+    <span class="n">job</span> <span class="o">=</span> <span class="n">pyccc</span><span class="o">.</span><span class="n">Job</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">get_image_path</span><span class="p">(</span><span class="n">IMAGE</span><span class="p">),</span>
+                    <span class="n">command</span><span class="o">=</span><span class="s1">&#39; &amp;&amp; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmds</span><span class="p">),</span>
+                    <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+                    <span class="n">when_finished</span><span class="o">=</span><span class="n">finish_job</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;GAFF assignment: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mol</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">run_job</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">_return_result</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="n">ATOMSPEC</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;\.R&lt;(\S+) (\d+)&gt;\.A&lt;(\S+) (\d+)&gt;&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_parse_tleap_errors</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">molin</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">moldesign.widgets.parameterization</span> <span class="kn">import</span> <span class="n">UnusualBond</span><span class="p">,</span> <span class="n">UnknownAtom</span><span class="p">,</span> <span class="n">UnknownResidue</span>
+
+    <span class="c1"># TODO: special messages for known problems (e.g. histidine)</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">unknown_res</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># so we can print only one error per unkonwn residue</span>
+    <span class="n">lineiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">molin</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pdbindex</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">reslookup</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">offset</span><span class="p">):</span> <span class="n">r</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">molin</span><span class="o">.</span><span class="n">residues</span><span class="p">)}</span>
+
+    <span class="k">def</span> <span class="nf">_atom_from_re</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="n">resname</span><span class="p">,</span> <span class="n">residx</span><span class="p">,</span> <span class="n">atomname</span><span class="p">,</span> <span class="n">atomidx</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">reslookup</span><span class="p">[</span><span class="n">residx</span><span class="p">]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="n">atomname</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">a</span>
+
+    <span class="k">def</span> <span class="nf">unusual_bond</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+        <span class="n">atomre1</span><span class="p">,</span> <span class="n">atomre2</span> <span class="o">=</span> <span class="n">ATOMSPEC</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">_atom_from_re</span><span class="p">(</span><span class="n">atomre1</span><span class="p">),</span> <span class="n">_atom_from_re</span><span class="p">(</span><span class="n">atomre2</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">a1</span> <span class="o">=</span> <span class="n">a2</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">r1</span> <span class="o">=</span> <span class="n">reslookup</span><span class="p">[</span><span class="n">atomre1</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">r2</span> <span class="o">=</span> <span class="n">reslookup</span><span class="p">[</span><span class="n">atomre2</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">UnusualBond</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">),</span> <span class="p">(</span><span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">))</span>
+
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">lineiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;Unknown&#39;</span><span class="p">,</span><span class="s1">&#39;residue:&#39;</span><span class="p">]:</span>
+            <span class="c1"># EX: &quot;Unknown residue: 3TE   number: 499   type: Terminal/beginning&quot;</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">molin</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">4</span><span class="p">])]</span>
+            <span class="n">unknown_res</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">UnknownResidue</span><span class="p">(</span><span class="n">line</span><span class="p">,</span><span class="n">res</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="n">fields</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Warning: Close contact of&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="c1"># EX: &quot;Warning: Close contact of 1.028366 angstroms between .R&lt;DC5 1&gt;.A&lt;HO5&#39; 1&gt; and .R&lt;DC5 81&gt;.A&lt;P 9&gt;&quot;</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unusual_bond</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="n">fields</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;WARNING: There is a bond of&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="c1"># Matches two lines, EX:</span>
+            <span class="c1"># &quot;WARNING: There is a bond of 34.397700 angstroms between:&quot;</span>
+            <span class="c1"># &quot;-------  .R&lt;DG 92&gt;.A&lt;O3&#39; 33&gt; and .R&lt;DG 93&gt;.A&lt;P 1&gt;&quot;</span>
+            <span class="n">nextline</span> <span class="o">=</span> <span class="n">lineiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unusual_bond</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="n">nextline</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="n">fields</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Created a new atom named:&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="c1"># EX: &quot;Created a new atom named: P within residue: .R&lt;DC5 81&gt;&quot;</span>
+            <span class="n">residue</span> <span class="o">=</span> <span class="n">reslookup</span><span class="p">[</span><span class="n">fields</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">unknown_res</span><span class="p">:</span> <span class="k">continue</span>  <span class="c1"># suppress atoms from an unknown res ...</span>
+            <span class="n">atom</span> <span class="o">=</span> <span class="n">residue</span><span class="p">[</span><span class="n">fields</span><span class="p">[</span><span class="mi">5</span><span class="p">]]</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">UnknownAtom</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">residue</span><span class="p">,</span> <span class="n">atom</span><span class="p">))</span>
+
+
+    <span class="k">return</span> <span class="n">msg</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

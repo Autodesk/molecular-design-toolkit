@@ -1,0 +1,487 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.min package &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>moldesign.min package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_moldesign_api/moldesign.min.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-moldesign.min">
+<span id="moldesign-min-package"></span><h1>moldesign.min package<a class="headerlink" href="#module-moldesign.min" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="moldesign.min.bfgs">
+<code class="descclassname">moldesign.min.</code><code class="descname">bfgs</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.min.bfgs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="moldesign.min.sequential_least_squares">
+<code class="descclassname">moldesign.min.</code><code class="descname">sequential_least_squares</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.min.sequential_least_squares" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="moldesign.min.gradient_descent">
+<code class="descclassname">moldesign.min.</code><code class="descname">gradient_descent</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.min.gradient_descent" title="Permalink to this definition">¶</a></dt>
+<dd><p>A careful (perhaps overly careful) gradient descent implementation designed to relax
+structures far from equilibrium.</p>
+<p>A backtracking line search is performed along the steepest gradient direction.</p>
+<p>The maximum move for any single atom is also limited by <code class="docutils literal"><span class="pre">max_atom_move</span></code></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last docutils">
+<dt>This algorithm is good at stably removing large forces, but it&#8217;s very poorly suited to</dt>
+<dd>locating any type of critical point; don&#8217;t use this to find a minimum!</dd>
+</dl>
+</div>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://www.math.washington.edu/~burke/crs/408/lectures/L7-line-search.pdf">https://www.math.washington.edu/~burke/crs/408/lectures/L7-line-search.pdf</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule to minimize</li>
+<li><strong>max_atom_move</strong> (<em>Scalar[length]</em>) &#8211; maximum displacement of a single atom</li>
+<li><strong>scaling</strong> (<em>Scalar[length/force]</em>) &#8211; unit of displacement per unit force</li>
+<li><strong>gamma</strong> (<em>float</em>) &#8211; number between 0 and 1 indicating scale factor for backtracking search</li>
+<li><strong>control</strong> (<em>float</em>) &#8211; threshold for terminating line search; this is a proportion
+(0&lt;=``control``&lt;=1) of the expected function decrease</li>
+<li><strong>**kwargs</strong> (<em>dict</em>) &#8211; kwargs from <code class="xref py py-class docutils literal"><span class="pre">MinimizerBase</span></code></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.min.minimize">
+<code class="descclassname">moldesign.min.</code><code class="descname">minimize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.min.minimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses gradient descent until forces fall below a threshold,
+then switches to BFGS (unconstrained) or SLSQP (constrained).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>gd_threshold</strong> (<em>u.Scalar[force]</em>) &#8211; Use gradient descent if there are any forces larger
+than this; use an approximate hessian method (BFGS or SLSQP) otherwise</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Not really that smart.</p>
+</div>
+</dd></dl>
+
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-moldesign.min.base">
+<span id="moldesign-min-base-module"></span><h2>moldesign.min.base module<a class="headerlink" href="#module-moldesign.min.base" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.min.base.MinimizerBase">
+<em class="property">class </em><code class="descclassname">moldesign.min.base.</code><code class="descname">MinimizerBase</code><span class="sig-paren">(</span><em>mol</em>, <em>nsteps=20</em>, <em>force_tolerance=&lt;Quantity(0.00514220566583</em>, <em>'eV / ang')&gt;</em>, <em>frame_interval=None</em>, <em>_restart_from=0</em>, <em>_restart_energy=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/min/base.html#MinimizerBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.min.base.MinimizerBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="moldesign.min.base.MinimizerBase.callback">
+<code class="descname">callback</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/min/base.html#MinimizerBase.callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.min.base.MinimizerBase.callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>To be called after each minimization step</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*args</strong> &#8211; ignored</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.min.base.MinimizerBase.grad">
+<code class="descname">grad</code><span class="sig-paren">(</span><em>vector</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/min/base.html#MinimizerBase.grad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.min.base.MinimizerBase.grad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback function to calculate the objective&#8217;s gradient</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.min.base.MinimizerBase.objective">
+<code class="descname">objective</code><span class="sig-paren">(</span><em>vector</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/min/base.html#MinimizerBase.objective"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.min.base.MinimizerBase.objective" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback function to calculate the objective function</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.min.base.MinimizerBase.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/min/base.html#MinimizerBase.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.min.base.MinimizerBase.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.min.descent">
+<span id="moldesign-min-descent-module"></span><h2>moldesign.min.descent module<a class="headerlink" href="#module-moldesign.min.descent" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.min.descent.GradientDescent">
+<em class="property">class </em><code class="descclassname">moldesign.min.descent.</code><code class="descname">GradientDescent</code><span class="sig-paren">(</span><em>mol</em>, <em>max_atom_move=&lt;Quantity(0.05</em>, <em>'ang')&gt;</em>, <em>scaling=&lt;Quantity(0.01</em>, <em>'ang ** 2 / eV')&gt;</em>, <em>gamma=0.4</em>, <em>control=0.25</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/min/descent.html#GradientDescent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.min.descent.GradientDescent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.min.base.MinimizerBase" title="moldesign.min.base.MinimizerBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.min.base.MinimizerBase</span></code></a></p>
+<p>A careful (perhaps overly careful) gradient descent implementation designed to relax
+structures far from equilibrium.</p>
+<p>A backtracking line search is performed along the steepest gradient direction.</p>
+<p>The maximum move for any single atom is also limited by <code class="docutils literal"><span class="pre">max_atom_move</span></code></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last docutils">
+<dt>This algorithm is good at stably removing large forces, but it&#8217;s very poorly suited to</dt>
+<dd>locating any type of critical point; don&#8217;t use this to find a minimum!</dd>
+</dl>
+</div>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://www.math.washington.edu/~burke/crs/408/lectures/L7-line-search.pdf">https://www.math.washington.edu/~burke/crs/408/lectures/L7-line-search.pdf</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule to minimize</li>
+<li><strong>max_atom_move</strong> (<em>Scalar[length]</em>) &#8211; maximum displacement of a single atom</li>
+<li><strong>scaling</strong> (<em>Scalar[length/force]</em>) &#8211; unit of displacement per unit force</li>
+<li><strong>gamma</strong> (<em>float</em>) &#8211; number between 0 and 1 indicating scale factor for backtracking search</li>
+<li><strong>control</strong> (<em>float</em>) &#8211; threshold for terminating line search; this is a proportion
+(0&lt;=``control``&lt;=1) of the expected function decrease</li>
+<li><strong>**kwargs</strong> (<em>dict</em>) &#8211; kwargs from <code class="xref py py-class docutils literal"><span class="pre">MinimizerBase</span></code></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldesign.min.descent.GradientDescent.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/min/descent.html#GradientDescent.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.min.descent.GradientDescent.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.min.descent.GradientDescent.scale_move">
+<code class="descname">scale_move</code><span class="sig-paren">(</span><em>grad</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/min/descent.html#GradientDescent.scale_move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.min.descent.GradientDescent.scale_move" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.min.descent.gradient_descent">
+<code class="descclassname">moldesign.min.descent.</code><code class="descname">gradient_descent</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.min.descent.gradient_descent" title="Permalink to this definition">¶</a></dt>
+<dd><p>A careful (perhaps overly careful) gradient descent implementation designed to relax
+structures far from equilibrium.</p>
+<p>A backtracking line search is performed along the steepest gradient direction.</p>
+<p>The maximum move for any single atom is also limited by <code class="docutils literal"><span class="pre">max_atom_move</span></code></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last docutils">
+<dt>This algorithm is good at stably removing large forces, but it&#8217;s very poorly suited to</dt>
+<dd>locating any type of critical point; don&#8217;t use this to find a minimum!</dd>
+</dl>
+</div>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://www.math.washington.edu/~burke/crs/408/lectures/L7-line-search.pdf">https://www.math.washington.edu/~burke/crs/408/lectures/L7-line-search.pdf</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule to minimize</li>
+<li><strong>max_atom_move</strong> (<em>Scalar[length]</em>) &#8211; maximum displacement of a single atom</li>
+<li><strong>scaling</strong> (<em>Scalar[length/force]</em>) &#8211; unit of displacement per unit force</li>
+<li><strong>gamma</strong> (<em>float</em>) &#8211; number between 0 and 1 indicating scale factor for backtracking search</li>
+<li><strong>control</strong> (<em>float</em>) &#8211; threshold for terminating line search; this is a proportion
+(0&lt;=``control``&lt;=1) of the expected function decrease</li>
+<li><strong>**kwargs</strong> (<em>dict</em>) &#8211; kwargs from <code class="xref py py-class docutils literal"><span class="pre">MinimizerBase</span></code></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.min.scipy">
+<span id="moldesign-min-scipy-module"></span><h2>moldesign.min.scipy module<a class="headerlink" href="#module-moldesign.min.scipy" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.min.scipy.BFGS">
+<em class="property">class </em><code class="descclassname">moldesign.min.scipy.</code><code class="descname">BFGS</code><span class="sig-paren">(</span><em>mol</em>, <em>nsteps=20</em>, <em>force_tolerance=&lt;Quantity(0.00514220566583</em>, <em>'eV / ang')&gt;</em>, <em>frame_interval=None</em>, <em>_restart_from=0</em>, <em>_restart_energy=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/min/scipy.html#BFGS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.min.scipy.BFGS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldesign.min.scipy.ScipyMinimizer</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.min.scipy.bfgs">
+<code class="descclassname">moldesign.min.scipy.</code><code class="descname">bfgs</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.min.scipy.bfgs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="moldesign.min.scipy.SequentialLeastSquares">
+<em class="property">class </em><code class="descclassname">moldesign.min.scipy.</code><code class="descname">SequentialLeastSquares</code><span class="sig-paren">(</span><em>mol</em>, <em>nsteps=20</em>, <em>force_tolerance=&lt;Quantity(0.00514220566583</em>, <em>'eV / ang')&gt;</em>, <em>frame_interval=None</em>, <em>_restart_from=0</em>, <em>_restart_energy=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/min/scipy.html#SequentialLeastSquares"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.min.scipy.SequentialLeastSquares" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldesign.min.scipy.ScipyMinimizer</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.min.scipy.sequential_least_squares">
+<code class="descclassname">moldesign.min.scipy.</code><code class="descname">sequential_least_squares</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.min.scipy.sequential_least_squares" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.min.smart">
+<span id="moldesign-min-smart-module"></span><h2>moldesign.min.smart module<a class="headerlink" href="#module-moldesign.min.smart" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.min.smart.SmartMin">
+<em class="property">class </em><code class="descclassname">moldesign.min.smart.</code><code class="descname">SmartMin</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/min/smart.html#SmartMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.min.smart.SmartMin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.min.base.MinimizerBase" title="moldesign.min.base.MinimizerBase"><code class="xref py py-class docutils literal"><span class="pre">moldesign.min.base.MinimizerBase</span></code></a></p>
+<p>Uses gradient descent until forces fall below a threshold,
+then switches to BFGS (unconstrained) or SLSQP (constrained).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>gd_threshold</strong> (<em>u.Scalar[force]</em>) &#8211; Use gradient descent if there are any forces larger
+than this; use an approximate hessian method (BFGS or SLSQP) otherwise</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Not really that smart.</p>
+</div>
+<dl class="method">
+<dt id="moldesign.min.smart.SmartMin.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/min/smart.html#SmartMin.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.min.smart.SmartMin.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.min.smart.minimize">
+<code class="descclassname">moldesign.min.smart.</code><code class="descname">minimize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.min.smart.minimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses gradient descent until forces fall below a threshold,
+then switches to BFGS (unconstrained) or SLSQP (constrained).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>gd_threshold</strong> (<em>u.Scalar[force]</em>) &#8211; Use gradient descent if there are any forces larger
+than this; use an approximate hessian method (BFGS or SLSQP) otherwise</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Not really that smart.</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>moldesign.widgets.computeconfig &mdash; Molecular Design Toolkit 0.7.0 documentation</title>
+  <title>moldesign.widgets.computeconfig &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Molecular Design Toolkit 0.7.0 documentation" href="../../../index.html"/>
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.3
               </div>
             
           
@@ -80,13 +80,37 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents</span></p>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
 </ul>
 
             
@@ -100,7 +124,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../contents.html">Molecular Design Toolkit</a>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
       </nav>
 
 
@@ -115,7 +139,7 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
       
           <li><a href="../../index.html">Module code</a> &raquo;</li>
       
@@ -151,6 +175,7 @@
 
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="kn">as</span> <span class="nn">ipy</span>
+<span class="kn">from</span> <span class="nn">pip._vendor.packaging</span> <span class="kn">import</span> <span class="n">version</span>
 
 <span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
 <span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">compute</span><span class="p">,</span> <span class="n">uibase</span>
@@ -160,7 +185,7 @@
 
 
 <span class="nd">@toplevel</span>
-<div class="viewcode-block" id="configure"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.configure">[docs]</a><span class="k">def</span> <span class="nf">configure</span><span class="p">():</span>
+<div class="viewcode-block" id="configure"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.configure">[docs]</a><span class="k">def</span> <span class="nf">configure</span><span class="p">():</span>
     <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
     <span class="n">display</span><span class="p">(</span><span class="n">MDTConfig</span><span class="p">())</span></div>
 
@@ -169,18 +194,20 @@
 <span class="n">__packageall</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;about&#39;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="MDTConfig"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.MDTConfig">[docs]</a><span class="k">class</span> <span class="nc">MDTConfig</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">):</span>
+<div class="viewcode-block" id="MDTConfig"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.MDTConfig">[docs]</a><span class="k">class</span> <span class="nc">MDTConfig</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MDTConfig</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">display</span><span class="o">=</span><span class="s1">&#39;flex&#39;</span><span class="p">,</span> <span class="n">flex_flow</span><span class="o">=</span><span class="s1">&#39;column&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">compute_config</span> <span class="o">=</span> <span class="n">ComputeConfig</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tab_list</span> <span class="o">=</span> <span class="n">uibase</span><span class="o">.</span><span class="n">StyledTab</span><span class="p">([</span><span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">(),</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_config</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changelog</span> <span class="o">=</span> <span class="n">ChangeLog</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tab_list</span> <span class="o">=</span> <span class="n">uibase</span><span class="o">.</span><span class="n">StyledTab</span><span class="p">([</span><span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">changelog</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tab_list</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;^&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tab_list</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Compute configuration&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tab_list</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;What&#39;s new&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">make_header</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_list</span><span class="p">]</span>
 
-<div class="viewcode-block" id="MDTConfig.make_header"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.MDTConfig.make_header">[docs]</a>    <span class="k">def</span> <span class="nf">make_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MDTConfig.make_header"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.MDTConfig.make_header">[docs]</a>    <span class="k">def</span> <span class="nf">make_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">img</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">PACKAGEPATH</span><span class="p">,</span> <span class="s1">&#39;_static_data/img/banner.png&#39;</span><span class="p">),</span> <span class="s1">&#39;r+b&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">encoded</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
         <span class="n">img</span> <span class="o">=</span> <span class="s1">&#39;&lt;img style=&quot;max-width:100%&quot; src=data:image/png;base64,&#39;</span><span class="o">+</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span><span class="o">%</span><span class="n">encoded</span><span class="p">)</span>
@@ -204,7 +231,56 @@
                                                                                   <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ComputeConfig"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.ComputeConfig">[docs]</a><span class="k">class</span> <span class="nc">ComputeConfig</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">):</span>
+<div class="viewcode-block" id="ChangeLog"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.ChangeLog">[docs]</a><span class="k">class</span> <span class="nc">ChangeLog</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ChangeLog</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+            <span class="n">latest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_check</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">current</span> <span class="o">&gt;=</span> <span class="n">latest</span><span class="p">:</span>
+                <span class="n">versiontext</span> <span class="o">=</span> <span class="s1">&#39;Up to date. Latest release: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">latest</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">versiontext</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;New release available! &#39;</span>
+                               <span class="s1">&#39;(Current: </span><span class="si">%s</span><span class="s1">, latest: </span><span class="si">%s</span><span class="s1"> &lt;br&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">latest</span><span class="p">)</span> <span class="o">+</span>
+                               <span class="s1">&#39;&lt;b&gt;Install it:&lt;/b&gt; &#39;</span>
+                               <span class="s1">&#39;&lt;span style=&quot;font-family:monospace&quot;&gt;pip install -U moldesign&#39;</span>
+                               <span class="s1">&#39;&lt;/span&gt;&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">versiontext</span> <span class="o">=</span> <span class="s1">&#39;&lt;b&gt;Failed update check&lt;/b&gt;: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">e</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="n">versiontext</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">textarea</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Textarea</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;700px&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;300px&#39;</span><span class="p">)</span>
+
+        <span class="n">p1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">PACKAGEPATH</span><span class="p">,</span> <span class="s2">&quot;HISTORY.rst&quot;</span><span class="p">)</span>
+        <span class="n">p2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">PACKAGEPATH</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;HISTORY.rst&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">p1</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">p1</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">p2</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">p2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">textarea</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">textarea</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;HISTORY.rst not found&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">textarea</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">textarea</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="ChangeLog.version_check"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.ChangeLog.version_check">[docs]</a>    <span class="k">def</span> <span class="nf">version_check</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        References:</span>
+<span class="sd">            http://code.activestate.com/recipes/577708-check-for-package-updates-on-pypi-works-best-in-pi/</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">xmlrpclib</span>
+        <span class="n">pypi</span> <span class="o">=</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">ServerProxy</span><span class="p">(</span><span class="s1">&#39;https://pypi.python.org/pypi&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pypi</span><span class="o">.</span><span class="n">package_releases</span><span class="p">(</span><span class="s1">&#39;moldesign&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ComputeConfig"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.ComputeConfig">[docs]</a><span class="k">class</span> <span class="nc">ComputeConfig</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ComputeConfig</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">display</span><span class="o">=</span><span class="s1">&#39;flex&#39;</span><span class="p">,</span> <span class="n">flex_flow</span><span class="o">=</span><span class="s1">&#39;column&#39;</span><span class="p">)</span>
 
@@ -215,7 +291,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">engine_dropdown</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">update_engine_display</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">engine_config_description</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">engine_config_value</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="s1">&#39;blank&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engine_config_value</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="s1">&#39;blank&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s1">&#39;500px&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">engine_config</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">engine_config_description</span><span class="p">,</span>
                                        <span class="bp">self</span><span class="o">.</span><span class="n">engine_config_value</span><span class="p">])</span>
 
@@ -225,9 +301,13 @@
                                                 <span class="n">tooltip</span><span class="o">=</span><span class="s1">&#39;Apply for this session&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_save_changes_button</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Make default&#39;</span><span class="p">,</span>
                                                <span class="n">tooltip</span><span class="o">=</span><span class="s1">&#39;Make this the default for new sessions&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_test_button</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Test connection&#39;</span><span class="p">,</span>
+                                       <span class="n">tooltip</span><span class="o">=</span><span class="s1">&#39;Test if MDT can run jobs with the &#39;</span>
+                                               <span class="s1">&#39;current configuration&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reset_config_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reset_config</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_apply_changes_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apply_config</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_save_changes_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_test_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_connection</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">engine_dropdown</span><span class="p">,</span>
                          <span class="n">ipy</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;&lt;hr&gt;&#39;</span><span class="p">),</span>
@@ -235,11 +315,12 @@
                                    <span class="bp">self</span><span class="o">.</span><span class="n">engine_config_value</span><span class="p">]),</span>
                          <span class="n">ipy</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_reset_config_button</span><span class="p">,</span>
                                    <span class="bp">self</span><span class="o">.</span><span class="n">_apply_changes_button</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">_test_button</span><span class="p">,</span>
                                    <span class="bp">self</span><span class="o">.</span><span class="n">_save_changes_button</span><span class="p">])</span>
                          <span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_config</span><span class="p">()</span>
 
-<div class="viewcode-block" id="ComputeConfig.update_engine_display"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.ComputeConfig.update_engine_display">[docs]</a>    <span class="k">def</span> <span class="nf">update_engine_display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="ComputeConfig.update_engine_display"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.ComputeConfig.update_engine_display">[docs]</a>    <span class="k">def</span> <span class="nf">update_engine_display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">engine_config_value</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="n">enginename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine_dropdown</span><span class="o">.</span><span class="n">value</span>
         <span class="n">enginespec</span> <span class="o">=</span> <span class="n">ENGINES</span><span class="p">[</span><span class="n">enginename</span><span class="p">]</span>
@@ -251,43 +332,95 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">engine_config_value</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">compute</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">enginespec</span><span class="p">[</span><span class="s1">&#39;configkey&#39;</span><span class="p">]]</span></div>
 
-<div class="viewcode-block" id="ComputeConfig.reset_config"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.ComputeConfig.reset_config">[docs]</a>    <span class="k">def</span> <span class="nf">reset_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="ComputeConfig.reset_config"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.ComputeConfig.reset_config">[docs]</a>    <span class="k">def</span> <span class="nf">reset_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Reset configuration in UI widget to the stored values</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="n">compute</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">engine_type</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">compute</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">engine_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ENGINES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">engine_dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s1">&#39;aliases&#39;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">engine_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">compute</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">engine_type</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_engine_display</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ComputeConfig.apply_config"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.ComputeConfig.apply_config">[docs]</a>    <span class="k">def</span> <span class="nf">apply_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="ComputeConfig.apply_config"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.ComputeConfig.apply_config">[docs]</a>    <span class="k">def</span> <span class="nf">apply_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="n">enginename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine_dropdown</span><span class="o">.</span><span class="n">value</span>
-        <span class="n">compute</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">engine_type</span> <span class="o">=</span> <span class="n">enginename</span>
+        <span class="n">compute</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">engine_type</span> <span class="o">=</span> <span class="n">ENGINES</span><span class="p">[</span><span class="n">enginename</span><span class="p">][</span><span class="s1">&#39;aliases&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">compute</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">ENGINES</span><span class="p">[</span><span class="n">enginename</span><span class="p">][</span><span class="s1">&#39;configkey&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine_config_value</span><span class="o">.</span><span class="n">value</span>
-        <span class="n">compute</span><span class="o">.</span><span class="n">reset_from_config</span><span class="p">()</span></div>
+        <span class="n">compute</span><span class="o">.</span><span class="n">reset_compute_engine</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ComputeConfig.save_config"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.ComputeConfig.save_config">[docs]</a>    <span class="k">def</span> <span class="nf">save_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+<div class="viewcode-block" id="ComputeConfig.test_connection"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.ComputeConfig.test_connection">[docs]</a>    <span class="k">def</span> <span class="nf">test_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_config</span><span class="p">()</span>
+        <span class="n">engine</span> <span class="o">=</span> <span class="n">compute</span><span class="o">.</span><span class="n">default_engine</span>
+        <span class="k">if</span> <span class="n">engine</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Failed to create compute engine with current configuration&#39;</span><span class="p">)</span>
+        <span class="n">engine</span><span class="o">.</span><span class="n">test_connection</span><span class="p">()</span>
+        <span class="k">print</span> <span class="s2">&quot;SUCCESS: </span><span class="si">%s</span><span class="s2"> is accepting jobs&quot;</span> <span class="o">%</span> <span class="n">engine</span></div>
+
+<div class="viewcode-block" id="ComputeConfig.save_config"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.ComputeConfig.save_config">[docs]</a>    <span class="k">def</span> <span class="nf">save_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">compute</span><span class="o">.</span><span class="n">write_config</span><span class="p">()</span></div></div>
 
 
-<span class="n">ENGINES</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">((</span>
+<div class="viewcode-block" id="RegistryConfig"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.RegistryConfig">[docs]</a><span class="k">class</span> <span class="nc">RegistryConfig</span><span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">Box</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RegistryConfig</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">display</span><span class="o">=</span><span class="s1">&#39;flex&#39;</span><span class="p">,</span> <span class="n">flex_flow</span><span class="o">=</span><span class="s1">&#39;column&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repo_field</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Image repository&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version_field</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Image version&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_config_button</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Reset&#39;</span><span class="p">,</span>
+                                               <span class="n">tooltip</span><span class="o">=</span><span class="s1">&#39;Reset to current configuration&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_apply_changes_button</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Apply&#39;</span><span class="p">,</span>
+                                                <span class="n">tooltip</span><span class="o">=</span><span class="s1">&#39;Apply for this session&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_changes_button</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Make default&#39;</span><span class="p">,</span>
+                                               <span class="n">tooltip</span><span class="o">=</span><span class="s1">&#39;Make this the default for new sessions&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pull_button</span> <span class="o">=</span> <span class="n">ipy</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Pull images&#39;</span><span class="p">,</span>
+                                       <span class="n">tooltip</span><span class="o">=</span>
+                                       <span class="s1">&#39;Download all moldesign images to the compute engine&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">(</span><span class="n">ipy</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">repo_field</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_field</span><span class="p">]),</span>
+                         <span class="n">ipy</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_reset_config_button</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">_apply_changes_button</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">_pull_button</span><span class="p">]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_config_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reset_config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_apply_changes_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">apply_config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_changes_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_test_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_connection</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RegistryConfig.reset_config"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.RegistryConfig.reset_config">[docs]</a>    <span class="k">def</span> <span class="nf">reset_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repo_field</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">default_repository</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version_field</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">compute</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">version_tag</span></div>
+
+<div class="viewcode-block" id="RegistryConfig.apply_config"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.RegistryConfig.apply_config">[docs]</a>    <span class="k">def</span> <span class="nf">apply_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">compute</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">default_repository</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo_field</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">compute</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">version_tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">version_field</span><span class="o">.</span><span class="n">value</span></div></div>
+
+
+<span class="n">_enginedefs</span> <span class="o">=</span> <span class="p">(</span>
     <span class="p">(</span><span class="s1">&#39;free-compute-cannon&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;displayname&#39;</span><span class="p">:</span> <span class="s2">&quot;Public CloudComputeCannon Demo&quot;</span><span class="p">,</span>
                              <span class="s1">&#39;hostdescription&#39;</span><span class="p">:</span> <span class="s1">&#39;Autodesk-sponsored cloud compute server&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;configkey&#39;</span><span class="p">:</span><span class="s1">&#39;default_ccc_host&#39;</span><span class="p">}),</span>
+                             <span class="s1">&#39;configkey&#39;</span><span class="p">:</span> <span class="s1">&#39;default_ccc_host&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;aliases&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;ccc&#39;</span><span class="p">,</span> <span class="s1">&#39;cloudcomputecannon&#39;</span><span class="p">)</span>
+                             <span class="p">}),</span>
 
     <span class="p">(</span><span class="s1">&#39;cloud-compute-cannon&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;displayname&#39;</span><span class="p">:</span> <span class="s1">&#39;CloudComputeCannon&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;hostdescription&#39;</span><span class="p">:</span> <span class="s1">&#39;Server name with port (e.g.,   &#39;</span>
-                                                 <span class="s1">&#39;&quot;192.168.0.1:8000&quot;)&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;configkey&#39;</span><span class="p">:</span><span class="s1">&#39;default_ccc_host&#39;</span><span class="p">}),</span>
+                              <span class="s1">&#39;hostdescription&#39;</span><span class="p">:</span> <span class="s1">&#39;Server address and port (e.g.,   &#39;</span>
+                                                 <span class="s1">&#39;&quot;192.168.0.1:9000&quot;)&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;configkey&#39;</span><span class="p">:</span> <span class="s1">&#39;default_ccc_host&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;aliases&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;ccc&#39;</span><span class="p">,</span> <span class="s1">&#39;cloudcomputecannon&#39;</span><span class="p">)}),</span>
 
     <span class="p">(</span><span class="s1">&#39;docker&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;displayname&#39;</span><span class="p">:</span> <span class="s1">&#39;Docker&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;hostdescription&#39;</span><span class="p">:</span> <span class="s1">&#39;Docker host with port (e.g., &quot;localhost:2375&quot;)&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;configkey&#39;</span><span class="p">:</span><span class="s1">&#39;default_docker_host&#39;</span><span class="p">}),</span>
+                <span class="s1">&#39;configkey&#39;</span><span class="p">:</span> <span class="s1">&#39;default_docker_host&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;aliases&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;docker&#39;</span><span class="p">,)</span>
+                <span class="p">}),</span>
 
     <span class="p">(</span><span class="s1">&#39;docker-machine&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;displayname&#39;</span><span class="p">:</span> <span class="s1">&#39;Docker Machine&#39;</span><span class="p">,</span>
                         <span class="s1">&#39;hostdescription&#39;</span><span class="p">:</span> <span class="s1">&#39;Name of docker-machine (e.g., &quot;default&quot;)&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;configkey&#39;</span><span class="p">:</span><span class="s1">&#39;default_docker_machine&#39;</span><span class="p">}),</span>
-<span class="p">))</span>
+                        <span class="s1">&#39;configkey&#39;</span><span class="p">:</span> <span class="s1">&#39;default_docker_machine&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;aliases&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;docker-machine&#39;</span><span class="p">,)</span>
+                        <span class="p">}),</span>
+<span class="p">)</span>
 
+<span class="n">ENGINES</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">_enginedefs</span><span class="p">)</span>
 <span class="n">ENGINE_DISPLAY</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">((</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;displayname&#39;</span><span class="p">],</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">ENGINES</span><span class="o">.</span><span class="n">iteritems</span><span class="p">())</span>
 </pre></div>
 
@@ -322,7 +455,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.7.0',
+            VERSION:'0.7.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

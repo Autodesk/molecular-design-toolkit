@@ -1,0 +1,1421 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>1. Geometry API &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/>
+        <link rel="next" title="2. Widgets API" href="moldesign.widgets.html"/>
+        <link rel="prev" title="4. Electronic wavefunction API" href="../api/wfn.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">1. Geometry API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#classes">1.1. Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#anglemonitor-class">1.1.1. <code class="docutils literal"><span class="pre">AngleMonitor</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dihedralmonitor-class">1.1.2. <code class="docutils literal"><span class="pre">DihedralMonitor</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#distancemonitor-class">1.1.3. <code class="docutils literal"><span class="pre">DistanceMonitor</span></code> class</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#functions">1.2. Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#angle-function">1.2.1. <code class="docutils literal"><span class="pre">angle</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#angle-gradient-function">1.2.2. <code class="docutils literal"><span class="pre">angle_gradient</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dihedral-function">1.2.3. <code class="docutils literal"><span class="pre">dihedral</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dihedral-gradient-function">1.2.4. <code class="docutils literal"><span class="pre">dihedral_gradient</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#distance-function">1.2.5. <code class="docutils literal"><span class="pre">distance</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#distance-gradient-function">1.2.6. <code class="docutils literal"><span class="pre">distance_gradient</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#set-angle-function">1.2.7. <code class="docutils literal"><span class="pre">set_angle</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#set-dihedral-function">1.2.8. <code class="docutils literal"><span class="pre">set_dihedral</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#set-distance-function">1.2.9. <code class="docutils literal"><span class="pre">set_distance</span></code> function</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#unexported-api">1.3. Unexported API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#angle-force-constant">1.3.1. <code class="docutils literal"><span class="pre">ANGLE_FORCE_CONSTANT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#angle-tolerance">1.3.2. <code class="docutils literal"><span class="pre">ANGLE_TOLERANCE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#angleconstraint-class">1.3.3. <code class="docutils literal"><span class="pre">AngleConstraint</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dist-force-constant">1.3.4. <code class="docutils literal"><span class="pre">DIST_FORCE_CONSTANT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dist-tolerance">1.3.5. <code class="docutils literal"><span class="pre">DIST_TOLERANCE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dihedralconstraint-class">1.3.6. <code class="docutils literal"><span class="pre">DihedralConstraint</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#distanceconstraint-class">1.3.7. <code class="docutils literal"><span class="pre">DistanceConstraint</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fixedcoordinate-class">1.3.8. <code class="docutils literal"><span class="pre">FixedCoordinate</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fixedposition-class">1.3.9. <code class="docutils literal"><span class="pre">FixedPosition</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#geometryconstraint-class">1.3.10. <code class="docutils literal"><span class="pre">GeometryConstraint</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#molecularsymmetry-class">1.3.11. <code class="docutils literal"><span class="pre">MolecularSymmetry</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#monitor-class">1.3.12. <code class="docutils literal"><span class="pre">Monitor</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#symmetryelement-class">1.3.13. <code class="docutils literal"><span class="pre">SymmetryElement</span></code> class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#apply-4x4-transform-function">1.3.14. <code class="docutils literal"><span class="pre">apply_4x4_transform</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#get-symmetry-function">1.3.15. <code class="docutils literal"><span class="pre">get_symmetry</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#improper-axis-from-matrix-function">1.3.16. <code class="docutils literal"><span class="pre">improper_axis_from_matrix</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#normalized-function">1.3.17. <code class="docutils literal"><span class="pre">normalized</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#perpendicular-function">1.3.18. <code class="docutils literal"><span class="pre">perpendicular</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#safe-arccos-function">1.3.19. <code class="docutils literal"><span class="pre">safe_arccos</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#shake-positions-function">1.3.20. <code class="docutils literal"><span class="pre">shake_positions</span></code> function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sub-angles-function">1.3.21. <code class="docutils literal"><span class="pre">sub_angles</span></code> function</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>1. Geometry API</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_mdt_api/moldesign.geom.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="geometry-api">
+<h1>1. Geometry API<a class="headerlink" href="#geometry-api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="classes">
+<h2>1.1. Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="anglemonitor-class">
+<h3>1.1.1. <code class="docutils literal"><span class="pre">AngleMonitor</span></code> class<a class="headerlink" href="#anglemonitor-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.AngleMonitor">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">AngleMonitor</code><span class="sig-paren">(</span><em>*atoms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/monitor.html#AngleMonitor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.AngleMonitor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../_moldesign_api/moldesign.geom.html#moldesign.geom.monitor.Monitor" title="moldesign.geom.monitor.Monitor"><code class="xref py py-class docutils literal"><span class="pre">moldesign.geom.monitor.Monitor</span></code></a></p>
+<dl class="attribute">
+<dt id="moldesign.AngleMonitor.CONSTRAINT">
+<code class="descname">CONSTRAINT</code><a class="headerlink" href="#moldesign.AngleMonitor.CONSTRAINT" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">AngleConstraint</span></code></p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.AngleMonitor.GETTER">
+<em class="property">static </em><code class="descname">GETTER</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.AngleMonitor.GETTER" title="Permalink to this definition">¶</a></dt>
+<dd><p>The angle between bonds a2-a1 and a2-a3</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2,a3</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the angle</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the distance</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar[length]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.AngleMonitor.GRAD">
+<em class="property">static </em><code class="descname">GRAD</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.AngleMonitor.GRAD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gradient of the angle between bonds a2-a1 and a2-a3</p>
+<div class="math">
+\[\nabla \theta_{ijkl} = \frac{\partial \theta_{ijkl}}{\partial \mathbf R}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2,a3</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the vector</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://salilab.org/modeller/9v6/manual/node436.html">https://salilab.org/modeller/9v6/manual/node436.html</a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.AngleMonitor.NUM_ATOMS">
+<code class="descname">NUM_ATOMS</code><em class="property"> = 3</em><a class="headerlink" href="#moldesign.AngleMonitor.NUM_ATOMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.AngleMonitor.SETTER">
+<em class="property">static </em><code class="descname">SETTER</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>theta</em>, <em>adjustmol=True</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.AngleMonitor.SETTER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the angle between bonds a1-a2 and a3-a2. The atoms will be adjusted along the
+gradient of the angle.
+If <code class="docutils literal"><span class="pre">adjustmol</span></code> is True and the topology is unambiguous, then the entire molecule&#8217;s positions
+will be modified as well</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a1,a2,a3</strong> (<em>mdt.Atom</em>) &#8211; atoms to adjust</li>
+<li><strong>theta</strong> (<em>u.Scalar[angle]</em>) &#8211; new angle to set</li>
+<li><strong>adjustmol</strong> (<em>bool</em>) &#8211; Adjust all atoms on either side of this bond?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="dihedralmonitor-class">
+<h3>1.1.2. <code class="docutils literal"><span class="pre">DihedralMonitor</span></code> class<a class="headerlink" href="#dihedralmonitor-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.DihedralMonitor">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">DihedralMonitor</code><span class="sig-paren">(</span><em>*atoms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/monitor.html#DihedralMonitor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.DihedralMonitor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../_moldesign_api/moldesign.geom.html#moldesign.geom.monitor.Monitor" title="moldesign.geom.monitor.Monitor"><code class="xref py py-class docutils literal"><span class="pre">moldesign.geom.monitor.Monitor</span></code></a></p>
+<dl class="attribute">
+<dt id="moldesign.DihedralMonitor.CONSTRAINT">
+<code class="descname">CONSTRAINT</code><a class="headerlink" href="#moldesign.DihedralMonitor.CONSTRAINT" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">DihedralConstraint</span></code></p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.DihedralMonitor.GETTER">
+<em class="property">static </em><code class="descname">GETTER</code><span class="sig-paren">(</span><em>a1</em>, <em>a2=None</em>, <em>a3=None</em>, <em>a4=None</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.DihedralMonitor.GETTER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Twist angle of bonds a1-a2 and a4-a3 around around the central bond a2-a3</p>
+<dl class="docutils">
+<dt>Can be called as <code class="docutils literal"><span class="pre">dihedral(a1,</span> <span class="pre">a2,</span> <span class="pre">a3,</span> <span class="pre">a4)</span></code></dt>
+<dd>OR     <code class="docutils literal"><span class="pre">dihedral(a2,</span> <span class="pre">a2)</span></code>
+OR     <code class="docutils literal"><span class="pre">dihedral(bond)</span></code></dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>a1</strong> (<em>mdt.Bond</em>) &#8211; the central bond in the dihedral. OR</li>
+<li><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the dihedral</li>
+<li><strong>a3,a4</strong> (<em>mdt.Atom</em>) &#8211; (optional) if not passed, <code class="docutils literal"><span class="pre">a1</span></code> and <code class="docutils literal"><span class="pre">a2</span></code> will be treated as the
+central atoms in this bond, and a3 and a4 will be inferred.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">angle -  [0, 2 pi) radians</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(units.Scalar[angle])</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.DihedralMonitor.GRAD">
+<em class="property">static </em><code class="descname">GRAD</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>a4</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.DihedralMonitor.GRAD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cartesian gradient of a dihedral coordinate,</p>
+<div class="math">
+\[\nabla \theta_{ijkl} = \frac{\partial \theta_{ijkl}}{\partial \mathbf R}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2,a3,a4</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the dihedral</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://salilab.org/modeller/9v6/manual/node436.html">https://salilab.org/modeller/9v6/manual/node436.html</a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.DihedralMonitor.NUM_ATOMS">
+<code class="descname">NUM_ATOMS</code><em class="property"> = 4</em><a class="headerlink" href="#moldesign.DihedralMonitor.NUM_ATOMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.DihedralMonitor.SETTER">
+<em class="property">static </em><code class="descname">SETTER</code><span class="sig-paren">(</span><em>a1</em>, <em>a2=None</em>, <em>a3=None</em>, <em>a4=None</em>, <em>theta=None</em>, <em>adjustmol=True</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.DihedralMonitor.SETTER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the twist angle of atoms a1 and a4 around the central bond a2-a3. The atoms will be
+adjusted along the gradient of the angle.</p>
+<dl class="docutils">
+<dt>Can be called as <code class="docutils literal"><span class="pre">set_dihedral(a1,</span> <span class="pre">a2,</span> <span class="pre">a3,</span> <span class="pre">a4,</span> <span class="pre">theta,</span> <span class="pre">adjustmol=True)</span></code></dt>
+<dd>OR     <code class="docutils literal"><span class="pre">set_dihedral(a2,</span> <span class="pre">a2,</span> <span class="pre">theta,</span> <span class="pre">adjustmol=True)</span></code>
+OR     <code class="docutils literal"><span class="pre">set_dihedral(bond,</span> <span class="pre">theta,</span> <span class="pre">adjustmol=True)</span></code></dd>
+</dl>
+<p>If <code class="docutils literal"><span class="pre">adjustmol</span></code> is True and the topology is unambiguous, then the entire molecule&#8217;s positions
+will be modified as well</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a1</strong> (<em>mdt.Bond</em>) &#8211; central bond in dihedral</li>
+<li><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; atoms around central bond in dihedral</li>
+<li><strong>a4</strong> (<em>a3,</em>) &#8211; </li>
+<li><strong>theta</strong> (<em>u.Scalar[angle]</em>) &#8211; new angle to set</li>
+<li><strong>adjustmol</strong> (<em>bool</em>) &#8211; Adjust all atoms on either side of this bond?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="distancemonitor-class">
+<h3>1.1.3. <code class="docutils literal"><span class="pre">DistanceMonitor</span></code> class<a class="headerlink" href="#distancemonitor-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.DistanceMonitor">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">DistanceMonitor</code><span class="sig-paren">(</span><em>*atoms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/monitor.html#DistanceMonitor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.DistanceMonitor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../_moldesign_api/moldesign.geom.html#moldesign.geom.monitor.Monitor" title="moldesign.geom.monitor.Monitor"><code class="xref py py-class docutils literal"><span class="pre">moldesign.geom.monitor.Monitor</span></code></a></p>
+<dl class="attribute">
+<dt id="moldesign.DistanceMonitor.CONSTRAINT">
+<code class="descname">CONSTRAINT</code><a class="headerlink" href="#moldesign.DistanceMonitor.CONSTRAINT" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">DistanceConstraint</span></code></p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.DistanceMonitor.GETTER">
+<em class="property">static </em><code class="descname">GETTER</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.DistanceMonitor.GETTER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return distance between two atoms</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; the two atoms</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the distance</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar[length]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.DistanceMonitor.GRAD">
+<em class="property">static </em><code class="descname">GRAD</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.DistanceMonitor.GRAD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gradient of the distance between two atoms,</p>
+<div class="math">
+\[\frac{\partial \mathbf{R}_1}{\partial \mathbf{r}} ||\mathbf{R}_1 - \mathbf{R}_2|| =
+   \frac{\mathbf{R}_1 - \mathbf{R}_2}{||\mathbf{R}_1 - \mathbf{R}_2||}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; the two atoms</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(gradient w.r.t. first atom, gradient w.r.t.
+second atom)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Tuple[u.Vector[length], u.Vector[length]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.DistanceMonitor.NUM_ATOMS">
+<code class="descname">NUM_ATOMS</code><em class="property"> = 2</em><a class="headerlink" href="#moldesign.DistanceMonitor.NUM_ATOMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="moldesign.DistanceMonitor.SETTER">
+<em class="property">static </em><code class="descname">SETTER</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>newlength</em>, <em>adjustmol=True</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.DistanceMonitor.SETTER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the distance between two atoms. They will be adjusted along the vector separating them.
+If the two atoms are A) bonded, B) not part of the same ring system, and C) <code class="docutils literal"><span class="pre">adjustmol</span></code> is
+True, then the entire molecule&#8217;s positions will be modified as well</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; atoms to adjust</li>
+<li><strong>newlength</strong> (<em>u.Scalar[length]</em>) &#8211; new length to set</li>
+<li><strong>adjustmol</strong> (<em>bool</em>) &#8211; Adjust all atoms on either side of this bond?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="functions">
+<h2>1.2. Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="angle-function">
+<h3>1.2.1. <code class="docutils literal"><span class="pre">angle</span></code> function<a class="headerlink" href="#angle-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.angle">
+<code class="descclassname">moldesign.</code><code class="descname">angle</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/coords.html#angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>The angle between bonds a2-a1 and a2-a3</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2,a3</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the angle</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the distance</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar[length]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="angle-gradient-function">
+<h3>1.2.2. <code class="docutils literal"><span class="pre">angle_gradient</span></code> function<a class="headerlink" href="#angle-gradient-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.angle_gradient">
+<code class="descclassname">moldesign.</code><code class="descname">angle_gradient</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/grads.html#angle_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.angle_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gradient of the angle between bonds a2-a1 and a2-a3</p>
+<div class="math">
+\[\nabla \theta_{ijkl} = \frac{\partial \theta_{ijkl}}{\partial \mathbf R}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2,a3</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the vector</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://salilab.org/modeller/9v6/manual/node436.html">https://salilab.org/modeller/9v6/manual/node436.html</a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="dihedral-function">
+<h3>1.2.3. <code class="docutils literal"><span class="pre">dihedral</span></code> function<a class="headerlink" href="#dihedral-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.dihedral">
+<code class="descclassname">moldesign.</code><code class="descname">dihedral</code><span class="sig-paren">(</span><em>a1</em>, <em>a2=None</em>, <em>a3=None</em>, <em>a4=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/coords.html#dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.dihedral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Twist angle of bonds a1-a2 and a4-a3 around around the central bond a2-a3</p>
+<dl class="docutils">
+<dt>Can be called as <code class="docutils literal"><span class="pre">dihedral(a1,</span> <span class="pre">a2,</span> <span class="pre">a3,</span> <span class="pre">a4)</span></code></dt>
+<dd>OR     <code class="docutils literal"><span class="pre">dihedral(a2,</span> <span class="pre">a2)</span></code>
+OR     <code class="docutils literal"><span class="pre">dihedral(bond)</span></code></dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>a1</strong> (<em>mdt.Bond</em>) &#8211; the central bond in the dihedral. OR</li>
+<li><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the dihedral</li>
+<li><strong>a3,a4</strong> (<em>mdt.Atom</em>) &#8211; (optional) if not passed, <code class="docutils literal"><span class="pre">a1</span></code> and <code class="docutils literal"><span class="pre">a2</span></code> will be treated as the
+central atoms in this bond, and a3 and a4 will be inferred.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">angle -  [0, 2 pi) radians</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(units.Scalar[angle])</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="dihedral-gradient-function">
+<h3>1.2.4. <code class="docutils literal"><span class="pre">dihedral_gradient</span></code> function<a class="headerlink" href="#dihedral-gradient-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.dihedral_gradient">
+<code class="descclassname">moldesign.</code><code class="descname">dihedral_gradient</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>a4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/grads.html#dihedral_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.dihedral_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cartesian gradient of a dihedral coordinate,</p>
+<div class="math">
+\[\nabla \theta_{ijkl} = \frac{\partial \theta_{ijkl}}{\partial \mathbf R}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2,a3,a4</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the dihedral</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://salilab.org/modeller/9v6/manual/node436.html">https://salilab.org/modeller/9v6/manual/node436.html</a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="distance-function">
+<h3>1.2.5. <code class="docutils literal"><span class="pre">distance</span></code> function<a class="headerlink" href="#distance-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.distance">
+<code class="descclassname">moldesign.</code><code class="descname">distance</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/coords.html#distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return distance between two atoms</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; the two atoms</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the distance</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar[length]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="distance-gradient-function">
+<h3>1.2.6. <code class="docutils literal"><span class="pre">distance_gradient</span></code> function<a class="headerlink" href="#distance-gradient-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.distance_gradient">
+<code class="descclassname">moldesign.</code><code class="descname">distance_gradient</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/grads.html#distance_gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.distance_gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gradient of the distance between two atoms,</p>
+<div class="math">
+\[\frac{\partial \mathbf{R}_1}{\partial \mathbf{r}} ||\mathbf{R}_1 - \mathbf{R}_2|| =
+   \frac{\mathbf{R}_1 - \mathbf{R}_2}{||\mathbf{R}_1 - \mathbf{R}_2||}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; the two atoms</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(gradient w.r.t. first atom, gradient w.r.t.
+second atom)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Tuple[u.Vector[length], u.Vector[length]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="set-angle-function">
+<h3>1.2.7. <code class="docutils literal"><span class="pre">set_angle</span></code> function<a class="headerlink" href="#set-angle-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.set_angle">
+<code class="descclassname">moldesign.</code><code class="descname">set_angle</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>theta</em>, <em>adjustmol=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/setcoord.html#set_angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.set_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the angle between bonds a1-a2 and a3-a2. The atoms will be adjusted along the
+gradient of the angle.
+If <code class="docutils literal"><span class="pre">adjustmol</span></code> is True and the topology is unambiguous, then the entire molecule&#8217;s positions
+will be modified as well</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a1,a2,a3</strong> (<em>mdt.Atom</em>) &#8211; atoms to adjust</li>
+<li><strong>theta</strong> (<em>u.Scalar[angle]</em>) &#8211; new angle to set</li>
+<li><strong>adjustmol</strong> (<em>bool</em>) &#8211; Adjust all atoms on either side of this bond?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="set-dihedral-function">
+<h3>1.2.8. <code class="docutils literal"><span class="pre">set_dihedral</span></code> function<a class="headerlink" href="#set-dihedral-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.set_dihedral">
+<code class="descclassname">moldesign.</code><code class="descname">set_dihedral</code><span class="sig-paren">(</span><em>a1</em>, <em>a2=None</em>, <em>a3=None</em>, <em>a4=None</em>, <em>theta=None</em>, <em>adjustmol=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/setcoord.html#set_dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.set_dihedral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the twist angle of atoms a1 and a4 around the central bond a2-a3. The atoms will be
+adjusted along the gradient of the angle.</p>
+<dl class="docutils">
+<dt>Can be called as <code class="docutils literal"><span class="pre">set_dihedral(a1,</span> <span class="pre">a2,</span> <span class="pre">a3,</span> <span class="pre">a4,</span> <span class="pre">theta,</span> <span class="pre">adjustmol=True)</span></code></dt>
+<dd>OR     <code class="docutils literal"><span class="pre">set_dihedral(a2,</span> <span class="pre">a2,</span> <span class="pre">theta,</span> <span class="pre">adjustmol=True)</span></code>
+OR     <code class="docutils literal"><span class="pre">set_dihedral(bond,</span> <span class="pre">theta,</span> <span class="pre">adjustmol=True)</span></code></dd>
+</dl>
+<p>If <code class="docutils literal"><span class="pre">adjustmol</span></code> is True and the topology is unambiguous, then the entire molecule&#8217;s positions
+will be modified as well</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a1</strong> (<em>mdt.Bond</em>) &#8211; central bond in dihedral</li>
+<li><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; atoms around central bond in dihedral</li>
+<li><strong>a4</strong> (<em>a3,</em>) &#8211; </li>
+<li><strong>theta</strong> (<em>u.Scalar[angle]</em>) &#8211; new angle to set</li>
+<li><strong>adjustmol</strong> (<em>bool</em>) &#8211; Adjust all atoms on either side of this bond?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="set-distance-function">
+<h3>1.2.9. <code class="docutils literal"><span class="pre">set_distance</span></code> function<a class="headerlink" href="#set-distance-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.set_distance">
+<code class="descclassname">moldesign.</code><code class="descname">set_distance</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>newlength</em>, <em>adjustmol=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/setcoord.html#set_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.set_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the distance between two atoms. They will be adjusted along the vector separating them.
+If the two atoms are A) bonded, B) not part of the same ring system, and C) <code class="docutils literal"><span class="pre">adjustmol</span></code> is
+True, then the entire molecule&#8217;s positions will be modified as well</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; atoms to adjust</li>
+<li><strong>newlength</strong> (<em>u.Scalar[length]</em>) &#8211; new length to set</li>
+<li><strong>adjustmol</strong> (<em>bool</em>) &#8211; Adjust all atoms on either side of this bond?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="unexported-api">
+<h2>1.3. Unexported API<a class="headerlink" href="#unexported-api" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="angle-force-constant">
+<h3>1.3.1. <code class="docutils literal"><span class="pre">ANGLE_FORCE_CONSTANT</span></code><a class="headerlink" href="#angle-force-constant" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="moldesign.geom.ANGLE_FORCE_CONSTANT">
+<code class="descclassname">moldesign.geom.</code><code class="descname">ANGLE_FORCE_CONSTANT</code><em class="property"> = &lt;Quantity(1500.0, 'kcalpermol / radian ** 2')&gt;</em><a class="headerlink" href="#moldesign.geom.ANGLE_FORCE_CONSTANT" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a &#8216;patched&#8217; version of pint&#8217;s quantities that can be pickled (slightly hacky)
+and supports more numpy operations.
+Users should never need to instantiate this directly - instead, construct
+MDT quantities by multiplying numbers/arrays with the pre-defined units</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mf">5.0</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">femtoseconds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">eV</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="angle-tolerance">
+<h3>1.3.2. <code class="docutils literal"><span class="pre">ANGLE_TOLERANCE</span></code><a class="headerlink" href="#angle-tolerance" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="moldesign.geom.ANGLE_TOLERANCE">
+<code class="descclassname">moldesign.geom.</code><code class="descname">ANGLE_TOLERANCE</code><em class="property"> = &lt;Quantity(0.0001, 'degree')&gt;</em><a class="headerlink" href="#moldesign.geom.ANGLE_TOLERANCE" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a &#8216;patched&#8217; version of pint&#8217;s quantities that can be pickled (slightly hacky)
+and supports more numpy operations.
+Users should never need to instantiate this directly - instead, construct
+MDT quantities by multiplying numbers/arrays with the pre-defined units</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mf">5.0</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">femtoseconds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">eV</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="angleconstraint-class">
+<h3>1.3.3. <code class="docutils literal"><span class="pre">AngleConstraint</span></code> class<a class="headerlink" href="#angleconstraint-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.geom.AngleConstraint">
+<em class="property">class </em><code class="descclassname">moldesign.geom.</code><code class="descname">AngleConstraint</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>value=None</em>, <em>tolerance=&lt;Quantity(0.0001</em>, <em>'degree')&gt;</em>, <em>force_constant=&lt;Quantity(1500.0</em>, <em>'kcalpermol / radian ** 2')&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#AngleConstraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.AngleConstraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../_moldesign_api/moldesign.geom.html#moldesign.geom.constraints.GeometryConstraint" title="moldesign.geom.constraints.GeometryConstraint"><code class="xref py py-class docutils literal"><span class="pre">moldesign.geom.constraints.GeometryConstraint</span></code></a></p>
+<dl class="staticmethod">
+<dt id="moldesign.geom.AngleConstraint.atomgrad">
+<em class="property">static </em><code class="descname">atomgrad</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.geom.AngleConstraint.atomgrad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gradient of the angle between bonds a2-a1 and a2-a3</p>
+<div class="math">
+\[\nabla \theta_{ijkl} = \frac{\partial \theta_{ijkl}}{\partial \mathbf R}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2,a3</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the vector</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://salilab.org/modeller/9v6/manual/node436.html">https://salilab.org/modeller/9v6/manual/node436.html</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.geom.AngleConstraint.current">
+<code class="descname">current</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#AngleConstraint.current"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.AngleConstraint.current" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current value of the constrained quantity</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.geom.AngleConstraint.desc">
+<code class="descname">desc</code><em class="property"> = 'angle'</em><a class="headerlink" href="#moldesign.geom.AngleConstraint.desc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.geom.AngleConstraint.dof">
+<code class="descname">dof</code><em class="property"> = 1</em><a class="headerlink" href="#moldesign.geom.AngleConstraint.dof" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.geom.AngleConstraint.error">
+<code class="descname">error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#AngleConstraint.error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.AngleConstraint.error" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">deviation of current geometry from the constraint</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="dist-force-constant">
+<h3>1.3.4. <code class="docutils literal"><span class="pre">DIST_FORCE_CONSTANT</span></code><a class="headerlink" href="#dist-force-constant" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="moldesign.geom.DIST_FORCE_CONSTANT">
+<code class="descclassname">moldesign.geom.</code><code class="descname">DIST_FORCE_CONSTANT</code><em class="property"> = &lt;Quantity(1000.0, 'kcalpermol / ang ** 2')&gt;</em><a class="headerlink" href="#moldesign.geom.DIST_FORCE_CONSTANT" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a &#8216;patched&#8217; version of pint&#8217;s quantities that can be pickled (slightly hacky)
+and supports more numpy operations.
+Users should never need to instantiate this directly - instead, construct
+MDT quantities by multiplying numbers/arrays with the pre-defined units</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mf">5.0</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">femtoseconds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">eV</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="dist-tolerance">
+<h3>1.3.5. <code class="docutils literal"><span class="pre">DIST_TOLERANCE</span></code><a class="headerlink" href="#dist-tolerance" title="Permalink to this headline">¶</a></h3>
+<dl class="data">
+<dt id="moldesign.geom.DIST_TOLERANCE">
+<code class="descclassname">moldesign.geom.</code><code class="descname">DIST_TOLERANCE</code><em class="property"> = &lt;Quantity(1e-06, 'ang')&gt;</em><a class="headerlink" href="#moldesign.geom.DIST_TOLERANCE" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a &#8216;patched&#8217; version of pint&#8217;s quantities that can be pickled (slightly hacky)
+and supports more numpy operations.
+Users should never need to instantiate this directly - instead, construct
+MDT quantities by multiplying numbers/arrays with the pre-defined units</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mf">5.0</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">femtoseconds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">eV</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="dihedralconstraint-class">
+<h3>1.3.6. <code class="docutils literal"><span class="pre">DihedralConstraint</span></code> class<a class="headerlink" href="#dihedralconstraint-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.geom.DihedralConstraint">
+<em class="property">class </em><code class="descclassname">moldesign.geom.</code><code class="descname">DihedralConstraint</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>value=None</em>, <em>tolerance=&lt;Quantity(0.0001</em>, <em>'degree')&gt;</em>, <em>force_constant=&lt;Quantity(1500.0</em>, <em>'kcalpermol / radian ** 2')&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#DihedralConstraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.DihedralConstraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../_moldesign_api/moldesign.geom.html#moldesign.geom.constraints.GeometryConstraint" title="moldesign.geom.constraints.GeometryConstraint"><code class="xref py py-class docutils literal"><span class="pre">moldesign.geom.constraints.GeometryConstraint</span></code></a></p>
+<dl class="staticmethod">
+<dt id="moldesign.geom.DihedralConstraint.atomgrad">
+<em class="property">static </em><code class="descname">atomgrad</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>a4</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.geom.DihedralConstraint.atomgrad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cartesian gradient of a dihedral coordinate,</p>
+<div class="math">
+\[\nabla \theta_{ijkl} = \frac{\partial \theta_{ijkl}}{\partial \mathbf R}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2,a3,a4</strong> (<em>mdt.Atom</em>) &#8211; the atoms describing the dihedral</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://salilab.org/modeller/9v6/manual/node436.html">https://salilab.org/modeller/9v6/manual/node436.html</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.geom.DihedralConstraint.current">
+<code class="descname">current</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#DihedralConstraint.current"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.DihedralConstraint.current" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current value of the constrained quantity</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.geom.DihedralConstraint.desc">
+<code class="descname">desc</code><em class="property"> = 'dihedral'</em><a class="headerlink" href="#moldesign.geom.DihedralConstraint.desc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.geom.DihedralConstraint.dof">
+<code class="descname">dof</code><em class="property"> = 1</em><a class="headerlink" href="#moldesign.geom.DihedralConstraint.dof" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.geom.DihedralConstraint.error">
+<code class="descname">error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#DihedralConstraint.error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.DihedralConstraint.error" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">deviation of current geometry from the constraint</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="distanceconstraint-class">
+<h3>1.3.7. <code class="docutils literal"><span class="pre">DistanceConstraint</span></code> class<a class="headerlink" href="#distanceconstraint-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.geom.DistanceConstraint">
+<em class="property">class </em><code class="descclassname">moldesign.geom.</code><code class="descname">DistanceConstraint</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>value=None</em>, <em>tolerance=&lt;Quantity(1e-06</em>, <em>'ang')&gt;</em>, <em>force_constant=&lt;Quantity(1000.0</em>, <em>'kcalpermol / ang ** 2')&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#DistanceConstraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.DistanceConstraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../_moldesign_api/moldesign.geom.html#moldesign.geom.constraints.GeometryConstraint" title="moldesign.geom.constraints.GeometryConstraint"><code class="xref py py-class docutils literal"><span class="pre">moldesign.geom.constraints.GeometryConstraint</span></code></a></p>
+<dl class="staticmethod">
+<dt id="moldesign.geom.DistanceConstraint.atomgrad">
+<em class="property">static </em><code class="descname">atomgrad</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.geom.DistanceConstraint.atomgrad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gradient of the distance between two atoms,</p>
+<div class="math">
+\[\frac{\partial \mathbf{R}_1}{\partial \mathbf{r}} ||\mathbf{R}_1 - \mathbf{R}_2|| =
+   \frac{\mathbf{R}_1 - \mathbf{R}_2}{||\mathbf{R}_1 - \mathbf{R}_2||}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a1,a2</strong> (<em>mdt.Atom</em>) &#8211; the two atoms</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(gradient w.r.t. first atom, gradient w.r.t.
+second atom)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Tuple[u.Vector[length], u.Vector[length]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.geom.DistanceConstraint.current">
+<code class="descname">current</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#DistanceConstraint.current"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.DistanceConstraint.current" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current value of the constrained quantity</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.geom.DistanceConstraint.desc">
+<code class="descname">desc</code><em class="property"> = 'distance'</em><a class="headerlink" href="#moldesign.geom.DistanceConstraint.desc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.geom.DistanceConstraint.dof">
+<code class="descname">dof</code><em class="property"> = 1</em><a class="headerlink" href="#moldesign.geom.DistanceConstraint.dof" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="fixedcoordinate-class">
+<h3>1.3.8. <code class="docutils literal"><span class="pre">FixedCoordinate</span></code> class<a class="headerlink" href="#fixedcoordinate-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.geom.FixedCoordinate">
+<em class="property">class </em><code class="descclassname">moldesign.geom.</code><code class="descname">FixedCoordinate</code><span class="sig-paren">(</span><em>atom</em>, <em>vector</em>, <em>value=None</em>, <em>tolerance=&lt;Quantity(1e-06</em>, <em>'ang')&gt;</em>, <em>force_constant=&lt;Quantity(1000.0</em>, <em>'kcalpermol / ang ** 2')&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#FixedCoordinate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.FixedCoordinate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../_moldesign_api/moldesign.geom.html#moldesign.geom.constraints.GeometryConstraint" title="moldesign.geom.constraints.GeometryConstraint"><code class="xref py py-class docutils literal"><span class="pre">moldesign.geom.constraints.GeometryConstraint</span></code></a></p>
+<p>Fixes a single, linear degree of freedom for an atom, so that it&#8217;s constrained to a plane.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atom</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Atom" title="moldesign.Atom"><em>moldesign.Atom</em></a>) &#8211; atom to constrain</li>
+<li><strong>vector</strong> (<em>np.ndarray</em>) &#8211; direction to constrain</li>
+<li><strong>value</strong> (<em>units.Scalar[length]</em>) &#8211; constraint value (i.e., we constrain the dot product of the
+atom&#8217;s position and the normalized direction vector to be this value)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldesign.geom.FixedCoordinate.atomgrad">
+<code class="descname">atomgrad</code><span class="sig-paren">(</span><em>atom=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#FixedCoordinate.atomgrad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.FixedCoordinate.atomgrad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.geom.FixedCoordinate.current">
+<code class="descname">current</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#FixedCoordinate.current"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.FixedCoordinate.current" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current value of the constrained quantity</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.geom.FixedCoordinate.desc">
+<code class="descname">desc</code><em class="property"> = 'coordinate'</em><a class="headerlink" href="#moldesign.geom.FixedCoordinate.desc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.geom.FixedCoordinate.dof">
+<code class="descname">dof</code><em class="property"> = 1</em><a class="headerlink" href="#moldesign.geom.FixedCoordinate.dof" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="fixedposition-class">
+<h3>1.3.9. <code class="docutils literal"><span class="pre">FixedPosition</span></code> class<a class="headerlink" href="#fixedposition-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.geom.FixedPosition">
+<em class="property">class </em><code class="descclassname">moldesign.geom.</code><code class="descname">FixedPosition</code><span class="sig-paren">(</span><em>atom</em>, <em>value=None</em>, <em>tolerance=&lt;Quantity(1e-06</em>, <em>'ang')&gt;</em>, <em>force_constant=&lt;Quantity(1000.0</em>, <em>'kcalpermol / ang ** 2')&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#FixedPosition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.FixedPosition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../_moldesign_api/moldesign.geom.html#moldesign.geom.constraints.GeometryConstraint" title="moldesign.geom.constraints.GeometryConstraint"><code class="xref py py-class docutils literal"><span class="pre">moldesign.geom.constraints.GeometryConstraint</span></code></a></p>
+<p>Fixes a single atom at a given location</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The gradient of this function is singular and discontinuous when the constraint is satisfied,
+leading to poor results in iterative methods such as SHAKE.</p>
+<p class="last">In such cases, this constraint should be automatically replaced with three
+<code class="xref py py-class docutils literal"><span class="pre">FixedCoordinate</span></code> constraints on the atom&#8217;s x, y, and z coordinates.</p>
+</div>
+<dl class="method">
+<dt id="moldesign.geom.FixedPosition.atomgrad">
+<code class="descname">atomgrad</code><span class="sig-paren">(</span><em>atom=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#FixedPosition.atomgrad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.FixedPosition.atomgrad" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For numerical reasons, this returns a vector in the [1,1,1] direction if the
+constraint is exactly met</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>unit vector from the constraint location to the atom&#8217;s actual</dt>
+<dd>location (len=3)</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">u.Vector[length]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.geom.FixedPosition.current">
+<code class="descname">current</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#FixedPosition.current"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.FixedPosition.current" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current value of the constrained quantity</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.geom.FixedPosition.desc">
+<code class="descname">desc</code><em class="property"> = 'position'</em><a class="headerlink" href="#moldesign.geom.FixedPosition.desc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.geom.FixedPosition.dof">
+<code class="descname">dof</code><em class="property"> = 3</em><a class="headerlink" href="#moldesign.geom.FixedPosition.dof" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.geom.FixedPosition.error">
+<code class="descname">error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#FixedPosition.error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.FixedPosition.error" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">deviation of current geometry from the constraint</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="geometryconstraint-class">
+<h3>1.3.10. <code class="docutils literal"><span class="pre">GeometryConstraint</span></code> class<a class="headerlink" href="#geometryconstraint-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.geom.GeometryConstraint">
+<em class="property">class </em><code class="descclassname">moldesign.geom.</code><code class="descname">GeometryConstraint</code><span class="sig-paren">(</span><em>atoms</em>, <em>value=None</em>, <em>tolerance=None</em>, <em>force_constant=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#GeometryConstraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.GeometryConstraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Base class - Keeps track of a 3D geometry constraint.
+The constraint is satisfied when self.current() == self.value</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atoms</strong> (<em>List[mdt.Atom]</em>) &#8211; atoms involved</li>
+<li><strong>value</strong> (<em>u.Scalar</em>) &#8211; constrain the coordinate to this value</li>
+<li><strong>tolerance</strong> (<em>u.Scalar</em>) &#8211; absolute tolerance (for iterative constraint enforcement)</li>
+<li><strong>force_constant</strong> (<em>u.Scalar[force]</em>) &#8211; optional, only for minimizations and/or use in
+restraints)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="moldesign.geom.GeometryConstraint.current">
+<code class="descname">current</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#GeometryConstraint.current"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.GeometryConstraint.current" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current value of the constrained quantity</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.geom.GeometryConstraint.desc">
+<code class="descname">desc</code><em class="property"> = 'base constraint'</em><a class="headerlink" href="#moldesign.geom.GeometryConstraint.desc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.geom.GeometryConstraint.dof">
+<code class="descname">dof</code><em class="property"> = 1</em><a class="headerlink" href="#moldesign.geom.GeometryConstraint.dof" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.geom.GeometryConstraint.error">
+<code class="descname">error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#GeometryConstraint.error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.GeometryConstraint.error" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">deviation of current geometry from the constraint</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.geom.GeometryConstraint.gradient">
+<code class="descname">gradient</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#GeometryConstraint.gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.GeometryConstraint.gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the gradient of the constrained quantity
+Requires that self.atomgrad be implemented (or otherwise provided)</p>
+<div class="math">
+\[\nabla G(\mathbf r)\]</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.geom.GeometryConstraint.restraint_penalty">
+<code class="descname">restraint_penalty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#GeometryConstraint.restraint_penalty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.GeometryConstraint.restraint_penalty" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">energy penalty for restraints</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">u.Scalar[energy]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.geom.GeometryConstraint.restraint_penalty_force">
+<code class="descname">restraint_penalty_force</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#GeometryConstraint.restraint_penalty_force"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.GeometryConstraint.restraint_penalty_force" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">forces from restraint</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">u.Vector[energy]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.geom.GeometryConstraint.satisfied">
+<code class="descname">satisfied</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/constraints.html#GeometryConstraint.satisfied"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.GeometryConstraint.satisfied" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if this constraint is satisfied to within tolerance</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="molecularsymmetry-class">
+<h3>1.3.11. <code class="docutils literal"><span class="pre">MolecularSymmetry</span></code> class<a class="headerlink" href="#molecularsymmetry-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.geom.MolecularSymmetry">
+<em class="property">class </em><code class="descclassname">moldesign.geom.</code><code class="descname">MolecularSymmetry</code><span class="sig-paren">(</span><em>mol</em>, <em>symbol</em>, <em>rms</em>, <em>orientation=None</em>, <em>elems=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/symmetry.html#MolecularSymmetry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.MolecularSymmetry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="moldesign.geom.MolecularSymmetry.get_symmetrized_coords">
+<code class="descname">get_symmetrized_coords</code><span class="sig-paren">(</span><em>elem</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/symmetry.html#MolecularSymmetry.get_symmetrized_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.MolecularSymmetry.get_symmetrized_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Symmetrize the molecule based on the symmetry operation
+This will work as long as the symmetry operation brings each atom closest to a symmetry relation.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="monitor-class">
+<h3>1.3.12. <code class="docutils literal"><span class="pre">Monitor</span></code> class<a class="headerlink" href="#monitor-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.geom.Monitor">
+<em class="property">class </em><code class="descclassname">moldesign.geom.</code><code class="descname">Monitor</code><span class="sig-paren">(</span><em>*atoms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/monitor.html#Monitor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.Monitor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="moldesign.geom.Monitor.constrain">
+<code class="descname">constrain</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/monitor.html#Monitor.constrain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.Monitor.constrain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constrain this coordinate.</p>
+<p>This will add a new item to the parent molecule&#8217;s constraint list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value</strong> (<em>u.Scalar</em>) &#8211; constrain the coordinate to this value</li>
+<li><strong>tolerance</strong> (<em>u.Scalar</em>) &#8211; absolute tolerance (for iterative constraint enforcement)</li>
+<li><strong>force_constant</strong> (<em>u.Scalar[force]</em>) &#8211; optional, only for minimizations and/or use in
+restraints)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the constraint object</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../_moldesign_api/moldesign.geom.html#moldesign.geom.constraints.GeometryConstraint" title="moldesign.geom.constraints.GeometryConstraint">constraints.GeometryConstraint</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.geom.Monitor.gradient">
+<code class="descname">gradient</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/monitor.html#Monitor.gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.Monitor.gradient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.geom.Monitor.value">
+<code class="descname">value</code><a class="headerlink" href="#moldesign.geom.Monitor.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="symmetryelement-class">
+<h3>1.3.13. <code class="docutils literal"><span class="pre">SymmetryElement</span></code> class<a class="headerlink" href="#symmetryelement-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="moldesign.geom.SymmetryElement">
+<em class="property">class </em><code class="descclassname">moldesign.geom.</code><code class="descname">SymmetryElement</code><span class="sig-paren">(</span><em>symbol</em>, <em>matrix</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/symmetry.html#SymmetryElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.SymmetryElement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Represents an basic, origin-centered symmetry operation: an identity operation (C1/E),
+inversion center (Ci),
+mirror plane (Cs), rotation axis (C2,C3,...), or
+improper rotation (S4, S6, ...)</p>
+<dl class="method">
+<dt id="moldesign.geom.SymmetryElement.get_axis">
+<code class="descname">get_axis</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/symmetry.html#SymmetryElement.get_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.SymmetryElement.get_axis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns normal of the plane for Cs or axis of rotation for a Cn
+:param symm_elem: symmetry element (with attributes &#8216;symbol&#8217; and &#8216;matrix&#8217;)
+:return: array of shape (3,)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="apply-4x4-transform-function">
+<h3>1.3.14. <code class="docutils literal"><span class="pre">apply_4x4_transform</span></code> function<a class="headerlink" href="#apply-4x4-transform-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.geom.apply_4x4_transform">
+<code class="descclassname">moldesign.geom.</code><code class="descname">apply_4x4_transform</code><span class="sig-paren">(</span><em>trans</em>, <em>vecs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/mathutils.html#apply_4x4_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.apply_4x4_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies a 4x4 transformation vector so one or more 3-D position vector
+:param trans:
+:param vecs:
+:return: transformed position vector</p>
+</dd></dl>
+
+</div>
+<div class="section" id="get-symmetry-function">
+<h3>1.3.15. <code class="docutils literal"><span class="pre">get_symmetry</span></code> function<a class="headerlink" href="#get-symmetry-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.geom.get_symmetry">
+<code class="descclassname">moldesign.geom.</code><code class="descname">get_symmetry</code><span class="sig-paren">(</span><em>mol</em>, <em>tolerance=&lt;Quantity(0.1</em>, <em>'ang')&gt;</em>, <em>image='symmol'</em>, <em>engine=None</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.geom.get_symmetry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="improper-axis-from-matrix-function">
+<h3>1.3.16. <code class="docutils literal"><span class="pre">improper_axis_from_matrix</span></code> function<a class="headerlink" href="#improper-axis-from-matrix-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.geom.improper_axis_from_matrix">
+<code class="descclassname">moldesign.geom.</code><code class="descname">improper_axis_from_matrix</code><span class="sig-paren">(</span><em>matrix</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/symmetry.html#improper_axis_from_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.improper_axis_from_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return rotation angle and axis / mirror plane normal from improper rotation matrix.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="normalized-function">
+<h3>1.3.17. <code class="docutils literal"><span class="pre">normalized</span></code> function<a class="headerlink" href="#normalized-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.geom.normalized">
+<code class="descclassname">moldesign.geom.</code><code class="descname">normalized</code><span class="sig-paren">(</span><em>vec</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/mathutils.html#normalized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.normalized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a vector normalized in L2.
+If vector is 0, return 0</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vec</strong> (<em>u.Vector</em>) &#8211; vector to be normalized</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">normalized vector</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">u.Vector</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="perpendicular-function">
+<h3>1.3.18. <code class="docutils literal"><span class="pre">perpendicular</span></code> function<a class="headerlink" href="#perpendicular-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.geom.perpendicular">
+<code class="descclassname">moldesign.geom.</code><code class="descname">perpendicular</code><span class="sig-paren">(</span><em>vec</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/mathutils.html#perpendicular"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.perpendicular" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="safe-arccos-function">
+<h3>1.3.19. <code class="docutils literal"><span class="pre">safe_arccos</span></code> function<a class="headerlink" href="#safe-arccos-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.geom.safe_arccos">
+<code class="descclassname">moldesign.geom.</code><code class="descname">safe_arccos</code><span class="sig-paren">(</span><em>costheta</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/mathutils.html#safe_arccos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.safe_arccos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version of arccos that can handle numerical noise greater than 1.0</p>
+</dd></dl>
+
+</div>
+<div class="section" id="shake-positions-function">
+<h3>1.3.20. <code class="docutils literal"><span class="pre">shake_positions</span></code> function<a class="headerlink" href="#shake-positions-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.geom.shake_positions">
+<code class="descclassname">moldesign.geom.</code><code class="descname">shake_positions</code><span class="sig-paren">(</span><em>mol</em>, <em>prev_positions</em>, <em>max_cycles=100</em>, <em>use_masses=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/geom/shake.html#shake_positions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.shake_positions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satisfy all molecular constraints using the SHAKE algorithm</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule with unsatisfied constraints</li>
+<li><strong>prev_positions</strong> (<em>mdt.units.Array[length]</em>) &#8211; positions prior to move</li>
+<li><strong>max_cycles</strong> (<em>int</em>) &#8211; halt and raise an exception after this many cycles</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This algorithm does badly if constraint function gradients go to 0.</p>
+</div>
+<p class="rubric">References</p>
+<ol class="upperalpha" start="18">
+<li><dl class="first docutils">
+<dt>Elber, A. Ruymgaart, B. Hess: SHAKE Parallelization.</dt>
+<dd><p class="first last">Eur Phys J Spec Top. 2011 Nov 1; 200(1): 211.
+doi:10.1140/epjst/e2011-01525-9</p>
+</dd>
+</dl>
+</li>
+</ol>
+</dd></dl>
+
+</div>
+<div class="section" id="sub-angles-function">
+<h3>1.3.21. <code class="docutils literal"><span class="pre">sub_angles</span></code> function<a class="headerlink" href="#sub-angles-function" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="moldesign.geom.sub_angles">
+<code class="descclassname">moldesign.geom.</code><code class="descname">sub_angles</code><span class="sig-paren">(</span><em>a</em>, <em>b</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/mathutils.html#sub_angles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.geom.sub_angles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subtract two angles, keeping the result within [-180,180)</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="moldesign.widgets.html" class="btn btn-neutral float-right" title="2. Widgets API" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../api/wfn.html" class="btn btn-neutral" title="4. Electronic wavefunction API" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

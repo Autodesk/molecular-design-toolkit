@@ -1,0 +1,341 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.orbitals.wfn &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.orbitals.wfn</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.orbitals.wfn</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">moldesign.utils</span> <span class="kn">import</span> <span class="n">DotDict</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">MolecularOrbitals</span>
+
+
+<div class="viewcode-block" id="ElectronicWfn"><a class="viewcode-back" href="../../../api/wfn.html#moldesign.orbitals.wfn.ElectronicWfn">[docs]</a><span class="k">class</span> <span class="nc">ElectronicWfn</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Stores the results of a quantum chemistry calculation.</span>
+
+<span class="sd">    This is necessarily pretty flexible, but generally stores an LCAO wfn and one or more sets of</span>
+<span class="sd">    orbitals. Can also store CI vectors, etc.</span>
+
+<span class="sd">    These objects will usually be created by quantum chemical energy models.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mol (moldesign.Molecule): Molecule this wavefunction belongs to</span>
+<span class="sd">        num_electrons (int): number of electrons in this wavefunction</span>
+<span class="sd">        model (moldesign.models.base.EnergyModelBase): The model this wavefunction was created with</span>
+<span class="sd">        aobasis (moldesign.orbitals.BasisSet): The basis functions for the enclosed orbitals</span>
+<span class="sd">        nbasis (int): number of AO basis functions</span>
+<span class="sd">        fock_ao (moldesign.units.Array[energy]): fock matrix in the AO basis</span>
+<span class="sd">        positions (moldesign.units.Array[length]): positions of the nuclei for this wfn</span>
+<span class="sd">        civectors (np.ndarray): CI vectors (if applicable)</span>
+<span class="sd">        description (str): text describing the wfn (e.g. &#39;RHF/STO-3G&#39;, &#39;CAS(2,2)/SA3/6-31G**&#39;)</span>
+<span class="sd">        density_matrix_ao (np.ndarray): density matrix in the ao basis</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="n">num_electrons</span><span class="p">,</span>
+                 <span class="n">model</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">aobasis</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">fock_ao</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">positions</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">civectors</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">description</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">density_matrix_ao</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="n">mol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">civectors</span> <span class="o">=</span> <span class="n">civectors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aobasis</span> <span class="o">=</span> <span class="n">aobasis</span>
+        <span class="k">if</span> <span class="n">aobasis</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nbasis</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aobasis</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nbasis</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span> <span class="o">=</span> <span class="n">DotDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fock_ao</span> <span class="o">=</span> <span class="n">fock_ao</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_electrons</span> <span class="o">=</span> <span class="n">num_electrons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">homo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_electrons</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lumo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">homo</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_canonical</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">density_matrix_ao</span> <span class="o">=</span> <span class="n">density_matrix_ao</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+
+        <span class="k">if</span> <span class="n">positions</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">positions</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aobasis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span><span class="p">[</span><span class="s1">&#39;atomic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aobasis</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aobasis</span><span class="o">.</span><span class="n">wfn</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="k">for</span> <span class="n">orb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">aobasis</span><span class="o">.</span><span class="n">orbitals</span><span class="p">:</span>
+                <span class="n">orb</span><span class="o">.</span><span class="n">wfn</span> <span class="o">=</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;ElectronicWfn (</span><span class="si">%s</span><span class="s1">) of </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> wfn&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span>
+
+<div class="viewcode-block" id="ElectronicWfn.set_canonical_mos"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.wfn.ElectronicWfn.set_canonical_mos">[docs]</a>    <span class="k">def</span> <span class="nf">set_canonical_mos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orbs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">orbs</span><span class="o">.</span><span class="n">wfn</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">orbs</span><span class="o">.</span><span class="n">wfn</span> <span class="o">=</span> <span class="bp">self</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_canonical</span> <span class="o">=</span> <span class="bp">True</span></div>
+
+<div class="viewcode-block" id="ElectronicWfn.align_orbital_phases"><a class="viewcode-back" href="../../../api/wfn.html#moldesign.orbitals.wfn.ElectronicWfn.align_orbital_phases">[docs]</a>    <span class="k">def</span> <span class="nf">align_orbital_phases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">assert_same</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Align this wavefunction&#39;s orbitals to have the same phase as those in `other`.</span>
+<span class="sd">        :type other: ElectronicWfn</span>
+<span class="sd">        :param assert_same: raise an exception if the two wavefunctions do not have the same kinds of orbitals</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">orbtype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">orbtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">orbitals</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">assert_same</span><span class="p">:</span> <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> has orbital type </span><span class="si">%s</span><span class="s1">, but </span><span class="si">%s</span><span class="s1"> does not.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orbtype</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span><span class="p">[</span><span class="n">orbtype</span><span class="p">]</span><span class="o">.</span><span class="n">align_phases</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">orbitals</span><span class="p">[</span><span class="n">orbtype</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ElectronicWfn.run_nbo"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.wfn.ElectronicWfn.run_nbo">[docs]</a>    <span class="k">def</span> <span class="nf">run_nbo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">moldesign.interfaces</span> <span class="kn">import</span> <span class="n">nbo_interface</span>
+        <span class="n">nbo_interface</span><span class="o">.</span><span class="n">run_nbo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElectronicWfn.add_orbitals"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.orbitals.html#moldesign.orbitals.wfn.ElectronicWfn.add_orbitals">[docs]</a>    <span class="k">def</span> <span class="nf">add_orbitals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orbs</span><span class="p">,</span> <span class="n">orbtype</span><span class="o">=</span><span class="s1">&#39;canonical&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">mo_object</span> <span class="o">=</span> <span class="n">MolecularOrbitals</span><span class="p">(</span><span class="n">orbs</span><span class="p">,</span>
+                                      <span class="n">wfn</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                                      <span class="n">orbtype</span><span class="o">=</span><span class="n">orbtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span><span class="p">[</span><span class="n">orbtype</span><span class="p">]</span> <span class="o">=</span> <span class="n">mo_object</span>
+        <span class="k">if</span> <span class="n">orbtype</span> <span class="o">==</span> <span class="s1">&#39;canonical&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_canonical</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_canonical_mos</span><span class="p">(</span><span class="n">mo_object</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mo_object</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">molecular_orbitals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A synonym for self.orbitals[&#39;canonical&#39;], since this is usually what&#39;s wanted&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span><span class="p">[</span><span class="s1">&#39;canonical&#39;</span><span class="p">]</span>
+
+    <span class="nd">@molecular_orbitals.setter</span>
+    <span class="k">def</span> <span class="nf">molecular_orbitals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A synonym for self.orbitals[&#39;canonical&#39;], since this is usually what&#39;s wanted&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orbitals</span><span class="p">[</span><span class="s1">&#39;canonical&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

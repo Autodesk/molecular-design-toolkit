@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>moldesign.viewer.viewer3d &mdash; Molecular Design Toolkit 0.7.0 documentation</title>
+  <title>moldesign.viewer.viewer3d &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Molecular Design Toolkit 0.7.0 documentation" href="../../../index.html"/>
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.3
               </div>
             
           
@@ -80,13 +80,37 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents</span></p>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
 </ul>
 
             
@@ -100,7 +124,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../contents.html">Molecular Design Toolkit</a>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
       </nav>
 
 
@@ -115,7 +139,7 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
       
           <li><a href="../../index.html">Module code</a> &raquo;</li>
       
@@ -161,7 +185,7 @@
 <span class="c1"># Right now hard-coded to use 3DMol driver - will need to be configurable when there&#39;s more than one</span>
 <span class="c1"># In theory, the only tie to the specific driver should be the class that we inherit from</span>
 <span class="nd">@toplevel</span>
-<div class="viewcode-block" id="GeometryViewer"><a class="viewcode-back" href="../../../toplevel.html#moldesign.GeometryViewer">[docs]</a><span class="k">class</span> <span class="nc">GeometryViewer</span><span class="p">(</span><span class="n">MolViz_3DMol</span><span class="p">,</span> <span class="n">ColorMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer">[docs]</a><span class="k">class</span> <span class="nc">GeometryViewer</span><span class="p">(</span><span class="n">MolViz_3DMol</span><span class="p">,</span> <span class="n">ColorMixin</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Viewer for static and multiple-frame geometries</span>
 
@@ -173,7 +197,7 @@
     <span class="n">DEFAULT_COLOR_MAP</span> <span class="o">=</span> <span class="n">colormap</span>
     <span class="n">DEFAULT_WIDTH</span> <span class="o">=</span> <span class="mi">625</span>
     <span class="n">DEFAULT_HEIGHT</span> <span class="o">=</span> <span class="mi">400</span>
-    <span class="n">DEF_PADDING</span> <span class="o">=</span> <span class="mf">1.75</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span>
+    <span class="n">DEF_PADDING</span> <span class="o">=</span> <span class="mf">2.25</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span>
 
     <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;prevent these from being pickled for now&quot;&quot;&quot;</span>
@@ -214,7 +238,7 @@
     <span class="k">def</span> <span class="nf">wfn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">wfns</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_frame</span><span class="p">]</span>
 
-<div class="viewcode-block" id="GeometryViewer.autostyle"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.autostyle">[docs]</a>    <span class="k">def</span> <span class="nf">autostyle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.autostyle"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.autostyle">[docs]</a>    <span class="k">def</span> <span class="nf">autostyle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">mass</span> <span class="o">&lt;=</span> <span class="mf">500.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">dalton</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stick</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -230,7 +254,7 @@
                     <span class="n">cartoon_atoms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="n">residue</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;water&#39;</span><span class="p">,</span> <span class="s1">&#39;solvent&#39;</span><span class="p">):</span>
                     <span class="n">line_atoms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="n">residue</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;dna&#39;</span><span class="p">,</span> <span class="s1">&#39;rna&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">numatoms</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">residue</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;dna&#39;</span><span class="p">,</span> <span class="s1">&#39;rna&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">num_atoms</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
                     <span class="n">cartoon_atoms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>  <span class="c1"># includes DNA, RNA if molecule is small enough</span>
                     <span class="n">stick_atoms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
@@ -247,18 +271,15 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">stick</span><span class="p">(</span><span class="n">atoms</span><span class="o">=</span><span class="n">stick_atoms</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
         <span class="c1"># Deal with unbonded atoms (they only show up in VDW rep)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">numatoms</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s1">&#39;WARN: large structure; waters not shown by default.&#39;</span>
-            <span class="n">lone</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span> <span class="k">if</span>
-                    <span class="n">atom</span><span class="o">.</span><span class="n">num_bonds</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s1">&#39;water&#39;</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hide</span><span class="p">(</span><span class="n">atoms</span><span class="o">=</span><span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span> <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">num_bonds</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span>
-                             <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;water&#39;</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">show_unbonded</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">num_atoms</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="p">:</span>
+            <span class="n">lone</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span> <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">num_bonds</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">lone</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vdw</span><span class="p">(</span><span class="n">atoms</span><span class="o">=</span><span class="n">lone</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">render</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="n">render</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.show_unbonded"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.show_unbonded">[docs]</a>    <span class="k">def</span> <span class="nf">show_unbonded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.show_unbonded"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.show_unbonded">[docs]</a>    <span class="k">def</span> <span class="nf">show_unbonded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
         <span class="n">lone</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span> <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">num_bonds</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">lone</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">vdw</span><span class="p">(</span><span class="n">atoms</span><span class="o">=</span><span class="n">lone</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">)</span></div>
 
@@ -286,14 +307,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="p">(</span><span class="s1">&#39;setBonds&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">bonds</span><span class="p">])</span>
 
     <span class="nd">@utils.doc_inherit</span>
-<div class="viewcode-block" id="GeometryViewer.set_color"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.set_color">[docs]</a>    <span class="k">def</span> <span class="nf">set_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">_store</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.set_color"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.set_color">[docs]</a>    <span class="k">def</span> <span class="nf">set_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">_store</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">_store</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_colored_as</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">GeometryViewer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="n">atoms</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">)</span></div>
 
     <span class="nd">@utils.doc_inherit</span>
-<div class="viewcode-block" id="GeometryViewer.set_colors"><a class="viewcode-back" href="../../../toplevel.html#moldesign.GeometryViewer.set_colors">[docs]</a>    <span class="k">def</span> <span class="nf">set_colors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colormap</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">_store</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.set_colors"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.set_colors">[docs]</a>    <span class="k">def</span> <span class="nf">set_colors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colormap</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">_store</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">_store</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">color</span><span class="p">,</span> <span class="n">atoms</span> <span class="ow">in</span> <span class="n">colormap</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
                 <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
@@ -301,7 +322,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">GeometryViewer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">set_colors</span><span class="p">(</span><span class="n">colormap</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></div>
 
     <span class="nd">@utils.doc_inherit</span>
-<div class="viewcode-block" id="GeometryViewer.unset_color"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.unset_color">[docs]</a>    <span class="k">def</span> <span class="nf">unset_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">_store</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.unset_color"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.unset_color">[docs]</a>    <span class="k">def</span> <span class="nf">unset_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">_store</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">_store</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_colored_as</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
@@ -311,7 +332,7 @@
         <span class="k">if</span> <span class="n">render</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">result</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.get_input_file"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.get_input_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_input_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.get_input_file"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.get_input_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_input_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">250</span><span class="p">:</span>
             <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;sdf&#39;</span>
         <span class="k">else</span><span class="p">:</span>
@@ -323,12 +344,12 @@
         <span class="n">instring</span> <span class="o">=</span> <span class="n">writemol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="n">fmt</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">instring</span><span class="p">,</span> <span class="n">fmt</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.get_positions"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.get_positions">[docs]</a>    <span class="k">def</span> <span class="nf">get_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.get_positions"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.get_positions">[docs]</a>    <span class="k">def</span> <span class="nf">get_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">positions</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DISTANCE_UNITS</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
                      <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">positions</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.calc_orb_grid"><a class="viewcode-back" href="../../../toplevel.html#moldesign.GeometryViewer.calc_orb_grid">[docs]</a>    <span class="k">def</span> <span class="nf">calc_orb_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orbname</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">framenum</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.calc_orb_grid"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.calc_orb_grid">[docs]</a>    <span class="k">def</span> <span class="nf">calc_orb_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orbname</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="n">framenum</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Calculate orbitals on a grid</span>
 
 <span class="sd">        Args:</span>
@@ -364,10 +385,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="p">(</span><span class="s1">&#39;adjustClipping&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.6</span><span class="o">*</span> <span class="n">maxrange</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)])</span>
         <span class="k">return</span> <span class="n">grid</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.get_orbnames"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.get_orbnames">[docs]</a>    <span class="k">def</span> <span class="nf">get_orbnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.get_orbnames"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.get_orbnames">[docs]</a>    <span class="k">def</span> <span class="nf">get_orbnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.draw_atom_vectors"><a class="viewcode-back" href="../../../toplevel.html#moldesign.GeometryViewer.draw_atom_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">draw_atom_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vecs</span><span class="p">,</span> <span class="n">rescale_to</span><span class="o">=</span><span class="mf">1.75</span><span class="p">,</span>
+<div class="viewcode-block" id="GeometryViewer.draw_atom_vectors"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.draw_atom_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">draw_atom_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vecs</span><span class="p">,</span> <span class="n">rescale_to</span><span class="o">=</span><span class="mf">1.75</span><span class="p">,</span>
                           <span class="n">scale_factor</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span>
                           <span class="n">radius</span><span class="o">=</span><span class="mf">0.11</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -409,11 +430,12 @@
                                                                     <span class="n">native</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">DISTANCE_UNITS</span><span class="p">)</span>
         <span class="n">shapes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">atom</span><span class="p">,</span> <span class="n">vecarray</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">,</span> <span class="n">arrowvecs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">vecarray</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">:</span> <span class="k">continue</span>
             <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">draw_arrow</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="n">vector</span><span class="o">=</span><span class="n">vecarray</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">render</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">shapes</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.draw_axis"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.draw_axis">[docs]</a>    <span class="k">def</span> <span class="nf">draw_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.draw_axis"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.draw_axis">[docs]</a>    <span class="k">def</span> <span class="nf">draw_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="n">label_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">on</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axis_objects</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">xarrow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_arrow</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
@@ -432,13 +454,13 @@
 
         <span class="k">if</span> <span class="n">render</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.draw_forces"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.draw_forces">[docs]</a>    <span class="k">def</span> <span class="nf">draw_forces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.draw_forces"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.draw_forces">[docs]</a>    <span class="k">def</span> <span class="nf">draw_forces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_atom_vectors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">forces</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.draw_momenta"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.draw_momenta">[docs]</a>    <span class="k">def</span> <span class="nf">draw_momenta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.draw_momenta"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.draw_momenta">[docs]</a>    <span class="k">def</span> <span class="nf">draw_momenta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_atom_vectors</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">momenta</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.highlight_atoms"><a class="viewcode-back" href="../../../toplevel.html#moldesign.GeometryViewer.highlight_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">highlight_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.highlight_atoms"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.highlight_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">highlight_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Args:</span>
@@ -469,7 +491,7 @@
 
         <span class="k">if</span> <span class="n">render</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
 
-<div class="viewcode-block" id="GeometryViewer.label_atoms"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.label_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">label_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.label_atoms"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.label_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">label_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;render&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="k">if</span> <span class="n">atoms</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span>
@@ -477,14 +499,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">draw_label</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">render</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.add_click_callback"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.add_click_callback">[docs]</a>    <span class="k">def</span> <span class="nf">add_click_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.add_click_callback"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.add_click_callback">[docs]</a>    <span class="k">def</span> <span class="nf">add_click_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">callable</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.remove_click_callback"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.remove_click_callback">[docs]</a>    <span class="k">def</span> <span class="nf">remove_click_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.remove_click_callback"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.remove_click_callback">[docs]</a>    <span class="k">def</span> <span class="nf">remove_click_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.handle_click"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.handle_click">[docs]</a>    <span class="k">def</span> <span class="nf">handle_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trait_name</span><span class="p">,</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.handle_click"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.handle_click">[docs]</a>    <span class="k">def</span> <span class="nf">handle_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trait_name</span><span class="p">,</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
         <span class="c1"># TODO: this should handle more than just atoms</span>
         <span class="n">atom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">new</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection_group</span><span class="p">:</span>
@@ -492,7 +514,7 @@
         <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">:</span>
             <span class="n">callback</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.append_frame"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.append_frame">[docs]</a>    <span class="k">def</span> <span class="nf">append_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">wfn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.append_frame"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.append_frame">[docs]</a>    <span class="k">def</span> <span class="nf">append_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">wfn</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="c1"># override base method - we&#39;ll handle frames entirely in python</span>
         <span class="c1"># this is copied verbatim from molviz, except for the line noted</span>
         <span class="k">if</span> <span class="n">positions</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -511,7 +533,7 @@
         <span class="k">if</span> <span class="n">render</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span></div>
 
     <span class="nd">@utils.doc_inherit</span>
-<div class="viewcode-block" id="GeometryViewer.show_frame"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.show_frame">[docs]</a>    <span class="k">def</span> <span class="nf">show_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">framenum</span><span class="p">,</span> <span class="n">_fire_event</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">update_orbitals</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.show_frame"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.show_frame">[docs]</a>    <span class="k">def</span> <span class="nf">show_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">framenum</span><span class="p">,</span> <span class="n">_fire_event</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">update_orbitals</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="c1"># override base method - we&#39;ll handle frames using self.set_positions</span>
         <span class="c1"># instead of any built-in handlers</span>
         <span class="k">if</span> <span class="n">framenum</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_frame</span><span class="p">:</span>
@@ -523,7 +545,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">redraw_orbs</span><span class="p">(</span><span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">render</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.handle_selection_event"><a class="viewcode-back" href="../../../toplevel.html#moldesign.GeometryViewer.handle_selection_event">[docs]</a>    <span class="k">def</span> <span class="nf">handle_selection_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.handle_selection_event"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.handle_selection_event">[docs]</a>    <span class="k">def</span> <span class="nf">handle_selection_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deals with an external selection event</span>
 <span class="sd">        :param selection:todo</span>
@@ -557,7 +579,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="GeometryViewer.redraw_orbs"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.viewer.html#moldesign.GeometryViewer.redraw_orbs">[docs]</a>    <span class="k">def</span> <span class="nf">redraw_orbs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryViewer.redraw_orbs"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.html#moldesign.GeometryViewer.redraw_orbs">[docs]</a>    <span class="k">def</span> <span class="nf">redraw_orbs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orbital_is_selected</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">draw_orbital</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_orbital</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">orbital_spec</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">render</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span></div>
@@ -604,7 +626,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.7.0',
+            VERSION:'0.7.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

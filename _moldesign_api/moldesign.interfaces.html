@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>moldesign.interfaces package &mdash; Molecular Design Toolkit 0.7.0 documentation</title>
+  <title>moldesign.interfaces package &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
   
 
   
@@ -30,10 +30,7 @@
   
 
   
-    <link rel="top" title="Molecular Design Toolkit 0.7.0 documentation" href="../index.html"/>
-        <link rel="up" title="moldesign package" href="moldesign.html"/>
-        <link rel="next" title="moldesign.min package" href="moldesign.min.html"/>
-        <link rel="prev" title="moldesign.integrators package" href="moldesign.integrators.html"/> 
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -51,7 +48,7 @@
           
 
           
-            <a href="../contents.html" class="icon icon-home"> Molecular Design Toolkit
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
           
 
           
@@ -61,7 +58,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.3
               </div>
             
           
@@ -82,55 +79,37 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../howdoi.html">How do I ...?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../structure.html">Atoms, molecules, and biomolecules</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="moldesign.html">Complete API reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="moldesign.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="moldesign.compute.html">moldesign.compute package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.external.html">moldesign.external package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.forcefields.html">moldesign.forcefields package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.geom.html">moldesign.geom package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.integrators.html">moldesign.integrators package</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">moldesign.interfaces package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.interfaces.ambertools">moldesign.interfaces.ambertools module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.interfaces.biopython_interface">moldesign.interfaces.biopython_interface module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.interfaces.nbo_interface">moldesign.interfaces.nbo_interface module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.interfaces.openbabel">moldesign.interfaces.openbabel module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.interfaces.openmm">moldesign.interfaces.openmm module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.interfaces.opsin_interface">moldesign.interfaces.opsin_interface module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.interfaces.pdbfixer_interface">moldesign.interfaces.pdbfixer_interface module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.interfaces.pyscf_interface">moldesign.interfaces.pyscf_interface module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#moldesign-interfaces-qmmm-module">moldesign.interfaces.qmmm module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-moldesign.interfaces.symmol_interface">moldesign.interfaces.symmol_interface module</a></li>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
 </ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.min.html">moldesign.min package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.models.html">moldesign.models package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.molecules.html">moldesign.molecules package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.orbitals.html">moldesign.orbitals package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.uibase.html">moldesign.uibase package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.units.html">moldesign.units package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.utils.html">moldesign.utils package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.viewer.html">moldesign.viewer package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="moldesign.widgets.html">moldesign.widgets package</a></li>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
 </ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.converters">moldesign.converters module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.data">moldesign.data module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.exceptions">moldesign.exceptions module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.helpers">moldesign.helpers module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.mathutils">moldesign.mathutils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.method">moldesign.method module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.parameters">moldesign.parameters module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="moldesign.html#module-moldesign.tools">moldesign.tools module</a></li>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/wfn.html">4. Electronic wavefunction API</a></li>
 </ul>
-</li>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.data.html">6. Data API</a></li>
 </ul>
 
             
@@ -144,7 +123,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../contents.html">Molecular Design Toolkit</a>
+        <a href="../index.html">Molecular Design Toolkit</a>
       </nav>
 
 
@@ -159,9 +138,7 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../contents.html">Docs</a> &raquo;</li>
-      
-          <li><a href="moldesign.html">moldesign package</a> &raquo;</li>
+    <li><a href="../index.html">Docs</a> &raquo;</li>
       
     <li>moldesign.interfaces package</li>
       <li class="wy-breadcrumbs-aside">
@@ -208,28 +185,10 @@
 
 </dd></dl>
 
-<dl class="class">
-<dt id="moldesign.interfaces.ambertools.GAFFParameters">
-<em class="property">class </em><code class="descclassname">moldesign.interfaces.ambertools.</code><code class="descname">GAFFParameters</code><span class="sig-paren">(</span><em>lib</em>, <em>frcmod</em>, <em>job</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.interfaces.ambertools.GAFFParameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></p>
 <dl class="attribute">
-<dt id="moldesign.interfaces.ambertools.GAFFParameters.frcmod">
-<code class="descname">frcmod</code><a class="headerlink" href="#moldesign.interfaces.ambertools.GAFFParameters.frcmod" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 1</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="moldesign.interfaces.ambertools.GAFFParameters.job">
-<code class="descname">job</code><a class="headerlink" href="#moldesign.interfaces.ambertools.GAFFParameters.job" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 2</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="moldesign.interfaces.ambertools.GAFFParameters.lib">
-<code class="descname">lib</code><a class="headerlink" href="#moldesign.interfaces.ambertools.GAFFParameters.lib" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 0</p>
-</dd></dl>
-
+<dt id="moldesign.interfaces.ambertools.ExtraAmberParameters">
+<code class="descclassname">moldesign.interfaces.ambertools.</code><code class="descname">ExtraAmberParameters</code><a class="headerlink" href="#moldesign.interfaces.ambertools.ExtraAmberParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">GAFFParameters</span></code></p>
 </dd></dl>
 
 <dl class="exception">
@@ -239,15 +198,9 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="moldesign.interfaces.ambertools.am1_bcc_charges">
-<code class="descclassname">moldesign.interfaces.ambertools.</code><code class="descname">am1_bcc_charges</code><span class="sig-paren">(</span><em>mol</em>, <em>minsteps=None</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#am1_bcc_charges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.ambertools.am1_bcc_charges" title="Permalink to this definition">¶</a></dt>
-<dd><p>Doesn&#8217;t work yet ...</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="moldesign.interfaces.ambertools.assign_forcefield">
 <code class="descclassname">moldesign.interfaces.ambertools.</code><code class="descname">assign_forcefield</code><span class="sig-paren">(</span><em>mol</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#assign_forcefield"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.ambertools.assign_forcefield" title="Permalink to this definition">¶</a></dt>
-<dd><p>run_tleap(mol, protein=&#8217;ff14SB&#8217;, dna=&#8217;OL15&#8217;, rna=&#8217;OL3&#8217;, carbohydrate=&#8217;GLYCAM_06j-1&#8217;, lipid=&#8217;lipid14&#8217;, water=&#8217;tip3p&#8217;, organic=&#8217;gaff2&#8217;, off_files=(), frcmod_files=(), engine=None, image=None, wait=True, jobname=None, display=True)
+<dd><p>run_tleap(mol, forcefields=None, parameters=None, engine=None, image=None, wait=True, jobname=None, display=True)
 Drives tleap to create a prmtop and inpcrd file. Specifically uses the AmberTools 16
 tleap distribution.</p>
 <p>Defaults are as recommended in the ambertools manual.</p>
@@ -256,18 +209,13 @@ tleap distribution.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to set up</li>
-<li><strong>protein</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; protein forcefield name (default:ff14SB)</li>
-<li><strong>dna</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; dna forcefield name (default: OL15)</li>
-<li><strong>rna</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; rna forcefield name (default: OL3)</li>
-<li><strong>carbohydrate</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; carbohydrate forcefield name (default: GLYCAM_06j)</li>
-<li><strong>lipid</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; lipid forcefield name (default: lipid14)</li>
-<li><strong>water</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; water forcefield name (default: tip3p)</li>
-<li><strong>organic</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; organic forcefield name (default: gaff2)</li>
-<li><strong>off_files</strong> (<em>List[batch.FileContainer]</em>) &#8211; </li>
-<li><strong>frcmod_files</strong> (<em>List[batch.FileContainer]</em>) &#8211; </li>
+<li><strong>mol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to set up</li>
+<li><strong>forcefields</strong> (<em>List[str]</em>) &#8211; list of the names of forcefields to use
+(see AmberTools manual for descriptions)</li>
+<li><strong>parameters</strong> (<em>List[ExtraAmberParameters]</em>) &#8211; (optional) list of amber parameters
+for non-standard residues</li>
 <li><strong>engine</strong> (<em>pyccc.Engine</em>) &#8211; Engine to run this job on (default:
-<code class="docutils literal"><span class="pre">moldesign.compute.default_engine</span></code>)</li>
+<code class="docutils literal"><span class="pre">moldesign.compute.get_engine()</span></code>)</li>
 <li><strong>image</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; URL for the docker image</li>
 <li><strong>wait</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if True, block until this function completes and return the function&#8217;s
 return value. Otherwise, return a job object immediately that can be queried later.</li>
@@ -295,7 +243,7 @@ recommendations.</p>
 <li><strong>sequence</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; DNA sequence for one of the strands (a complementary sequence will
 automatically be created)</li>
 <li><strong>engine</strong> (<em>pyccc.Engine</em>) &#8211; Engine to run this job on (default:
-<code class="docutils literal"><span class="pre">moldesign.compute.default_engine</span></code>)</li>
+<code class="docutils literal"><span class="pre">moldesign.compute.get_engine()</span></code>)</li>
 <li><strong>image</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; URL for the docker image</li>
 <li><strong>wait</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if True, block until this function completes and return the function&#8217;s
 return value. Otherwise, return a job object immediately that can be queried later.</li>
@@ -307,7 +255,7 @@ return value. Otherwise, return a job object immediately that can be queried lat
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">B-DNA double helix</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
 </td>
 </tr>
 </tbody>
@@ -315,14 +263,148 @@ return value. Otherwise, return a job object immediately that can be queried lat
 </dd></dl>
 
 <dl class="function">
-<dt id="moldesign.interfaces.ambertools.get_gaff_parameters">
-<code class="descclassname">moldesign.interfaces.ambertools.</code><code class="descname">get_gaff_parameters</code><span class="sig-paren">(</span><em>mol</em>, <em>charges</em>, <em>image='ambertools'</em>, <em>engine=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#get_gaff_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.ambertools.get_gaff_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Doesn&#8217;t work yet</p>
+<dt id="moldesign.interfaces.ambertools.build_dna_helix">
+<code class="descclassname">moldesign.interfaces.ambertools.</code><code class="descname">build_dna_helix</code><span class="sig-paren">(</span><em>sequence</em>, <em>helix_type='B'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#build_dna_helix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.ambertools.build_dna_helix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses Ambertools&#8217; Nucleic Acid Builder to build a 3D DNA double-helix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sequence</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; DNA sequence for one of the strands (a complementary sequence will
+automatically be created)</li>
+<li><strong>helix_type</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Type of helix - &#8216;A&#8217;=Arnott A-DNA
+&#8216;B&#8217;=B-DNA (from standard templates and helical params),
+&#8216;LB&#8217;=Langridge B-DNA,
+&#8216;AB&#8217;=Arnott B-DNA,
+&#8216;SB&#8217;=Sasisekharan left-handed B-DNA</li>
+<li><strong>engine</strong> (<em>pyccc.Engine</em>) &#8211; Engine to run this job on (default:
+<code class="docutils literal"><span class="pre">moldesign.compute.get_engine()</span></code>)</li>
+<li><strong>image</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; URL for the docker image</li>
+<li><strong>wait</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if True, block until this function completes and return the function&#8217;s
+return value. Otherwise, return a job object immediately that can be queried later.</li>
+<li><strong>jobname</strong> &#8211; argument for <a class="reference internal" href="moldesign.compute.html#moldesign.compute.compute.run_job" title="moldesign.compute.compute.run_job"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.compute.compute.run_job()</span></code></a></li>
+<li><strong>display</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if True, show logging output for this job</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>All helix types except &#8216;B&#8217; are taken from fiber diffraction data (see the refernce for details)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">B-DNA double helix</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p>See NAB / AmberTools documentation: <a class="reference external" href="http://ambermd.org/doc12/Amber16.pdf">http://ambermd.org/doc12/Amber16.pdf</a>, pg 771-2</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.interfaces.ambertools.calc_am1_bcc_charges">
+<code class="descclassname">moldesign.interfaces.ambertools.</code><code class="descname">calc_am1_bcc_charges</code><span class="sig-paren">(</span><em>mol</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#calc_am1_bcc_charges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.ambertools.calc_am1_bcc_charges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate am1 bcc charges</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; assign partial charges to this molecule
+(they will be stored at <code class="docutils literal"><span class="pre">mol.properties['am1-bcc']</span></code>)</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This will implicity run an AM1 energy minimization before calculating the final
+partial charges. For more control over this process, use the
+<code class="docutils literal"><span class="pre">moldesign.models.SQMPotential</span></code> energy model to calculate the charges.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">AM1-BCC partial charges on each atom</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Mapping[moldesign.Atom, units.Scalar[charge]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.interfaces.ambertools.calc_gasteiger_charges">
+<code class="descclassname">moldesign.interfaces.ambertools.</code><code class="descname">calc_gasteiger_charges</code><span class="sig-paren">(</span><em>mol</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#calc_gasteiger_charges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.ambertools.calc_gasteiger_charges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate gasteiger charges</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; assign partial charges to this molecule</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>gasteiger partial charges on each atom</dt>
+<dd>(they will be stored at <code class="docutils literal"><span class="pre">mol.properties['gasteiger']</span></code>)</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Mapping[moldesign.Atom, units.Scalar[charge]]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.interfaces.ambertools.parameterize">
+<code class="descclassname">moldesign.interfaces.ambertools.</code><code class="descname">parameterize</code><span class="sig-paren">(</span><em>mol</em>, <em>charges='esp'</em>, <em>ffname='gaff2'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#parameterize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.ambertools.parameterize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameterize <code class="docutils literal"><span class="pre">mol</span></code>, typically using GAFF parameters.</p>
+<p>This will both assign a forcefield to the molecule (at <code class="docutils literal"><span class="pre">mol.ff</span></code>) and produce the parameters
+so that they can be used in other systems (e.g., so that this molecule can be simulated
+embedded in a larger protein)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">&#8216;am1-bcc&#8217; and &#8216;gasteiger&#8217; partial charges will be automatically computed if necessary.
+Other charge types must be precomputed.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; </li>
+<li><strong>charges</strong> (<em>str or dict</em>) &#8211; <dl class="docutils">
+<dt>what partial charges to use? Can be a dict (<code class="docutils literal"><span class="pre">{atom:charge}</span></code>) OR</dt>
+<dd>a string, in which case charges will be read from</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">mol.properties.[charges</span> <span class="pre">name]</span></code>; typical values will be &#8216;esp&#8217;, &#8216;mulliken&#8217;,
+&#8216;am1-bcc&#8217;, etc. Use &#8216;zero&#8217; to set all charges to 0 (for QM/MM and testing)</p>
+</li>
+<li><strong>ffname</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of the gaff-like forcefield file (default: gaff2)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Parameters for the molecule; this object can be used to create</dt>
+<dd><p class="first last">forcefield parameters for other systems that contain this molecule</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#moldesign.interfaces.ambertools.ExtraAmberParameters" title="moldesign.interfaces.ambertools.ExtraAmberParameters">ExtraAmberParameters</a></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="moldesign.interfaces.ambertools.run_tleap">
-<code class="descclassname">moldesign.interfaces.ambertools.</code><code class="descname">run_tleap</code><span class="sig-paren">(</span><em>mol</em>, <em>protein='ff14SB'</em>, <em>dna='OL15'</em>, <em>rna='OL3'</em>, <em>carbohydrate='GLYCAM_06j-1'</em>, <em>lipid='lipid14'</em>, <em>water='tip3p'</em>, <em>organic='gaff2'</em>, <em>off_files=()</em>, <em>frcmod_files=()</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#run_tleap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.ambertools.run_tleap" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">moldesign.interfaces.ambertools.</code><code class="descname">run_tleap</code><span class="sig-paren">(</span><em>mol</em>, <em>forcefields=None</em>, <em>parameters=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/ambertools.html#run_tleap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.ambertools.run_tleap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Drives tleap to create a prmtop and inpcrd file. Specifically uses the AmberTools 16
 tleap distribution.</p>
 <p>Defaults are as recommended in the ambertools manual.</p>
@@ -331,18 +413,13 @@ tleap distribution.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to set up</li>
-<li><strong>protein</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; protein forcefield name (default:ff14SB)</li>
-<li><strong>dna</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; dna forcefield name (default: OL15)</li>
-<li><strong>rna</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; rna forcefield name (default: OL3)</li>
-<li><strong>carbohydrate</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; carbohydrate forcefield name (default: GLYCAM_06j)</li>
-<li><strong>lipid</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; lipid forcefield name (default: lipid14)</li>
-<li><strong>water</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; water forcefield name (default: tip3p)</li>
-<li><strong>organic</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; organic forcefield name (default: gaff2)</li>
-<li><strong>off_files</strong> (<em>List[batch.FileContainer]</em>) &#8211; </li>
-<li><strong>frcmod_files</strong> (<em>List[batch.FileContainer]</em>) &#8211; </li>
+<li><strong>mol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to set up</li>
+<li><strong>forcefields</strong> (<em>List[str]</em>) &#8211; list of the names of forcefields to use
+(see AmberTools manual for descriptions)</li>
+<li><strong>parameters</strong> (<em>List[ExtraAmberParameters]</em>) &#8211; (optional) list of amber parameters
+for non-standard residues</li>
 <li><strong>engine</strong> (<em>pyccc.Engine</em>) &#8211; Engine to run this job on (default:
-<code class="docutils literal"><span class="pre">moldesign.compute.default_engine</span></code>)</li>
+<code class="docutils literal"><span class="pre">moldesign.compute.get_engine()</span></code>)</li>
 <li><strong>image</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; URL for the docker image</li>
 <li><strong>wait</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if True, block until this function completes and return the function&#8217;s
 return value. Otherwise, return a job object immediately that can be queried later.</li>
@@ -361,35 +438,15 @@ recommendations.</p>
 </div>
 <div class="section" id="module-moldesign.interfaces.biopython_interface">
 <span id="moldesign-interfaces-biopython-interface-module"></span><h2>moldesign.interfaces.biopython_interface module<a class="headerlink" href="#module-moldesign.interfaces.biopython_interface" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="moldesign.interfaces.biopython_interface.BioAssembly">
-<em class="property">class </em><code class="descclassname">moldesign.interfaces.biopython_interface.</code><code class="descname">BioAssembly</code><span class="sig-paren">(</span><em>desc</em>, <em>chains</em>, <em>transforms</em><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.interfaces.biopython_interface.BioAssembly" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></p>
-<dl class="attribute">
-<dt id="moldesign.interfaces.biopython_interface.BioAssembly.chains">
-<code class="descname">chains</code><a class="headerlink" href="#moldesign.interfaces.biopython_interface.BioAssembly.chains" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 1</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="moldesign.interfaces.biopython_interface.BioAssembly.desc">
-<code class="descname">desc</code><a class="headerlink" href="#moldesign.interfaces.biopython_interface.BioAssembly.desc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 0</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="moldesign.interfaces.biopython_interface.BioAssembly.transforms">
-<code class="descname">transforms</code><a class="headerlink" href="#moldesign.interfaces.biopython_interface.BioAssembly.transforms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 2</p>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="function">
 <dt id="moldesign.interfaces.biopython_interface.biopy_to_mol">
 <code class="descclassname">moldesign.interfaces.biopython_interface.</code><code class="descname">biopy_to_mol</code><span class="sig-paren">(</span><em>struc</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/biopython_interface.html#biopy_to_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.biopython_interface.biopy_to_mol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a biopython PDB structure to an MDT molecule.
-Because Biopython doesn&#8217;t assign bonds, assign connectivity using templates.</p>
+<dd><p>Convert a biopython PDB structure to an MDT molecule.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Biopython doesn&#8217;t deal with bond data, so no bonds will be present
+in the Molecule</p>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -398,54 +455,57 @@ Because Biopython doesn&#8217;t assign bonds, assign connectivity using template
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">converted molecule</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="function">
-<dt id="moldesign.interfaces.biopython_interface.get_assemblies">
-<code class="descclassname">moldesign.interfaces.biopython_interface.</code><code class="descname">get_assemblies</code><span class="sig-paren">(</span><em>fileobj</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/biopython_interface.html#get_assemblies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.biopython_interface.get_assemblies" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="moldesign.interfaces.biopython_interface.get_conect_records">
-<code class="descclassname">moldesign.interfaces.biopython_interface.</code><code class="descname">get_conect_records</code><span class="sig-paren">(</span><em>pdbfile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/biopython_interface.html#get_conect_records"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.biopython_interface.get_conect_records" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse a PDB file, return CONECT records</p>
-<p>Bond orders are assigned as 1 by default. Repeated CONECT records are interpreted as
-higher order bonds.</p>
+<dt id="moldesign.interfaces.biopython_interface.get_mmcif_assemblies">
+<code class="descclassname">moldesign.interfaces.biopython_interface.</code><code class="descname">get_mmcif_assemblies</code><span class="sig-paren">(</span><em>fileobj=None</em>, <em>mmcdata=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/biopython_interface.html#get_mmcif_assemblies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.biopython_interface.get_mmcif_assemblies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse an mmCIF file, return biomolecular assembly specifications</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pdbfile</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#file" title="(in Python v2.7)"><em>file</em></a>) &#8211; file-like object</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fileobj</strong> (<em>file-like</em>) &#8211; File-like object for the PDB file
+(this object will be rewound before returning)</li>
+<li><strong>mmcdata</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; dict version of complete mmCIF data structure (if passed, this will
+not be read again from fileobj)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict mapping assembly ids to BioAssembly instances</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Mapping[str, BioAssembly]</p>
+</td>
 </tr>
 </tbody>
 </table>
-<p class="rubric">Example</p>
-<p>&gt; CONECT   1   2   3
-&gt; CONECT   1   2
-&gt; CONECT   2   1   1
-&gt; CONECT   3   1
-These records are interpreted as a double-bond between atoms 1 and 2
-and a single bond between atoms 1 and 3</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.interfaces.biopython_interface.parse_mmcif">
+<code class="descclassname">moldesign.interfaces.biopython_interface.</code><code class="descname">parse_mmcif</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/biopython_interface.html#parse_mmcif"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.biopython_interface.parse_mmcif" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse an mmCIF file (using the Biopython parser) and return a molecule</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This only returns the covalent CONECT records (the first 4 entries) - it doesn&#8217;t
-return salt bridges or hydrogen bonds</p>
+<p class="last">This routine is not currently called by any part of the user-facing API! The
+OpenBabel parser appears to give more accurate results for the time being. The
+molecules created using this routine will NOT have any bond topology!</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>CONECT records using serial numbers -</dt>
-<dd><code class="docutils literal"><span class="pre">{serial1:</span> <span class="pre">{serial2:order.</span> <span class="pre">serial3:order,</span> <span class="pre">},</span> <span class="pre">...}</span></code></dd>
-</dl>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>f</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#file" title="(in Python v2.7)"><em>file</em></a>) &#8211; file-like object containing the mmCIF file</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">parsed molecule</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
 </tr>
 </tbody>
 </table>
@@ -454,7 +514,17 @@ return salt bridges or hydrogen bonds</p>
 <dl class="function">
 <dt id="moldesign.interfaces.biopython_interface.parse_pdb">
 <code class="descclassname">moldesign.interfaces.biopython_interface.</code><code class="descname">parse_pdb</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/biopython_interface.html#parse_pdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.biopython_interface.parse_pdb" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse a PDB file (using the Biopython parser), assign bonds, and return a molecule</p>
+<dd><p>Parse a PDB file (using the Biopython parser) and return the basic structure</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This structure will be missing some key data - most notably bonds, but also
+any biomolecular assembly information. Therefore, our default parser combines
+this routine with a few other methods to create the final Molecule object</p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">moldesign.fileio.read_pdb</p>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -463,7 +533,7 @@ return salt bridges or hydrogen bonds</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">parsed molecule</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
 </tr>
 </tbody>
 </table>
@@ -517,20 +587,24 @@ return salt bridges or hydrogen bonds</p>
 <span id="moldesign-interfaces-openbabel-module"></span><h2>moldesign.interfaces.openbabel module<a class="headerlink" href="#module-moldesign.interfaces.openbabel" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="moldesign.interfaces.openbabel.add_hydrogen">
-<code class="descclassname">moldesign.interfaces.openbabel.</code><code class="descname">add_hydrogen</code><span class="sig-paren">(</span><em>mol</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openbabel.html#add_hydrogen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openbabel.add_hydrogen" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Add hydrogens to saturate atomic valences. (Does not assign formal charges or correct</dt>
-<dd>for pH).</dd>
-</dl>
+<code class="descclassname">moldesign.interfaces.openbabel.</code><code class="descname">add_hydrogen</code><span class="sig-paren">(</span><em>mol</em>, <em>ph=None</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openbabel.html#add_hydrogen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openbabel.add_hydrogen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add hydrogens to saturate atomic valences.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to saturate</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to saturate</li>
+<li><strong>ph</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Assign formal charges and protonation using pH model; if None (the default),
+neutral protonation will be assigned where possible.</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">New molecule with all valences saturated</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">New molecule with all valences saturated</p>
+</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -555,7 +629,7 @@ We only use the first result from the conformation generator.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the translated molecule</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
 </td>
 </tr>
 </tbody>
@@ -570,11 +644,11 @@ We only use the first result from the conformation generator.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to perceive the bonds of</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to perceive the bonds of</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">New molecule with assigned bonds</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></td>
 </tr>
 </tbody>
 </table>
@@ -593,7 +667,7 @@ we don&#8217;t translate any metadata.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mdtmol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule to translate</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mdtmol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule to translate</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">translated molecule</td>
 </tr>
@@ -605,7 +679,7 @@ we don&#8217;t translate any metadata.</p>
 
 <dl class="function">
 <dt id="moldesign.interfaces.openbabel.pybel_to_mol">
-<code class="descclassname">moldesign.interfaces.openbabel.</code><code class="descname">pybel_to_mol</code><span class="sig-paren">(</span><em>pbmol</em>, <em>atom_names=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openbabel.html#pybel_to_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openbabel.pybel_to_mol" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">moldesign.interfaces.openbabel.</code><code class="descname">pybel_to_mol</code><span class="sig-paren">(</span><em>pbmol</em>, <em>atom_names=True</em>, <em>reorder_atoms_by_residue=False</em>, <em>primary_structure=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openbabel.html#pybel_to_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openbabel.pybel_to_mol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Translate a pybel molecule object into a moldesign object.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -618,6 +692,9 @@ we don&#8217;t translate any metadata.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>pbmol</strong> (<em>pybel.Molecule</em>) &#8211; molecule to translate</li>
 <li><strong>atom_names</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; use pybel&#8217;s atom names (default True)</li>
+<li><strong>reorder_atoms_by_residue</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; change atom order so that all atoms in a residue are stored
+contiguously</li>
+<li><strong>primary_structure</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; translate primary structure data as well as atomic data</li>
 <li><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; keyword arguments to  moldesign.Molecule __init__ method</li>
 </ul>
 </td>
@@ -625,7 +702,7 @@ we don&#8217;t translate any metadata.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">translated molecule</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
 </td>
 </tr>
 </tbody>
@@ -654,7 +731,7 @@ we don&#8217;t translate any metadata.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">parsed result</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
 </td>
 </tr>
 </tbody>
@@ -683,7 +760,7 @@ we don&#8217;t translate any metadata.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">parsed result</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
 </td>
 </tr>
 </tbody>
@@ -712,7 +789,7 @@ we don&#8217;t translate any metadata.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">parsed result</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
 </td>
 </tr>
 </tbody>
@@ -728,7 +805,7 @@ we don&#8217;t translate any metadata.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule to write</li>
+<li><strong>mol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule to write</li>
 <li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; File to write to</li>
 <li><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Writing mode (e.g. &#8216;w&#8217; to overwrite, the default, or &#8216;a&#8217; to append)</li>
 <li><strong>format</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; File format: pdb, sdf, mol2, bbll, etc.</li>
@@ -748,7 +825,7 @@ we don&#8217;t translate any metadata.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule to write</li>
+<li><strong>mol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule to write</li>
 <li><strong>format</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; File format: pdb, sdf, mol2, bbll, etc.</li>
 </ul>
 </td>
@@ -766,50 +843,10 @@ we don&#8217;t translate any metadata.</p>
 </div>
 <div class="section" id="module-moldesign.interfaces.openmm">
 <span id="moldesign-interfaces-openmm-module"></span><h2>moldesign.interfaces.openmm module<a class="headerlink" href="#module-moldesign.interfaces.openmm" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="function">
 <dt id="moldesign.interfaces.openmm.MdtReporter">
-<em class="property">class </em><code class="descclassname">moldesign.interfaces.openmm.</code><code class="descname">MdtReporter</code><span class="sig-paren">(</span><em>mol</em>, <em>report_interval</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openmm.html#MdtReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openmm.MdtReporter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">simtk.openmm.app.statedatareporter.StateDataReporter</span></code></p>
-<p>We&#8217;ll use this class to capture all the information we need about a trajectory
-It&#8217;s pretty basic - the assumption is that there will be more processing on the client side</p>
-<dl class="attribute">
-<dt id="moldesign.interfaces.openmm.MdtReporter.LEN">
-<code class="descname">LEN</code><em class="property"> = 30</em><a class="headerlink" href="#moldesign.interfaces.openmm.MdtReporter.LEN" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">moldesign.interfaces.openmm.</code><code class="descname">MdtReporter</code><span class="sig-paren">(</span><em>mol</em>, <em>report_interval</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openmm.html#MdtReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openmm.MdtReporter" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="method">
-<dt id="moldesign.interfaces.openmm.MdtReporter.describeNextReport">
-<code class="descname">describeNextReport</code><span class="sig-paren">(</span><em>simulation</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openmm.html#MdtReporter.describeNextReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openmm.MdtReporter.describeNextReport" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">report_description
-A five element tuple.  The first element is the number of steps
-until the next report.  The remaining elements specify whether
-that report will require positions, velocities, forces, and
-energies respectively.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tuple</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="moldesign.interfaces.openmm.MdtReporter.report">
-<code class="descname">report</code><span class="sig-paren">(</span><em>simulation</em>, <em>state</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openmm.html#MdtReporter.report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openmm.MdtReporter.report" title="Permalink to this definition">¶</a></dt>
-<dd><p>Callback for dynamics after the specified interval
-:type simulation: simtk.openmm.app.Simulation
-:type state: simtk.openmm.State</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="moldesign.interfaces.openmm.MdtReporter.report_from_mol">
-<code class="descname">report_from_mol</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openmm.html#MdtReporter.report_from_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openmm.MdtReporter.report_from_mol" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
 
 <dl class="class">
 <dt id="moldesign.interfaces.openmm.OpenMMPickleMixin">
@@ -819,14 +856,31 @@ energies respectively.</td>
 
 <dl class="function">
 <dt id="moldesign.interfaces.openmm.amber_to_mol">
-<code class="descclassname">moldesign.interfaces.openmm.</code><code class="descname">amber_to_mol</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openmm.html#amber_to_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openmm.amber_to_mol" title="Permalink to this definition">¶</a></dt>
-<dd><p>_amber_to_mol(prmtop_file, inpcrd_file, wait=True)</p>
-</dd></dl>
+<code class="descclassname">moldesign.interfaces.openmm.</code><code class="descname">amber_to_mol</code><span class="sig-paren">(</span><em>prmtop_file</em>, <em>inpcrd_file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openmm.html#amber_to_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openmm.amber_to_mol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
-<dt id="moldesign.interfaces.openmm.mol_to_toplogy">
-<code class="descclassname">moldesign.interfaces.openmm.</code><code class="descname">mol_to_toplogy</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openmm.html#mol_to_toplogy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openmm.mol_to_toplogy" title="Permalink to this definition">¶</a></dt>
+<dt id="moldesign.interfaces.openmm.mol_to_modeller">
+<code class="descclassname">moldesign.interfaces.openmm.</code><code class="descname">mol_to_modeller</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openmm.html#mol_to_modeller"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openmm.mol_to_modeller" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="function">
+<dt id="moldesign.interfaces.openmm.mol_to_topology">
+<code class="descclassname">moldesign.interfaces.openmm.</code><code class="descname">mol_to_topology</code><span class="sig-paren">(</span><em>mol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openmm.html#mol_to_topology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openmm.mol_to_topology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an openmm topology object from an MDT molecule</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule to copy topology from</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">topology of the molecule</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">simtk.openmm.app.Topology</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="moldesign.interfaces.openmm.pint2simtk">
@@ -846,12 +900,21 @@ to SI first</p>
 
 <dl class="function">
 <dt id="moldesign.interfaces.openmm.topology_to_mol">
-<code class="descclassname">moldesign.interfaces.openmm.</code><code class="descname">topology_to_mol</code><span class="sig-paren">(</span><em>topo</em>, <em>name=None</em>, <em>positions=None</em>, <em>velocities=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openmm.html#topology_to_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openmm.topology_to_mol" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<code class="descclassname">moldesign.interfaces.openmm.</code><code class="descname">topology_to_mol</code><span class="sig-paren">(</span><em>topo</em>, <em>name=None</em>, <em>positions=None</em>, <em>velocities=None</em>, <em>assign_bond_orders=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/openmm.html#topology_to_mol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.openmm.topology_to_mol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an OpenMM topology object into an MDT molecule.</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>topo</strong> (<em>simtk.openmm.app.topology.Topology</em>) &#8211; topology to convert</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name to assign to molecule</li>
+<li><strong>positions</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; simtk list of atomic positions</li>
+<li><strong>velocities</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; simtk list of atomic velocities</li>
+<li><strong>assign_bond_orders</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; assign bond orders from templates (simtk topologies
+do not store bond orders)</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -866,21 +929,73 @@ to SI first</p>
 <dd></dd></dl>
 
 </div>
+<div class="section" id="module-moldesign.interfaces.parmed_interface">
+<span id="moldesign-interfaces-parmed-interface-module"></span><h2>moldesign.interfaces.parmed_interface module<a class="headerlink" href="#module-moldesign.interfaces.parmed_interface" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="moldesign.interfaces.parmed_interface.parmed_to_mdt">
+<code class="descclassname">moldesign.interfaces.parmed_interface.</code><code class="descname">parmed_to_mdt</code><span class="sig-paren">(</span><em>pmdmol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/parmed_interface.html#parmed_to_mdt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.parmed_interface.parmed_to_mdt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert parmed object to MDT object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pmdmol</strong> (<em>parmed.Structure</em>) &#8211; parmed structure to convert</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">converted molecule</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mdt.Molecule</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 <div class="section" id="module-moldesign.interfaces.pdbfixer_interface">
 <span id="moldesign-interfaces-pdbfixer-interface-module"></span><h2>moldesign.interfaces.pdbfixer_interface module<a class="headerlink" href="#module-moldesign.interfaces.pdbfixer_interface" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="moldesign.interfaces.pdbfixer_interface.add_hydrogen">
-<code class="descclassname">moldesign.interfaces.pdbfixer_interface.</code><code class="descname">add_hydrogen</code><span class="sig-paren">(</span><em>mol</em>, <em>pH=7.4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/pdbfixer_interface.html#add_hydrogen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.pdbfixer_interface.add_hydrogen" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">moldesign.interfaces.pdbfixer_interface.</code><code class="descname">add_hydrogen</code><span class="sig-paren">(</span><em>mol</em>, <em>pH=7.4</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/pdbfixer_interface.html#add_hydrogen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.pdbfixer_interface.add_hydrogen" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="function">
+<dt id="moldesign.interfaces.pdbfixer_interface.add_water">
+<code class="descclassname">moldesign.interfaces.pdbfixer_interface.</code><code class="descname">add_water</code><span class="sig-paren">(</span><em>mol</em>, <em>min_box_size=None</em>, <em>padding=None</em>, <em>ion_concentration=None</em>, <em>neutralize=True</em>, <em>positive_ion='Na+'</em>, <em>negative_ion='Cl-'</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/pdbfixer_interface.html#add_water"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.pdbfixer_interface.add_water" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solvate a molecule in a water box with optional ions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; solute molecule</li>
+<li><strong>min_box_size</strong> (<em>u.Scalar[length] or u.Vector[length]</em>) &#8211; size of the water box - either
+a vector of x,y,z dimensions, or just a uniform cube length. Either this or
+<code class="docutils literal"><span class="pre">padding</span></code> (or both) must be passed</li>
+<li><strong>padding</strong> (<em>u.Scalar[length]</em>) &#8211; distance to edge of water box from the solute in each dimension</li>
+<li><strong>neutralize</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; add ions to neutralize solute charge (in
+addition to specified ion concentration)</li>
+<li><strong>positive_ion</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; type of positive ions to add, if needed. Allowed values
+(from OpenMM modeller) are Cs, K, Li, Na (the default) and Rb</li>
+<li><strong>negative_ion</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; type of negative ions to add, if needed. Allowed values
+(from OpenMM modeller) are Cl (the default), Br, F, and I</li>
+<li><strong>ion_concentration</strong> (<em>float or u.Scalar[molarity]</em>) &#8211; ionic concentration in addition to
+whatever is needed to neutralize the solute. (if float is passed, we assume the
+number is Molar)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">new Molecule object containing both solvent and solute</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule">moldesign.Molecule</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="moldesign.interfaces.pdbfixer_interface.mutate">
-<code class="descclassname">moldesign.interfaces.pdbfixer_interface.</code><code class="descname">mutate</code><span class="sig-paren">(</span><em>mol</em>, <em>mutationmap</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/pdbfixer_interface.html#mutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.pdbfixer_interface.mutate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="moldesign.interfaces.pdbfixer_interface.solvate">
-<code class="descclassname">moldesign.interfaces.pdbfixer_interface.</code><code class="descname">solvate</code><span class="sig-paren">(</span><em>mol</em>, <em>padding=&lt;Quantity(10.0</em>, <em>'ang')&gt;</em>, <em>size=None</em>, <em>cation='Na+'</em>, <em>anion='Cl-'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/pdbfixer_interface.html#solvate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.pdbfixer_interface.solvate" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">moldesign.interfaces.pdbfixer_interface.</code><code class="descname">mutate</code><span class="sig-paren">(</span><em>mol</em>, <em>mutationmap</em>, <em>wait=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/pdbfixer_interface.html#mutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.pdbfixer_interface.mutate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -906,7 +1021,7 @@ to SI first</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mol</strong> (<a class="reference internal" href="../toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to attach basis set to</li>
+<li><strong>mol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; Molecule to attach basis set to</li>
 <li><strong>basis</strong> (<a class="reference internal" href="moldesign.orbitals.html#moldesign.orbitals.BasisSet" title="moldesign.orbitals.BasisSet"><em>moldesign.orbitals.BasisSet</em></a>) &#8211; set of basis functions</li>
 <li><strong>coords</strong> (<em>Array[length]</em>) &#8211; List of coordinates (with shape <code class="docutils literal"><span class="pre">(len(coords),</span> <span class="pre">3)</span></code>)</li>
 <li><strong>coeffs</strong> (<a class="reference internal" href="moldesign.units.html#moldesign.units.quantity.Vector" title="moldesign.units.quantity.Vector"><em>Vector</em></a>) &#8211; List of ao coefficients (optional; if not passed, all basis fn
@@ -945,6 +1060,49 @@ values are returned)</li>
 <div class="section" id="moldesign-interfaces-qmmm-module">
 <h2>moldesign.interfaces.qmmm module<a class="headerlink" href="#moldesign-interfaces-qmmm-module" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-moldesign.interfaces.qtrfit">
+<span id="moldesign-interfaces-qtrfit-module"></span><h2>moldesign.interfaces.qtrfit module<a class="headerlink" href="#module-moldesign.interfaces.qtrfit" title="Permalink to this headline">¶</a></h2>
+<p>Interface to quaternion-based atom alignment routines.</p>
+<p>This code has been translated from Fortran to Python</p>
+<dl class="function">
+<dt id="moldesign.interfaces.qtrfit.qtrfit">
+<code class="descclassname">moldesign.interfaces.qtrfit.</code><code class="descname">qtrfit</code><span class="sig-paren">(</span><em>mol</em>, <em>pos</em>, <em>ref</em>, <em>massweight=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/interfaces/qtrfit.html#qtrfit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.interfaces.qtrfit.qtrfit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform the atomic positions in <code class="docutils literal"><span class="pre">pos</span></code> to minimize the overall distance to those in <code class="docutils literal"><span class="pre">ref</span></code></p>
+<p>This function minimizes the distance between pos and ref. If <a href="#id1"><span class="problematic" id="id2">`</span></a>massweight`=True, we minimize the mass-weighted distance:</p>
+<dl class="docutils">
+<dt>..math::</dt>
+<dd>D = sqrt{ sum_{i=1}^{text{N}} m_i left| mathbf{pos}_i - mathbf{ref}_i right|^2 }</dd>
+</dl>
+<p>Otherwise, the root-squared distance is used:</p>
+<dl class="docutils">
+<dt>..math::</dt>
+<dd>D = sqrt{ sum_{i=1}^{text{N}} left| mathbf{pos}_i - mathbf{ref}_i right|^2 }</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mol</strong> (<a class="reference internal" href="moldesign.html#moldesign.Molecule" title="moldesign.Molecule"><em>moldesign.Molecule</em></a>) &#8211; molecule that these arrays describe</li>
+<li><strong>pos</strong> (<em>u.Array</em>) &#8211; The Nx3 array to be rotated</li>
+<li><strong>ref</strong> (<em>u.Array</em>) &#8211; The Nx3 array to match</li>
+<li><strong>massweight</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; whether to use mass-weighted coordinates (the default)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">translated and rotated version of pos with minimum RMSD</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">u.Array</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p>TODO: reference to original qtrfit code (and license, if it exists)</p>
+</dd></dl>
+
+</div>
 <div class="section" id="module-moldesign.interfaces.symmol_interface">
 <span id="moldesign-interfaces-symmol-interface-module"></span><h2>moldesign.interfaces.symmol_interface module<a class="headerlink" href="#module-moldesign.interfaces.symmol_interface" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
@@ -969,15 +1127,6 @@ values are returned)</li>
            </div>
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="moldesign.min.html" class="btn btn-neutral float-right" title="moldesign.min package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="moldesign.integrators.html" class="btn btn-neutral" title="moldesign.integrators package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>
@@ -1006,7 +1155,7 @@ values are returned)</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.7.0',
+            VERSION:'0.7.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

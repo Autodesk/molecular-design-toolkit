@@ -1,0 +1,634 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>3. Biopolymer API &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/>
+        <link rel="next" title="4. Electronic wavefunction API" href="wfn.html"/>
+        <link rel="prev" title="2. Molecule API" href="molecule.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">3. Biopolymer API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#residues">3.1. Residues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chains">3.2. Chains</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>3. Biopolymer API</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/biopolymer.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="biopolymer-api">
+<h1>3. Biopolymer API<a class="headerlink" href="#biopolymer-api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="residues">
+<h2>3.1. Residues<a class="headerlink" href="#residues" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.Residue">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">Residue</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/residue.html#Residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Residue" title="Permalink to this definition">¶</a></dt>
+<dd><p>A biomolecular residue - most often an amino acid, a nucleic base, or a solvent
+molecule. In PDB structures, also often refers to non-biochemical molecules.</p>
+<p>Its children are almost always residues.</p>
+<dl class="attribute">
+<dt id="Residue.parent">
+<code class="descname">parent</code><a class="headerlink" href="#Residue.parent" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>mdt.Molecule</em> &#8211; the molecule this residue belongs to</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Residue.chain">
+<code class="descname">chain</code><a class="headerlink" href="#Residue.chain" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Chain</em> &#8211; the chain this residue belongs to</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Residue.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>atom</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/residue.html#Residue.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Residue.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a child to this entity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code> &#8211; if an object with this key already exists</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>item</strong> (<em>Entity or mdt.Atom</em>) &#8211; the child object to add</li>
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Key to retrieve this item (default: <code class="docutils literal"><span class="pre">item.name</span></code> )</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Residue.assign_template_bonds">
+<code class="descname">assign_template_bonds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/residue.html#Residue.assign_template_bonds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Residue.assign_template_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign bonds from bioresidue templates.</p>
+<p>Only assigns bonds that are internal to this residue (does not connect different residues).
+The topologies here assume pH7.4 and may need to be corrected for other pHs</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><span class="xref std std-ref">moldesign.Chain.assign_biopolymer_bonds</span> for assigning inter-residue bonds</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if <code class="docutils literal"><span class="pre">residue.resname</span></code> is not in bioresidue templates</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code> &#8211; if an atom in this residue is not recognized</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.atomnames">
+<code class="descname">atomnames</code><a class="headerlink" href="#moldesign.Residue.atomnames" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Residue</em> &#8211; synonym for <code class="docutils literal"><span class="pre">`self`</span></code> for for the sake of readability &#8211; <code class="docutils literal"><span class="pre">`molecule.chains['A'].residues[123].atomnames['CA']`</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.backbone">
+<code class="descname">backbone</code><a class="headerlink" href="#moldesign.Residue.backbone" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>AtomList</em> &#8211; all backbone atoms for nucleic and protein residues
+(indentified using PDB names); returns None for other residue types</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.code">
+<code class="descname">code</code><a class="headerlink" href="#moldesign.Residue.code" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; one-letter amino acid code or two letter nucleic acid code, or &#8216;?&#8217; otherwise</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Residue.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/residue.html#Residue.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Residue.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy a group of atoms which may already have bonds, residues, and a parent molecule
+assigned. Do so by copying only the relevant entities, and creating a &#8220;mask&#8221; with
+deepcopy&#8217;s memo function to stop anything else from being copied.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of copied atoms</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../_moldesign_api/moldesign.molecules.html#moldesign.molecules.atomcollections.AtomList" title="moldesign.molecules.atomcollections.AtomList">AtomList</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.is_3prime_end">
+<code class="descname">is_3prime_end</code><a class="headerlink" href="#moldesign.Residue.is_3prime_end" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; this is the last base in a strand</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if this residue is not a DNA base</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.is_5prime_end">
+<code class="descname">is_5prime_end</code><a class="headerlink" href="#moldesign.Residue.is_5prime_end" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; this is the first base in a strand</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if this residue is not a DNA base</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.is_c_terminal">
+<code class="descname">is_c_terminal</code><a class="headerlink" href="#moldesign.Residue.is_c_terminal" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; this is the first residue in a peptide</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if this residue is not an amino acid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.is_monomer">
+<code class="descname">is_monomer</code><a class="headerlink" href="#moldesign.Residue.is_monomer" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; this residue is not part of a biopolymer</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.is_n_terminal">
+<code class="descname">is_n_terminal</code><a class="headerlink" href="#moldesign.Residue.is_n_terminal" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; this is the last residue in a peptide</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if this residue is not an amino acid</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.is_standard_residue">
+<code class="descname">is_standard_residue</code><a class="headerlink" href="#moldesign.Residue.is_standard_residue" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; this residue is a &#8220;standard residue&#8221; for the purposes of a PDB entry.</p>
+<p>In PDB files, this will be stored using &#8216;ATOM&#8217; if this is a standard residue
+and &#8216;HETATM&#8217; records if not.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We currently define &#8220;standard&#8221; residues as those whose 3 letter residue code appears in
+the <code class="docutils literal"><span class="pre">moldesign.data.RESIDUE_DESCRIPTIONS</span></code> dictionary. Although this seems to work
+well, we&#8217;d welcome a PR with a less hacky method.</p>
+</div>
+<p class="rubric">References</p>
+<p>PDB format guide: <a class="reference external" href="http://www.wwpdb.org/documentation/file-format">http://www.wwpdb.org/documentation/file-format</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Residue.markdown_summary">
+<code class="descname">markdown_summary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/residue.html#Residue.markdown_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Residue.markdown_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Markdown-formatted information about this residue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">markdown-formatted string</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.next_residue">
+<code class="descname">next_residue</code><a class="headerlink" href="#moldesign.Residue.next_residue" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt><em>Residue</em> &#8211;     The next residue in the chain (in the C-direction for proteins, 3&#8217;</dt>
+<dd>direction for nucleic acids)</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">NotImplementedError</span></code> &#8211; If we don&#8217;t know how to deal with this type of biopolymer</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">StopIteration</span></code> &#8211; If there isn&#8217;t a next residue (i.e. it&#8217;s a 3&#8217;- or C-terminus)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.prev_residue">
+<code class="descname">prev_residue</code><a class="headerlink" href="#moldesign.Residue.prev_residue" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Residue</em> &#8211;</p>
+<dl class="docutils">
+<dt>The next residue in the chain (in the N-direction for proteins, 5&#8217; direction for</dt>
+<dd>nucleic acids)</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">NotImplementedError</span></code> &#8211; If we don&#8217;t know how to deal with this type of biopolymer</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">StopIteration</span></code> &#8211; If there isn&#8217;t a previous residue (i.e. it&#8217;s a 5&#8217;- or N-terminus)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.resname">
+<code class="descname">resname</code><a class="headerlink" href="#moldesign.Residue.resname" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Synonym for pdbname</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.sidechain">
+<code class="descname">sidechain</code><a class="headerlink" href="#moldesign.Residue.sidechain" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>AtomList</em> &#8211; all sidechain atoms for nucleic and protein residues
+(defined as non-backbone atoms); returns None for other residue types</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Residue.type">
+<code class="descname">type</code><a class="headerlink" href="#moldesign.Residue.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Classification of the residue (protein, solvent, dna, water, unknown)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="chains">
+<h2>3.2. Chains<a class="headerlink" href="#chains" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.Chain">
+<em class="property">class </em><code class="descclassname">moldesign.</code><code class="descname">Chain</code><span class="sig-paren">(</span><em>pdbname=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/chain.html#Chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Chain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Biomolecular chain class - its children are almost always residues.</p>
+<dl class="attribute">
+<dt id="Chain.parent">
+<code class="descname">parent</code><a class="headerlink" href="#Chain.parent" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>mdt.Molecule</em> &#8211; the molecule this residue belongs to</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Chain.chain">
+<code class="descname">chain</code><a class="headerlink" href="#Chain.chain" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Chain</em> &#8211; the chain this residue belongs to</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Chain.assign_biopolymer_bonds">
+<code class="descname">assign_biopolymer_bonds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/chain.html#Chain.assign_biopolymer_bonds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Chain.assign_biopolymer_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect bonds between residues in this chain.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><span class="xref std std-ref">moldesign.Residue.assign_template_bonds</span></p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if <code class="docutils literal"><span class="pre">residue.resname</span></code> is not in bioresidue templates</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code> &#8211; if an atom in this residue is not recognized</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Chain.c_terminal">
+<code class="descname">c_terminal</code><a class="headerlink" href="#moldesign.Chain.c_terminal" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>moldesign.Residue</em> &#8211; The chain&#8217;s C-terminus (or <code class="docutils literal"><span class="pre">None</span></code> if it does not exist)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Chain.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/chain.html#Chain.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Chain.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy a group of atoms which may already have bonds, residues, and a parent molecule
+assigned. Do so by copying only the relevant entities, and creating a &#8220;mask&#8221; with
+deepcopy&#8217;s memo function to stop anything else from being copied.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of copied atoms</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../_moldesign_api/moldesign.molecules.html#moldesign.molecules.atomcollections.AtomList" title="moldesign.molecules.atomcollections.AtomList">AtomList</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Chain.fiveprime_end">
+<code class="descname">fiveprime_end</code><a class="headerlink" href="#moldesign.Chain.fiveprime_end" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>moldesign.Residue</em> &#8211; The chain&#8217;s 5&#8217; base (or <code class="docutils literal"><span class="pre">None</span></code> if it does not exist)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.Chain.get_ligand">
+<code class="descname">get_ligand</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/molecules/chain.html#Chain.get_ligand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.Chain.get_ligand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a (single) ligand if it exists; raises ValueError if there&#8217;s not exactly one</p>
+<p>This is a utility routine to get a single ligand from a chain. If there&#8217;s exactly one
+residue, it is returned. If not, ValueError is raised - use
+<code class="xref py py-meth docutils literal"><span class="pre">Chain.unclassified_residues()</span></code> to get an iterator over all unclassified residues.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">ligand residue</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="../toplevel.html#moldesign.Residue" title="moldesign.Residue">moldesign.Residue</a></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; if the chain does not contain exactly one unclassifiable residue</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Chain.n_terminal">
+<code class="descname">n_terminal</code><a class="headerlink" href="#moldesign.Chain.n_terminal" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>moldesign.Residue</em> &#8211; The chain&#8217;s N-terminus (or <code class="docutils literal"><span class="pre">None</span></code> if it does not exist)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Chain.residues">
+<code class="descname">residues</code><a class="headerlink" href="#moldesign.Chain.residues" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>ChildList</em> &#8211; list of residues in this chain</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Chain.sequence">
+<code class="descname">sequence</code><a class="headerlink" href="#moldesign.Chain.sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; this chain&#8217;s residue sequence with one-letter residue codes</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Chain.threeprime_end">
+<code class="descname">threeprime_end</code><a class="headerlink" href="#moldesign.Chain.threeprime_end" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>moldesign.Residue</em> &#8211; The chain&#8217;s 3&#8217; base (or <code class="docutils literal"><span class="pre">None</span></code> if it does not exist)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.Chain.type">
+<code class="descname">type</code><a class="headerlink" href="#moldesign.Chain.type" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; the type of chain - protein, DNA, solvent, etc.</p>
+<p>This field returns the type of chain, classified by the following rules:
+1) If the chain contains only one type of residue, it is given that classification</p>
+<blockquote>
+<div>(so a chain containing only ions has type &#8220;ion&#8221;</div></blockquote>
+<ol class="arabic simple" start="2">
+<li>If the chain contains a biopolymer + ligands and solvent, it is classified as a
+biopolymer (i.e. &#8216;protein&#8217;, &#8216;dna&#8217;, or &#8216;rna&#8217;). This is the most common case with .pdb
+files from the PDB.</li>
+<li>If the chain contains multiple biopolymer types, it will be given a hybrid classification
+(e.g. &#8216;dna/rna&#8217;, &#8216;protein/dna&#8217;) - this is rare!</li>
+<li>If it contains multiple kinds of non-biopolymer residues, it will be called &#8220;solvent&#8221;
+(if all non-bio residues are water/solvent/ion) or given a hybrid name as in 3)</li>
+</ol>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="wfn.html" class="btn btn-neutral float-right" title="4. Electronic wavefunction API" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="molecule.html" class="btn btn-neutral" title="2. Molecule API" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

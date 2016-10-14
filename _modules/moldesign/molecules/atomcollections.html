@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>moldesign.molecules.atomcollections &mdash; Molecular Design Toolkit 0.7.0 documentation</title>
+  <title>moldesign.molecules.atomcollections &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Molecular Design Toolkit 0.7.0 documentation" href="../../../index.html"/>
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.3
               </div>
             
           
@@ -80,13 +80,37 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents</span></p>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
 </ul>
 
             
@@ -100,7 +124,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../contents.html">Molecular Design Toolkit</a>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
       </nav>
 
 
@@ -115,7 +139,7 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
       
           <li><a href="../../index.html">Module code</a> &raquo;</li>
       
@@ -149,7 +173,6 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">distance</span> <span class="k">as</span> <span class="n">spd</span>
 
 <span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
 <span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
@@ -188,6 +211,12 @@
     <span class="k">def</span> <span class="nf">heavy_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; AtomList: a list of all heavy atoms (i.e., non-hydrogen) in this object &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">AtomList</span><span class="p">([</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">atnum</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; u.Scalar[mass]: total mass of this object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AtomContainer.get_atoms"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.get_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">get_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">queries</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Allows keyword-based atom queries.</span>
@@ -232,14 +261,16 @@
 <span class="sd">            &gt;&gt;&gt; dists = self.calc_distance_array(other)</span>
 <span class="sd">            &gt;&gt;&gt; dists[i, j] == self.atoms[i].distance(other.atoms[j])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">cdist</span>
+
         <span class="n">other</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">other_positions</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">positions</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">ang</span><span class="p">)</span>
+            <span class="n">other_positions</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">positions</span><span class="o">.</span><span class="n">defunits_value</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="n">other_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">other</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">ang</span><span class="p">)])</span>
+            <span class="n">other_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">other</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">defunits_value</span><span class="p">()])</span>
 
-        <span class="n">distances</span> <span class="o">=</span> <span class="n">spd</span><span class="o">.</span><span class="n">cdist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">ang</span><span class="p">),</span> <span class="n">other_positions</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">distances</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">ang</span></div>
+        <span class="n">distances</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="o">.</span><span class="n">defunits_value</span><span class="p">(),</span> <span class="n">other_positions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">distances</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">length</span></div>
 
 <div class="viewcode-block" id="AtomContainer.calc_displacements"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.calc_displacements">[docs]</a>    <span class="k">def</span> <span class="nf">calc_displacements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Calculate an array of displacements between all atoms in this object</span>
@@ -297,7 +328,7 @@
     <span class="k">def</span> <span class="nf">num_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; int: number of atoms in this object &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
-    <span class="n">natoms</span> <span class="o">=</span> <span class="n">numatoms</span> <span class="o">=</span> <span class="n">num_atoms</span>
+    <span class="n">natoms</span> <span class="o">=</span> <span class="n">num_atoms</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">center_of_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -310,6 +341,43 @@
         <span class="n">com</span> <span class="o">=</span> <span class="n">com</span> <span class="o">/</span> <span class="n">total_mass</span>
         <span class="k">return</span> <span class="n">com</span>
     <span class="n">com</span> <span class="o">=</span> <span class="n">center_of_mass</span>  <span class="c1"># synonym</span>
+
+    <span class="k">def</span> <span class="nf">_getatom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Given an atom&#39;s name, index, or object, return the atom object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">a</span>
+
+<div class="viewcode-block" id="AtomContainer.angle"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.angle">[docs]</a>    <span class="k">def</span> <span class="nf">angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate the angle between three atoms.</span>
+
+<span class="sd">        Atoms can be passed as the atoms themselves or as the atom names</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            a1, a2, a3 (str OR int OR moldesign.Atom): atoms defining the angle</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            units.Scalar[angle]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: use single dispatch to also accept two bonds</span>
+        <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">geom</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="o">*</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_getatom</span><span class="p">,</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="AtomContainer.dihedral"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.dihedral">[docs]</a>    <span class="k">def</span> <span class="nf">dihedral</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">a4</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate the dihedral angle between atoms a1, a2, a3, a4.</span>
+
+<span class="sd">        Atoms can be passed as the atoms themselves or as the atom names</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            a1, a2, a3, a4 (str OR int OR moldesign.Atom): atoms defining the dihedral</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            units.Scalar[angle]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">geom</span><span class="o">.</span><span class="n">dihedral</span><span class="p">(</span><span class="o">*</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_getatom</span><span class="p">,</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)))</span></div>
 
 <div class="viewcode-block" id="AtomContainer.draw"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomContainer.draw">[docs]</a>    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">show_2dhydrogens</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Visualize this molecule (Jupyter only).</span>
@@ -393,6 +461,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            AtomList: list of copied atoms</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">ChildList</span>
+
         <span class="n">oldatoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span>
         <span class="n">old_bond_graph</span> <span class="o">=</span> <span class="p">{</span><span class="n">a</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
@@ -413,7 +483,7 @@
                 <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">chain</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">replaced</span><span class="p">:</span>
                     <span class="n">chain</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">chain</span><span class="p">)</span>
                     <span class="n">chain</span><span class="o">.</span><span class="n">molecule</span> <span class="o">=</span> <span class="bp">None</span>
-                    <span class="n">chain</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">chain</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">ChildList</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
                     <span class="n">replaced</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">chain</span><span class="p">]</span> <span class="o">=</span> <span class="n">chain</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">chain</span> <span class="o">=</span> <span class="n">replaced</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">chain</span><span class="p">]</span>
@@ -425,7 +495,7 @@
                     <span class="n">res</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="p">)</span>
                     <span class="n">res</span><span class="o">.</span><span class="n">molecule</span> <span class="o">=</span> <span class="bp">None</span>
                     <span class="n">res</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">chain</span>
-                    <span class="n">res</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">ChildList</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 
                     <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
                     <span class="n">replaced</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
@@ -491,7 +561,7 @@
 
 
 <span class="nd">@toplevel</span>
-<div class="viewcode-block" id="AtomList"><a class="viewcode-back" href="../../../toplevel.html#moldesign.AtomList">[docs]</a><span class="k">class</span> <span class="nc">AtomList</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">AtomContainer</span><span class="p">):</span>
+<div class="viewcode-block" id="AtomList"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.AtomList">[docs]</a><span class="k">class</span> <span class="nc">AtomList</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">AtomContainer</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A list of atoms that allows attribute &quot;slicing&quot; - accessing an attribute of the</span>
 <span class="sd">    list will return a list of atom attributes.</span>
 
@@ -574,7 +644,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.7.0',
+            VERSION:'0.7.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

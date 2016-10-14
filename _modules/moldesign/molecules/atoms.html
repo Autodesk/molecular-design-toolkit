@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>moldesign.molecules.atoms &mdash; Molecular Design Toolkit 0.7.0 documentation</title>
+  <title>moldesign.molecules.atoms &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Molecular Design Toolkit 0.7.0 documentation" href="../../../index.html"/>
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.3
               </div>
             
           
@@ -80,13 +80,37 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents</span></p>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
 </ul>
 
             
@@ -100,7 +124,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../contents.html">Molecular Design Toolkit</a>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
       </nav>
 
 
@@ -115,7 +139,7 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
       
           <li><a href="../../index.html">Module code</a> &raquo;</li>
       
@@ -332,6 +356,7 @@
 
         <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;**Atomic number**: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">atnum</span><span class="p">)</span>
         <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;**Mass**: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;**Formal charge**: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">formal_charge</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">is_biomolecule</span><span class="p">:</span>
@@ -378,7 +403,7 @@
 
 
 <span class="nd">@toplevel</span>
-<div class="viewcode-block" id="Atom"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Atom">[docs]</a><span class="k">class</span> <span class="nc">Atom</span><span class="p">(</span><span class="n">AtomDrawingMixin</span><span class="p">,</span> <span class="n">AtomGeometryMixin</span><span class="p">,</span> <span class="n">AtomPropertyMixin</span><span class="p">,</span> <span class="n">AtomReprMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.Atom">[docs]</a><span class="k">class</span> <span class="nc">Atom</span><span class="p">(</span><span class="n">AtomDrawingMixin</span><span class="p">,</span> <span class="n">AtomGeometryMixin</span><span class="p">,</span> <span class="n">AtomPropertyMixin</span><span class="p">,</span> <span class="n">AtomReprMixin</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A data structure representing an atom.</span>
 
 <span class="sd">    ``Atom`` objects store information about individual atoms within a larger molecular system,</span>
@@ -445,7 +470,7 @@
     <span class="c1">#################################################################</span>
     <span class="c1"># Methods for BUILDING the atom and indexing it in a molecule</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">atnum</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">residue</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">pdbname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pdbindex</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                 <span class="n">formal_charge</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pdbname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pdbindex</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">element</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
 
         <span class="c1"># Allow user to instantiate an atom as Atom(6) or Atom(&#39;C&#39;)</span>
         <span class="k">if</span> <span class="n">atnum</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">element</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -464,14 +489,24 @@
         <span class="k">if</span> <span class="n">mass</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">ATOMIC_MASSES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atnum</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="n">mass</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">formal_charge</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">formal_charge</span><span class="p">,</span> <span class="mf">0.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">q_e</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="n">residue</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">chain</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_momentum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">length</span><span class="o">*</span>
-                                                <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">mass</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+                                       <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">mass</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bond_graph</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="Atom.to_json"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.Atom.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Designed to be called by the MdtJsonEncoder&quot;&quot;&quot;</span>
+        <span class="n">js</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">chemjson</span><span class="o">.</span><span class="n">jsonify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                  <span class="p">(</span><span class="s1">&#39;name index atnum position &#39;</span>
+                                   <span class="s1">&#39;mass momentum&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="n">js</span><span class="p">[</span><span class="s1">&#39;chain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">js</span><span class="p">[</span><span class="s1">&#39;residue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">index</span>
+        <span class="k">return</span> <span class="n">js</span></div>
 
     <span class="nd">@utils.args_from</span><span class="p">(</span><span class="n">AtomContainer</span><span class="o">.</span><span class="n">copy</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -513,7 +548,7 @@
         <span class="n">moleculearray</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">oldarray</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">array_name</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>  <span class="c1"># remove the internally stored version</span>
 
-<div class="viewcode-block" id="Atom.bond_to"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Atom.bond_to">[docs]</a>    <span class="k">def</span> <span class="nf">bond_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+<div class="viewcode-block" id="Atom.bond_to"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.Atom.bond_to">[docs]</a>    <span class="k">def</span> <span class="nf">bond_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create or modify a bond with another atom</span>
 
 <span class="sd">        Args:</span>
@@ -525,7 +560,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="n">other</span><span class="o">.</span><span class="n">molecule</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">[</span><span class="n">other</span><span class="p">]</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">order</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">num_bonds</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># allow unassigned atoms to be bonded to anything for building purposes</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">[</span><span class="n">other</span><span class="p">]</span> <span class="o">=</span> <span class="n">order</span>
         <span class="k">return</span> <span class="n">Bond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span></div>
@@ -600,6 +634,13 @@
         <span class="sd">&quot;&quot;&quot; int: the number of other atoms this atom is bonded to</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">)</span>
+    <span class="n">nbonds</span> <span class="o">=</span> <span class="n">num_bonds</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">valence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; int: the sum of this atom&#39;s bond orders</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_graph</span><span class="o">.</span><span class="n">itervalues</span><span class="p">())</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -642,7 +683,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.7.0',
+            VERSION:'0.7.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -1,0 +1,449 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.compute package &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>moldesign.compute package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_moldesign_api/moldesign.compute.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-moldesign.compute">
+<span id="moldesign-compute-package"></span><h1>moldesign.compute package<a class="headerlink" href="#module-moldesign.compute" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-moldesign.compute.compute">
+<span id="moldesign-compute-compute-module"></span><h2>moldesign.compute.compute module<a class="headerlink" href="#module-moldesign.compute.compute" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.compute.compute.DummyJob">
+<em class="property">class </em><code class="descclassname">moldesign.compute.compute.</code><code class="descname">DummyJob</code><span class="sig-paren">(</span><em>result</em>, <em>updated_object=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/compute.html#DummyJob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.compute.DummyJob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A job that doesn&#8217;t actually need to run.
+Useful as a return value for processes that return a job object.</p>
+<dl class="staticmethod">
+<dt id="moldesign.compute.compute.DummyJob.get_output_files">
+<em class="property">static </em><code class="descname">get_output_files</code><span class="sig-paren">(</span><em>filename=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/compute.html#DummyJob.get_output_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.compute.DummyJob.get_output_files" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.compute.compute.DummyJob.get_stderr_stream">
+<code class="descname">get_stderr_stream</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.compute.compute.DummyJob.get_stderr_stream" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.compute.compute.DummyJob.get_stdout_stream">
+<code class="descname">get_stdout_stream</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.compute.compute.DummyJob.get_stdout_stream" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.compute.compute.DummyJob.kill">
+<code class="descname">kill</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.compute.compute.DummyJob.kill" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.compute.compute.DummyJob.status">
+<code class="descname">status</code><em class="property"> = 'finished'</em><a class="headerlink" href="#moldesign.compute.compute.DummyJob.status" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.compute.compute.DummyJob.stderr">
+<code class="descname">stderr</code><em class="property"> = ''</em><a class="headerlink" href="#moldesign.compute.compute.DummyJob.stderr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.compute.compute.DummyJob.stdout">
+<code class="descname">stdout</code><em class="property"> = ''</em><a class="headerlink" href="#moldesign.compute.compute.DummyJob.stdout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.compute.compute.DummyJob.wait">
+<code class="descname">wait</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#moldesign.compute.compute.DummyJob.wait" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.compute.compute.get_image_path">
+<code class="descclassname">moldesign.compute.compute.</code><code class="descname">get_image_path</code><span class="sig-paren">(</span><em>image_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/compute.html#get_image_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.compute.get_image_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a fully qualified tag that points to the correct registry</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>image_name</strong> (<em>str</em>) &#8211; name of the image (without tags, repository, etc.)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;default_repository&#39;</span><span class="p">:</span><span class="s1">&#39;my.docker.registry/orgname/myrepo:&#39;</span><span class="p">,</span>
+<span class="go">                   &#39;default_version_tag&#39;:&#39;latest&#39;})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_image_path</span><span class="p">(</span><span class="s1">&#39;myimage&#39;</span><span class="p">)</span>
+<span class="go">&#39;my.docker.registry/orgname/myrepo:myimage-latest&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;default_repository&#39;</span><span class="p">:</span><span class="s1">&#39;docker.io/myorg&#39;</span><span class="p">,</span>
+<span class="go">                   &#39;default_version_tag&#39;:&#39;0.2&#39;})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_image_path</span><span class="p">(</span><span class="s1">&#39;someimage&#39;</span><span class="p">)</span>
+<span class="go">&#39;docker.io/myorg/someimage:0.2</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.compute.compute.run_job">
+<code class="descclassname">moldesign.compute.compute.</code><code class="descname">run_job</code><span class="sig-paren">(</span><em>job</em>, <em>engine=None</em>, <em>image=None</em>, <em>wait=True</em>, <em>jobname=None</em>, <em>display=True</em>, <em>_return_result=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/compute.html#run_job"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.compute.run_job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper for running jobs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>job</strong> (<em>pyccc.Job</em>) &#8211; The job to run</li>
+<li><strong>engine</strong> (<em>pyccc.Engine</em>) &#8211; Engine to run this job on (default:
+<code class="docutils literal"><span class="pre">moldesign.compute.get_engine()</span></code>)</li>
+<li><strong>image</strong> (<em>str</em>) &#8211; URL for the docker image</li>
+<li><strong>wait</strong> (<em>bool</em>) &#8211; if True, block until this function completes and return the function&#8217;s
+return value. Otherwise, return a job object immediately that can be queried later.</li>
+<li><strong>display</strong> (<em>bool</em>) &#8211; if True, show logging output for this job</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">pyccc job object OR function&#8217;s return value</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.compute.configuration">
+<span id="moldesign-compute-configuration-module"></span><h2>moldesign.compute.configuration module<a class="headerlink" href="#module-moldesign.compute.configuration" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="moldesign.compute.configuration.DEFAULT_CONFIG_PATH">
+<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">DEFAULT_CONFIG_PATH</code><em class="property"> = '/Users/aaronvirshup/.moldesign/moldesign.yml'</em><a class="headerlink" href="#moldesign.compute.configuration.DEFAULT_CONFIG_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; default search path for moldesign.yml.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="moldesign.compute.configuration.DEF_CONFIG">
+<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">DEF_CONFIG</code><em class="property"> = {'default_repository': 'docker.io/autodesk/moldesign:', 'default_ccc_host': 'cloudcomputecannon.bionano.autodesk.com:9000', 'default_python_image': None, 'default_version_tag': '0.7.3', 'default_docker_host': 'unix://var/run/docker.sock', 'engine_type': 'ccc'}</em><a class="headerlink" href="#moldesign.compute.configuration.DEF_CONFIG" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; default configuration to be written to moldesign.yml if it doesn&#8217;t exist</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="moldesign.compute.configuration.ENVVAR">
+<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">ENVVAR</code><em class="property"> = 'MOLDESIGN_CONFIG'</em><a class="headerlink" href="#moldesign.compute.configuration.ENVVAR" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; name of environmental variable that stores path to moldesign.yml file.</p>
+<p>If this variable is not set, <code class="docutils literal"><span class="pre">$HOME/.moldesign/moldesign.yml</span></code> will be used by default.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="moldesign.compute.configuration.config">
+<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">config</code><em class="property"> = {'default_repository': 'docker.io/autodesk/moldesign:', 'default_ccc_host': 'cloudcomputecannon.bionano.autodesk.com:9000', 'default_python_image': 'docker.io/autodesk/moldesign:moldesign_complete-0.7.3', 'default_version_tag': '0.7.3', 'default_docker_host': 'unix://var/run/docker.sock', 'default_docker_machine': 'default', 'engine_type': 'docker'}</em><a class="headerlink" href="#moldesign.compute.configuration.config" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; dictionary of parameters (read from user&#8217;s moldesign.yml at startup)</p>
+<p>This dictionary configures how MDT interacts with &#8220;computational engines&#8221; - the systems that run
+jobs, usually using docker images.</p>
+<p class="rubric">Notes</p>
+<p>Values in this dictionary can be configured at runtime; however, after changing them,
+you should update the compute configuration by running
+<code class="docutils literal"><span class="pre">moldesign.compute.reset_compute_engine()</span></code></p>
+<p>Configuration is specified using the following keys:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>engine_type</strong> (<em>str</em>) &#8211; The computational job engine to use. Default: &#8216;ccc&#8217;. Currently supported:
+&#8216;docker&#8217;, &#8216;ccc&#8217;, or &#8216;subprocess&#8217;</li>
+<li><strong>default_repository</strong> (<em>str</em>) &#8211; Repository to pull MDT&#8217;s standard images from.
+default: &#8216;docker.io/autodesk/moldesign:&#8217;</li>
+<li><strong>default_python_image</strong> (<em>str</em>) &#8211; Image to run python commands in
+(default: <code class="docutils literal"><span class="pre">docker.io/autodesk/moldesign:moldesign_complete-[VERSION]</span></code>, where
+[VERSION] is the version of MDT)</li>
+<li><strong>default_version_tag</strong> (<em>str</em>) &#8211; Default version tag for docker images
+(default: <code class="docutils literal"><span class="pre">moldesign.__version__</span></code>)</li>
+<li><strong>default_docker_machine</strong> (<em>str</em>) &#8211; Name of the docker machine to connect to; if
+<code class="docutils literal"><span class="pre">engine_type=='docker'</span></code>, EITHER this OR <code class="docutils literal"><span class="pre">default_docker_url</span></code> (but not both) must
+be set. (default: &#8216;default&#8217;)</li>
+<li><strong>default_docker_url</strong> (<em>str</em>) &#8211; URL for the docker daemon to run; if <code class="docutils literal"><span class="pre">engine_type=='docker'</span></code>,
+EITHER this OR <code class="docutils literal"><span class="pre">default_docker_machine</span></code> (but not both) must be set.
+(default: <code class="docutils literal"><span class="pre">unix://var/run/docker.sock</span></code>, the URL for a local docker instance)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>MDT uses a non-standard docker tagging system to store its docker images. Generally,
+a given image is pulled from a URL of the form:</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">http://[some_docker_registry/orgname/reponame]:[imagename]-[versiontag]</span></code></div></blockquote>
+<dl class="docutils">
+<dt>For instance, the ambertools 0.6 image is stored in the default repository at:</dt>
+<dd><code class="docutils literal"><span class="pre">http://docker.io/autodesk/moldesign:ambertools-0.6</span></code></dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.compute.configuration.get_engine">
+<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">get_engine</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/configuration.html#get_engine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.configuration.get_engine" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="moldesign.compute.configuration.init_config">
+<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">init_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/configuration.html#init_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.configuration.init_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called at the end of package import to read initial configuration and setup cloud computing.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.compute.configuration.registry_login">
+<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">registry_login</code><span class="sig-paren">(</span><em>client</em>, <em>login</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/configuration.html#registry_login"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.configuration.registry_login" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="moldesign.compute.configuration.reset_compute_engine">
+<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">reset_compute_engine</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/configuration.html#reset_compute_engine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.configuration.reset_compute_engine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the configuration dict at <code class="docutils literal"><span class="pre">moldesign.compute.config</span></code> and set up compute engine</p>
+<p>Sets the module-level variable <code class="docutils literal"><span class="pre">default_engine</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">copy of the config dictionary used to set the engine</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.compute.configuration.write_config">
+<code class="descclassname">moldesign.compute.configuration.</code><code class="descname">write_config</code><span class="sig-paren">(</span><em>path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/configuration.html#write_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.configuration.write_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.compute.runsremotely">
+<span id="moldesign-compute-runsremotely-module"></span><h2>moldesign.compute.runsremotely module<a class="headerlink" href="#module-moldesign.compute.runsremotely" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.compute.runsremotely.RunsRemotely">
+<em class="property">class </em><code class="descclassname">moldesign.compute.runsremotely.</code><code class="descname">RunsRemotely</code><span class="sig-paren">(</span><em>enable=True</em>, <em>display=True</em>, <em>jobname=None</em>, <em>sendsource=False</em>, <em>engine=None</em>, <em>image=None</em>, <em>is_imethod=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/compute/runsremotely.html#RunsRemotely"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.compute.runsremotely.RunsRemotely" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.compute.runsremotely.runsremotely">
+<code class="descclassname">moldesign.compute.runsremotely.</code><code class="descname">runsremotely</code><a class="headerlink" href="#moldesign.compute.runsremotely.runsremotely" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#moldesign.compute.runsremotely.RunsRemotely" title="moldesign.compute.runsremotely.RunsRemotely"><code class="xref py py-class docutils literal"><span class="pre">RunsRemotely</span></code></a></p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

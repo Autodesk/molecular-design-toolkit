@@ -1,0 +1,850 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.utils package &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>moldesign.utils package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_moldesign_api/moldesign.utils.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-moldesign.utils">
+<span id="moldesign-utils-package"></span><h1>moldesign.utils package<a class="headerlink" href="#module-moldesign.utils" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="moldesign.utils.docparsers.html">moldesign.utils.docparsers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.utils.docparsers.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="moldesign.utils.docparsers.html#module-moldesign.utils.docparsers.google">moldesign.utils.docparsers.google module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-moldesign.utils.callsigs">
+<span id="moldesign-utils-callsigs-module"></span><h2>moldesign.utils.callsigs module<a class="headerlink" href="#module-moldesign.utils.callsigs" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.utils.callsigs.DocInherit">
+<em class="property">class </em><code class="descclassname">moldesign.utils.callsigs.</code><code class="descname">DocInherit</code><span class="sig-paren">(</span><em>mthd</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/callsigs.html#DocInherit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.callsigs.DocInherit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Allows methods to inherit docstrings from their superclasses
+FROM <a class="reference external" href="http://code.activestate.com/recipes/576862/">http://code.activestate.com/recipes/576862/</a></p>
+<dl class="method">
+<dt id="moldesign.utils.callsigs.DocInherit.get_no_inst">
+<code class="descname">get_no_inst</code><span class="sig-paren">(</span><em>cls</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/callsigs.html#DocInherit.get_no_inst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.callsigs.DocInherit.get_no_inst" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.callsigs.DocInherit.get_with_inst">
+<code class="descname">get_with_inst</code><span class="sig-paren">(</span><em>obj</em>, <em>cls</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/callsigs.html#DocInherit.get_with_inst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.callsigs.DocInherit.get_with_inst" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.callsigs.DocInherit.use_parent_doc">
+<code class="descname">use_parent_doc</code><span class="sig-paren">(</span><em>func</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/callsigs.html#DocInherit.use_parent_doc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.callsigs.DocInherit.use_parent_doc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.callsigs.args_from">
+<code class="descclassname">moldesign.utils.callsigs.</code><code class="descname">args_from</code><span class="sig-paren">(</span><em>original_function</em>, <em>only=None</em>, <em>allexcept=None</em>, <em>inject_kwargs=None</em>, <em>inject_docs=None</em>, <em>wraps=None</em>, <em>update_docstring_args=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/callsigs.html#args_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.callsigs.args_from" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator to transfer call signatures - helps to hide ugly <a href="#id1"><span class="problematic" id="id2">*</span></a>args and <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs in delegated calls</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>original_function</strong> (<em>callable</em>) &#8211; the function to take the call signature from</li>
+<li><strong>only</strong> (<em>List[str]</em>) &#8211; only transfer these arguments (incompatible with <cite>allexcept</cite>)</li>
+<li><strong>wraps</strong> (<em>bool</em>) &#8211; Transfer documentation and attributes from original_function to
+decorated_function, using functools.wraps (default: True if call signature is
+unchanged, False otherwise)</li>
+<li><strong>allexcept</strong> (<em>List[str]</em>) &#8211; transfer all except these arguments (incompatible with <cite>only</cite>)</li>
+<li><strong>inject_kwargs</strong> (<em>dict</em>) &#8211; Inject new kwargs into the call signature
+(of the form <code class="docutils literal"><span class="pre">{argname:</span> <span class="pre">defaultvalue}</span></code>)</li>
+<li><strong>inject_docs</strong> (<em>dict</em>) &#8211; Add or modifies argument documentation (requires google-style
+docstrings) with a dict of the form <cite>{argname: &#8220;(type): description&#8221;}</cite></li>
+<li><strong>update_docstring_args</strong> (<em>bool</em>) &#8211; Update &#8220;arguments&#8221; section of the docstring using the
+original function&#8217;s documentation (requires google-style docstrings and wraps=False)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To use arguments from a classes&#8217; __init__ method, pass the class itself as
+<code class="docutils literal"><span class="pre">original_function</span></code> - this will also allow us to inject the documentation</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Decorator function</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.utils.callsigs.doc_inherit">
+<code class="descclassname">moldesign.utils.callsigs.</code><code class="descname">doc_inherit</code><a class="headerlink" href="#moldesign.utils.callsigs.doc_inherit" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#moldesign.utils.callsigs.DocInherit" title="moldesign.utils.callsigs.DocInherit"><code class="xref py py-class docutils literal"><span class="pre">DocInherit</span></code></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.callsigs.get_qualified_name">
+<code class="descclassname">moldesign.utils.callsigs.</code><code class="descname">get_qualified_name</code><span class="sig-paren">(</span><em>original_function</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/callsigs.html#get_qualified_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.callsigs.get_qualified_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.callsigs.kwargs_from">
+<code class="descclassname">moldesign.utils.callsigs.</code><code class="descname">kwargs_from</code><span class="sig-paren">(</span><em>reference_function</em>, <em>mod_docs=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/callsigs.html#kwargs_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.callsigs.kwargs_from" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces <code class="docutils literal"><span class="pre">**kwargs</span></code> in a call signature with keyword arguments from another function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>reference_function</strong> (<em>function</em>) &#8211; function to get kwargs from</li>
+<li><strong>mod_docs</strong> (<em>bool</em>) &#8211; whether to modify the decorated function&#8217;s docstring</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">mod_docs</span></code> works ONLY for google-style docstrings</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.utils.classes">
+<span id="moldesign-utils-classes-module"></span><h2>moldesign.utils.classes module<a class="headerlink" href="#module-moldesign.utils.classes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.utils.classes.Alias">
+<em class="property">class </em><code class="descclassname">moldesign.utils.classes.</code><code class="descname">Alias</code><span class="sig-paren">(</span><em>objmethod</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#Alias"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.Alias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Descriptor that calls a child object&#8217;s method.
+e.g.
+&gt;&gt;&gt; class A(object):
+&gt;&gt;&gt;     childkeys = Alias(&#8216;child.keys&#8217;)
+&gt;&gt;&gt;     child = dict()
+&gt;&gt;&gt;
+&gt;&gt;&gt; a = A()
+&gt;&gt;&gt; a.child[&#8216;key&#8217;] = &#8216;value&#8217;
+&gt;&gt;&gt; a.childkeys() #calls a.child.keys(), returns [&#8216;key&#8217;]
+[&#8216;key&#8217;]</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.classes.Attribute">
+<em class="property">class </em><code class="descclassname">moldesign.utils.classes.</code><code class="descname">Attribute</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#Attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.Attribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>For overriding a property in a superclass - turns the attribute back
+into a normal instance attribute</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.classes.Categorizer">
+<em class="property">class </em><code class="descclassname">moldesign.utils.classes.</code><code class="descname">Categorizer</code><span class="sig-paren">(</span><em>keyfn</em>, <em>iterable</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#Categorizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.Categorizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">dict</span></code></p>
+<p>Create a dict of lists from an iterable, with dict keys given by keyfn</p>
+<dl class="method">
+<dt id="moldesign.utils.classes.Categorizer.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#Categorizer.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.Categorizer.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.classes.DictLike">
+<em class="property">class </em><code class="descclassname">moldesign.utils.classes.</code><code class="descname">DictLike</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#DictLike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.DictLike" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>This just wraps normal dicts so that other classes don&#8217;t have to inherit from a built-in class,
+which apparently breaks pickle quite frequently.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.classes.DotDict">
+<em class="property">class </em><code class="descclassname">moldesign.utils.classes.</code><code class="descname">DotDict</code><a class="reference internal" href="../_modules/moldesign/utils/classes.html#DotDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.DotDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">dict</span></code></p>
+<p>Dict with items accessible as attributes</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.classes.ExclusiveList">
+<em class="property">class </em><code class="descclassname">moldesign.utils.classes.</code><code class="descname">ExclusiveList</code><span class="sig-paren">(</span><em>iterable=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#ExclusiveList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.ExclusiveList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Behaves like a list, but won&#8217;t allow duplicate items with duplicate keys to be added.</p>
+<dl class="method">
+<dt id="moldesign.utils.classes.ExclusiveList.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#ExclusiveList.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.ExclusiveList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.ExclusiveList.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#ExclusiveList.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.ExclusiveList.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.ExclusiveList.extend">
+<code class="descname">extend</code><span class="sig-paren">(</span><em>iterable</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#ExclusiveList.extend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.ExclusiveList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.ExclusiveList.pop">
+<code class="descname">pop</code><span class="sig-paren">(</span><em>index=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#ExclusiveList.pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.ExclusiveList.pop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.ExclusiveList.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#ExclusiveList.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.ExclusiveList.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.classes.OrderedDotDict">
+<em class="property">class </em><code class="descclassname">moldesign.utils.classes.</code><code class="descname">OrderedDotDict</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwds</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#OrderedDotDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.OrderedDotDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">collections.OrderedDict</span></code></p>
+<p>Dict with items accessible as attributes</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.classes.SortedCollection">
+<em class="property">class </em><code class="descclassname">moldesign.utils.classes.</code><code class="descname">SortedCollection</code><span class="sig-paren">(</span><em>iterable=()</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#SortedCollection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.SortedCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Sequence sorted by a key function.</p>
+<p>TAKEN WITHOUT MODIFICATION FROM:
+<a class="reference external" href="https://code.activestate.com/recipes/577197-sortedcollection/">https://code.activestate.com/recipes/577197-sortedcollection/</a>
+(EDIT: removed <code class="docutils literal"><span class="pre">__reduce__</span></code> - better behavior with __dict__ states)</p>
+<p>SortedCollection() is much easier to work with than using bisect() directly.
+It supports key functions like those use in sorted(), min(), and max().
+The result of the key function call is saved so that keys can be searched
+efficiently.</p>
+<p>Instead of returning an insertion-point which can be hard to interpret, the
+five find-methods return a specific item in the sequence. They can scan for
+exact matches, the last item less-than-or-equal to a key, or the first item
+greater-than-or-equal to a key.</p>
+<p>Once found, an item&#8217;s ordinal position can be located with the index() method.
+New items can be added with the insert() and insert_right() methods.
+Old items can be deleted with the remove() method.</p>
+<p>The usual sequence methods are provided to support indexing, slicing,
+length lookup, clearing, copying, forward and reverse iteration, contains
+checking, item counts, item removal, and a nice looking repr.</p>
+<p>Finding and indexing are O(log n) operations while iteration and insertion
+are O(n).  The initial sort is O(n log n).</p>
+<p>The key function is stored in the &#8216;key&#8217; attibute for easy introspection or
+so that you can assign a new key function (triggering an automatic re-sort).</p>
+<p>In short, the class was designed to handle all of the common use cases for
+bisect but with a simpler API and support for key functions.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pprint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">operator</span> <span class="k">import</span> <span class="n">itemgetter</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">SortedCollection</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="p">[</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s1">&#39;roger&#39;</span><span class="p">,</span> <span class="s1">&#39;young&#39;</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s1">&#39;angela&#39;</span><span class="p">,</span> <span class="s1">&#39;jones&#39;</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s1">&#39;bill&#39;</span><span class="p">,</span> <span class="s1">&#39;smith&#39;</span><span class="p">,</span> <span class="mi">22</span><span class="p">),</span>
+<span class="gp">... </span>        <span class="p">(</span><span class="s1">&#39;david&#39;</span><span class="p">,</span> <span class="s1">&#39;thomas&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">)]:</span>
+<span class="gp">... </span>    <span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>         <span class="c1"># show records sorted by age</span>
+<span class="go">[(&#39;bill&#39;, &#39;smith&#39;, 22),</span>
+<span class="go"> (&#39;angela&#39;, &#39;jones&#39;, 28),</span>
+<span class="go"> (&#39;roger&#39;, &#39;young&#39;, 30),</span>
+<span class="go"> (&#39;david&#39;, &#39;thomas&#39;, 32)]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">find_le</span><span class="p">(</span><span class="mi">29</span><span class="p">)</span>           <span class="c1"># find oldest person aged 29 or younger</span>
+<span class="go">(&#39;angela&#39;, &#39;jones&#39;, 28)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">find_lt</span><span class="p">(</span><span class="mi">28</span><span class="p">)</span>           <span class="c1"># find oldest person under 28</span>
+<span class="go">(&#39;bill&#39;, &#39;smith&#39;, 22)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">find_gt</span><span class="p">(</span><span class="mi">28</span><span class="p">)</span>           <span class="c1"># find youngest person over 28</span>
+<span class="go">(&#39;roger&#39;, &#39;young&#39;, 30)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">find_ge</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>       <span class="c1"># find youngest person aged 32 or older</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>              <span class="c1"># get the index of their record</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>                    <span class="c1"># fetch the record at that index</span>
+<span class="go">(&#39;david&#39;, &#39;thomas&#39;, 32)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>   <span class="c1"># now sort by first name</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+<span class="go">[(&#39;angela&#39;, &#39;jones&#39;, 28),</span>
+<span class="go"> (&#39;bill&#39;, &#39;smith&#39;, 22),</span>
+<span class="go"> (&#39;david&#39;, &#39;thomas&#39;, 32),</span>
+<span class="go"> (&#39;roger&#39;, &#39;young&#39;, 30)]</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="moldesign.utils.classes.SortedCollection.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#SortedCollection.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.SortedCollection.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.SortedCollection.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#SortedCollection.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.SortedCollection.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.SortedCollection.count">
+<code class="descname">count</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#SortedCollection.count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.SortedCollection.count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return number of occurrences of item</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.SortedCollection.find">
+<code class="descname">find</code><span class="sig-paren">(</span><em>k</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#SortedCollection.find"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.SortedCollection.find" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return first item with a key == k.  Raise ValueError if not found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.SortedCollection.find_ge">
+<code class="descname">find_ge</code><span class="sig-paren">(</span><em>k</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#SortedCollection.find_ge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.SortedCollection.find_ge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return first item with a key &gt;= equal to k.  Raise ValueError if not found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.SortedCollection.find_gt">
+<code class="descname">find_gt</code><span class="sig-paren">(</span><em>k</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#SortedCollection.find_gt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.SortedCollection.find_gt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return first item with a key &gt; k.  Raise ValueError if not found</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.SortedCollection.find_le">
+<code class="descname">find_le</code><span class="sig-paren">(</span><em>k</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#SortedCollection.find_le"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.SortedCollection.find_le" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return last item with a key &lt;= k.  Raise ValueError if not found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.SortedCollection.find_lt">
+<code class="descname">find_lt</code><span class="sig-paren">(</span><em>k</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#SortedCollection.find_lt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.SortedCollection.find_lt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return last item with a key &lt; k.  Raise ValueError if not found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.SortedCollection.index">
+<code class="descname">index</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#SortedCollection.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.SortedCollection.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the position of an item.  Raise ValueError if not found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.SortedCollection.insert">
+<code class="descname">insert</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#SortedCollection.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.SortedCollection.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a new item.  If equal keys are found, add to the left</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.SortedCollection.insert_right">
+<code class="descname">insert_right</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#SortedCollection.insert_right"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.SortedCollection.insert_right" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a new item.  If equal keys are found, add to the right</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="moldesign.utils.classes.SortedCollection.key">
+<code class="descname">key</code><a class="headerlink" href="#moldesign.utils.classes.SortedCollection.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>key function</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.classes.SortedCollection.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#SortedCollection.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.SortedCollection.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove first occurence of item.  Raise ValueError if not found</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.classes.Synonym">
+<em class="property">class </em><code class="descclassname">moldesign.utils.classes.</code><code class="descname">Synonym</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/classes.html#Synonym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.classes.Synonym" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>An attribute (class or intance) that is just a synonym for another.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.utils.databases">
+<span id="moldesign-utils-databases-module"></span><h2>moldesign.utils.databases module<a class="headerlink" href="#module-moldesign.utils.databases" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="moldesign.utils.databases.CompressedJsonDbm">
+<em class="property">class </em><code class="descclassname">moldesign.utils.databases.</code><code class="descname">CompressedJsonDbm</code><span class="sig-paren">(</span><em>filename</em>, <em>flag='r'</em>, <em>dbm=&lt;module 'dumbdbm' from '/usr/local/Cellar/python/2.7.12/Frameworks/Python.framework/Versions/2.7/lib/python2.7/dumbdbm.pyc'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/databases.html#CompressedJsonDbm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.databases.CompressedJsonDbm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Quick-and-dirty interface to a DBM file</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.databases.Hdf5Dbm">
+<em class="property">class </em><code class="descclassname">moldesign.utils.databases.</code><code class="descname">Hdf5Dbm</code><span class="sig-paren">(</span><em>filename</em>, <em>mode='r'</em>, <em>compression=10</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/databases.html#Hdf5Dbm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.databases.Hdf5Dbm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A simplified DBM interface backed by HDF5.</p>
+<p>Like DBMs, it only stores strings. Unlike DBMs, the strings must be completely ascii</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">if something other than a string is passed, it will be converted using json.dumps</p>
+</div>
+<p>This was written only because dumbdbm has a tendency to get corrupted (because it doesn&#8217;t
+support read-only mode), none of the other standard library DBMs are portable, and other
+alternatives (like semidbm) don&#8217;t play nice with git.</p>
+<dl class="method">
+<dt id="moldesign.utils.databases.Hdf5Dbm.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/databases.html#Hdf5Dbm.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.databases.Hdf5Dbm.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="moldesign.utils.databases.Hdf5Dbm.open">
+<em class="property">classmethod </em><code class="descname">open</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/databases.html#Hdf5Dbm.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.databases.Hdf5Dbm.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Synonym for __init__ for compatibility with stdlib DBM modules</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.databases.ReadOnlyDumb">
+<em class="property">class </em><code class="descclassname">moldesign.utils.databases.</code><code class="descname">ReadOnlyDumb</code><span class="sig-paren">(</span><em>filebasename</em>, <em>mode</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/databases.html#ReadOnlyDumb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.databases.ReadOnlyDumb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">dumbdbm._Database</span></code></p>
+<p>A read-only subclass of dumbdbm</p>
+<p>All possible operations that could result in a disk write have been turned into no-ops or raise
+exceptions</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-moldesign.utils.utils">
+<span id="moldesign-utils-utils-module"></span><h2>moldesign.utils.utils module<a class="headerlink" href="#module-moldesign.utils.utils" title="Permalink to this headline">¶</a></h2>
+<p>My standard utilities. Intended to be included in all projects
+Obviously everything included here needs to be in the standard library (or numpy)</p>
+<dl class="class">
+<dt id="moldesign.utils.utils.BaseTable">
+<em class="property">class </em><code class="descclassname">moldesign.utils.utils.</code><code class="descname">BaseTable</code><span class="sig-paren">(</span><em>categories</em>, <em>fileobj=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#BaseTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.BaseTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="moldesign.utils.utils.BaseTable.add_line">
+<code class="descname">add_line</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#BaseTable.add_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.BaseTable.add_line" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.utils.BaseTable.getstring">
+<code class="descname">getstring</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#BaseTable.getstring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.BaseTable.getstring" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.utils.BaseTable.writeline">
+<code class="descname">writeline</code><span class="sig-paren">(</span><em>newline</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#BaseTable.writeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.BaseTable.writeline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.utils.MarkdownTable">
+<em class="property">class </em><code class="descclassname">moldesign.utils.utils.</code><code class="descname">MarkdownTable</code><span class="sig-paren">(</span><em>*categories</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#MarkdownTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.MarkdownTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.utils.utils.BaseTable" title="moldesign.utils.utils.BaseTable"><code class="xref py py-class docutils literal"><span class="pre">moldesign.utils.utils.BaseTable</span></code></a></p>
+<dl class="method">
+<dt id="moldesign.utils.utils.MarkdownTable.getstring">
+<code class="descname">getstring</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#MarkdownTable.getstring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.MarkdownTable.getstring" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.utils.MarkdownTable.markdown">
+<code class="descname">markdown</code><span class="sig-paren">(</span><em>replace=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#MarkdownTable.markdown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.MarkdownTable.markdown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.utils.MarkdownTable.writeline">
+<code class="descname">writeline</code><span class="sig-paren">(</span><em>newline</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#MarkdownTable.writeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.MarkdownTable.writeline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.utils.PipedFile">
+<em class="property">class </em><code class="descclassname">moldesign.utils.utils.</code><code class="descname">PipedFile</code><span class="sig-paren">(</span><em>fileobj</em>, <em>filename='pipe'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#PipedFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.PipedFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Allows us to pass data by filesystem path without ever writing it to disk
+To prevent deadlock, we spawn a thread to write to the pipe
+Call it as a context manager:
+&gt;&gt;&gt; with PipedFile(&#8216;file contents&#8217;,filename=&#8217;contents.txt&#8217;) as pipepath:
+&gt;&gt;&gt;     print open(pipepath,&#8217;r&#8217;).read()</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.utils.PrintTable">
+<em class="property">class </em><code class="descclassname">moldesign.utils.utils.</code><code class="descname">PrintTable</code><span class="sig-paren">(</span><em>formatstr</em>, <em>fileobj=&lt;open file '&lt;stdout&gt;'</em>, <em>mode 'w'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#PrintTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.PrintTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#moldesign.utils.utils.BaseTable" title="moldesign.utils.utils.BaseTable"><code class="xref py py-class docutils literal"><span class="pre">moldesign.utils.utils.BaseTable</span></code></a></p>
+<dl class="method">
+<dt id="moldesign.utils.utils.PrintTable.getstring">
+<code class="descname">getstring</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#PrintTable.getstring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.PrintTable.getstring" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="moldesign.utils.utils.PrintTable.writeline">
+<code class="descname">writeline</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#PrintTable.writeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.PrintTable.writeline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.utils.binomial_coefficient">
+<code class="descclassname">moldesign.utils.utils.</code><code class="descname">binomial_coefficient</code><span class="sig-paren">(</span><em>n</em>, <em>k</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#binomial_coefficient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.binomial_coefficient" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.utils.from_filepath">
+<code class="descclassname">moldesign.utils.utils.</code><code class="descname">from_filepath</code><span class="sig-paren">(</span><em>func</em>, <em>filelike</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#from_filepath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.from_filepath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run func on a temporary <em>path</em> assigned to filelike</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.utils.if_not_none">
+<code class="descclassname">moldesign.utils.utils.</code><code class="descname">if_not_none</code><span class="sig-paren">(</span><em>item</em>, <em>default</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#if_not_none"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.if_not_none" title="Permalink to this definition">¶</a></dt>
+<dd><p>Equivalent to <cite>item if item is not None else default</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.utils.is_color">
+<code class="descclassname">moldesign.utils.utils.</code><code class="descname">is_color</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#is_color"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.is_color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do our best to determine if &#8220;s&#8221; is a color spec that can be converted to hex
+:param s:
+:return:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.utils.is_printable">
+<code class="descclassname">moldesign.utils.utils.</code><code class="descname">is_printable</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#is_printable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.is_printable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.utils.make_local_temp_dir">
+<code class="descclassname">moldesign.utils.utils.</code><code class="descname">make_local_temp_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#make_local_temp_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.make_local_temp_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.utils.make_none">
+<code class="descclassname">moldesign.utils.utils.</code><code class="descname">make_none</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#make_none"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.make_none" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.utils.methodcaller">
+<em class="property">class </em><code class="descclassname">moldesign.utils.utils.</code><code class="descname">methodcaller</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#methodcaller"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.methodcaller" title="Permalink to this definition">¶</a></dt>
+<dd><p>The pickleable implementation of the standard library operator.methodcaller.</p>
+<p>This was copied without modification from:
+<a class="reference external" href="https://github.com/python/cpython/blob/065990fa5bd30fb3ca61b90adebc7d8cb3f16b5a/Lib/operator.py">https://github.com/python/cpython/blob/065990fa5bd30fb3ca61b90adebc7d8cb3f16b5a/Lib/operator.py</a></p>
+<p>The c-extension version is not pickleable, so we keep a copy of the pure-python standard library
+code here. See <a class="reference external" href="https://bugs.python.org/issue22955">https://bugs.python.org/issue22955</a></p>
+<p>Original documentation:
+Return a callable object that calls the given method on its operand.
+After f = methodcaller(&#8216;name&#8217;), the call f(r) returns r.name().
+After g = methodcaller(&#8216;name&#8217;, &#8216;date&#8217;, foo=1), the call g(r) returns
+r.name(&#8216;date&#8217;, foo=1).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.utils.pairwise_displacements">
+<code class="descclassname">moldesign.utils.utils.</code><code class="descname">pairwise_displacements</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#pairwise_displacements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.pairwise_displacements" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+</tbody>
+</table>
+<p>from <a class="reference external" href="http://stackoverflow.com/questions/22390418/pairwise-displacement-vectors-among-set-of-points">http://stackoverflow.com/questions/22390418/pairwise-displacement-vectors-among-set-of-points</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.utils.printflush">
+<code class="descclassname">moldesign.utils.utils.</code><code class="descname">printflush</code><span class="sig-paren">(</span><em>s</em>, <em>newline=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#printflush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.printflush" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.utils.progressbar">
+<em class="property">class </em><code class="descclassname">moldesign.utils.utils.</code><code class="descname">progressbar</code><span class="sig-paren">(</span><em>description</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#progressbar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.progressbar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Create a progress bar for a calculation</p>
+<p>The context manager provides a callback which needs to be called as
+set_progress(percent), where percent is a number between 0 and 100</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">time</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">progressbar</span><span class="p">(</span><span class="s1">&#39;count to 100&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">set_progress</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">set_progress</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="moldesign.utils.utils.progressbar.set_progress">
+<code class="descname">set_progress</code><span class="sig-paren">(</span><em>percent</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#progressbar.set_progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.progressbar.set_progress" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.utils.recursionlimit_atleast">
+<code class="descclassname">moldesign.utils.utils.</code><code class="descname">recursionlimit_atleast</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwds</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#recursionlimit_atleast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.recursionlimit_atleast" title="Permalink to this definition">¶</a></dt>
+<dd><p>Context manager for temporarily raising the context manager&#8217;s
+the interpreter&#8217;s maximum call stack size (misleading called the <code class="docutils literal"><span class="pre">recursion</span> <span class="pre">limit</span></code>)</p>
+<p class="rubric">Notes</p>
+<dl class="docutils">
+<dt>This will explicitly reset the the recursion limit when we exit the context;</dt>
+<dd>any intermediate recursion limit changes will be lost</dd>
+</dl>
+<p>This will not lower the limit <code class="docutils literal"><span class="pre">n</span></code> is less than the current recursion limit.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.utils.redirect_stderr">
+<em class="property">class </em><code class="descclassname">moldesign.utils.utils.</code><code class="descname">redirect_stderr</code><span class="sig-paren">(</span><em>new_target</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#redirect_stderr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.redirect_stderr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldesign.utils.utils._RedirectStream</span></code></p>
+<p>From python3.4 stdlib</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.utils.redirect_stdout">
+<em class="property">class </em><code class="descclassname">moldesign.utils.utils.</code><code class="descname">redirect_stdout</code><span class="sig-paren">(</span><em>new_target</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#redirect_stdout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.redirect_stdout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">moldesign.utils.utils._RedirectStream</span></code></p>
+<p>From python3.4 stdlib</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="moldesign.utils.utils.remove_directories">
+<code class="descclassname">moldesign.utils.utils.</code><code class="descname">remove_directories</code><span class="sig-paren">(</span><em>list_of_paths</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#remove_directories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.remove_directories" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes non-leafs from a list of directory paths</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="moldesign.utils.utils.textnotify">
+<em class="property">class </em><code class="descclassname">moldesign.utils.utils.</code><code class="descname">textnotify</code><span class="sig-paren">(</span><em>startmsg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/moldesign/utils/utils.html#textnotify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#moldesign.utils.utils.textnotify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Print a single, immediately flushed line to log the execution of a block.</p>
+<p>Prints &#8216;done&#8217; at the end of the line (or &#8216;ERROR&#8217; if an uncaught exception)</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">time</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">textnotify</span><span class="p">(</span><span class="s1">&#39;starting to sleep&#39;</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">starting to sleep...done</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">textnotify</span><span class="p">(</span><span class="s1">&#39;raising an exception...&#39;</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+<span class="go">raising an exception...error</span>
+<span class="go">ValueError [...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

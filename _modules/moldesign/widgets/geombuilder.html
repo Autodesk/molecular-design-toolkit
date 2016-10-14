@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>moldesign.widgets.geombuilder &mdash; Molecular Design Toolkit 0.7.0 documentation</title>
+  <title>moldesign.widgets.geombuilder &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="Molecular Design Toolkit 0.7.0 documentation" href="../../../index.html"/>
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="../../../contents.html" class="icon icon-home"> Molecular Design Toolkit
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.3
               </div>
             
           
@@ -80,13 +80,37 @@
           
             
             
-                <p class="caption"><span class="caption-text">Contents</span></p>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../howdoi.html">How do I ...?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Atoms, molecules, and biomolecules</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../_moldesign_api/moldesign.html">Complete API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
 </ul>
 
             
@@ -100,7 +124,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../contents.html">Molecular Design Toolkit</a>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
       </nav>
 
 
@@ -115,7 +139,7 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../contents.html">Docs</a> &raquo;</li>
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
       
           <li><a href="../../index.html">Module code</a> &raquo;</li>
       
@@ -147,12 +171,10 @@
 <span class="c1"># limitations under the License.</span>
 <span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="kn">as</span> <span class="nn">ipy</span>
 
-<span class="kn">from</span> <span class="nn">moldesign.geom</span> <span class="kn">import</span> <span class="n">set_angle</span><span class="p">,</span> <span class="n">set_dihedral</span><span class="p">,</span> <span class="n">set_distance</span>
-<span class="kn">import</span> <span class="nn">moldesign.molecules.bonds</span>
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">moldesign.viewer</span> <span class="kn">import</span> <span class="n">BondClicker</span>
 <span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
-
-<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">geom</span><span class="p">,</span> <span class="n">utils</span>
 
 <span class="kn">from</span> <span class="nn">moldesign.uibase</span> <span class="kn">import</span> <span class="n">ViewerToolBase</span><span class="p">,</span> <span class="n">ReadoutFloatSlider</span>
 
@@ -163,7 +185,7 @@
 
 
 <span class="nd">@exports</span>
-<div class="viewcode-block" id="GeometryBuilder"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.geombuilder.GeometryBuilder">[docs]</a><span class="k">class</span> <span class="nc">GeometryBuilder</span><span class="p">(</span><span class="n">ViewerToolBase</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryBuilder"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder">[docs]</a><span class="k">class</span> <span class="nc">GeometryBuilder</span><span class="p">(</span><span class="n">ViewerToolBase</span><span class="p">):</span>
     <span class="n">VIEWERTYPE</span> <span class="o">=</span> <span class="n">BondClicker</span>
 
     <span class="n">MAXDIST</span> <span class="o">=</span> <span class="mf">20.0</span>  <span class="c1"># TODO: we need to set this dynamically</span>
@@ -237,44 +259,44 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">toolpane</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tool_holder</span><span class="p">,</span>
                                   <span class="bp">self</span><span class="o">.</span><span class="n">reset_button</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GeometryBuilder.set_distance"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.geombuilder.GeometryBuilder.set_distance">[docs]</a>    <span class="k">def</span> <span class="nf">set_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryBuilder.set_distance"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.set_distance">[docs]</a>    <span class="k">def</span> <span class="nf">set_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
         <span class="k">assert</span> <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;bond&#39;</span>
         <span class="n">dist_in_angstrom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">length_slider</span><span class="o">.</span><span class="n">value</span>
-        <span class="n">set_distance</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">dist_in_angstrom</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span> <span class="n">adjustmol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adjust_button</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">mdt</span><span class="o">.</span><span class="n">set_distance</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">dist_in_angstrom</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span> <span class="n">adjustmol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adjust_button</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">set_positions</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="GeometryBuilder.set_angle"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.geombuilder.GeometryBuilder.set_angle">[docs]</a>    <span class="k">def</span> <span class="nf">set_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryBuilder.set_angle"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.set_angle">[docs]</a>    <span class="k">def</span> <span class="nf">set_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
         <span class="k">assert</span> <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;bond&#39;</span>
         <span class="n">angle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angle_slider</span><span class="o">.</span><span class="n">value</span>
-        <span class="n">set_angle</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">,</span> <span class="n">angle</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">adjustmol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adjust_button</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">mdt</span><span class="o">.</span><span class="n">set_angle</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">,</span> <span class="n">angle</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">adjustmol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adjust_button</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">set_positions</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="GeometryBuilder.set_dihedral"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.geombuilder.GeometryBuilder.set_dihedral">[docs]</a>    <span class="k">def</span> <span class="nf">set_dihedral</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryBuilder.set_dihedral"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.set_dihedral">[docs]</a>    <span class="k">def</span> <span class="nf">set_dihedral</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
         <span class="k">assert</span> <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;bond&#39;</span>
         <span class="n">angle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_slider</span><span class="o">.</span><span class="n">value</span>
-        <span class="n">set_dihedral</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">,</span> <span class="n">angle</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">180.0</span><span class="p">,</span>
+        <span class="n">mdt</span><span class="o">.</span><span class="n">set_dihedral</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">,</span> <span class="n">angle</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">180.0</span><span class="p">,</span>
                                              <span class="n">adjustmol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adjust_button</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">set_positions</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="GeometryBuilder.set_atom_x"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.geombuilder.GeometryBuilder.set_atom_x">[docs]</a>    <span class="k">def</span> <span class="nf">set_atom_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryBuilder.set_atom_x"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.set_atom_x">[docs]</a>    <span class="k">def</span> <span class="nf">set_atom_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="GeometryBuilder.set_atom_y"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.geombuilder.GeometryBuilder.set_atom_y">[docs]</a>    <span class="k">def</span> <span class="nf">set_atom_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryBuilder.set_atom_y"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.set_atom_y">[docs]</a>    <span class="k">def</span> <span class="nf">set_atom_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="GeometryBuilder.set_atom_z"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.geombuilder.GeometryBuilder.set_atom_z">[docs]</a>    <span class="k">def</span> <span class="nf">set_atom_z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryBuilder.set_atom_z"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.set_atom_z">[docs]</a>    <span class="k">def</span> <span class="nf">set_atom_z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="GeometryBuilder.label_atoms"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.geombuilder.GeometryBuilder.label_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">label_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryBuilder.label_atoms"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.label_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">label_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_box</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">label_atoms</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">remove_all_labels</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="GeometryBuilder.atom_click"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.geombuilder.GeometryBuilder.atom_click">[docs]</a>    <span class="k">def</span> <span class="nf">atom_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryBuilder.atom_click"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.atom_click">[docs]</a>    <span class="k">def</span> <span class="nf">atom_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
         <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
         <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">blank</span><span class="p">:</span>  <span class="c1"># select this atom</span>
             <span class="n">sel</span><span class="o">.</span><span class="n">blank</span> <span class="o">=</span> <span class="bp">False</span>
@@ -286,7 +308,7 @@
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">clear_selection</span><span class="p">()</span>
 
             <span class="k">elif</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">sel</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">:</span>  <span class="c1"># select the bond</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_click</span><span class="p">(</span><span class="n">moldesign</span><span class="o">.</span><span class="n">molecules</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">Bond</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="n">atom</span><span class="p">))</span>  <span class="c1"># turn this into a bond selection</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_click</span><span class="p">(</span><span class="n">mdt</span><span class="o">.</span><span class="n">Bond</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="n">atom</span><span class="p">))</span>  <span class="c1"># turn this into a bond selection</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># select a new atom</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">clear_selection</span><span class="p">(</span><span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
                 <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
@@ -341,7 +363,7 @@
 
             <span class="c1"># Bond angle</span>
             <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">angle_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">)</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">angle_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">)</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
                 <span class="c1"># self.angle_slider.observe(self.set_angle, &#39;value&#39;)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">angle_slider</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">False</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">angle_slider</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;&lt;b&gt;Bond angle&lt;/b&gt; &lt;span style=&quot;color:{c1}&quot;&gt;{a1.name}&#39;</span> \
@@ -356,7 +378,7 @@
 
             <span class="c1"># Dihedral twist</span>
             <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span> <span class="ow">and</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">dihedral</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">)</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">dihedral</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">)</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
                 <span class="c1"># self.dihedral_slider.observe(self.set_dihedral, &#39;value&#39;)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_slider</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="bp">False</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_slider</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;&lt;b&gt;Dihedral angle&lt;/b&gt; &lt;span style=&quot;color:{c0}&quot;&gt;{a4.name}&lt;/span&gt;&#39;</span> \
@@ -376,7 +398,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown selection type </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GeometryBuilder.bond_click"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.geombuilder.GeometryBuilder.bond_click">[docs]</a>    <span class="k">def</span> <span class="nf">bond_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryBuilder.bond_click"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.bond_click">[docs]</a>    <span class="k">def</span> <span class="nf">bond_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond</span><span class="p">):</span>
         <span class="n">sel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
         <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;bond&#39;</span><span class="p">:</span>  <span class="c1"># check if this bond is already selected</span>
             <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">bond</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">a2</span>
@@ -438,12 +460,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_highlight_atoms</span><span class="p">([</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">],</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">nmdtond</span> <span class="o">=</span> <span class="n">moldesign</span><span class="o">.</span><span class="n">molecules</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">Bond</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span><span class="p">)</span>
+                <span class="n">nmdtond</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Bond</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_highlight_atoms</span><span class="p">([</span><span class="n">sel</span><span class="o">.</span><span class="n">nbr_a1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">NBR1HIGHLIGHT</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">set_bond_color</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NBR1HIGHLIGHT</span><span class="p">,</span> <span class="n">nmdtond</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_highlighted_bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nmdtond</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">nmdtond</span> <span class="o">=</span> <span class="n">moldesign</span><span class="o">.</span><span class="n">molecules</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">Bond</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">)</span>
+                <span class="n">nmdtond</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">Bond</span><span class="p">(</span><span class="n">sel</span><span class="o">.</span><span class="n">a2</span><span class="p">,</span> <span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_highlight_atoms</span><span class="p">([</span><span class="n">sel</span><span class="o">.</span><span class="n">nbr_a2</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">NBR2HIGHLIGHT</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">set_bond_color</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NBR2HIGHLIGHT</span><span class="p">,</span> <span class="n">nmdtond</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_highlighted_bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nmdtond</span><span class="p">)</span>
@@ -454,12 +476,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_tool_state</span><span class="p">()</span>
 
-<div class="viewcode-block" id="GeometryBuilder.clear_selection"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.geombuilder.GeometryBuilder.clear_selection">[docs]</a>    <span class="k">def</span> <span class="nf">clear_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryBuilder.clear_selection"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.clear_selection">[docs]</a>    <span class="k">def</span> <span class="nf">clear_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">DotDict</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selection_description</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="n">render</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redraw_selection</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="GeometryBuilder.reset_geometry"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.widgets.html#moldesign.widgets.geombuilder.GeometryBuilder.reset_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">reset_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="GeometryBuilder.reset_geometry"><a class="viewcode-back" href="../../../_mdt_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder.reset_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">reset_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clear_selection</span><span class="p">(</span><span class="n">render</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_position</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">set_positions</span><span class="p">()</span>
@@ -497,7 +519,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.7.0',
+            VERSION:'0.7.3',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -1,0 +1,1358 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>moldesign.molecules.molecule &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">4. Geometry tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>moldesign.molecules.molecule</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for moldesign.molecules.molecule</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2016 Autodesk Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">moldesign</span> <span class="kn">as</span> <span class="nn">mdt</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">helpers</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">moldesign.exceptions</span> <span class="kn">import</span> <span class="n">NotCalculatedError</span>
+<span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">moldesign.compute</span> <span class="kn">import</span> <span class="n">DummyJob</span>
+<span class="kn">from</span> <span class="nn">moldesign.min.base</span> <span class="kn">import</span> <span class="n">MinimizerBase</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">toplevel</span><span class="p">,</span> <span class="n">Residue</span><span class="p">,</span> <span class="n">Chain</span><span class="p">,</span> <span class="n">Instance</span><span class="p">,</span> <span class="n">AtomContainer</span><span class="p">,</span> <span class="n">Bond</span>
+<span class="kn">from</span> <span class="nn">.coord_arrays</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="nd">@toplevel</span>
+<div class="viewcode-block" id="MolecularProperties"><a class="viewcode-back" href="../../../toplevel.html#moldesign.MolecularProperties">[docs]</a><span class="k">class</span> <span class="nc">MolecularProperties</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">DotDict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Stores property values for a molecule.</span>
+<span class="sd">    These objects will be generally created and updated by EnergyModels, not by users.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">,</span> <span class="o">**</span><span class="n">properties</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialization: ``properties`` MUST include positions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mol (Molecule): molecule that these properties are associated with</span>
+<span class="sd">            **properties (dict): values of molecular properties (MUST include positions as a key)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># ADD_FEATURE: always return stored properties in the default unit systems</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MolecularProperties</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">positions</span><span class="o">=</span><span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="o">**</span><span class="n">properties</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MolecularProperties.geometry_matches"><a class="viewcode-back" href="../../../toplevel.html#moldesign.MolecularProperties.geometry_matches">[docs]</a>    <span class="k">def</span> <span class="nf">geometry_matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns:</span>
+<span class="sd">            bool: True if the molecule&#39;s ``position`` is the same as these properties&#39; ``position``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span> <span class="n">mol</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MolConstraintMixin"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolConstraintMixin">[docs]</a><span class="k">class</span> <span class="nc">MolConstraintMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Functions for applying and managing geometrical constraints.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This is a mixin class designed only to be mixed into the :class:`Molecule` class. Routines</span>
+<span class="sd">        are separated are here for code organization only - they could be included in the main</span>
+<span class="sd">        Molecule class without changing any functionality</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MolConstraintMixin.clear_constraints"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolConstraintMixin.clear_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">clear_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clear all geometry constraints from the molecule.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            This does NOT clear integrator options - such as &quot;constrain H bonds&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_methods</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MolConstraintMixin.constrain_atom"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolConstraintMixin.constrain_atom">[docs]</a>    <span class="k">def</span> <span class="nf">constrain_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;  Constrain the position of an atom</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atom (moldesign.Atom): The atom to constrain</span>
+<span class="sd">            pos (moldesign.units.MdtQuantity): position to fix this atom at (default: atom.position) [length]</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            moldesign.geometry.FixedPosition: constraint object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">geom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">FixedPosition</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">pos</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_methods</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MolConstraintMixin.constrain_distance"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolConstraintMixin.constrain_distance">[docs]</a>    <span class="k">def</span> <span class="nf">constrain_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;  Constrain the distance between two atoms</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atom1 (moldesign.Atom)</span>
+<span class="sd">            atom2 (moldesign.Atom)</span>
+<span class="sd">            dist ([length]): distance value (default: current distance)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            moldesign.geometry.DistanceConstraint: constraint object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">geom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">geom</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">DistanceConstraint</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">dist</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_methods</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MolConstraintMixin.constrain_angle"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolConstraintMixin.constrain_angle">[docs]</a>    <span class="k">def</span> <span class="nf">constrain_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;  Constrain the bond angle atom1-atom2-atom3</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atom1 (moldesign.Atom)</span>
+<span class="sd">            atom2 (moldesign.Atom)</span>
+<span class="sd">            atom3 (moldesign.Atom)</span>
+<span class="sd">            angle ([angle]): angle value (default: current angle)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            moldesign.geometry.AngleConstraint: constraint object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">geom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">geom</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">AngleConstraint</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">angle</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_methods</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MolConstraintMixin.constrain_dihedral"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolConstraintMixin.constrain_dihedral">[docs]</a>    <span class="k">def</span> <span class="nf">constrain_dihedral</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;  Constrain the bond angle atom1-atom2-atom3</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atom1 (moldesign.Atom)</span>
+<span class="sd">            atom2 (moldesign.Atom)</span>
+<span class="sd">            atom3 (moldesign.Atom)</span>
+<span class="sd">            atom4 (moldesign.Atom)</span>
+<span class="sd">            angle ([angle]): angle value (default: current angle)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            moldesign.geom.AngleConstraint: constraint object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">moldesign</span> <span class="kn">import</span> <span class="n">geom</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">geom</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">DihedralConstraint</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">angle</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_methods</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="MolPropertyMixin"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolPropertyMixin">[docs]</a><span class="k">class</span> <span class="nc">MolPropertyMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Functions for calculating and accessing molecular properties.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This is a mixin class designed only to be mixed into the :class:`Molecule` class. Routines</span>
+<span class="sd">        are separated are here for code organization only - they could be included in the main</span>
+<span class="sd">        Molecule class without changing any functionality</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; u.Scalar[mass]: the molecule&#39;s mass</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kinetic_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot; u.Scalar[energy]: Classical kinetic energy :math:`\sum_{\text{atoms}} \frac{p^2}{2m}`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">helpers</span><span class="o">.</span><span class="n">kinetic_energy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">momenta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_masses</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kinetic_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot; [temperature]: temperature calculated using the equipartition theorem,</span>
+
+<span class="sd">        :math:`\frac{2 E_{\text{kin}}}{k_b f}`,</span>
+
+<span class="sd">        where :math:`E_{\text{kin}}` is the kinetic energy and :math:`f` is the number of</span>
+<span class="sd">        degrees of freedom (see :meth:`dynamic_dof &lt;Molecule.dynamic_dof&gt;`)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">helpers</span><span class="o">.</span><span class="n">kinetic_temperature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kinetic_energy</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_dof</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dynamic_dof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; int: Count the number of spatial degrees of freedom of the system,</span>
+<span class="sd">        taking into account any constraints</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            If there are other DOFs not taken into account here, this quantity can be</span>
+<span class="sd">            set explicitly</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dof</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dof</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndims</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;remove_translation&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">):</span>
+                <span class="n">df</span> <span class="o">-=</span> <span class="mi">3</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;remove_rotation&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">df</span> <span class="o">-=</span> <span class="mi">2</span>
+
+        <span class="n">const_hbonds</span> <span class="o">=</span> <span class="n">const_water</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">const_hbonds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;constrain_hbonds&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+            <span class="n">const_water</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;constrain_water&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">const_hbonds</span><span class="p">:</span>  <span class="c1"># TODO: deal with molecular hydrogen</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atnum</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="n">df</span> <span class="o">-=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">const_water</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">residue</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;water&#39;</span><span class="p">:</span>  <span class="c1"># constrained water has 6 degrees of freedom</span>
+                    <span class="k">if</span> <span class="n">const_hbonds</span><span class="p">:</span>  <span class="c1"># two are already accounted for</span>
+                        <span class="n">df</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">df</span> <span class="o">-=</span> <span class="mi">3</span>
+
+        <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">:</span>  <span class="c1"># TODO: deal with more double-counting cases</span>
+            <span class="k">if</span> <span class="n">const_hbonds</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">constraint</span><span class="p">,</span> <span class="n">mdt</span><span class="o">.</span><span class="n">geom</span><span class="o">.</span><span class="n">DistanceConstraint</span><span class="p">):</span>
+                    <span class="c1"># don&#39;t double-count constrained hbonds</span>
+                    <span class="k">if</span> <span class="n">constraint</span><span class="o">.</span><span class="n">a1</span><span class="o">.</span><span class="n">atnum</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">constraint</span><span class="o">.</span><span class="n">a2</span><span class="o">.</span><span class="n">atnum</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">df</span> <span class="o">-=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">dof</span>
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="nd">@dynamic_dof.setter</span>
+    <span class="k">def</span> <span class="nf">dynamic_dof</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dof</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_electrons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;int: The number of electrons in the system, based on the atomic numbers and self.charge&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">atnum</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="o">.</span><span class="n">value_in</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">q_e</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">homo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;int: The array index (0-based) of the highest occupied molecular orbital (HOMO).</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            This assumes a closed shell ground state! &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_electrons</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lumo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;int: The array index (0-based) of the lowest unoccupied molecular orbital (LUMO).</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            This assumes a closed shell ground state! &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_electrons</span><span class="o">/</span><span class="mi">2</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">wfn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; moldesign.orbitals.ElectronicWfn: return the molecule&#39;s current electronic state,</span>
+<span class="sd">        if calculated.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotCalculatedError: If the electronic state has not yet been calculated at this</span>
+<span class="sd">                geometry</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="s1">&#39;wfn&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MolPropertyMixin.calc_property"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolPropertyMixin.calc_property">[docs]</a>    <span class="k">def</span> <span class="nf">calc_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate the given property if necessary and return it</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): name of the property (e.g. &#39;potential_energy&#39;, &#39;forces&#39;, etc.)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: the requested property</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">requests</span><span class="o">=</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MolPropertyMixin.get_property"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolPropertyMixin.get_property">[docs]</a>    <span class="k">def</span> <span class="nf">get_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the given property if already calculated; raise NotCalculatedError otherwise</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): name of the property (e.g. &#39;potential_energy&#39;, &#39;forces&#39;, etc.)</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotCalculatedError: If the molecular property has not yet been calculated at this</span>
+<span class="sd">                geometry</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: the requested property</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NotCalculatedError</span><span class="p">(</span>
+                    <span class="p">(</span><span class="s2">&quot;The &#39;{0}&#39; property hasn&#39;t been calculated yet. &quot;</span>
+                     <span class="s2">&quot;Calculate it with the molecule.calculate_{0}() method&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="MolPropertyMixin.calculate_forces"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolPropertyMixin.calculate_forces">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_forces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate forces and return them</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            units.Vector[force]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_property</span><span class="p">(</span><span class="s1">&#39;forces&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MolPropertyMixin.calculate_potential_energy"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolPropertyMixin.calculate_potential_energy">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_potential_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate potential energy and return it</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            units.Scalar[energy]: potential energy at this position</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_property</span><span class="p">(</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MolPropertyMixin.calculate_dipole"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolPropertyMixin.calculate_dipole">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate forces and return them</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            units.Vector[length*charge]: dipole moment at this position (len=3)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_property</span><span class="p">(</span><span class="s1">&#39;dipole&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MolPropertyMixin.calculate_wfn"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolPropertyMixin.calculate_wfn">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_wfn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate forces and return them</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            moldesign.orbitals.ElectronicWfn: electronic wavefunction object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_property</span><span class="p">(</span><span class="s1">&#39;wfn&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MolPropertyMixin.update_properties"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolPropertyMixin.update_properties">[docs]</a>    <span class="k">def</span> <span class="nf">update_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">properties</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is intended mainly as a callback for long-running property calculations.</span>
+<span class="sd">        When they are finished, they can call this method to update the molecule&#39;s properties.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            properties (dict): properties-like object. MUST contain a &#39;positions&#39; attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">properties</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">==</span> <span class="n">properties</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> \
+                <span class="s1">&#39;The molecular geometry does not correspond to these properties&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">potential_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; units.Scalar[energy]: return the molecule&#39;s current potential energy, if calculated.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotCalculatedError: If the potential energy has not yet been calculated at this</span>
+<span class="sd">                geometry</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="s1">&#39;potential_energy&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">forces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; units.Vector[force]: return the current force on the molecule, if calculated.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotCalculatedError: If the forces have not yet been calculated at this geometry</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="s1">&#39;forces&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; units.Vector[length*charge]: return the molecule&#39;s dipole moment, if calculated (len=3).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotCalculatedError: If the dipole moment has not yet been calculated at this</span>
+<span class="sd">                geometry</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="s1">&#39;dipole&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;MolecularProperties: Molecular properties calculated at this geometry</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># ADD_FEATURE: some sort of persistent caching so that they aren&#39;t lost</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_properties</span><span class="o">.</span><span class="n">geometry_matches</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_properties</span> <span class="o">=</span> <span class="n">MolecularProperties</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_properties</span>
+
+    <span class="nd">@properties.setter</span>
+    <span class="k">def</span> <span class="nf">properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Sanity checks - make sure that these properties correspond to the correct geoemtry.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">val</span><span class="o">.</span><span class="n">geometry_matches</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> \
+            <span class="s2">&quot;Can&#39;t set properties - they&#39;re for a different molecular geometry&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_properties</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="c1"># synonyms for backwards compatibility</span>
+    <span class="n">calc_wfn</span> <span class="o">=</span> <span class="n">calculate_wfn</span>
+    <span class="n">calc_dipole</span> <span class="o">=</span> <span class="n">calculate_dipole</span>
+    <span class="n">calc_potential_energy</span> <span class="o">=</span> <span class="n">calculate_potential_energy</span>
+    <span class="n">calc_forces</span> <span class="o">=</span> <span class="n">calculate_forces</span></div>
+
+
+<div class="viewcode-block" id="MolDrawingMixin"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolDrawingMixin">[docs]</a><span class="k">class</span> <span class="nc">MolDrawingMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Methods for visualizing molecular structure.</span>
+
+<span class="sd">    See Also:</span>
+<span class="sd">        :class:`moldesign.molecules.atomcollections.AtomContainer`</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This is a mixin class designed only to be mixed into the :class:`Molecule` class. Routines</span>
+<span class="sd">        are separated are here for code organization only - they could be included in the main</span>
+<span class="sd">        Molecule class without changing any functionality</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MolDrawingMixin.draw_orbitals"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolDrawingMixin.draw_orbitals">[docs]</a>    <span class="k">def</span> <span class="nf">draw_orbitals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Visualize any calculated molecular orbitals (Jupyter only).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mdt.orbitals.OrbitalViewer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">moldesign.widgets.orbitals</span> <span class="kn">import</span> <span class="n">OrbitalViewer</span>
+        <span class="k">if</span> <span class="s1">&#39;wfn&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calculate_wfn</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">OrbitalViewer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MolReprMixin"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolReprMixin">[docs]</a><span class="k">class</span> <span class="nc">MolReprMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Methods for creating text-based representations of the molecule</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This is a mixin class designed only to be mixed into the :class:`Molecule` class. Routines</span>
+<span class="sd">        are separated are here for code organization only - they could be included in the main</span>
+<span class="sd">        Molecule class without changing any functionality</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">), </span><span class="si">%d</span><span class="s1"> atoms&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                                            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&lt;molecule (error in __repr__) at </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;Molecule: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+<div class="viewcode-block" id="MolReprMixin.markdown_summary"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolReprMixin.markdown_summary">[docs]</a>    <span class="k">def</span> <span class="nf">markdown_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A markdown description of this molecule.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Markdown&quot;&quot;&quot;</span>
+        <span class="c1"># TODO: remove leading underscores for descriptor-protected attributes</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;### Molecule: &quot;</span><span class="si">%s</span><span class="s1">&quot; (</span><span class="si">%d</span><span class="s1"> atoms)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">natoms</span><span class="p">),</span>
+                 <span class="s1">&#39;**Mass**: {:.2f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="p">),</span>
+                 <span class="s1">&#39;**Formula**: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stoichiometry</span><span class="p">(</span><span class="n">html</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+                 <span class="s1">&#39;**Charge**: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_model</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;**Potential model**: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_model</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;**Integrator**: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_biomolecule</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">biomol_summary_markdown</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_repr_markdown_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">markdown_summary</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MolReprMixin.biomol_summary_markdown"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolReprMixin.biomol_summary_markdown">[docs]</a>    <span class="k">def</span> <span class="nf">biomol_summary_markdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A markdown description of biomolecular structure.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Markdown string&quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_residue_table</span><span class="p">()</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;### Residues&#39;</span><span class="p">)</span>
+            <span class="c1"># extra &#39;|&#39; here may be workaround for a bug in ipy.markdown?</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">replace</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s1">&#39; &#39;</span><span class="p">})</span> <span class="o">+</span> <span class="s1">&#39;|&#39;</span><span class="p">)</span>
+
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;### Biopolymer chains&#39;</span><span class="p">)</span>
+            <span class="n">seqs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
+                <span class="n">seq</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">sequence</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">seq</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>  <span class="c1"># don&#39;t write anything if there&#39;s no sequence</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># deal with extra-long sequences</span>
+                <span class="n">seqstring</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">),</span> <span class="mi">80</span><span class="p">):</span>
+                    <span class="n">seqstring</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seq</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">80</span><span class="p">])</span>
+                <span class="n">seqstring</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seqstring</span><span class="p">)</span>
+                <span class="n">seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;**</span><span class="si">%s</span><span class="s1">**: `</span><span class="si">%s</span><span class="s1">`&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">seqstring</span><span class="p">))</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&lt;br&gt;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seqs</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">lines</span></div>
+
+<div class="viewcode-block" id="MolReprMixin.get_residue_table"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolReprMixin.get_residue_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_residue_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a data table summarizing this molecule&#39;s primary structure.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            moldesign.utils.MarkdownTable&quot;&quot;&quot;</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">MarkdownTable</span><span class="p">(</span><span class="o">*</span><span class="p">([</span><span class="s1">&#39;chain&#39;</span><span class="p">]</span> <span class="o">+</span>
+                                      <span class="s1">&#39;protein dna rna unknown water solvent&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
+            <span class="n">counts</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">unk</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">chain</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+                <span class="n">cat</span> <span class="o">=</span> <span class="n">residue</span><span class="o">.</span><span class="n">type</span>
+                <span class="k">if</span> <span class="n">cat</span> <span class="o">==</span> <span class="s1">&#39;unknown&#39;</span><span class="p">:</span>
+                    <span class="n">unk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">counts</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">counts</span><span class="p">[</span><span class="s1">&#39;chain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&lt;pre&gt;&lt;b&gt;</span><span class="si">%s</span><span class="s1">&lt;/b&gt;&lt;/pre&gt;&#39;</span> <span class="o">%</span> <span class="n">chain</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">unk</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="n">counts</span><span class="p">[</span><span class="s1">&#39;unknown&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">unk</span><span class="p">)</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">add_line</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">table</span></div>
+
+<div class="viewcode-block" id="MolReprMixin.get_stoichiometry"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolReprMixin.get_stoichiometry">[docs]</a>    <span class="k">def</span> <span class="nf">get_stoichiometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">html</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return this molecule&#39;s stoichiometry</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">symbol</span><span class="p">:</span>
+            <span class="n">counts</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">symbol</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="n">my_elements</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">html</span><span class="p">:</span> <span class="n">template</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;sub&gt;</span><span class="si">%d</span><span class="s1">&lt;/sub&gt;&#39;</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">template</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">template</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">counts</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">my_elements</span><span class="p">])</span></div></div>
+
+
+<div class="viewcode-block" id="MolTopologyMixin"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolTopologyMixin">[docs]</a><span class="k">class</span> <span class="nc">MolTopologyMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Functions for building and keeping track of bond topology and biochemical structure.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This is a mixin class designed only to be mixed into the :class:`Molecule` class. Routines</span>
+<span class="sd">        are separated are here for code organization only - they could be included in the main</span>
+<span class="sd">        Atom class without changing any functionality</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MolTopologyMixin.copy"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolTopologyMixin.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a copy of the molecule and all of its substructures</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Molecule: copied molecule</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            Assigned energy models and integrators are not currently copied, although properties are</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; copy&#39;</span>
+        <span class="n">newmol</span> <span class="o">=</span> <span class="n">Molecule</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">,</span>
+                          <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                          <span class="n">pdbname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pdbname</span><span class="p">,</span>
+                          <span class="n">charge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">)</span>
+        <span class="n">newmol</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">newmol</span></div>
+
+<div class="viewcode-block" id="MolTopologyMixin.to_json"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolTopologyMixin.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">js</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">chemjson</span><span class="o">.</span><span class="n">jsonify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                  <span class="p">(</span><span class="s1">&#39;time residues atoms name&#39;</span>
+                                   <span class="s1">&#39;properties energy_model integrator&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="n">js</span><span class="p">[</span><span class="s1">&#39;chains&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)</span>
+        <span class="n">js</span><span class="p">[</span><span class="s1">&#39;bonds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">js</span></div>
+
+
+<div class="viewcode-block" id="MolTopologyMixin.assert_atom"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolTopologyMixin.assert_atom">[docs]</a>    <span class="k">def</span> <span class="nf">assert_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;If passed an integer, just return self.atoms[atom].</span>
+<span class="sd">         Otherwise, assert that the atom belongs to this molecule&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="n">atom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">atom</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Atom </span><span class="si">%s</span><span class="s2"> does not belong to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">atom</span></div>
+
+<div class="viewcode-block" id="MolTopologyMixin.rebuild"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolTopologyMixin.rebuild">[docs]</a>    <span class="k">def</span> <span class="nf">rebuild</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chains</span> <span class="o">=</span> <span class="n">Instance</span><span class="p">(</span><span class="n">molecule</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residues</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rebuild_topology</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_rebuild_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond_graph</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Build the molecule&#39;s bond graph based on its atoms&#39; bonds</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            bond_graph (dict): graph to build the bonds from</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">bond_graph</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bond_graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_bonds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bond_graph</span> <span class="o">=</span> <span class="n">bond_graph</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_biomolecule</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ndims</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_momenta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">momentum</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">masses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">mass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim_masses</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">masses</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># TODO: pickling</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assign_atom_indices</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assign_residue_indices</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dof</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_build_bonds</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Build a bond graph describing bonds between this list of atoms</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            atoms (List[moldesign.atoms.Atom])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: check atom parents</span>
+        <span class="n">bonds</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># First pass - create initial bonds</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">atom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bonds</span><span class="p">,</span> <span class="s1">&#39;Atom appears twice in this list&#39;</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="s1">&#39;bonds&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom</span><span class="o">.</span><span class="n">bond_graph</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">bonds</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">bond_graph</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">bonds</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Now make sure both atoms have a record of their bonds</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">nbr</span> <span class="ow">in</span> <span class="n">bonds</span><span class="p">[</span><span class="n">atom</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">bonds</span><span class="p">[</span><span class="n">nbr</span><span class="p">]:</span>
+                    <span class="k">assert</span> <span class="n">bonds</span><span class="p">[</span><span class="n">nbr</span><span class="p">][</span><span class="n">atom</span><span class="p">]</span> <span class="o">==</span> <span class="n">bonds</span><span class="p">[</span><span class="n">atom</span><span class="p">][</span><span class="n">nbr</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">bonds</span><span class="p">[</span><span class="n">nbr</span><span class="p">][</span><span class="n">atom</span><span class="p">]</span> <span class="o">=</span> <span class="n">bonds</span><span class="p">[</span><span class="n">atom</span><span class="p">][</span><span class="n">nbr</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">bonds</span>
+
+    <span class="k">def</span> <span class="nf">_assign_atom_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create geometry-level information based on constituent atoms, and mark the atoms</span>
+<span class="sd">        as the property of this molecule</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idim</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">_set_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">idx</span>
+            <span class="n">idim</span> <span class="o">+=</span> <span class="mi">3</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">masses</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span>
+            <span class="c1"># Here, we index the atom arrays directly into the molecule</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">_index_into_molecule</span><span class="p">(</span><span class="s1">&#39;_position&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">_index_into_molecule</span><span class="p">(</span><span class="s1">&#39;_momentum&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">momenta</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_assign_residue_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set up the chain/residue/atom hierarchy</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: consistency checks</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defchain</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_defchain</span> <span class="o">=</span> <span class="n">Chain</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                   <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                   <span class="n">molecule</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defres</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_defres</span> <span class="o">=</span> <span class="n">Residue</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                   <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                   <span class="n">pdbindex</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                   <span class="n">pdbname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                   <span class="n">chain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_defchain</span><span class="p">,</span>
+                                   <span class="n">molecule</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_defchain</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_defres</span><span class="p">)</span>
+
+        <span class="n">default_residue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defres</span>
+        <span class="n">default_chain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_defchain</span>
+        <span class="n">num_biores</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="c1"># if atom has no chain/residue, assign defaults</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="n">default_residue</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">chain</span> <span class="o">=</span> <span class="n">default_chain</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+
+            <span class="c1"># assign the chain to this molecule if necessary</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">molecule</span> <span class="o">=</span> <span class="bp">self</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)</span>
+
+                <span class="k">assert</span> <span class="n">atom</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">chain</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">atom</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="bp">self</span>
+
+            <span class="c1"># assign the residue to this molecule</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">molecule</span> <span class="o">=</span> <span class="bp">self</span>
+                <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;dna&#39;</span><span class="p">,</span> <span class="s1">&#39;rna&#39;</span><span class="p">,</span> <span class="s1">&#39;protein&#39;</span><span class="p">):</span> <span class="n">num_biores</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">atom</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="bp">self</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_biomolecule</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_biores</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nchains</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_chains</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_chains</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nresidues</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_residues</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_residues</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MolSimulationMixin"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolSimulationMixin">[docs]</a><span class="k">class</span> <span class="nc">MolSimulationMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Functions calculating energies, running dynamics, and minimizing geometry.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This is a mixin class designed only to be mixed into the :class:`Molecule` class. Routines</span>
+<span class="sd">        are separated are here for code organization only - they could be included in the main</span>
+<span class="sd">        Atom class without changing any functionality</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MolSimulationMixin.run"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolSimulationMixin.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_for</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Starts the integrator&#39;s default integration</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            run_for (int or [time]): number of steps or amount of time to run for</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            moldesign.trajectory.Trajectory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot simulate; no integrator set for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">init_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
+        <span class="n">traj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_for</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s1">&#39;Done - integrated &quot;</span><span class="si">%s</span><span class="s1">&quot; from </span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">traj</span></div>
+
+<div class="viewcode-block" id="MolSimulationMixin.calculate"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolSimulationMixin.calculate">[docs]</a>    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requests</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">use_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs a potential energy calculation on the current geometry, returning the requested quantities.</span>
+<span class="sd">        If `requests` is not passed, the properties specified in the energy_models DEFAULT_PROPERTIES</span>
+<span class="sd">        will be calculated.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            requests (List[str]): list of quantities for the model to calculate,</span>
+<span class="sd">                e.g. [&#39;dipole&#39;, &#39;forces&#39;]</span>
+<span class="sd">            wait (bool): if True, wait for the calculation to complete before returning. \</span>
+<span class="sd">                 If false, return a job object - this will not update the molecule&#39;s properties!</span>
+<span class="sd">            use_cache (bool): Return cached results if possible</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            MolecularProperties</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_model</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot calculate properties; no energy model set for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">requests</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">requests</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Figure out what needs to be calculated,</span>
+        <span class="c1"># and either launch the job or set the result</span>
+        <span class="n">to_calculate</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">requests</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_model</span><span class="o">.</span><span class="n">DEFAULT_PROPERTIES</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_cache</span><span class="p">:</span>
+            <span class="n">to_calculate</span> <span class="o">=</span> <span class="n">to_calculate</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_calculate</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_model</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">to_calculate</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">wait</span><span class="p">:</span>
+            <span class="c1"># We&#39;ll wait for the job to complete, then</span>
+            <span class="c1"># returns the molecule&#39;s calculated properties</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="s1">&#39;wait&#39;</span><span class="p">):</span>
+                <span class="n">job</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="n">properties</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">result</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">properties</span> <span class="o">=</span> <span class="n">job</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># We&#39;re not waiting for the job to complete - return a job object</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="s1">&#39;wait&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">job</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">DummyJob</span><span class="p">(</span><span class="n">job</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MolSimulationMixin.set_energy_model"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolSimulationMixin.set_energy_model">[docs]</a>    <span class="k">def</span> <span class="nf">set_energy_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Associate an energy model with this molecule</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model (moldesign.methods.EnergyModelBase): The energy model to associate with this</span>
+<span class="sd">                molecule</span>
+<span class="sd">            **params (dict): a dictionary of parameters for the model</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            For convenience, ``model`` can be an instance, a class, or a constructor (with</span>
+<span class="sd">            call signature ``model(**params) -&gt; model instance)``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If passed the class or constructor, create an instance of the energy model</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">),</span> <span class="n">mdt</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">EnergyModelBase</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy_model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">MolecularProperties</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;charge&#39;</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">charge</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+               <span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge</span>
+            <span class="k">elif</span> <span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">charge</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s2">&quot;Warning: molecular charge (</span><span class="si">%d</span><span class="s2">) does not match energy model&#39;s charge (</span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">charge</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">_prepped</span> <span class="o">=</span> <span class="bp">False</span></div>
+
+<div class="viewcode-block" id="MolSimulationMixin.set_integrator"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolSimulationMixin.set_integrator">[docs]</a>    <span class="k">def</span> <span class="nf">set_integrator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">integrator</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Associate an integrator with this molecule</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            integrator (moldesign.integrators.IntegratorBase): The integrator to associate with this</span>
+<span class="sd">                molecule</span>
+<span class="sd">            **params (dict): a dictionary of parameters for the integrator</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            For convenience, ``integrator`` can be an instance, a class, or a constructor (with</span>
+<span class="sd">            call signature ``integrator(**params) -&gt; integrator instance)``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If passed the class or constructor, create an instance of the integrator</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">integrator</span><span class="p">),</span> <span class="n">mdt</span><span class="o">.</span><span class="n">integrators</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">IntegratorBase</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="nb">callable</span><span class="p">(</span><span class="n">integrator</span><span class="p">)):</span>
+            <span class="n">integrator</span> <span class="o">=</span> <span class="n">integrator</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span> <span class="o">=</span> <span class="n">integrator</span>
+        <span class="n">integrator</span><span class="o">.</span><span class="n">mol</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">integrator</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">integrator</span><span class="o">.</span><span class="n">_prepped</span> <span class="o">=</span> <span class="bp">False</span></div>
+
+    <span class="nd">@utils.args_from</span><span class="p">(</span><span class="n">MinimizerBase</span><span class="p">,</span>
+                     <span class="n">allexcept</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;self&#39;</span><span class="p">],</span>
+                     <span class="n">inject_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;assert_converged&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">})</span>
+<div class="viewcode-block" id="MolSimulationMixin.minimize"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolSimulationMixin.minimize">[docs]</a>    <span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">assert_converged</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform an energy minimization (aka geometry optimization or relaxation).</span>
+
+<span class="sd">        If ``force_tolerance`` is not specified, the program defaults are used.</span>
+<span class="sd">        If specified, the largest force component must be less than force_tolerance</span>
+<span class="sd">        and the RMSD must be less than 1/3 of it. (based on GAMESS OPTTOL keyword)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            assert_converged (bool): Raise an exception if the minimization does not converged.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            moldesign.trajectory.Trajectory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_model</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot minimize molecule; no energy model set for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">trajectory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_model</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+            <span class="n">trajectory</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s1">&#39;Reduced energy from </span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">trajectory</span><span class="o">.</span><span class="n">potential_energy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                <span class="n">trajectory</span><span class="o">.</span><span class="n">potential_energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">assert_converged</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">trajectory</span></div>
+
+    <span class="k">def</span> <span class="nf">_reset_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called whenever a property is changed that the energy model and/or integrator</span>
+<span class="sd">        need to know about</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: what should this do with the property object?</span>
+        <span class="c1"># TODO: handle duplicate constraints (this happens a lot, and is bad)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">energy_model</span><span class="o">.</span><span class="n">_prepped</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">_prepped</span> <span class="o">=</span> <span class="bp">False</span>
+
+<div class="viewcode-block" id="MolSimulationMixin.configure_methods"><a class="viewcode-back" href="../../../_moldesign_api/moldesign.molecules.html#moldesign.MolSimulationMixin.configure_methods">[docs]</a>    <span class="k">def</span> <span class="nf">configure_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Interactively configure this molecule&#39;s simulation methods (notebooks only)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ipywidgets.Box: configuration widget</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="kn">as</span> <span class="nn">ipy</span>
+
+        <span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_model</span><span class="p">:</span>
+            <span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_model</span><span class="o">.</span><span class="n">configure</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="p">:</span>
+            <span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">integrator</span><span class="o">.</span><span class="n">configure</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">ipy</span><span class="o">.</span><span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="p">)</span></div></div>
+
+
+<span class="nd">@toplevel</span>
+<div class="viewcode-block" id="Molecule"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Molecule">[docs]</a><span class="k">class</span> <span class="nc">Molecule</span><span class="p">(</span><span class="n">AtomContainer</span><span class="p">,</span>
+               <span class="n">MolConstraintMixin</span><span class="p">,</span>
+               <span class="n">MolPropertyMixin</span><span class="p">,</span>
+               <span class="n">MolDrawingMixin</span><span class="p">,</span>
+               <span class="n">MolReprMixin</span><span class="p">,</span>
+               <span class="n">MolTopologyMixin</span><span class="p">,</span> <span class="n">MolSimulationMixin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ``Molecule`` objects store a molecular system, including atoms, 3D coordinates, molecular</span>
+<span class="sd">    properties, biomolecular entities, and other model-specific information. Interfaces with</span>
+<span class="sd">    simulation models take place through the molecule object.</span>
+
+<span class="sd">    Molecule objects will generally be created by reading files or parsing other input; see, for</span>
+<span class="sd">    example: :meth:`moldesign.read`, :meth:`moldesign.from_smiles`,</span>
+<span class="sd">    :meth:`moldesign.from_pdb`, etc.</span>
+
+<span class="sd">    This constructor is useful, however for copying other molecular structures (see</span>
+<span class="sd">    examples below).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        atomcontainer (AtomContainer or AtomList or List[moldesign.Atom]): atoms that make up</span>
+<span class="sd">            this molecule.</span>
+
+<span class="sd">            Note:</span>
+<span class="sd">                If the passed atoms don&#39;t already belong to a molecule, they will be assigned</span>
+<span class="sd">                to this one. If they DO already belong to a molecule, they will be copied,</span>
+<span class="sd">                leaving the original molecule untouched.</span>
+
+<span class="sd">        name (str): name of the molecule (automatically generated if not provided)</span>
+<span class="sd">        bond_graph (dict): dictionary specifying bonds between the atoms - of the form</span>
+<span class="sd">            ``{atom1:{atom2:bond_order, atom3:bond_order}, atom2:...}``</span>
+<span class="sd">            This structure must be symmetric; we require</span>
+<span class="sd">            ``bond_graph[atom1][atom2] == bond_graph[atom2][atom1]``</span>
+<span class="sd">        copy_atoms (bool): Create the molecule with *copies* of the passed atoms</span>
+<span class="sd">            (they will be copied automatically if they already belong to another molecule)</span>
+<span class="sd">        pdbname (str): Name of the PDB file</span>
+<span class="sd">        charge (units.Scalar[charge]): molecule&#39;s formal charge</span>
+<span class="sd">        electronic_state_index (int): index of the molecule&#39;s electronic state</span>
+
+
+<span class="sd">    Examples:</span>
+<span class="sd">        Use the ``Molecule`` class to create copies of other molecules and substructures thereof:</span>
+<span class="sd">        &gt;&gt;&gt; benzene = mdt.from_name(&#39;benzene&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; benzene_copy = mdt.Molecule(benzene, name=&#39;benzene copy&#39;)</span>
+
+<span class="sd">        &gt;&gt;&gt; protein = mdt.from_pdb(&#39;3AID&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; carbon_copies = mdt.Molecule([atom for atom in protein.atoms if atom.atnum==6])</span>
+<span class="sd">        &gt;&gt;&gt; first_residue_copy = mdt.Molecule(protein.residues[0])</span>
+
+<span class="sd">    **Molecule instance attributes:**</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        atoms (AtomList): List of all atoms in this molecule.</span>
+<span class="sd">        bond_graph (dict): symmetric dictionary specifying bonds between the</span>
+<span class="sd">           atoms:</span>
+
+<span class="sd">               ``bond_graph = {atom1:{atom2:bond_order, atom3:bond_order}, atom2:...}``</span>
+
+<span class="sd">               ``bond_graph[atom1][atom2] == bond_graph[atom2][atom1]``</span>
+<span class="sd">        residues (List[moldesign.Residue]): flat list of all biomolecular residues in this molecule</span>
+<span class="sd">        chains (Dict[moldesign.Chain]): Biomolecular chains - individual chains can be</span>
+<span class="sd">            accessed as ``mol.chains[list_index]`` or ``mol.chains[chain_name]``</span>
+<span class="sd">        name (str): A descriptive name for molecule</span>
+<span class="sd">        charge (units.Scalar[charge]): molecule&#39;s formal charge</span>
+<span class="sd">        constraints (List[moldesign.geom.GeometryConstraint]): list of constraints</span>
+<span class="sd">        ndims (int): length of the positions, momenta, and forces arrays (usually 3*self.num_atoms)</span>
+<span class="sd">        num_atoms (int): number of atoms (synonym: natoms)</span>
+<span class="sd">        num_bonds (int): number of bonds (synonym: nbonds)</span>
+<span class="sd">        positions (units.Array[length]): Nx3 array of atomic positions</span>
+<span class="sd">        momenta (units.Array[momentum]): Nx3 array of atomic momenta</span>
+<span class="sd">        masses (units.Vector[mass]): vector of atomic masses</span>
+<span class="sd">        dim_masses (units.Array[mass]): Nx3 array of atomic masses (for numerical convenience -</span>
+<span class="sd">           allows you to calculate velocity, for instance, as</span>
+<span class="sd">           ``velocity = mol.momenta/mol.dim_masses``</span>
+<span class="sd">        time (units.Scalar[time]): current time in dynamics</span>
+<span class="sd">        energy_model (moldesign.models.base.EnergyModelBase): Object that calculates</span>
+<span class="sd">            molecular properties - driven by `mol.calculate()`</span>
+<span class="sd">        integrator (moldesign.integrators.base.IntegratorBase): Object that drives movement of 3D</span>
+<span class="sd">            coordinates in time, driven by mol.run()</span>
+<span class="sd">        is_biomolecule (bool): True if this molecule contains at least 2 biochemical residues</span>
+
+
+<span class="sd">    **Molecule methods and properties**</span>
+
+<span class="sd">    See also methods offered by the mixin superclasses:</span>
+
+<span class="sd">            - :class:`moldesign.molecules.AtomContainer`</span>
+<span class="sd">            - :class:`moldesign.molecules.MolPropertyMixin`</span>
+<span class="sd">            - :class:`moldesign.molecules.MolDrawingMixin`</span>
+<span class="sd">            - :class:`moldesign.molecules.MolSimulationMixin`</span>
+<span class="sd">            - :class:`moldesign.molecules.MolTopologyMixin`</span>
+<span class="sd">            - :class:`moldesign.molecules.MolConstraintMixin`</span>
+<span class="sd">            - :class:`moldesign.molecules.MolReprMixin`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">positions</span> <span class="o">=</span> <span class="n">ProtectedArray</span><span class="p">(</span><span class="s1">&#39;_positions&#39;</span><span class="p">)</span>
+    <span class="n">momenta</span> <span class="o">=</span> <span class="n">ProtectedArray</span><span class="p">(</span><span class="s1">&#39;_momenta&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomcontainer</span><span class="p">,</span>
+                 <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">bond_graph</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">copy_atoms</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                 <span class="n">pdbname</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">charge</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">electronic_state_index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Molecule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+
+        <span class="c1"># copy atoms from another object (i.e., a molecule)</span>
+        <span class="n">oldatoms</span> <span class="o">=</span> <span class="n">helpers</span><span class="o">.</span><span class="n">get_all_atoms</span><span class="p">(</span><span class="n">atomcontainer</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">copy_atoms</span> <span class="ow">or</span> <span class="p">(</span><span class="n">oldatoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="c1">#print &#39;INFO: Copying atoms into new molecule&#39;</span>
+            <span class="n">atoms</span> <span class="o">=</span> <span class="n">oldatoms</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>  <span class="c1"># Figure out a reasonable name</span>
+                <span class="k">if</span> <span class="n">oldatoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">oldatoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">molecule</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; copy&#39;</span>
+                <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">atomcontainer</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atomcontainer</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">if_not_none</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">atomcontainer</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; copy&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;unnamed&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">atoms</span> <span class="o">=</span> <span class="n">oldatoms</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="n">atoms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;uninitialized molecule&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_defres</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_defchain</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdbname</span> <span class="o">=</span> <span class="n">pdbname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">ExclusiveList</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">methodcaller</span><span class="p">(</span><span class="s1">&#39;_constraintsig&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy_model</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">integrator</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">electronic_state_index</span> <span class="o">=</span> <span class="n">electronic_state_index</span>
+
+        <span class="k">if</span> <span class="n">charge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="n">charge</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">charge</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">):</span>  <span class="c1"># assume fundamental charge units if not explicitly set</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">*=</span> <span class="n">u</span><span class="o">.</span><span class="n">q_e</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">formal_charge</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+
+        <span class="c1"># Builds the internal memory structures</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chains</span> <span class="o">=</span> <span class="n">Instance</span><span class="p">(</span><span class="n">molecule</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residues</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rebuild_topology</span><span class="p">(</span><span class="n">bond_graph</span><span class="o">=</span><span class="n">bond_graph</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_small_molecule</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;unnamed macromolecule&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stoichiometry</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_properties</span> <span class="o">=</span> <span class="n">MolecularProperties</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ff</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">DotDict</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Molecule.newbond"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Molecule.newbond">[docs]</a>    <span class="k">def</span> <span class="nf">newbond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a new bond</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            a1 (moldesign.Atom): First atom in the bond</span>
+<span class="sd">            a2 (moldesign.Atom): Second atom in the bond</span>
+<span class="sd">            order (int): order of the bond</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            moldesign.Bond</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">a1</span><span class="o">.</span><span class="n">molecule</span> <span class="o">==</span> <span class="n">a2</span><span class="o">.</span><span class="n">molecule</span> <span class="o">==</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="n">a1</span><span class="o">.</span><span class="n">bond_to</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; u.Vector[length/time]: Nx3 array of atomic velocities</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">momenta</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">dim_masses</span><span class="p">)</span><span class="o">.</span><span class="n">defunits</span><span class="p">()</span>
+
+    <span class="nd">@velocities.setter</span>
+    <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">momenta</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_masses</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_bonds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;int: number of chemical bonds in this molecule&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">nbonds</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+
+    <span class="n">nbonds</span> <span class="o">=</span> <span class="n">num_bonds</span>
+
+<div class="viewcode-block" id="Molecule.addatom"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Molecule.addatom">[docs]</a>    <span class="k">def</span> <span class="nf">addatom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newatom</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;  Add a new atom to the molecule</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            newatom (moldesign.Atom): The atom to add</span>
+<span class="sd">                (it will be copied if it already belongs to a molecule)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addatoms</span><span class="p">([</span><span class="n">newatom</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Molecule.addatoms"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Molecule.addatoms">[docs]</a>    <span class="k">def</span> <span class="nf">addatoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newatoms</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add new atoms to this molecule.</span>
+<span class="sd">        For now, we really just rebuild the entire molecule in place.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">           newatoms (List[moldesign.Atom]))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_methods</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">newatoms</span><span class="p">:</span> <span class="k">assert</span> <span class="n">atom</span><span class="o">.</span><span class="n">molecule</span> <span class="ow">is</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">newatoms</span><span class="p">)</span>
+
+        <span class="c1"># symmetrize bonds between the new atoms and the pre-existing molecule</span>
+        <span class="n">bonds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_bonds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">newatom</span> <span class="ow">in</span> <span class="n">newatoms</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">nbr</span> <span class="ow">in</span> <span class="n">bonds</span><span class="p">[</span><span class="n">newatom</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">nbr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">:</span>  <span class="c1"># i.e., it&#39;s part of the original molecule</span>
+                    <span class="n">bonds</span><span class="p">[</span><span class="n">nbr</span><span class="p">][</span><span class="n">newatom</span><span class="p">]</span> <span class="o">=</span> <span class="n">bonds</span><span class="p">[</span><span class="n">newatom</span><span class="p">][</span><span class="n">nbr</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rebuild_topology</span><span class="p">(</span><span class="n">bonds</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Molecule.deletebond"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Molecule.deletebond">[docs]</a>    <span class="k">def</span> <span class="nf">deletebond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Remove this bond from the molecule&#39;s topology</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            Bond: bond to remove</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">a1</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">[</span><span class="n">bond</span><span class="o">.</span><span class="n">a2</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">a1</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_force_converged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return True if the forces on this molecule:</span>
+<span class="sd">        1) Are less than tolerance in every dimension</span>
+<span class="sd">        2) have an RMS of less than 1/3 the tolerance value</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tolerance (units.Scalar[force]): force tolerance</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if RMSD force is less than this quantity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">forces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_forces</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">forces</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">tolerance</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
+        <span class="n">rmsd2</span> <span class="o">=</span> <span class="n">forces</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">forces</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndims</span>
+        <span class="k">if</span> <span class="n">rmsd2</span> <span class="o">&gt;</span> <span class="n">tolerance</span> <span class="o">*</span> <span class="n">tolerance</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+<div class="viewcode-block" id="Molecule.write"><a class="viewcode-back" href="../../../toplevel.html#moldesign.Molecule.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Write this molecule to a string or file.</span>
+
+<span class="sd">        This is a convenience method for :ref:`moldesign.converters.write`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): filename to write (if not passed, write to string)</span>
+<span class="sd">            format (str): file format (if filename is not passed, format must be specified)</span>
+<span class="sd">                Guessed from file extension if not passed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: make it easier to do the right thing, which is write to .pkl.bz2</span>
+        <span class="k">return</span> <span class="n">mdt</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_small_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;bool: True if molecule&#39;s mass is less than 500 Daltons (not mutually exclusive with</span>
+<span class="sd">        :meth:`self.is_biomolecule &lt;Molecule.is_biomolecule&gt;`)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">&lt;=</span> <span class="mf">500.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">amu</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bonds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Iterator over all bonds in the molecule</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            moldesign.atoms.Bond: bond object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">nbr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_graph</span><span class="p">[</span><span class="n">atom</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="n">nbr</span><span class="o">.</span><span class="n">index</span><span class="p">:</span> <span class="k">continue</span>  <span class="c1"># don&#39;t double count</span>
+                <span class="k">yield</span> <span class="n">Bond</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">nbr</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

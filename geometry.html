@@ -1,0 +1,393 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>4. Geometry tools &mdash; Molecular Design Toolkit 0.7.3 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Molecular Design Toolkit 0.7.3 documentation" href="index.html"/>
+        <link rel="next" title="5. Property calculations" href="properties.html"/>
+        <link rel="prev" title="3. Biomolecular structure" href="biomolecule.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Molecular Design Toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.3
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">2. Molecular Design Toolkit Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">3. Installing MDT</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Recipes</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="creating_and_converting.html">1. Reading and building molecules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">2. Molecular structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="biomolecule.html">3. Biomolecular structure</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">4. Geometry tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#atomic-positions">4.1. Atomic positions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#internal-coordinates">4.2. Internal coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#manipulating-coordinates">4.3. Manipulating coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#monitor-coordinates">4.4. Monitor coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#groups-of-atoms">4.5. Groups of atoms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#analyze-dynamics">4.6. Analyze dynamics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#constrain-geometry">4.7. Constrain geometry</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="properties.html">5. Property calculations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamics.html">6. Molecular dynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">7. Visualization</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Physical object API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/datastructures.html">1. Molecular data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/molecule.html">2. Molecule API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/biopolymer.html">3. Biopolymer API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/wfn.html">4. Electronic wavefunction API</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Simulation and tools API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.geom.html">1. Geometry API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.widgets.html">2. Widgets API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.tools.html">3. Tools API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.models.html">4. Energy models API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.integrators.html">5. Integrators API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_mdt_api/moldesign.data.html">6. Data API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Molecular Design Toolkit</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>4. Geometry tools</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/geometry.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="geometry-tools">
+<h1>4. Geometry tools<a class="headerlink" href="#geometry-tools" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="atomic-positions">
+<h2>4.1. Atomic positions<a class="headerlink" href="#atomic-positions" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="_images/atompos.png"><img alt="_images/atompos.png" src="_images/atompos.png" style="width: 221.0px; height: 184.0px;" /></a>
+<p>Atomic positions are accessible both as vectors and scalars:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s1">&#39;CCC&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">position</span>
+<span class="go">&lt;Quantity([ 0.99016981  0.04194212  0.10581842], &#39;ang&#39;)&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">x</span>
+<span class="go">&lt;Quantity(0.990169808818, &#39;ang&#39;)&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">z</span>
+<span class="go">&lt;Quantity(0.105818418471, &#39;ang&#39;)&gt;</span>
+</pre></div>
+</div>
+<p>These quantities can be updated, not just read. Everything is kept automatically in sync - changing <code class="docutils literal"><span class="pre">atom.position</span></code> will automatically change <code class="docutils literal"><span class="pre">atom.x,</span> <span class="pre">atom.y</span></code> and <code class="docutils literal"><span class="pre">atom.z</span></code>, and vice versa:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mf">5.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">position</span>
+<span class="go">&lt;Quantity([ 5.          0.04194212  0.10581842], &#39;ang&#39;)&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">z</span>
+<span class="go">(&lt;Quantity(0.0, &#39;ang&#39;)&gt;, &lt;Quantity(0.0, &#39;ang&#39;)&gt;, &lt;Quantity(0.0, &#39;ang&#39;)&gt;)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="internal-coordinates">
+<h2>4.2. Internal coordinates<a class="headerlink" href="#internal-coordinates" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="api/geometry.html#module-moldesign.geom" title="moldesign.geom"><code class="xref py py-mod docutils literal"><span class="pre">moldesign.geom</span></code></a> module contains a variety of methods for measuring (and
+manipulate geometry).</p>
+<p>You can get the distance between any two atoms with the
+<code class="xref py py-meth docutils literal"><span class="pre">atom.distance</span></code> method.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom1</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">atom2</span><span class="p">)</span>
+<span class="go">[...] angstrom</span>
+</pre></div>
+</div>
+<p>Bond angles and dihedral (twist) angles can be measured using the <a class="reference internal" href="toplevel.html#moldesign.angle" title="moldesign.angle"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.angle()</span></code></a>
+and <a class="reference internal" href="toplevel.html#moldesign.dihedral" title="moldesign.dihedral"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.dihedral()</span></code></a> methods:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">moldesign</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">)</span>
+<span class="go">[...] radians</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">moldesign</span><span class="o">.</span><span class="n">dihedral</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">atom3</span><span class="p">,</span> <span class="n">atom4</span><span class="p">)</span>
+<span class="go">[...] radians</span>
+</pre></div>
+</div>
+<p>Measuring a dihedral (or twist) angle can be a pain, because they are defined as a function of <em>four</em> atomic positions.  For quick measurements, you can pass in only the two central atoms in the dihedral, and MDT will infer the others. Any of the following call signatures will work:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">moldesign</span><span class="o">.</span><span class="n">dihedral</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">moldesign</span><span class="o">.</span><span class="n">dihedral</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">moldesign</span><span class="o">.</span><span class="n">dihedral</span><span class="p">(</span><span class="n">bond</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For applications that require derivatives, the gradients of these quantites are also available using the <a class="reference internal" href="toplevel.html#moldesign.distance_gradient" title="moldesign.distance_gradient"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.distance_gradient()</span></code></a>, <a class="reference internal" href="toplevel.html#moldesign.angle_gradient" title="moldesign.angle_gradient"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.angle_gradient()</span></code></a>, and <a class="reference internal" href="toplevel.html#moldesign.dihedral_gradient" title="moldesign.dihedral_gradient"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.dihedral_gradient()</span></code></a>.</p>
+</div>
+<div class="section" id="manipulating-coordinates">
+<h2>4.3. Manipulating coordinates<a class="headerlink" href="#manipulating-coordinates" title="Permalink to this headline">¶</a></h2>
+<p>Internal coordinates can also be manipulated using the <a class="reference internal" href="toplevel.html#moldesign.set_distance" title="moldesign.set_distance"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.set_distance()</span></code></a>, <a class="reference internal" href="toplevel.html#moldesign.set_angle" title="moldesign.set_angle"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.set_angle()</span></code></a>, and <a class="reference internal" href="toplevel.html#moldesign.set_dihedral" title="moldesign.set_dihedral"><code class="xref py py-meth docutils literal"><span class="pre">moldesign.set_dihedral()</span></code></a> functions.</p>
+<p>Note that these functions can work in two ways. We&#8217;ll illustrate this with ethylene:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ethylene</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s1">&#39;C=C&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ethylene</span><span class="o">.</span><span class="n">draw3d</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/ethyl_init.png"><img alt="_images/ethyl_init.png" src="_images/ethyl_init.png" style="width: 263.0px; height: 191.0px;" /></a>
+<p>By default, MDT will move all atoms affected by the change (equivalent to manipulating the molecule&#8217;s internal coordinates). Here, although we only explicitly change the distance between the two carbons, the methylene groups move as well:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdt</span><span class="o">.</span><span class="n">set_distance</span><span class="p">(</span><span class="n">ethylene</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ethylene</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/ethyl_after.png"><img alt="_images/ethyl_after.png" src="_images/ethyl_after.png" style="width: 336.0px; height: 191.0px;" /></a>
+<p>However, if the keyword <code class="docutils literal"><span class="pre">adjustmol</span></code> is set to <code class="docutils literal"><span class="pre">False</span></code>, <em>only the specified atoms</em> will be moved; the hydrogens stay in their original positions:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ethylene</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s1">&#39;C=C&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdt</span><span class="o">.</span><span class="n">set_distance</span><span class="p">(</span><span class="n">ethylene</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ethylene</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>                 <span class="mf">3.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                 <span class="n">adjustmol</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ethylene</span><span class="o">.</span><span class="n">draw3d</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/ethyl_noadjust.png"><img alt="_images/ethyl_noadjust.png" src="_images/ethyl_noadjust.png" style="width: 254.0px; height: 166.0px;" /></a>
+<p>In notebooks, these quantities can be changed interactively using the <a class="reference internal" href="_mdt_api/moldesign.widgets.html#moldesign.widgets.GeometryBuilder" title="moldesign.widgets.GeometryBuilder"><code class="xref py py-class docutils literal"><span class="pre">GeometryBuilder</span></code></a> widget:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdt</span><span class="o">.</span><span class="n">GeometryBuilder</span><span class="p">(</span><span class="n">ethylene</span><span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/geometrybuilder.png"><img alt="_images/geometrybuilder.png" src="_images/geometrybuilder.png" style="width: 1018.0px; height: 483.0px;" /></a>
+</div>
+<div class="section" id="monitor-coordinates">
+<h2>4.4. Monitor coordinates<a class="headerlink" href="#monitor-coordinates" title="Permalink to this headline">¶</a></h2>
+<p><code class="xref py py-class docutils literal"><span class="pre">Geometry</span> <span class="pre">monitor</span></code> classes can simplify the process of tracking and manipulating internal coordinates.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ethylene</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s1">&#39;C=C&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">distance_monitor</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">DistanceMonitor</span><span class="p">(</span><span class="n">ethylene</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ethylene</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">distance_monitor</span><span class="o">.</span><span class="n">value</span>
+<span class="go">&lt;Quantity(1.51205701815, &#39;ang&#39;)&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ethylene</span><span class="o">.</span><span class="n">draw3d</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/ethyl_init.png"><img alt="_images/ethyl_init.png" src="_images/ethyl_init.png" style="width: 263.0px; height: 191.0px;" /></a>
+<p>Changing the monitor&#8217;s value will <em>change the molecular geometry</em>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">distance_monitor</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ethylene</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/ethyl_after.png"><img alt="_images/ethyl_after.png" src="_images/ethyl_after.png" style="width: 336.0px; height: 191.0px;" /></a>
+</div>
+<div class="section" id="groups-of-atoms">
+<h2>4.5. Groups of atoms<a class="headerlink" href="#groups-of-atoms" title="Permalink to this headline">¶</a></h2>
+<p>Most groups of atoms in MDT - including molecules, residues, and even arbitrary lists of atoms in <a class="reference internal" href="toplevel.html#moldesign.AtomList" title="moldesign.AtomList"><code class="xref py py-class docutils literal"><span class="pre">AtomLists</span></code></a> - have built-in geometric analysis and manipulation methods (inherited from the <a class="reference internal" href="_moldesign_api/moldesign.molecules.html#moldesign.molecules.atomcollections.AtomContainer" title="moldesign.molecules.atomcollections.AtomContainer"><code class="xref py py-class docutils literal"><span class="pre">AtomContainer</span></code></a> class).</p>
+<p>Analysis methods include calculating a center of mass,</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">from_pdb</span><span class="p">(</span><span class="s1">&#39;1YU8&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">center_of_mass</span>
+<span class="go">&lt;Quantity([ 10.59496153  15.55064957  21.02801831], &#39;ang&#39;)&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">center_of_mass</span>
+<span class="go">&lt;Quantity([ 10.24884993  27.76183367  19.85926777], &#39;ang&#39;)&gt;</span>
+</pre></div>
+</div>
+<p>the distance between two groups of atoms (i.e., the minimum distance between any pair of atoms in the two objects),</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r1</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r1</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span>
+<span class="go">&lt;Quantity(1.32810161367, &#39;ang&#39;)&gt;</span>
+</pre></div>
+</div>
+<p>and arrays of distances between the atoms in two objects:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">array</span> <span class="o">=</span> <span class="n">r1</span><span class="o">.</span><span class="n">calc_distance_array</span><span class="p">(</span><span class="n">r2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">array</span>
+<span class="go">&lt;Quantity([[ 3.49805684  4.74654325  ...]</span>
+<span class="go">           [ 2.43405388  3.8018831   ...]</span>
+<span class="go">             ...], &#39;ang&#39;)&gt;</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal"><span class="pre">array[i,j]</span> <span class="pre">==</span> <span class="pre">r1.atoms[i].distance(r2.atoms[j])</span></code>.</p>
+<p>In addition, groups of atoms can be moved using their <a class="reference internal" href="_moldesign_api/moldesign.molecules.html#moldesign.molecules.atomcollections.AtomContainer.translate" title="moldesign.molecules.atomcollections.AtomContainer.translate"><code class="xref py py-meth docutils literal"><span class="pre">translate</span></code></a> and <a class="reference internal" href="_moldesign_api/moldesign.molecules.html#moldesign.molecules.atomcollections.AtomContainer.rotate" title="moldesign.molecules.atomcollections.AtomContainer.rotate"><code class="xref py py-meth docutils literal"><span class="pre">rotate</span></code></a> methods.</p>
+</div>
+<div class="section" id="analyze-dynamics">
+<h2>4.6. Analyze dynamics<a class="headerlink" href="#analyze-dynamics" title="Permalink to this headline">¶</a></h2>
+<p>WIP</p>
+</div>
+<div class="section" id="constrain-geometry">
+<h2>4.7. Constrain geometry<a class="headerlink" href="#constrain-geometry" title="Permalink to this headline">¶</a></h2>
+<p>Geometric constraints - coordinates that are held constant during dynamics or minimizations - can be created using <a class="reference internal" href="toplevel.html#moldesign.Molecule" title="moldesign.Molecule"><code class="xref py py-class docutils literal"><span class="pre">Molecule</span></code></a> methods:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dist_constraint</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">constrain_distance</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ang_constraint</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">constrain_angle</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>These <code class="xref py py-class docutils literal"><span class="pre">constraint</span> <span class="pre">&lt;moldesign.geom.constraints.GeometryConstraint</span></code> objects can be queried:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dist_constraint</span><span class="o">.</span><span class="n">error</span><span class="p">()</span>
+<span class="go">&lt;Quantity(0.0, &#39;ang&#39;)&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dist_constraint</span><span class="o">.</span><span class="n">satisfied</span><span class="p">()</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>and can be manipulated via their <code class="docutils literal"><span class="pre">value</span></code> and <code class="docutils literal"><span class="pre">tolerance</span></code> attributes.</p>
+<p>For convenience, constraints can also be created from <code class="xref py py-class docutils literal"><span class="pre">Geometry</span> <span class="pre">monitor</span></code> objects:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">distance</span> <span class="o">=</span> <span class="n">mdt</span><span class="o">.</span><span class="n">DistanceMonitor</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mol</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">constraint</span> <span class="o">=</span> <span class="n">distance</span><span class="o">.</span><span class="n">constrain</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Molecular constraints are stored in a list at <code class="docutils literal"><span class="pre">molecule.constraints</span></code>. To remove all constraints from a molecule, use the <code class="xref py py-class docutils literal"><span class="pre">clear_constraints</span></code> method.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="properties.html" class="btn btn-neutral float-right" title="5. Property calculations" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="biomolecule.html" class="btn btn-neutral" title="3. Biomolecular structure" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016 Autodesk Research.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

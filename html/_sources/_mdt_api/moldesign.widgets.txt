@@ -1,0 +1,97 @@
+===========
+Widgets API
+===========
+
+Classes
+=======
+
+``BondSelector`` class
+----------------------
+
+.. autoclass:: moldesign.widgets.BondSelector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``ChangeLog`` class
+-------------------
+
+.. autoclass:: moldesign.widgets.ChangeLog
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``ComputeConfig`` class
+-----------------------
+
+.. autoclass:: moldesign.widgets.ComputeConfig
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``GeometryBuilder`` class
+-------------------------
+
+.. autoclass:: moldesign.widgets.GeometryBuilder
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``MDTConfig`` class
+-------------------
+
+.. autoclass:: moldesign.widgets.MDTConfig
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``RegistryConfig`` class
+------------------------
+
+.. autoclass:: moldesign.widgets.RegistryConfig
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``ResidueSelector`` class
+-------------------------
+
+.. autoclass:: moldesign.widgets.ResidueSelector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+``Symmetrizer`` class
+---------------------
+
+.. autoclass:: moldesign.widgets.Symmetrizer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Functions
+=========
+
+``about`` function
+------------------
+
+.. autofunction:: moldesign.widgets.about
+
+``configure`` function
+----------------------
+
+.. autofunction:: moldesign.widgets.configure
+
+Data
+====
+
+``ENGINES`` 
+------------
+
+.. autodata:: moldesign.widgets.ENGINES
+
+``ENGINE_DISPLAY`` 
+-------------------
+
+.. autodata:: moldesign.widgets.ENGINE_DISPLAY
+
