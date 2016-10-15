@@ -1,6 +1,7 @@
+import numpy as np
+
 import moldesign as mdt
 from moldesign import units as u
-import numpy as np
 
 DEFSTEP = 0.000005*u.angstrom
 

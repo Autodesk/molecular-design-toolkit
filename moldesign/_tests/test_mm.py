@@ -66,25 +66,19 @@ def test_properties(objkey, request):
     assert forces.shape == mol.positions.shape
 
 
+@pytest.mark.skipif(mdt.interfaces.openmm.force_remote,
+                    reason="Numerical derivatives need to be parallelized, "
+                           "otherwise this takes too long")
 @pytest.mark.parametrize('objkey', registered_types['mdready'])
 def test_forces(objkey, request):
     mol = request.getfuncargvalue(objkey)
 
-    if mol.num_atoms > 20:
-        atoms = random.sample(mol.atoms, 20)
-    else:
-        atoms = mol.atoms
-
     anagrad = -mol.calculate_forces().defunits_value()
     numgrad = helpers.num_grad(mol,
                                mol.calculate_potential_energy,
-                               atoms=atoms,
                                step=0.005*u.angstrom
                                ).defunits_value()
-    testgrad = np.array([anagrad[a.index] for a in atoms])
-    np.testing.assert_allclose(testgrad, numgrad, rtol=1.0, atol=1.0e-5)
-    # note: rtol doesn't work here, because the force varies too slowly in some directions and
-    # too quickly in others. So we just use an absolute error cutoff instead
+    assert np.sqrt(np.sum((anagrad-numgrad) ** 2))/(3.0*mol.num_atoms) <= 1.0e-4  # this isn't good
 
 
 @pytest.mark.parametrize('objkey', registered_types['mdready'])
