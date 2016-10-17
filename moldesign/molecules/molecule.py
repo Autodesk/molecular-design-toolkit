@@ -541,12 +541,58 @@ class MolTopologyMixin(object):
 
     def to_json(self):
         js = mdt.chemjson.jsonify(self,
-                                  ('time residues atoms name'
-                                   'properties energy_model integrator').split())
-        js['chains'] = list(self.chains)
-        js['bonds'] = list(self.bonds)
-        return js
+            ('name'
+            'properties integrator').split())
+        js['atoms'] = []
+        js['bonds'] = []
+        js['residues'] = []
+        js['chains'] = []
 
+        if self.energy_model:
+            js['energy_model'] = self.energy_model.to_json()
+
+        for i, atom in enumerate(self.atoms):
+            momenta = []
+            for j, momentum in enumerate(atom.momentum):
+                momenta.insert(j, momentum.magnitude)
+
+            positions = []
+            for j, position in enumerate(atom.position):
+                positions.insert(j, position.magnitude)
+
+            js['atoms'].insert(i, {
+                'serial': i,
+                'name': atom.name,
+                'elem': atom.elem,
+                'mass_magnitude': atom.mass.magnitude,
+                'residue_index': atom.residue.index,
+                'residue_name': atom.residue.name,
+                'chain': atom.chain.name,
+                'positions': positions,
+                'momenta': momenta,
+            })
+
+        for i, bond in enumerate(self.bonds):
+            js['bonds'].insert(i, {
+                    'atom1_index': bond.a1.index,
+                    'atom2_index': bond.a2.index,
+                    'bond_order': bond.order,
+                })
+
+        for i, residue in enumerate(self.residues):
+            js['residues'].insert(i, {
+                    'name': residue.name,
+                    'sequence_number': residue.pdbindex,
+                    'chain_index': residue.chain.index,
+                })
+
+        for i, chain in enumerate(self.chains):
+            js['chains'].insert(i, {
+                    'name': chain.name,
+                    'description': '',
+                })
+
+        return js
 
     def assert_atom(self, atom):
         """If passed an integer, just return self.atoms[atom].

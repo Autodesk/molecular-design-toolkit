@@ -20,6 +20,7 @@ import moldesign as mdt
 from moldesign import units as u
 from moldesign import utils, external, mathutils
 from . import toplevel
+import traitlets
 
 
 class AtomContainer(object):
@@ -239,6 +240,7 @@ class AtomContainer(object):
         import ipywidgets as ipy
         import IPython.display
 
+        viz2d = None
         if self.num_atoms < 40:
 
             viz2d = self.draw2d(width=width, height=height,
@@ -246,11 +248,19 @@ class AtomContainer(object):
                                 show_hydrogens=show_2dhydrogens)
             viz3d = self.draw3d(width=width, height=height,
                                 display=False)
+            traitlets.link((viz3d, 'selected_atom_indices'), (viz2d, 'selected_atom_indices'))
             views = ipy.HBox([viz2d, viz3d])
         else:
             views = self.draw3d(display=False)
 
-        displayobj = mdt.uibase.SelectionGroup([views, mdt.uibase.components.AtomInspector()])
+        atom_inspector = mdt.uibase.components.AtomInspector()
+        traitlets.directional_link(
+            (viz2d or views, 'selected_atom_indices'),
+            (atom_inspector, 'value'),
+            lambda selected_atom_indices: atom_inspector.indices_to_value(selected_atom_indices, self.atoms)
+        )
+
+        displayobj = mdt.uibase.SelectionGroup([views, atom_inspector])
 
         if display:
             IPython.display.display(displayobj)
