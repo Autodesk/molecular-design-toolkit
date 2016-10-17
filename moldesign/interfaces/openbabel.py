@@ -21,8 +21,9 @@ import moldesign.molecules.atomcollections
 
 try:
     import pybel as pb
-    import openbabel as ob  # WARNING: this is the real library, not our interface - this works because of absolute (ctd)
-# imports. We should probably rename this interface
+    import openbabel as ob
+    # WARNING: this is the real library, not our interface - this works because of absolute
+    # imports. We should probably rename this interface
 except ImportError:
     force_remote = True
 else:  # this should be configurable
@@ -201,9 +202,11 @@ def mol_to_pybel(mdtmol):
         if atom.residue and atom.residue not in resmap:
             obres = obmol.NewResidue()
             resmap[atom.residue] = obres
-            obres.SetChain(bytes(atom.chain.name[0]))
-            obres.SetName(bytes(atom.residue.pdbname))
-            obres.SetNum(atom.residue.pdbindex)
+            obres.SetChain(bytes(
+                    mdt.utils.if_not_none(atom.chain.name, 'Z')[0] ))
+            obres.SetName(bytes(
+                    mdt.utils.if_not_none(atom.residue.pdbname, 'UNL') ))
+            obres.SetNum(mdt.utils.if_not_none(atom.residue.pdbindex, '0'))
         else:
             obres = resmap[atom.residue]
 
@@ -229,7 +232,11 @@ def mol_to_pybel(mdtmol):
     return pbmol
 
 
-def pybel_to_mol(pbmol, atom_names=True, reorder_atoms_by_residue=False, **kwargs):
+def pybel_to_mol(pbmol,
+                 atom_names=True,
+                 reorder_atoms_by_residue=False,
+                 primary_structure=True,
+                 **kwargs):
     """ Translate a pybel molecule object into a moldesign object.
 
     Note:
@@ -240,6 +247,7 @@ def pybel_to_mol(pbmol, atom_names=True, reorder_atoms_by_residue=False, **kwarg
         atom_names (bool): use pybel's atom names (default True)
         reorder_atoms_by_residue (bool): change atom order so that all atoms in a residue are stored
             contiguously
+        primary_structure (bool): translate primary structure data as well as atomic data
         **kwargs (dict): keyword arguments to  moldesign.Molecule __init__ method
 
     Returns:
@@ -274,38 +282,41 @@ def pybel_to_mol(pbmol, atom_names=True, reorder_atoms_by_residue=False, **kwarg
                                                  pdbname=name, pdbindex=pybatom.OBAtom.GetIdx())
         newatom_map[pybatom.OBAtom.GetIdx()] = mdtatom
         mdtatom.position = pybatom.coords * u.angstrom
-        obres = pybatom.OBAtom.GetResidue()
-        resname = obres.GetName()
-        residx = obres.GetIdx()
-        chain_id = obres.GetChain()
-        chain_id_num = obres.GetChainNum()
 
-        if chain_id_num not in newchains:
-            # create new chain
-            if not mdt.utils.is_printable(chain_id.strip()) or not chain_id.strip():
-                chain_id = backup_chain_names.pop()
-                print 'WARNING: assigned name %s to unnamed chain object @ %s' % (
-                    chain_id, hex(chain_id_num))
-            chn = mdt.Chain(pdbname=str(chain_id))
-            newchains[chain_id_num] = chn
-        else:
-            chn = newchains[chain_id_num]
+        if primary_structure:
+            obres = pybatom.OBAtom.GetResidue()
+            resname = obres.GetName()
+            residx = obres.GetIdx()
+            chain_id = obres.GetChain()
+            chain_id_num = obres.GetChainNum()
 
-        if residx not in newresidues:
-            # Create new residue
-            pdb_idx = obres.GetNum()
-            res = mdt.Residue(pdbname=resname,
-                              pdbindex=pdb_idx)
-            newresidues[residx] = res
-            chn.add(res)
-            res.chain = chn
-        else:
-            res = newresidues[residx]
+            if chain_id_num not in newchains:
+                # create new chain
+                if not mdt.utils.is_printable(chain_id.strip()) or not chain_id.strip():
+                    chain_id = backup_chain_names.pop()
+                    print 'WARNING: assigned name %s to unnamed chain object @ %s' % (
+                        chain_id, hex(chain_id_num))
+                chn = mdt.Chain(pdbname=str(chain_id))
+                newchains[chain_id_num] = chn
+            else:
+                chn = newchains[chain_id_num]
 
-        # Assign the atom
-        if mdtatom.name in res:
-            mdtatom.name = '%s%d' % (mdtatom.name, pybatom.idx)  # prevent name clashes
-        res.add(mdtatom)
+            if residx not in newresidues:
+                # Create new residue
+                pdb_idx = obres.GetNum()
+                res = mdt.Residue(pdbname=resname,
+                                  pdbindex=pdb_idx)
+                newresidues[residx] = res
+                chn.add(res)
+                res.chain = chn
+            else:
+                res = newresidues[residx]
+
+            # Assign the atom
+            if mdtatom.name in res:
+                mdtatom.name = '%s%d' % (mdtatom.name, pybatom.idx)  # prevent name clashes
+            res.add(mdtatom)
+
         newatoms.append(mdtatom)
 
     newtopo = {}
@@ -321,7 +332,7 @@ def pybel_to_mol(pbmol, atom_names=True, reorder_atoms_by_residue=False, **kwarg
         newtopo[a1][a2] = order
         newtopo[a2][a1] = order
 
-    if reorder_atoms_by_residue:
+    if reorder_atoms_by_residue and primary_structure:
         resorder = {}
         for atom in newatoms:
             resorder.setdefault(atom.residue, len(resorder))
@@ -349,9 +360,10 @@ def from_smiles(smi, name=None):
     pbmol = pb.readstring('smi', smi)
     pbmol.addh()
     pbmol.make3D()
-    mol = pybel_to_mol(pbmol, name=name, atom_names=False)
+    mol = pybel_to_mol(pbmol,
+                       name=name,
+                       atom_names=False,
+                       primary_structure=False)
     for atom in mol.atoms:
         atom.name = atom.elem + str(atom.index)
-    mol._defres = mol.atoms[0].residue
-    mol._defchain = mol._defres.chain
     return mol

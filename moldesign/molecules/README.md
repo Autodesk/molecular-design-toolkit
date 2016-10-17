@@ -1,5 +1,6 @@
-## Structure subpackage
-The `moldesign.molecule` subpackage contains class definitions for atomic, molecular, biomolecular, and trajectory data structures. 
+## Molecule subpackage
+The `moldesign.molecule` subpackage contains class definitions for molecular data,
+including atomic, molecular, biomolecular, and trajectory data structures. 
 
 ### Naming and indexing conventions
 
@@ -33,6 +34,4 @@ atom.pdbindex |    |  |  residue.pdbindex                                 atom.e
 ```
 
 #### Small molecules
-Small molecules can come from a variety of sources with a variety of different metadata available. If a given molecule is provided with PDB-type metadata, we'll name and index it according to the biomolecule conventions above.
-
-Other formats (like XYZ files or SMILES strings) don't contain as much metadata. For molecules created from these formats, a chain ("Z") and residue ("UNL1") will be automatically created. If the atom names are just the names of the elements (e.g., all carbon atoms are named C), atom.name will be automatically assigned as `"%s%d" % (atom.elem, atom.index)`.
+Small molecules can come from a variety of sources with a variety of different metadata available. If a given molecule is provided with PDB-type metadata, we'll name and index it according to the biomolecule conventions above. Otherwise, a 'placeholder' residue and chain will be created to hold the atoms. If the atom names are just the names of the elements (e.g., all carbon atoms are named C), atom.name will be automatically assigned as `"%s%d" % (atom.elem, atom.index)`.

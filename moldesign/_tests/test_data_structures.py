@@ -137,7 +137,7 @@ def test_h2_trajectory(h2_trajectory):
     """
     traj = h2_trajectory
     mol = traj.mol
-    k = mol.energy_model.k
+    k = mol.energy_model.params.k
     period = 2*u.pi*np.sqrt(mol.atoms[0].mass/k)
     for frame in traj.frames:
         period_progress = (frame.time % period) / period
