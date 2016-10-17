@@ -134,6 +134,63 @@ def test_atom_lookup_by_name_and_index(fixture, request):
 
 
 @pytest.mark.parametrize('fixture', fixture_types['protein'])
+def test_protein_residue_iteration(fixture, request):
+    mol = request.getfuncargvalue(fixture)
+
+    assert mol.chains['A'].type == 'protein'
+
+    firstres = mol.chains['A'].residues[0]
+    for res in mol.chains['A']:
+        if res.type == 'protein':
+            lastres = res
+
+    lr = firstres
+    for res in mol.chains['A'][1:]:
+        if res is lastres:
+            break
+        assert res.prev_residue is lr
+        assert lr.next_residue is res
+        lr = res
+
+    lastseq = -1
+    for ires, res in enumerate(mol.chains['A'].polymer_residues):
+        if ires == 0:
+            assert res is firstres
+        assert res.pdbindex > lastseq
+        lastseq = res.pdbindex
+    assert res is lastres
+
+
+@pytest.mark.parametrize('fixture', fixture_types['protein'])
+def test_protein_residue_terminals(fixture, request):
+    mol = request.getfuncargvalue(fixture)
+
+    assert mol.chains['A'].type == 'protein'
+
+    firstres = mol.chains['A'].residues[0]
+    for res in mol.chains['A']:
+        if res.type == 'protein':
+            lastres = res
+
+    assert firstres.is_n_terminal
+    assert lastres.is_c_terminal
+    assert mol.chains['A'].n_terminal is firstres
+    assert mol.chains['A'].c_terminal is lastres
+
+    for res in mol.chains['A'][1:]:
+        if res is lastres:
+            break
+        assert not res.is_n_terminal
+        assert not res.is_c_terminal
+
+    with pytest.raises(StopIteration):
+        firstres.prev_residue
+
+    with pytest.raises(StopIteration):
+        lastres.next_residue
+
+
+@pytest.mark.parametrize('fixture', fixture_types['protein'])
 def test_molecule_links(fixture, request):
     mol = request.getfuncargvalue(fixture)
 
