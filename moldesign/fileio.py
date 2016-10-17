@@ -68,7 +68,10 @@ def read(f, format=None):
         fileobj = f.open('r')
     elif hasattr(f, 'read'):  # it's already file-like
         fileobj = f
-    elif isinstance(f, basestring):  # it's just a string
+    elif isinstance(f, basestring):  # assume it's just a string
+        if format is None:
+            raise IOError(('No file named "%s"; ' % f[:50]) +
+                          'please set the `format` argument if you want to parse the string')
         fileobj = StringIO.StringIO(f)
     else:
         raise ValueError('Parameter to moldesign.read (%s) not ' % str(f) +
