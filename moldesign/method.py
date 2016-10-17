@@ -15,12 +15,32 @@
 This module contains abstract base classes for potential models, integrators, and various
 associated data types (force fields, orbitals, basis sets, etc.).
 """
+import funcsigs
+
 import moldesign as mdt
 from moldesign.utils import DotDict
 
 
+class _InitKeywordMeta(type):
+    """ Constructs a custom call signature for __init__ based on cls.PARAMETERS.
+    """
+    @property
+    def __signature__(self):
+        if hasattr(self, '__customsig'):
+            return self.__customsig
+
+        kwargs = []
+        for param in self.PARAMETERS:
+            kwargs.append(funcsigs.Parameter(param.name,
+                                             default=param.default,
+                                             kind=funcsigs.Parameter.POSITIONAL_OR_KEYWORD))
+
+        self.__customsig = funcsigs.Signature(kwargs, __validate_parameters__=True)
+        return self.__customsig
+
+
 class Method(object):
-    """Abstract Base class for energy models and integrators
+    """Abstract Base class for energy models, integrators, and "heavy duty" simulation objects
 
     Args:
         **kwargs (dict): list of parameters for the method.
@@ -28,6 +48,8 @@ class Method(object):
     Attributes:
        mol (mdt.Molecule): the molecule this method is associated with
     """
+
+    __metaclass__ = _InitKeywordMeta
 
     PARAMETERS = []
     """ list: list of Parameters that can be used to configure this method

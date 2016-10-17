@@ -54,7 +54,8 @@ class Residue(Entity):
         self._backbone = None
         self._sidechain = None
         self._template_name = None
-        if self.name is None: self.name = self.pdbname + str(self.pdbindex)
+        if self.name is None and self.pdbname is not None:
+            self.name = self.pdbname + str(self.pdbindex)
 
     @property
     def atoms(self):
@@ -317,6 +318,9 @@ class Residue(Entity):
         Returns:
             str: markdown-formatted string
         """
+        if self.type == 'placeholder':
+            return '`%s`' % repr(self)
+
         if self.molecule is None:
             lines = ["<h3>Residue %s</h3>" % self.name]
         else:

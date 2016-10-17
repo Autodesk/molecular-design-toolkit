@@ -144,7 +144,7 @@ RESTYPES = dict(
     unknown=set(),
     ions=set(IONS))
 
-RESIDUE_TYPES = {}
+RESIDUE_TYPES = {None: 'placeholder'}
 for typename, namelist in RESTYPES.iteritems():
     for resname in namelist: RESIDUE_TYPES[resname] = typename
 

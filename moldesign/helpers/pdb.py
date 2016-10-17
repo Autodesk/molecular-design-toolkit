@@ -107,6 +107,46 @@ def warn_assemblies(mol, assemblies):
                   ' to build one of the above assemblies'
 
 
+def guess_atnum_from_name(s):
+    """ Guess an atomic number given a name string (usually 1-3 characters).
+
+    Args:
+        s (str): atomic number
+
+    Returns:
+        int: atomic number
+
+    Raises:
+        KeyError: if atomic number can't be determined
+
+    Examples:
+        >>> guess_atnum_from_name('C')
+        6
+        >>> guess_atnum_from_name('C1')
+        6
+        >>> guess_atnum_from_name('cl3')
+        17
+        >>> guess_atnum_from_name('CL')
+        17
+    """
+    try:  # the unmodified string
+        return mdt.data.ATOMIC_NUMBERS[s]
+    except KeyError:
+        pass
+
+    cleaned = ''.join((c.upper() if i==0 else c.lower())
+                      for i,c in enumerate(s)
+                      if c.isalpha())
+
+    try:  # just the letters, with proper capitalization
+        return mdt.data.ATOMIC_NUMBERS[cleaned]
+    except KeyError:
+        pass
+
+    # otherwise, just the first letter
+    return mdt.data.ATOMIC_NUMBERS[cleaned[0]]
+
+
 def get_conect_records(pdbfile):
     """Parse a PDB file, return CONECT records
 

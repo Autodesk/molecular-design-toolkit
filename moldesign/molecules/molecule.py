@@ -632,15 +632,15 @@ class MolTopologyMixin(object):
         # TODO: consistency checks
 
         if self._defchain is None:
-            self._defchain = Chain(name='Z',
-                                   index=99,
+            self._defchain = Chain(name=None,
+                                   index=None,
                                    molecule=None)
 
         if self._defres is None:
-            self._defres = Residue(name='UNK999',
-                                   index=999,
-                                   pdbindex=1,
-                                   pdbname='UNK',
+            self._defres = Residue(name=None,
+                                   index=None,
+                                   pdbindex=None,
+                                   pdbname=None,
                                    chain=self._defchain,
                                    molecule=None)
             self._defchain.add(self._defres)
@@ -1136,15 +1136,3 @@ class Molecule(AtomContainer,
             for nbr in self.bond_graph[atom]:
                 if atom.index > nbr.index: continue  # don't double count
                 yield Bond(atom, nbr)
-
-    def _update_from(self, other):
-        """ Update this molecule's data, including all substructures, from another molecule.
-
-        This is mainly for use in cloud computing.
-
-        Args:
-            other (Molecule):
-        """
-
-
-

@@ -150,8 +150,6 @@ def init_config():
         with open(path, 'r') as infile:
             print 'Reading configuration from %s' % path
             config.update(yaml.load(infile))
-    else:
-        print 'No config file found at %s - using defaults' % path
 
     if config.default_python_image is None:
         config.default_python_image = compute.get_image_path('moldesign_complete')

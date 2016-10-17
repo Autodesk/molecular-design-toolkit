@@ -11,3 +11,5 @@ _test.py
 /dist
 /build
 *.egg-info
+.cloudcomputecannon
+

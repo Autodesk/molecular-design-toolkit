@@ -27,7 +27,7 @@
 ### What can I contribute?
 Contributions to this project are encouraged! Email the maintainers at `moldesign_maintainers@autodesk.com` to become a contributor.
 
-If you're interested in getting started, here are some ideas:
+If you're interested in getting started, here are some general contributions that are always welcome. We also maintain a [wishlist of specific ideas on the wiki](https://github.com/Autodesk/molecular-design-toolkit/wiki/Contribution-ideas).
 
 **Tests**: This is one of the easiest ways to get started - see also `moldesign/tests/README.md`
 

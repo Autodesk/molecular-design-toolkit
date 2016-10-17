@@ -8,6 +8,7 @@ _ALL_:
  - python_install
  - moldesign_complete
  - moldesign_notebook
+ - moldesign_minimal
 
 
 ##################################################
@@ -79,16 +80,21 @@ devtools:
 
 ############################################
 # moldesign
-# Note - this image installs from github so we can test it before submitting to pypi
+# Note - this is built by CLONING the current repo, then building an sdist, then installing that.
+# It's convoluted, but it's to replicate what actually gets installed via PyPI
 moldesign:
  requires:  # TODO: remove biopython dependency (it's in C ...)
   - python_install
- build_directory: moldesign
+  - biopython
+ build_directory: ../
  build: |
-  RUN apt-get update && apt-get install -y gcc gfortran python-dev git \
-   && pip install biopython \
-   && pip install git+https://github.com/Autodesk/molecular-design-toolkit@0.7.2 \
-   && apt-get -y remove --purge gcc gfortran python-dev git \
+  COPY . /opt/molecular-design-toolkit
+  RUN apt-get update && apt-get install -y git \
+   && cd /opt && mv molecular-design-toolkit molecular-design-toolkit_dirty \
+   && git clone molecular-design-toolkit_dirty molecular-design-toolkit \
+   && cd molecular-design-toolkit && python setup.py sdist \
+   && pip install dist/* \
+   && apt-get -y remove --purge git \
    && apt-get -y autoremove --purge \
    && apt-get -y clean
 
@@ -130,6 +136,20 @@ moldesign_complete:
    ENTRYPOINT []
    CMD ''
 
+
+moldesign_minimal:
+   description: |
+      Same as moldesign_notebook, but *without* any dependencies (OpenBabel, OpenMM etc.).
+      Used for testing remote execution environment
+   requires:
+    - notebook
+    - moldesign
+   build: |
+     RUN cp -r /usr/local/lib/python2.7/dist-packages/moldesign/_notebooks /notebooks/moldesign_examples
+     RUN jupyter nbextension enable --python --sys-prefix widgetsnbextension \
+      && jupyter nbextension enable --python --sys-prefix nbmolviz
+     ENTRYPOINT []
+     CMD ''
 
 #########################################
 # Command line chemistry
@@ -226,6 +246,7 @@ notebook:
     WORKDIR /notebooks
     COPY run_notebook.sh /run_notebook.sh
 
+
 openmm: # NEWFEATURE: add GPU support (opencl/cuda)
  description: Basic OpenMM install (CPU only) with python bindings
  build_directory: openmm
@@ -233,7 +254,7 @@ openmm: # NEWFEATURE: add GPU support (opencl/cuda)
   - python_install
  build: |
   RUN mkdir -p /src
-  ADD OpenMM-7.0.0-Linux.zip /src/OpenMM.zip
+  ADD OpenMM-7.0.1-Linux.zip /src/OpenMM.zip
   RUN apt-get update \
    && apt-get install -y \
        gcc \
@@ -314,12 +335,23 @@ chem_python:
   - openmm
   - pyscf
   - pdbfixer
+  - biopython
 
 chem_notebook:
  requires:
   - notebook
   - chem_python
 
+
+biopython:
+  requires:
+   - python_install
+  build: |
+    RUN apt-get update && apt-get install -y gcc gfortran python-dev  \
+      && pip install biopython \
+      && apt-get -y remove --purge gcc gfortran python-dev \
+      && apt-get -y autoremove --purge \
+      && apt-get -y clean
 
 
 ########################

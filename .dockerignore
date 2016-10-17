@@ -1,6 +1,5 @@
 *.pyc
 *.pyo
-*.pdf
 .idea
 .ipynb_checkpoints/
 *.delete
@@ -11,3 +10,6 @@ _test.py
 ./dist/
 ./build/
 *.egg-info
+docker_images
+prep_release.py
+

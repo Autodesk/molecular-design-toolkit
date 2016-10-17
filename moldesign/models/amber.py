@@ -33,6 +33,8 @@ class GAFF(ForceField):
     This is implemented as a special case of the ForceField energy model; it automates small
     parameterization process
     """
+    # TODO: mechanism to store partial charges so they don't need to be constantly recomputed
+
     PARAMETERS = [Parameter('partial_charges',
                             'Partial charge model',
                             type=str,
@@ -46,11 +48,17 @@ class GAFF(ForceField):
                   ] + ForceField.PARAMETERS
 
     def prep(self, force=False):
+        self._parameterize()
+        return super(GAFF, self).prep()
+
+    def calculate(self, requests=None):
+        if not self._prepped:
+            self._parameterize()
+        return super(GAFF, self).calculate(requests=requests)
+
+    def _parameterize(self):
         if not self.mol.ff:
             mdt.parameterize(self.mol,
                              charges=self.params.partial_charges,
                              ffname=self.params.gaff_version)
 
-        super(GAFF, self).prep()
-
-        # TODO: mechanism to store partial charges so they don't need to be constantly recomputed

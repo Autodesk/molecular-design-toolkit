@@ -117,18 +117,20 @@ def biopy_to_mol(struc):
                         name=struc.get_full_id()[0])
 
 
-def get_mmcif_assemblies(fileobj):
+def get_mmcif_assemblies(fileobj=None, mmcdata=None):
     """Parse an mmCIF file, return biomolecular assembly specifications
 
     Args:
         fileobj (file-like): File-like object for the PDB file
             (this object will be rewound before returning)
+        mmcdata (dict): dict version of complete mmCIF data structure (if passed, this will
+            not be read again from fileobj)
 
     Returns:
         Mapping[str, BioAssembly]: dict mapping assembly ids to BioAssembly instances
     """
-    mmcdata = Bio.PDB.MMCIF2Dict.MMCIF2Dict(fileobj)
-    fileobj.seek(0)  # rewind for future access
+    if mmcdata is None:
+        mmcdata = _getmmcdata(fileobj)
 
     if '_pdbx_struct_assembly.id' not in mmcdata:
         return {}  # no assemblies present
@@ -183,4 +185,7 @@ def _make_transform_dict(tmat, transform_ids):
     return transforms
 
 
-
+def _getmmcdata(fileobj):
+    mmcdata = Bio.PDB.MMCIF2Dict.MMCIF2Dict(fileobj)
+    fileobj.seek(0)  # rewind for future access
+    return mmcdata
