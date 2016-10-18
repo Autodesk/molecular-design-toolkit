@@ -6,6 +6,7 @@ import pytest
 import moldesign as mdt
 from moldesign import units as u
 
+from .helpers import get_data_path
 
 fixture_types = {}
 
@@ -24,12 +25,12 @@ def typedfixture(*types, **kwargs):
 
 @typedfixture('3AID', 'protein')
 def protease_pdb():
-    return mdt.read('data/3aid.pdb')
+    return mdt.read(get_data_path('3aid.pdb'))
 
 
 @typedfixture('3AID', 'protein')
 def protease_cif():
-    return mdt.read('data/3aid.cif')
+    return mdt.read(get_data_path('3aid.cif'))
 
 
 @pytest.mark.xfail(reason="Known biopython bugs, should be fixed by 0.7.4")
