@@ -21,9 +21,21 @@ from moldesign import units as u
 def exports(o):
     __all__.append(o.__name__)
     return o
-
-
 __all__ = []
+
+
+def parse_mmcif(f):
+    """Parse an mmCIF file (using the Biopython parser) and return a molecule
+
+    Args:
+        f (file): file-like object containing the mmCIF file
+
+    Returns:
+        moldesign.Molecule: parsed molecule
+    """
+    parmedmol = parmed.read_CIF(f)
+    mol = parmed_to_mdt(parmedmol)
+    return mol
 
 
 @exports
@@ -65,7 +77,9 @@ def parmed_to_mdt(pmdmol):
     for pbnd in pmdmol.bonds:
         atoms[pbnd.atom1].bond_to(atoms[pbnd.atom2], int(pbnd.order))
 
-    return mdt.Molecule(atoms.values(), name=pmdmol.title)
+    mol = mdt.Molecule(atoms.values())
+    mol.description = pmdmol.title
+    return mol
 
 
 def _parmed_to_ff(topo, atom_map):
