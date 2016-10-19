@@ -1,19 +1,21 @@
-0.7.3 (WIP)
-===========
+0.7.3 - October 17, 2016
+========================
 NEW MODELING FEATURES
  - #33 - Add DFT w/ gradients; MP2, CASSCF, CASCI w/out gradients
  - Constrained minimizations w/ SHAKE and scipy's SLQSP
- - Rename `build_bdna` to `build_dna_helix` and give access to all NAB helix types
+ - Transition dipoles and oscillator strengths
  - GAFF parameterizer for small molecules -- ``params = mdt.parameterize(mol)``
  - AM1-BCC and Gasteiger partial charge calculators: ``mdt.calc_am1_bcc_charges`` and
     ``mdt.calc_gasteiger_charges``
  - Add PDB database and biomolecular assembly support for mmCIF files
  - #72 - Add ``moldesign.guess_formal_charges`` and ``moldesign.add_missing_data``
- - Excited and multi-state property calculations
+ - Excited and multi-state property calculations with CAS methods
+ - Rename `build_bdna` to `build_dna_helix` and give access to all NAB helix types
+
 
 OTHER ENHANCEMENTS
  - #78 - ``moldesign`` now imports much more quickly
- - Add ``GAFF`` energy model automates small molecule parameterization
+ - Add ``GAFF`` energy model to automate small molecule parameterization
  - Change Example 2 to show an absorption spectrum calculation
  - Add Example 4 on protein MD with a small ligand
  - Add Example 5: on constrained minimization and enthalpic barriers

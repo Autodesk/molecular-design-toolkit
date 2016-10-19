@@ -13,6 +13,8 @@ import moldesign.molecules.atomcollections
 import moldesign.utils.classes
 from moldesign import units as u
 
+from .helpers import get_data_path
+
 registered_types = {}
 
 
@@ -348,8 +350,6 @@ def test_h2(h2):
 # Tests around PDB ID 3AID
 @typedfixture('molecule', scope='session')
 def pdb3aid():
-    #FPATH = '../notebooks/data/3AID.pdb'
-    #assert os.path.exists(FPATH)
     mol = mdt.from_pdb('3AID')
     return mol
 
@@ -413,7 +413,7 @@ def test_nucleic_build(nucleic):
 @typedfixture('molecule', scope='session')
 def nucleic():
     # ACTG.pdb contains a molecule generated using mdt.build_dna('ACTG')
-    mol = mdt.read('data/ACTG.pdb')
+    mol = mdt.read(get_data_path('ACTG.pdb'))
     return mol
 
 

@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 
 import moldesign as mdt
@@ -6,7 +8,16 @@ from moldesign import units as u
 DEFSTEP = 0.000005*u.angstrom
 
 
+def get_data_path(f):
+    """
+    Returns path to a file in the ``moldesign/_tests/data/`` directory.
+    """
+    return os.path.join(mdt.data.PACKAGEPATH, '_tests', 'data', f)
+
+
 def num_grad(mol, fn, step=DEFSTEP, atoms=None, fnargs=None, fnkwargs=None):
+    """ Calculate the finite-difference gradient of a function
+    """
     grad = None
     origpos = mol.positions.copy()
     if fnargs is None:

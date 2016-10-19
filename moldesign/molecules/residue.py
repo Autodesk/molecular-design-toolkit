@@ -176,7 +176,7 @@ class Residue(Entity):
                 print 'INFO: no bonds assigned to residue %s' % self
                 return
             else:
-                raise ValueError("No bonding template for residue '%s'" % resname)
+                raise KeyError("No bonding template for residue '%s'" % resname)
 
         # intra-residue bonds
         bond_graph = {atom: {} for atom in self}
@@ -222,7 +222,10 @@ class Residue(Entity):
         if self.chain.type == 'protein':
             return self._get_neighbor('N', 'N-terminus')
         elif self.chain.type == 'dna':
-            return self._get_neighbor("P", "5' end")
+            try:
+                return self._get_neighbor("P", "5' end")
+            except KeyError:
+                raise StopIteration("No 5' bond for this residue")
         else:
             raise NotImplementedError('We only deal with dna and amino acids right now')
 
