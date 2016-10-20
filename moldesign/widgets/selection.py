@@ -129,7 +129,7 @@ class ResidueSelector(SelBase):
                 residues[atom.residue.index]['selected_count'] = 1
 
             if residues[atom.residue.index]['selected_count'] >= residues[atom.residue.index]['total']:
-                selected_residues.add(atom.residue.name)
+                selected_residues.add(atom.residue)
 
         return list(selected_residues)
 
