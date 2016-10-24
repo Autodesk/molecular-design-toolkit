@@ -214,8 +214,11 @@ class AtomReprMixin(object):
         lines.append('**Formal charge**: %s' % self.formal_charge)
 
         if self.molecule is not None:
+            lines.append('\n')
             if self.molecule.is_biomolecule:
-                lines.append("\n\n**Residue**: %s (index %d)" % (self.residue.name, self.residue.index))
+                if self.pdbindex is not None:
+                    lines.append('**PDB serial #**: %s'%self.pdbindex)
+                lines.append("**Residue**: %s (index %d)" % (self.residue.name, self.residue.index))
                 lines.append("**Chain**: %s" % self.chain.name)
             lines.append("**Molecule**: %s" % self.molecule.name)
             for ibond, (nbr, order) in enumerate(self.bond_graph.iteritems()):
