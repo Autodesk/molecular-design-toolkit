@@ -17,8 +17,7 @@ from moldesign.helpers import colormap
 
 
 class ColorMixin(object):
-    def color_by(self, atom_callback, atoms=None, mplmap='auto', render=True,
-                 force_cmap=False):
+    def color_by(self, atom_callback, atoms=None, mplmap='auto', force_cmap=False):
         """
         Color atoms according to either:
           * an atomic attribute (e.g., 'chain', 'residue', 'mass')
@@ -31,7 +30,6 @@ class ColorMixin(object):
             mplmap (str): name of the matplotlib colormap to use if colors aren't explicitly
                specified)
             force_cmap (bool): force the use of a colormap
-            render (bool): draw these changes immediately
 
         Notes:
             If you'd like to explicitly specify colors, the callback can return color
@@ -81,5 +79,5 @@ class ColorMixin(object):
             for cat, color in zip(cats, colornames):
                 colors[color].extend(categories[cat])
 
-        self.set_colors(colors, render=render)
+        self.set_colors(colors)
 

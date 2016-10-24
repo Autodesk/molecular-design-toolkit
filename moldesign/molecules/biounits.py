@@ -68,8 +68,12 @@ class ChildList(AtomContainer):
         try:
             return self._childbyname[item]
         except KeyError:
-            raise AttributeError('ChildList object in %s has no attribute %s.' % (
-                self.parent, item))
+            try:
+                error_msg = 'ChildList object in %s has no attribute %s.' % (
+                    self.parent, item)
+            except:  # during copy / depickling, might encounter unset attrs
+                error_msg = 'Lookup failed'
+            raise AttributeError(error_msg)
 
     def iteratoms(self):
         """Iterate over all atoms
@@ -169,7 +173,11 @@ class Entity(AtomContainer):
         try:
             return self.children[item]
         except KeyError:
-            raise AttributeError('%s has no attribute "%s"' % (self, item))
+            try:
+                error_msg = '%s has no attribute "%s"' % (self, item)
+            except:  # during copy / depickling, might encounter unset attrs
+                error_msg = 'Lookup failed'
+            raise AttributeError(error_msg)
 
     def __hash__(self):
         """ Explicitly hash by object id

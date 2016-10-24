@@ -17,8 +17,10 @@
 Due to its size, we generate a dbm database that can be accessed without loading the whole thing
 into memory.
 """
+import collections
 import itertools
 import sys
+import os
 sys.path.insert(0, '..')
 import utils
 
@@ -31,7 +33,12 @@ ORDERS = dict(SING=1, DOUB=2, TRIP=3)
 if __name__ == '__main__':
     print 'This program regenerates the `residue_bonds` database using the "Chemical Component '
     print 'Dictionary" and "Protonation Variants Dictionary" from http://www.wwpdb.org/data/ccd'
-    print 'These files are not included in the repository and must be downloaded manually.\n'
+    print 'The most recent versions will now be downloaded and converted into a database ...\n'
+
+    os.system('wget -N ftp://ftp.wwpdb.org/pub/pdb/data/monomers/aa-variants-v1.cif.gz')
+    os.system('wget -N ftp://ftp.wwpdb.org/pub/pdb/data/monomers/components.cif.gz')
+    os.system('gunzip -v -f -k components.cif.gz aa-variants-v1.cif.gz')
+    
     print 'Reading components.cif ...'
     sys.stdout.flush()
 
@@ -50,7 +57,7 @@ if __name__ == '__main__':
             print '\nskipped %s (no bonds)' % resname
             continue
 
-        bonds = {}
+        bonds = collections.OrderedDict()
         bond_data = data['_chem_comp_bond']
         if type(bond_data['atom_id_1']) == str:  # there's just one bond
             a1 = bond_data['atom_id_1']
@@ -70,7 +77,7 @@ if __name__ == '__main__':
         print resname,
         sys.stdout.flush()
 
-    print 'Created db (%d records)' % len(db)
+    print '\nCreated db (%d records)' % len(db)
     db.close()
 
 
