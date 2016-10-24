@@ -12,4 +12,6 @@ _test.py
 *.egg-info
 docker_images
 prep_release.py
+.dockerignore
+.gitignore
 
