@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import collections
+
+import itertools
 import parmed
 
 import moldesign as mdt
@@ -24,7 +26,7 @@ def exports(o):
 __all__ = []
 
 
-def parse_mmcif(f, reassign_chains=False):
+def parse_mmcif(f, reassign_chains=True):
     """Parse an mmCIF file (using the Biopython parser) and return a molecule
 
     Args:
@@ -38,8 +40,7 @@ def parse_mmcif(f, reassign_chains=False):
     mol = parmed_to_mdt(parmedmol)
     if reassign_chains:
         f.seek(0)
-        _reassign_chains(f, mol)
-
+        mol = _reassign_chains(f, mol)
     mdt.helpers.assign_biopolymer_bonds(mol)
     return mol
 
@@ -135,14 +136,43 @@ def _parmed_to_ff(topo, atom_map):
                  for dihedral in topo.dihedrals]
 
 
-
-def _reassign_chains(f, pmdmol):
+def _reassign_chains(f, mol):
     """ Change chain ID assignments to the mmCIF standard (parmed uses author assignments)
 
     Args:
         f (file): mmcif file/stream
-        pmdmol (parmed.Structure): molecule with default parmed assignemnts
-    """
-    data = mdt.interfaces.biopython_interface.get_mmcif_assemblies(f)
+        mol (moldesign.Molecule): molecule with default parmed assignemnts
 
+    Returns:
+        moldesign.Molecule: new molecule with reassigned chains
+    """
+    data = mdt.interfaces.biopython_interface.get_mmcif_data(f)
+    f.seek(0)
+    newchain_names = set(data['_pdbx_poly_seq_scheme.asym_id']+
+                         data['_pdbx_nonpoly_scheme.asym_id'])
+    newchains = {name: mdt.Chain(name) for name in newchain_names}
+
+    residue_iterator = itertools.chain(
+            zip(data['_pdbx_poly_seq_scheme.mon_id'],
+                data['_pdbx_poly_seq_scheme.pdb_seq_num'],
+                data['_pdbx_poly_seq_scheme.pdb_strand_id'],
+                data['_pdbx_poly_seq_scheme.asym_id']),
+
+            zip(data['_pdbx_nonpoly_scheme.mon_id'],
+                data['_pdbx_nonpoly_scheme.pdb_seq_num'],
+                data['_pdbx_nonpoly_scheme.pdb_strand_id'],
+                data['_pdbx_nonpoly_scheme.asym_id']))
+
+    reschains = {(rname, ridx, rchain): newchains[chainid]
+                 for rname, ridx, rchain, chainid in residue_iterator}
+
+    for residue in mol.residues:
+        newchain = reschains[residue.resname, str(residue.pdbindex), residue.chain.name]
+
+        for atom in residue.atoms:
+            atom.chain = newchain
+        residue.chain = newchain
+
+    return mdt.Molecule(mol.atoms,
+                        name=mol.name, description=mol.description)
 
