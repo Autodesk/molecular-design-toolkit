@@ -86,7 +86,7 @@ setup(
     url='http://moldesign.bionano.autodesk.com',
     cmdclass=cmdclass,
     license='Apache 2.0',
-    author='Aaron Virshup, BioNano Research at Atuodesk',
+    author='Aaron Virshup, BioNano Research at Autodesk',
     author_email='moleculardesigntoolkit@autodesk.com',
     description='The Molecular Design Toolkit: Dead-simple chemical simulation, visualization, '
                 'and cloud computing in a notebook'
