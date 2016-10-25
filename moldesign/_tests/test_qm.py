@@ -53,7 +53,8 @@ def test_pyscf_rhf_sto3g_properties(objkey, request):
     assert 'wfn' in mol.properties
     assert 'canonical' in mol.wfn.orbitals
     assert 'atomic' in mol.wfn.orbitals
-    assert mol.wfn.num_electrons == sum(mol.atoms.atnum) - mol.charge.value_in(u.q_e)
+    assert mol.wfn.num_electrons == sum([atom.atnum for atom in mol.atoms]) \
+                                    - mol.charge.value_in(u.q_e)
 
 
 @pytest.mark.parametrize('objkey', registered_types['molecule'])
