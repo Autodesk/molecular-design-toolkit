@@ -36,7 +36,7 @@ def mol_to_pyscf(mol, basis, symmetry=None, charge=0, positions=None):
     from pyscf import gto
     pyscfmol = gto.Mole()
 
-    positions = if_not_none(positions, mol.atoms.position)
+    positions = if_not_none(positions, mol.positions)
     pyscfmol.atom = [[atom.elem, pos.value_in(u.angstrom)]
                      for atom, pos in zip(mol.atoms, positions)]
     pyscfmol.basis = basis

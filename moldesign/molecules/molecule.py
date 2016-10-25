@@ -504,8 +504,8 @@ class MolReprMixin(object):
             str
         """
         counts = {}
-        for symbol in self.atoms.symbol:
-            counts[symbol] = counts.get(symbol, 0) + 1
+        for atom in self.atoms:
+            counts[atom.symbol] = counts.get(atom.symbol, 0) + 1
 
         my_elements = sorted(counts.keys())
         if html: template = '%s<sub>%d</sub>'

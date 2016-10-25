@@ -34,7 +34,7 @@ class AtomContainer(object):
     def positions(self):
         """ u.Array[length]: (Nx3) array of atomic positions
         """
-        return self.atoms.position
+        return u.array([atom.position for atom in self.atoms])
 
     @positions.setter
     def positions(self, val):
@@ -49,6 +49,9 @@ class AtomContainer(object):
         self._atom_attrs = None
         self.viz2d = None
         self.viz3d = None
+
+    def __len__(self):
+        return len(self.atoms)
 
     @property
     def heavy_atoms(self):
@@ -406,14 +409,11 @@ class AtomContainer(object):
         """
         # TODO: deal with units ... hard because the matrix has diff units for diff columns
         assert matrix.shape == (4, 4)
-        positions = u.array(self.atoms.position)
-        newpos = mathutils.apply_4x4_transform(matrix, positions)
-        for atom, r in zip(self.atoms, newpos):
-            atom.position = r
+        self.positions = mathutils.apply_4x4_transform(matrix, self.positions)
 
 
 @toplevel
-class AtomList(list, AtomContainer):
+class AtomList(AtomContainer):
     """A list of atoms that allows attribute "slicing" - accessing an attribute of the
     list will return a list of atom attributes.
 
@@ -422,44 +422,18 @@ class AtomList(list, AtomContainer):
         >>> getattr(atomlist, attr) == [getattr(atom, attr) for atom in atomlist.atoms]
     """
 
-    def __init__(self, *args, **kwargs):
-        super(AtomList, self).__init__(*args, **kwargs)
+    append = mdt.utils.Alias('atoms.append')
+    pop = mdt.utils.Alias('atoms.pop')
+    insert = mdt.utils.Alias('atoms.insert')
+    sort = mdt.utils.Alias('atoms.sort')
 
-    def __dir__(self):
-        """
-        Overrides ``dir`` to allow tab completion for both this object's attributes
-        and the underlying atomic properties
-        """
-        if self._atom_attrs is None:
-            self._atom_attrs = set([k for k,v in self.atoms[0].__dict__.iteritems()
-                                    if not callable(v)])
-        return list(self._atom_attrs.union(dir(self.__class__)).union(self.__dict__))
+    def __init__(self, atomlist):
+        self.atoms = list(atomlist)
+        super(AtomList, self).__init__()
 
-    def __getattr__(self, item):
-        """
-        Returns an array of atomic properties, e.g., an array of all atomic masses
-        is returned by ``AtomContainer.mass = AtomContainer.__getattr__('mass')``
-        """
-        if item.startswith('__'):
-            raise AttributeError
-        atom_attrs = [getattr(atom, item) for atom in self.atoms]
-        try:
-            return u.array(atom_attrs)
-        except (TypeError, StopIteration):
-            return atom_attrs
+    def __iter__(self):
+        return iter(self.atoms)
 
-    def __setattr__(self, key, vals):
-        """
-        Set an array of atomic properties, e.g., set all atomic masses to 1 with
-        ``atoms.mass = [1.0 for a in atoms]``
-        """
-        assert len(vals) == len(self)
-        for atom, v in zip(self, vals): setattr(atom, key, v)
+    def __getitem__(self, item):
+        return self.atoms[item]
 
-    @property
-    def atoms(self):
-        """This is a synonym for self so that AtomContainer methods will work here too"""
-        return self
-
-    def __getslice__(self, *args, **kwargs):
-        return AtomList(super(AtomList, self).__getslice__(*args, **kwargs))
