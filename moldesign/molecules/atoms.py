@@ -96,6 +96,10 @@ class AtomGeometryMixin(object):
     def atoms_within(self, *args, **kwargs):
         return self._container.atoms_within(*args, **kwargs)
 
+    @utils.args_from(AtomContainer.residues_within)
+    def residues_within(self, *args, **kwargs):
+        return self._container.residues_within(*args, **kwargs)
+
     @utils.args_from(AtomContainer.calc_distance_array)
     def calc_distances(self, *args, **kwargs):
         array = self._container.calc_distance_array(*args, **kwargs)

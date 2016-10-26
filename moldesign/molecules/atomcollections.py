@@ -14,6 +14,7 @@
 
 import copy
 
+import collections
 import numpy as np
 
 import moldesign as mdt
@@ -152,7 +153,7 @@ class AtomContainer(object):
 
         Args:
             radius (u.Scalar[length]): radius to search for atoms
-            other (AtomContainer): object containing the atoms to search (default:self.parent)
+            other (AtomContainer): object containing the atoms to search (default:self.molecule)
             include_self (bool): if True, include the atoms from this object (since, by definition,
                their distance from this object is 0)
 
@@ -162,13 +163,32 @@ class AtomContainer(object):
         if other is None:
             other = self.atoms[0].molecule
         if not include_self:
-            myatoms = set(self.atoms)
+            filter_atoms = set(self.atoms)
+        else:
+            filter_atoms = set()
 
-        close_atoms = AtomList()
-        for atom in other.atoms:
-            if self.distance(atom) <= radius and (include_self or (atom not in myatoms)):
-                close_atoms.append(atom)
+        distances = self.calc_distance_array(other=other)
+        mindists = distances.min(axis=0)
+
+        close_atoms = AtomList(atom for dist,atom in zip(mindists, other.atoms)
+                               if dist <= radius and atom not in filter_atoms)
         return close_atoms
+
+    def residues_within(self, radius, other=None, include_self=False):
+        """ Return all atoms in an object within a given radius of this object
+
+        Args:
+            radius (u.Scalar[length]): radius to search for atoms
+            other (AtomContainer): object containing the atoms to search (default:self.molecule)
+            include_self (bool): if True, include the atoms from this object (since, by definition,
+               their distance from this object is 0)
+
+        Returns:
+            AtomList: list of the atoms within ``radius`` of this object
+        """
+        atoms = self.atoms_within(radius, other=other, include_self=include_self)
+        residues = collections.OrderedDict((atom.residue, None) for atom in atoms)
+        return residues.keys()
 
     @property
     def num_atoms(self):
@@ -417,9 +437,9 @@ class AtomList(AtomContainer):
     """A list of atoms that allows attribute "slicing" - accessing an attribute of the
     list will return a list of atom attributes.
 
-    Example:
-        >>> atomlist.mass == [atom.mass for atom in atomlist.atoms]
-        >>> getattr(atomlist, attr) == [getattr(atom, attr) for atom in atomlist.atoms]
+    Args:
+        atomlist (List[AtomContainer]): list of objects that are either atoms or contain a list of
+           atoms at ``atomlist.atoms``
     """
 
     append = mdt.utils.Alias('atoms.append')
@@ -428,7 +448,12 @@ class AtomList(AtomContainer):
     sort = mdt.utils.Alias('atoms.sort')
 
     def __init__(self, atomlist):
-        self.atoms = list(atomlist)
+        self.atoms = []
+        for obj in atomlist:
+            if hasattr(obj, 'atoms'):
+                self.atoms.extend(obj.atoms)
+            else:
+                self.atoms.append(obj)
         super(AtomList, self).__init__()
 
     def __iter__(self):
@@ -436,4 +461,10 @@ class AtomList(AtomContainer):
 
     def __getitem__(self, item):
         return self.atoms[item]
+
+    def __str__(self):
+        return str(self.atoms)
+
+    def __repr__(self):
+        return '<%s: %s>' % (type(self).__name__, self.atoms)
 

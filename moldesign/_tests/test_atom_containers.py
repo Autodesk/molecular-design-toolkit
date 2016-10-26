@@ -7,6 +7,8 @@ import numpy as np
 import moldesign as mdt
 from moldesign import units as u
 
+from . import helpers
+
 
 registered_types = {}
 
@@ -25,7 +27,12 @@ def typedfixture(*types, **kwargs):
 
 @typedfixture('container')
 def protein():
-    return mdt.read('data/3AID.pdb')
+    return mdt.read(helpers.get_data_path('3AID.pdb'))
+
+
+@pytest.fixture
+def atom(protein):
+    return random.choice(protein.atoms)
 
 
 @typedfixture('container')
@@ -129,6 +136,7 @@ def test_position_links(fixturename, request):
     np.testing.assert_array_equal(obj.positions[0, :],
                                   obj.atoms[0].position)
 
+
 def _get_minimum_pairwise(group1, group2):
     mindist = np.inf * u.angstrom
     for a1, a2 in itertools.product(group1.atoms, group2.atoms):
@@ -136,3 +144,60 @@ def _get_minimum_pairwise(group1, group2):
         mindist = min(distance, mindist)
 
     return mindist
+
+
+@pytest.mark.parametrize('fixturename', ['atom', 'residue', 'atomlist', 'small_molecule'])
+def test_atoms_within(fixturename, request):
+    obj = request.getfuncargvalue(fixturename)
+
+    if fixturename == 'atom':
+        myatoms = {obj}
+        mol = obj.molecule
+    else:
+        myatoms = set(obj.atoms)
+        mol = obj.atoms[0].molecule
+
+    assert len(obj.atoms_within(0.0*u.angstrom)) == 0
+
+    within5 = set(obj.atoms_within(5.0*u.angstrom))
+    within5_self = set(obj.atoms_within(5.0*u.angstrom, include_self=True))
+
+    assert myatoms.issubset(within5_self)
+    assert within5.union(myatoms) == within5_self
+
+    for atom in mol.atoms:
+        if atom in myatoms:
+            assert atom not in within5
+        elif atom.distance(obj) <= 5.0*u.angstrom:
+            assert atom in within5
+        else:
+            assert atom not in within5
+
+
+@pytest.mark.parametrize('fixturename', ['atom', 'residue', 'atomlist'])
+def test_residues_within(fixturename, request):
+    obj = request.getfuncargvalue(fixturename)
+
+    if fixturename == 'atom':
+        mol = obj.molecule
+    else:
+        mol = obj.atoms[0].molecule
+
+    assert len(obj.residues_within(0.0*u.angstrom)) == 0
+
+    within5 = set(obj.residues_within(5.0*u.angstrom))
+    within5_self = set(obj.residues_within(5.0*u.angstrom, include_self=True))
+
+    if fixturename == 'residue':
+        assert within5.union([obj]) == within5_self
+    else:
+        assert within5 == within5_self
+
+    for residue in mol.residues:
+        if residue == obj:
+            assert residue in within5_self
+            assert residue not in within5
+        elif residue.distance(obj) <= 5.0*u.angstrom:
+            assert residue in within5
+        else:
+            assert residue not in within5
