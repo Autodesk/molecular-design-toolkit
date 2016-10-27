@@ -468,3 +468,9 @@ class AtomList(AtomContainer):
     def __repr__(self):
         return '<%s: %s>' % (type(self).__name__, self.atoms)
 
+    def intersection(self):
+        raise NotImplementedError()
+
+    def union(self):
+        raise NotImplementedError()
+
