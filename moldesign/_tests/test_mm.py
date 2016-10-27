@@ -105,10 +105,10 @@ def test_analytical_vs_numerical_forces(objkey, request):
         atoms = mol.atoms
     atom_indices = [atom.index for atom in atoms]
 
-    anagrad = -mol.calculate_forces()#[atom_indices]
+    anagrad = -mol.calculate_forces()[atom_indices]
     numgrad = helpers.num_grad(mol,
                                mol.calculate_potential_energy,
-                               #atoms=atoms,
+                               atoms=atoms,
                                step=0.005*u.angstrom)
     assert (anagrad-numgrad).norm()/(3.0*len(atoms)) <= 1.0e-4 * u.eV / u.angstrom
 

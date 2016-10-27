@@ -30,6 +30,7 @@ __all__ = []
 FFNAMES = {n: n.capitalize() for n in ['ghemical', 'mmff94', 'mmff94s', 'uff']}
 UNITNAMES = {'kcal/mol': u.kcalpermol, 'kJ/mol': u.kjpermol}
 
+
 @exports
 class OpenBabelPotential(EnergyModelBase):
     DEFAULT_PROPERTIES = ['potential_energy', 'forces']
@@ -58,12 +59,12 @@ class OpenBabelPotential(EnergyModelBase):
         self.prep()
         for atom, pbatom in zip(self.mol.atoms, self._pbmol.atoms):
             pbatom.OBAtom.SetVector(*atom.position.value_in(u.angstrom))
-        self._ff.UpdateCoordinates(self._pbmol.OBMol)
+        self._ff.SetCoordinates(self._pbmol.OBMol)
         energy = self._ff.Energy(True)
+        self._ff.GetCoordinates(self._pbmol.OBMol)
 
-        # these next two lines are a complete mystery to me. Comes from
         # http://forums.openbabel.org/Doing-an-energ-force-calculation-with-openbabel-td1590730.html
-        data = ob.toConformerData(self._pbmol.OBMol.GetData(4))
+        data = ob.toConformerData(self._pbmol.OBMol.GetData(4))  # 4 == OBConformerData constant
         force_iterator = data.GetForces()[0]
 
         forces = np.array([[f.GetX(), f.GetY(), f.GetZ()] for f in force_iterator])
