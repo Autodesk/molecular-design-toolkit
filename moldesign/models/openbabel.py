@@ -52,7 +52,7 @@ class OpenBabelPotential(EnergyModelBase):
 
         self._prepped = True
 
-    #@mdt.compute.runsremotely(enable=mdt.interfaces.openbabel.force_remote, is_imethod=True)
+    @mdt.compute.runsremotely(enable=mdt.interfaces.openbabel.force_remote, is_imethod=True)
     def calculate(self, requests):
         import openbabel as ob
 
@@ -75,8 +75,9 @@ class OpenBabelPotential(EnergyModelBase):
                                          forces=forces*self._units/u.angstrom)
         return result
 
-    # run the entire minimization remotely for speed
-    #@mdt.compute.runsremotely(enable=mdt.interfaces.openbabel.force_remote, is_imethod=True)
+
+    # if necessary, run the entire minimization remotely for speed
+    @mdt.compute.runsremotely(enable=mdt.interfaces.openbabel.force_remote, is_imethod=True)
     def minimize(self, **kwargs):
         super(OpenBabelPotential, self).minimize(**kwargs)
 
