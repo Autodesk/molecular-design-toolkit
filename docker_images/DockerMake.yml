@@ -46,6 +46,7 @@ devtools:
  requires:
   - python_install
  build: |
+  RUN apt-get update
   RUN apt-get -y install \
       build-essential \
       libcr-dev \
@@ -366,30 +367,51 @@ cuda7_0:
   RUN dpkg -i cuda-repo-ubuntu1404_7.0-28_amd64.deb && apt-get update && apt-get -y install cuda
 
 
-
 nwchem:
  requires:
-  - devtools
+  - base
  build_directory: nwchem/
  build: |
-  RUN cd /opt \
-   && wget --trust-server-names -nv http://www.nwchem-sw.org/download.php?f=Nwchem-6.6.revision27746-srconly.2015-10-20.tar.bz2 \
-   && tar xjf Nwchem-6.6.revision27746-srconly.2015-10-20.tar.bz2 \
-   && rm Nwchem-6.6.revision27746-srconly.2015-10-20.tar.bz2
-  ENV MPI_LOC=/usr \
-      MPI_INCLUDE=/usr/include/mpich \
-      MPI_LIB=/usr/lib \
-      NWCHEM_TOP=/opt/nwchem-6.6 \
-      NWCHEM_TARGET=LINUX64 \
-      NWCHEM_MODULES=all \
-      USE_MPI=y USE_MPIF=y \
-      HAS_BLAS=yes \
-      LIBMPI='-lfmpich -lmpich' \
-      NWCHEM_TARGET=LINUX64 \
-      BLASOPT="-lblas -lpthread -lrt" \
-      BLAS_SIZE=4 \
-      USE_64TO32=y
-  RUN cd $NWCHEM_TOP/src && make nwchem_config && make -j4 | tee make.log
+   RUN apt-get update \
+       && apt-get install -y \
+           python-dev \
+           gfortran \
+           libopenblas-dev \
+           libopenmpi-dev \
+           openmpi-bin \
+           tcsh \
+           make \
+           wget \
+       && apt-get -y clean \
+       && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+   ENV FILE=Nwchem-6.6.revision27746-src.2015-10-20.tar.gz
+   RUN cd /opt \
+    && wget --trust-server-names -nv http://www.nwchem-sw.org/download.php?f=$FILE \
+    && tar xzf $FILE \
+    && rm $FILE
+   ENV USE_MPI=y                           \
+       NWCHEM_TARGET=LINUX64               \
+       USE_PYTHONCONFIG=y                  \
+       PYTHONVERSION=2.7                   \
+       PYTHONHOME=/usr                     \
+       BLASOPT="-lopenblas -lpthread -lrt" \
+       BLAS_SIZE=4                         \
+       USE_64TO32=y                        \
+       NWCHEM_TOP=/opt/nwchem-6.6
+   RUN cd $NWCHEM_TOP/src \
+      && make nwchem_config NWCHEM_MODULES="all python" \
+      && make -j 12 64_to_32
+   RUN apt-get update \
+       && apt-get install -y \
+            vim \
+            ssh \
+       && apt-get -y clean \
+       && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+   RUN cd $NWCHEM_TOP/src \
+      && make -j 12
+   RUN cd /usr/local/bin \
+     && ln -s $NWCHEM_TOP/bin/LINUX64/nwchem .
+
 
 
 nbo: # This ISN'T open source - we'll provide the dockerfile, but users must supply the source code
