@@ -15,13 +15,22 @@
 """
 from __future__ import absolute_import
 
-import openbabel as ob
+import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
 from .base import EnergyModelBase
 
 
+def exports(o):
+    __all__.append(o.__name__)
+    return o
+__all__ = []
+
+FFNAMES = {n: n.capitalize() for n in ['ghemical', 'mmff94', 'mmff94s', 'uff']}
+UNITNAMES = {'kcal/mol': u.kcalpermol, 'kJ/mol': u.kjpermol}
+
+@exports
 class OpenBabelPotential(EnergyModelBase):
     DEFAULT_PROPERTIES = ['potential_energy', 'forces']
     ALL_PROPERTIES = DEFAULT_PROPERTIES
@@ -30,40 +39,45 @@ class OpenBabelPotential(EnergyModelBase):
                                            type=str,
                                            default='mmff94s',
                                            choices=['ghemical', 'mmff94', 'mmff94s', 'uff'])]
-    FORCE_UNITS = u.hartree / u.bohr
-
-    FFNAMES = {n: n.capitalize() for n in ['ghemical', 'mmff94', 'mmff94s', 'uff']}
 
     def prep(self):
-        if self._prepped:
-            return
-        self._pbmol = mdt.interfaces.openbabel.mol_to_pybel(self.mol)
-        self._ff = ob.OBForceField.FindForceField(self.FFNAMES[self.params.forcefield])
-        self._ff.Setup(self._pbmol.OBMol)
+        import openbabel as ob
 
-        assert self._ff.GetUnit() == 'kcal/mol'
+        if self._prepped: return
+        self._pbmol = mdt.interfaces.openbabel.mol_to_pybel(self.mol)
+        self._ff = ob.OBForceField.FindForceField(FFNAMES[self.params.forcefield])
+        self._ff.Setup(self._pbmol.OBMol)
+        self._units = UNITNAMES[self._ff.GetUnit()]
+
         self._prepped = True
 
+    #@mdt.compute.runsremotely(enable=mdt.interfaces.openbabel.force_remote, is_imethod=True)
     def calculate(self, requests):
+        import openbabel as ob
+
         self.prep()
         for atom, pbatom in zip(self.mol.atoms, self._pbmol.atoms):
             pbatom.OBAtom.SetVector(*atom.position.value_in(u.angstrom))
         self._ff.UpdateCoordinates(self._pbmol.OBMol)
-
         energy = self._ff.Energy(True)
-        data = ob.toConformerData(self._pbmol.OBMol.GetData(4))
-        forces = []
 
-        for iatom, f in enumerate(data.GetForces()[0]):
-            forces.append([f.GetX(), f.GetY(), f.GetZ()])
+        # these next two lines are a complete mystery to me. Comes from
+        # http://forums.openbabel.org/Doing-an-energ-force-calculation-with-openbabel-td1590730.html
+        data = ob.toConformerData(self._pbmol.OBMol.GetData(4))
+        force_iterator = data.GetForces()[0]
+
+        forces = np.array([[f.GetX(), f.GetY(), f.GetZ()] for f in force_iterator])
+        forces[np.abs(forces) < 1e-30] = 0.0  # prevent underflows
 
         result = mdt.MolecularProperties(self.mol,
-                                         potential_energy=energy*u.kcalpermol,
-                                         forces=forces*u.kcalpermol/u.angstrom)
-
+                                         potential_energy=energy*self._units,
+                                         forces=forces*self._units/u.angstrom)
         return result
 
-
+    # run the entire minimization remotely for speed
+    #@mdt.compute.runsremotely(enable=mdt.interfaces.openbabel.force_remote, is_imethod=True)
+    def minimize(self, **kwargs):
+        super(OpenBabelPotential, self).minimize(**kwargs)
 
 
 
