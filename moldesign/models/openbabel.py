@@ -64,7 +64,7 @@ class OpenBabelPotential(EnergyModelBase):
         self._ff.GetCoordinates(self._pbmol.OBMol)
 
         # http://forums.openbabel.org/Doing-an-energ-force-calculation-with-openbabel-td1590730.html
-        data = ob.toConformerData(self._pbmol.OBMol.GetData(4))  # 4 == OBConformerData constant
+        data = ob.toConformerData(self._pbmol.OBMol.GetData(ob.ConformerData))
         force_iterator = data.GetForces()[0]
 
         forces = np.array([[f.GetX(), f.GetY(), f.GetZ()] for f in force_iterator])
@@ -80,7 +80,3 @@ class OpenBabelPotential(EnergyModelBase):
     @mdt.compute.runsremotely(enable=mdt.interfaces.openbabel.force_remote, is_imethod=True)
     def minimize(self, **kwargs):
         super(OpenBabelPotential, self).minimize(**kwargs)
-
-
-
-
