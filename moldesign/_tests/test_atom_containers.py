@@ -217,3 +217,5 @@ def test_setlike_atomlist_methods(protein):
 
     assert l1 - l2 == protein.atoms[:5]
     assert l2 - l1 == protein.atoms[10:15]
+
+    assert (l1 + l2).unique() == protein.atoms[:15]

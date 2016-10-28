@@ -30,7 +30,7 @@ class ChildList(AtomContainer):
 
     def __repr__(self):
         try:
-            return '<Children of %s: %s>' % (self.parent, mdt.AtomList.__)
+            return '<Children of %s: %s>' % (self.parent, self)
         except:
             return '<ChildList @ %x (__repr__ failed)>' % id(self)
 
