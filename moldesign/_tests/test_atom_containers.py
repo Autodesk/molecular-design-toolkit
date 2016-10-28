@@ -201,3 +201,19 @@ def test_residues_within(fixturename, request):
             assert residue in within5
         else:
             assert residue not in within5
+
+
+def test_setlike_atomlist_methods(protein):
+    l1 = protein.atoms[:10]
+    assert isinstance(l1, mdt.AtomList)
+    l2 = protein.atoms[5:15]
+
+    assert l1.union(l2) == protein.atoms[:15]
+    assert l2.union(l1) == protein.atoms[5:15] + protein.atoms[:5]
+
+    interx = l1.intersection(l2)
+    assert interx == protein.atoms[5:10]
+    assert l2.intersection(l1) == interx
+
+    assert l1 - l2 == protein.atoms[:5]
+    assert l2 - l1 == protein.atoms[10:15]

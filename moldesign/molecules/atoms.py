@@ -179,8 +179,17 @@ class AtomReprMixin(object):
                 molstring += ' (res %s chain %s)' % (self.residue.name, self.chain.name)
         return '%s%s' % (desc, molstring)
 
+    def _shortstr(self):
+        """ A shorter string representation for easier-to-read lists of atoms
+        """
+        fields = [self.name]
+        if self.molecule:
+            fields.append('#%d' % self.index)
+            if self.molecule.is_biomolecule:
+                fields.append('in %s.%s' % (self.chain.name, self.residue.name))
+        return ' '.join(fields)
+
     def __repr__(self):
-        # TODO: rename parent to "molecule"
         try:
             if self.molecule:
                 return '<%s in molecule %s>' % (self, self.molecule)
