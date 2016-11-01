@@ -14,6 +14,9 @@
 
 import copy
 
+import collections
+
+import itertools
 import numpy as np
 
 import moldesign as mdt
@@ -152,7 +155,7 @@ class AtomContainer(object):
 
         Args:
             radius (u.Scalar[length]): radius to search for atoms
-            other (AtomContainer): object containing the atoms to search (default:self.parent)
+            other (AtomContainer): object containing the atoms to search (default:self.molecule)
             include_self (bool): if True, include the atoms from this object (since, by definition,
                their distance from this object is 0)
 
@@ -162,13 +165,32 @@ class AtomContainer(object):
         if other is None:
             other = self.atoms[0].molecule
         if not include_self:
-            myatoms = set(self.atoms)
+            filter_atoms = set(self.atoms)
+        else:
+            filter_atoms = set()
 
-        close_atoms = AtomList()
-        for atom in other.atoms:
-            if self.distance(atom) <= radius and (include_self or (atom not in myatoms)):
-                close_atoms.append(atom)
+        distances = self.calc_distance_array(other=other)
+        mindists = distances.min(axis=0)
+
+        close_atoms = AtomList(atom for dist,atom in zip(mindists, other.atoms)
+                               if dist <= radius and atom not in filter_atoms)
         return close_atoms
+
+    def residues_within(self, radius, other=None, include_self=False):
+        """ Return all atoms in an object within a given radius of this object
+
+        Args:
+            radius (u.Scalar[length]): radius to search for atoms
+            other (AtomContainer): object containing the atoms to search (default:self.molecule)
+            include_self (bool): if True, include the atoms from this object (since, by definition,
+               their distance from this object is 0)
+
+        Returns:
+            AtomList: list of the atoms within ``radius`` of this object
+        """
+        atoms = self.atoms_within(radius, other=other, include_self=include_self)
+        residues = collections.OrderedDict((atom.residue, None) for atom in atoms)
+        return residues.keys()
 
     @property
     def num_atoms(self):
@@ -413,27 +435,86 @@ class AtomContainer(object):
 
 
 @toplevel
-class AtomList(AtomContainer):
-    """A list of atoms that allows attribute "slicing" - accessing an attribute of the
-    list will return a list of atom attributes.
+class AtomList(list, AtomContainer):
+    """ A list of atoms with various helpful methods for creating and manipulating atom selections
 
-    Example:
-        >>> atomlist.mass == [atom.mass for atom in atomlist.atoms]
-        >>> getattr(atomlist, attr) == [getattr(atom, attr) for atom in atomlist.atoms]
+    Args:
+        atomlist (List[AtomContainer]): list of objects that are either atoms or contain a list of
+           atoms at ``atomlist.atoms``
     """
-
-    append = mdt.utils.Alias('atoms.append')
-    pop = mdt.utils.Alias('atoms.pop')
-    insert = mdt.utils.Alias('atoms.insert')
-    sort = mdt.utils.Alias('atoms.sort')
-
-    def __init__(self, atomlist):
-        self.atoms = list(atomlist)
-        super(AtomList, self).__init__()
-
-    def __iter__(self):
-        return iter(self.atoms)
+    def __init__(self, atomlist=()):
+        atoms = []
+        for obj in atomlist:
+            if hasattr(obj, 'atoms'):
+                atoms.extend(obj.atoms)
+            else:
+                atoms.append(obj)
+        super(AtomList, self).__init__(atoms)
 
     def __getitem__(self, item):
-        return self.atoms[item]
+        result = super(AtomList, self).__getitem__(item)
+        if isinstance(item, slice):
+            return type(self)(result)
+        else:
+            return result
 
+    def __getslice__(self, i, j):
+        result = super(AtomList, self).__getslice__(i, j)
+        return type(self)(result)
+
+    def __str__(self):
+        return '[Atoms: %s]' % ', '.join(atom._shortstr() for atom in self)
+
+    def __repr__(self):
+        try:
+            return '<AtomList: [%s]>' % ', '.join(atom._shortstr() for atom in self)
+        except:
+            return '<AtomList at %x (__repr__ failed)>' % id(self)
+
+    def intersection(self, *otherlists):
+        """ Return a list of atoms that appear in all lists (including this one).
+
+        Args:
+            *otheriters (Iterable): one or more lists of atoms
+
+        Returns:
+            moldesign.AtomList: intersection of this lists with all passed lists. Preserves order
+              in this list
+        """
+        s = set(self).intersection(*otherlists)
+        return type(self)(o for o in self if o in s)
+
+    def union(self, *otherlists):
+        """ Return a list of atoms that appear in any lists (including this one).
+
+        Args:
+            *otherlists (Iterable): one or more lists of atoms
+
+        Returns:
+            moldesign.AtomList: union of this list of atoms with all passed lists of atoms.
+               Equivalent to concatenating all lists then removing duplicates
+        """
+        found = set()
+        newlist = type(self)()
+        for item in itertools.chain(self, *otherlists):
+            if item not in found:
+                found.add(item)
+                newlist.append(item)
+        return newlist
+
+    def unique(self):
+        """ Return only unique atoms from this list
+
+        Returns:
+            moldesign.AtomList: copy of this list without any duplicates. Preserves order.
+        """
+        return self.union()
+
+    def __sub__(self, other):
+        otherset = set(other)
+        return type(self)(atom for atom in self if atom not in otherset)
+
+    # alas for self so that this works with AtomContainer methods
+    @property
+    def atoms(self):
+        return self

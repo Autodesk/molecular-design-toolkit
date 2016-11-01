@@ -96,6 +96,10 @@ class AtomGeometryMixin(object):
     def atoms_within(self, *args, **kwargs):
         return self._container.atoms_within(*args, **kwargs)
 
+    @utils.args_from(AtomContainer.residues_within)
+    def residues_within(self, *args, **kwargs):
+        return self._container.residues_within(*args, **kwargs)
+
     @utils.args_from(AtomContainer.calc_distance_array)
     def calc_distances(self, *args, **kwargs):
         array = self._container.calc_distance_array(*args, **kwargs)
@@ -175,8 +179,17 @@ class AtomReprMixin(object):
                 molstring += ' (res %s chain %s)' % (self.residue.name, self.chain.name)
         return '%s%s' % (desc, molstring)
 
+    def _shortstr(self):
+        """ A shorter string representation for easier-to-read lists of atoms
+        """
+        fields = [self.name]
+        if self.molecule:
+            fields.append('#%d' % self.index)
+            if self.molecule.is_biomolecule:
+                fields.append('in %s.%s' % (self.chain.name, self.residue.name))
+        return ' '.join(fields)
+
     def __repr__(self):
-        # TODO: rename parent to "molecule"
         try:
             if self.molecule:
                 return '<%s in molecule %s>' % (self, self.molecule)
