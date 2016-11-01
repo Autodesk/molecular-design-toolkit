@@ -86,6 +86,7 @@ def args_from(original_function,
                                           default=default)
                 newparams.append(newp)
 
+        newparams.sort(key=lambda param: param._kind)
         sig = sig.replace(parameters=newparams)
 
     else:
