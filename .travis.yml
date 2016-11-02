@@ -1,0 +1,51 @@
+language: python
+
+python:
+  - "2.7"
+
+addons:
+  apt:
+    packages:
+      - git
+
+sudo: required
+services:
+  - docker
+
+before_install: # from http://conda.pydata.org/docs/travis.html
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+    else
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    fi
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda info -a
+  - "mkdir ~/.moldesign && echo 'engine_type: docker' > ~/.moldesign/moldesign.yml"
+  - conda install pyyaml jupyter
+
+
+install:
+  - conda env create
+  - source activate moldesign_env
+  - pip install .
+  - pip install pytest-xdist
+
+
+script: py.test -n 2
+
+
+deploy:
+  provider: pypi
+  user: justinmc
+  password:
+    secure: ial5zhD0Ewxtp4uDBfhxIDS0+VO1YIwg9u3qb6FjQB1q92QcrSpVIyiX04A3dd8czWX9WcQRA1Z2dS1g1Im4t+SG50Au3hF4HwLW1qu3iMWaU+9NQ00MwoqZy68DCoBgag7LB7WzplX6G4p64JJBX3tlvfgBxNQ6dSp09shPFRdKUWHgEGZcKZR+ogoijb4+UYoRNov925Y0TQhy0xmYty1d/re/zyOEsG2DDFn8ojnRyLW6yv7AiS/4Eu3Rowh93EBV/EJ6bHOcwjjA7GlPHy4LsDjpDX2s+0Y1AoOQOsukRZR9bnSciQ5wLlYM1MLUGeTR+nAj3ITDRkBO+1NLOiY/WC+8l018Ca9mNaudEtapb7pZfOsvzoHExB9gkkMYW7KFL9crpG+iY66qD2LHCzBAi9MB3QWZQK+SVDZINbk+Vph06mA2iFYrLCdLK6ttFW48Pkw2zr50v3IhBB3b3BcPs89CSnYXqmfqNk9+80FD2o5AEoCurro0PUTu/7Rvg1T+rfybIlHRgdfBOb7XnxVl8LdUvVfxaWolLPx5k028g178r64Bblp0dHSn24pcJjXSpsItA/KWYI/M61R2A2gX5qqOl0iSnLRUP+mHGmqDeUpqYGTTi1PGPfGb+VJixdglzqj9DcjHme612VJguVrZOuL+PFhSUHAH3WOkWhA=
+  on:
+    tags: true
+    branch: master
+    repo: Autodesk/molecular-design-toolkit
+
+# TODO: add deployment to dockerhub, conda, and binder.io
