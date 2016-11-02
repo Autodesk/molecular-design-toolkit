@@ -548,8 +548,8 @@ class MolTopologyMixin(object):
         js['residues'] = []
         js['chains'] = []
 
-        if self.energy_model:
-            js['energy_model'] = self.energy_model.to_json()
+        # if self.energy_model:
+        #     js['energy_model'] = self.energy_model.to_json()
 
         for i, atom in enumerate(self.atoms):
             momenta = []
