@@ -89,3 +89,7 @@ if _building_docs:
               tools.__all__ + \
               viewer.__all__
 
+
+from ._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
