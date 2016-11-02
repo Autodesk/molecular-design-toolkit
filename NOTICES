@@ -40,3 +40,11 @@ LICENSE: To make Versioneer easier to embed, all its code is dedicated to the pu
 The _version.py that it creates is also in the public domain. Specifically, both are released
 under the Creative Commons "Public Domain Dedication" license (CC0-1.0), as described in
 https://creativecommons.org/publicdomain/zero/1.0/ 
+
+    Symmol.f
+------------------------------------
+By Tullio Pilati and Alessandra Forni
+Released by the CCP14 Project
+SOURCE CODE: docker_images/symmol/symmol.f
+WEBSITE: http://www.ccp14.ac.uk
+LICENSE: None available
