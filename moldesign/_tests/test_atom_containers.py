@@ -27,7 +27,7 @@ def typedfixture(*types, **kwargs):
 
 @typedfixture('container')
 def protein():
-    return mdt.read(helpers.get_data_path('3AID.pdb'))
+    return mdt.read(helpers.get_data_path('3aid.pdb'))
 
 
 @pytest.fixture
