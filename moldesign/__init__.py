@@ -66,7 +66,7 @@ compute.init_config()
 
 
 # package metadata
-from moldesign import _version
+from . import _version
 __version__ = _version.get_versions()['version']
 __copyright__ = "Copyright 2016 Autodesk Inc."
 __license__ = "Apache 2.0"
@@ -89,7 +89,3 @@ if _building_docs:
               tools.__all__ + \
               viewer.__all__
 
-
-from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
