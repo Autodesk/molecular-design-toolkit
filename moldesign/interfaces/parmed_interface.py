@@ -24,7 +24,27 @@ def exports(o):
 __all__ = []
 
 
-def parse_mmcif(f):
+def parse_mmcif(f, reassign_chains=False):
+    """Parse an mmCIF file (using the Biopython parser) and return a molecule
+
+    Args:
+        f (file): file-like object containing the mmCIF file
+        reassign_chains (bool): reassign chain IDs from ``auth_asym_id`` to ``label_asym_id``
+
+    Returns:
+        moldesign.Molecule: parsed molecule
+    """
+    parmedmol = parmed.read_CIF(f)
+    mol = parmed_to_mdt(parmedmol)
+    if reassign_chains:
+        f.seek(0)
+        _reassign_chains(f, mol)
+
+    mdt.helpers.assign_biopolymer_bonds(mol)
+    return mol
+
+
+def parse_pdb(f):
     """Parse an mmCIF file (using the Biopython parser) and return a molecule
 
     Args:
@@ -33,7 +53,7 @@ def parse_mmcif(f):
     Returns:
         moldesign.Molecule: parsed molecule
     """
-    parmedmol = parmed.read_CIF(f)
+    parmedmol = parmed.read_PDB(f)
     mol = parmed_to_mdt(parmedmol)
     return mol
 
@@ -113,3 +133,16 @@ def _parmed_to_ff(topo, atom_map):
                                                      dihedral.type.phi_k*u.kcalpermol,
                                                      dihedral.type.phase*u.degrees)
                  for dihedral in topo.dihedrals]
+
+
+
+def _reassign_chains(f, pmdmol):
+    """ Change chain ID assignments to the mmCIF standard (parmed uses author assignments)
+
+    Args:
+        f (file): mmcif file/stream
+        pmdmol (parmed.Structure): molecule with default parmed assignemnts
+    """
+    data = mdt.interfaces.biopython_interface.get_mmcif_assemblies(f)
+
+
