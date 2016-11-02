@@ -2,7 +2,7 @@ biopython
 docker-py
 fortranformat
 funcsigs
-ipywidgets >= 5.1
+ipywidgets >= 6.0.0b1
 ipython >= 4.2
 markdown2
 matplotlib

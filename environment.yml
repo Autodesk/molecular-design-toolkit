@@ -22,6 +22,6 @@ dependencies:
    - fortranformat
    - pyccc >= 0.6.6
    - ipython >= 4.2  # the conda version's backports packages don't import correctly ...
-   - ipywidgets >= 5.1
+   - ipywidgets >= 6.0.0b1
    - notebook >= 4.2
    - nbmolviz == 0.6.7rc2  # increment for release as appropriate
