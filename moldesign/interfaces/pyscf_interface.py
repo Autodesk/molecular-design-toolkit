@@ -22,6 +22,12 @@ from moldesign.utils import if_not_none, redirect_stderr
 from moldesign import orbitals
 
 
+def exports(o):
+    __all__.append(o.__name__)
+    return o
+__all__ = []
+
+
 try:
     imp.find_module('pyscf')
 except (ImportError, OSError) as exc:
@@ -31,6 +37,7 @@ else:
     force_remote = False
 
 
+@exports
 def mol_to_pyscf(mol, basis, symmetry=None, charge=0, positions=None):
     """Convert an MDT molecule to a PySCF "Mole" object"""
     from pyscf import gto

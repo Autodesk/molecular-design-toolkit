@@ -22,6 +22,13 @@ from moldesign.utils import from_filepath
 from moldesign import units as u
 from moldesign import compute
 
+
+def exports(o):
+    __all__.append(o.__name__)
+    return o
+__all__ = []
+
+
 try:
     imp.find_module('simtk')
 except (ImportError, OSError) as exc:
@@ -136,6 +143,7 @@ PINT_NAMES = {'mole': u.avogadro,
               'elementary charge': u.q_e}
 
 
+@exports
 def simtk2pint(quantity, flat=False):
     """
     Converts a quantity from the simtk unit system to a quantity from the pint unit system
@@ -163,6 +171,7 @@ def simtk2pint(quantity, flat=False):
     return u.default.convert(mag)
 
 
+@exports
 def pint2simtk(quantity):
     """ Converts a quantity from the pint to simtk unit system.
     Note SimTK appears limited, esp for energy units. May need to have pint convert
@@ -209,6 +218,10 @@ else:
     amber_to_mol = _amber_to_mol
 
 
+exports(amber_to_mol)
+
+
+@exports
 def topology_to_mol(topo, name=None, positions=None, velocities=None, assign_bond_orders=True):
     """ Convert an OpenMM topology object into an MDT molecule.
 
@@ -292,6 +305,7 @@ def topology_to_mol(topo, name=None, positions=None, velocities=None, assign_bon
     return newmol
 
 
+@exports
 def mol_to_topology(mol):
     """ Create an openmm topology object from an MDT molecule
 
@@ -319,6 +333,7 @@ def mol_to_topology(mol):
     return top
 
 
+@exports
 def mol_to_modeller(mol):
     from simtk.openmm import app
     return app.Modeller(mol_to_topology(mol), pint2simtk(mol.positions))
