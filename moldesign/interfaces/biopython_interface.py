@@ -76,6 +76,7 @@ def _parse_file(f, parser_type):
     mol = biopy_to_mol(struc)
     return mol
 
+
 @exports
 def biopy_to_mol(struc):
     """Convert a biopython PDB structure to an MDT molecule.

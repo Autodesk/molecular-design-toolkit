@@ -18,6 +18,7 @@ from moldesign import utils
 
 IMAGE = 'opsin'
 
+
 @utils.kwargs_from(mdt.compute.run_job)
 def name_to_smiles(name,
                    **kwargs):

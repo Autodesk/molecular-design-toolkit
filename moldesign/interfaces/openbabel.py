@@ -35,6 +35,13 @@ import moldesign.molecules.atoms
 from moldesign import units as u
 
 
+def exports(o):
+    __all__.append(o.__name__)
+    return o
+
+__all__ = []
+
+
 def read_file(filename, name=None, format=None):
     """ Read a molecule from a file
 
@@ -174,7 +181,7 @@ def add_hydrogen(mol, ph=None):
     mdt.helpers.assign_unique_hydrogen_names(newmol)
     return newmol
 
-
+@exports
 def mol_to_pybel(mdtmol):
     """ Translate a moldesign molecule object into a pybel molecule object.
 
@@ -232,6 +239,7 @@ def mol_to_pybel(mdtmol):
     return pbmol
 
 
+@exports
 def pybel_to_mol(pbmol,
                  atom_names=True,
                  reorder_atoms_by_residue=False,
