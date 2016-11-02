@@ -73,6 +73,7 @@ class PostInstall(install):
         print('\nTo get started, please run:')
         print(' >>> python -m moldesign intro')
 
+
 cmdclass = versioneer.get_cmdclass()
 cmdclass['install'] = PostInstall
 
