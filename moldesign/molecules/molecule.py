@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import itertools
 import numpy as np
 
 import moldesign as mdt
@@ -428,10 +428,15 @@ class MolReprMixin(object):
         Returns:
             str: Markdown"""
         # TODO: remove leading underscores for descriptor-protected attributes
-        lines = ['### Molecule: "%s" (%d atoms)' % (self.name, self.natoms),
+        lines = ['### Molecule: "%s" (%d atoms)' % (self.name, self.natoms)]
+
+        if self.description:
+            lines.append(self.description[:5000])
+
+        lines.extend([
                  '**Mass**: {:.2f}'.format(self.mass),
                  '**Formula**: %s' % self.get_stoichiometry(html=True),
-                 '**Charge**: %s'%self.charge]
+                 '**Charge**: %s'%self.charge])
 
         if self.energy_model:
             lines.append('**Potential model**: %s' % str(self.energy_model))
@@ -725,6 +730,45 @@ class MolTopologyMixin(object):
         self.nchains = self.n_chains = self.num_chains = len(self.chains)
         self.nresidues = self.n_residues = self.num_residues = len(self.residues)
 
+    def __eq__(self, other):
+        """ Test whether two molecules are "equivalent"
+
+        We specifically test these quantities for equality:
+         - positions
+         - momenta
+         - chain names
+         - residue names
+         - atom names
+
+        Note:
+            This tests geometry and topology only; it does not test
+            energy models or any calculated properties; it also ignores the ``time`` attribute.
+
+        Args:
+            other (moldesign.Molecule): molecule to test against
+
+        Returns:
+            bool: true if all tested quantities are equal
+        """
+        if (self.num_atoms != other.num_atoms
+            or self.num_residues != other.num_residues
+            or self.num_chains != other.num_chains
+            or (self.positions != other.positions).any()
+            or (self.momenta != other.momenta).any()):
+            return False
+
+        for a1, a2 in zip(itertools.chain(self.atoms, self.residues, self.chains),
+                          itertools.chain(other.atoms, other.residues, other.chains)):
+            if a1.name != a2.name:
+                return False
+
+        return True
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    __ne__.__doc__ = __eq__.__doc__
+
 
 class MolSimulationMixin(object):
     """ Functions calculating energies, running dynamics, and minimizing geometry.
@@ -949,6 +993,7 @@ class Molecule(AtomContainer,
         pdbname (str): Name of the PDB file
         charge (units.Scalar[charge]): molecule's formal charge
         electronic_state_index (int): index of the molecule's electronic state
+        description (str): arbitrary text description of this molecule
 
 
     Examples:
@@ -1013,7 +1058,8 @@ class Molecule(AtomContainer,
                  copy_atoms=False,
                  pdbname=None,
                  charge=None,
-                 electronic_state_index=0):
+                 electronic_state_index=0,
+                 description=None):
         super(Molecule, self).__init__()
 
         # copy atoms from another object (i.e., a molecule)
@@ -1041,6 +1087,7 @@ class Molecule(AtomContainer,
         self.constraints = utils.ExclusiveList(key=utils.methodcaller('_constraintsig'))
         self.energy_model = None
         self.integrator = None
+        self.description = description
         self.electronic_state_index = electronic_state_index
 
         if charge is not None:

@@ -24,6 +24,12 @@ from moldesign import units as u
 from moldesign.helpers.pdb import BioAssembly
 
 
+def exports(o):
+    __all__.append(o.__name__)
+    return o
+__all__ = []
+
+
 def parse_mmcif(f):
     """Parse an mmCIF file (using the Biopython parser) and return a molecule
 
@@ -70,7 +76,7 @@ def _parse_file(f, parser_type):
     mol = biopy_to_mol(struc)
     return mol
 
-
+@exports
 def biopy_to_mol(struc):
     """Convert a biopython PDB structure to an MDT molecule.
 
@@ -130,7 +136,7 @@ def get_mmcif_assemblies(fileobj=None, mmcdata=None):
         Mapping[str, BioAssembly]: dict mapping assembly ids to BioAssembly instances
     """
     if mmcdata is None:
-        mmcdata = _getmmcdata(fileobj)
+        mmcdata = get_mmcif_data(fileobj)
 
     if '_pdbx_struct_assembly.id' not in mmcdata:
         return {}  # no assemblies present
@@ -185,7 +191,7 @@ def _make_transform_dict(tmat, transform_ids):
     return transforms
 
 
-def _getmmcdata(fileobj):
+def get_mmcif_data(fileobj):
     mmcdata = Bio.PDB.MMCIF2Dict.MMCIF2Dict(fileobj)
     fileobj.seek(0)  # rewind for future access
     return mmcdata

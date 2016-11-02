@@ -11,26 +11,30 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import pyccc
+
 import moldesign as mdt
 from moldesign import utils
 
+IMAGE = 'opsin'
+
+@utils.kwargs_from(mdt.compute.run_job)
 def name_to_smiles(name,
-                   image='opsin',
-                   engine=None):
+                   **kwargs):
 
     command = 'opsin -osmi input.txt output.txt'
 
-    # TODO: this boilerplate has to go
-    engine = utils.if_not_none(engine, mdt.compute.get_engine())
-    imagename = mdt.compute.get_image_path(image)
-    job = engine.launch(imagename,
-                          command,
-                          inputs={'input.txt': name + '\n'},
-                          name="opsin, %s" % name)
-    mdt.uibase.display_log(job.get_display_object(), "opsin, %s"%name)
-    job.wait()
-    smistring = job.get_output('output.txt').read().strip()
-    if not smistring:
-        raise ValueError('Could not parse chemical name "%s"' % name)
-    else:
-        return smistring
+    def finish_job(job):
+        smistring = job.get_output('output.txt').read().strip()
+        if not smistring:
+            raise ValueError('Could not parse chemical name "%s"' % name)
+        else:
+            return smistring
+
+    job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
+                    command=command,
+                    name="opsin, %s" % name,
+                    inputs={'input.txt': name + '\n'},
+                    when_finished=finish_job)
+
+    return mdt.compute.run_job(job, _return_result=True, **kwargs)

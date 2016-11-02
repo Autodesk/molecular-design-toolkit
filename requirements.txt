@@ -9,6 +9,7 @@ matplotlib
 nbmolviz >= 0.6.5
 notebook >= 4.2
 numpy
+parmed >= 2.0.0
 pint >= 0.7
 pyccc >= 0.6.4
 pytest
