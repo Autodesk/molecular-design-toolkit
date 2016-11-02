@@ -66,7 +66,7 @@ class PostInstall(install):
         install.run(self)
         self.prompt_intro()
 
-    def prompt_intro(self):  # this doesn't actually display - print statements don't work?
+    def prompt_intro(self):
         print 'Thank you for installing the Molecular Design Toolkit!!!'
         print 'For help, documentation, and any questions, visit us at '
         print '    http://moldesign.bionano.autodesk.com/'
