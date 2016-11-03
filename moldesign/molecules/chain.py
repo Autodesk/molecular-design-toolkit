@@ -128,11 +128,6 @@ class Chain(Entity):
             raise ValueError('Multiple ligands detected. Use `chain.unclassified_residues` to '
                              'iterate over them')
 
-    def to_json(self):
-        js = mdt.chemjson.jsonify(self, 'index name pdbindex'.split())
-        js['residues'] = [res.index for res in self.residues]
-        return js
-
     def copy(self):
         newatoms = super(Chain, self).copy()
         return newatoms[0].chain
