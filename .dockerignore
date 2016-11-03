@@ -2,16 +2,12 @@
 *.pyo
 .idea
 .ipynb_checkpoints/
-*.delete
 pyquante.log
 _docker_make_tmp
 lastfailed
-_test.py
 ./dist/
 ./build/
 *.egg-info
 docker_images
-prep_release.py
 .dockerignore
-.gitignore
-
+__pycache__
