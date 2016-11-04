@@ -27,7 +27,7 @@ __all__ = []
 
 
 def parse_mmcif(f, reassign_chains=True):
-    """Parse an mmCIF file (using the Biopython parser) and return a molecule
+    """Parse an mmCIF file (using the parmEd parser) and return a molecule
 
     Args:
         f (file): file-like object containing the mmCIF file
@@ -46,7 +46,7 @@ def parse_mmcif(f, reassign_chains=True):
 
 
 def parse_pdb(f):
-    """Parse an mmCIF file (using the Biopython parser) and return a molecule
+    """Parse an mmCIF file (using the parmEd parser) and return a molecule
 
     Args:
         f (file): file-like object containing the mmCIF file
