@@ -48,7 +48,7 @@ class OrbitalUIPane(Selector, ipy.Box):
         self.type_dropdown.value = initial_orb
         self.type_dropdown.observe(self.new_orb_type, 'value')
 
-        self.orblist = ipy.Select(options={None: None},
+        self.orblist = ipy.Dropdown(options={None: None},
                                   width=str(kwargs['width'])+'px',
                                   height=str(int(kwargs['height']) - 75)+'px')
 
@@ -69,7 +69,6 @@ class OrbitalUIPane(Selector, ipy.Box):
         super(OrbitalUIPane, self).__init__(children, **kwargs)
         self.new_orb_type()
         self.orblist.observe(self.new_orbital_selection, 'value')
-
 
     def new_orbital_selection(self, *args):
         self.fire_selection_event({'orbname': (self.type_dropdown.value, self.orblist.value)})
