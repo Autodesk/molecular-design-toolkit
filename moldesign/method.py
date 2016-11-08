@@ -79,11 +79,6 @@ class Method(object):
             if param.name not in self.params:
                 self.params[param.name] = param.default
 
-    def to_json(self):
-        return {'params': self.params,
-                'name': type(self).__name__,
-                'version': 'MolecularDesignToolkit-%s' % mdt.__version__}
-
     def configure(self):
         from moldesign.widgets.configurator import Configurator
         return Configurator(self.params, self.PARAMETERS,

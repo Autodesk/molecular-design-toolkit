@@ -23,7 +23,6 @@ from moldesign.interfaces import biopython_interface
 import moldesign.interfaces.openbabel as openbabel_interface
 from moldesign.interfaces.openmm import amber_to_mol as read_amber
 from moldesign.helpers import pdb
-from moldesign import chemjson
 
 def exports(o, name=None):
     __all__.append(o.__name__)
@@ -363,13 +362,12 @@ def _get_format(filename, format):
 ####################################
 
 # All extensions MUST be lower case
-READERS = {'json': chemjson.reader,
-           'pdb': read_pdb,
+READERS = {'pdb': read_pdb,
            'cif': read_mmcif,
            'mmcif': read_mmcif,
            'xyz': read_xyz}
 
-WRITERS = {'json': chemjson.writer}
+WRITERS = {}
 
 PICKLE_EXTENSIONS = set("p pkl pickle mdt".split())
 COMPRESSION = {'gz': gzip.open,

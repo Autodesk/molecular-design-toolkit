@@ -34,12 +34,6 @@ class Residue(Entity):
         return newatoms[0].residue
     copy.__doc__ = Entity.copy.__doc__
 
-    def to_json(self):
-        js = mdt.chemjson.jsonify(self, 'index resname name pdbindex'.split())
-        js['chain'] = self.chain.index
-        js['atoms'] = [atom.index for atom in self.atoms]
-        return js
-
     @utils.args_from(Entity)
     def __init__(self, **kwargs):
         """ Initialization
