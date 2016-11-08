@@ -197,7 +197,7 @@ def read_pdb(f, assign_ccd_bonds=True):
     """
     assemblies = pdb.get_pdb_assemblies(f)
     f.seek(0)
-    mol = biopython_interface.parse_pdb(f)
+    mol = mdt.interfaces.parmed_interface.parse_pdb(f)
     mol.properties.bioassemblies = assemblies
     f.seek(0)
     conect_graph = pdb.get_conect_records(f)
@@ -236,7 +236,7 @@ def read_mmcif(f):
     Returns:
         moldesign.Molecule: the parsed molecular structure
     """
-    mol = openbabel_interface.read_stream(f, 'cif')
+    mol = mdt.interfaces.parmed_interface.parse_mmcif(f)
     f.seek(0)
     assemblies = biopython_interface.get_mmcif_assemblies(f)
     if assemblies:

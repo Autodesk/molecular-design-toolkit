@@ -333,7 +333,7 @@ class Residue(Entity):
 
         lines.append('**<p>Chain:** %s' % self.chain.name)
 
-        lines.append('**Sequence number**: %d' % self.pdbindex)
+        lines.append('**PDB sequence #**: %d' % self.pdbindex)
 
         terminus = None
         if self.type == 'dna':
