@@ -8,6 +8,6 @@ lastfailed
 ./dist/
 ./build/
 *.egg-info
-docker_images
 .dockerignore
 __pycache__
+Dockerfile
