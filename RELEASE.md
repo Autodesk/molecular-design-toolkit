@@ -2,15 +2,6 @@
 
 Make SURE that you've run `set_filters.sh` at the project base. This will make sure that you don't accidentally commit any `ipynb` output fields into the repository. You can check to make sure the filters are working by running `git diff` on any notebook file that has output in it: all `output` and `metadata` fields should remain blank.
 
-# Creating a Pull Request
-
-These instructions generally apply to [Autodesk/molecular-design-toolkit](https://github.com/Autodesk/molecular-design-toolkit),
-[Autodesk/py-cloud-compute-cannon](https://github.com/Autodesk/py-cloud-compute-cannon), and [Autodesk/notebook-molecular-visualization](https://github.com/Autodesk/notebook-molecular-visualization).
-
-1. Group all changes in a single branch.
-1. Run tests in `moldesign/_tests` with `py.test -n NCORES` where `NCORES` is the number of jobs to run simultanously.
-2. Create a pull-request for the appropriate branch in Autodesk/molecular-design-toolkit
-
 
 # Maintainers: Accepting a PR
 
@@ -20,35 +11,18 @@ are considered "stable".
 
 1. Review the code.
 1. Make sure that there's appropriate functional tests.
-1. Run all tests. They don't all *necessarily* need to pass, but you need to undertand why  what's passing and what's not.
-1. Run any example notebooks that might be affected by the PR.
+1. Check that the travis build is at least running all the way to the end. The tests don't *necessarily* need to pass, but you need to undertand why  what's passing and what's not.
 
 
 # Maintainers: Creating a new release
 
-Decide on the new version number (using [semantic versioning](http://semver.org/)).
-
-Everything here is HIGHLY PRELIMINARY!!! This will be a lot easier once Travis/Jenkins is up.
-
-1. Make sure all changes have been PR'd into master
-1. Check out a clean copy of master
-1. Run `check-manifest` at project root to make sure the distribution will include the necessary files.
-1. Increment the `default_version_tag` field in `moldesign.compute.config`, and commit the change
-1. Tag your local branch with the release number: `git tag [version]` (note: delete this tag with `git tag rm [version]` if you need to abort the release)
-4. Build new docker images: `cd docker_images; ./dockermake.py --all --repo docker.io/Autodesk/moldesign: --tag [version]`
-1. Confirm that all tests are passing *with and without* locally installed dependencies (pyscf, openbabel, etc)
-1. Confirm that all tutorial and example notebooks run without errors.
-
-If this is all succesfull - you're ready to make it public.
-
-1. Push docker images to cloud: `cd docker_images; ./dockermake.py --all --push --repo docker.io/Autodesk/moldesign: --tag [version]`
-4. `python setup.py register -r pypi`
-5. `python setup.py sdist upload -r pypi`
-1. `git push origin master --tags`
-
-The final step is the point of no return - you'll need to prep a new release if you discover a problem. Before that, you can undo
-what you've done by deleting your release off of PyPI and DockerHub.
-
+1. Decide on the new version number (using [semantic versioning](http://semver.org/)). For our purposes here, we'll pretend it's `0.9.3`.
+1. Tag the relevant commit (the build must be passing) with a release candidate version number, e.g., `0.9.3rc1`. Note that this commit must be passing the full nightly test battery in all test environments (still WIP 11/2/16)
+1. After travis finishes building all deployment artifacts (still WIP 11/2/16), manually test all examples and tutorials from a docker container by:
+  A. Running `docker run -it -p 8888:8888 moldesign_notebook`, then
+  B. Testing the notebooks at http://localhost:8888
+1. If something isn't working right, keep working, and keep tagging release candidates with `0.9.3.rc2`, `0.9.3rc3`, ..., until it works
+1. If it IS working, tag THE SAME COMMIT YOU JUST TESTED (the one already tagged as a release candidate) with its final version string - that's `0.9.3` here.
 
 
 # Maintainers: updating docs

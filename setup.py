@@ -66,12 +66,13 @@ class PostInstall(install):
         install.run(self)
         self.prompt_intro()
 
-    def prompt_intro(self):
-        print 'Thank you for installing the Molecular Design Toolkit!!!'
-        print 'For help, documentation, and any questions, visit us at '
-        print '    http://moldesign.bionano.autodesk.com/'
-        print '\nTo get started, please run:'
-        print ' >>> python -m moldesign intro'
+    def prompt_intro(self):  # this doesn't actually display - print statements don't work?
+        print('Thank you for installing the Molecular Design Toolkit!!!')
+        print('For help, documentation, and any questions, visit us at ')
+        print('    http://moldesign.bionano.autodesk.com/')
+        print('\nTo get started, please run:')
+        print(' >>> python -m moldesign intro')
+
 
 cmdclass = versioneer.get_cmdclass()
 cmdclass['install'] = PostInstall
