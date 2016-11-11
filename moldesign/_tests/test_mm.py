@@ -58,10 +58,12 @@ def openbabel_mmff94s(small_molecule):
     return small_molecule
 
 
-@typedfixture('hasmodel')
-def openbabel_uff(small_molecule):
-    small_molecule.set_energy_model(mdt.models.OpenBabelPotential, forcefield='uff')
-    return small_molecule
+# This test (along with the uff energy model) because it does not appear to return a gradient
+# that's consistent with the energy surface
+#@typedfixture('hasmodel')
+#def openbabel_uff(small_molecule):
+#    small_molecule.set_energy_model(mdt.models.OpenBabelPotential, forcefield='uff')
+#    return small_molecule
 
 
 @typedfixture('hasmodel')
