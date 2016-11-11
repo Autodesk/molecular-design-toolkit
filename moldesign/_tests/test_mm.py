@@ -58,8 +58,8 @@ def openbabel_mmff94s(small_molecule):
     return small_molecule
 
 
-# This test (along with the uff energy model) because it does not appear to return a gradient
-# that's consistent with the energy surface
+# This test (along with the uff energy model) is disabled because it does not appear to return a
+# gradient that's consistent with the energy surface
 #@typedfixture('hasmodel')
 #def openbabel_uff(small_molecule):
 #    small_molecule.set_energy_model(mdt.models.OpenBabelPotential, forcefield='uff')
@@ -112,7 +112,7 @@ def test_analytical_vs_numerical_forces(objkey, request):
                                mol.calculate_potential_energy,
                                atoms=atoms,
                                step=0.005*u.angstrom)
-    assert (anagrad-numgrad).norm()/(3.0*len(atoms)) <= 1.0e-4 * u.eV / u.angstrom
+    assert (anagrad-numgrad).norm()/(3.0*len(atoms)) <= 5.0e-4 * u.eV / u.angstrom
 
 
 @pytest.mark.parametrize('objkey', registered_types['hasmodel'])
