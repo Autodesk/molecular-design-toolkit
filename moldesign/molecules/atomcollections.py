@@ -514,7 +514,10 @@ class AtomList(list, AtomContainer):
         otherset = set(other)
         return type(self)(atom for atom in self if atom not in otherset)
 
-    # alas for self so that this works with AtomContainer methods
+    def __add__(self, other):
+        return type(self)(itertools.chain(self, other))
+
+    # alias for self so that this works with AtomContainer methods
     @property
     def atoms(self):
         return self
