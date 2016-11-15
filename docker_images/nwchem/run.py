@@ -2,6 +2,7 @@
 """
 This script drives an NWChem calculation given a generic QM specification
 """
+import json
 import os
 
 
@@ -19,12 +20,12 @@ def run_calculation(parameters):
 
     # write input
     inputs = _make_input_files(parameters)
-    for filename, contents in inputs:
+    for filename, contents in inputs.iteritems():
         with open(filename, 'w') as inputfile:
             inputfile.write(contents)
 
     # run the command
-    cmd = 'nwchem nw.in'
+    cmd = 'nwchem nw.in > nw.out'
     if 'num_processors' in parameters:
         cmd += 'mpirun -n %d' % parameters['num_processors']
 
@@ -34,8 +35,7 @@ def run_calculation(parameters):
 ##### helper routines below ######
 
 def _make_input_files(calc):
-    nwin = ['title %s\nstart' % calc.get('name', 'unnamed calculation'),
-            _header(calc),
+    nwin = [_header(calc),
             _geom_block(calc),
             _basisblock(calc),
             _chargeblock(calc),
@@ -101,11 +101,11 @@ def _taskblock(calc):
 
 
 def _multiplicityline(calc):
-    return 'mult %s' % calc['multiplicity']
+    return 'mult %s' % calc.get('multiplicity', 1)
 
 
 def _chargeblock(calc):
-    return '\ncharge %s\n' % calc['charge']
+    return '\ncharge %s\n' % calc.get('charge', 0)
 
 
 def _theorylines(calc):
@@ -114,3 +114,9 @@ def _theorylines(calc):
     else:
         return ''
 
+
+if __name__ == '__main__':
+    with open('params.json','r') as pjson:
+        parameters = json.load(pjson)
+
+    run_calculation(parameters)

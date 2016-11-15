@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
+
 import pyccc
 
 import moldesign as mdt
@@ -20,91 +22,59 @@ from .base import QMBase
 
 IMAGE = 'nwchem'
 
-TASKNAMES = {'rhf': 'scf',
-             'uks': 'scf',
-             'rks': 'dft',
-             'uks': 'dft'}
-
-SCFNAMES = {'rhf': 'rhf',
-            'uks': 'uhf',
-            'rks': 'rhf',
-            'uks': 'uhf'}
-
 class NWChemQM(QMBase):
+    """ Interface with NWChem package (QM only)
+
+    Note:
+        This is the first interface based on our new wrapping strategy. This is slightly hacked,
+        but has the potential to become very general; very few things here are NWChem-specific
+    """
 
     def prep(self):
-        self._scfname = SCFNAMES[self.params.theory]
-        self._taskname = TASKNAMES[self.params.theory]
         self._prepped = True
 
     def calculate(self, requests=None):
         self.prep()
 
-        grad = (requests is not None and 'forces' in requests)
+        parameters = self.params.copy()
+        if requests is not None:
+            parameters['properties'] = list(requests)
 
-        job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
-                        command='nwchem nw.in && get_results.py',
-                        inputs=self.make_input_files(grad=grad),
-                        when_finished=self.get_results)
+        parameters['constraints'] = []
+        for constraint in self.mol.constraints:
+            raise NotImplementedError()
+
+        parameters['charge'] = self.mol.charge.value_in(u.q_e)
+        parameters['runType'] = 'singlePoint'
+
+        job = pyccc.Job(  # image=mdt.compute.get_image_path(IMAGE),
+                image=IMAGE,
+                command='run.py && getresults.py',
+                inputs={'input.xyz': self.mol.write(format='xyz'),
+                        'params.json': json.dumps(parameters)},
+                when_finished=self.finish,
+                name='nwchem/%s' % self.mol.name)
 
         return mdt.compute.run_job(job, _return_result=True)
 
-    def make_input_files(self, grad=False):
-        nwin = ['title %s\nstart' % self.mol.name,
-                self._header(),
-                self._geom_block(self.mol),
-                self._basisblock(),
-                self._chargeblock(),
-                self._theoryblock(),
-                self._taskblock(grad)]
+    def finish(self, job):
+        results = json.loads(job.get_output('results.json').read())
+        assert len(results['states']) == 1
 
-        return {'nw.in': '\n'.join(nwin)}
-
-    def get_results(self):
-        raise NotImplementedError()
+        jsonprops = results['states'][0]['calculated']
+        result = mdt.MolecularProperties(self.mol,
+                                         **self._get_properties(jsonprops))
+        return result
 
     @staticmethod
-    def _geom_block(mol):
-        lines = ['geometry units angstrom noautoz noautosym']
-        for atom in mol.atoms:
-            lines.append('  %s  %24.14e  %24.14e  %24.14e' %
-                         (atom.symbol,
-                          atom.x.value_in(u.angstrom),
-                          atom.y.value_in(u.angstrom),
-                          atom.z.value_in(u.angstrom)))
-        lines.append('end')
-        return '\n'.join(lines)
+    def _get_properties(jsonprops):
+        props = {}
+        for name, property in jsonprops.iteritems():
+            if isinstance(property, dict) and len(property) == 2 and \
+                            'units' in property and 'value' in property:
+                props[name] = property['value'] * u.ureg(property['units'])
+            else:
+                props[name] = property
 
-    def _basisblock(self):
-        return 'basis\n  * library %s\nend' % self.params.basis  # TODO: translate names
-
-    def _theoryblock(self):
-        lines = [self._taskname,
-                 self._multiplicityline(),
-                 self._theorylines(),
-                 'end'
-                 ]
-        return '\n'.join(lines)
-
-    def _taskblock(self, grad):
-        if grad:
-            tasktype = 'gradient'
-        else:
-            tasktype = 'energy'
-        return 'task %s %s' % (self._taskname, tasktype)
-
-    def _multiplicityline(self):
-        return 'mult %s' % self.params.multiplicity
-
-    def _chargeblock(self):
-        return '\ncharge %s\n' % self.mol.charge.value_in(u.q_e)
-
-    def _header(self):
-        return '\nstart mol\n\npermanent_dir ./perm\n'
-
-    def _theorylines(self):
-        if self._taskname == 'dft':
-            return 'XC %s' % self.params.functional
-        else:
-            return ''
+        return props
 

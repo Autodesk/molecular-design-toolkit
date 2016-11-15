@@ -38,11 +38,8 @@ def prep():
     global _PROPERTYGROUP
 
     nwchem.rtdb_open('perm/mol.db', 'old')
-    theory = get_theory()
-    if theory != 'dft':
-        raise NotImplementedError
 
-    _PROPERTYGROUP = theory
+    _PROPERTYGROUP = nwchem.rtdb_get('task:theory')
 
 
 ##### Units #####
@@ -161,7 +158,7 @@ def _get_method_description():
                     'citation': get_package_citation()},
         'basis': get_basis(),
         'scf': get_scftype(),
-        'theory': get_theory() }
+        'theory': get_theory()}
 
     if result['theory'] == 'dft':
         result['functional'] = get_functional()
@@ -172,7 +169,7 @@ def _get_calculated_properties():
     props = {'method': _get_method_description()}
 
     _insert_if_present(props, 'dipole', get_dipole(), get_dipole_units())
-    _insert_if_present(props, 'gradient', get_forces(), get_force_units())
+    _insert_if_present(props, 'forces', get_forces(), get_force_units())
     _insert_if_present(props, 'potential_energy', get_potential_energy(), get_energy_units())
 
     return props
@@ -210,9 +207,8 @@ def _main():
               'topology': topology,
               'states': [state]}
 
-    print json.dumps(result)
-
-
+    with open('results.json', 'w') as outfile:
+        json.dump(result, outfile)
 
 
 if __name__ == '__main__':

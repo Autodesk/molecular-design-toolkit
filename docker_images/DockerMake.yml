@@ -372,7 +372,7 @@ nwchem:
   - base
  build_directory: nwchem/
  build: |
-   RUN apt-get update \
+   RUN apt-get clean && apt-get update \
        && apt-get install -y \
            python-dev \
            gfortran \
@@ -382,13 +382,14 @@ nwchem:
            tcsh \
            make \
            wget \
+           git \
        && apt-get -y clean \
        && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-   ENV FILE=Nwchem-6.6.revision27746-src.2015-10-20.tar.gz
+   ENV NWCHEMFILE=Nwchem-6.6.revision27746-src.2015-10-20.tar.gz
    RUN cd /opt \
-    && wget --trust-server-names -nv http://www.nwchem-sw.org/download.php?f=$FILE \
-    && tar xzf $FILE \
-    && rm $FILE
+    && wget --trust-server-names -nv http://www.nwchem-sw.org/download.php?f=$NWCHEMFILE \
+    && tar xzf $NWCHEMFILE \
+    && rm $NWCHEMFILE
    ENV USE_MPI=y                           \
        NWCHEM_TARGET=LINUX64               \
        USE_PYTHONCONFIG=y                  \
@@ -409,8 +410,14 @@ nwchem:
        && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
    RUN cd $NWCHEM_TOP/src \
       && make -j 12
-   RUN cd /usr/local/bin \
-     && ln -s $NWCHEM_TOP/bin/LINUX64/nwchem .
+   RUN ln -s $NWCHEM_TOP/bin/LINUX64/nwchem /usr/bin/nwchem
+   RUN git clone https://github.com/NWChem-Python/nwapi \
+     && cd nwapi \
+     && make -f makefile.linux \
+     && python setup.py install
+   COPY run.py getresults.py /usr/bin/
+   RUN chmod +x /usr/bin/getresults.py /usr/bin/run.py
+
 
 
 
