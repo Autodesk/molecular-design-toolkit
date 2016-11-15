@@ -13,23 +13,29 @@ def run_calculation(parameters):
         parameters (dict): dictionary describing this run (see
            https://github.com/Autodesk/molecular-design-toolkit/wiki/Generic-parameter-names )
     """
-
-    # check that coordinates were passed
-    assert os.path.isfile('input.xyz'), 'Expecting input coordinates at input.xyz'
-    os.mkdir('./perm')
-
-    # write input
-    inputs = _make_input_files(parameters)
-    for filename, contents in inputs.iteritems():
-        with open(filename, 'w') as inputfile:
-            inputfile.write(contents)
-
-    # run the command
     cmd = 'nwchem nw.in > nw.out'
     if 'num_processors' in parameters:
         cmd += 'mpirun -n %d' % parameters['num_processors']
 
     os.system(cmd)
+
+
+def write_inputs(parameters):
+    """ Write input files using passed parameters
+
+    Args:
+        parameters (dict): dictionary describing this run (see
+           https://github.com/Autodesk/molecular-design-toolkit/wiki/Generic-parameter-names )
+    """
+
+    # check that coordinates were passed
+    assert os.path.isfile('input.xyz'), 'Expecting input coordinates at input.xyz'
+    os.mkdir('./perm')
+
+    inputs = _make_input_files(parameters)
+    for filename, contents in inputs.iteritems():
+        with open(filename, 'w') as inputfile:
+            inputfile.write(contents)
 
 
 ##### helper routines below ######
@@ -40,6 +46,7 @@ def _make_input_files(calc):
             _basisblock(calc),
             _chargeblock(calc),
             _theoryblock(calc),
+            _otherblocks(calc),
             _taskblock(calc)]
 
     return {'nw.in': '\n'.join(nwin)}
@@ -66,6 +73,14 @@ def _theoryblock(calc):
              _theorylines(calc),
              'end'
              ]
+    return '\n'.join(lines)
+
+
+def _otherblocks(calc):
+    lines = []
+    if calc['runType'] == 'minimization' and 'minimization_steps' in calc:
+        lines.append('driver\n  maxiter %d\nend\n' % calc['minimization_steps'])
+
     return '\n'.join(lines)
 
 
@@ -119,4 +134,5 @@ if __name__ == '__main__':
     with open('params.json','r') as pjson:
         parameters = json.load(pjson)
 
+    write_inputs(parameters)
     run_calculation(parameters)

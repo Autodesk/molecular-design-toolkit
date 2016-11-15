@@ -22,6 +22,13 @@ from .base import QMBase
 
 IMAGE = 'nwchem'
 
+def exports(o):
+    __all__.append(o.__name__)
+    return o
+__all__ = []
+
+
+@exports
 class NWChemQM(QMBase):
     """ Interface with NWChem package (QM only)
 
@@ -31,21 +38,22 @@ class NWChemQM(QMBase):
     """
 
     def prep(self):
-        self._prepped = True
-
-    def calculate(self, requests=None):
-        self.prep()
-
         parameters = self.params.copy()
-        if requests is not None:
-            parameters['properties'] = list(requests)
 
         parameters['constraints'] = []
         for constraint in self.mol.constraints:
             raise NotImplementedError()
 
         parameters['charge'] = self.mol.charge.value_in(u.q_e)
+        self._jobparams = parameters
+        self._prepped = True
+
+    def calculate(self, requests=None):
+        self.prep()
+
+        parameters = self._jobparams.copy()
         parameters['runType'] = 'singlePoint'
+        parameters['properties'] = list(requests)
 
         job = pyccc.Job(  # image=mdt.compute.get_image_path(IMAGE),
                 image=IMAGE,
@@ -77,4 +85,23 @@ class NWChemQM(QMBase):
                 props[name] = property
 
         return props
+
+    def minimize(self, nsteps=None):
+        self.prep()
+
+        parameters = self._jobparams.copy()
+
+        parameters['runType'] = 'minimization'
+        if nsteps is not None:
+            parameters['minimization_steps'] = 100
+
+        job = pyccc.Job(  # image=mdt.compute.get_image_path(IMAGE),
+                image=IMAGE,
+                command='run.py && getresults.py',
+                inputs={'input.xyz': self.mol.write(format='xyz'),
+                        'params.json': json.dumps(parameters)},
+                when_finished=self.finish,
+                name='nwchem/%s' % self.mol.name)
+
+        return mdt.compute.run_job(job, _return_result=True)
 

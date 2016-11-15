@@ -415,8 +415,8 @@ nwchem:
      && cd nwapi \
      && make -f makefile.linux \
      && python setup.py install
-   COPY run.py getresults.py /usr/bin/
-   RUN chmod +x /usr/bin/getresults.py /usr/bin/run.py
+   COPY run.sh run.py getresults.py /usr/bin/
+   RUN chmod +x /usr/bin/getresults.py /usr/bin/run.py /usr/bin/run.sh
 
 
 

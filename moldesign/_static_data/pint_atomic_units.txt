@@ -9,3 +9,5 @@ amu = 1.0 * atomic_mass_units
 ang = 1.0 * angstrom
 eV = electron_volt
 debye = 0.393430307 * elementary_charge * bohr
+electron_charge = elementary_charge
+q_e = elementary_charge
