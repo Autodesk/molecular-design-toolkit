@@ -1,0 +1,11 @@
+name: NWChem6.6
+coordinateFormat: xyz
+minimizer: True
+packageType: qm
+constraints:
+  - atom
+restraints:
+  - atom
+  - bond
+  - angle
+  - dihedral

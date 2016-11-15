@@ -1,0 +1,116 @@
+#!/usr/bin/env python
+"""
+This script drives an NWChem calculation given a generic QM specification
+"""
+import os
+
+
+def run_calculation(parameters):
+    """ Drive the calculation, based on passed parameters
+
+    Args:
+        parameters (dict): dictionary describing this run (see
+           https://github.com/Autodesk/molecular-design-toolkit/wiki/Generic-parameter-names )
+    """
+
+    # check that coordinates were passed
+    assert os.path.isfile('input.xyz'), 'Expecting input coordinates at input.xyz'
+    os.mkdir('./perm')
+
+    # write input
+    inputs = _make_input_files(parameters)
+    for filename, contents in inputs:
+        with open(filename, 'w') as inputfile:
+            inputfile.write(contents)
+
+    # run the command
+    cmd = 'nwchem nw.in'
+    if 'num_processors' in parameters:
+        cmd += 'mpirun -n %d' % parameters['num_processors']
+
+    os.system(cmd)
+
+
+##### helper routines below ######
+
+def _make_input_files(calc):
+    nwin = ['title %s\nstart' % calc.get('name', 'unnamed calculation'),
+            _header(calc),
+            _geom_block(calc),
+            _basisblock(calc),
+            _chargeblock(calc),
+            _theoryblock(calc),
+            _taskblock(calc)]
+
+    return {'nw.in': '\n'.join(nwin)}
+
+
+def _header(calc):
+    return '\nstart mol\n\npermanent_dir ./perm\n'
+
+
+def _geom_block(calc):
+    lines = ['geometry units angstrom noautoz noautosym nocenter',
+             '  load format xyz input.xyz',
+             'end']
+    return '\n'.join(lines)
+
+
+def _basisblock(calc):
+    return 'basis\n  * library %s\nend' % calc['basis']  # TODO: translate names
+
+
+def _theoryblock(calc):
+    lines = [_taskname(calc),
+             _multiplicityline(calc),
+             _theorylines(calc),
+             'end'
+             ]
+    return '\n'.join(lines)
+
+
+TASKNAMES = {'rhf': 'scf',
+             'uhf': 'scf',
+             'rks': 'dft',
+             'uks': 'dft'}
+
+
+def _taskname(calc):
+    return TASKNAMES[calc['theory']]
+
+
+SCFNAMES = {'rhf': 'rhf',
+            'uhf': 'uhf',
+            'rks': 'rhf',
+            'uks': 'uhf'}
+
+
+def _scfname(calc):
+    return SCFNAMES[calc['theory']]
+
+
+def _taskblock(calc):
+    if calc['runType'] == 'minimization':
+        tasktype = 'optimize'
+    elif 'forces' in calc['properties']:
+        tasktype = 'gradient'
+    else:
+        tasktype = 'energy'
+
+    return 'task %s %s' % (_taskname(calc), tasktype)
+
+
+def _multiplicityline(calc):
+    return 'mult %s' % calc['multiplicity']
+
+
+def _chargeblock(calc):
+    return '\ncharge %s\n' % calc['charge']
+
+
+def _theorylines(calc):
+    if _taskname(calc) == 'dft':
+        return 'XC %s' % calc['functional']
+    else:
+        return ''
+

@@ -65,8 +65,26 @@ def get_force_units():
 
 ##### Calculation description #####
 
+# TODO: semantics for reference wfns / post-HF methods. How do we denote CIS/UHF?
+
 def get_theory():
-    return nwchem.rtdb_get('task:theory')
+    theory = nwchem.rtdb_get('task:theory').lower()
+    if theory == 'dft':
+        scf = nwchem.rtdb_get('dft:scftype').lower()
+    else:
+        scf = nwchem.rtdb_get('scf:scftype').lower()
+
+    if theory == 'scf':
+        return scf
+    elif theory == 'dft':
+        if scf == 'uhf':
+            return 'uks'
+        elif scf =='rhf':
+            return 'rks'
+
+    # if here, it wasn't handled
+    raise NotImplementedError('%s %s' % (theory, scf))
+
 
 def get_scftype():
     if nwchem.rtdb_get('task:theory').lower() == 'dft':
@@ -117,8 +135,11 @@ def get_dipole():
     return nwchem.rtdb_get('%s:dipole' % _PROPERTYGROUP)
 
 def get_forces():
-    forces = nwchem.rtdb_get('%s:gradient' % _PROPERTYGROUP)
-    return _reshape_atom_vector([-f for f in forces])
+    try:
+        forces = nwchem.rtdb_get('%s:gradient' % _PROPERTYGROUP)
+        return _reshape_atom_vector([-f for f in forces])
+    except:
+        return None
 
 def get_potential_energy():
     return nwchem.rtdb_get('%s:energy' % _PROPERTYGROUP)
