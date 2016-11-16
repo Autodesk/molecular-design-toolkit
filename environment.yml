@@ -1,5 +1,6 @@
 name: moldesign_env
 channels:
+ - bioconda
  - omnia
 dependencies:
  - python=2.7
