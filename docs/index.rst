@@ -1,13 +1,13 @@
 Molecular Design Toolkit |version|
 ##################################
 
-Molecular science is hard - the software shouldn't make it harder. The `Molecular Design Toolkit <http://moldesign.bionano.autodesk.com/>`_ offers access to a large and still-growing set of computational modeling methods from a science-focused, Python API. When you
-call MDT functions from a Jupyter notebook, you'll also be get inline 2D and 3D visualization,
-plotting support, and interactivity.
+The `Molecular Design Toolkit <http://moldesign.bionano.autodesk.com/>`_ offers access to a large and still-growing set of computational modeling methods with a science-focused Python API. When you
+call MDT functions from a Jupyter notebook, you'll also get inline 2D and 3D visualization,
+ready-to-plot data structures, and interactive user interfaces. MDT is free, open source, and built for scientific collaboration.
+
 
 `Try a live demo now. <http://mybinder.org/repo/avirshup/mdt-gallery-test>`_
 
-MDT is free, open source, and is built for scientific collaboration.
 
 
 
@@ -38,10 +38,28 @@ MDT is free, open source, and is built for scientific collaboration.
 .. toctree::
    :maxdepth: 2
    :numbered:
-   :caption: API Reference
+   :caption: Physical object API
 
-   api/general
-   api/atoms
+   api/datastructures
+   api/molecule
+   api/biopolymer
+   api/wfn
+
+
+.. toctree::
+   :maxdepth: 1
+   :numbered:
+   :caption: Simulation and tools API
+
+   _mdt_api/moldesign.geom.rst
+   _mdt_api/moldesign.widgets.rst
+   _mdt_api/moldesign.tools.rst
+   _mdt_api/moldesign.models.rst
+   _mdt_api/moldesign.integrators.rst
+   _mdt_api/moldesign.data.rst
+
+
+
 
 * :ref:`Alphabetical index <genindex>`
 * :ref:`Search <search>`

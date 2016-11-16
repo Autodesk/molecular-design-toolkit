@@ -57,7 +57,7 @@ Depending on how python is installed on your system, you may need to run this in
 We've encountered issues trying to install Jupyter with MacOS's built-in python distribution. We highly recommend using `Homebrew <http://brew.sh/>` to install a friendlier version of Python that doesn't require root permissions; see http://docs.python-guide.org/en/latest/starting/install/osx/ for instructions.
 
 **Python version**
-The toolkit is not yet compatible with Python 3. For now, make sure you're using Python 2 to install and run everything.
+The toolkit is not yet compatible with Python 3. For now, make sure you're using Python 2.7 to install and run everything.
 
 
 Notebook extensions
@@ -67,6 +67,14 @@ MDT will automatically install and enable the ``nbmolviz`` and ``widgetsnbextens
 .. code-block:: bash
 
     jupyter nbextension list
+
+
+They can be turned on, if necessary, by running:
+
+.. code-block:: bash
+
+    jupyter nbextension enable --python nbwidgetsextension
+    jupyter nbextension enable --python nbmolviz
 
 
 Optional python installs

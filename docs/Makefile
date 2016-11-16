@@ -54,10 +54,11 @@ help:
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILDDIR) moldesign_api
+	rm -rf $(BUILDDIR) _moldesign_api _mdt_api
 
 moldesign_api:
 	./autogen_api.sh
+	python generate_api.py
 
 html dirhtml singlehtml pickle json htmlhelp qthelp applehelp devhelp epub \
 epub3 latex latexpdf latexpdfja text man texinfo info gettext changes xml \

@@ -89,6 +89,8 @@ CHAIN_MONOMER_NAMES = {'dna': 'dna base',
 # This is a very big dict, so we load it as a compressed database
 _bondfilename = os.path.join(PACKAGEPATH, '_static_data/residue_bonds')
 RESIDUE_BONDS = utils.CompressedJsonDbm(_bondfilename, 'r', dbm=utils.ReadOnlyDumb)
+""" Database of bonds, as determined by the PDB chemical component dictionary.
+Accessed similarly to a dict, but not stored in memory."""
 
 AMINO_NAMES = {
     "ALA": "Alanine",
@@ -117,6 +119,7 @@ AMINO_NAMES = {
     "TYR": "Tyrosine",
     "VAL": "Valine",
     "UNK": "Undetermined"}
+""" Maps 3-letter codes to common names """
 
 NUCLEIC_NAMES = {
     'A': 'Adenine',
@@ -125,6 +128,7 @@ NUCLEIC_NAMES = {
     'I': 'Inosine',  # actually not sure about this one
     'T': 'Thymine',
     'U': 'Uracil'}
+""" Maps 1-letter nucleic base codes to common names """
 
 IONS = {'NA': 'Na+',
         'K': 'K+',
@@ -134,6 +138,7 @@ IONS = {'NA': 'Na+',
         'Cl': 'Cl-',
         'Br': 'Br-',
         'I': 'I-'}
+""" Maps PDB residue names for ions to common names"""
 
 RESTYPES = dict(
     protein=set(AMINO_NAMES),
