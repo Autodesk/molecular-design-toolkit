@@ -1,7 +1,7 @@
 name: moldesign_env
 channels:
- - bioconda
  - omnia
+ - bioconda
 dependencies:
  - python=2.7
  - biopython
@@ -14,15 +14,15 @@ dependencies:
  - pyyaml
  - requests
  - scipy
- - openbabel
+ - openbabel >= 2.3
  - openmm
  - pip:
+   - ipython
+   - notebook
    - webcolors
    - funcsigs
    - docker-py
    - fortranformat
    - pyccc >= 0.6.6
-   - ipython >= 4.2  # the conda version's backports packages don't import correctly ...
-   - ipywidgets >= 6.0.0b1
-   - notebook >= 4.2
+   - ipywidgets == 6.0.0b1
    - nbmolviz == 0.6.7rc2  # increment for release as appropriate

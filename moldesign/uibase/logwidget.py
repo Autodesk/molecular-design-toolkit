@@ -11,15 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import base64
-import io
 import logging
-import os
+
 from collections import OrderedDict
 
 import IPython.display
 import ipywidgets as ipy
-import traitlets
 
 import moldesign as mdt
 
@@ -39,13 +36,7 @@ _prev_tabs = None
 _current_tabs = None
 _capture_enabled = False
 
-# TODO: Something better than this
-try:
-    ipy.Text()
-except traitlets.TraitError:
-    widgets_enabled = False
-else:
-    widgets_enabled = True
+widgets_enabled = mdt.utils.running_in_notebook()
 
 
 def display_log(obj, title=None, show=False):
