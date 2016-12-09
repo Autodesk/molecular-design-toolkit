@@ -100,8 +100,19 @@ class NWChemQM(QMBase):
                 command='run.py && getresults.py',
                 inputs={'input.xyz': self.mol.write(format='xyz'),
                         'params.json': json.dumps(parameters)},
-                when_finished=self.finish,
+                when_finished=self.finish_min,
                 name='nwchem/%s' % self.mol.name)
 
         return mdt.compute.run_job(job, _return_result=True)
+
+    def finish_min(self, job):
+        # TODO: do a better job here
+        properties = self.finish(job)
+        traj = mdt.Trajectory(self.mol)
+        traj.new_frame()
+        self.mol.positions = properties.positions
+        self.mol.properties = properties
+        traj.new_frame()
+        return traj
+
 

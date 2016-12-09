@@ -81,7 +81,7 @@ def read(f, format=None):
     else:  # default to openbabel if there's not an explicit reader for this format
         mol = openbabel_interface.read_stream(fileobj, format)
 
-    if filename is not None:
+    if filename is not None and mol.name not in (None, 'untitled'):
         mol.name = filename
 
     return mol
