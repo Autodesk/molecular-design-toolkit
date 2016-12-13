@@ -49,26 +49,30 @@ class NWChemQM(QMBase):
         self._prepped = True
 
     def calculate(self, requests=None):
-        self.prep()
+        job = self._make_calculation_job(requests)
 
+        return mdt.compute.run_job(job, _return_result=True)
+
+    def _make_calculation_job(self, requests=None):
+        self.prep()
         parameters = self._jobparams.copy()
         parameters['runType'] = 'singlePoint'
         parameters['properties'] = list(requests)
-
         job = pyccc.Job(  # image=mdt.compute.get_image_path(IMAGE),
                 image=IMAGE,
                 command='run.py && getresults.py',
                 inputs={'input.xyz': self.mol.write(format='xyz'),
                         'params.json': json.dumps(parameters)},
                 when_finished=self.finish,
-                name='nwchem/%s' % self.mol.name)
-
-        return mdt.compute.run_job(job, _return_result=True)
+                name='nwchem/%s'%self.mol.name)
+        return job
 
     def finish(self, job):
         results = json.loads(job.get_output('results.json').read())
-        assert len(results['states']) == 1
+        return self._process_results(results)
 
+    def _process_results(self, results):
+        assert len(results['states']) == 1
         jsonprops = results['states'][0]['calculated']
         result = mdt.MolecularProperties(self.mol,
                                          **self._get_properties(jsonprops))
@@ -87,14 +91,16 @@ class NWChemQM(QMBase):
         return props
 
     def minimize(self, nsteps=None):
+        job = self._make_minimization_job(nsteps)
+
+        return mdt.compute.run_job(job, _return_result=True)
+
+    def _make_minimization_job(self, nsteps):
         self.prep()
-
         parameters = self._jobparams.copy()
-
         parameters['runType'] = 'minimization'
         if nsteps is not None:
             parameters['minimization_steps'] = 100
-
         job = pyccc.Job(  # image=mdt.compute.get_image_path(IMAGE),
                 image=IMAGE,
                 command='run.py && getresults.py',
@@ -102,11 +108,10 @@ class NWChemQM(QMBase):
                         'params.json': json.dumps(parameters)},
                 when_finished=self.finish_min,
                 name='nwchem/%s' % self.mol.name)
-
-        return mdt.compute.run_job(job, _return_result=True)
+        return job
 
     def finish_min(self, job):
-        # TODO: do a better job here
+        # TODO: parse more data than just the final minimization state
         properties = self.finish(job)
         traj = mdt.Trajectory(self.mol)
         traj.new_frame()
