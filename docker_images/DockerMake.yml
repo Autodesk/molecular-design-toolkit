@@ -84,6 +84,7 @@ devtools:
 # Note - this is built by CLONING the current repo, then building an sdist, then installing that.
 # It's convoluted, but it's to replicate what actually gets installed via PyPI
 moldesign:
+ description: Base installation of the MDT library. Built by cloning the current git repo.
  requires:  # TODO: remove biopython dependency (it's in C ...)
   - python_install
   - biopython
@@ -130,13 +131,25 @@ moldesign_notebook:
 
 
 moldesign_complete:
-  description: An image with moldesign and all its dependencies
+  description: An image with moldesign and all python dependencies
   requires:
    - moldesign_notebook
   build: |
    ENTRYPOINT []
    CMD ''
 
+moldesign_standalone:
+  description: |
+       Complete image INCLUDING binary dependencies, which run in container
+       subprocesses (i.e., NOT with CCC)
+  requires:
+     - moldesign_complete
+     - nwchem
+     - ambertools
+     #- opsin - there's a base image conflict with this
+  build: |
+    RUN mkdir -p ~/.moldesign \
+     && echo "engine_type: subprocess" > ~/.moldesign/moldesign.yml
 
 moldesign_minimal:
    description: |
@@ -371,52 +384,83 @@ nwchem:
  requires:
   - base
  build_directory: nwchem/
+ description: Based on https://github.com/edoapra/docker-file/tree/master/nwchem-dev
  build: |
-   RUN apt-get clean && apt-get update \
-       && apt-get install -y \
-           python-dev \
-           gfortran \
-           libopenblas-dev \
-           libopenmpi-dev \
-           openmpi-bin \
-           tcsh \
-           make \
-           wget \
-           git \
-       && apt-get -y clean \
-       && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-   ENV NWCHEMFILE=Nwchem-6.6.revision27746-src.2015-10-20.tar.gz
-   RUN cd /opt \
-    && wget --trust-server-names -nv http://www.nwchem-sw.org/download.php?f=$NWCHEMFILE \
-    && tar xzf $NWCHEMFILE \
-    && rm $NWCHEMFILE
-   ENV USE_MPI=y                           \
-       NWCHEM_TARGET=LINUX64               \
-       USE_PYTHONCONFIG=y                  \
-       PYTHONVERSION=2.7                   \
-       PYTHONHOME=/usr                     \
-       BLASOPT="-lopenblas -lpthread -lrt" \
-       BLAS_SIZE=4                         \
-       USE_64TO32=y                        \
-       NWCHEM_TOP=/opt/nwchem-6.6
-   RUN cd $NWCHEM_TOP/src \
-      && make nwchem_config NWCHEM_MODULES="all python" \
-      && make -j 12 64_to_32
-   RUN apt-get update \
-       && apt-get install -y \
-            vim \
-            ssh \
-       && apt-get -y clean \
-       && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-   RUN cd $NWCHEM_TOP/src \
-      && make -j 12
-   RUN ln -s $NWCHEM_TOP/bin/LINUX64/nwchem /usr/bin/nwchem
-   RUN git clone https://github.com/NWChem-Python/nwapi \
-     && cd nwapi \
-     && make -f makefile.linux \
-     && python setup.py install
-   COPY run.sh run.py getresults.py /usr/bin/
-   RUN chmod +x /usr/bin/getresults.py /usr/bin/run.py /usr/bin/run.sh
+    RUN         apt-get update \
+                   && apt-get -y upgrade \
+                   && apt-get install -y  gfortran  libopenmpi-dev openmpi-bin tcsh make ssh patch \
+                                          curl subversion wget unzip perl \
+                   && apt-get clean
+    #get OpenBLAS and compile with 64-bit integers
+    WORKDIR     /opt
+    RUN         mkdir -p /opt/lib/ \
+                   && wget  https://github.com/xianyi/OpenBLAS/archive/develop.zip \
+                   && unzip develop.zip \
+                   && rm develop.zip \
+                   && cd  OpenBLAS-develop \
+                   && make -j3 TARGET=CORE2 INTERFACE64=1 NO_CBLAS=1 NO_LAPACK=1 NO_LAPACKE=1 libs shared \
+                   &&  cp libopenblas.* /opt/lib \
+                   && rm -rf /opt/OpenBLAS-develop
+    WORKDIR     /opt
+    ENV         NWCHEM_TOP="/opt/nwchem" \
+                   NWCHEM_TARGET=LINUX64 \
+                   NWCHEM_MODULES="nwdft driver stepper" \
+                   PYTHONVERSION=2.7 \
+                   PYTHONHOME="/usr" \
+                   USE_PYTHONCONFIG=Y \
+                   BLASOPT="-L/opt/lib -lopenblas" \
+                   BLAS_SIZE=8 \
+                   LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/lib" \
+                   USE_MPI=y \
+                   USE_MPIF=y \
+                   USE_MPIF4=y
+    #ENV         MRCC_METHODS=y
+    #ENV         CCSDTQ=y
+    #ENV         CCSDTLR=y
+    RUN         mkdir -p nwchem \
+                   && cd nwchem \
+                   && svn co --depth empty https://svn.pnl.gov/svn/nwchem/trunk/src \
+                   && cd src \
+                   && svn update GNUmakefile nwchem.F config \
+                        tools include basis geom inp input  \
+                        pstat rtdb task symmetry util peigs perfm bq cons blas lapack \
+                        NWints atomscf cphf ddscf driver gradients hessian nwdft optim property stepper symmetry vib \
+                   && rm -rf /opt/nwchem/.svn \
+                   && cd tools \
+                   && svn export --non-interactive --username nwchem --password nwchem \
+                          https://svn.pnl.gov/svn/hpctools/branches/ga-5-5  \
+                   && cd .. \
+                   #strip native compiler options as Fedora does
+                   && sed -i 's|-march=native||' config/makefile.h \
+                   && sed -i 's|-mtune=native|-mtune=generic|' config/makefile.h \
+                   && sed -i 's|-mfpmath=sse||' config/makefile.h \
+                   && sed -i 's|-msse3||' config/makefile.h  \
+                   && make nwchem_config && make -j3  \
+                   #clean unnecessary source to reduce docker size
+                   && rm -rf tce tools nwdft NWints geom symmetry util nwxc ddscf lapack blas rism \
+                          argos peigs rmdft gradients symmetry property smd lucia dplot propery \
+                          hessian ccsd mp2_grad moints cafe analyz dimqm /opt/nwchem/lib
+    ENV         FFIELD=amber \
+                   AMBER_1=${NWCHEM_TOP}/src/data/amber_s/ \
+                   AMBER_2=${NWCHEM_TOP}/src/data/amber_q/ \
+                   AMBER_3=${NWCHEM_TOP}/src/data/amber_x/ \
+                   AMBER_4=${NWCHEM_TOP}/src/data/amber_u/ \
+                   SPCE=${NWCHEM_TOP}/src/data/solvents/spce.rst \
+                   CHARMM_S=${NWCHEM_TOP}/src/data/charmm_s/ \
+                   CHARMM_X=${NWCHEM_TOP}/src/data/charmm_x/ \
+                   PATH=$PATH:${NWCHEM_TOP}/bin/LINUX64
+    COPY run.sh run.py getresults.py /usr/bin/
+    RUN chmod +x /usr/bin/getresults.py /usr/bin/run.py /usr/bin/run.sh
+    RUN apt-get install -y git make python python-dev \
+       && git clone https://github.com/NWChem-Python/nwapi \
+       && cd nwapi \
+       && make -f makefile.linux \
+       && python test.py \
+       && python setup.py install \
+       && apt-get -y remove --purge git make python-dev \
+       && apt-get -y autoremove --purge \
+       && apt-get -y clean
+    ENV NWCHEMFILE="From https://svn.pnl.gov/svn/nwchem/trunk/src"
 
 
 

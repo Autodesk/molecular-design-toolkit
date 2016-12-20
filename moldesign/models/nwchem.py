@@ -37,6 +37,8 @@ class NWChemQM(QMBase):
         but has the potential to become very general; very few things here are NWChem-specific
     """
 
+    DEFAULT_PROPERTIES = ['potential_energy']
+
     def prep(self):
         parameters = self.params.copy()
 
@@ -49,6 +51,7 @@ class NWChemQM(QMBase):
         self._prepped = True
 
     def calculate(self, requests=None):
+        if requests is None: requests = self.DEFAULT_PROPERTIES
         job = self._make_calculation_job(requests)
 
         return mdt.compute.run_job(job, _return_result=True)
