@@ -48,8 +48,22 @@ class Residue(Entity):
         self._backbone = None
         self._sidechain = None
         self._template_name = None
-        if self.name is None and self.pdbname is not None:
-            self.name = self.pdbname + str(self.pdbindex)
+        self._name = None
+
+    @property
+    def name(self):
+        if self._name is not None:
+            return self._name
+        elif self.pdbname is None:
+            return None
+        elif self.pdbindex is None:
+            return self._pdbname
+        else:
+            return self.pdbname + str(self.pdbindex)
+
+    @name.setter
+    def name(self, value):
+        self._name = value
 
     @property
     def atoms(self):
