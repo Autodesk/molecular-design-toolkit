@@ -218,9 +218,7 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
     if forcefields is None:
         forcefields = mdt.forcefields.ffdefaults.values()
     leapstr = ['source %s' % LEAPRCFILES[ff] for ff in forcefields]
-
-    # TLeap requires proper TER records, so we insert them into the PDB file
-    inputs = {'input.pdb': mdt.helpers.insert_ter_records(mol, mol.write(format='pdb'))}
+    inputs = {'input.pdb': mol.write(format='pdb')}
 
     if parameters:
         if isinstance(parameters, ExtraAmberParameters):

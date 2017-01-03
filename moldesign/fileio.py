@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import bz2
-import cPickle as pkl # TODO: if cpickle fails, retry with regular pickle to get a better traceback
+import cPickle as pkl  # TODO: if cpickle fails, retry with regular pickle to get a better traceback
 import cStringIO as StringIO
 import functools
 import gzip
@@ -22,7 +22,9 @@ import moldesign as mdt
 from moldesign.interfaces import biopython_interface
 import moldesign.interfaces.openbabel as openbabel_interface
 from moldesign.interfaces.openmm import amber_to_mol as read_amber
+from moldesign.interfaces.parmed_interface import write_pdb, write_mmcif
 from moldesign.helpers import pdb
+
 
 def exports(o, name=None):
     __all__.append(o.__name__)
@@ -197,7 +199,7 @@ def read_pdb(f, assign_ccd_bonds=True):
     """
     assemblies = pdb.get_pdb_assemblies(f)
     f.seek(0)
-    mol = mdt.interfaces.parmed_interface.parse_pdb(f)
+    mol = mdt.interfaces.parmed_interface.read_pdb(f)
     mol.properties.bioassemblies = assemblies
     f.seek(0)
     conect_graph = pdb.get_conect_records(f)
@@ -236,7 +238,7 @@ def read_mmcif(f):
     Returns:
         moldesign.Molecule: the parsed molecular structure
     """
-    mol = mdt.interfaces.parmed_interface.parse_mmcif(f)
+    mol = mdt.interfaces.parmed_interface.read_mmcif(f)
     f.seek(0)
     assemblies = biopython_interface.get_mmcif_assemblies(f)
     if assemblies:
@@ -367,7 +369,8 @@ READERS = {'pdb': read_pdb,
            'mmcif': read_mmcif,
            'xyz': read_xyz}
 
-WRITERS = {}
+WRITERS = {'pdb': write_pdb,
+           'mmcif': write_mmcif}
 
 PICKLE_EXTENSIONS = set("p pkl pickle mdt".split())
 COMPRESSION = {'gz': gzip.open,

@@ -26,7 +26,7 @@ def exports(o):
 __all__ = []
 
 
-def parse_mmcif(f, reassign_chains=True):
+def read_mmcif(f, reassign_chains=True):
     """Parse an mmCIF file (using the parmEd parser) and return a molecule
 
     Args:
@@ -45,7 +45,7 @@ def parse_mmcif(f, reassign_chains=True):
     return mol
 
 
-def parse_pdb(f):
+def read_pdb(f):
     """Parse an mmCIF file (using the parmEd parser) and return a molecule
 
     Args:
@@ -59,9 +59,33 @@ def parse_pdb(f):
     return mol
 
 
+def write_pdb(mol, fileobj, protect_numbers=True):
+    pmedmol = mol_to_parmed(mol)
+
+    if protect_numbers:  # a hack to prevent parmed from changing negative numbers
+        for obj in itertools.chain(pmedmol.atoms, pmedmol.residues):
+            obj.number = _ProtectFloordiv(obj.number)
+
+    pmedmol.write_pdb(fileobj, renumber=False)
+
+
+class _ProtectFloordiv(int):
+    """ Total hack class to prevent parmed from changing our numbering.
+
+    They use a __floordiv__ to renumber negatively-numbered atoms and residues.
+    This makes that always return 0.
+    """
+    def __floordiv__(self, other):
+        return 0
+
+
+def write_mmcif(mol, fileobj):
+    mol_to_parmed(mol).write_cif(fileobj)
+
+
 @exports
-def parmed_to_mdt(pmdmol):
-    """ Convert parmed object to MDT object
+def parmed_to_mdt(pmdmol, protect_numbers=True):
+    """ Convert parmed Structure to MDT Structure
 
     Args:
         pmdmol (parmed.Structure): parmed structure to convert
@@ -101,6 +125,38 @@ def parmed_to_mdt(pmdmol):
     mol = mdt.Molecule(atoms.values())
     mol.description = pmdmol.title
     return mol
+
+
+@exports
+def mol_to_parmed(mol):
+    """ Convert MDT Molecule to parmed Structure
+    Args:
+        mol (moldesign.Molecule):
+
+    Returns:
+        parmed.Structure
+    """
+    struc = parmed.Structure()
+    struc.title = mol.name
+
+    pmedatoms = []
+    for atom in mol.atoms:
+        pmedatm = parmed.Atom(atomic_number=atom.atomic_number,
+                              name=atom.name,
+                              mass=atom.mass.value_in(u.dalton),
+                              number=atom.pdbindex)
+        pmedatm.xx, pmedatm.xy, pmedatm.xz = atom.position.value_in(u.angstrom)
+        pmedatoms.append(pmedatm)
+        struc.add_atom(pmedatm,
+                       resname=atom.residue.resname,
+                       resnum=atom.residue.pdbindex,
+                       chain=atom.chain.name)
+
+    for bond in mol.bonds:
+        struc.bonds.append(parmed.Bond(pmedatoms[bond.a1.index],
+                                       pmedatoms[bond.a2.index],
+                                       order=bond.order))
+    return struc
 
 
 def _parmed_to_ff(topo, atom_map):

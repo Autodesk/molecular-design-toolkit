@@ -60,7 +60,7 @@ ATOMIC_MASSES[-1] = -1.0 * u.amu
 
 
 ########## BIOPOLYMERS
-# TODO: regenerate all this data to using the PDB Chemical Component Dictionary
+# TODO: regenerate all this data using the PDB Chemical Component Dictionary
 
 BASES = 'C T G U A I'.split()
 ALL_BASES = BASES + ['%s5' % b for b in BASES] + ['%s3' % b for b in BASES]
@@ -97,6 +97,8 @@ AMINO_NAMES = {
     "ASP": "Aspartic acid",
     "ASX": "ASP/ASN ambiguous",
     "CYS": "Cysteine",
+    "CYX": "Cystine",
+    "CYM": "Cysteine anion",
     "GLN": "Glutamine",
     "GLU": "Glutamic acid",
     "GLX": "GLU/GLN ambiguous",
