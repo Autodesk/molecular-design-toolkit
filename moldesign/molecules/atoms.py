@@ -458,8 +458,9 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
 
     @property
     def bonded_atoms(self):
-        for bond in self.bonds:
-            yield bond.partner(self)
+        """ List[moldesign.Atom]: a list of the atoms this atom is bonded to
+        """
+        return [bond.partner(self) for bond in self.bonds]
 
     @property
     def force(self):

@@ -21,7 +21,7 @@ from moldesign import units as u
 from moldesign.compute import DummyJob
 from moldesign.min.base import MinimizerBase
 
-from . import toplevel, Residue, Chain, Instance, AtomContainer, Bond
+from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond
 from .coord_arrays import *
 
 
@@ -143,18 +143,6 @@ class MolPropertyMixin(object):
         are separated are here for code organization only - they could be included in the main
         Molecule class without changing any functionality
     """
-    @property
-    def mass(self):
-        """ u.Scalar[mass]: the molecule's mass
-        """
-        return sum(self.atoms.mass)
-
-    @property
-    def kinetic_energy(self):
-        r""" u.Scalar[energy]: Classical kinetic energy :math:`\sum_{\text{atoms}} \frac{p^2}{2m}`
-        """
-        return helpers.kinetic_energy(self.momenta, self.dim_masses)
-
     @property
     def kinetic_temperature(self):
         r""" [temperature]: temperature calculated using the equipartition theorem,
@@ -383,7 +371,7 @@ class MolDrawingMixin(object):
     """ Methods for visualizing molecular structure.
 
     See Also:
-        :class:`moldesign.molecules.atomcollections.AtomContainer`
+        :class:`moldesign.molecules.atomcollections.AtomGroup`
 
     Note:
         This is a mixin class designed only to be mixed into the :class:`Molecule` class. Routines
@@ -902,7 +890,7 @@ class MolSimulationMixin(object):
 
 
 @toplevel
-class Molecule(AtomContainer,
+class Molecule(AtomGroup,
                MolConstraintMixin,
                MolPropertyMixin,
                MolDrawingMixin,

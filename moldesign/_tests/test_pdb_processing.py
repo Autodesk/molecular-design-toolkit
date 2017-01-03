@@ -48,7 +48,7 @@ def test_numeric_residue_name_1PYN():
     import parmed
 
     mol = mdt.read(get_data_path('1pyn.pdb'))
-    ligand = mol.residues[283]
+    ligand = mdt.Molecule(mol.residues[283])
 
     params = mdt.parameterize(ligand, charges='gasteiger')
     params.lib.put('/tmp/tmp.lib')

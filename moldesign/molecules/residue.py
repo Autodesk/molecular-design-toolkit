@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import collections
+
 import moldesign as mdt
 from moldesign import utils, data
 
@@ -70,6 +72,15 @@ class Residue(Entity):
     @property
     def atoms(self):
         return self.children
+
+    @property
+    def bonded_residues(self):
+        """ List[moldesign.Residue]: list of residues this residue is bonded to
+        """
+        residues = collections.OrderedDict()
+        for atom in self.bonded_atoms:
+            residues[atom.residue] = None
+        return residues.keys()
 
     def add(self, atom, key=None):
         """Deals with atom name clashes within a residue - common for small molecules"""

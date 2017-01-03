@@ -21,40 +21,33 @@ import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
-from moldesign import utils, external, mathutils
+from moldesign import utils, external, mathutils, helpers
 from . import toplevel
 import traitlets
 
 
-class AtomContainer(object):
+class AtomGroup(object):
     """ Mixin functions for objects that have a ``self.atoms`` attribute with a list of atoms
 
     Attributes:
         atoms (List[Atom]): a list of atoms
     """
-
-    @property
-    def positions(self):
-        """ u.Array[length]: (Nx3) array of atomic positions
-        """
-        return u.array([atom.position for atom in self.atoms])
-
-    @positions.setter
-    def positions(self, val):
-        assert len(val) == self.num_atoms
-        for atom, p in zip(self.atoms, val):
-            atom.position = p
-
     def __init__(self, *args, **kwargs):
         """ This should never be called directly - it will be called by the `super` methods
         of its subclasses """
-        super(AtomContainer, self).__init__(*args, **kwargs)
+        super(AtomGroup, self).__init__(*args, **kwargs)
         self._atom_attrs = None
         self.viz2d = None
         self.viz3d = None
 
     def __len__(self):
         return len(self.atoms)
+
+    @property
+    def num_atoms(self):
+        """ int: number of atoms in this object """
+        return len(self)
+    natoms = num_atoms
 
     @property
     def heavy_atoms(self):
@@ -66,6 +59,24 @@ class AtomContainer(object):
         """ u.Scalar[mass]: total mass of this object
         """
         return sum(a.mass for a in self.atoms)
+
+    @property
+    def momentum(self):
+        """ u.Vector[momentum]: total momentum of this object
+        """
+        return self.momenta.sum(axis=0)
+
+    @property
+    def velocity(self):
+        """ u.Vector[velocity]: center of mass velocity of this object
+        """
+        return self.momentum/self.mass
+
+    @property
+    def kinetic_energy(self):
+        r""" u.Scalar[energy]: Classical kinetic energy :math:`\sum_{\text{atoms}} \frac{p^2}{2m}`
+        """
+        return helpers.kinetic_energy(self.momenta, self.masses)
 
     def get_atoms(self, **queries):
         """Allows keyword-based atom queries.
@@ -149,54 +160,6 @@ class AtomContainer(object):
         """
         distance_array = self.calc_distance_array(other)
         return distance_array.min()
-
-    def atoms_within(self, radius, other=None, include_self=False):
-        """ Return all atoms in an object within a given radius of this object
-
-        Args:
-            radius (u.Scalar[length]): radius to search for atoms
-            other (AtomContainer): object containing the atoms to search (default:self.molecule)
-            include_self (bool): if True, include the atoms from this object (since, by definition,
-               their distance from this object is 0)
-
-        Returns:
-            AtomList: list of the atoms within ``radius`` of this object
-        """
-        if other is None:
-            other = self.atoms[0].molecule
-        if not include_self:
-            filter_atoms = set(self.atoms)
-        else:
-            filter_atoms = set()
-
-        distances = self.calc_distance_array(other=other)
-        mindists = distances.min(axis=0)
-
-        close_atoms = AtomList(atom for dist,atom in zip(mindists, other.atoms)
-                               if dist <= radius and atom not in filter_atoms)
-        return close_atoms
-
-    def residues_within(self, radius, other=None, include_self=False):
-        """ Return all atoms in an object within a given radius of this object
-
-        Args:
-            radius (u.Scalar[length]): radius to search for atoms
-            other (AtomContainer): object containing the atoms to search (default:self.molecule)
-            include_self (bool): if True, include the atoms from this object (since, by definition,
-               their distance from this object is 0)
-
-        Returns:
-            AtomList: list of the atoms within ``radius`` of this object
-        """
-        atoms = self.atoms_within(radius, other=other, include_self=include_self)
-        residues = collections.OrderedDict((atom.residue, None) for atom in atoms)
-        return residues.keys()
-
-    @property
-    def num_atoms(self):
-        """ int: number of atoms in this object """
-        return len(self.atoms)
-    natoms = num_atoms
 
     @property
     def center_of_mass(self):
@@ -432,6 +395,120 @@ class AtomContainer(object):
         # TODO: deal with units ... hard because the matrix has diff units for diff columns
         assert matrix.shape == (4, 4)
         self.positions = mathutils.apply_4x4_transform(matrix, self.positions)
+
+
+class _AtomArray(object):
+    def __init__(self, attrname):
+        self.attrname = attrname
+
+    def __get__(self, instance, owner):
+        return u.array([getattr(atom, self.attrname) for atom in instance.atoms])
+
+    def __set__(self, instance, value):
+        assert len(value) == instance.num_atoms
+        for atom in instance.atoms:
+            setattr(atom, self.attrname)
+
+
+class AtomContainer(AtomGroup):
+    """
+    Mixin functions for NON-MOLECULE objects that have a list of atoms at``self.atoms``
+    """
+    positions = _AtomArray('position')
+    masses = _AtomArray('mass')
+    momenta = _AtomArray('momentum')
+    velocities = _AtomArray('velocity')
+
+    @property
+    def bond_graph(self):
+        """ Dict[moldesign.Atom: List[moldesign.Atom]]: bond graph for all atoms in this object
+        """
+        return {atom: atom.bond_graph for atom in self.atoms}
+
+    @property
+    def bonds(self):
+        """ Iterable[moldesign.Bond]: iterator over bonds from this object's atoms
+        """
+        bg = self.bond_graph
+        for atom, nbrs in bg.iteritems():
+            for nbr, order in nbrs.iteritems():
+                if atom.index < nbr.index or nbr not in bg:
+                    yield mdt.Bond(atom,nbr, order)
+
+    @property
+    def internal_bonds(self):
+        """ Iterable[moldesign.Bond]: iterator over bonds that connect two atoms in this object
+        """
+        bg = self.bond_graph
+        for atom, nbrs in bg.iteritems():
+            for nbr, order in nbrs.iteritems():
+                if atom.index < nbr.index and nbr in bg:
+                    yield mdt.Bond(atom, nbr, order)
+
+    @property
+    def external_bonds(self):
+        """
+        Iterable[moldesign.Bond]: iterator over bonds that bond these atoms to other atoms
+        """
+        bg = self.bond_graph
+        for atom, nbrs in bg.iteritems():
+            for nbr, order in nbrs.iteritems():
+                if nbr not in bg:
+                    yield mdt.Bond(atom, nbr, order)
+
+    @property
+    def bonded_atoms(self):
+        """ List[moldesign.Atom]: list of external atoms this object is bonded to
+        """
+        bg = self.bond_graph
+        atoms = []
+        for atom, nbrs in bg.iteritems():
+            for nbr, order in nbrs.iteritems():
+                if nbr not in bg:
+                    atoms.append(nbr)
+        return atoms
+
+    def atoms_within(self, radius, other=None, include_self=False):
+        """ Return all atoms in an object within a given radius of this object
+
+        Args:
+            radius (u.Scalar[length]): radius to search for atoms
+            other (AtomContainer): object containing the atoms to search (default:self.molecule)
+            include_self (bool): if True, include the atoms from this object (since, by definition,
+               their distance from this object is 0)
+
+        Returns:
+            AtomList: list of the atoms within ``radius`` of this object
+        """
+        if other is None:
+            other = self.atoms[0].molecule
+        if not include_self:
+            filter_atoms = set(self.atoms)
+        else:
+            filter_atoms = set()
+
+        distances = self.calc_distance_array(other=other)
+        mindists = distances.min(axis=0)
+
+        close_atoms = AtomList(atom for dist,atom in zip(mindists, other.atoms)
+                               if dist <= radius and atom not in filter_atoms)
+        return close_atoms
+
+    def residues_within(self, radius, other=None, include_self=False):
+        """ Return all atoms in an object within a given radius of this object
+
+        Args:
+            radius (u.Scalar[length]): radius to search for atoms
+            other (AtomContainer): object containing the atoms to search (default:self.molecule)
+            include_self (bool): if True, include the atoms from this object (since, by definition,
+               their distance from this object is 0)
+
+        Returns:
+            AtomList: list of the atoms within ``radius`` of this object
+        """
+        atoms = self.atoms_within(radius, other=other, include_self=include_self)
+        residues = collections.OrderedDict((atom.residue, None) for atom in atoms)
+        return residues.keys()
 
 
 @toplevel
