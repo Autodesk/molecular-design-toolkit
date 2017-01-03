@@ -210,8 +210,24 @@ class MdtQuantity(ureg.Quantity):
         return self.ito(newunit)
 
     def to_simtk(self):
+        """ Return a SimTK quantity object
+        """
         from moldesign.interfaces.openmm import pint2simtk
         return pint2simtk(self)
+
+    def to_json(self):
+        """ Convert to a simple JSON format
+
+        Returns:
+            dict: ``{value: <float>, units: <str>}``
+
+        Examples:
+            >>> from moldesign.units import angstrom
+            >>> q = 1.0 * angstrom
+            >>> q.to_json()
+            {'units':'angstrom', value: 1.0}
+        """
+        return {'value':self.magnitude, 'units':str(self.units)}
 
 # monkeypatch pint's unit registry to return BuckyballQuantities
 ureg.Quantity = MdtQuantity

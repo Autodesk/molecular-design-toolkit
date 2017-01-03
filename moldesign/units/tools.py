@@ -11,9 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from moldesign import utils
 
 from .quantity import *
+
+
+def from_json(j):
+    """
+    Convert a JSON description to a quantity.
+    This is the inverse of :meth:`moldesign.units.quantity.MDTQuantity.to_json`
+
+    Args:
+        j (dict): ``{value: <float>, units: <str>}``
+
+    Returns:
+        moldesign.units.quantity.MDTQuantity
+    """
+    return j['value'] * ureg(j['units'])
 
 
 def units_transfer(from_var, to_var, force=False):
