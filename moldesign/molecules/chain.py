@@ -224,7 +224,7 @@ class Chain(Entity):
     def sequence(self):
         """str: this chain's residue sequence with one-letter residue codes
         """
-        missing = '.'  # don't do this
+        missing = '.'  # TODO: don't do this, overlaps with other notations
         outputs = []
         last_idx = None
         for res in sorted(self, key=lambda x: x.pdbindex):

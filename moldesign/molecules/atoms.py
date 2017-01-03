@@ -457,6 +457,11 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
                     if nbr.atnum > 1]
 
     @property
+    def bonded_atoms(self):
+        for bond in self.bonds:
+            yield bond.partner(self)
+
+    @property
     def force(self):
         """ (units.Vector[force]): atomic force vector. This quantity must be calculated - it is
         equivalent to ``self.molecule.forces[self.index]``

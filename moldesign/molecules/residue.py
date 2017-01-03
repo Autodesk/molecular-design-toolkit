@@ -128,6 +128,17 @@ class Residue(Entity):
             nextres = self.next_residue
         except StopIteration:
             return True
+        except KeyError:
+            # If we're here, the residue is missing some atoms. We'll fall back to checking the
+            # next residues in line
+            if self.index == len(self.molecule.residues):
+                return True
+            else:
+                print 'WARNING: %s is missing expected atoms. Attempting to infer chain end' % \
+                    self
+                nextres = self.molecule.residues[self.index + 1]
+                return not self._same_polymer(nextres)
+
         else:
             return False
 
@@ -138,8 +149,22 @@ class Residue(Entity):
             prevres = self.prev_residue
         except StopIteration:
             return True
+        except KeyError:
+            # If we're here, the residue is missing some atoms. We'll fall back to checking the
+            # next residues in line
+            if self.index <= 0:
+                assert self.index == 0
+                return True
+            else:
+                print 'WARNING: %s is missing expected atoms. Attempting to infer chain start' % \
+                    self
+                nextres = self.molecule.residues[self.index - 1]
+                return not self._same_polymer(nextres)
         else:
             return False
+
+    def _same_polymer(self, otherres):
+        return (otherres.type == self.type) and (otherres.chain is self.chain)
 
     def assign_template_bonds(self):
         """Assign bonds from bioresidue templates.
