@@ -58,6 +58,8 @@ class Residue(Entity):
             return None
         elif self.pdbindex is None:
             return self._pdbname
+        elif self.pdbname[-1].isdigit():
+            return '%s (seq # %s)' % (self.pdbname, self.pdbindex)
         else:
             return self.pdbname + str(self.pdbindex)
 

@@ -368,15 +368,18 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
     inputs = {'mol.mol2': mol.write(format='mol2'),
               'mol.charges': '\n'.join(map(str, charge_array))}
 
-    cmds = ['antechamber -i mol.mol2 -fi mol2 -o mol_charged.mol2 -fo mol2 -c rc -cf mol.charges',
-            'parmchk -i mol_charged.mol2 -f mol2 -o mol.frcmod', 'tleap -f leap.in']
+    cmds = ['antechamber -i mol.mol2 -fi mol2 -o mol_charged.mol2 '
+                   ' -fo mol2 -c rc -cf mol.charges -rn %s' % resname,
+            'parmchk -i mol_charged.mol2 -f mol2 -o mol.frcmod',
+            'tleap -f leap.in',
+            'sed -e "s/tempresname/%s/g" mol_rename.lib > mol.lib' % resname]
 
     inputs['leap.in'] = '\n'.join(["source leaprc.%s" % ffname,
-                                   "%s = loadmol2 mol_charged.mol2" % resname,
+                                   "tempresname = loadmol2 mol_charged.mol2",
                                    "fmod = loadamberparams mol.frcmod",
-                                   "check %s" % resname,
-                                   "saveoff %s mol.lib" % resname,
-                                   "saveamberparm %s mol.prmtop mol.inpcrd" % resname,
+                                   "check tempresname",
+                                   "saveoff tempresname mol_rename.lib",
+                                   "saveamberparm tempresname mol.prmtop mol.inpcrd",
                                    "quit\n"])
 
     def finish_job(j):

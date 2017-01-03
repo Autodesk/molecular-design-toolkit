@@ -5,7 +5,6 @@ trying to process biomolecular structures from the pdb.
 These currently just test the specific cases that we've implemented fixes for
 """
 
-
 import moldesign as mdt
 from .helpers import get_data_path
 
@@ -41,6 +40,22 @@ def test_negative_residue_numbers_2jaj():
     assert res.pdbindex == -4
     assert res.index == 272
     assert res.name == 'GLY-4'
+
+
+def test_numeric_residue_name_1PYN():
+    """ The ligand in this residue is named "941", which causes a little trickiness
+    """
+    import parmed
+
+    mol = mdt.read(get_data_path('1pyn.pdb'))
+    ligand = mol.residues[283]
+
+    params = mdt.parameterize(ligand, charges='gasteiger')
+    params.lib.put('/tmp/tmp.lib')
+
+    contents = parmed.load_file('/tmp/tmp.lib')
+    assert len(contents) == 1
+    assert contents.keys()[0] == '941'
 
 
 

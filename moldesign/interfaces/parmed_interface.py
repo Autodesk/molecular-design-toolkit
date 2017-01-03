@@ -18,6 +18,7 @@ import parmed
 
 import moldesign as mdt
 from moldesign import units as u
+from moldesign import utils
 
 
 def exports(o):
@@ -59,14 +60,22 @@ def read_pdb(f):
     return mol
 
 
-def write_pdb(mol, fileobj, protect_numbers=True):
+def write_pdb(mol, fileobj):
     pmedmol = mol_to_parmed(mol)
+
+    # Check if we have appropriate indices for the PDB file
+    for obj in itertools.chain(mol.atoms, mol.residues):
+        if obj.pdbindex is None:
+            protect_numbers = False
+            break
+    else:
+        protect_numbers = True
 
     if protect_numbers:  # a hack to prevent parmed from changing negative numbers
         for obj in itertools.chain(pmedmol.atoms, pmedmol.residues):
             obj.number = _ProtectFloordiv(obj.number)
 
-    pmedmol.write_pdb(fileobj, renumber=False)
+    pmedmol.write_pdb(fileobj, renumber=not protect_numbers)
 
 
 class _ProtectFloordiv(int):
@@ -84,7 +93,7 @@ def write_mmcif(mol, fileobj):
 
 
 @exports
-def parmed_to_mdt(pmdmol, protect_numbers=True):
+def parmed_to_mdt(pmdmol):
     """ Convert parmed Structure to MDT Structure
 
     Args:
@@ -144,13 +153,13 @@ def mol_to_parmed(mol):
         pmedatm = parmed.Atom(atomic_number=atom.atomic_number,
                               name=atom.name,
                               mass=atom.mass.value_in(u.dalton),
-                              number=atom.pdbindex)
+                              number=utils.if_not_none(atom.pdbindex, -1))
         pmedatm.xx, pmedatm.xy, pmedatm.xz = atom.position.value_in(u.angstrom)
         pmedatoms.append(pmedatm)
         struc.add_atom(pmedatm,
                        resname=atom.residue.resname,
-                       resnum=atom.residue.pdbindex,
-                       chain=atom.chain.name)
+                       resnum=utils.if_not_none(atom.residue.pdbindex, -1),
+                       chain=utils.if_not_none(atom.chain.name, ''))
 
     for bond in mol.bonds:
         struc.bonds.append(parmed.Bond(pmedatoms[bond.a1.index],
