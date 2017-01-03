@@ -215,8 +215,11 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
         recommendations.
     """
     # Prepare input for tleap
-    if forcefields is None: forcefields = mdt.forcefields.ffdefaults.values()
+    if forcefields is None:
+        forcefields = mdt.forcefields.ffdefaults.values()
     leapstr = ['source %s' % LEAPRCFILES[ff] for ff in forcefields]
+
+    # TLeap requires proper TER records, so we insert them into the PDB file
     inputs = {'input.pdb': mdt.helpers.insert_ter_records(mol, mol.write(format='pdb'))}
 
     if parameters:
@@ -250,7 +253,10 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
 def assign_forcefield(mol, **kwargs):
     """ see run_tleap docstring """
     from moldesign.widgets.parameterization import ParameterizationDisplay
-    job = run_tleap(mol, **kwargs)
+
+    clean_molecule = _prep_for_tleap(mol)
+
+    job = run_tleap(clean_molecule, **kwargs)
 
     if 'output.inpcrd' in job.get_output():
         prmtop = job.get_output('output.prmtop')
@@ -261,10 +267,10 @@ def assign_forcefield(mol, **kwargs):
     else:
         newmol = None
 
-    errors = _parse_tleap_errors(job, mol)
+    errors = _parse_tleap_errors(job, clean_molecule)
 
     try:
-        report = ParameterizationDisplay(errors, mol, molout=newmol)
+        report = ParameterizationDisplay(errors, clean_molecule, molout=newmol)
         uibase.display_log(report, title='ERRORS/WARNINGS', show=True)
     except traitlets.TraitError:
         print 'Forcefield assignment: %s' % ('Success' if newmol is not None else 'Failure')
@@ -274,7 +280,47 @@ def assign_forcefield(mol, **kwargs):
     if newmol is not None:
         return newmol
     else:
-        raise ParameterizationError('TLeap failed to assign force field parameters for %s' % mol, job)
+        raise ParameterizationError('TLeap failed to assign force field parameters for %s' % mol,
+                                    job)
+
+
+def _prep_for_tleap(mol):
+    """ Returns a modified *copy* that's been modified for input to tleap
+
+    Currently, this just looks for disulfide bonds
+    """
+    change = False
+    clean = mdt.Molecule(mol.atoms)
+    for residue in clean.residues:
+        if residue.resname == 'CYS':  # deal with cysteine states
+            if 'SG' not in residue.atoms or 'HG' in residue.atoms:
+                continue  # sulfur's missing, we'll let tleap create it
+            else:
+                sulfur = residue.atoms['SG']
+
+            if sulfur.formal_charge == -1*u.q_e:
+                residue.resname = 'CYM'
+                change = True
+                continue
+
+            # check for a reasonable hybridization state
+            if sulfur.formal_charge != 0 or sulfur.num_bonds not in (1, 2):
+                raise ValueError("Unknown sulfur hybridization state for %s"
+                                 % sulfur)
+
+            # check for a disulfide bond
+            for otheratom in sulfur.bonded_atoms:
+                if otheratom.residue is not residue:
+                    if otheratom.name != 'SG' or otheratom.residue.resname not in ('CYS', 'CYX'):
+                        raise ValueError('Unknown bond from cysteine sulfur (%s)' % sulfur)
+
+                    # if we're here, this is a cystine with a disulfide bond
+                    print 'INFO: disulfide bond detected. Renaming %s from CYS to CYX' % residue
+                    sulfur.residue.resname = 'CYX'
+
+            clean._rebuild_topology()
+
+    return clean
 
 
 @utils.kwargs_from(mdt.compute.run_job)
