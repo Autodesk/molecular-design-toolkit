@@ -228,7 +228,7 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
             libname = 'res%d.lib' % ipmtr
             inputs[frcname] = p.frcmod
             inputs[libname] = p.lib
-            leapstr.append('loadamberparam %s' % frcname)
+            leapstr.append('loadAmberParams %s' % frcname)
             leapstr.append('loadoff %s' % libname)
 
     leapstr.append('mol = loadpdb input.pdb\n'
@@ -403,7 +403,8 @@ ATOMSPEC = re.compile(r'\.R<(\S+) (\d+)>\.A<(\S+) (\d+)>')
 
 
 def _parse_tleap_errors(job, molin):
-    from moldesign.widgets.parameterization import UnusualBond, UnknownAtom, UnknownResidue
+    from moldesign.widgets.parameterization import (UnusualBond, UnknownAtom,
+                                                    UnknownResidue, MissingTerms)
 
     # TODO: special messages for known problems (e.g. histidine)
     msg = []
@@ -435,11 +436,11 @@ def _parse_tleap_errors(job, molin):
             break
 
         fields = line.split()
-        if fields[0:2] == ['Unknown','residue:']:
+        if fields[0:2] == ['Unknown', 'residue:']:
             # EX: "Unknown residue: 3TE   number: 499   type: Terminal/beginning"
             res = molin.residues[int(fields[4])]
             unknown_res.add(res)
-            msg.append(UnknownResidue(line,res))
+            msg.append(UnknownResidue(line, res))
 
         elif fields[:4] == 'Warning: Close contact of'.split():
             # EX: "Warning: Close contact of 1.028366 angstroms between .R<DC5 1>.A<HO5' 1> and .R<DC5 81>.A<P 9>"
@@ -459,5 +460,9 @@ def _parse_tleap_errors(job, molin):
             atom = residue[fields[5]]
             msg.append(UnknownAtom(line, residue, atom))
 
+        elif (fields[:5] == '** No torsion terms for'.split() or
+                      fields[:5] == 'Could not find angle parameter:'.split()):
+            # EX: " ** No torsion terms for  ca-ce-c3-hc"
+            msg.append(MissingTerms(line.strip()))
 
     return msg

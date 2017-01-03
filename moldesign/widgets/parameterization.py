@@ -79,7 +79,20 @@ class StructureOk(ForceFieldMessage):
     desc = 'No errors or warnings'
 
     def show(self, viewer):
+        viewer.ribbon(opacity=0.7)
+
+    def unshow(self, viewer):
         pass
+
+
+class MissingTerms(ForceFieldMessage):
+    def __init__(self, message):
+        self.message = message
+        self.desc = self.message
+        self.short = self.message
+
+    def show(self, viewer):
+        viewer.ribbon(opacity=0.7)
 
     def unshow(self, viewer):
         pass
@@ -97,7 +110,7 @@ class UnknownAtom(ForceFieldMessage):
                                                                          self.atom.residue.resname)
 
     def show(self, viewer):
-        viewer.licorice(atoms=self.residue.atoms, render=False)
+        viewer.licorice(atoms=self.residue.atoms)
         viewer.vdw(atoms=[self.atom])
 
     def unshow(self, viewer):
