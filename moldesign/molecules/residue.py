@@ -218,7 +218,7 @@ class Residue(Entity):
             bonds_by_name = data.RESIDUE_BONDS[resname]
             self._template_name = resname
         except KeyError:
-            if len(self) == 1:
+            if len(self) == 1 and self.type not in ('water', 'ion'):
                 print 'INFO: no bonds assigned to residue %s' % self
                 return
             else:

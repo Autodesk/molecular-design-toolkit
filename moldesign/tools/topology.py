@@ -20,13 +20,14 @@ from moldesign import units as u
 
 from . import toplevel, __all__ as _pkgall
 
-from moldesign.interfaces.openbabel import add_hydrogen, guess_bond_orders
+from moldesign.interfaces.openbabel import add_hydrogen, guess_bond_orders, set_protonation
 from moldesign.interfaces.pdbfixer_interface import mutate, add_water
 from moldesign.interfaces.ambertools import assign_forcefield, parameterize
 from moldesign.interfaces.ambertools import calc_am1_bcc_charges, calc_gasteiger_charges
 
 _pkgall.extend(('add_hydrogen guess_bond_orders mutate add_water'
-                ' assign_forcefield parameterize calc_am1_bcc_charges calc_gasteiger_charges').split())
+                ' assign_forcefield parameterize calc_am1_bcc_charges calc_gasteiger_charges '
+                'set_protonation').split())
 
 ATNUM_VALENCE_CHARGE = {6: {3: -1, 4: 0},
                         7: {2: -1, 3: 0, 4: 1},
@@ -96,8 +97,32 @@ def assign_formal_charges(mol, ignore_nonzero=True):
 
 
 @toplevel
-def add_missing_data(mol):
-    """ Add missing hydrogens, bond orders, and formal charges to a structure (often from the PDB)
+def set_hybridization_and_ph(mol, ph=7.4):
+    """ Add missing hydrogens, bond orders, and formal charges
+
+    Specifically, this is a convenience function that runs:
+    ``mdt.guess_bond_orders``, ``mdt.add_hydrogen``, and ``mdt.assign_formal_charges``
+
+    Note:
+        This does NOT add missing residues to biochemical structures. This functionality will be
+        available as :meth:`moldesign.add_missing_residues`
+
+    Args:
+        mol (moldesign.Molecule): molecule to clean
+        ph (float): assigned pH. Assign protonation states using the default OpenBabel pKa model
+
+    Returns:
+        moldesign.Molecule: cleaned version of the molecule
+    """
+    m1 = mdt.guess_bond_orders(mol)
+    m2 = mdt.add_hydrogen(m1)
+    m2 = mdt.set_protonation(m1, ph)
+    return m2
+
+
+@toplevel
+def set_hybridization_and_saturate(mol):
+    """ Assign bond orders, saturate with hydrogens, and assign formal charges
 
     Specifically, this is a convenience function that runs:
     ``mdt.guess_bond_orders``, ``mdt.add_hydrogen``, and ``mdt.assign_formal_charges``
@@ -112,9 +137,10 @@ def add_missing_data(mol):
     Returns:
         moldesign.Molecule: cleaned version of the molecule
     """
-    m = mdt.add_hydrogen(mdt.guess_bond_orders(mol))
-    assign_formal_charges(m)
-    return m
+    m1 = mdt.guess_bond_orders(mol)
+    m2 = mdt.add_hydrogen(m1)
+    assign_formal_charges(m2)
+    return m2
 
 
 @toplevel

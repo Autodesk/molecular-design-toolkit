@@ -277,8 +277,9 @@ def assign_biopolymer_bonds(mol):
         try:
             residue.assign_template_bonds()
         except KeyError:
-            print('WARNING: failed to assign bonds for %s; use '
-                  '``residue.assign_distance.bonds`` to guess the topology') % str(residue)
+            if residue.type not in ('ion', 'water'):
+                print('WARNING: failed to assign bonds for %s; use '
+                      '``residue.assign_distance.bonds`` to guess the topology') % str(residue)
 
 
 def assign_unique_hydrogen_names(mol):

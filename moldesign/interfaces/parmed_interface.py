@@ -81,7 +81,7 @@ def write_pdb(mol, fileobj):
 class _ProtectFloordiv(int):
     """ Total hack class to prevent parmed from changing our numbering.
 
-    They use a __floordiv__ to renumber negatively-numbered atoms and residues.
+    ParmEd uses a __floordiv__ to renumber negatively-numbered atoms and residues.
     This makes that always return 0.
     """
     def __floordiv__(self, other):
@@ -126,6 +126,7 @@ def parmed_to_mdt(pmdmol):
         atom.residue = residue
         residue.add(atom)
         atom.chain = chain
+        assert patm not in atoms
         atoms[patm] = atom
 
     for pbnd in pmdmol.bonds:
