@@ -82,10 +82,13 @@ class _ProtectFloordiv(int):
     """ Total hack class to prevent parmed from changing our numbering.
 
     ParmEd uses a __floordiv__ to renumber negatively-numbered atoms and residues.
-    This makes that always return 0.
+    Also always evaluates to True even if it's 0.
     """
     def __floordiv__(self, other):
         return 0
+
+    def __nonzero__(self):
+        return True
 
 
 def write_mmcif(mol, fileobj):

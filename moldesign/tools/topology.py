@@ -116,8 +116,8 @@ def set_hybridization_and_ph(mol, ph=7.4):
     """
     m1 = mdt.guess_bond_orders(mol)
     m2 = mdt.add_hydrogen(m1)
-    m2 = mdt.set_protonation(m1, ph)
-    return m2
+    m3 = mdt.set_protonation(m2, ph)
+    return m3
 
 
 @toplevel
