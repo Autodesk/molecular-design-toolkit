@@ -144,7 +144,7 @@ RESTYPES = dict(
     dna=set(DBASES),
     rna=set(RBASES),
     unknown=set(),
-    ions=set(IONS))
+    ion=set(IONS))
 
 RESIDUE_TYPES = {None: 'placeholder'}
 for typename, namelist in RESTYPES.iteritems():

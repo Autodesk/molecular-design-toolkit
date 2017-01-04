@@ -201,21 +201,10 @@ def read_pdb(f, assign_ccd_bonds=True):
     f.seek(0)
     mol = mdt.interfaces.parmed_interface.read_pdb(f)
     mol.properties.bioassemblies = assemblies
-    f.seek(0)
-    conect_graph = pdb.get_conect_records(f)
 
     # Assign bonds from residue templates
     if assign_ccd_bonds:
         pdb.assign_biopolymer_bonds(mol)
-
-    # Create bonds from CONECT records
-    serials = {atom.pdbindex: atom for atom in mol.atoms}
-    for atomserial, nbrs in conect_graph.iteritems():
-        atom = serials[atomserial]
-        for nbrserial, order in nbrs.iteritems():
-            nbr = serials[nbrserial]
-            if nbr not in atom.bond_graph:  # we already got it from CCD
-                mol.newbond(atom, nbr, order)
 
     if assemblies:
         pdb.warn_assemblies(mol, assemblies)

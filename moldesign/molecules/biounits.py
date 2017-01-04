@@ -119,6 +119,7 @@ class Entity(AtomContainer):
     __getitem__ = utils.Alias('children.__getitem__')
     __len__ = utils.Alias('children.__len__')
     __iter__ = utils.Alias('children.__iter__')
+    __contains__ = utils.Alias('children.__contains__')
     atoms = utils.Alias('children.atoms')
     iteratoms = utils.Alias('children.iteratoms')
     rebuild = utils.Alias('children.rebuild')
