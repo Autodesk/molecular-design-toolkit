@@ -294,7 +294,7 @@ pdbfixer:
  requires:
   - openmm
  build: |
-  RUN pip install https://github.com/pandegroup/pdbfixer/archive/v1.2.tar.gz
+  RUN pip install https://github.com/pandegroup/pdbfixer/archive/v1.3.1.tar.gz
 
 pyscf:
  requires:

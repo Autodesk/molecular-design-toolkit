@@ -202,6 +202,9 @@ def read_pdb(f, assign_ccd_bonds=True):
     mol = mdt.interfaces.parmed_interface.read_pdb(f)
     mol.properties.bioassemblies = assemblies
 
+    f.seek(0)
+    mol.metadata.missing_residues = mdt.helpers.get_pdb_missing_residues(f)
+
     # Assign bonds from residue templates
     if assign_ccd_bonds:
         pdb.assign_biopolymer_bonds(mol)
@@ -272,7 +275,9 @@ def from_pdb(pdbcode, usecif=False):
     assert len(pdbcode) == 4, "%s is not a valid PDB ID." % pdbcode
 
     fileext = 'cif' if usecif else 'pdb'
-    request = requests.get('http://www.rcsb.org/pdb/files/%s.%s' % (pdbcode, fileext))
+
+    url = 'http://www.rcsb.org/pdb/files/%s.%s' % (pdbcode, fileext)
+    request = requests.get(url)
 
     if request.status_code == 404 and not usecif:  # if not found, try the cif-format version
         print 'WARNING: %s.pdb not found in rcsb.org database. Trying %s.cif...' % (
@@ -292,6 +297,7 @@ def from_pdb(pdbcode, usecif=False):
 
     mol = read(filestring, format=fileext)
     mol.name = pdbcode
+    mol.metadata.url = 'http://www.rcsb.org/pdb/explore.do?structureId=%s' % pdbcode
     return mol
 
 

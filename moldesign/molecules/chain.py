@@ -224,22 +224,65 @@ class Chain(Entity):
     def sequence(self):
         """str: this chain's residue sequence with one-letter residue codes
         """
-        missing = '.'  # TODO: don't do this, overlaps with other notations
-        outputs = []
-        last_idx = None
-        for res in sorted(self, key=lambda x: x.pdbindex):
-            if res.type not in ('protein', 'dna', 'rna'): continue
-            if last_idx is not None:
-                num_missing = res.pdbindex - last_idx - 1
-                if num_missing > 0:
-                    outputs.append(missing * (res.pdbindex - last_idx - 1))
-            if res.code != '?':
-                outputs.append(res.code)
-            else:
-                if len(outputs) > 0 and outputs[-1][-1] != ',':
+        return self._get_sequence()
+
+    def _get_sequence(self, _html=False):
+        if _html:
+            outputs = ['<span style="word-wrap:break-word;font-family:monospace">']
+        else:
+            outputs = []
+
+        # get a list of ALL residues, including missing ones
+        missing = self.molecule.metadata.get('missing_residues', {}).get(self.pdbname, {})
+        all_residues = list(self.residues)
+        all_residues.extend(mdt.helpers.MissingResidue(self.pdbname, resname, resnum)
+                            for resnum, resname  in missing.iteritems())
+        all_residues.sort(key=lambda r: r.pdbindex)
+
+        bracket_open = False
+        for res in all_residues:
+            if res.type not in ('protein', 'dna', 'rna'):  # don't display non-biological residues
+                continue
+
+            elif getattr(res, 'missing', False):  # deal with missing residues
+                if bracket_open:
+                    outputs.append(']')
+                    bracket_open = False
+
+                if _html:
+                    outputs.append(
+                        '<span title="%s%s (MISSING), chain %s" style="color:Red">%s</span>' %
+                        (res.resname, res.pdbindex, self.pdbname, res.code))
+                else:
+                    outputs.append('-')
+
+            elif len(res.code) > 1:  # name is more than 1 character
+                if not bracket_open:
+                    outputs.append('[')
+                    bracket_open = True
+                else:
                     outputs.append(',')
-                outputs.append(res.pdbname + ',')
-            last_idx = res.pdbindex
+
+                if _html:
+                    outputs.append('<span title="%s (idx %d), chain %s">%s</span>' %
+                                   (res.name, res.index, res.chain.name, res.pdbname))
+                else:
+                    outputs.append(res.pdbname)
+
+            else:  # we have a normal residue name
+                if bracket_open:
+                    outputs.append(']')
+                    bracket_open = False
+
+                if _html:
+                    outputs.append('<span title="%s (idx %d), chain %s">%s</span>' %
+                                   (res.name, res.index, res.chain.name, res.code))
+                else:
+                    outputs.append(res.code)
+
+        if _html:
+            outputs.append('</span>')
+
         return ''.join(outputs)
 
     def __str__(self):

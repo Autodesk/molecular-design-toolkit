@@ -93,6 +93,7 @@ def insert_ter_records(mol, pdbfile):
     else:
         return newf
 
+
 def warn_assemblies(mol, assemblies):
     """ Print a warning message if the PDB structure contains a biomolecular assembly
     """
@@ -187,6 +188,101 @@ def get_conect_records(pdbfile):
                 atombonds[serial] = 0
             atombonds[serial] += 1
     return conect
+
+
+class MissingResidue(object):
+    type = 'protein'
+    missing = True
+
+    def __init__(self, chain, resname, pdbindex):
+        self.chain = chain
+        self.resname = resname
+        self.pdbindex = pdbindex
+
+    @property
+    def code(self):
+        """str: one-letter amino acid code or two letter nucleic acid code, or '?' otherwise"""
+        return mdt.data.RESIDUE_ONE_LETTER.get(self.resname, '?')
+
+
+def get_pdb_missing_residues(fileobj):
+    """ Parses missing residues from a PDB file.
+
+    Args:
+        fileobj (filelike): file-like access to the PDB file
+
+    Returns:
+        dict: listing of the missing residues of the form
+           ``{[chain_id]:{[residue_number]:[residue_name], ...}, ...}``
+
+    Examples:
+        >>> with open('2jaj.pdb') as pdbfile:
+        >>>     res = get_pdb_missing_residues(pdbfile)
+        >>> res
+        'A': {-4: 'GLY',
+              -3: 'PRO',
+              [...]
+              284: 'SER'},
+        'B': {34: 'GLY',
+              35: 'GLU',
+              [...]
+    """
+    lineiter = iter(fileobj)
+    while True:
+        try:
+            fields = lineiter.next().split()
+        except StopIteration:
+            missing = {}  # no missing residues found in file
+            break
+
+        if fields == ['REMARK', '465', 'M', 'RES', 'C', 'SSSEQI']:
+            missing = _parse_missing_xtal(fileobj)
+            break
+        elif fields[:3] == ['REMARK', '465', 'MODELS']:
+            missing = _parse_missing_nmr(fileobj)
+            break
+
+    summary = {}
+    for m in missing:
+        summary.setdefault(m.chain, {})[m.pdbindex] = m.resname
+    return summary
+
+
+def _parse_missing_xtal(fileobj):
+    missing = []
+    while True:
+        fields = fileobj.next().split()
+        if fields[:2] != ['REMARK', '465']:
+            break
+
+        if len(fields) == 6:
+            has_modelnum = 1
+            if fields[2] != 1:  # only process the first model
+                continue
+        else:
+            has_modelnum = 0
+
+        missing.append(MissingResidue(chain=fields[3+has_modelnum],
+                                      resname=fields[2+has_modelnum],
+                                      pdbindex=int(fields[4+has_modelnum])))
+    return missing
+
+
+def _parse_missing_nmr(fileobj):
+    header = fileobj.next().split()
+    assert header == ['REMARK', '465', 'RES', 'C', 'SSSEQI']
+
+    missing = []
+    while True:
+        fields = fileobj.next().split()
+
+        if fields[:2] != ['REMARK', '465']:
+            break
+
+        missing.append(MissingResidue(chain=fields[3],
+                                      resname=fields[2],
+                                      pdbindex=int(fields[4])))
+    return missing
 
 
 def get_pdb_assemblies(fileobj):
