@@ -135,9 +135,32 @@ def parmed_to_mdt(pmdmol):
     for pbnd in pmdmol.bonds:
         atoms[pbnd.atom1].bond_to(atoms[pbnd.atom2], int(pbnd.order))
 
-    mol = mdt.Molecule(atoms.values())
-    mol.description = pmdmol.title
+    mol = mdt.Molecule(atoms.values(),
+                       metadata=_get_pdb_metadata(pmdmol))
     return mol
+
+
+def _get_pdb_metadata(pmdmol):
+    metadata = utils.DotDict(description=pmdmol.title)
+
+    authors = getattr(pmdmol, 'journal_authors', None)
+    if authors:
+        metadata.pdb_authors = authors
+
+    experimental = getattr(pmdmol, 'experimental', None)
+    if experimental:
+        metadata.pdb_experimental = experimental
+
+    box_vectors = getattr(pmdmol, 'box_vectors', None)
+    if box_vectors:
+        metadata.pdb_box_vectors = box_vectors
+
+    doi = getattr(pmdmol, 'doi', None)
+    if doi:
+        metadata.pdb_doi = doi
+        metadata.url = "http://dx.doi.org/%s" % doi
+
+    return metadata
 
 
 @exports

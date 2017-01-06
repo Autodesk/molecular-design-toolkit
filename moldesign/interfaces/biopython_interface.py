@@ -77,6 +77,13 @@ def _parse_file(f, parser_type):
     return mol
 
 
+def get_pdb_seqres(f):
+    from Bio import SeqIO
+    chainseqs = list(SeqIO.parse(f, "pdb-seqres"))
+    seqs = {cs.annotations['chain']: str(cs.seq) for cs in chainseqs}
+    return seqs
+
+
 @exports
 def biopy_to_mol(struc):
     """Convert a biopython PDB structure to an MDT molecule.

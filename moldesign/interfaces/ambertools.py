@@ -221,7 +221,7 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
     inputs = {'input.pdb': mol.write(format='pdb')}
 
     if parameters:
-        if isinstance(parameters, ExtraAmberParameters):
+        if hasattr(parameters, 'lib') or hasattr(parameters, 'frcmod'):
             parameters = [parameters]
         for ipmtr, p in enumerate(parameters):
             frcname = 'res%d.frcmod' % ipmtr
@@ -399,7 +399,7 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
     return mdt.compute.run_job(job, _return_result=True, **kwargs)
 
 
-ATOMSPEC = re.compile(r'\.R<(\S+) (\d+)>\.A<(\S+) (\d+)>')
+ATOMSPEC = re.compile(r'\.R<(\S+) ([\-0-9]+)>\.A<(\S+) ([\-0-9]+)>')
 
 
 def _parse_tleap_errors(job, molin):

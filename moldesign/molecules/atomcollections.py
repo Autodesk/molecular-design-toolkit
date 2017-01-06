@@ -419,6 +419,11 @@ class AtomContainer(AtomGroup):
     momenta = _AtomArray('momentum')
     velocities = _AtomArray('velocity')
 
+    def __add__(self, other):
+        l = mdt.AtomList(self.atoms)
+        l.extend(other.atoms)
+        return l
+
     @property
     def bond_graph(self):
         """ Dict[moldesign.Atom: List[moldesign.Atom]]: bond graph for all atoms in this object
@@ -591,7 +596,8 @@ class AtomList(list, AtomContainer):
         otherset = set(other)
         return type(self)(atom for atom in self if atom not in otherset)
 
-    # alas for self so that this works with AtomContainer methods
+
+    # alias for self so that this works with AtomContainer methods
     @property
     def atoms(self):
         return self
