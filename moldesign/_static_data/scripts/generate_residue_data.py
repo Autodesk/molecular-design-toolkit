@@ -19,7 +19,6 @@ into memory.
 """
 import collections
 import itertools
-import json
 import sys
 import os
 sys.path.insert(0, '..')
@@ -32,6 +31,7 @@ from mmCif.mmcifIO import CifFileReader
 ORDERS = dict(SING=1, DOUB=2, TRIP=3)
 
 DBNAME = 'chemical_components'
+
 
 def bond_data(data):
     if '_chem_comp_bond' not in data:
@@ -83,6 +83,16 @@ def download_ccd():
 RESFIELDS = ['name', 'type', 'atoms', 'bonds']
 
 
+def read_ccd():
+    print 'Reading components.cif ...'
+    sys.stdout.flush()
+    components = CifFileReader()
+    all_residues = components.read('components.cif')
+    print 'Reading aa-variants-v1.cif ...'
+    amino_variants = components.read('aa-variants-v1.cif')
+    return itertools.chain(all_residues.iteritems(), amino_variants.iteritems())
+
+
 def store_residue(resname, data, db):
     try:
         record = [data['_chem_comp']['name'],
@@ -97,7 +107,7 @@ def store_residue(resname, data, db):
     sys.stdout.flush()
 
 
-if __name__ == '__main__':
+def main():
     print 'This program regenerates the `%s` database using the "Chemical Component ' % DBNAME
     print 'Dictionary" and "Protonation Variants Dictionary" from http://www.wwpdb.org/data/ccd'
 
@@ -107,29 +117,18 @@ if __name__ == '__main__':
     else:
         print 'Using cached download (run with "--download" to download a new version)'
 
-    print 'Reading components.cif ...'
-    sys.stdout.flush()
-    components = CifFileReader()
-    all_residues = components.read('components.cif')
-    print 'Reading aa-variants-v1.cif ...'
-    amino_variants = components.read('aa-variants-v1.cif')
+    residues = read_ccd()
 
     db = utils.CompressedJsonDbm(DBNAME, 'n')
     db['__FIELDS__'] = {'ATOMFIELDS': ATOMFIELDS,
                         'RESFIELDS': RESFIELDS}
-    restypes = collections.OrderedDict()
 
-    for resname, data in itertools.chain(all_residues.iteritems(), amino_variants.iteritems()):
+    for resname, data in residues:
         store_residue(resname, data, db)
 
     print '\nCreated db "%s" (%d records)' % (DBNAME, len(db))
     db.close()
 
-    with open('residue.types.json', 'w') as fp:
-        json.dump(restypes, fp)
 
-
-
-
-
-
+if __name__ == '__main__':
+    main()
