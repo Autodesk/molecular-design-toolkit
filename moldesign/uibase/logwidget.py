@@ -11,15 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import base64
-import io
 import logging
-import os
 from collections import OrderedDict
 
 import IPython.display
 import ipywidgets as ipy
-import traitlets
 
 import moldesign as mdt
 
@@ -33,19 +29,11 @@ STANDARD = 25  # logging level between INFO and WARN
 root = logging.getLogger('moldesign')
 root.setLevel(STANDARD)
 
-# TODO: we need to handle logging outside the widget context - what if user is in CLI?
-
 _prev_tabs = None
 _current_tabs = None
 _capture_enabled = False
 
-# TODO: Something better than this
-try:
-    ipy.Text()
-except traitlets.TraitError:
-    widgets_enabled = False
-else:
-    widgets_enabled = True
+widgets_enabled = mdt.utils.can_use_widgets()
 
 
 def display_log(obj, title=None, show=False):
@@ -128,6 +116,7 @@ def enable_logging_widgets(enable=True):
         #root.removeHandler(capture_handler)
         ip.events.unregister('pre_run_cell', _capture_logging_displays)
         ip.events.unregister('post_run_cell', _finalize_logging_displays)
+
 
 if widgets_enabled:
     class LoggingTabs(StyledTab):

@@ -46,6 +46,27 @@ def if_not_none(item, default):
         return item
 
 
+def can_use_widgets():
+    """ Expanded from from http://stackoverflow.com/a/34092072/1958900
+    """
+    if 'IPython' not in sys.modules:
+        # IPython hasn't been imported, definitely not
+        return False
+    from IPython import get_ipython
+
+    # check for `kernel` attribute on the IPython instance
+    if getattr(get_ipython(), 'kernel', None) is None:
+        return False
+
+    try:
+        import ipywidgets as ipy
+        import traitlets
+    except ImportError:
+        return False
+
+    return True
+
+
 def printflush(s, newline=True):
     if newline:
         print s
