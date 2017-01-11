@@ -418,3 +418,22 @@ def from_filepath(func, filelike):
             outfile.flush()
             result = func(outfile.name)
         return result
+
+
+
+def running_in_notebook():
+    """ Attempts to discover if this python interpreter is connected to a notebook or not
+
+    Returns:
+        bool: True if there is a connection to a notebook kernel
+
+    References:
+        Copied from
+        http://stackoverflow.com/a/34092072/1958900
+    """
+    if 'IPython' not in sys.modules:
+        # IPython hasn't been imported, definitely not
+        return False
+    from IPython import get_ipython
+    # check for `kernel` attribute on the IPython instance
+    return getattr(get_ipython(), 'kernel', None) is not None

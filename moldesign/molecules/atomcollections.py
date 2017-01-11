@@ -596,7 +596,6 @@ class AtomList(list, AtomContainer):
         otherset = set(other)
         return type(self)(atom for atom in self if atom not in otherset)
 
-
     # alias for self so that this works with AtomContainer methods
     @property
     def atoms(self):

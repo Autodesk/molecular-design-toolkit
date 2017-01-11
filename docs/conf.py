@@ -83,7 +83,7 @@ author = u'Aaron Virshup, Dion Amago, Justin McCandless, Malte Tinnus (Bio/Nano 
 
 import moldesign
 # The short X.Y version.
-version = '0.7'
+version = '0.7.3'
 # The full version, including alpha/beta/rc tags.
 release = '0.7.3'
 

@@ -1,8 +1,8 @@
-Creating molecules
-==================
+Reading and building molecules
+==============================
 
 
-From names and ids
+From names and IDs
 ------------------
 You can use an IUPAC name:
 
@@ -66,7 +66,8 @@ For instance, a list of atoms:
 
 An amino acid residue from another molecule:
    >>> protein = mdt.from_pdb('3AID')
-   >>> mol = mdt.Molecule( protein.residues[3] )
+   >>> mol1 = mdt.Molecule(protein.atoms[0:20])
+   >>> mol2 = mdt.Molecule(protein.chains['A'].residue['PRO1'])
 
 Or even a list of molecules, atoms, and residues:
    >>> protein = mdt.from_pdb('3AID')

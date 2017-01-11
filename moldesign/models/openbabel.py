@@ -27,7 +27,8 @@ def exports(o):
     return o
 __all__ = []
 
-FFNAMES = {n: n.capitalize() for n in ['ghemical', 'mmff94', 'mmff94s', 'uff']}
+# uff disabled because it doesn't pass tests
+FFNAMES = {n: n.capitalize() for n in ['ghemical', 'mmff94', 'mmff94s']}
 UNITNAMES = {'kcal/mol': u.kcalpermol, 'kJ/mol': u.kjpermol}
 
 
@@ -39,7 +40,7 @@ class OpenBabelPotential(EnergyModelBase):
                                            short_description='Forcefield selection',
                                            type=str,
                                            default='mmff94s',
-                                           choices=['ghemical', 'mmff94', 'mmff94s', 'uff'])]
+                                           choices=['ghemical', 'mmff94', 'mmff94s'])]
 
     def prep(self):
         import openbabel as ob
