@@ -256,7 +256,7 @@ class Chain(Entity):
                 else:
                     outputs.append('-')
 
-            elif len(res.code) > 1:  # name is more than 1 character
+            elif res.code == '?':  # unknown residue type
                 if not bracket_open:
                     outputs.append('[')
                     bracket_open = True
@@ -279,6 +279,9 @@ class Chain(Entity):
                                    (res.name, res.index, res.chain.name, res.code))
                 else:
                     outputs.append(res.code)
+
+        if bracket_open:
+            outputs.append(']')
 
         if _html:
             outputs.append('</span>')

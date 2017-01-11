@@ -74,7 +74,10 @@ class DockerMaker(object):
 
         sourcedefs = {}
         for s in yamldefs.get('_SOURCES_', []):
-            sourcedefs.update(self.parse_yaml(s))
+            src = self.parse_yaml(s)
+            for item in src.itervalues():
+                _fix_build_path(item, os.path.dirname(s))
+            sourcedefs.update(src)
 
         sourcedefs.update(yamldefs)
         return sourcedefs
@@ -122,8 +125,8 @@ class DockerMaker(object):
                           nocache=self.no_cache)
         if step.build_dir is not None:
             tempname = '_docker_make_tmp/'
-            tempdir = '%s/%s' % (step.build_dir, tempname)
-            temp_df = tempdir + 'Dockerfile'
+            tempdir = os.path.abspath(os.path.join(step.build_dir, tempname))
+            temp_df = os.path.join(tempdir, 'Dockerfile')
             if not os.path.isdir(tempdir):
                 os.makedirs(tempdir)
             with open(temp_df, 'w') as df_out:
@@ -420,6 +423,20 @@ def printable_code(c):
     return '\n'.join(output)
 
 
+def _fix_build_path(item, filepath):
+    path = os.path.expanduser(filepath)
+
+    if 'build_directory' not in item:
+        return
+
+    elif os.path.isabs(item['build_directory']):
+        return
+
+    else:
+        item['build_directory'] = os.path.join(os.path.abspath(path),
+                                               item['build_directory'])
+
+
 def make_arg_parser():
     parser = argparse.ArgumentParser(description=
                                      "NOTE: Docker environmental variables must be set.\n"
@@ -500,4 +517,5 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."""
 
-if __name__ == '__main__': main()
+if __name__ == '__main__':
+    main()

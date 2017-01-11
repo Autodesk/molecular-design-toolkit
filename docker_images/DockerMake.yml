@@ -88,6 +88,7 @@ moldesign:
  requires:  # TODO: remove biopython dependency (it's in C ...)
   - python_install
   - biopython
+  - parmed
  build_directory: ../
  build: |
   COPY . /opt/molecular-design-toolkit
@@ -241,6 +242,33 @@ symmol:
   RUN mv /src/symmol/symmol /usr/local/bin
 
 
+dssp:
+  requires:
+   - base
+  build: |
+    RUN apt-get update \
+      && apt-get install -y --no-install-recommends wget  \
+      && wget ftp://ftp.cmbi.ru.nl/pub/software/dssp/dssp-2.0.4-linux-i386 \
+      && mv dssp-2.0.4-linux-i386 /usr/local/bin/dssp.exe \
+      && chmod +x /usr/local/bin/dssp.exe \
+      && apt-get -y clean \
+      && apt-get autoremove -y --purge \
+      && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+edtsurf:
+  requires:
+    - base
+  build: |
+      RUN apt-get update \
+      && apt-get install -y --no-install-recommends wget \
+      && cd /usr/local/bin \
+      && wget http://zhanglab.ccmb.med.umich.edu/EDTSurf/EDTSurf \
+      && chmod +x EDTSurf \
+      && apt-get -y clean \
+      && apt-get autoremove -y --purge \
+      && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+
 ########################
 # Python tools
 notebook:
@@ -249,7 +277,9 @@ notebook:
  build_directory: notebook/
  build: |
     RUN apt-get update \
-       && apt-get -y install python-matplotlib \
+       && apt-get -y install python-matplotlib gcc python-dev \
+       && pip install scandir \
+       && apt-get -y remove gcc python-dev --purge \
        && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
     RUN pip install \
         jupyter \
@@ -350,6 +380,7 @@ chem_python:
   - pyscf
   - pdbfixer
   - biopython
+  - parmed
 
 chem_notebook:
  requires:
@@ -367,6 +398,16 @@ biopython:
       && apt-get -y autoremove --purge \
       && apt-get -y clean
 
+
+parmed:
+  requires:
+   - python_install
+  build: |
+    RUN apt-get update && apt-get install -y gcc g++ gfortran python-dev  \
+      && pip install parmed \
+      && apt-get -y remove --purge gcc g++ gfortran python-dev \
+      && apt-get -y autoremove --purge \
+      && apt-get -y clean
 
 ########################
 # Still being developed
