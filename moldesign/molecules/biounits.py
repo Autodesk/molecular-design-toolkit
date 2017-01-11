@@ -56,7 +56,7 @@ class ChildList(AtomContainer):
         self._childinorder.insert_right(val)
 
     def __contains__(self, item):
-        if isinstance(item, basestring):
+        if isinstance(item, basestring) or item is None:
             return (item in self._childbyname)
         else:
             return (item in self._childinorder)

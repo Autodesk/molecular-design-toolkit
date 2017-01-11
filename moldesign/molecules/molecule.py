@@ -532,7 +532,7 @@ class MolTopologyMixin(object):
                 atom.chain.molecule = self
                 atom.chain.index = len(self.chains)
 
-                assert atom.chain.name not in self.chains
+                assert atom.chain not in self.chains
                 self.chains.add(atom.chain)
             else:
                 assert atom.chain.molecule is self
