@@ -23,10 +23,29 @@ from moldesign import units as u
 
 IMAGE = 'ambertools'
 
-AmberParameters = collections.namedtuple('AmberParameters',
-                                         'prmtop inpcrd job')
-ExtraAmberParameters = collections.namedtuple('GAFFParameters',
-                                              'lib frcmod job')
+
+class AmberParameters(object):
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state['job'] = None
+        return state
+
+    def __init__(self, prmtop, inpcrd, job=None):
+        self.prmtop = prmtop
+        self.inpcrd = inpcrd
+        self.job = job
+
+
+class ExtraAmberParameters(object):
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state['job'] = None
+        return state
+
+    def __init__(self, lib, frcmod, job=None):
+        self.lib = lib
+        self.frcmod = frcmod
+        self.job = job
 
 DNA_FF = {ff: 'leaprc.DNA.%s'%ff for ff in ['OL15', 'bsc1']}
 RNA_FF = {ff: 'leaprc.RNA.%s'%ff for ff in ['OL3', 'YIL']}

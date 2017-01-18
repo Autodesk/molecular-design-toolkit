@@ -24,8 +24,6 @@ import os
 from . import PACKAGEPATH
 from moldesign import utils
 
-__all__ = 'CCD_DATABASE RESIDUE_BONDS RESIDUE_ATOMS'.split()
-
 
 class _DatabaseEntry(object):
     """ Maps into a field stored in the database
@@ -41,10 +39,28 @@ class _DatabaseEntry(object):
     def __getitem__(self, item):
         return self.hostdb[item][self.index]
 
+    __contains__ = utils.Alias('hostdb.__contains__')
+
+    def iterkeys(self):
+        for key in self.hostdb.iterkeys():
+            if key == '__FIELDS__':
+                continue
+            yield key
+
+    def keys(self):
+        return list(self.iterkeys())
+
+    def iteritems(self):
+        for key in self:
+            yield key, self[key]
+
+    __iter__ = iterkeys
+
 
 # This is a very big dict, so we load it as a compressed database
 _bondfilename = os.path.join(PACKAGEPATH, '_static_data', 'chemical_components')
 CCD_DATABASE = utils.CompressedJsonDbm(_bondfilename, 'r', dbm=utils.ReadOnlyDumb)
-
 RESIDUE_BONDS = _DatabaseEntry(CCD_DATABASE, 'bonds')
 RESIDUE_ATOMS = _DatabaseEntry(CCD_DATABASE, 'atoms')
+RESIDUE_CCD_NAMES = _DatabaseEntry(CCD_DATABASE, 'name')
+RESIDUE_CCD_TYPES = _DatabaseEntry(CCD_DATABASE, 'type')
