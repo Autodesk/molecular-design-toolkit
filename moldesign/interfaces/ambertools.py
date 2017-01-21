@@ -11,15 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import collections
 import re
-
-import traitlets
 
 import moldesign as mdt
 import pyccc
-from moldesign import compute, uibase, utils
+from moldesign import compute, utils
 from moldesign import units as u
+from moldesign.widgets.parameterization import show_parameterization_results
 
 IMAGE = 'ambertools'
 
@@ -110,7 +108,7 @@ def _antechamber_calc_charges(mol, ambname, chargename, kwargs):
     charge = utils.if_not_none(mol.charge, 0)
     command = 'antechamber -fi pdb -i mol.pdb -fo mol2 -o out.mol2 -c %s -an n'%ambname
     if charge != 0:
-        command += ' -nc %d'%charge.value_in(u.q_e)
+        command += ' -nc %d' % charge.value_in(u.q_e)
 
     def finish_job(job):
         """Callback to complete the job"""
@@ -286,13 +284,7 @@ def assign_forcefield(mol, **kwargs):
 
     errors = _parse_tleap_errors(job, clean_molecule)
 
-    try:
-        report = ParameterizationDisplay(errors, clean_molecule, molout=newmol)
-        uibase.display_log(report, title='ERRORS/WARNINGS', show=True)
-    except traitlets.TraitError:
-        print 'Forcefield assignment: %s' % ('Success' if newmol is not None else 'Failure')
-        for err in errors:
-            print err.desc
+    show_parameterization_results(errors, clean_molecule, molout=newmol)
 
     if newmol is not None:
         return newmol
