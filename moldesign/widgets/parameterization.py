@@ -27,10 +27,22 @@ import collections
 import ipywidgets as ipy
 
 from moldesign import units as u
+from moldesign import uibase
+
+
+def show_parameterization_results(errormessages, molin, molout=None):
+    if uibase.widgets_enabled:
+        report = ParameterizationDisplay(errormessages, molin, molout)
+        uibase.display_log(report, title='ERRORS/WARNINGS', show=True)
+
+    else:
+        print 'Forcefield assignment: %s' % ('Success' if molout is not None else 'Failure')
+        for err in errormessages:
+            print err.desc
+
 
 
 class ParameterizationDisplay(ipy.Box):
-
     def __init__(self, errormessages, molin, molout=None):
         self.molin = molin
         self.molout = molout
@@ -57,6 +69,7 @@ class ParameterizationDisplay(ipy.Box):
                     self.errmsg)
 
         super(ParameterizationDisplay, self).__init__(children=children)
+
 
     def switch_display(self, d):
         old = d['old']

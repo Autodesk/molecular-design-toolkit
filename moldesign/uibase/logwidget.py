@@ -151,7 +151,9 @@ if widgets_enabled:
             if display and not self._displayed:
                 IPython.display.display(self)
                 self._displayed = True
-                if show: self.selected_index = len(self.children) - 1
+                if show:
+                    self.selected_index = len(self.children) - 1
+
 
 
 class Logger(ipy.Textarea if widgets_enabled else object):
