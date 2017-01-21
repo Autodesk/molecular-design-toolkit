@@ -4,6 +4,10 @@ This script drives an NWChem calculation given a generic QM specification
 """
 import json
 import os
+import pint
+
+ureg = pint.UnitRegistry()
+ureg.define('bohr = a0 = hbar/(m_e * c * fine_structure_constant')
 
 
 def run_calculation(parameters):
@@ -36,6 +40,31 @@ def write_inputs(parameters):
     for filename, contents in inputs.iteritems():
         with open(filename, 'w') as inputfile:
             inputfile.write(contents)
+
+
+def convert(q, units):
+    """
+    Convert a javascript quantity description into a floating point number in the desired units
+
+    Args:
+        q (dict): Quantity to convert (of form ``{value: <float>, units: <str>}`` )
+        units (str): name of the units
+
+    Returns:
+        float: value of the quantity in the passed unit system
+
+    Raises:
+        pint.DimensionalityError: If the units are incompatible with the desired quantity
+
+    Examples:
+        >>> q = {'value':1.0, 'units':'nm'}
+        >>> convert(q, 'angstrom')
+        10.0
+    """
+    quantity = q['value'] * ureg(q['units'])
+    return quantity.m_as(units)
+
+
 
 
 ##### helper routines below ######
@@ -78,8 +107,11 @@ def _theoryblock(calc):
 
 def _otherblocks(calc):
     lines = []
-    if calc['runType'] == 'minimization' and 'minimization_steps' in calc:
-        lines.append('driver\n  maxiter %d\nend\n' % calc['minimization_steps'])
+    if calc['runType'] == 'minimization':
+        lines.append('driver\n xyz opt\n print high\n')
+        if 'minimization_steps' in calc:
+            lines.append('maxiter %d' % calc['minimization_steps'])
+        lines.append('end')
 
     return '\n'.join(lines)
 
@@ -115,8 +147,75 @@ def _taskblock(calc):
     return 'task %s %s' % (_taskname(calc), tasktype)
 
 
+STATENAMES = {1: "SINGLET",
+              2: "DOUBLET",
+              3: "TRIPLET",
+              4: "QUARTET",
+              5: "QUINTET",
+              6: "SEXTET",
+              7: "SEPTET",
+              8: "OCTET"}
+
+
 def _multiplicityline(calc):
-    return 'mult %s' % calc.get('multiplicity', 1)
+    if calc.theory in ('rks', 'uks'):
+        return 'mult %s' % calc.get('multiplicity', 1)
+    else:
+        return STATENAMES[calc.get('multiplicity', 1)]
+
+
+def _constraintblock(calc):
+    """
+    Constraints / restraints are specified in JSON objects at calc.constraints and calc.restraints.
+
+    "Constraints" describe a specific degree of freedom and its value. This value is expected to be
+    rigorously conserved by any dynamics or optimization algorithms.
+
+    A "restraint", in constrast, is a harmonic restoring force applied to a degree of freedom.
+    Restraint forces should be added to the nuclear hamiltonian. A restraint's "value" is the
+    spring's equilibrium position.
+
+    The list at calc['constraints'] has the form:
+    [{type: <str>,
+      restraint: <bool>,
+      value: {value: <float>, units: <str>}
+      atomIdx0: <int>...} ...]
+
+    For example, fixes atom constraints have the form:
+    {type: 'atomPosition',
+     restraint: False,
+     atomIdx: <int>}
+
+    Restraints are described similary, but include a spring constant (of the appropriate units):
+    {type: 'bond',
+     restraint: True,
+     atomIdx1: <int>,
+     atomIdx2: <int>,
+     springConstant: {value: <float>, units: <str>},
+     value: {value: <float>, units: <str>}}
+    """
+    clist = calc.get('constraints', None)
+    if clist is None: return
+
+    lines = ['constraints']
+
+    for constraint in clist:
+        if constraint['type'] == 'position':
+            lines.append('  fix atom %d' % constraint['atomIdx'])
+        elif constraint['type'] == 'distance' and constraint['restraint']:
+            k = convert(constraint['springConstant'], 'hartree/(a0*a0)')
+            d0 = convert(constraint('value', 'a0'))
+            lines.append('  spring bond  %d %d %20.10f %20.10f' %
+                         (constraint['atomIdx1']+1, constraint['atomIdx2']+1, k, d0))
+        else:
+            raise NotImplementedError('Constraint type %s (as restraint: %b) not implemented' %
+                                      (constraint['type'], constraint['restraint']))
+
+    lines.append('end')
+
+    return '\n'.join(lines)
+
+
 
 
 def _chargeblock(calc):

@@ -1,2 +1,1 @@
-docker-py
-pyyaml
+docker-make >= 0.5

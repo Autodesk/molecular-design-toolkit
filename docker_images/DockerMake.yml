@@ -16,90 +16,114 @@ _ALL_:
 base:  # cache-buster - build this with --no-cache to force a complete rebuild.
  FROM: debian:jessie
 
-python_install:
+buildbase:
+ description: |
+    Well-outfitted image for building binaries. Rather than deploying this huge image,
+    binaries should be built here then copied into smaller deployment images
  requires:
   - base
  build: |
+  RUN apt-get update && apt-get upgrade
+  RUN apt-get install -y \
+        autoconf        \
+        automake        \
+        build-essential \
+        cmake           \
+        cmake-curses-gui\
+        csh             \
+        doxygen         \
+        gfortran        \
+        git             \
+        libatlas-dev    \
+        libblas-dev     \
+        libbz2-dev      \
+        libcr-dev       \
+        libfftw3-dev    \
+        libhdf5-dev     \
+        liblapack-dev   \
+        libnetcdf-dev   \
+        libopenmpi-dev  \
+        libpng12-dev    \
+        libpython-dev   \
+        libtool         \
+        mercurial       \
+        mpich2          \
+        mpich2-doc      \
+        patch           \
+        pkg-config      \
+        python          \
+        python-numpy    \
+        python-pip      \
+        python-scipy    \
+        python-tornado  \
+        python-yaml     \
+        python-zmq      \
+        subversion      \
+        swig            \
+        tcsh            \
+        vim             \
+        wget            \
+        zip
+  ENV TERM=dumb
+  RUN echo '#!/bin/bash' > /usr/local/bin/cleanapt \
+    && chmod +x /usr/local/bin/cleanapt
+
+
+deploybase:
+  description: lightweight image for deployment
+  requires:
+    - base
+  build_directory: ./deploybase
+  build: |
+    ADD cleanapt /usr/local/bin
+    RUN chmod +x /usr/local/bin/cleanapt
+    RUN apt-get update \
+      && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        git \
+        vim \
+        wget \
+      && cleanapt
+
+python_deploy_base:
+ requires:
+  - deploybase
+ build: |
   RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-         python \
-         python-numpy \
-         python-scipy \
-         python-yaml \
-         python-zmq \
-         python-tornado \
-         pkg-config \
-         libpng12-dev \
-         wget \
-    && wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py \
-    && apt-get -y clean \
-    && apt-get -y remove wget \
-    && apt-get autoremove -y --purge \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-  RUN mkdir -p /opt
+      && apt-get install -y --no-install-recommends \
+        python \
+        python-numpy \
+        python-scipy \
+        python-yaml \
+      && cleanapt
+  RUN cd /tmp \
+    && wget https://bootstrap.pypa.io/get-pip.py \
+    && python get-pip.py
   ENV PYTHONPATH=/opt
 
-devtools:
- description: |
-   A dev environment - intended to be mixed in to other images. Any images that require devtools
-   are not production-ready.
- requires:
-  - python_install
- build: |
-  RUN apt-get update
-  RUN apt-get -y install \
-      build-essential \
-      libcr-dev \
-      mpich2 \
-      mpich2-doc \
-      cmake \
-      git \
-      subversion \
-      mercurial \
-      libfftw3-dev \
-      libbz2-dev \
-      libopenmpi-dev \
-      libtool \
-      swig \
-      wget \
-      liblapack-dev \
-      libblas-dev \
-      gfortran \
-      csh \
-      tcsh \
-      cmake-curses-gui \
-      libhdf5-dev \
-      libatlas-dev \
-      liblapack-dev \
-      patch \
-      autoconf \
-      automake \
-      libnetcdf-dev \
-      doxygen
-  ENV TERM=dumb
 
 
 ############################################
 # moldesign
 # Note - this is built by CLONING the current repo, then building an sdist, then installing that.
-# It's convoluted, but it's to replicate what actually gets installed via PyPI
+# It's convoluted, but it replicate what actually gets installed via PyPI
 moldesign:
  description: Base installation of the MDT library. Built by cloning the current git repo.
- requires:  # TODO: remove biopython dependency (it's in C ...)
-  - python_install
-  - biopython
-  - parmed
+ requires:
+  - python_deploy_base
  build_directory: ../
  build: |
   COPY . /opt/molecular-design-toolkit
-  RUN apt-get update && apt-get install -y git \
-   && cd /opt && mv molecular-design-toolkit molecular-design-toolkit_dirty \
+  RUN cd /opt \
+   && mv molecular-design-toolkit molecular-design-toolkit_dirty \
    && git clone molecular-design-toolkit_dirty molecular-design-toolkit \
    && cd molecular-design-toolkit && python setup.py sdist \
-   && pip install dist/* \
-   && apt-get -y remove --purge git \
-   && apt-get -y autoremove --purge \
-   && apt-get -y clean
+   && pip install dist/*
+ copy_from:
+   biopython:
+     /usr/lib/python2.7/dist-packages/biopython: /usr/lib/python2.7/dist-packages
+   parmed:
+     /usr/lib/python2.7/dist-packages/parmed: /usr/lib/python2.7/dist-packages
 
 
 pyccc:
@@ -178,53 +202,58 @@ opsin:
     chmod +x /usr/local/bin/opsin
 
 
-ambertools:
- requires:
-  - python_install
- build_directory: ambertools
+ambertools_requirements:
  build: |
-    ENV AMBERHOME /opt/amber16/
-    ENV PATH /opt/amber16/bin:$PATH
-    RUN apt-get update \
+   ENV AMBERHOME /opt/amber16/
+   ENV PATH /opt/amber16/bin:$PATH
+   RUN  apt-get update \
      && apt-get install -y --no-install-recommends \
+             libbz2-dev \
+             libnetcdf-dev \
+             libfftw3-dev \
+             libnetcdf-dev \
+     && cleanapt
+
+ambertools_build:
+ requires:
+   - buildbase
+   - ambertools_requirements
+ build: |
+    RUN apt-get update
+    RUN apt-get install -y wget bzip2
+    RUN cd /opt \
+     && echo 'Expanding tar archive AmberTools16.tar.bz2 ...' \
+     && wget -nv "http://ambermd.org/cgi-bin/AmberTools16-get.pl?Name=AaronVirshup&Institution=Autodesk&City=SanFrancisco&State=CA&Country=USA" -O \
+           /opt/AmberTools16.tar.bz2 \
+     && tar -xjf AmberTools16.tar.bz2 && rm AmberTools16.tar.bz2
+    RUN apt-get install -y \
          flex \
          bison \
          csh \
          gfortran \
          g++ \
-         libbz2-dev \
-         libnetcdf-dev \
-         libfftw3-dev \
-         libnetcdf-dev \
          make \
          patch \
-         python-dev \
-         bzip2 \
-         wget \
-     && cd /opt \
-     && echo 'Expanding tar archive AmberTools16.tar.bz2 ...' \
-     && wget -nv "http://ambermd.org/cgi-bin/AmberTools16-get.pl?Name=AaronVirshup&Institution=Autodesk&City=SanFrancisco&State=CA&Country=USA" -O \
-           /opt/AmberTools16.tar.bz2 \
-     && tar -xjf AmberTools16.tar.bz2 && rm AmberTools16.tar.bz2 \
-     && cd /opt/amber16 \
+         python-dev
+    RUN cd /opt/amber16 \
      && echo Y | ./configure -noX11 --with-python /usr/bin/python --with-netcdf /usr/ gnu \
      && make -j6 install \
-     && rm -rf test AmberTools doc  # reduce image size after the build \
-     && apt-get -y remove --purge \
-         gfortran \
-         g++ \
-         python-dev \
-         wget \
-     && apt-get -y clean \
-     && apt-get autoremove -y --purge \
-     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+     && rm -rf test AmberTools doc  # reduce image size after the build
     RUN cd /opt/amber16 \
-      && echo "test -f /opt/amber16/amber.sh \
-      && source /opt/amber16/amber.sh" >> /root/.bash_profile
+      && echo "test -f /opt/amber16/amber.sh && source /opt/amber16/amber.sh" >> /root/.bash_profile
 
-symmol:
+ambertools:
+  requires:
+    - deploybase
+    - ambertools_requirements
+  copy_from:
+    ambertools_build:
+      /opt/amber16: /opt
+      /root/.bash_profile: /root
+
+symmol_build:
  requires:
-  - base
+  - buildbase
  build_directory: symmol
  build: |
   RUN mkdir -p /src/symmol
@@ -240,6 +269,13 @@ symmol:
    && apt-get autoremove -y --purge \
    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
   RUN mv /src/symmol/symmol /usr/local/bin
+
+symmol:
+  requires:
+   - deploybase
+  copy_from:
+    symmol_build:
+      /usr/local/bin/symmol: /usr/local/bin
 
 
 dssp:
@@ -273,14 +309,15 @@ edtsurf:
 # Python tools
 notebook:
  requires:
-  - python_install
+  - python_deploy_base
  build_directory: notebook/
  build: |
     RUN apt-get update \
-       && apt-get -y install python-matplotlib gcc python-dev \
+       && apt-get -y install --no-install-recommends \
+            python-matplotlib gcc python-dev \
        && pip install scandir \
        && apt-get -y remove gcc python-dev --purge \
-       && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+       && cleanapt
     RUN pip install \
         jupyter \
         ipywidgets
@@ -291,33 +328,29 @@ notebook:
     COPY run_notebook.sh /run_notebook.sh
 
 
-openmm: # NEWFEATURE: add GPU support (opencl/cuda)
+openmm_build:
  description: Basic OpenMM install (CPU only) with python bindings
  build_directory: openmm
  requires:
-  - python_install
+  - buildbase
  build: |
   RUN mkdir -p /src
   ADD OpenMM-7.0.1-Linux.zip /src/OpenMM.zip
-  RUN apt-get update \
-   && apt-get install -y \
-       gcc \
-       g++ \
-       python-dev \
-       zip \
-   && cd /src/ \
+  RUN cd /src/ \
    && unzip OpenMM.zip && rm OpenMM.zip \
    && cd /src/OpenMM-7.*-Linux \
-   && cat < echo "\n\n" | ./install.sh \
-   && rm -rf examples docs \
-   && apt-get -y remove --purge \
-       gcc \
-       g++ \
-       python-dev \
-       zip \
-   && apt-get -y clean \
-   && apt-get autoremove -y --purge \
-   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+   && cat < echo "\n\n" | ./install.sh
+
+
+openmm:
+  requires:
+    - python_deploy_base
+  copy_from:
+   openmm_build:
+     /usr/local/lib/python2.7/dist-packages/simtk/: /usr/local/lib/python2.7/dist-packages/
+     /usr/local/openmm/include: /usr/local/openmm
+     /usr/local/openmm/lib: /usr/local/openmm
+     /usr/local/openmm/licenses: /usr/local/openmm
 
 
 pdbfixer:
@@ -326,11 +359,23 @@ pdbfixer:
  build: |
   RUN pip install https://github.com/pandegroup/pdbfixer/archive/v1.3.1.tar.gz
 
-pyscf:
+
+pyscf_dependencies:
+  build: |
+    RUN apt-get update \
+     && apt-get install -y --no-install-recommends \
+        libblas-dev \
+        libgomp1 \
+        python-h5py \
+     && cleanapt
+
+
+pyscf_build:
  requires:
-  - python_install
+  - buildbase
+  - pyscf_dependencies
  build: |
-  RUN apt-get update && apt-get install -y \
+  RUN apt-get install -y \
     cmake \
     python-h5py \
     g++ \
@@ -344,16 +389,20 @@ pyscf:
    && cd /opt/pyscf/lib \
      && mv CMakeLists.txt CMakeLists.txt.old \
      && sed -e "s/libcint\.git/qcint.git/" CMakeLists.txt.old > CMakeLists.txt \
-     && mkdir build && cd build && cmake .. && make \
-   && apt-get -y remove --purge \
-       cmake \
-       g++ \
-       wget \
-       git \
-       gfortran \
-   && apt-get -y clean \
-   && apt-get autoremove -y --purge \
-   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+     && mkdir build && cd build \
+     && cmake .. \
+     && make \
+     && rm -rf /opt/pyscf/lib/build
+
+
+pyscf:
+  requires:
+    - python_deploy_base
+    - pyscf_dependencies
+  copy_from:
+    pyscf_build:
+      /opt/pyscf: /opt
+
 
 openbabel:
  requires:
@@ -366,11 +415,13 @@ openbabel:
    && apt-get autoremove -y --purge \
    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+
 pyquante2:
  requires:
   - python_install
  build: |
   RUN pip install git+git://github.com/rpmuller/pyquante2.git
+
 
 chem_python:
  description: All of the external python chemistry libraries in one place
@@ -382,36 +433,43 @@ chem_python:
   - biopython
   - parmed
 
+
 chem_notebook:
  requires:
   - notebook
   - chem_python
 
 
+####### BioPython ########
+biopython_build:
+  requires:
+   - buildbase
+  build: RUN pip install biopython
+
+
 biopython:
   requires:
-   - python_install
-  build: |
-    RUN apt-get update && apt-get install -y gcc gfortran python-dev  \
-      && pip install biopython \
-      && apt-get -y remove --purge gcc gfortran python-dev \
-      && apt-get -y autoremove --purge \
-      && apt-get -y clean
+    - python_deploy_base
+  copy_from:
+    biopython_build:
+      /usr/local/lib/python2.7/dist-packages/: /usr/local/lib/python2.7/
 
+
+####### ParmEd ##########
+parmed_build:
+  requires:
+   - buildbase
+  build: RUN  pip install parmed
 
 parmed:
   requires:
-   - python_install
-  build: |
-    RUN apt-get update && apt-get install -y gcc g++ gfortran python-dev  \
-      && pip install parmed \
-      && apt-get -y remove --purge gcc g++ gfortran python-dev \
-      && apt-get -y autoremove --purge \
-      && apt-get -y clean
+    - python_deploy_base
+  copy_from:
+    parmed_build:
+      /usr/local/lib/python2.7/dist-packages/: /usr/local/lib/python2.7/
 
-########################
-# Still being developed
-# These images will be huge and shouldn't be deployed
+
+
 
 cuda7_0:
  requires:
@@ -421,17 +479,39 @@ cuda7_0:
   RUN dpkg -i cuda-repo-ubuntu1404_7.0-28_amd64.deb && apt-get update && apt-get -y install cuda
 
 
-nwchem:
- requires:
-  - base
- build_directory: nwchem/
- description: Based on https://github.com/edoapra/docker-file/tree/master/nwchem-dev
- build: |
+
+############## NWChem ###########
+nwchem_requirements:
+  build_directory: nwchem/
+  description: Base libraries for BOTH running and building NWChem
+  build: |
     RUN         apt-get update \
-                   && apt-get -y upgrade \
-                   && apt-get install -y  gfortran  libopenmpi-dev openmpi-bin tcsh make ssh patch \
-                                          curl subversion wget unzip perl \
-                   && apt-get clean
+             && apt-get install -y libopenmpi-dev openmpi-bin \
+             && cleanapt
+    ENV            NWCHEM_TOP="/opt/nwchem" \
+                   NWCHEM_TARGET=LINUX64 \
+                   FFIELD=amber
+    ENV            AMBER_1=${NWCHEM_TOP}/src/data/amber_s/ \
+                   AMBER_2=${NWCHEM_TOP}/src/data/amber_q/ \
+                   AMBER_3=${NWCHEM_TOP}/src/data/amber_x/ \
+                   AMBER_4=${NWCHEM_TOP}/src/data/amber_u/ \
+                   SPCE=${NWCHEM_TOP}/src/data/solvents/spce.rst \
+                   CHARMM_S=${NWCHEM_TOP}/src/data/charmm_s/ \
+                   CHARMM_X=${NWCHEM_TOP}/src/data/charmm_x/ \
+                   PATH=$PATH:${NWCHEM_TOP}/bin/LINUX64
+    COPY run.sh run.py getresults.py /usr/bin/
+    RUN chmod +x /usr/bin/getresults.py /usr/bin/run.py /usr/bin/run.sh
+    ENV NWCHEMFILE="From https://svn.pnl.gov/svn/nwchem/trunk/src"
+
+
+
+nwchem_build:
+ requires:
+  - buildbase
+  - nwchem_requirements
+ description: Build image for NWChem. Based on https://github.com/edoapra/docker-file/tree/master/nwchem-dev
+ build: |
+    RUN         apt-get install -y patch curl perl
     #get OpenBLAS and compile with 64-bit integers
     WORKDIR     /opt
     RUN         mkdir -p /opt/lib/ \
@@ -442,10 +522,8 @@ nwchem:
                    && make -j3 TARGET=CORE2 INTERFACE64=1 NO_CBLAS=1 NO_LAPACK=1 NO_LAPACKE=1 libs shared \
                    &&  cp libopenblas.* /opt/lib \
                    && rm -rf /opt/OpenBLAS-develop
-    WORKDIR     /opt
-    ENV         NWCHEM_TOP="/opt/nwchem" \
-                   NWCHEM_TARGET=LINUX64 \
-                   NWCHEM_MODULES="nwdft driver stepper" \
+    WORKDIR      /opt
+    ENV          NWCHEM_MODULES="nwdft driver stepper" \
                    PYTHONVERSION=2.7 \
                    PYTHONHOME="/usr" \
                    USE_PYTHONCONFIG=Y \
@@ -458,7 +536,7 @@ nwchem:
     #ENV         MRCC_METHODS=y
     #ENV         CCSDTQ=y
     #ENV         CCSDTLR=y
-    RUN         mkdir -p nwchem \
+    RUN          mkdir -p nwchem \
                    && cd nwchem \
                    && svn co --depth empty https://svn.pnl.gov/svn/nwchem/trunk/src \
                    && cd src \
@@ -481,28 +559,21 @@ nwchem:
                    && rm -rf tce tools nwdft NWints geom symmetry util nwxc ddscf lapack blas rism \
                           argos peigs rmdft gradients symmetry property smd lucia dplot propery \
                           hessian ccsd mp2_grad moints cafe analyz dimqm /opt/nwchem/lib
-    ENV         FFIELD=amber \
-                   AMBER_1=${NWCHEM_TOP}/src/data/amber_s/ \
-                   AMBER_2=${NWCHEM_TOP}/src/data/amber_q/ \
-                   AMBER_3=${NWCHEM_TOP}/src/data/amber_x/ \
-                   AMBER_4=${NWCHEM_TOP}/src/data/amber_u/ \
-                   SPCE=${NWCHEM_TOP}/src/data/solvents/spce.rst \
-                   CHARMM_S=${NWCHEM_TOP}/src/data/charmm_s/ \
-                   CHARMM_X=${NWCHEM_TOP}/src/data/charmm_x/ \
-                   PATH=$PATH:${NWCHEM_TOP}/bin/LINUX64
-    COPY run.sh run.py getresults.py /usr/bin/
-    RUN chmod +x /usr/bin/getresults.py /usr/bin/run.py /usr/bin/run.sh
-    RUN apt-get install -y git make python python-dev \
-       && git clone https://github.com/NWChem-Python/nwapi \
+    RUN git clone https://github.com/NWChem-Python/nwapi \
        && cd nwapi \
        && make -f makefile.linux \
-       && python test.py \
-       && python setup.py install \
-       && apt-get -y remove --purge git make python-dev \
-       && apt-get -y autoremove --purge \
-       && apt-get -y clean
-    ENV NWCHEMFILE="From https://svn.pnl.gov/svn/nwchem/trunk/src"
+       && python test.py
 
+
+nwchem:
+  requires:
+    - python_deploy_base
+    - nwchem_requirements
+  copy_from:
+    nwchem_build:
+      /usr/local/lib/python2.7/dist-packages: /usr/local/lib/python2.7/
+      /opt/nwchem: /opt
+      /opt/lib: /opt
 
 
 
