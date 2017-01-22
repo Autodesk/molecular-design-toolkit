@@ -1,0 +1,65 @@
+opsin:
+  FROM: java
+  build: |
+    RUN mkdir -p /opt/opsin && cd /opt/opsin && \
+      wget https://bitbucket.org/dan2097/opsin/downloads/opsin-2.0.0-jar-with-dependencies.jar
+    RUN cmd='java -jar /opt/opsin/opsin-2.0.0-jar-with-dependencies.jar' && \
+      printf "#!/bin/bash\n$cmd \$@\n" > /usr/local/bin/opsin && \
+      chmod +x /usr/local/bin/opsin
+
+
+dssp:
+  requires:
+   - base
+  build: |
+    RUN apt-get update \
+      && apt-get install -y --no-install-recommends wget  \
+      && wget ftp://ftp.cmbi.ru.nl/pub/software/dssp/dssp-2.0.4-linux-i386 \
+      && mv dssp-2.0.4-linux-i386 /usr/local/bin/dssp.exe \
+      && chmod +x /usr/local/bin/dssp.exe \
+      && apt-get -y clean \
+      && apt-get autoremove -y --purge \
+      && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+edtsurf:
+  requires:
+    - base
+  build: |
+      RUN apt-get update \
+      && apt-get install -y --no-install-recommends wget \
+      && cd /usr/local/bin \
+      && wget http://zhanglab.ccmb.med.umich.edu/EDTSurf/EDTSurf \
+      && chmod +x EDTSurf \
+      && apt-get -y clean \
+      && apt-get autoremove -y --purge \
+      && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+
+nbo: # This ISN'T open source - we'll provide the dockerfile, but users must supply the source code
+ requires:
+  - buildbase
+ build_directory: buildfiles/nbo6_0
+ build: |
+  ADD nbo6.0-src.tar.gz /opt/
+  RUN cd /opt/nbo6 && sed -i.orig -e 's/NBODIR = \~\/nbo6/NBODIR = \/opt\/nbo6/g' Make.config
+  RUN cd /opt/nbo6 && make
+  RUN ln -s /opt/nbo6/bin/*.exe /usr/local/bin/
+  ENV NBOEXE=/opt/nbo6/bin/nbo6.i4.exe
+
+
+gamess:
+ requires:
+  - buildbase
+ build_directory: buildfiles/gamess
+ build: |
+  RUN apt-get install -y libatlas-base-dev
+  ADD gamess-current.tar.gz /opt
+  ADD config.tar /opt
+  RUN cd /opt/gamess/ddi \
+   && ./compddi | tee compddi.log \
+   && mv ddikick.x .. \
+   && cd /opt/gamess \
+   && ./compall | tee compall.log \
+   && ./lked gamess 00 | tee lked.log \
+   && mkdir -p /scr/root /root/scr \
+   && ln -s /opt/gamess/rungms /usr/local/bin/rungms

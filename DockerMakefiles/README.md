@@ -7,7 +7,7 @@ To make these calculations 1) easy, 2) portable, and 3) reproducible, users don'
 
 # About the images
 
-MDT uses a vendored version of `docker-make.py` to automate building and pushing images to the public repositories. The Dockerfiles for all images are defined in the `DockerMake.yml` file in this directory.
+`docker-make` is used to build and push the images to the public repositories. The Dockerfiles for all images are defined in the `DockerMake.yml` and its associates YAML sources in this directory.
 
 MDT relies on two types of dependencies:
 
