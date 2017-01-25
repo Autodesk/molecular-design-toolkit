@@ -1,20 +1,23 @@
+moldesign_requirements:
+ requires:
+   - biopython
+   - parmed
+
+
 moldesign:
  description: Base installation of the MDT library. Built by cloning the current git repo.
  requires:
-  - python_deploy_base
+  - notebook
+  - moldesign_requirements
  build_directory: ../
  build: |
   COPY . /opt/molecular-design-toolkit
   RUN cd /opt \
    && mv molecular-design-toolkit molecular-design-toolkit_dirty \
    && git clone molecular-design-toolkit_dirty molecular-design-toolkit \
+   && rm -r molecular-design-toolkit_dirty \
    && cd molecular-design-toolkit && python setup.py sdist \
    && pip install dist/*
- copy_from:
-   biopython:
-     /usr/lib/python2.7/dist-packages/biopython: /usr/lib/python2.7/dist-packages
-   parmed:
-     /usr/lib/python2.7/dist-packages/parmed: /usr/lib/python2.7/dist-packages
 
 
 pyccc:

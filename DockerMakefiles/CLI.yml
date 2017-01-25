@@ -2,7 +2,7 @@ opsin:
   FROM: java
   build: |
     RUN mkdir -p /opt/opsin && cd /opt/opsin && \
-      wget https://bitbucket.org/dan2097/opsin/downloads/opsin-2.0.0-jar-with-dependencies.jar
+      wget -nv https://bitbucket.org/dan2097/opsin/downloads/opsin-2.0.0-jar-with-dependencies.jar
     RUN cmd='java -jar /opt/opsin/opsin-2.0.0-jar-with-dependencies.jar' && \
       printf "#!/bin/bash\n$cmd \$@\n" > /usr/local/bin/opsin && \
       chmod +x /usr/local/bin/opsin
