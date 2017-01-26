@@ -418,7 +418,6 @@ class MolTopologyMixin(object):
         newmol.properties = self.properties.copy()
         return newmol
 
-
     def assert_atom(self, atom):
         """If passed an integer, just return self.atoms[atom].
          Otherwise, assert that the atom belongs to this molecule"""

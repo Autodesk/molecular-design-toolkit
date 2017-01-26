@@ -330,7 +330,7 @@ class PySCFPotential(QMBase):
         raise mdt.QMConvergenceError(method)
 
     def _build_theory(self, name, refobj):
-        if name in ('mscscf', 'casci', 'casscf'):
+        if name in ('mcscf', 'casci', 'casscf'):
             theory = THEORIES[name](refobj,
                                     self.params.active_orbitals,
                                     self.params.active_electrons)

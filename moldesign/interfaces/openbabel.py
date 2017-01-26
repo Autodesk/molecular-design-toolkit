@@ -192,7 +192,8 @@ def set_protonation(mol, ph=7.4):
     Returns:
         moldesign.Molecule: New molecule with adjusted protonation
     """
-    # TODO: this doesn't appear to work!!!
+    # TODO: this doesn't appear to do anything for most molecules!!!
+    # TODO: this renames hydrogens!!!
 
     pbmol = mol_to_pybel(mol)
     pbmol.OBMol.AddHydrogens(False, True, ph)
@@ -342,9 +343,6 @@ def pybel_to_mol(pbmol,
             else:
                 res = newresidues[residx]
 
-            # Assign the atom
-            if mdtatom.name in res:
-                mdtatom.name = '%s%d' % (mdtatom.name, pybatom.idx)  # prevent name clashes
             res.add(mdtatom)
 
         newatoms.append(mdtatom)

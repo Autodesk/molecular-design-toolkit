@@ -101,6 +101,7 @@ def warn_assemblies(mol, assemblies):
     # Don't warn if the only assembly is the asymmetric unit
     if len(assemblies) > 1 or len(assemblies.values()[0].transforms) > 1:
         print "WARNING: This PDB file contains the following biomolecular assemblies:"
+
         for name, asm in assemblies.iteritems():
             print 'WARNING: Assembly "%s": %d copies of chains %s'%(
                 name, len(asm.transforms), ', '.join(asm.chains))
