@@ -158,7 +158,7 @@ STATENAMES = {1: "SINGLET",
 
 
 def _multiplicityline(calc):
-    if calc.theory in ('rks', 'uks'):
+    if calc['theory'] in ('rks', 'uks'):
         return 'mult %s' % calc.get('multiplicity', 1)
     else:
         return STATENAMES[calc.get('multiplicity', 1)]

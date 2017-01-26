@@ -1,10 +1,12 @@
 nwchem_requirements:
-  build_directory: buildfiles/nwchem/
   description: Base libraries for BOTH running and building NWChem
   build: |
     RUN apt-get update \
-             && apt-get install -y libopenmpi-dev openmpi-bin \
-             && cleanapt
+      && apt-get install -y --no-install-recommends \
+           libopenmpi-dev \
+           openmpi-bin \
+           ssh \
+      && cleanapt
     ENV            NWCHEM_TOP="/opt/nwchem" \
                    NWCHEM_TARGET=LINUX64 \
                    FFIELD=amber \
@@ -17,9 +19,6 @@ nwchem_requirements:
                    CHARMM_S=${NWCHEM_TOP}/src/data/charmm_s/ \
                    CHARMM_X=${NWCHEM_TOP}/src/data/charmm_x/ \
                    PATH=$PATH:${NWCHEM_TOP}/bin/LINUX64
-    COPY run.sh run.py getresults.py /usr/bin/
-    RUN chmod +x /usr/bin/getresults.py /usr/bin/run.py /usr/bin/run.sh
-    ENV NWCHEMFILE="From https://svn.pnl.gov/svn/nwchem/trunk/src"
   copy_from:
     openblas:
       /opt/lib: /opt
@@ -71,14 +70,23 @@ nwchem_build:
     RUN git clone https://github.com/NWChem-Python/nwapi \
        && cd nwapi \
        && make -f makefile.linux \
-       && python test.py
+       && python test.py \
+       && python setup.py install \
+       && pip install pint
 
 
 nwchem:
   description: Deployable NWChem image
+  build_directory: buildfiles/nwchem/
   requires:
     - python_deploy_base
     - nwchem_requirements
+  build: |
+    COPY run.sh run.py getresults.py /usr/bin/
+    RUN chmod +x /usr/bin/getresults.py /usr/bin/run.py /usr/bin/run.sh
+    RUN pip install pint
+    ENV NWCHEMFILE="From https://svn.pnl.gov/svn/nwchem/trunk/src"
+    ENV PYTHONPATH=$PYTHONPATH:/opt
   copy_from:
     nwchem_build:
       /usr/local/lib/python2.7/dist-packages: /usr/local/lib/python2.7/

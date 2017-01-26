@@ -61,6 +61,8 @@ class NWChemQM(QMBase):
         parameters = self._jobparams.copy()
         parameters['runType'] = 'singlePoint'
         parameters['properties'] = list(requests)
+        if self.mol.constraints:
+            self.write_constraints(parameters)
         job = pyccc.Job(  # image=mdt.compute.get_image_path(IMAGE),
                 image=IMAGE,
                 command='run.py && getresults.py',
@@ -69,6 +71,23 @@ class NWChemQM(QMBase):
                 when_finished=self.finish,
                 name='nwchem/%s'%self.mol.name)
         return job
+
+    def write_constraints(self, parameters):
+        parameters['constraints'] = []
+        for constraint in self.mol.constraints:
+
+            if not constraint.satisfied():  # TODO: factor this out into NWChem subclass
+                raise ValueError('Constraints must be satisfied before passing to NWChem %s'
+                                 %constraint)
+
+            cjson = {'type': constraint['desc'],
+                     'value': constraint['value'].to_json()}
+            if cjson['type'] == 'position':
+                cjson['atomIdx'] = constraint.atom.index
+            elif cjson['type'] == 'distance':
+                cjson['atomIdx1'] = constraint.a1.index
+                cjson['atomIdx2'] = constraint.a2.index
+
 
     def finish(self, job):
         results = json.loads(job.get_output('results.json').read())
