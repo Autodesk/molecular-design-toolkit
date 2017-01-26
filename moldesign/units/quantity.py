@@ -227,7 +227,11 @@ class MdtQuantity(ureg.Quantity):
             >>> q.to_json()
             {'units':'angstrom', value: 1.0}
         """
-        return {'value':self.magnitude, 'units':str(self.units)}
+        mag = self.magnitude
+        if isinstance(mag, np.ndarray):
+            mag = mag.tolist()
+        return {'value': mag,
+                'units': str(self.units)}
 
 # monkeypatch pint's unit registry to return BuckyballQuantities
 ureg.Quantity = MdtQuantity
