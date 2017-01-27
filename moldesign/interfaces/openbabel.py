@@ -85,7 +85,7 @@ def read_stream(filelike, format, name=None):
     Returns:
         moldesign.Molecule: parsed result
     """
-    molstring = filelike.read()
+    molstring = str(filelike.read())  # openbabel chokes on unicode
     return read_string(molstring, format, name=name)
 
 
@@ -385,7 +385,7 @@ def from_smiles(smi, name=None):
         moldesign.Molecule: the translated molecule
     """
     if name is None: name = smi
-    pbmol = pb.readstring('smi', smi)
+    pbmol = pb.readstring('smi', str(smi))  # avoid passing unicode by casting to str
     pbmol.addh()
     pbmol.make3D()
     mol = pybel_to_mol(pbmol,
