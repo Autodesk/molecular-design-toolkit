@@ -14,6 +14,8 @@ import tempfile
 import threading
 from cStringIO import StringIO
 from uuid import uuid4
+from HTMLParser import HTMLParser
+
 
 import webcolors
 
@@ -44,6 +46,32 @@ def if_not_none(item, default):
         return default
     else:
         return item
+
+
+class MLStripper(HTMLParser):
+    """ Strips markup language tags from a string.
+
+    FROM http://stackoverflow.com/a/925630/1958900
+    """
+    def __init__(self):
+        self.reset()
+        self.fed = []
+
+    def handle_data(self, d):
+        self.fed.append(d)
+
+    def get_data(self):
+        return ''.join(self.fed)
+
+
+def html_to_text(html):
+    """
+    FROM http://stackoverflow.com/a/925630/1958900
+    """
+    s = MLStripper()
+    s.unescape = True  # convert HTML entities to text
+    s.feed(html)
+    return s.get_data()
 
 
 def can_use_widgets():
