@@ -42,13 +42,19 @@ class Frame(utils.DotDict):
 
     Example:
         >>> mol = mdt.from_name('benzene')
-        >>> mol.set_potential_model(moldesign.methods.models.RHF(basis='3-21g'))
+        >>> mol.set_potential_model(moldesign.models.RHF(basis='3-21g'))
         >>> traj = mol.minimize()
         >>> starting_frame = traj.frames[0]
         >>> assert starting_frame.potential_energy >= traj.frames[-1].potential_energy
         >>> assert starting_frame.minimization_step == 0
     """
-    pass
+    def __init__(self, traj):
+        self.traj = traj
+        super(Frame, self).__init__()
+
+    def write(self, *args, **kwargs):
+        self.traj.apply_frame(self)
+        self.traj._tempmol.write(*args, **kwargs)
 
 
 class _TrajAtom(object):
@@ -219,7 +225,7 @@ class Trajectory(object):
         """
         # TODO: callbacks to update a status display - allows monitoring a running simulation
         if properties is None:
-            new_frame = Frame()
+            new_frame = Frame(self)
             for attr in self.MOL_ATTRIBUTES:
                 val = getattr(self.mol, attr)
                 try:  # take numpy arrays' values, not a reference

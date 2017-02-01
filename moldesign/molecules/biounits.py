@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import operator
-
 import moldesign as mdt
 from moldesign import utils
 
@@ -24,6 +22,7 @@ class ChildList(AtomContainer):
     """
     __len__ = utils.Alias('_childinorder.__len__')
     __iter__ = utils.Alias('_childinorder.__iter__')
+    index = utils.Alias('_childinorder.index')
 
     def __str__(self):
         return str(self._childinorder._items)
@@ -123,6 +122,7 @@ class Entity(AtomContainer):
     atoms = utils.Alias('children.atoms')
     iteratoms = utils.Alias('children.iteratoms')
     rebuild = utils.Alias('children.rebuild')
+    index = utils.Alias('children.index')
 
     def __init__(self, name=None, molecule=None, index=None, pdbname=None, pdbindex=None,
                  **kwargs):
