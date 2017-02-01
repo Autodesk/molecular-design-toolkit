@@ -1,0 +1,127 @@
+LAMMPS (17 Nov 2016)
+units real
+atom_style full
+pair_style lj/charmm/coul/long 8.0 10.0 10.0
+bond_style harmonic
+angle_style harmonic
+dihedral_style charmm
+improper_style harmonic
+kspace_style pppm 0.0001
+read_data /var/folders/l9/th_rqp090gg3375t46j58vsm0000gq/T/tmpwolwJo/data.lammps_molecule
+  orthogonal box = (-7.11899 -0.265 7.09693) to (29.2502 30.5096 37.4841)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  1289 atoms
+  reading velocities ...
+  1289 velocities
+  scanning bonds ...
+  4 = max bonds/atom
+  scanning angles ...
+  6 = max angles/atom
+  scanning dihedrals ...
+  28 = max dihedrals/atom
+  reading bonds ...
+  1300 bonds
+  reading angles ...
+  1862 angles
+  reading dihedrals ...
+  4484 dihedrals
+  4 = max # of 1-2 neighbors
+  9 = max # of 1-3 neighbors
+  19 = max # of 1-4 neighbors
+  21 = max # of special neighbors
+info system
+info system
+print "$(x[1013])"
+8.8770000000000006679
+print "$(y[1013])"
+11.102999999999999758
+print "$(z[1013])"
+14.169000000000000483
+info system
+info system
+print "$(vx[1013])"
+0
+print "$(vy[1013])"
+0
+print "$(vz[1013])"
+0
+info system
+info system
+print "$(fx[1013])"
+0
+print "$(fy[1013])"
+0
+print "$(fz[1013])"
+0
+thermo_style custom step temp pe etotal
+run 0
+WARNING: No fixes defined, atoms won't move (../verlet.cpp:55)
+PPPM initialization ...
+WARNING: System is not charge neutral, net charge = -2 (../kspace.cpp:298)
+WARNING: Using 12-bit tables for long-range coulomb (../kspace.cpp:317)
+  G vector (1/distance) = 0.243816
+  grid = 15 15 12
+  stencil order = 5
+  estimated absolute RMS force accuracy = 0.0251739
+  estimated relative force accuracy = 7.58106e-05
+  using double precision FFTs
+  3d grid and FFT values/proc = 6800 2700
+Neighbor list info ...
+  1 neighbor list requests
+  update every 1 steps, delay 10 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 12
+  ghost atom cutoff = 12
+  binsize = 6 -> bins = 7 6 6
+Memory usage per processor = 18.6286 Mbytes
+Step Temp PotEng TotEng 
+       0            0    -4179.444    -4179.444 
+Loop time of 9.53674e-07 on 1 procs for 0 steps with 1289 atoms
+
+104.9% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0          | 0          | 0          |   0.0 |  0.00
+Bond    | 0          | 0          | 0          |   0.0 |  0.00
+Kspace  | 0          | 0          | 0          |   0.0 |  0.00
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0          | 0          | 0          |   0.0 |  0.00
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 9.537e-07  |            |       |100.00
+
+Nlocal:    1289 ave 1289 max 1289 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:    3690 ave 3690 max 3690 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    270269 ave 270269 max 270269 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 270269
+Ave neighs/atom = 209.673
+Ave special neighs/atom = 9.0706
+Neighbor list builds = 0
+Dangerous builds = 0
+print "$(pe)"
+-4179.4440241394422628
+info system
+info system
+print "$(vx[1005])"
+0
+print "$(vy[1005])"
+0
+print "$(vz[1005])"
+0
+info system
+info system
+set atom 1 x 10.367
+  1 settings made for x
+set atom 1 y 29.903
+  1 settings made for y
+set atom 1 z 18.753
+  1 settings made for z
+set atom 0 vx 0.0
+ERROR: Numeric index is out of bounds (../set.cpp:501)
