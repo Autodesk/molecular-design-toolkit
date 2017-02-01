@@ -10,3 +10,4 @@ lastfailed
 *.egg-info
 .cloudcomputecannon
 __pycache__
+.idea

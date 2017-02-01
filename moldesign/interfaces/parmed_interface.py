@@ -266,5 +266,5 @@ def _reassign_chains(f, mol):
         residue.chain = newchain
 
     return mdt.Molecule(mol.atoms,
-                        name=mol.name, description=mol.description)
+                        name=mol.name, metadata=mol.metadata)
 

@@ -40,13 +40,10 @@ class AtomGroup(object):
         self.viz2d = None
         self.viz3d = None
 
-    def __len__(self):
-        return len(self.atoms)
-
     @property
     def num_atoms(self):
         """ int: number of atoms in this object """
-        return len(self)
+        return len(self.atoms)
     natoms = num_atoms
 
     @property
@@ -396,6 +393,48 @@ class AtomGroup(object):
         assert matrix.shape == (4, 4)
         self.positions = mathutils.apply_4x4_transform(matrix, self.positions)
 
+    def atoms_within(self, radius, other=None, include_self=False):
+        """ Return all atoms in an object within a given radius of this object
+
+        Args:
+            radius (u.Scalar[length]): radius to search for atoms
+            other (AtomContainer): object containing the atoms to search (default:self.molecule)
+            include_self (bool): if True, include the atoms from this object (since, by definition,
+               their distance from this object is 0)
+
+        Returns:
+            AtomList: list of the atoms within ``radius`` of this object
+        """
+        if other is None:
+            other = self.atoms[0].molecule
+        if not include_self:
+            filter_atoms = set(self.atoms)
+        else:
+            filter_atoms = set()
+
+        distances = self.calc_distance_array(other=other)
+        mindists = distances.min(axis=0)
+
+        close_atoms = AtomList(atom for dist,atom in zip(mindists, other.atoms)
+                               if dist <= radius and atom not in filter_atoms)
+        return close_atoms
+
+    def residues_within(self, radius, other=None, include_self=False):
+        """ Return all atoms in an object within a given radius of this object
+
+        Args:
+            radius (u.Scalar[length]): radius to search for atoms
+            other (AtomContainer): object containing the atoms to search (default:self.molecule)
+            include_self (bool): if True, include the atoms from this object (since, by definition,
+               their distance from this object is 0)
+
+        Returns:
+            AtomList: list of the atoms within ``radius`` of this object
+        """
+        atoms = self.atoms_within(radius, other=other, include_self=include_self)
+        residues = collections.OrderedDict((atom.residue, None) for atom in atoms)
+        return residues.keys()
+
 
 class _AtomArray(object):
     def __init__(self, attrname):
@@ -406,8 +445,8 @@ class _AtomArray(object):
 
     def __set__(self, instance, value):
         assert len(value) == instance.num_atoms
-        for atom in instance.atoms:
-            setattr(atom, self.attrname)
+        for atom, atomval in zip(instance.atoms, value):
+            setattr(atom, self.attrname, atomval)
 
 
 class AtomContainer(AtomGroup):
@@ -473,51 +512,9 @@ class AtomContainer(AtomGroup):
                     atoms.append(nbr)
         return atoms
 
-    def atoms_within(self, radius, other=None, include_self=False):
-        """ Return all atoms in an object within a given radius of this object
-
-        Args:
-            radius (u.Scalar[length]): radius to search for atoms
-            other (AtomContainer): object containing the atoms to search (default:self.molecule)
-            include_self (bool): if True, include the atoms from this object (since, by definition,
-               their distance from this object is 0)
-
-        Returns:
-            AtomList: list of the atoms within ``radius`` of this object
-        """
-        if other is None:
-            other = self.atoms[0].molecule
-        if not include_self:
-            filter_atoms = set(self.atoms)
-        else:
-            filter_atoms = set()
-
-        distances = self.calc_distance_array(other=other)
-        mindists = distances.min(axis=0)
-
-        close_atoms = AtomList(atom for dist,atom in zip(mindists, other.atoms)
-                               if dist <= radius and atom not in filter_atoms)
-        return close_atoms
-
-    def residues_within(self, radius, other=None, include_self=False):
-        """ Return all atoms in an object within a given radius of this object
-
-        Args:
-            radius (u.Scalar[length]): radius to search for atoms
-            other (AtomContainer): object containing the atoms to search (default:self.molecule)
-            include_self (bool): if True, include the atoms from this object (since, by definition,
-               their distance from this object is 0)
-
-        Returns:
-            AtomList: list of the atoms within ``radius`` of this object
-        """
-        atoms = self.atoms_within(radius, other=other, include_self=include_self)
-        residues = collections.OrderedDict((atom.residue, None) for atom in atoms)
-        return residues.keys()
-
 
 @toplevel
-class AtomList(list, AtomContainer):
+class AtomList(AtomContainer, list):  # order is important, list will override methods otherwise
     """ A list of atoms with various helpful methods for creating and manipulating atom selections
 
     Args:
