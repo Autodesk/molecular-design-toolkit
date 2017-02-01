@@ -1,0 +1,15 @@
+Id,Name,Type,Order from Sun,Diameter (Earth=1),Diameter (km),Mass (Earth=1),Mean Distance from Sun (AU),Orbital Period (years),Orbital Eccentricity,Mean Orbital Velocity (km/sec),Rotation Period (days),Inclination of Axis (degrees),Mean Temperature at Surface (C),Gravity at Equator (Earth=1),Escape Velocity (km/sec),Mean Density (water=1),Atmospheric Composition,Number of Moons,Rings,Parent,Image,URI
+1,Sun,Star,0,109,1392000,333000,0,0,0,0,25.05,7.25,5600,28,617.7,1.4,H2+He,0,false,,Images\Sun.jpg,http://en.wikipedia.org/wiki/Sun
+2,Mercury,Terrestrial planet,1,0.382,4878,0.055,0.39,0.24,0.2056,47.89,58.65,0,125,0.38,4.25,5.43,none,0,false,1,Images\Mercury.jpg,http://en.wikipedia.org/wiki/Mercury_(planet)
+3,Venus,Terrestrial planet,2,0.949,12104,0.815,0.72,0.62,0.0068,35.03,-243,177.4,465,0.9,10.36,5.25,CO2,0,false,1,Images\Venus.jpg,http://en.wikipedia.org/wiki/Venus
+4,Earth,Terrestrial planet,3,1,12756,1,1,1,0.0167,29.79,1,23.45,15,1,11.18,5.52,N2+O2,1,false,1,Images\Earth.jpg,http://en.wikipedia.org/wiki/Earth
+5,Mars,Terrestrial planet,4,0.532,6787,0.107,1.52,1.88,0.0934,24.13,1.03,23.98,-53,0.38,5.02,3.93,CO2,2,false,1,Images\Mars.jpg,http://en.wikipedia.org/wiki/Mars
+6,Jupiter,Gas giant,6,11.209,142800,318,5.2,11.86,0.0483,13.06,0.41,3.08,-150,2.64,59.54,1.33,H2+He,63,true,1,Images\Jupiter.jpg,http://en.wikipedia.org/wiki/Jupiter
+7,Saturn,Gas giant,7,9.44,120000,95,9.54,29.46,0.056,9.64,0.44,26.73,-170,0.93,35.49,0.71,H2+He,62,true,1,Images\Saturn.jpg,http://en.wikipedia.org/wiki/Saturn
+8,Uranus,Gas giant,8,4.007,51118,15,19.18,84.01,0.0461,6.81,-0.72,97.92,-200,0.89,21.29,1.24,H2+He,27,true,1,Images\Uranus.jpg,http://en.wikipedia.org/wiki/Uranus
+9,Neptune,Gas giant,9,3.883,49528,17,30.06,164.8,0.0097,5.43,0.72,28.8,-210,1.12,23.71,1.67,H2+He,13,true,1,Images\Neptune.jpg,http://en.wikipedia.org/wiki/Neptune
+10,Ceres,Dwarf planet,5,0.076,974.6,0.00016,2.76596,4.599,0.07976,17.882,0.378,3,-106,0.028,0.51,2.077,none,0,false,1,Images\Ceres.jpg,http://en.wikipedia.org/wiki/Ceres_(dwarf_planet)
+11,Pluto,Dwarf planet,10,0.18,2300,0.002,39.44,247.7,0.2482,4.74,-6.38,122,-220,0.06,1.27,2.03,CH4,3,false,1,Images\Pluto.jpg,http://en.wikipedia.org/wiki/Pluto
+12,Haumea,Dwarf planet,11,0.11,1300,0.0007,43.335,285.4,0.18874,4.484,0.163,,-223,0.045,0.84,2.95,none?,2,false,1,Images\Haumea.jpg,http://en.wikipedia.org/wiki/Haumea_(dwarf_planet)
+13,Makemake,Dwarf planet,12,0.1255,1420,0.00067,45.791,309.88,0.159,4.419,0.32,,-240,0.051,0.8,2,maybe CH4,0,false,1,Images\Makemake.jpg,http://en.wikipedia.org/wiki/Makemake_(dwarf_planet)
+14,Eris,Dwarf planet,13,0.2115,2326,0.0028,67.6681,557,0.44177,3.436,1,,-230,0.082,1.31,1.745,maybe CH4,1,false,1,Images\Eris.jpg,http://en.wikipedia.org/wiki/Eris_(dwarf_planet)
