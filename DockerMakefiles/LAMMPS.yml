@@ -4,13 +4,15 @@ lammps_requirements:
     RUN apt-get -y update
     RUN apt-get -y install \
         bc \
+        ssh \
         mpich2 \
         python-dev \
         libz-dev \
         fftw3-dev
 
-    # ENV PYTHONPATH /opt/python:${PYTHONPATH}
-    # ENV LD_LIBRARY_PATH /opt/src:${LD_LIBRARY_PATH}
+    ENV PATH=${PATH}:/usr/lib
+    ENV PYTHONPATH=${PYTHONPATH}:/opt/lammps/python
+    ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/lammps/src
 
 lammps_build:
  requires:
@@ -18,39 +20,22 @@ lammps_build:
   - lammps_requirements
  description: Build image for LAMMPS. Based on https://github.com/malramsay64/lammps-docker/blob/master/Dockerfile
  build: |
-    #RUN wget -P /tmp https://packages.openkim.org/rpm/centos/openkim-centos-rhel-repo-1-2.noarch.rpm && \
-        #rpm -i /tmp/openkim-centos-rhel-repo-1-2.noarch.rpm && \
-        #rm /tmp/openkim-centos-rhel-repo-1-2.noarch.rpm && \
-        #yum update && \
-        #yum -y install kim-api
 
-    #RUN wget -P /tmp http://math.lbl.gov/voro++/download/dir/voro++-0.4.6.tar.gz && \
-        #cd /tmp && \
-        #tar xvzf voro++-0.4.6.tar.gz && \
-        #cd voro++-0.4.6 && \
-        #make && make install && \
-        #rm -rf /tmp/voro*
-
-    RUN git clone https://github.com/lammps/lammps.git /opt/lammps 
-    
-    RUN cd /opt/lammps
-    RUN git fetch && \
+    RUN git clone https://github.com/lammps/lammps.git /opt/lammps && \
+        cd /opt/lammps && \
+        git fetch && \
         git checkout stable
-    RUN cd opt/lammps/src 
-
-    # RUN export PYTHONPATH=${PYTHONPATH}:/opt/python && \
-    #     export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/src
-
-    ENV PYTHONPATH /opt/lammps/python:${PYTHONPATH}
-    ENV LD_LIBRARY_PATH /opt/lammps/src:${LD_LIBRARY_PATH}
-
-    RUN cd /opt/lammps/src
-
-    RUN make yes-ASPHERE yes-BODY yes-CLASS2 yes-COLLOID yes-COMPRESS yes-CORESHELL yes-DIPOLE yes-GRANULAR yes-KSPACE yes-MANYBODY
-    RUN make yes-MC yes-MOLECULE yes-OPT yes-PERI yes-PERI yes-PYTHON yes-REPLICA yes-RIGID yes-SHOCK yes-SNAP yes-SRD
 
     RUN cd /opt/lammps/src && \
-        make mpi mode=shlib -j4
+        make yes-ASPHERE yes-BODY yes-CLASS2 yes-COLLOID yes-COMPRESS yes-CORESHELL yes-DIPOLE yes-GRANULAR yes-KSPACE yes-MANYBODY && \
+        make yes-MC yes-MOLECULE yes-OPT yes-PERI yes-PERI yes-PYTHON yes-REPLICA yes-RIGID yes-SHOCK yes-SNAP yes-SRD
+
+    # RUN cd /opt/lammps/src && \
+    #     make serial mode=shlib -j4
+
+    RUN cd /opt/lammps/src && \
+        make mpi mode=shlib -j4 MPI_INC="-DMPICH_SKIP_MPICXX -I/usr/include/mpich" MPI_LIB="-Wl,-rpath,/usr/lib/mpich/lib -L/usr/lib/mpich/lib -lmpl -lmpich"
+
 
 lammps:
   description: Deployable LAMMPS image
@@ -61,4 +46,5 @@ lammps:
   copy_from:
     lammps_build:
       /usr/local/lib/python2.7/dist-packages: /usr/local/lib/python2.7/
+      /usr/lib: /usr
       /opt/lammps: /opt

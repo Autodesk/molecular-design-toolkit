@@ -10,6 +10,7 @@ _SOURCES_:
   - PySCF.yml
   - PythonTools.yml
   - SymMol.yml
+  - LAMMPS.yml
 
 _ALL_:
   - ambertools
@@ -24,7 +25,7 @@ _ALL_:
   - moldesign_notebook
   - moldesign_minimal
   - lammps
-
+  - parmed
 
 ##################################################
 # Base image definitions
