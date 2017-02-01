@@ -21,31 +21,11 @@ from moldesign import units as u
 from moldesign.compute import DummyJob
 from moldesign.exceptions import NotCalculatedError
 from moldesign.min.base import MinimizerBase
-from moldesign.molecules.notebook_display import MolNotebookMixin
+
+from .notebook_display import MolNotebookMixin
+from .properties import MolecularProperties
 from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond
 from .coord_arrays import *
-
-
-@toplevel
-class MolecularProperties(utils.DotDict):
-    """ Stores property values for a molecule.
-    These objects will be generally created and updated by EnergyModels, not by users.
-    """
-    def __init__(self, mol, **properties):
-        """Initialization: ``properties`` MUST include positions.
-
-        Args:
-            mol (Molecule): molecule that these properties are associated with
-            **properties (dict): values of molecular properties (MUST include positions as a key)
-        """
-        # ADD_FEATURE: always return stored properties in the default unit systems
-        super(MolecularProperties, self).__init__(positions=mol.positions.copy(), **properties)
-
-    def geometry_matches(self, mol):
-        """Returns:
-            bool: True if the molecule's ``position`` is the same as these properties' ``position``
-        """
-        return np.array_equal(self.positions, mol.positions)
 
 
 class MolConstraintMixin(object):

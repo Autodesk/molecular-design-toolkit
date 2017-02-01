@@ -17,18 +17,18 @@ import collections
 import moldesign as mdt
 from moldesign import utils, data
 
-from . import Entity, toplevel
+from . import BioContainer, toplevel
 
 
 @toplevel
-class Chain(Entity):
+class Chain(BioContainer):
     """ Biomolecular chain class - its children are almost always residues.
 
     Attributes:
         parent (mdt.Molecule): the molecule this residue belongs to
         chain (Chain): the chain this residue belongs to
     """
-    @utils.args_from(Entity)
+    @utils.args_from(BioContainer)
     def __init__(self, pdbname=None, **kwargs):
         super(Chain, self).__init__(pdbname=pdbname, **kwargs)
         if self.name is None:
@@ -131,7 +131,7 @@ class Chain(Entity):
     def copy(self):
         newatoms = super(Chain, self).copy()
         return newatoms[0].chain
-    copy.__doc__ = Entity.copy.__doc__
+    copy.__doc__ = BioContainer.copy.__doc__
 
     @property
     def num_residues(self):

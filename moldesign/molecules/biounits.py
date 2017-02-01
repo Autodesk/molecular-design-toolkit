@@ -102,7 +102,7 @@ def _sortkey(x):
 
 
 @toplevel
-class Entity(AtomContainer):
+class BioContainer(AtomContainer):
     """
     Generalized storage mechanism for hierarchical representation of biomolecules,
     e.g. by residue, chain, etc. Permits other groupings, provided that everything is
@@ -112,7 +112,7 @@ class Entity(AtomContainer):
     ``entity.childname`` or ``entity['childname']`` or ``entity[index]``
 
     Yields:
-        Entity or mdt.Atom: this entity's children, in order
+        BioContainer or mdt.Atom: this entity's children, in order
     """
 
     __getitem__ = utils.Alias('children.__getitem__')
@@ -135,7 +135,7 @@ class Entity(AtomContainer):
             pdbname (str): PDB-format name of this entity
             pdbindex (str): Index of this entity in PDB format
         """
-        super(Entity, self).__init__()
+        super(BioContainer, self).__init__()
         self.children = ChildList(self)
         self.molecule = molecule
         self.name = name
@@ -154,7 +154,7 @@ class Entity(AtomContainer):
             KeyError: if an object with this key already exists
 
         Args:
-            item (Entity or mdt.Atom): the child object to add
+            item (BioContainer or mdt.Atom): the child object to add
             key (str): Key to retrieve this item (default: ``item.name`` )
         """
         if key is None:
@@ -215,7 +215,7 @@ class Entity(AtomContainer):
 
 
 @toplevel
-class Instance(Entity):
+class Instance(BioContainer):
     """ The singleton biomolecular container for each ``Molecule``. Its children are generally
     PDB chains. Users won't ever really see this object.
     """
