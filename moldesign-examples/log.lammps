@@ -160,3 +160,28 @@ Ave neighs/atom = 210.431
 Ave special neighs/atom = 9.0706
 Neighbor list builds = 19
 Dangerous builds = 18
+info system
+info system
+print "$(x[1013])"
+9.1949407585949192168
+print "$(y[1013])"
+11.451470715040096948
+print "$(z[1013])"
+15.346603769920546867
+info system
+info system
+print "$(vx[1013])"
+-0.0039725141211885799108
+print "$(vy[1013])"
+-0.0015766077350572761662
+print "$(vz[1013])"
+-0.010748494668691991466
+info system
+info system
+print "$(fx[1013])"
+0.98838425169693155947
+print "$(fy[1013])"
+-14.583172882856926478
+print "$(fz[1013])"
+8.9072082812443245103
+Total wall time: 1:43:07
