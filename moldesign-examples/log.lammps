@@ -7,7 +7,7 @@ angle_style harmonic
 dihedral_style charmm
 improper_style harmonic
 kspace_style pppm 0.0001
-read_data /var/folders/l9/th_rqp090gg3375t46j58vsm0000gq/T/tmpwolwJo/data.lammps_molecule
+read_data /var/folders/l9/th_rqp090gg3375t46j58vsm0000gq/T/tmpvO1faK/data.lammps_molecule
   orthogonal box = (-7.11899 -0.265 7.09693) to (29.2502 30.5096 37.4841)
   1 by 1 by 1 MPI processor grid
   reading atoms ...
@@ -49,14 +49,48 @@ print "$(vz[1013])"
 info system
 info system
 print "$(fx[1013])"
-0
+8.4879833792737108472e-314
 print "$(fy[1013])"
-0
+9.4428812719891132698e-312
 print "$(fz[1013])"
-0
+9.4216613119006310485e-312
+neighbor 2.0 bin
+timestep 1.0
 thermo_style custom step temp pe etotal
-run 0
-WARNING: No fixes defined, atoms won't move (../verlet.cpp:55)
+thermo 10
+fix 1 all nvt temp 300.0 300.0 100.0
+group hbonds type 4 16 10 5 11 2 8 13 12
+689 atoms in group hbonds
+fix 2 hbonds rattle 0.0001 20 0 t 5 6 m 1.0 a 31
+  92 = # of size 2 clusters
+  0 = # of size 3 clusters
+  0 = # of size 4 clusters
+  0 = # of frozen angles
+neighbor 2.0 bin
+timestep 1.0
+thermo_style custom step temp pe etotal
+thermo 10
+fix 1 all nvt temp 300.0 300.0 100.0
+group hbonds type 4 16 10 5 11 2 8 13 12
+689 atoms in group hbonds
+fix 2 hbonds rattle 0.0001 20 0 t 5 6 m 1.0 a 31
+  92 = # of size 2 clusters
+  0 = # of size 3 clusters
+  0 = # of size 4 clusters
+  0 = # of frozen angles
+neighbor 2.0 bin
+timestep 1.0
+thermo_style custom step temp pe etotal
+thermo 10
+fix 1 all nvt temp 300.0 300.0 100.0
+group hbonds type 4 16 10 5 11 2 8 13 12
+689 atoms in group hbonds
+fix 2 hbonds rattle 0.0001 20 0 t 5 6 m 1.0 a 31
+  92 = # of size 2 clusters
+  0 = # of size 3 clusters
+  0 = # of size 4 clusters
+  0 = # of frozen angles
+run 200
 PPPM initialization ...
 WARNING: System is not charge neutral, net charge = -2 (../kspace.cpp:298)
 WARNING: Using 12-bit tables for long-range coulomb (../kspace.cpp:317)
@@ -74,54 +108,55 @@ Neighbor list info ...
   master list distance cutoff = 12
   ghost atom cutoff = 12
   binsize = 6 -> bins = 7 6 6
-Memory usage per processor = 18.6286 Mbytes
+Memory usage per processor = 19.8786 Mbytes
 Step Temp PotEng TotEng 
-       0            0    -4179.444    -4179.444 
-Loop time of 9.53674e-07 on 1 procs for 0 steps with 1289 atoms
+       0            0   -4179.4486   -4179.4486 
+      10    144.04034   -4719.4291   -4179.5844 
+      20    277.46019   -5205.5623    -4165.677 
+      30    318.82877   -5344.9672   -4150.0378 
+      40    299.26578   -5262.1432   -4140.5334 
+      50    282.67358   -5193.8539   -4134.4296 
+      60    281.08847   -5181.8761   -4128.3925 
+      70    290.65138    -5211.586   -4122.2619 
+      80    298.87635   -5236.4983    -4116.348 
+      90    297.86912   -5226.2928   -4109.9175 
+     100    302.43081    -5238.005   -4104.5331 
+     110    317.75694   -5290.1682   -4099.2559 
+     120    313.02883   -5268.8831   -4095.6912 
+     130    296.83795   -5204.5817   -4092.0711 
+     140    313.75478   -5266.4548   -4090.5421 
+     150    322.05824   -5295.3643   -4088.3312 
+     160    323.17313   -5299.7748   -4088.5633 
+     170    317.07656   -5278.2833    -4089.921 
+     180    320.49039   -5294.5648   -4093.4079 
+     190    316.16636   -5283.0967   -4098.1457 
+     200    306.23636   -5251.6167   -4103.8821 
+Loop time of 1.39493 on 1 procs for 200 steps with 1289 atoms
 
-104.9% CPU use with 1 MPI tasks x no OpenMP threads
+Performance: 12.388 ns/day, 1.937 hours/ns, 143.377 timesteps/s
+99.9% CPU use with 1 MPI tasks x no OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0          | 0          | 0          |   0.0 |  0.00
-Bond    | 0          | 0          | 0          |   0.0 |  0.00
-Kspace  | 0          | 0          | 0          |   0.0 |  0.00
-Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0          | 0          | 0          |   0.0 |  0.00
-Output  | 0          | 0          | 0          |   0.0 |  0.00
-Modify  | 0          | 0          | 0          |   0.0 |  0.00
-Other   |            | 9.537e-07  |            |       |100.00
+Pair    | 0.95043    | 0.95043    | 0.95043    |   0.0 | 68.13
+Bond    | 0.086209   | 0.086209   | 0.086209   |   0.0 |  6.18
+Kspace  | 0.2257     | 0.2257     | 0.2257     |   0.0 | 16.18
+Neigh   | 0.11851    | 0.11851    | 0.11851    |   0.0 |  8.50
+Comm    | 0.0045416  | 0.0045416  | 0.0045416  |   0.0 |  0.33
+Output  | 0.00032425 | 0.00032425 | 0.00032425 |   0.0 |  0.02
+Modify  | 0.0082233  | 0.0082233  | 0.0082233  |   0.0 |  0.59
+Other   |            | 0.0009899  |            |       |  0.07
 
 Nlocal:    1289 ave 1289 max 1289 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
-Nghost:    3690 ave 3690 max 3690 min
+Nghost:    3661 ave 3661 max 3661 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
-Neighs:    270269 ave 270269 max 270269 min
+Neighs:    271246 ave 271246 max 271246 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
 
-Total # of neighbors = 270269
-Ave neighs/atom = 209.673
+Total # of neighbors = 271246
+Ave neighs/atom = 210.431
 Ave special neighs/atom = 9.0706
-Neighbor list builds = 0
-Dangerous builds = 0
-print "$(pe)"
--4179.4440241394422628
-info system
-info system
-print "$(vx[1005])"
-0
-print "$(vy[1005])"
-0
-print "$(vz[1005])"
-0
-info system
-info system
-set atom 1 x 10.367
-  1 settings made for x
-set atom 1 y 29.903
-  1 settings made for y
-set atom 1 z 18.753
-  1 settings made for z
-set atom 0 vx 0.0
-ERROR: Numeric index is out of bounds (../set.cpp:501)
+Neighbor list builds = 19
+Dangerous builds = 18
