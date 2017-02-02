@@ -5,8 +5,8 @@
 pyquante.log
 _docker_make_tmp
 lastfailed
-/dist
-/build
+dist
+build
 *.egg-info
 .cloudcomputecannon
 __pycache__

@@ -915,7 +915,7 @@ class Molecule(AtomGroup,
             return '<%s (%s), %d atoms>' % (self.name,
                                             self.__class__.__name__,
                                             len(self.atoms))
-        except:
+        except (KeyError, AttributeError):
             return '<molecule (error in __repr__) at %s>' % id(self)
 
     def __str__(self):

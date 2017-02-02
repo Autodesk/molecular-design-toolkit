@@ -8,8 +8,8 @@ from moldesign import units as u
 
 from . import helpers
 
-
 registered_types = {}
+
 
 def typedfixture(*types, **kwargs):
     """This is a decorator that lets us associate fixtures with one or more arbitrary types.
@@ -82,7 +82,7 @@ def protein_default_amber_forcefield():
 
 @typedfixture('hasmodel')
 def gaff_model_gasteiger(small_molecule):
-    small_molecule.set_energy_model(mdt.models.GAFF, charges='gasteiger')
+    small_molecule.set_energy_model(mdt.models.GAFF, partial_charges='gasteiger')
     return small_molecule
 
 

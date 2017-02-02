@@ -30,8 +30,8 @@ class ChildList(AtomContainer):
     def __repr__(self):
         try:
             return '<Children of %s: %s>' % (self.parent, self)
-        except:
-            return '<ChildList @ %x (__repr__ failed)>' % id(self)
+        except (KeyError, AttributeError):
+            return '<ChildList @ %x (exception in self.__repr__)>' % id(self)
 
     def __init__(self, parent):
         super(ChildList, self).__init__()
@@ -67,12 +67,8 @@ class ChildList(AtomContainer):
         try:
             return self._childbyname[item]
         except KeyError:
-            try:
-                error_msg = 'ChildList object in %s has no attribute %s.' % (
-                    self.parent, item)
-            except:  # during copy / depickling, might encounter unset attrs
-                error_msg = 'Lookup failed'
-            raise AttributeError(error_msg)
+            raise AttributeError('ChildList object in %s has no attribute %s.' %
+                                 (self.parent.__repr__(), item))
 
     def iteratoms(self):
         """Iterate over all atoms
@@ -109,7 +105,7 @@ class BioContainer(AtomContainer):
     tree-like.
 
     All children of a given entity must have unique names. An individual child can be retrieved with
-    ``entity.childname`` or ``entity['childname']`` or ``entity[index]``
+    ``biocontainer.childname`` or ``biocontainer['childname']`` or ``biocontainer[index]``
 
     Yields:
         BioContainer or mdt.Atom: this entity's children, in order
@@ -122,18 +118,17 @@ class BioContainer(AtomContainer):
     atoms = utils.Alias('children.atoms')
     iteratoms = utils.Alias('children.iteratoms')
     rebuild = utils.Alias('children.rebuild')
-    index = utils.Alias('children.index')
 
     def __init__(self, name=None, molecule=None, index=None, pdbname=None, pdbindex=None,
                  **kwargs):
         """  Initialization:
 
         Args:
-            name (str): Name of this entity
-            parent (mdt.Molecule): molecule this entity belongs to
-            index (int): index of this entity in the parent molecule
-            pdbname (str): PDB-format name of this entity
-            pdbindex (str): Index of this entity in PDB format
+            name (str): Name of this biocontainer
+            parent (mdt.Molecule): molecule this biocontainer belongs to
+            index (int): index of this biocontainer in the parent molecule
+            pdbname (str): PDB-format name of this biocontainer
+            pdbindex (str): Index of this biocontainer in PDB format
         """
         super(BioContainer, self).__init__()
         self.children = ChildList(self)
@@ -166,19 +161,13 @@ class BioContainer(AtomContainer):
     def __dir__(self):
         return (self.__dict__.keys() +
                 self.__class__.__dict__.keys() +
-                [x.name for x in self])
+                [x.name for x in self.children])
 
     def __getattr__(self, item):
-        if not hasattr(self, 'children'):
-            raise AttributeError("Uninitialized")
-        try:
+        if hasattr(self, 'children') and item in self.children:
             return self.children[item]
-        except KeyError:
-            try:
-                error_msg = '%s has no attribute "%s"' % (self, item)
-            except:  # during copy / depickling, might encounter unset attrs
-                error_msg = 'Lookup failed'
-            raise AttributeError(error_msg)
+        else:
+            raise AttributeError('%s has no attribute "%s"' % (self.__repr__(), item))
 
     def __hash__(self):
         """ Explicitly hash by object id
@@ -194,8 +183,8 @@ class BioContainer(AtomContainer):
                 return '<%s in %s>' % (self, self.molecule)
             else:
                 return '<%s (no molecule)>' % self
-        except:
-            return '<%s at %s (exc in __repr__)>' % (self.__class__.__name__,
+        except (KeyError, AttributeError):
+            return '<%s at %s (exception in __repr__)>' % (self.__class__.__name__,
                                                      id(self))
 
     def __str__(self):

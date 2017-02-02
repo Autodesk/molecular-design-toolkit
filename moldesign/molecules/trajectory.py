@@ -204,7 +204,7 @@ class Trajectory(object):
     def __repr__(self):
         try:
             return '<%s>' % str(self)
-        except Exception:
+        except (KeyError, AttributeError):
             return '<Trajectory object @ %s (exception in repr)>' % hex(id(self))
 
     def __add__(self, other):

@@ -321,8 +321,10 @@ class Residue(BioContainer):
                 return None
             self._backbone = AtomList()
             for name in data.BACKBONES[self.type]:
-                try: self._backbone.append(self[name])
-                except KeyError: pass
+                try:
+                    self._backbone.append(self[name])
+                except KeyError:
+                    pass
         return self._backbone
 
     @property
@@ -355,8 +357,7 @@ class Residue(BioContainer):
         return self.resname in mdt.data.RESIDUE_DESCRIPTIONS
 
     def __str__(self):
-        return 'Residue %s (index %d, chain %s)' % (self.name, self.index,
-                                                    self.chain.name)
+        return 'Residue %s (index %d, chain %s)' % (self.name, self.index, self.chain.name)
 
     def _repr_markdown_(self):
         return self.markdown_summary()

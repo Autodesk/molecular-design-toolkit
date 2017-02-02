@@ -547,7 +547,7 @@ class AtomList(AtomContainer, list):  # order is important, list will override m
     def __repr__(self):
         try:
             return '<AtomList: [%s]>' % ', '.join(atom._shortstr() for atom in self)
-        except:
+        except (KeyError, AttributeError):
             return '<AtomList at %x (__repr__ failed)>' % id(self)
 
     def intersection(self, *otherlists):

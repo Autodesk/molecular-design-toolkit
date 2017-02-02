@@ -91,8 +91,8 @@ class Bond(object):
     def __repr__(self):
         try:
             return '<Bond: %s>'%str(self)
-        except:
-            print '<Bond @ %s (error in __repr__)>' % id(self)
+        except (KeyError, AttributeError):
+            return '<Bond @ %s (exception in __repr__)>' % id(self)
 
     def __str__(self):
         return self.name
