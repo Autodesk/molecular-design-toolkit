@@ -59,7 +59,7 @@ class Residue(BioContainer):
         elif self.pdbname is None:
             return None
         elif self.pdbindex is None:
-            return self._pdbname
+            return self.pdbname
         elif self.pdbname[-1].isdigit():
             return '%s (seq # %s)' % (self.pdbname, self.pdbindex)
         else:
