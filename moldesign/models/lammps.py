@@ -53,12 +53,22 @@ class LAMMPSPotential(EnergyModelBase):
             type=u.angstrom, default=2.0)]
 
     
+    def __init__(self, **kwargs):
+        super(LAMMPSPotential, self).__init__(**kwargs)
+        self._prepped = False # is the model prepped?
+
+        self.lammps_system = None # LAMMPS object for this molecule
+        self.group_hbond = False # are hbonds grouped?
+        self.group_water = False # are water molecules grouped?
+        self._last_velocity = None # keep track of previous velocities of the molecule
+
+
     # calculate potential energy and force
     def calculate(self, requests):
         
         # Recreate system if molecule changed
         # NOTE: WILL THIS WORK????
-        if(self._last_mol != self.mol):
+        if self._last_velocity != self.mol.velocities:
             self._create_system()
 
         # Run for 0 fs duration to evaluate system
@@ -69,7 +79,7 @@ class LAMMPSPotential(EnergyModelBase):
         pe = my_lmps.eval("pe")
         force_array = []
         for i in range(0, my_lmps.atoms.natoms):
-            force_array.append(self.my_lmps.atoms[i].force)
+            force_array.append(my_lmps.atoms[i].force)
         return {'potential_energy': pe * u.kcalpermol,
                 'forces': force_array * u.kcalpermol / u.angstrom}
     
@@ -161,8 +171,8 @@ class LAMMPSPotential(EnergyModelBase):
             self.group_water = False
 
         self.lammps_system = pylmp
-        self._last_mol = self.mol #Keep track of last molecule that was used to create the LAMMPS system 
-    
+        
+        self._last_velocity = self.mol.velocities.copy() #Keep track of last velocity that was used to create the LAMMPS system 
 
     """
         Get indices of non-bond atom types that contain hydrogen bonds

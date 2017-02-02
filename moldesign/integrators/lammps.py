@@ -96,13 +96,14 @@ class LAMMPSNvt(ConstantTemperatureBase):
             self.params.temperature, 100.0)
         lammps_system.command(nvt_command)
 
-        # TODO:
+        # NOTE: Can you help me figure out the parameters for fix shake?
         if self.params.constrain_hbonds and self.model.group_hbond == True :
             shake_hbond_command = "fix 2 hbond shake 0.0001 20 0 t 5 6 m 1.0 a 31"
             lammps_system.command(shake_hbond_command)
 
+        # NOTE: Can you help me figure out the parameters for fix shake?
         if self.params.constrain_water and self.model.group_water == True :
-            shake_water_command = "fix 2 hbond shake 0.0001 20 0 t 5 6 m 1.0 a 31"
+            shake_water_command = "fix 2 water shake 0.0001 20 0 t 5 6 m 1.0 a 31"
             lammps_system.command(shake_water_command)
 
         self.lammps_system = lammps_system
