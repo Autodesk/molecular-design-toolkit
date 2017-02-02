@@ -72,13 +72,12 @@ class LAMMPSPotential(EnergyModelBase):
 
 
     # calculate potential energy and force
-    def calculate(self, requests=None):
+    def calculate(self, requests):
         
         # Recreate system if molecule changed
-        # NOTE: WILL THIS WORK????
         self.prep()
 
-        # Run for 0 fs duration to evaluate system
+        # Run for 0 fs to evaluate system
         my_lmps = self.lammps_system
         my_lmps.run(0)
 
@@ -91,7 +90,7 @@ class LAMMPSPotential(EnergyModelBase):
                 'forces': force_array * u.kcalpermol / u.angstrom}
     
       
-    def prep(self, force=False):
+    def prep(self):
     """
         Drive the construction of the LAMMPS simulation
         This will rebuild this OpenMM simulation if: A) it's not built yet, or B)
@@ -101,6 +100,7 @@ class LAMMPSPotential(EnergyModelBase):
         # If current molecule's velocity is not the same as last recorded velocity, create a new system
         if self._last_velocity == None or self._last_velocity != self.mol.velocities:
             self._create_system()
+
         self._prepped = True
         
         # TODO: wiring integrator
@@ -134,9 +134,7 @@ class LAMMPSPotential(EnergyModelBase):
         # create temporary file system
         tmpdir = tempfile.mkdtemp()
         saved_umask = os.umask(0077)
-
         dataPath = _create_lammps_data(tmpdir, parmedmol)
-        print 'Created LAMMPS data'
 
         pylmp.command("units real")
         pylmp.command("atom_style full")
@@ -154,8 +152,6 @@ class LAMMPSPotential(EnergyModelBase):
         os.rmdir(tmpdir)
         
         # NOTE: Do we want this?
-        pylmp.command("neighbor " + str(self.params.skin) + " bin")
-        
         pylmp.command("thermo_style custom step temp pe etotal")
         # NOTE: By default, time step is 10.0
         pylmp.command("thermo 10")
@@ -209,7 +205,6 @@ class LAMMPSPotential(EnergyModelBase):
             parmed: parmed struct to iterate through all residues to find water residues
 
     """
-    
         min_index = sys.maxint;
         max_index = 0;
         for res in parmedmol.residues:

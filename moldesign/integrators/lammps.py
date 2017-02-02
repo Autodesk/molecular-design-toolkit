@@ -116,7 +116,7 @@ class LAMMPSNvt(ConstantTemperatureBase):
     def step(self):
         # Run Lammps simulation
         L = self.lammps_system
-        L.run(int(self.params.timestep))    # run takes in integer number
+        L.run(1)    # run takes in integer number
 
         # Update position and velocity of each atom
         for i in range(0, L.atoms.natom):
