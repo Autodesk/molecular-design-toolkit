@@ -25,7 +25,6 @@ _ALL_:
   - moldesign_notebook
   - moldesign_minimal
   - lammps
-  - parmed
 
 ##################################################
 # Base image definitions
