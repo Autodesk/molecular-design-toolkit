@@ -107,11 +107,11 @@ class LAMMPSNvt(ConstantTemperatureBase):
 
         self.lammps_system = lammps_system
 
-        # # TODO:
-        # if self.params.constrain_water && self.model.group_water == True :
-        #     shake_command = "fix 3 water shake 0.00"
 
+    """
+        Update molecule's position and velocity at each step of the simulation
 
+    """
     def step(self):
         # Run Lammps simulation
         L = self.lammps_system
