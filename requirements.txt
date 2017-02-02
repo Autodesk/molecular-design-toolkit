@@ -6,12 +6,12 @@ ipywidgets >= 6.0.0b1
 ipython >= 4.2
 markdown2
 matplotlib
-nbmolviz >= 0.6.5
+nbmolviz >= 0.6.7rc2
 notebook >= 4.2
 numpy
 parmed >= 2.0.0
 pint >= 0.7
-pyccc >= 0.6.4
+pyccc >= 0.6.7a0
 pytest
 pyyaml
 requests
