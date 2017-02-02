@@ -61,7 +61,7 @@ class ChildList(AtomContainer):
             return (item in self._childinorder)
 
     def __getattr__(self, item):
-        if not hasattr(self, '_childbyname'):
+        if '_childbyname' not in self.__dict__ or '_childinorder' not in self.__dict__:
             raise AttributeError('Uninitialized')
 
         try:
@@ -162,12 +162,6 @@ class BioContainer(AtomContainer):
         return (self.__dict__.keys() +
                 self.__class__.__dict__.keys() +
                 [x.name for x in self.children])
-
-    def __getattr__(self, item):
-        if hasattr(self, 'children') and item in self.children:
-            return self.children[item]
-        else:
-            raise AttributeError('%s has no attribute "%s"' % (self.__repr__(), item))
 
     def __hash__(self):
         """ Explicitly hash by object id
