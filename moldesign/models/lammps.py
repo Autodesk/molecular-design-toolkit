@@ -12,19 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cStringIO import StringIO
-
-import moldesign.molecules
+import moldesign as mdt
 import moldesign.units as u
 
 from moldesign import compute
 from moldesign import forcefields as ff
 
-from moldesign.utils import from_filepath
 
-from lammps import lammps, PyLammps
+from .base import EnergyModelBase
+
+try:
+    from lammps import lammps, PyLammps
+    # WARNING: this is the real library, not our interface - this works because of absolute
+    # imports. We should probably rename this interface
+except ImportError:
+    print 'LAMMPS could not be imported; using remote docker container'
+    force_remote = True
+else:  # this should be configurable
+    force_remote = False  # debugging
+
 import parmed as med
-
 import tempfile
 import os
 import sys
@@ -61,15 +68,15 @@ class LAMMPSPotential(EnergyModelBase):
         self.group_hbond = False # are hbonds grouped?
         self.group_water = False # are water molecules grouped?
         self._last_velocity = None # keep track of previous velocities of the molecule
+        print "Initialized!"
 
 
     # calculate potential energy and force
-    def calculate(self, requests):
+    def calculate(self, requests=None):
         
         # Recreate system if molecule changed
         # NOTE: WILL THIS WORK????
-        if self._last_velocity != self.mol.velocities:
-            self._create_system()
+        self.prep()
 
         # Run for 0 fs duration to evaluate system
         my_lmps = self.lammps_system
@@ -83,17 +90,17 @@ class LAMMPSPotential(EnergyModelBase):
         return {'potential_energy': pe * u.kcalpermol,
                 'forces': force_array * u.kcalpermol / u.angstrom}
     
-    """
-        Prepare the LAMMPS model
-        
-    """    
+      
     def prep(self, force=False):
-        """
+    """
         Drive the construction of the LAMMPS simulation
         This will rebuild this OpenMM simulation if: A) it's not built yet, or B)
         there's a new integrator
-        """
-        self._create_system()
+    """ 
+        
+        # If current molecule's velocity is not the same as last recorded velocity, create a new system
+        if self._last_velocity == None or self._last_velocity != self.mol.velocities:
+            self._create_system()
         self._prepped = True
         
         # TODO: wiring integrator
@@ -102,6 +109,7 @@ class LAMMPSPotential(EnergyModelBase):
     #################################################
     # "Private" methods for managing LAMMPS are below
     
+    def _create_system(self):
     """
         Create a LAMMPS system. Use MDT molecule object to construct a LAMMPS system
         
@@ -109,9 +117,7 @@ class LAMMPSPotential(EnergyModelBase):
             run_for (int): number of timesteps OR amount of time to run for
             self.params.timestep (float): timestep length
 
-    """
-    def _create_system(self):
-        
+    """   
         # Ensure force fields are assigned 
         if 'amber_params' not in self.mol.ff:
             raise NotImplementedError('Assign forcefield parameters to the system')
@@ -174,6 +180,8 @@ class LAMMPSPotential(EnergyModelBase):
         
         self._last_velocity = self.mol.velocities.copy() #Keep track of last velocity that was used to create the LAMMPS system 
 
+    
+    def _group_hbonds(parmedmol):
     """
         Get indices of non-bond atom types that contain hydrogen bonds
         
@@ -181,7 +189,6 @@ class LAMMPSPotential(EnergyModelBase):
             parmed: parmed struct to iterate through all nonbond types to find hbonds
 
     """
-    def _group_hbonds(parmedmol):
         hbond_group = ""
         
         if len(parmedmol.LJ_types) <= 0:
@@ -194,6 +201,7 @@ class LAMMPSPotential(EnergyModelBase):
         return "group hbond type" + hbond_group
 
 
+    def _group_water(parmedmol):
     """
         Get indices of residues that are type 'water'
        
@@ -201,7 +209,7 @@ class LAMMPSPotential(EnergyModelBase):
             parmed: parmed struct to iterate through all residues to find water residues
 
     """
-    def _group_water(parmedmol):
+    
         min_index = sys.maxint;
         max_index = 0;
         for res in parmedmol.residues:
@@ -245,6 +253,8 @@ class LAMMPSPotential(EnergyModelBase):
 
     # See http://parmed.github.io/ParmEd/html/index.html for ParmEd units
 
+    
+    def _create_lammps_data(tmpdir, parmedmol):
     """
         Create a data. file that contains all necessary information regarding the molecule
         in order to create the appropirate LAMMPS system for it
@@ -253,9 +263,7 @@ class LAMMPSPotential(EnergyModelBase):
             tmpdir: temporary directory to store the data file
             parmed: parmed struct to iterate through all nonbond types to find hbonds
 
-    """
-    def _create_lammps_data(tmpdir, parmedmol):
-        
+    """    
         predictable_filename = 'data.lammps_mol'
         path = os.path.join(tmpdir, predictable_filename)
 
