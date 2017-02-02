@@ -26,16 +26,18 @@ __all__ = []
 
 @exports
 class LAMMPSNvt(ConstantTemperatureBase):
-    def __init__(self, *args, **kwargs):
-        super(LAMMPSNvt, self).__init__(*args, **kwargs)
-
+    
     # TODO: raise exception if any constraints are requested ...
 
     def run(self, run_for):
         """
         Users won't call this directly - instead, use mol.run
-        Propagate position, momentum by a single timestep using velocity verlet
-        :param run_for: number of timesteps OR amount of time to run for
+        Propagate position, momentum by a single timestep using LAMMPS NVT
+        
+        Arguments:
+            run_for (int): number of timesteps OR amount of time to run for
+            self.params.timestep (float): timestep length
+
         """
         if not self._prepped:
             self.prep()
@@ -43,20 +45,35 @@ class LAMMPSNvt(ConstantTemperatureBase):
 
         # Set up trajectory and record the first frame
         self.mol.time = 0.0 * u.default.time
-        # self.traj = Trajectory(self.mol)
-        # self.mol.calculate()
-        # self.traj.new_frame()
-        # next_trajectory_frame = self.params.frame_interval
+        self.traj = Trajectory(self.mol)
+        self.mol.calculate()
+        self.traj.new_frame()
+        next_trajectory_frame = self.params.frame_interval
 
         # Dynamics loop
         for istep in xrange(nsteps):
             self.step()
-        #     if istep + 1 >= next_trajectory_frame:
-        #         self.traj.new_frame()
-        #         next_trajectory_frame += self.params.frame_interval
-        # return self.traj
+            if istep + 1 >= next_trajectory_frame:
+                self.traj.new_frame()
+                next_trajectory_frame += self.params.frame_interval
+        
+        return self.traj
 
+    """
+        Prepare the LAMMPS system by configuring it for NVT simulation
+        
+        Arguments:
+            run_for (int): number of timesteps OR amount of time to run for
+            self.params.timestep (float): timestep length
+
+    """
     def prep(self):
+
+        # sanity check of parameters
+        # NOTE: DO I NEED THIS??
+        if self.params.timestep > params.frame_interval:
+            raise ValueError
+
         if self._prepped and self.model is self.mol.energy_model and self.model._prepped: return
         
         # prepare lammps model prior to preparing the integrator
@@ -80,16 +97,19 @@ class LAMMPSNvt(ConstantTemperatureBase):
         lammps_system.command(nvt_command)
 
         # TODO:
-        if self.params.constrain_hbonds && self.model.group_hbond == True :
-            shake_command = "fix 2 hbond shake 0.0001 20 10 t 5 6 m 1.0 a 31"
-            lammps_system.command(shake_command)
+        if self.params.constrain_hbonds and self.model.group_hbond == True :
+            shake_hbond_command = "fix 2 hbond shake 0.0001 20 0 t 5 6 m 1.0 a 31"
+            lammps_system.command(shake_hbond_command)
+
+        if self.params.constrain_water and self.model.group_water == True :
+            shake_water_command = "fix 2 hbond shake 0.0001 20 0 t 5 6 m 1.0 a 31"
+            lammps_system.command(shake_water_command)
 
         self.lammps_system = lammps_system
 
         # # TODO:
         # if self.params.constrain_water && self.model.group_water == True :
         #     shake_command = "fix 3 water shake 0.00"
-
 
 
     def step(self):

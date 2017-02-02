@@ -27,6 +27,7 @@ import parmed as med
 
 import tempfile
 import os
+import sys
 
 def exports(o):
     __all__.append(o.__name__)
@@ -56,6 +57,7 @@ class LAMMPSPotential(EnergyModelBase):
     def calculate(self, requests):
         
         # Recreate system if molecule changed
+        # NOTE: WILL THIS WORK????
         if(self._last_mol != self.mol):
             self._create_system()
 
@@ -143,17 +145,17 @@ class LAMMPSPotential(EnergyModelBase):
         pylmp.command("thermo 10")
         
         # group hbonds
-        hbond_lj_types = _group_hbonds(parmedmol)
-        if len(hbond_lj_types) > 0:
-            pylmp.command("group hbond type " + hbond_lj_types)
+        hbond_command = _group_hbonds(parmedmol)
+        if len(hbond_command) > 0:
+            pylmp.command(hbond_command)
             self.group_hbond = True
         else:
             self.group_hbond = False
 
         # group water
-        water_res = _group_water(parmedmol)
-        if len(water_res) > 0:
-            pylmp.command("group water molecule " + water_res)
+        water_command = _group_water(parmedmol)
+        if len(water_command) > 0:
+            pylmp.command(water_command)
             self.group_water = True
         else:
             self.group_water = False
@@ -173,12 +175,13 @@ class LAMMPSPotential(EnergyModelBase):
         hbond_group = ""
         
         if len(parmedmol.LJ_types) <= 0:
-            return hbond_groups
+            return hbond_group
 
         for nonbond_name, nonbond_idx in parmedmol.LJ_types.iteritems():
             if(nonbond_name[0] == 'H'):
                 hbond_group = hbond_group + " " + str(nonbond_idx)
-        return hbond_group
+        
+        return "group hbond type" + hbond_group
 
 
     """
@@ -199,8 +202,8 @@ class LAMMPSPotential(EnergyModelBase):
                     max_index = res.idx
         
         water_group = ""
-        if(min_index != sys.maxint):
-            water_group = "<> {0} {1}" .format(min_index, max_index)
+        if min_index != sys.maxint :
+            water_group = "group water molecule <> {0} {1}" .format(min_index, max_index)
 
         return water_group
 
