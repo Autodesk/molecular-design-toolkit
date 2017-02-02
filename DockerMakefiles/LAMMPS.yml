@@ -1,0 +1,50 @@
+lammps_requirements:
+  description: Base libraries for BOTH running and building LAMMPS
+  build: |
+    RUN apt-get -y update
+    RUN apt-get -y install \
+        bc \
+        ssh \
+        mpich2 \
+        python-dev \
+        libz-dev \
+        fftw3-dev
+
+    ENV PATH=${PATH}:/usr/lib
+    ENV PYTHONPATH=${PYTHONPATH}:/opt/lammps/python
+    ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/lammps/src
+
+lammps_build:
+ requires:
+  - buildbase
+  - lammps_requirements
+ description: Build image for LAMMPS. Based on https://github.com/malramsay64/lammps-docker/blob/master/Dockerfile
+ build: |
+
+    RUN git clone https://github.com/lammps/lammps.git /opt/lammps && \
+        cd /opt/lammps && \
+        git fetch && \
+        git checkout stable
+
+    RUN cd /opt/lammps/src && \
+        make yes-ASPHERE yes-BODY yes-CLASS2 yes-COLLOID yes-COMPRESS yes-CORESHELL yes-DIPOLE yes-GRANULAR yes-KSPACE yes-MANYBODY && \
+        make yes-MC yes-MOLECULE yes-OPT yes-PERI yes-PERI yes-PYTHON yes-REPLICA yes-RIGID yes-SHOCK yes-SNAP yes-SRD
+
+    # RUN cd /opt/lammps/src && \
+    #     make serial mode=shlib -j4
+
+    RUN cd /opt/lammps/src && \
+        make mpi mode=shlib -j4 MPI_INC="-DMPICH_SKIP_MPICXX -I/usr/include/mpich" MPI_LIB="-Wl,-rpath,/usr/lib/mpich/lib -L/usr/lib/mpich/lib -lmpl -lmpich"
+
+
+lammps:
+  description: Deployable LAMMPS image
+  build_directory: buildfiles/lammps/
+  requires:
+    - python_deploy_base
+    - lammps_requirements
+  copy_from:
+    lammps_build:
+      /usr/local/lib/python2.7/dist-packages: /usr/local/lib/python2.7/
+      /usr/lib: /usr
+      /opt/lammps: /opt
