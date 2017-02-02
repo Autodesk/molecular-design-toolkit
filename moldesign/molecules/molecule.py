@@ -207,7 +207,7 @@ class MolPropertyMixin(object):
     @property
     def num_electrons(self):
         """int: The number of electrons in the system, based on the atomic numbers and self.charge"""
-        return sum(self.atoms.atnum) - self.charge.value_in(u.q_e)
+        return sum(atom.atnum for atom in self.atoms) - self.charge.value_in(u.q_e)
 
     @property
     def homo(self):
@@ -417,7 +417,6 @@ class MolTopologyMixin(object):
                           charge=self.charge)
         newmol.properties = self.properties.copy()
         return newmol
-
 
     def assert_atom(self, atom):
         """If passed an integer, just return self.atoms[atom].

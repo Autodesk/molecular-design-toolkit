@@ -11,9 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
 import time
-from cStringIO import StringIO
 
 import numpy as np
 
@@ -23,16 +21,6 @@ from moldesign import units as u
 
 from .molecule import MolecularProperties
 from . import toplevel
-
-
-class SubSelection(object):
-    """
-    Descriptors to get bits of the trajectory
-    trajectory.atoms[3].position -> array of positions
-    trajectory.atoms[5].distance( mol.chains['B'].residues[5] ) -> array of distances
-    trajectory.chains['A'].residue[23].com -> array of COMs
-    NOT IMPLEMENTED YET
-    """
 
 
 class Frame(utils.DotDict):
@@ -140,8 +128,9 @@ class Trajectory(object):
         self._tempmol = mdt.Molecule(self.mol.atoms, copy_atoms=True)
         self._tempmol.dynamic_dof = self.mol.dynamic_dof
         self._viz = None
-        self.atoms = [_TrajAtom(self, i) for i in xrange(self.mol.num_atoms)]
+        self._atoms = None
         if first_frame: self.new_frame()
+
 
     # TODO: the current implementation does not support cases where the molecular topology changes
     # TODO: allow caching to disk for very large trajectories
@@ -150,10 +139,9 @@ class Trajectory(object):
     """List[str]: Always store these molecular attributes"""
 
     def __getstate__(self):
-        return self.__dict__.copy()
-
-    def __setstate__(self, d):
-        self.__dict__.update(d)
+        state = self.__dict__.copy()
+        state.pop('_atoms', None)
+        return state
 
     @property
     def num_frames(self):
@@ -163,6 +151,15 @@ class Trajectory(object):
     def __len__(self):
         """overrides len(trajectory) to return number of frames"""
         return len(self.frames)
+
+    @property
+    def atoms(self):
+        if self._atoms is None:
+            self._atoms = self._make_traj_atoms()
+        return self._atoms
+
+    def _make_traj_atoms(self):
+        return [_TrajAtom(self, i) for i in xrange(self.mol.num_atoms)]
 
     @utils.kwargs_from(mdt.widgets.trajectory.TrajectoryViewer)
     def draw3d(self, **kwargs):
@@ -176,7 +173,15 @@ class Trajectory(object):
     draw = draw3d  # synonym for backwards compatibility
 
     def draw_orbitals(self, align=True):
-        """TrajectoryOrbViewer: create a trajectory visualization"""
+        """ Visualize trajectory with molecular orbitals
+
+        Args:
+            align (bool): Align orbital phases (i.e., multiplying by -1 as needed) to prevent sign
+               flips between frames
+
+        Returns:
+            TrajectoryOrbViewer: create a trajectory visualization
+        """
         from moldesign import widgets
         for frame in self:
             if 'wfn' not in frame:
@@ -277,6 +282,9 @@ class Trajectory(object):
     def __getattr__(self, item):
         # TODO: move slicing to frames, so that this will work with __getitem__ as well
         # TODO: prevent identical recursion (so __getattr__(foo) can't call __getattr__(foo))
+        if not hasattr(self, '_property_keys'):
+            raise AttributeError('_property_keys')
+
         if self._property_keys is None:
             self._update_property_keys()
 

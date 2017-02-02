@@ -267,8 +267,6 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
 @utils.args_from(run_tleap)
 def assign_forcefield(mol, **kwargs):
     """ see run_tleap docstring """
-    from moldesign.widgets.parameterization import ParameterizationDisplay
-
     clean_molecule = _prep_for_tleap(mol)
 
     job = run_tleap(clean_molecule, **kwargs)

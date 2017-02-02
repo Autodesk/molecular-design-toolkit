@@ -1,5 +1,5 @@
 biopython
-docker-py
+docker >= 2.0
 fortranformat
 funcsigs
 ipywidgets >= 6.0.0b1

@@ -1,0 +1,27 @@
+openblas:
+  requires:
+    - buildbase
+  description:
+    OpenBlas compiled with 64-bit integers
+  build: |
+    WORKDIR     /opt
+    RUN         mkdir -p /opt/lib/ \
+                   && wget  https://github.com/xianyi/OpenBLAS/archive/develop.zip \
+                   && unzip develop.zip \
+                   && rm develop.zip \
+                   && cd  OpenBLAS-develop \
+                   && make -j3 TARGET=CORE2 INTERFACE64=1 NO_CBLAS=1 NO_LAPACK=1 NO_LAPACKE=1 libs shared \
+                   &&  cp libopenblas.* /opt/lib
+
+
+
+cuda7_0:
+  description: Container with Cuda installed
+  requires:
+    - buildbase
+  build: |
+    RUN wget -nv http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64/cuda-repo-ubuntu1404_7.0-28_amd64.deb
+    RUN dpkg -i cuda-repo-ubuntu1404_7.0-28_amd64.deb \
+     && apt-get update \
+     && apt-get -y install cuda
+

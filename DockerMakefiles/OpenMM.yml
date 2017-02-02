@@ -1,0 +1,23 @@
+openmm_build:
+ description: Basic OpenMM install (CPU only) with python bindings
+ build_directory: buildfiles/openmm
+ requires:
+  - buildbase
+ build: |
+  RUN mkdir -p /src
+  ADD OpenMM-7.0.1-Linux.zip /src/OpenMM.zip
+  RUN cd /src/ \
+   && unzip OpenMM.zip && rm OpenMM.zip \
+   && cd /src/OpenMM-7.*-Linux \
+   && cat < echo "\n\n" | ./install.sh
+
+
+openmm:
+  requires:
+    - python_deploy_base
+  copy_from:
+   openmm_build:
+     /usr/local/lib/python2.7/dist-packages/: /usr/local/lib/python2.7/
+     /usr/local/openmm/include: /usr/local/openmm
+     /usr/local/openmm/lib: /usr/local/openmm
+     /usr/local/openmm/licenses: /usr/local/openmm

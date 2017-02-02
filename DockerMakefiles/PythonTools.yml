@@ -1,0 +1,62 @@
+notebook:
+ requires:
+  - python_deploy_base
+ build_directory: buildfiles/notebook/
+ build: |
+    RUN apt-get update \
+       && apt-get -y install --no-install-recommends \
+            python-matplotlib gcc python-dev \
+       && pip install scandir \
+       && apt-get -y remove gcc python-dev --purge \
+       && cleanapt
+    RUN pip install \
+        jupyter \
+        ipywidgets
+    ENTRYPOINT /run_notebook.sh
+    EXPOSE 8888
+    RUN mkdir /notebooks
+    WORKDIR /notebooks
+    COPY run_notebook.sh /run_notebook.sh
+
+
+pdbfixer:
+ requires:
+  - openmm
+ build: |
+  RUN pip install https://github.com/pandegroup/pdbfixer/archive/v1.3.1.tar.gz
+
+
+openbabel:
+ requires:
+  - python_deploy_base
+ build: |
+  RUN apt-get update && apt-get install -y \
+    openbabel \
+    python-openbabel \
+   && apt-get -y clean \
+   && apt-get autoremove -y --purge \
+   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+
+pyquante2:
+ requires:
+  - python_deploy_base
+ build: |
+  RUN pip install git+git://github.com/rpmuller/pyquante2.git
+
+
+chem_python:
+ description: All of the external python chemistry libraries in one place
+ requires:
+  - openbabel
+  - openmm
+  - pyscf
+  - pdbfixer
+  - biopython
+  - parmed
+
+
+chem_notebook:
+ requires:
+  - notebook
+  - chem_python

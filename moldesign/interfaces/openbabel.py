@@ -85,7 +85,7 @@ def read_stream(filelike, format, name=None):
     Returns:
         moldesign.Molecule: parsed result
     """
-    molstring = filelike.read()
+    molstring = str(filelike.read())  # openbabel chokes on unicode
     return read_string(molstring, format, name=name)
 
 
@@ -192,7 +192,8 @@ def set_protonation(mol, ph=7.4):
     Returns:
         moldesign.Molecule: New molecule with adjusted protonation
     """
-    # TODO: this doesn't appear to work!!!
+    # TODO: this doesn't appear to do anything for most molecules!!!
+    # TODO: this renames hydrogens!!!
 
     pbmol = mol_to_pybel(mol)
     pbmol.OBMol.AddHydrogens(False, True, ph)
@@ -342,9 +343,6 @@ def pybel_to_mol(pbmol,
             else:
                 res = newresidues[residx]
 
-            # Assign the atom
-            if mdtatom.name in res:
-                mdtatom.name = '%s%d' % (mdtatom.name, pybatom.idx)  # prevent name clashes
             res.add(mdtatom)
 
         newatoms.append(mdtatom)
@@ -387,7 +385,7 @@ def from_smiles(smi, name=None):
         moldesign.Molecule: the translated molecule
     """
     if name is None: name = smi
-    pbmol = pb.readstring('smi', smi)
+    pbmol = pb.readstring('smi', str(smi))  # avoid passing unicode by casting to str
     pbmol.addh()
     pbmol.make3D()
     mol = pybel_to_mol(pbmol,

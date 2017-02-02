@@ -1,0 +1,119 @@
+_SOURCES_:
+  - AmberTools.yml
+  - BioPython.yml
+  - CLI.yml
+  - Libraries.yml
+  - Moldesign.yml
+  - NWChem.yml
+  - OpenMM.yml
+  - ParmEd.yml
+  - PySCF.yml
+  - PythonTools.yml
+  - SymMol.yml
+
+
+_ALL_:
+  - ambertools
+  - opsin
+  - symmol
+  - openmm
+  - openbabel
+  - pyscf
+  - nwchem
+  - chem_python
+  - moldesign_complete
+  - moldesign_notebook
+  - moldesign_minimal
+
+
+##################################################
+# Base image definitions
+base:
+  FROM: debian:jessie
+
+buildbase:
+  description: |
+    Well-outfitted image for building binaries. Rather than deploying this huge image,
+    binaries should be built here then copied into smaller deployment images
+  requires:
+    - base
+  build: |
+    RUN apt-get update && apt-get upgrade
+    RUN apt-get install -y \
+          autoconf        \
+          automake        \
+          build-essential \
+          cmake           \
+          cmake-curses-gui\
+          csh             \
+          doxygen         \
+          gfortran        \
+          git             \
+          libatlas-dev    \
+          libblas-dev     \
+          libbz2-dev      \
+          libcr-dev       \
+          libfftw3-dev    \
+          libhdf5-dev     \
+          liblapack-dev   \
+          libnetcdf-dev   \
+          libopenmpi-dev  \
+          libpng12-dev    \
+          libpython-dev   \
+          libtool         \
+          mercurial       \
+          mpich2          \
+          mpich2-doc      \
+          patch           \
+          pkg-config      \
+          python          \
+          python-numpy    \
+          python-pip      \
+          python-scipy    \
+          python-tornado  \
+          python-yaml     \
+          python-zmq      \
+          subversion      \
+          swig            \
+          tcsh            \
+          vim             \
+          wget            \
+          zip
+    ENV TERM=dumb
+    RUN echo '#!/bin/bash' > /usr/local/bin/cleanapt \
+      && chmod +x /usr/local/bin/cleanapt
+
+
+deploybase:
+  description: lightweight image for deployment
+  requires:
+    - base
+  build_directory: buildfiles/deploybase
+  build: |
+    ADD cleanapt /usr/local/bin
+    RUN chmod +x /usr/local/bin/cleanapt
+    RUN apt-get update \
+      && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        git \
+        vim \
+        wget \
+      && cleanapt
+
+
+python_deploy_base:
+  requires:
+    - deploybase
+  build: |
+    RUN apt-get update \
+        && apt-get install -y --no-install-recommends \
+          python \
+          python-numpy \
+          python-scipy \
+          python-yaml \
+        && cleanapt
+    RUN cd /tmp \
+      && wget https://bootstrap.pypa.io/get-pip.py \
+      && python get-pip.py
+    ENV PYTHONPATH=/opt
+

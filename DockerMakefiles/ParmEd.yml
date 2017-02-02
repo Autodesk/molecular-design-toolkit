@@ -1,0 +1,11 @@
+parmed_build:
+  requires:
+    - buildbase
+  build: RUN pip install parmed
+
+parmed:
+  requires:
+    - python_deploy_base
+  copy_from:
+    parmed_build:
+      /usr/local/lib/python2.7/dist-packages/: /usr/local/lib/python2.7/

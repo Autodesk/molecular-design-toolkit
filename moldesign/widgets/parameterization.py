@@ -28,6 +28,7 @@ import ipywidgets as ipy
 
 from moldesign import units as u
 from moldesign import uibase
+from moldesign import utils
 
 
 def show_parameterization_results(errormessages, molin, molout=None):
@@ -38,7 +39,7 @@ def show_parameterization_results(errormessages, molin, molout=None):
     else:
         print 'Forcefield assignment: %s' % ('Success' if molout is not None else 'Failure')
         for err in errormessages:
-            print err.desc
+            print utils.html_to_text(err.desc)
 
 
 

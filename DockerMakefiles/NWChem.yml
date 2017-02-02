@@ -1,0 +1,94 @@
+nwchem_requirements:
+  description: Base libraries for BOTH running and building NWChem
+  build: |
+    RUN apt-get update \
+      && apt-get install -y --no-install-recommends \
+           libopenmpi-dev \
+           openmpi-bin \
+           ssh \
+      && cleanapt
+    ENV            NWCHEM_TOP="/opt/nwchem" \
+                   NWCHEM_TARGET=LINUX64 \
+                   FFIELD=amber \
+                   LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/opt/lib"
+    ENV            AMBER_1=${NWCHEM_TOP}/src/data/amber_s/ \
+                   AMBER_2=${NWCHEM_TOP}/src/data/amber_q/ \
+                   AMBER_3=${NWCHEM_TOP}/src/data/amber_x/ \
+                   AMBER_4=${NWCHEM_TOP}/src/data/amber_u/ \
+                   SPCE=${NWCHEM_TOP}/src/data/solvents/spce.rst \
+                   CHARMM_S=${NWCHEM_TOP}/src/data/charmm_s/ \
+                   CHARMM_X=${NWCHEM_TOP}/src/data/charmm_x/ \
+                   PATH=$PATH:${NWCHEM_TOP}/bin/LINUX64
+  copy_from:
+    openblas:
+      /opt/lib: /opt
+
+
+nwchem_build:
+ requires:
+  - buildbase
+  - nwchem_requirements
+ description: Build image for NWChem. Based on https://github.com/edoapra/docker-file/tree/master/nwchem-dev
+ build: |
+    RUN         apt-get install -y patch curl perl
+    WORKDIR      /opt
+    ENV          NWCHEM_MODULES="nwdft driver stepper" \
+                   PYTHONVERSION=2.7 \
+                   PYTHONHOME="/usr" \
+                   USE_PYTHONCONFIG=Y \
+                   BLASOPT="-L/opt/lib -lopenblas" \
+                   BLAS_SIZE=8 \
+                   USE_MPI=y \
+                   USE_MPIF=y \
+                   USE_MPIF4=y
+    #ENV         MRCC_METHODS=y
+    #ENV         CCSDTQ=y
+    #ENV         CCSDTLR=y
+    RUN          mkdir -p nwchem \
+                   && cd nwchem \
+                   && svn co --depth empty https://svn.pnl.gov/svn/nwchem/trunk/src \
+                   && cd src \
+                   && svn update GNUmakefile nwchem.F config \
+                        tools include basis geom inp input  \
+                        pstat rtdb task symmetry util peigs perfm bq cons blas lapack \
+                        NWints atomscf cphf ddscf driver gradients hessian nwdft optim property stepper symmetry vib \
+                   && rm -rf /opt/nwchem/.svn \
+                   && cd tools \
+                   && svn export --non-interactive --username nwchem --password nwchem \
+                          https://svn.pnl.gov/svn/hpctools/branches/ga-5-5  \
+                   && cd .. \
+                   #strip native compiler options as Fedora does
+                   && sed -i 's|-march=native||' config/makefile.h \
+                   && sed -i 's|-mtune=native|-mtune=generic|' config/makefile.h \
+                   && sed -i 's|-mfpmath=sse||' config/makefile.h \
+                   && sed -i 's|-msse3||' config/makefile.h  \
+                   && make nwchem_config && make -j3  \
+                   #clean unnecessary source to reduce docker size
+                   && rm -rf tce tools nwdft NWints geom symmetry util nwxc ddscf lapack blas rism \
+                          argos peigs rmdft gradients symmetry property smd lucia dplot propery \
+                          hessian ccsd mp2_grad moints cafe analyz dimqm /opt/nwchem/lib
+    RUN git clone https://github.com/NWChem-Python/nwapi \
+       && cd nwapi \
+       && make -f makefile.linux \
+       && python test.py \
+       && python setup.py install \
+       && pip install pint
+
+
+nwchem:
+  description: Deployable NWChem image
+  build_directory: buildfiles/nwchem/
+  requires:
+    - python_deploy_base
+    - nwchem_requirements
+  build: |
+    COPY run.sh run.py getresults.py /usr/bin/
+    RUN chmod +x /usr/bin/getresults.py /usr/bin/run.py /usr/bin/run.sh
+    RUN pip install pint
+    ENV NWCHEMFILE="From https://svn.pnl.gov/svn/nwchem/trunk/src"
+    ENV PYTHONPATH=$PYTHONPATH:/opt
+  copy_from:
+    nwchem_build:
+      /usr/local/lib/python2.7/dist-packages: /usr/local/lib/python2.7/
+      /opt/nwchem: /opt
+      /opt/lib: /opt

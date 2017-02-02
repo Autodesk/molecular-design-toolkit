@@ -184,7 +184,7 @@ def mol_to_parmed(mol):
         pmedatm.xx, pmedatm.xy, pmedatm.xz = atom.position.value_in(u.angstrom)
         pmedatoms.append(pmedatm)
         struc.add_atom(pmedatm,
-                       resname=atom.residue.resname,
+                       resname=utils.if_not_none(atom.residue.resname, 'UNL'),
                        resnum=utils.if_not_none(atom.residue.pdbindex, -1),
                        chain=utils.if_not_none(atom.chain.name, ''))
 
