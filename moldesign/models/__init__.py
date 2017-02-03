@@ -5,3 +5,4 @@ from .toys import *
 from .amber import *
 from .openbabel import *
 from .nwchem import *
+from .lammps_model import *

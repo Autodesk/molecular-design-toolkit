@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import moldesign as mdt
 import moldesign.units as u
 
@@ -65,10 +64,10 @@ class LAMMPSPotential(EnergyModelBase):
         self._prepped = False # is the model prepped?
 
         self.lammps_system = None # LAMMPS object for this molecule
-        self.group_hbond = False # are hbonds grouped?
-        self.group_water = False # are water molecules grouped?
+        self.water_exists = False # are hbonds grouped?
+        self.hbond_exists = False # are water molecules grouped?
         self._last_velocity = None # keep track of previous velocities of the molecule
-        print "Initialized!"
+        self.unit_system = None
 
 
     # calculate potential energy and force
@@ -98,8 +97,11 @@ class LAMMPSPotential(EnergyModelBase):
         """ 
         
         # If current molecule's velocity is not the same as last recorded velocity, create a new system
-        if self._last_velocity == None or self._last_velocity != self.mol.velocities:
+        if self._last_velocity is None or (self._last_velocity == self.mol.velocities).all():
             self._create_system()
+
+        self.unit_system = u.UnitSystem(length=u.angstrom, force=u.kcalpermol/u.fs, energy=u.kcalpermol, time=u.fs, 
+            mass=u.gpermol, charge=u.electron_charge)
 
         self._prepped = True
         
@@ -134,7 +136,7 @@ class LAMMPSPotential(EnergyModelBase):
         # create temporary file system
         tmpdir = tempfile.mkdtemp()
         saved_umask = os.umask(0077)
-        dataPath = _create_lammps_data(tmpdir, parmedmol)
+        dataPath = self.create_lammps_data(tmpdir, parmedmol)
 
         pylmp.command("units real")
         pylmp.command("atom_style full")
@@ -151,33 +153,28 @@ class LAMMPSPotential(EnergyModelBase):
         os.umask(saved_umask)
         os.rmdir(tmpdir)
         
-        # NOTE: Do we want this?
-        pylmp.command("thermo_style custom step temp pe etotal")
-        # NOTE: By default, time step is 10.0
-        pylmp.command("thermo 10")
-        
         # group hbonds
-        hbond_command = _group_hbonds(parmedmol)
+        hbond_command = self.group_hbonds(parmedmol)
         if len(hbond_command) > 0:
             pylmp.command(hbond_command)
-            self.group_hbond = True
+            self.hbond_exists = True
         else:
-            self.group_hbond = False
+            self.hbond_exists = False
 
         # group water
-        water_command = _group_water(parmedmol)
+        water_command = self.group_water(parmedmol)
         if len(water_command) > 0:
             pylmp.command(water_command)
-            self.group_water = True
+            self.water_exists = True
         else:
-            self.group_water = False
+            self.water_exists = False
 
         self.lammps_system = pylmp
         
         self._last_velocity = self.mol.velocities.copy() #Keep track of last velocity that was used to create the LAMMPS system 
 
     
-    def _group_hbonds(parmedmol):
+    def group_hbonds(self, parmedmol):
         """
         Get indices of non-bond atom types that contain hydrogen bonds
         
@@ -197,7 +194,7 @@ class LAMMPSPotential(EnergyModelBase):
         return "group hbond type" + hbond_group
 
 
-    def _group_water(parmedmol):
+    def group_water(self, parmedmol):
         """
         Get indices of residues that are type 'water'
        
@@ -249,7 +246,7 @@ class LAMMPSPotential(EnergyModelBase):
     # See http://parmed.github.io/ParmEd/html/index.html for ParmEd units
 
     
-    def _create_lammps_data(tmpdir, parmedmol):
+    def create_lammps_data(self, tmpdir, parmedmol):
         """
         Create a data. file that contains all necessary information regarding the molecule
         in order to create the appropirate LAMMPS system for it
