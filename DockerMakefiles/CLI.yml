@@ -1,16 +1,24 @@
 opsin:
-  FROM: java
+  requires:
+    - deploybase
+  description: IUPAC nomenclature parser, see doi:10.1021/ci100384d
   build: |
-    RUN mkdir -p /opt/opsin && cd /opt/opsin && \
-      wget -nv https://bitbucket.org/dan2097/opsin/downloads/opsin-2.0.0-jar-with-dependencies.jar
-    RUN cmd='java -jar /opt/opsin/opsin-2.0.0-jar-with-dependencies.jar' && \
-      printf "#!/bin/bash\n$cmd \$@\n" > /usr/local/bin/opsin && \
-      chmod +x /usr/local/bin/opsin
+    RUN apt-get update \
+      && apt-get install -y default-jre --no-install-recommends \
+      && cleanapt
+    RUN mkdir -p /opt/opsin \
+      && cd /opt/opsin \
+      && wget -nv https://bitbucket.org/dan2097/opsin/downloads/opsin-2.2.0-jar-with-dependencies.jar
+    RUN cmd='java -jar /opt/opsin/opsin-2.2.0-jar-with-dependencies.jar' \
+      && cmdf='#!/bin/bash\n'$cmd' $@\n' \
+      && printf "$cmdf" > /usr/local/bin/opsin \
+      && chmod +x /usr/local/bin/opsin
 
 
 dssp:
   requires:
    - base
+  description: Protein secondary structure analysis
   build: |
     RUN apt-get update \
       && apt-get install -y --no-install-recommends wget  \
@@ -22,6 +30,7 @@ dssp:
       && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 edtsurf:
+  description: Molecular surface calculator
   requires:
     - base
   build: |

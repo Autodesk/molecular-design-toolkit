@@ -241,14 +241,25 @@ class UnitText(ipy.Box):
             self.value = value
 
     def _validate(self, change):
+        import pint
+
         self._validated_value = None
         self._error_msg = False
 
         # Check that we can parse this
         try:
             val = u.ureg(change['new'])
-        except:  # parsing failed, pint just raises generic "Exception"
+
+        except (pint.UndefinedUnitError,
+                pint.DimensionalityError,
+                pint.compat.tokenize.TokenError):
             self._error_msg = "Failed to parse '%s'" % self.textbox.value
+
+        except Exception as e:  # unfortunately, pint's parser sometimes raises bare exception class
+            if e.__class__ != Exception:
+                raise  # this isn't what we want
+            self._error_msg = "Failed to parse '%s'" % self.textbox.value
+
         else:  # Check dimensionality
             valdim = u.get_units(val).dimensionality
             if self.dimensionality is not None and valdim != self.dimensionality:

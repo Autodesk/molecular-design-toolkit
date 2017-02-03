@@ -42,50 +42,57 @@ class Frame(utils.DotDict):
 
     Example:
         >>> mol = mdt.from_name('benzene')
-        >>> mol.set_potential_model(moldesign.methods.models.RHF(basis='3-21g'))
+        >>> mol.set_potential_model(moldesign.models.RHF(basis='3-21g'))
         >>> traj = mol.minimize()
         >>> starting_frame = traj.frames[0]
         >>> assert starting_frame.potential_energy >= traj.frames[-1].potential_energy
         >>> assert starting_frame.minimization_step == 0
     """
-    pass
+    def __init__(self, traj):
+        self.traj = traj
+        super(Frame, self).__init__()
+
+    def write(self, *args, **kwargs):
+        self.traj.apply_frame(self)
+        self.traj._tempmol.write(*args, **kwargs)
 
 
 class _TrajAtom(object):
     """ A helper class for querying individual atoms' dynamics
     """
-
-    ATOMIC_ARRAYS = {'position': 'positions',
-                     'momentum': 'momenta',
-                     'force': 'forces'}
-
     def __init__(self, traj, index):
         self.traj = traj
         self.index = index
         self.real_atom = self.traj.mol.atoms[self.index]
 
-    def __getattr__(self, item):
+    @property
+    def position(self):
+        return self._arrayslice('positions')
+
+    @property
+    def momentum(self):
+        return self._arrayslice('momenta')
+
+    @property
+    def force(self):
+        return self._arrayslice('forces')
+
+    def _arrayslice(self, attr):
+        return getattr(self.traj, attr)[:, self.index, :]
+
+    def __getattr__(self, item):  # TODO: remove and replace all __getattr__
         if item in ('traj', 'index', 'real_atom'):
             raise AttributeError('_TrajAtom.%s not assigned (pickle issue?)' % item)
-
-        if item in self.ATOMIC_ARRAYS:
-            is_array = True
-            item = self.ATOMIC_ARRAYS[item]
-        else:
-            is_array = False
 
         try:  # try to get a time-dependent version
             trajslice = getattr(self.traj, item)
         except AttributeError:  # not time-dependent - look for an atomic property
             return getattr(self.real_atom, item)
 
-        if is_array:
-            return trajslice[:, self.index, :]
+        if trajslice[0]['type'] != 'atomic':
+            raise ValueError('%s is not an atomic quantity' % item)
         else:
-            if trajslice[0]['type'] != 'atomic':
-                raise ValueError('%s is not an atomic quantity' % item)
-            else:
-                return u.array([f[self.real_atom] for f in trajslice])
+            return u.array([f[self.real_atom] for f in trajslice])
 
     def __dir__(self):
         attrs = [self.ATOMIC_ARRAYS.get(x, x) for x in dir(self.traj)]
@@ -198,7 +205,7 @@ class Trajectory(object):
     def __repr__(self):
         try:
             return '<%s>' % str(self)
-        except Exception:
+        except (KeyError, AttributeError):
             return '<Trajectory object @ %s (exception in repr)>' % hex(id(self))
 
     def __add__(self, other):
@@ -219,7 +226,7 @@ class Trajectory(object):
         """
         # TODO: callbacks to update a status display - allows monitoring a running simulation
         if properties is None:
-            new_frame = Frame()
+            new_frame = Frame(self)
             for attr in self.MOL_ATTRIBUTES:
                 val = getattr(self.mol, attr)
                 try:  # take numpy arrays' values, not a reference
@@ -281,7 +288,7 @@ class Trajectory(object):
 
     def __getattr__(self, item):
         # TODO: move slicing to frames, so that this will work with __getitem__ as well
-        # TODO: prevent identical recursion (so __getattr__(foo) can't call __getattr__(foo))
+        # TODO: never ever define __getattr__, it leads to unmaintainable hell
         if not hasattr(self, '_property_keys'):
             raise AttributeError('_property_keys')
 

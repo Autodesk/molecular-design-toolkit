@@ -98,8 +98,8 @@ class Parameter(object):
     def __repr__(self):
         try:
             return '<%s>' % self
-        except:
-            return '<%s at %x - exc in __repr__>' % (type(self), id(self))
+        except (KeyError, AttributeError):
+            return '<%s at %x - exception in __repr__>' % (type(self), id(self))
 
 
 

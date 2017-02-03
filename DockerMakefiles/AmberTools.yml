@@ -41,6 +41,12 @@ ambertools:
   requires:
     - deploybase
     - ambertools_requirements
+  build: |
+    RUN apt-get update \
+     && apt-get install -y --no-install-recommends \
+         gcc \
+         gfortran \
+     && cleanapt
   copy_from:
     ambertools_build:
       /opt/amber16: /opt

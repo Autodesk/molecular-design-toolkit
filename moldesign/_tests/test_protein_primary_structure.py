@@ -66,10 +66,10 @@ def test_3aid_primary_structure_access_methods(fixture, request):
 
     a1 = mol.chains['A'].residues['GLN2'].atoms['CB']
     assert a1 is mol.atoms[a1.index]
-    assert a1 is mol.chains.A.residues.GLN2.atoms.CB
-    assert a1 is mol.chains.A.GLN2.CB
-    assert 'GLN2' in dir(mol.chains.A)
-    assert 'CB' in dir(mol.chains.A.GLN2)
+    assert a1 is mol.chains['A'].residues.GLN2.atoms.CB
+    assert a1 in mol.chains['A'].residues.GLN2
+    assert 'GLN2' in mol.chains['A']
+    assert hasattr(mol.chains['A'].residues.GLN2.atoms, 'CB')
 
 
 @pytest.mark.parametrize('fixture', fixture_types['3AID'])
@@ -89,7 +89,7 @@ def test_chain_lookup_by_name_and_index(fixture, request):
         assert mol.chains[chain.index] is chain
         assert mol.chains[chain.name] is chain
         assert mol.chains[ic] is chain
-        assert getattr(mol.chains, chain.name) is chain
+        # assert getattr(mol.chains, chain.name) is chain   # this functionality disabled for now, possibly forever
 
 
 @pytest.mark.parametrize('fixture', fixture_types['protein'])
@@ -101,7 +101,7 @@ def test_residue_lookup_by_name_and_index(fixture, request):
             assert mol.residues[residue.index] is residue
             assert chain[residue.name] is residue
             assert chain[ires] is residue
-            assert getattr(chain, residue.name) is residue
+            # assert getattr(chain, residue.name) is residue  # this functionality disabled for now, possibly forever
 
             assert chain.residues[residue.name] is residue
             assert chain.residues[ires] is residue
@@ -118,7 +118,7 @@ def test_atom_lookup_by_name_and_index(fixture, request):
         for iatom, atom in enumerate(residue.atoms):
             assert residue[atom.name] is atom
             assert residue[iatom] is atom
-            assert getattr(residue,atom.name) is atom
+            # assert getattr(residue,atom.name) is atom  # this functionality disabled for now, possibly forever
 
             assert residue.atoms[atom.name] is atom
             assert residue.atoms[iatom] is atom

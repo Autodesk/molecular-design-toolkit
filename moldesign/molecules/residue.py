@@ -16,11 +16,11 @@ import collections
 import moldesign as mdt
 from moldesign import utils, data
 
-from . import Entity, AtomList, toplevel
+from . import BioContainer, AtomList, toplevel
 
 
 @toplevel
-class Residue(Entity):
+class Residue(BioContainer):
     """ A biomolecular residue - most often an amino acid, a nucleic base, or a solvent
     molecule. In PDB structures, also often refers to non-biochemical molecules.
 
@@ -34,9 +34,9 @@ class Residue(Entity):
     def copy(self):
         newatoms = super(Residue, self).copy()
         return newatoms[0].residue
-    copy.__doc__ = Entity.copy.__doc__
+    copy.__doc__ = BioContainer.copy.__doc__
 
-    @utils.args_from(Entity)
+    @utils.args_from(BioContainer)
     def __init__(self, **kwargs):
         """ Initialization
         Args:
@@ -59,7 +59,7 @@ class Residue(Entity):
         elif self.pdbname is None:
             return None
         elif self.pdbindex is None:
-            return self._pdbname
+            return self.pdbname
         elif self.pdbname[-1].isdigit():
             return '%s (seq # %s)' % (self.pdbname, self.pdbindex)
         else:
@@ -96,7 +96,7 @@ class Residue(Entity):
             return super(Residue, self).add(atom, key=key)
         else:
             return super(Residue, self).add(atom, key='%s%s' % (atom.name, len(self)))
-    add.__doc__ = Entity.add.__doc__
+    add.__doc__ = BioContainer.add.__doc__
 
     @property
     def is_n_terminal(self):
@@ -321,8 +321,10 @@ class Residue(Entity):
                 return None
             self._backbone = AtomList()
             for name in data.BACKBONES[self.type]:
-                try: self._backbone.append(self[name])
-                except KeyError: pass
+                try:
+                    self._backbone.append(self[name])
+                except KeyError:
+                    pass
         return self._backbone
 
     @property
@@ -355,8 +357,7 @@ class Residue(Entity):
         return self.resname in mdt.data.RESIDUE_DESCRIPTIONS
 
     def __str__(self):
-        return 'Residue %s (index %d, chain %s)' % (self.name, self.index,
-                                                    self.chain.name)
+        return 'Residue %s (index %d, chain %s)' % (self.name, self.index, self.chain.name)
 
     def _repr_markdown_(self):
         return self.markdown_summary()
