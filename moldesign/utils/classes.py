@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from bisect import bisect_left, bisect_right
-
 import collections
+
+from .descriptors import Alias
 
 
 class Categorizer(dict):
@@ -94,28 +95,6 @@ class ExclusiveList(object):
 
     __str__ = __repr__
 
-
-class Alias(object):
-    """
-    Descriptor that calls a child object's method.
-    e.g.
-    >>> class A(object):
-    >>>     childkeys = Alias('child.keys')
-    >>>     child = dict()
-    >>>
-    >>> a = A()
-    >>> a.child['key'] = 'value'
-    >>> a.childkeys() #calls a.child.keys(), returns ['key']
-    ['key']
-    """
-    def __init__(self, objmethod):
-        objname, methodname = objmethod.split('.')
-        self.objname = objname
-        self.methodname = methodname
-
-    def __get__(self, instance, owner):
-        proxied = getattr(instance, self.objname)
-        return getattr(proxied,self.methodname)
 
 
 class DotDict(object):
@@ -212,32 +191,6 @@ class OrderedDotDict(DotDict):
     def update(self, *args, **kwargs):
         for k,v in collections.OrderedDict(*args, **kwargs).iteritems():
             self[k] = v
-
-
-class Synonym(object):
-    """ An attribute (class or intance) that is just a synonym for another.
-    """
-    def __init__(self, name):
-        self.name = name
-
-    def __get__(self, instance, owner):
-        return getattr(instance, self.name)
-
-    def __set__(self, instance, value):
-        setattr(instance, self.name, value)
-
-
-class Attribute(object):
-    """For overriding a property in a superclass - turns the attribute back
-    into a normal instance attribute"""
-    def __init__(self, name):
-        self.name = name
-
-    def __get__(self, instance, cls):
-        return getattr(instance, self.name)
-
-    def __set__(self, instance, value):
-        return setattr(instance, self.name, value)
 
 
 class SortedCollection(object):
