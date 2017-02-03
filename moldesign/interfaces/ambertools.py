@@ -11,22 +11,39 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import collections
 import re
-
-import traitlets
 
 import moldesign as mdt
 import pyccc
-from moldesign import compute, uibase, utils
+from moldesign import compute, utils
 from moldesign import units as u
+from moldesign.widgets.parameterization import show_parameterization_results
 
 IMAGE = 'ambertools'
 
-AmberParameters = collections.namedtuple('AmberParameters',
-                                         'prmtop inpcrd job')
-ExtraAmberParameters = collections.namedtuple('GAFFParameters',
-                                              'lib frcmod job')
+
+class AmberParameters(object):
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state['job'] = None
+        return state
+
+    def __init__(self, prmtop, inpcrd, job=None):
+        self.prmtop = prmtop
+        self.inpcrd = inpcrd
+        self.job = job
+
+
+class ExtraAmberParameters(object):
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state['job'] = None
+        return state
+
+    def __init__(self, lib, frcmod, job=None):
+        self.lib = lib
+        self.frcmod = frcmod
+        self.job = job
 
 DNA_FF = {ff: 'leaprc.DNA.%s'%ff for ff in ['OL15', 'bsc1']}
 RNA_FF = {ff: 'leaprc.RNA.%s'%ff for ff in ['OL3', 'YIL']}
@@ -91,7 +108,7 @@ def _antechamber_calc_charges(mol, ambname, chargename, kwargs):
     charge = utils.if_not_none(mol.charge, 0)
     command = 'antechamber -fi pdb -i mol.pdb -fo mol2 -o out.mol2 -c %s -an n'%ambname
     if charge != 0:
-        command += ' -nc %d'%charge.value_in(u.q_e)
+        command += ' -nc %d' % charge.value_in(u.q_e)
 
     def finish_job(job):
         """Callback to complete the job"""
@@ -215,19 +232,20 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
         recommendations.
     """
     # Prepare input for tleap
-    if forcefields is None: forcefields = mdt.forcefields.ffdefaults.values()
+    if forcefields is None:
+        forcefields = mdt.forcefields.ffdefaults.values()
     leapstr = ['source %s' % LEAPRCFILES[ff] for ff in forcefields]
-    inputs = {'input.pdb': mdt.helpers.insert_ter_records(mol, mol.write(format='pdb'))}
+    inputs = {'input.pdb': mol.write(format='pdb')}
 
     if parameters:
-        if isinstance(parameters, ExtraAmberParameters):
+        if hasattr(parameters, 'lib') or hasattr(parameters, 'frcmod'):
             parameters = [parameters]
         for ipmtr, p in enumerate(parameters):
             frcname = 'res%d.frcmod' % ipmtr
             libname = 'res%d.lib' % ipmtr
             inputs[frcname] = p.frcmod
             inputs[libname] = p.lib
-            leapstr.append('loadamberparam %s' % frcname)
+            leapstr.append('loadAmberParams %s' % frcname)
             leapstr.append('loadoff %s' % libname)
 
     leapstr.append('mol = loadpdb input.pdb\n'
@@ -249,8 +267,9 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
 @utils.args_from(run_tleap)
 def assign_forcefield(mol, **kwargs):
     """ see run_tleap docstring """
-    from moldesign.widgets.parameterization import ParameterizationDisplay
-    job = run_tleap(mol, **kwargs)
+    clean_molecule = _prep_for_tleap(mol)
+
+    job = run_tleap(clean_molecule, **kwargs)
 
     if 'output.inpcrd' in job.get_output():
         prmtop = job.get_output('output.prmtop')
@@ -261,20 +280,54 @@ def assign_forcefield(mol, **kwargs):
     else:
         newmol = None
 
-    errors = _parse_tleap_errors(job, mol)
+    errors = _parse_tleap_errors(job, clean_molecule)
 
-    try:
-        report = ParameterizationDisplay(errors, mol, molout=newmol)
-        uibase.display_log(report, title='ERRORS/WARNINGS', show=True)
-    except traitlets.TraitError:
-        print 'Forcefield assignment: %s' % ('Success' if newmol is not None else 'Failure')
-        for err in errors:
-            print err.desc
+    show_parameterization_results(errors, clean_molecule, molout=newmol)
 
     if newmol is not None:
         return newmol
     else:
-        raise ParameterizationError('TLeap failed to assign force field parameters for %s' % mol, job)
+        raise ParameterizationError('TLeap failed to assign force field parameters for %s' % mol,
+                                    job)
+
+
+def _prep_for_tleap(mol):
+    """ Returns a modified *copy* that's been modified for input to tleap
+
+    Currently, this just looks for disulfide bonds
+    """
+    change = False
+    clean = mdt.Molecule(mol.atoms)
+    for residue in clean.residues:
+        if residue.resname == 'CYS':  # deal with cysteine states
+            if 'SG' not in residue.atoms or 'HG' in residue.atoms:
+                continue  # sulfur's missing, we'll let tleap create it
+            else:
+                sulfur = residue.atoms['SG']
+
+            if sulfur.formal_charge == -1*u.q_e:
+                residue.resname = 'CYM'
+                change = True
+                continue
+
+            # check for a reasonable hybridization state
+            if sulfur.formal_charge != 0 or sulfur.num_bonds not in (1, 2):
+                raise ValueError("Unknown sulfur hybridization state for %s"
+                                 % sulfur)
+
+            # check for a disulfide bond
+            for otheratom in sulfur.bonded_atoms:
+                if otheratom.residue is not residue:
+                    if otheratom.name != 'SG' or otheratom.residue.resname not in ('CYS', 'CYX'):
+                        raise ValueError('Unknown bond from cysteine sulfur (%s)' % sulfur)
+
+                    # if we're here, this is a cystine with a disulfide bond
+                    print 'INFO: disulfide bond detected. Renaming %s from CYS to CYX' % residue
+                    sulfur.residue.resname = 'CYX'
+
+            clean._rebuild_topology()
+
+    return clean
 
 
 @utils.kwargs_from(mdt.compute.run_job)
@@ -324,15 +377,18 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
     inputs = {'mol.mol2': mol.write(format='mol2'),
               'mol.charges': '\n'.join(map(str, charge_array))}
 
-    cmds = ['antechamber -i mol.mol2 -fi mol2 -o mol_charged.mol2 -fo mol2 -c rc -cf mol.charges',
-            'parmchk -i mol_charged.mol2 -f mol2 -o mol.frcmod', 'tleap -f leap.in']
+    cmds = ['antechamber -i mol.mol2 -fi mol2 -o mol_charged.mol2 '
+                   ' -fo mol2 -c rc -cf mol.charges -rn %s' % resname,
+            'parmchk -i mol_charged.mol2 -f mol2 -o mol.frcmod',
+            'tleap -f leap.in',
+            'sed -e "s/tempresname/%s/g" mol_rename.lib > mol.lib' % resname]
 
     inputs['leap.in'] = '\n'.join(["source leaprc.%s" % ffname,
-                                   "%s = loadmol2 mol_charged.mol2" % resname,
+                                   "tempresname = loadmol2 mol_charged.mol2",
                                    "fmod = loadamberparams mol.frcmod",
-                                   "check %s" % resname,
-                                   "saveoff %s mol.lib" % resname,
-                                   "saveamberparm %s mol.prmtop mol.inpcrd" % resname,
+                                   "check tempresname",
+                                   "saveoff tempresname mol_rename.lib",
+                                   "saveamberparm tempresname mol.prmtop mol.inpcrd",
                                    "quit\n"])
 
     def finish_job(j):
@@ -352,11 +408,12 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
     return mdt.compute.run_job(job, _return_result=True, **kwargs)
 
 
-ATOMSPEC = re.compile(r'\.R<(\S+) (\d+)>\.A<(\S+) (\d+)>')
+ATOMSPEC = re.compile(r'\.R<(\S+) ([\-0-9]+)>\.A<(\S+) ([\-0-9]+)>')
 
 
 def _parse_tleap_errors(job, molin):
-    from moldesign.widgets.parameterization import UnusualBond, UnknownAtom, UnknownResidue
+    from moldesign.widgets.parameterization import (UnusualBond, UnknownAtom,
+                                                    UnknownResidue, MissingTerms)
 
     # TODO: special messages for known problems (e.g. histidine)
     msg = []
@@ -388,11 +445,11 @@ def _parse_tleap_errors(job, molin):
             break
 
         fields = line.split()
-        if fields[0:2] == ['Unknown','residue:']:
+        if fields[0:2] == ['Unknown', 'residue:']:
             # EX: "Unknown residue: 3TE   number: 499   type: Terminal/beginning"
             res = molin.residues[int(fields[4])]
             unknown_res.add(res)
-            msg.append(UnknownResidue(line,res))
+            msg.append(UnknownResidue(line, res))
 
         elif fields[:4] == 'Warning: Close contact of'.split():
             # EX: "Warning: Close contact of 1.028366 angstroms between .R<DC5 1>.A<HO5' 1> and .R<DC5 81>.A<P 9>"
@@ -412,5 +469,9 @@ def _parse_tleap_errors(job, molin):
             atom = residue[fields[5]]
             msg.append(UnknownAtom(line, residue, atom))
 
+        elif (fields[:5] == '** No torsion terms for'.split() or
+                      fields[:5] == 'Could not find angle parameter:'.split()):
+            # EX: " ** No torsion terms for  ca-ce-c3-hc"
+            msg.append(MissingTerms(line.strip()))
 
     return msg

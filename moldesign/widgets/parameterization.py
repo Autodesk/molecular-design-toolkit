@@ -23,15 +23,27 @@ NOTE:
 """
 import cgi
 import collections
-import re
 
 import ipywidgets as ipy
 
 from moldesign import units as u
+from moldesign import uibase
+from moldesign import utils
+
+
+def show_parameterization_results(errormessages, molin, molout=None):
+    if uibase.widgets_enabled:
+        report = ParameterizationDisplay(errormessages, molin, molout)
+        uibase.display_log(report, title='ERRORS/WARNINGS', show=True)
+
+    else:
+        print 'Forcefield assignment: %s' % ('Success' if molout is not None else 'Failure')
+        for err in errormessages:
+            print utils.html_to_text(err.desc)
+
 
 
 class ParameterizationDisplay(ipy.Box):
-
     def __init__(self, errormessages, molin, molout=None):
         self.molin = molin
         self.molout = molout
@@ -41,7 +53,10 @@ class ParameterizationDisplay(ipy.Box):
                                ('Success' if molout else 'FAILED'))
 
         self.listdesc = ipy.HTML('<b>Errors / warnings:</b>')
-        self.errorlist = ipy.Select(options=collections.OrderedDict((e.short, e) for e in self.msg))
+        error_display = collections.OrderedDict((e.short, e) for e in self.msg)
+        if len(error_display) == 0:
+            error_display['No errors or warnings.'] = StructureOk()
+        self.errorlist = ipy.Select(options=error_display)
         self.errmsg = ipy.HTML('-')
 
         self.viewer = self.molin.draw3d()
@@ -56,6 +71,7 @@ class ParameterizationDisplay(ipy.Box):
 
         super(ParameterizationDisplay, self).__init__(children=children)
 
+
     def switch_display(self, d):
         old = d['old']
         old.unshow(self.viewer)
@@ -65,9 +81,35 @@ class ParameterizationDisplay(ipy.Box):
         self.errmsg.value = new.desc
 
 
-
 class ForceFieldMessage(object):
     pass
+
+
+class StructureOk(ForceFieldMessage):
+    """
+    A blank message if no other warnings are generated.
+    """
+    message = 'No errors or warnings'
+    desc = 'No errors or warnings'
+
+    def show(self, viewer):
+        viewer.ribbon(opacity=0.7)
+
+    def unshow(self, viewer):
+        pass
+
+
+class MissingTerms(ForceFieldMessage):
+    def __init__(self, message):
+        self.message = message
+        self.desc = self.message
+        self.short = self.message
+
+    def show(self, viewer):
+        viewer.ribbon(opacity=0.7)
+
+    def unshow(self, viewer):
+        pass
 
 
 class UnknownAtom(ForceFieldMessage):
@@ -82,7 +124,7 @@ class UnknownAtom(ForceFieldMessage):
                                                                          self.atom.residue.resname)
 
     def show(self, viewer):
-        viewer.licorice(atoms=self.residue.atoms, render=False)
+        viewer.licorice(atoms=self.residue.atoms)
         viewer.vdw(atoms=[self.atom])
 
     def unshow(self, viewer):
@@ -159,8 +201,6 @@ class UnusualBond(ForceFieldMessage):
                                                radius=0.1 * u.angstrom,
                                                opacity=1.0,
                                                color='red')
-        else:
-            viewer.render()
 
     def unshow(self, viewer):
         viewer.ribbon(opacity=0.7, render=False)

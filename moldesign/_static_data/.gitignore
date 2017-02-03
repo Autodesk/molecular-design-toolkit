@@ -1,2 +1,3 @@
-residue_bonds.bak
-
+*.bak
+aa-variants*.*
+components.cif*

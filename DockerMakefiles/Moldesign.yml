@@ -1,0 +1,86 @@
+moldesign_requirements:
+ requires:
+   - biopython
+   - parmed
+
+
+moldesign:
+ description: Base installation of the MDT library. Built by cloning the current git repo.
+ requires:
+  - notebook
+  - moldesign_requirements
+ build_directory: ../
+ build: |
+  COPY . /opt/molecular-design-toolkit
+  RUN cd /opt \
+   && mv molecular-design-toolkit molecular-design-toolkit_dirty \
+   && git clone molecular-design-toolkit_dirty molecular-design-toolkit \
+   && rm -rf molecular-design-toolkit_dirty \
+   && cd molecular-design-toolkit && python setup.py sdist \
+   && pip install dist/* \
+   && cd / && rm -rf /opt/molecular-design-toolkit
+
+
+pyccc:
+ requires:
+  - python_install
+ build: |
+  RUN pip install pyccc==0.6.4
+
+
+nbmolviz:
+ requires:
+  - python_install
+ build: |
+  RUN pip install nbmolviz
+  RUN jupyter nbextension enable --python --sys-prefix nbmolviz==0.6.5 &&
+      jupyter nbextension enable --python --sys-prefix widgetsnbextensions
+
+
+moldesign_notebook:
+ description: A production-ready, fully outfitted jupyter server container
+ requires:
+  - chem_python
+  - notebook
+  - moldesign
+ build: |
+  RUN cp -r /usr/local/lib/python2.7/dist-packages/moldesign/_notebooks /notebooks/moldesign_examples
+  RUN jupyter nbextension enable --python --sys-prefix widgetsnbextension \
+   && jupyter nbextension enable --python --sys-prefix nbmolviz
+
+
+
+moldesign_complete:
+  description: An image with moldesign and all python dependencies
+  requires:
+   - moldesign_notebook
+  build: |
+   ENTRYPOINT []
+   CMD ''
+
+moldesign_standalone:
+  description: |
+       Complete image INCLUDING binary dependencies, which run in container
+       subprocesses (i.e., NOT with CCC)
+  requires:
+     - moldesign_complete
+     - nwchem
+     - ambertools
+     #- opsin - there's a base image conflict with this
+  build: |
+    RUN mkdir -p ~/.moldesign \
+     && echo "engine_type: subprocess" > ~/.moldesign/moldesign.yml
+
+moldesign_minimal:
+   description: |
+      Same as moldesign_notebook, but *without* any dependencies (OpenBabel, OpenMM etc.).
+      Used for testing remote execution environment
+   requires:
+    - notebook
+    - moldesign
+   build: |
+     RUN cp -r /usr/local/lib/python2.7/dist-packages/moldesign/_notebooks /notebooks/moldesign_examples
+     RUN jupyter nbextension enable --python --sys-prefix widgetsnbextension \
+      && jupyter nbextension enable --python --sys-prefix nbmolviz
+     ENTRYPOINT []
+     CMD ''

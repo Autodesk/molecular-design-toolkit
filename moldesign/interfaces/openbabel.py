@@ -16,7 +16,6 @@ from __future__ import absolute_import
 import os
 import string
 
-import collections
 import moldesign.molecules.atomcollections
 
 try:
@@ -86,7 +85,7 @@ def read_stream(filelike, format, name=None):
     Returns:
         moldesign.Molecule: parsed result
     """
-    molstring = filelike.read()
+    molstring = str(filelike.read())  # openbabel chokes on unicode
     return read_string(molstring, format, name=name)
 
 
@@ -163,23 +162,47 @@ def guess_bond_orders(mol):
 
 
 @runsremotely(enable=force_remote)
-def add_hydrogen(mol, ph=None):
+def add_hydrogen(mol):
     """Add hydrogens to saturate atomic valences.
 
     Args:
         mol (moldesign.Molecule): Molecule to saturate
-        ph (float): Assign formal charges and protonation using pH model; if None (the default),
-            neutral protonation will be assigned where possible.
 
     Returns:
         moldesign.Molecule: New molecule with all valences saturated
     """
     pbmol = mol_to_pybel(mol)
-    pbmol.OBMol.AddHydrogens(False,
-                             ph is not None,)
+    pbmol.OBMol.AddHydrogens()
     newmol = pybel_to_mol(pbmol, reorder_atoms_by_residue=True)
     mdt.helpers.assign_unique_hydrogen_names(newmol)
     return newmol
+
+
+@runsremotely(enable=force_remote)
+def set_protonation(mol, ph=7.4):
+    """ Adjust protonation according to the OpenBabel pka model.
+
+    This routine will return a copy of the molecule with the new protonation state and adjusted
+    formal charges
+
+    Args:
+        mol (moldesign.Molecule): Molecule to adjust
+        ph (float): assign protonation state for this pH value
+
+    Returns:
+        moldesign.Molecule: New molecule with adjusted protonation
+    """
+    # TODO: this doesn't appear to do anything for most molecules!!!
+    # TODO: this renames hydrogens!!!
+
+    pbmol = mol_to_pybel(mol)
+    pbmol.OBMol.AddHydrogens(False, True, ph)
+
+    newmol = pybel_to_mol(pbmol, reorder_atoms_by_residue=True)
+    mdt.helpers.assign_unique_hydrogen_names(newmol)
+    mdt.assign_formal_charges(newmol, ignore_nonzero=False)
+    return newmol
+
 
 @exports
 def mol_to_pybel(mdtmol):
@@ -320,9 +343,6 @@ def pybel_to_mol(pbmol,
             else:
                 res = newresidues[residx]
 
-            # Assign the atom
-            if mdtatom.name in res:
-                mdtatom.name = '%s%d' % (mdtatom.name, pybatom.idx)  # prevent name clashes
             res.add(mdtatom)
 
         newatoms.append(mdtatom)
@@ -365,7 +385,7 @@ def from_smiles(smi, name=None):
         moldesign.Molecule: the translated molecule
     """
     if name is None: name = smi
-    pbmol = pb.readstring('smi', smi)
+    pbmol = pb.readstring('smi', str(smi))  # avoid passing unicode by casting to str
     pbmol.addh()
     pbmol.make3D()
     mol = pybel_to_mol(pbmol,

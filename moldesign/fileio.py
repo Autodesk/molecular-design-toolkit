@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import bz2
-import cPickle as pkl # TODO: if cpickle fails, retry with regular pickle to get a better traceback
+import cPickle as pkl  # TODO: if cpickle fails, retry with regular pickle to get a better traceback
 import cStringIO as StringIO
 import functools
 import gzip
@@ -22,7 +22,9 @@ import moldesign as mdt
 from moldesign.interfaces import biopython_interface
 import moldesign.interfaces.openbabel as openbabel_interface
 from moldesign.interfaces.openmm import amber_to_mol as read_amber
+from moldesign.interfaces.parmed_interface import write_pdb, write_mmcif
 from moldesign.helpers import pdb
+
 
 def exports(o, name=None):
     __all__.append(o.__name__)
@@ -81,7 +83,7 @@ def read(f, format=None):
     else:  # default to openbabel if there's not an explicit reader for this format
         mol = openbabel_interface.read_stream(fileobj, format)
 
-    if filename is not None:
+    if filename is not None and mol.name not in (None, 'untitled'):
         mol.name = filename
 
     return mol
@@ -197,23 +199,15 @@ def read_pdb(f, assign_ccd_bonds=True):
     """
     assemblies = pdb.get_pdb_assemblies(f)
     f.seek(0)
-    mol = mdt.interfaces.parmed_interface.parse_pdb(f)
+    mol = mdt.interfaces.parmed_interface.read_pdb(f)
     mol.properties.bioassemblies = assemblies
+
     f.seek(0)
-    conect_graph = pdb.get_conect_records(f)
+    mol.metadata.missing_residues = mdt.helpers.get_pdb_missing_residues(f)
 
     # Assign bonds from residue templates
     if assign_ccd_bonds:
         pdb.assign_biopolymer_bonds(mol)
-
-    # Create bonds from CONECT records
-    serials = {atom.pdbindex: atom for atom in mol.atoms}
-    for atomserial, nbrs in conect_graph.iteritems():
-        atom = serials[atomserial]
-        for nbrserial, order in nbrs.iteritems():
-            nbr = serials[nbrserial]
-            if nbr not in atom.bond_graph:  # we already got it from CCD
-                mol.newbond(atom, nbr, order)
 
     if assemblies:
         pdb.warn_assemblies(mol, assemblies)
@@ -236,7 +230,7 @@ def read_mmcif(f):
     Returns:
         moldesign.Molecule: the parsed molecular structure
     """
-    mol = mdt.interfaces.parmed_interface.parse_mmcif(f)
+    mol = mdt.interfaces.parmed_interface.read_mmcif(f)
     f.seek(0)
     assemblies = biopython_interface.get_mmcif_assemblies(f)
     if assemblies:
@@ -281,7 +275,9 @@ def from_pdb(pdbcode, usecif=False):
     assert len(pdbcode) == 4, "%s is not a valid PDB ID." % pdbcode
 
     fileext = 'cif' if usecif else 'pdb'
-    request = requests.get('http://www.rcsb.org/pdb/files/%s.%s' % (pdbcode, fileext))
+
+    url = 'http://www.rcsb.org/pdb/files/%s.%s' % (pdbcode, fileext)
+    request = requests.get(url)
 
     if request.status_code == 404 and not usecif:  # if not found, try the cif-format version
         print 'WARNING: %s.pdb not found in rcsb.org database. Trying %s.cif...' % (
@@ -301,6 +297,7 @@ def from_pdb(pdbcode, usecif=False):
 
     mol = read(filestring, format=fileext)
     mol.name = pdbcode
+    mol.metadata.url = 'http://www.rcsb.org/pdb/explore.do?structureId=%s' % pdbcode
     return mol
 
 
@@ -367,7 +364,8 @@ READERS = {'pdb': read_pdb,
            'mmcif': read_mmcif,
            'xyz': read_xyz}
 
-WRITERS = {}
+WRITERS = {'pdb': write_pdb,
+           'mmcif': write_mmcif}
 
 PICKLE_EXTENSIONS = set("p pkl pickle mdt".split())
 COMPRESSION = {'gz': gzip.open,

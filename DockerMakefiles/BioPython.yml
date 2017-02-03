@@ -1,0 +1,12 @@
+biopython_build:
+  requires:
+   - buildbase
+  build: RUN pip install biopython
+
+
+biopython:
+  requires:
+    - python_deploy_base
+  copy_from:
+    biopython_build:
+      /usr/local/lib/python2.7/dist-packages/: /usr/local/lib/python2.7/

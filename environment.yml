@@ -23,6 +23,6 @@ dependencies:
    - funcsigs
    - docker-py
    - fortranformat
-   - pyccc >= 0.6.6
+   - pyccc >= 0.6.7a0
    - ipywidgets >= 5.1
    - nbmolviz == 0.6.7rc2  # increment for release as appropriate

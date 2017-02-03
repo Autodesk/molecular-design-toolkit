@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import imp
+import io
 
 import numpy as np
 
@@ -32,25 +33,60 @@ else:
     force_remote = False
 
 
+def exports(o):
+    __all__.append(o.__name__)
+    return o
+__all__ = []
+
+
+@exports
+def mol_to_fixer(mol):
+    import pdbfixer
+    fixer = pdbfixer.PDBFixer(
+            pdbfile=io.BytesIO(mol.write(format='pdb')))
+    return fixer
+
+
+@exports
+def fixer_to_mol(f):
+    return opm.topology_to_mol(f.topology, positions=f.positions)
+
+
 @compute.runsremotely(enable=force_remote)
 def add_hydrogen(mol, pH=7.4):
-    fixer = _get_fixer(mol)
+    fixer = mol_to_fixer(mol)
     fixer.addMissingHydrogens(pH)
-    return _get_mol(fixer)
+    return fixer_to_mol(fixer)
 
 
 @compute.runsremotely(enable=force_remote)
 def mutate(mol, mutationmap):
-    fixer = _get_fixer(mol)
+    fixer = mol_to_fixer(mol)
     chain_mutations = {}
     for res in mutationmap:
         chain_mutations.setdefault(res.chain.pdbname, {})[res] = mutationmap[res]
 
     for chainid, mutations in chain_mutations.iteritems():
-        mutstrings = ['%s-%d-%s' % (res.resname, res.pdbindex, newname) for res,newname in mutations.iteritems()]
+        mutstrings = ['%s-%d-%s' % (res.resname, res.pdbindex, newname)
+                      for res, newname in mutations.iteritems()]
         print 'Applying mutations to chain %s: %s' % (chainid, ', '.join(mutstrings))
         fixer.applyMutations(mutations, chainid)
-    return _get_mol(fixer)
+    return fixer_to_mol(fixer)
+
+
+@compute.runsremotely(enable=force_remote)
+def get_missing_residues(mol):
+    fixer = mol_to_fixer(mol)
+    fixer.findMissingResidues()
+    fixerchains = list(fixer.topology.chains)
+
+    missing = list()
+    for (chainidx, insertionpoint), reslist in fixer.missingResidues.iteritems():
+        chainid = fixerchains[chainidx].id
+        for ires, resname in enumerate(reslist):
+            missing.append(mdt.helpers.MissingResidue(chainid, resname, insertionpoint + ires))
+
+    return missing
 
 
 @compute.runsremotely(enable=force_remote)
@@ -125,14 +161,4 @@ def add_water(mol, min_box_size=None, padding=None,
                                positions=modeller.getPositions(),
                                name='%s with water box' % mol.name)
 
-
-
-def _get_fixer(mol):
-    import pdbfixer
-    mol.write('/tmp/tmp.pdb', format='pdb')
-    fixer = pdbfixer.PDBFixer('/tmp/tmp.pdb')
-    return fixer
-
-def _get_mol(f):
-    return opm.topology_to_mol(f.topology, positions=f.positions)
 

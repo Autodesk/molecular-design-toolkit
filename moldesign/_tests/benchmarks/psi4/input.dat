@@ -1,0 +1,27 @@
+
+memory 250 mb
+
+
+molecule ethylene {
+C        1.07507       -0.06286        0.01498
+C        0.40718       -0.99214       -0.67399
+H        0.54964        0.70016        0.58068
+H        2.16038       -0.04688        0.02683
+H       -0.67813       -1.00812       -0.68584
+H        0.93260       -1.75516       -1.23969
+}
+
+set basis 3-21g
+
+set mcscf {
+    reference   twocon
+    e_convergence  11
+    ci_diis     on
+    d_convergence  11
+    diis_max_vecs 4
+    docc        [10, 1]
+    socc        [ 0, 2]
+    maxiter     120
+}
+
+thisenergy = energy('mcscf')

@@ -225,7 +225,7 @@ def make_contact_view(entity, view_radius=5.0*u.ang,
                       **kwargs):
     """
 
-    :type entity: moldesign.biounits.Entity
+    :type entity: moldesign.biounits.BioContainer
     :param kwargs:
     :return:
     """

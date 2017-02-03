@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import operator
-
 import moldesign as mdt
 from moldesign import utils
 
@@ -24,6 +22,7 @@ class ChildList(AtomContainer):
     """
     __len__ = utils.Alias('_childinorder.__len__')
     __iter__ = utils.Alias('_childinorder.__iter__')
+    index = utils.Alias('_childinorder.index')
 
     def __str__(self):
         return str(self._childinorder._items)
@@ -31,8 +30,8 @@ class ChildList(AtomContainer):
     def __repr__(self):
         try:
             return '<Children of %s: %s>' % (self.parent, self)
-        except:
-            return '<ChildList @ %x (__repr__ failed)>' % id(self)
+        except (KeyError, AttributeError):
+            return '<ChildList @ %x (exception in self.__repr__)>' % id(self)
 
     def __init__(self, parent):
         super(ChildList, self).__init__()
@@ -56,24 +55,20 @@ class ChildList(AtomContainer):
         self._childinorder.insert_right(val)
 
     def __contains__(self, item):
-        if isinstance(item, basestring):
+        if isinstance(item, basestring) or item is None:
             return (item in self._childbyname)
         else:
             return (item in self._childinorder)
 
     def __getattr__(self, item):
-        if not hasattr(self, '_childbyname'):
+        if '_childbyname' not in self.__dict__ or '_childinorder' not in self.__dict__:
             raise AttributeError('Uninitialized')
 
         try:
             return self._childbyname[item]
         except KeyError:
-            try:
-                error_msg = 'ChildList object in %s has no attribute %s.' % (
-                    self.parent, item)
-            except:  # during copy / depickling, might encounter unset attrs
-                error_msg = 'Lookup failed'
-            raise AttributeError(error_msg)
+            raise AttributeError('ChildList object in %s has no attribute %s.' %
+                                 (self.parent.__repr__(), item))
 
     def iteratoms(self):
         """Iterate over all atoms
@@ -103,22 +98,23 @@ def _sortkey(x):
 
 
 @toplevel
-class Entity(AtomContainer):
+class BioContainer(AtomContainer):
     """
     Generalized storage mechanism for hierarchical representation of biomolecules,
     e.g. by residue, chain, etc. Permits other groupings, provided that everything is
     tree-like.
 
     All children of a given entity must have unique names. An individual child can be retrieved with
-    ``entity.childname`` or ``entity['childname']`` or ``entity[index]``
+    ``biocontainer.childname`` or ``biocontainer['childname']`` or ``biocontainer[index]``
 
     Yields:
-        Entity or mdt.Atom: this entity's children, in order
+        BioContainer or mdt.Atom: this entity's children, in order
     """
 
     __getitem__ = utils.Alias('children.__getitem__')
     __len__ = utils.Alias('children.__len__')
     __iter__ = utils.Alias('children.__iter__')
+    __contains__ = utils.Alias('children.__contains__')
     atoms = utils.Alias('children.atoms')
     iteratoms = utils.Alias('children.iteratoms')
     rebuild = utils.Alias('children.rebuild')
@@ -128,13 +124,13 @@ class Entity(AtomContainer):
         """  Initialization:
 
         Args:
-            name (str): Name of this entity
-            parent (mdt.Molecule): molecule this entity belongs to
-            index (int): index of this entity in the parent molecule
-            pdbname (str): PDB-format name of this entity
-            pdbindex (str): Index of this entity in PDB format
+            name (str): Name of this biocontainer
+            parent (mdt.Molecule): molecule this biocontainer belongs to
+            index (int): index of this biocontainer in the parent molecule
+            pdbname (str): PDB-format name of this biocontainer
+            pdbindex (str): Index of this biocontainer in PDB format
         """
-        super(Entity, self).__init__()
+        super(BioContainer, self).__init__()
         self.children = ChildList(self)
         self.molecule = molecule
         self.name = name
@@ -153,7 +149,7 @@ class Entity(AtomContainer):
             KeyError: if an object with this key already exists
 
         Args:
-            item (Entity or mdt.Atom): the child object to add
+            item (BioContainer or mdt.Atom): the child object to add
             key (str): Key to retrieve this item (default: ``item.name`` )
         """
         if key is None:
@@ -165,19 +161,7 @@ class Entity(AtomContainer):
     def __dir__(self):
         return (self.__dict__.keys() +
                 self.__class__.__dict__.keys() +
-                [x.name for x in self])
-
-    def __getattr__(self, item):
-        if not hasattr(self, 'children'):
-            raise AttributeError("Uninitialized")
-        try:
-            return self.children[item]
-        except KeyError:
-            try:
-                error_msg = '%s has no attribute "%s"' % (self, item)
-            except:  # during copy / depickling, might encounter unset attrs
-                error_msg = 'Lookup failed'
-            raise AttributeError(error_msg)
+                [x.name for x in self.children])
 
     def __hash__(self):
         """ Explicitly hash by object id
@@ -193,8 +177,8 @@ class Entity(AtomContainer):
                 return '<%s in %s>' % (self, self.molecule)
             else:
                 return '<%s (no molecule)>' % self
-        except:
-            return '<%s at %s (exc in __repr__)>' % (self.__class__.__name__,
+        except (KeyError, AttributeError):
+            return '<%s at %s (exception in __repr__)>' % (self.__class__.__name__,
                                                      id(self))
 
     def __str__(self):
@@ -214,7 +198,7 @@ class Entity(AtomContainer):
 
 
 @toplevel
-class Instance(Entity):
+class Instance(BioContainer):
     """ The singleton biomolecular container for each ``Molecule``. Its children are generally
     PDB chains. Users won't ever really see this object.
     """

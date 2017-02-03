@@ -195,7 +195,7 @@ class AtomReprMixin(object):
                 return '<%s in molecule %s>' % (self, self.molecule)
             else:
                 return '<%s>' % self
-        except:
+        except (KeyError, AttributeError):
             return '<%s at %s (exception in __repr__)>' % (self.__class__.__name__, id(self))
 
     def markdown_summary(self):
@@ -243,11 +243,8 @@ class AtomReprMixin(object):
                        ['%12.3f' % x.defunits_value() for x in self.position])
         table.add_line(['**momentum /** {}'.format(u.default.momentum)] +
                        ['%12.3e' % m.defunits_value() for m in self.momentum])
-        try:
-            self.force
-        except:
-            pass
-        else:
+
+        if self.molecule is not None and 'forces' in self.molecule.properties:
             table.add_line(['**force /** {.units}'.format(self.force.defunits())] +
                            ['%12.3e' % m.defunits_value() for m in self.force])
 
@@ -455,6 +452,12 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
             return [Bond(self, nbr, order)
                     for nbr, order in self.bond_graph.iteritems()
                     if nbr.atnum > 1]
+
+    @property
+    def bonded_atoms(self):
+        """ List[moldesign.Atom]: a list of the atoms this atom is bonded to
+        """
+        return [bond.partner(self) for bond in self.bonds]
 
     @property
     def force(self):

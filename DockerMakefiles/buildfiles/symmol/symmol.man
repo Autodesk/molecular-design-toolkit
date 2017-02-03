@@ -1,0 +1,126 @@
+SYMMOL: Version 28.04.1998
+===============================================================================
+By
+Tullio Pilati and Alessandra Forni
+C.N.R. - C.S.R.S.R.C.
+Via Golgi, 19
+I-20133  Milano
+Italy
+E-MAIL:   pila@sg1.csrsrc.mi.cnr.it (T. Pilati)
+E-MAIL:   aforni@rs18.csrsrc.mi.cnr.it (A. Forni)
+===============================================================================
+
+                         PROGRAM CAPABILITIES
+                         --------------------
+
+The program SYMMOL symmetrizes a group of atoms whose coordinates, either
+orthogonal or oblique, are given in input.  It  prints out informations
+about the given set of atoms and informations concerning its symmetry:
+the symmetrized orthogonal coordinates together the point group (PG), the labels
+and the equivalent positions.  Some quantities showing the goodness-of-fit are
+also printed: the rms on the coordinates, the molecular rms, the maximum
+deviation of the coordinates of the atom from the symmetrized ones and
+the continuous symmetry measure (CSM) for the whole PG and for the
+single elements of the PG.
+
+For hexagonal PGs or for PGs different from the 32 crystallographic PGs, the
+program also prints out the symmetry group matrices in the orthogonal frame, the
+symmetry operations in hexagonal coordinates and the atom coordinates in the
+hexagonal system.
+
+The symmetrization is performed within a tolerance based on a value
+given in input (DCM). The user may choose between different possible
+criteria of tolerance: the tolerance may be a constant, that is, the
+DCM input value, or a variable. In the latter case, the tolerance for each
+atom is DCM weigthed by either the distance of the atom from the centre
+of mass or the mean standard uncertainty (s.u.) of the atom.
+ 
+Computation of the inertia moments may be performed using  
+atomic masses as weigths or assigning unitary weigths to the atoms or 
+weigthing the atoms by the reciprocal of their mean square s.u. 
+
+Within the same job it is possible to symmetrize more than one group of atoms,
+by using the variable MOL. 
+
+Atoms with MOL<0 are not used to find the symmetry group, but, after
+symmetrization of atoms with MOL=I, the atoms with MOL=-I are examined to see
+if it is possible to symmetrize them in the same group, but according to the
+larger tolerance parameter DCME 
+To understand what the program do it is useful to examine the example.17
+Here there are two cyclohexane molecules [IABS(MOL)=1 and IABS(MOL)=2].
+The two molecules differs because the y coordinate of H62 of the second is
+moved of 2 Angstrom completely disrupting the molecular symmetry. 
+For the first molecule the carbon atoms present a D3d symmetry within 0.01
+Angstrom and the atoms have D6h symmetry only within 0.7 Angstrom.
+If you run the program with DCM=0.7 and MOL=1 for all the atoms of the first
+molecule, what do you obtain is chemically an absurdity: a planar molecule with 
+all the carbon and six H atoms on a plane like a benzene and the other six
+atoms alternatively above and below the least squares plane. This symmetry is
+reached with the same tolerance requested for the D3d symmetry!!!
+The correct D3d symmetry can be reached adopting DCM=0.01 and DCME=0.7 and
+MOL=-1 for all the H atoms. In that way, the program finds the symmetry 
+ignoring the H atoms whose coordinates largely deviate from D3d symmetry and
+after that the H atoms are symmetrized in the same symmetry group.
+For the second molecule the program finds the same result for carbon and Hi1
+atoms while for Hi2 atoms due to the H62 it is impossible to reach the D3d
+symmetry. The program warned that H atoms of the first molecule and Hi1 atoms
+of the second were symmetryzed but not used in determining the symmetry and
+that it is impossible to symmetryze Hi2 atoms of the second molecule within
+DCME.
+The use of MOL<0 can be very useful when there is a PSEUDO DEGENERATION OF
+THE PRINCIPAL INERTIA AXES 
+For example examine example.27 MOL=1 and MOL=2. The two case are similar;
+The only difference is that for MOL=1 due to a pseudo-degeneration of inertia
+moments the symmetry C2v is not reached, while in the second case, putting 
+MOL=-2 for Ir1, the degeneration is lost and the correct C2v group is found.
+===============================================================================
+
+                          INPUT DESCRIPTION
+                          ----------------- 
+
+   All lines of input starting with # are interpreted as comment and ignored
+
+1) CELL PARAMETERS (free format) 
+   if orthogonal coordinates are given,  cell must be: 1 1 1 90 90 90 
+
+2) INDWGH,INDTOL,DCM,DCME (free format)
+
+   INDWGH=0,1 moments of inertia are calculated with weigths = atomic masses
+
+   INDWGH=2   moments of inertia are calculated with weigths = 1.0
+
+   INDWGH=3   moments of inertia are calculated with weigths = (1/s(i))**2
+              were s(i) = is the mean s.u. for the atom i as calculated from
+              atomic standard uncertainties (see below)
+
+   INDTOL=0,1 an element of symmetry of the molecular group is accepted only
+              if for any atom i exist an atom j for which
+              ABS[XO(i)-Mk*XO(j)] < DCM 
+              where XO are the inertial coordinates, Mk is the symmetry matrix
+              and DCM is a constant tolerance
+
+   INDTOL=2   as indtol=1 but the tolerance is now DCM*d(i)/dm
+              where d(i) is the distance of the atom i from the mass centre 
+              and dm is the mean of the d(i) of all the considered atom
+
+   INDTOL=3   as indtol=1 but the tolerance is now DCM*s(i)
+
+3) NAME(i) MOL(i) X(i) SX(i) for I=1 to NA=total number of atoms.
+          format(a6,i2,6f9.5)
+
+   NAME(i) = Label for the atom i. The first (1 or 2) non-blank letters must
+             be the symbol of the atomic species. 
+           - the symbol may be in upper lower case or mixed
+
+   MOL(i)  =   group (molecule) of atom i
+               The program attempts to symmetrize all the groups 
+   MOL(i)  < 0 This atom belongs to the group ABS(MOL(i)) but it weight is =0.0
+               and the tolerance for this atoms is DCME
+   MOL(i)  = 0 This atom is completely ignored 
+
+   X(i)    = atom coordinates referred to the cell
+
+   SX(i)   = atom standard uncertainties referred to the cell
+===============================================================================
+The complete output of the program is on the file "symmol.out" (logic unit 9)
+A partial output is also sent on the standard output unit

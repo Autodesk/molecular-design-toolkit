@@ -249,7 +249,7 @@ def test_h2_harmonic_copy_loses_simulation(h2_harmonic_copy, h2_harmonic):
 
 def test_h2_calculation_caching(h2_harmonic):
     h2 = h2_harmonic
-    h2.properties = moldesign.molecules.molecule.MolecularProperties(h2)
+    h2.properties = mdt.MolecularProperties(h2)
     true_energy = h2.calc_potential_energy()
     assert 'potential_energy' in h2.properties
     assert 'forces' in h2.properties

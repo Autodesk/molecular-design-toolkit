@@ -11,14 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import collections
+
 import moldesign as mdt
 from moldesign import utils, data
 
-from . import Entity, AtomList, toplevel
+from . import BioContainer, AtomList, toplevel
 
 
 @toplevel
-class Residue(Entity):
+class Residue(BioContainer):
     """ A biomolecular residue - most often an amino acid, a nucleic base, or a solvent
     molecule. In PDB structures, also often refers to non-biochemical molecules.
 
@@ -32,9 +34,9 @@ class Residue(Entity):
     def copy(self):
         newatoms = super(Residue, self).copy()
         return newatoms[0].residue
-    copy.__doc__ = Entity.copy.__doc__
+    copy.__doc__ = BioContainer.copy.__doc__
 
-    @utils.args_from(Entity)
+    @utils.args_from(BioContainer)
     def __init__(self, **kwargs):
         """ Initialization
         Args:
@@ -48,12 +50,37 @@ class Residue(Entity):
         self._backbone = None
         self._sidechain = None
         self._template_name = None
-        if self.name is None and self.pdbname is not None:
-            self.name = self.pdbname + str(self.pdbindex)
+        self._name = None
+
+    @property
+    def name(self):
+        if self._name is not None:
+            return self._name
+        elif self.pdbname is None:
+            return None
+        elif self.pdbindex is None:
+            return self.pdbname
+        elif self.pdbname[-1].isdigit():
+            return '%s (seq # %s)' % (self.pdbname, self.pdbindex)
+        else:
+            return self.pdbname + str(self.pdbindex)
+
+    @name.setter
+    def name(self, value):
+        self._name = value
 
     @property
     def atoms(self):
         return self.children
+
+    @property
+    def bonded_residues(self):
+        """ List[moldesign.Residue]: list of residues this residue is bonded to
+        """
+        residues = collections.OrderedDict()
+        for atom in self.bonded_atoms:
+            residues[atom.residue] = None
+        return residues.keys()
 
     def add(self, atom, key=None):
         """Deals with atom name clashes within a residue - common for small molecules"""
@@ -69,7 +96,7 @@ class Residue(Entity):
             return super(Residue, self).add(atom, key=key)
         else:
             return super(Residue, self).add(atom, key='%s%s' % (atom.name, len(self)))
-    add.__doc__ = Entity.add.__doc__
+    add.__doc__ = BioContainer.add.__doc__
 
     @property
     def is_n_terminal(self):
@@ -128,6 +155,17 @@ class Residue(Entity):
             nextres = self.next_residue
         except StopIteration:
             return True
+        except KeyError:
+            # If we're here, the residue is missing some atoms. We'll fall back to checking the
+            # next residues in line
+            if self.index == len(self.molecule.residues):
+                return True
+            else:
+                print 'WARNING: %s is missing expected atoms. Attempting to infer chain end' % \
+                    self
+                nextres = self.molecule.residues[self.index + 1]
+                return not self._same_polymer(nextres)
+
         else:
             return False
 
@@ -138,8 +176,22 @@ class Residue(Entity):
             prevres = self.prev_residue
         except StopIteration:
             return True
+        except KeyError:
+            # If we're here, the residue is missing some atoms. We'll fall back to checking the
+            # next residues in line
+            if self.index <= 0:
+                assert self.index == 0
+                return True
+            else:
+                print 'WARNING: %s is missing expected atoms. Attempting to infer chain start' % \
+                    self
+                nextres = self.molecule.residues[self.index - 1]
+                return not self._same_polymer(nextres)
         else:
             return False
+
+    def _same_polymer(self, otherres):
+        return (otherres.type == self.type) and (otherres.chain is self.chain)
 
     def assign_template_bonds(self):
         """Assign bonds from bioresidue templates.
@@ -166,7 +218,7 @@ class Residue(Entity):
             bonds_by_name = data.RESIDUE_BONDS[resname]
             self._template_name = resname
         except KeyError:
-            if len(self) == 1:
+            if len(self) == 1 and self.type not in ('water', 'ion'):
                 print 'INFO: no bonds assigned to residue %s' % self
                 return
             else:
@@ -269,8 +321,10 @@ class Residue(Entity):
                 return None
             self._backbone = AtomList()
             for name in data.BACKBONES[self.type]:
-                try: self._backbone.append(self[name])
-                except KeyError: pass
+                try:
+                    self._backbone.append(self[name])
+                except KeyError:
+                    pass
         return self._backbone
 
     @property
@@ -303,8 +357,7 @@ class Residue(Entity):
         return self.resname in mdt.data.RESIDUE_DESCRIPTIONS
 
     def __str__(self):
-        return 'Residue %s (index %d, chain %s)' % (self.name, self.index,
-                                                    self.chain.name)
+        return 'Residue %s (index %d, chain %s)' % (self.name, self.index, self.chain.name)
 
     def _repr_markdown_(self):
         return self.markdown_summary()

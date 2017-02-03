@@ -1,0 +1,42 @@
+pyscf_dependencies:
+  build: |
+    RUN apt-get update \
+     && apt-get install -y --no-install-recommends \
+        libblas-dev \
+        libgomp1 \
+        python-h5py \
+     && cleanapt
+
+
+pyscf_build:
+ requires:
+  - buildbase
+  - pyscf_dependencies
+ build: |
+  RUN apt-get install -y \
+    cmake \
+    python-h5py \
+    g++ \
+    wget \
+    git \
+    gfortran \
+   && cd /opt \
+     && wget -nv https://github.com/sunqm/pyscf/archive/v1.1.1.tar.gz \
+     && tar xvzf v1.1.1.tar.gz && rm v1.1.1.tar.gz \
+     && mv pyscf-1.1.1 pyscf \
+   && cd /opt/pyscf/lib \
+     && mv CMakeLists.txt CMakeLists.txt.old \
+     && sed -e "s/libcint\.git/qcint.git/" CMakeLists.txt.old > CMakeLists.txt \
+     && mkdir build && cd build \
+     && cmake .. \
+     && make \
+     && rm -rf /opt/pyscf/lib/build
+
+
+pyscf:
+  requires:
+    - python_deploy_base
+    - pyscf_dependencies
+  copy_from:
+    pyscf_build:
+      /opt/pyscf: /opt

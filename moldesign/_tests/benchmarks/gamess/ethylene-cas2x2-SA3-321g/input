@@ -1,0 +1,18 @@
+
+ $CONTRL UNITS=ANGSTROM SCFTYP=MCSCF $END
+ $SYSTEM TIMLIM=1 $END
+ $BASIS  GBASIS=N21 NGAUSS=3 $END
+ $data
+Methane...G3(MP2,CCSD(T))
+C1
+C    6.0      1.07507       -0.06286        0.01498
+C    6.0      0.40718       -0.99214       -0.67399
+H    1.0      0.54964        0.70016        0.58068
+H    1.0      2.16038       -0.04688        0.02683
+H    1.0     -0.67813       -1.00812       -0.68584
+H    1.0      0.93260       -1.75516       -1.23969
+ $end
+ $GUESS  GUESS=HUCKEL $END
+
+ $DET ncore=7  NACT=2 NELS=2 NSTATE=3 $END
+

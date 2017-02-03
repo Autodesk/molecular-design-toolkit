@@ -30,13 +30,11 @@ STANDARD = 25  # logging level between INFO and WARN
 root = logging.getLogger('moldesign')
 root.setLevel(STANDARD)
 
-# TODO: we need to handle logging outside the widget context - what if user is in CLI?
-
 _prev_tabs = None
 _current_tabs = None
 _capture_enabled = False
 
-widgets_enabled = mdt.utils.running_in_notebook()
+widgets_enabled = mdt.utils.can_use_widgets()
 
 
 def display_log(obj, title=None, show=False):
@@ -120,6 +118,7 @@ def enable_logging_widgets(enable=True):
         ip.events.unregister('pre_run_cell', _capture_logging_displays)
         ip.events.unregister('post_run_cell', _finalize_logging_displays)
 
+
 if widgets_enabled:
     class LoggingTabs(StyledTab):
         def __init__(self, objects, display=False, **kwargs):
@@ -152,7 +151,9 @@ if widgets_enabled:
             if display and not self._displayed:
                 IPython.display.display(self)
                 self._displayed = True
-                if show: self.selected_index = len(self.children) - 1
+                if show:
+                    self.selected_index = len(self.children) - 1
+
 
 
 class Logger(ipy.Textarea if widgets_enabled else object):
