@@ -87,13 +87,13 @@ class LAMMPSNvt(ConstantTemperatureBase):
         lammps_system = self.model.lammps_system
 
         # NOTE: Ensure time step is in femtoseconds 
-        lammps_system.command("timestep " + str(self.params.timestep))
+        lammps_system.command("timestep " + str(self.params.timestep.value_in(u.fs)))
         lammps_system.command("thermo_style custom step temp pe etotal")
         lammps_system.command("thermo " + str(self.params.frame_interval))
         
         # TODO:
-        nvt_command = "fix 1 all nvt temp {0} {1} {2}" .format(self.params.temperature, 
-            self.params.temperature, 100.0)
+        nvt_command = "fix 1 all nvt temp {0} {1} {2}" .format(self.params.temperature.value_in(u.kelvin), 
+            self.params.temperature.value_in(u.kelvin), 100.0)
         lammps_system.command(nvt_command)
 
         # NOTE: Can you help me figure out the parameters for fix shake?

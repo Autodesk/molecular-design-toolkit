@@ -91,11 +91,11 @@ class LAMMPSPotential(EnergyModelBase):
     
       
     def prep(self):
-    """
+        """
         Drive the construction of the LAMMPS simulation
         This will rebuild this OpenMM simulation if: A) it's not built yet, or B)
         there's a new integrator
-    """ 
+        """ 
         
         # If current molecule's velocity is not the same as last recorded velocity, create a new system
         if self._last_velocity == None or self._last_velocity != self.mol.velocities:
@@ -110,14 +110,14 @@ class LAMMPSPotential(EnergyModelBase):
     # "Private" methods for managing LAMMPS are below
     
     def _create_system(self):
-    """
+        """
         Create a LAMMPS system. Use MDT molecule object to construct a LAMMPS system
         
         Arguments:
             run_for (int): number of timesteps OR amount of time to run for
             self.params.timestep (float): timestep length
+        """   
 
-    """   
         # Ensure force fields are assigned 
         if 'amber_params' not in self.mol.ff:
             raise NotImplementedError('Assign forcefield parameters to the system')
@@ -178,13 +178,13 @@ class LAMMPSPotential(EnergyModelBase):
 
     
     def _group_hbonds(parmedmol):
-    """
+        """
         Get indices of non-bond atom types that contain hydrogen bonds
         
         Arguments:
             parmed: parmed struct to iterate through all nonbond types to find hbonds
 
-    """
+        """
         hbond_group = ""
         
         if len(parmedmol.LJ_types) <= 0:
@@ -198,13 +198,13 @@ class LAMMPSPotential(EnergyModelBase):
 
 
     def _group_water(parmedmol):
-    """
+        """
         Get indices of residues that are type 'water'
        
         Arguments:
             parmed: parmed struct to iterate through all residues to find water residues
 
-    """
+        """
         min_index = sys.maxint;
         max_index = 0;
         for res in parmedmol.residues:
@@ -250,7 +250,7 @@ class LAMMPSPotential(EnergyModelBase):
 
     
     def _create_lammps_data(tmpdir, parmedmol):
-    """
+        """
         Create a data. file that contains all necessary information regarding the molecule
         in order to create the appropirate LAMMPS system for it
         
@@ -258,7 +258,7 @@ class LAMMPSPotential(EnergyModelBase):
             tmpdir: temporary directory to store the data file
             parmed: parmed struct to iterate through all nonbond types to find hbonds
 
-    """    
+        """    
         predictable_filename = 'data.lammps_mol'
         path = os.path.join(tmpdir, predictable_filename)
 
