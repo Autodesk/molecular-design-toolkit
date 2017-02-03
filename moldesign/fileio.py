@@ -160,7 +160,6 @@ def write_trajectory(traj, filename=None, format=None, overwrite=True):
 
     # for traditional molecular file formats, write the frames one after another
     else:
-        tempmol = traj._tempmol
         if filename and (not overwrite) and os.path.exists(filename):
             raise IOError('%s exists' % filename)
         if not filename:
@@ -169,8 +168,7 @@ def write_trajectory(traj, filename=None, format=None, overwrite=True):
             fileobj = open(filename, 'w')
 
         for frame in traj.frames:
-            traj.apply_frame(frame)
-            fileobj.write(tempmol.write(format=format))
+            fileobj.write(frame.write(format=format))
 
         if filename is None:
             fileobj.seek(0)

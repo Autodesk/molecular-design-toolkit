@@ -22,6 +22,8 @@ import numbers
 import numpy as np
 from pint import UnitRegistry, set_application_registry, DimensionalityError
 
+from ..utils import ResizableArray
+
 # Set up pint's unit definitions
 ureg = UnitRegistry()
 unit_def_file = join(abspath(dirname(__file__)), '../_static_data/pint_atomic_units.txt')
@@ -232,6 +234,18 @@ class MdtQuantity(ureg.Quantity):
             mag = mag.tolist()
         return {'value': mag,
                 'units': str(self.units)}
+
+    def make_resizable(self):
+        self._magnitude = ResizableArray(self._magnitude)
+
+    def append(self, item):
+        mag = item.value_in(self.units)
+        self._magnitude.append(mag)
+
+    def extend(self, items):
+        from . import array
+        mags = array(items).value_in(self.units)
+        self._magnitude.append(mags)
 
 # monkeypatch pint's unit registry to return BuckyballQuantities
 ureg.Quantity = MdtQuantity

@@ -51,11 +51,30 @@ class Frame(utils.DotDict):
     """
     def __init__(self, traj):
         self.traj = traj
+        self.frameidx = traj.num_frames
         super(Frame, self).__init__()
 
     def write(self, *args, **kwargs):
         self.traj._apply_frame(self)
         self.traj._tempmol.write(*args, **kwargs)
+
+    @property
+    def properties(self):
+        return {key: getattr(self.traj, key)[self.frameidx]
+                for key in self.traj._property_keys}
+
+    def as_molecule(self):
+        self.traj._apply_frame(self)
+        return mdt.Molecule(self.traj._tempmol)
+
+    def __getattr__(self, item):
+        if item == 'traj':
+            return self.__getattribute__('traj')
+        val = getattr(self.traj, item)
+        try:
+            return val[self.frameidx]
+        except TypeError:
+            raise AttributeError('No frame property named "%s" % item')
 
 
 class _TrajAtom(TrajNotebookMixin):
@@ -139,10 +158,6 @@ class Trajectory(object):
         self._atoms = None
         if first_frame: self.new_frame()
 
-
-    # TODO: the current implementation does not support cases where the molecular topology changes
-    # TODO: allow caching to disk for very large trajectories
-
     MOL_ATTRIBUTES = ['positions', 'momenta', 'time']
     """List[str]: Always store these molecular attributes"""
 
@@ -194,27 +209,64 @@ class Trajectory(object):
         Returns:
             int: frame number (0-based)
         """
-        # TODO: callbacks to update a status display - allows monitoring a running simulation
+        # get list of properties for this frame
         if properties is None:
-            new_frame = Frame(self)
-            for attr in self.MOL_ATTRIBUTES:
-                val = getattr(self.mol, attr)
-                try:  # take numpy arrays' values, not a reference
-                    val = val.copy()
-                except AttributeError:
-                    pass
-                if val is not None: new_frame[attr] = val
-            new_frame.update(self.mol.properties)
+            properties = self.mol.properties
+        properties = dict(properties)  # make a copy to avoid modifying the input
+        for attr in self.MOL_ATTRIBUTES:
+            if attr not in properties:
+                properties[attr] = getattr(self.mol, attr)
+
+        # add properties to trajectory
+        for key, value in properties.iteritems():
+            if key not in self._property_keys:
+                self._new_property(key, value)
+            else:
+                proplist = getattr(self, key)
+                assert len(proplist) == self.num_frames
+                proplist.append(value)
+
+        self.frames.append(Frame(self))  # probably don't need to do this
+
+        # backfill missing data with None
+        for key in self._property_keys:
+            proplist = getattr(self, key)
+            if len(proplist) < self.num_frames:
+                assert len(proplist) == self.num_frames - 1
+                try:
+                    proplist.append(None)
+                except TypeError:
+                    newpl = list(proplist)
+                    newpl.append(None)
+                    setattr(self, key, newpl)
+
+    def _new_property(self, key, value):
+        """ Create a new list of properties for each frame. To facilitate analysis, will try
+        to create this list as one of the following classes (in order of preference):
+          1) resizeable numpy array
+          2) resizeable MdtQuantity array
+          3) list
+
+        The list of properties will be backfilled with ``None`` if this property wasn't already
+        present
+        """
+        assert key not in self._property_keys
+
+        if self.num_frames != 0:
+            proplist = [None] * self.num_frames
+            proplist.append(value)
         else:
-            new_frame = Frame(properties)
-        for key, val in additional_data.iteritems():
-            assert key not in new_frame, (
-                "Can't overwrite molecule's properties with additional_data key %s" % key)
-            new_frame[key] = val
+            try:
+                proplist = u.array([value])
+            except TypeError:
+                proplist = [value]
+            else:
+                proplist.make_resizable()
+                if proplist.dimensionless:
+                    proplist = proplist._magnitude
 
-        self._update_property_keys(new_frame)
-        self.frames.append(new_frame)
-
+        setattr(self, key, proplist)
+        self._property_keys.add(key)
 
     def _get_traj_atom(self, a):
         if a is None:
@@ -236,39 +288,11 @@ class Trajectory(object):
         a1, a2, a3, a4 = map(self._get_traj_atom, (a1, a2, a3, a4))
         return mdt.dihedral(a1, a2, a3, a4)
 
-    def _update_property_keys(self, new_frame=None):
-        """
-        Update the internal list of molecular properties that can be sliced. If a frame is passed,
-        update from that frame's properties. Otherwise, update from the entire list of stored frames
-        """
-        if self._property_keys is None:
-            self._property_keys = set()
-
-        if new_frame is None:
-            for frame in self:
-                self._property_keys.update(frame.keys())
-        else:
-            self._property_keys.update(new_frame)
-
     def __dir__(self):
         return list(self._property_keys.union(dir(self.__class__)).union(self.__dict__))
 
     def __getitem__(self, item):
         return self.frames[item]
-
-    def __getattr__(self, item):
-        # TODO: move slicing to frames, so that this will work with __getitem__ as well
-        # TODO: never ever define __getattr__, it leads to unmaintainable hell
-        if not hasattr(self, '_property_keys'):
-            raise AttributeError('_property_keys')
-
-        if self._property_keys is None:
-            self._update_property_keys()
-
-        if item in self._property_keys:  # return a list of properties for each frame
-            return self.slice_frames(item)
-        else:
-            raise AttributeError('Frame %s has no attribute %s' % (self, item))
 
     def rmsd(self, atoms=None, reference=None):
         r""" Calculate root-mean-square displacement for each frame in the trajectory.
@@ -302,30 +326,6 @@ class Trajectory(object):
             diff = (refpos[indices] - f.positions[indices])
             rmsds.append(np.sqrt((diff*diff).sum()/len(atoms)))
         return u.array(rmsds).defunits()
-
-    def slice_frames(self, key, missing=None):
-        """ Return an array of giving the value of ``key`` at each frame.
-
-        Args:
-            key (str): name of the property, e.g., time, potential_energy, annotation, etc
-            missing: value to return if a given frame does not have this property
-
-        Returns:
-            moldesign.units.Vector: vector containing the value at each frame, or the value given
-                in the ``missing`` keyword) (len= `len(self)` )
-        """
-        has_units = True
-        result = []
-        for f in self.frames:
-            val = f.get(key, None)
-            if not issubclass(type(val), u.MdtQuantity):
-                has_units = False
-            result.append(val)
-        if has_units:
-            result = u.array([frame.get(key, None) for frame in self.frames])
-            return u.default.convert(result)
-        else:
-            return np.array(result)
 
     @property
     def kinetic_energy(self):
