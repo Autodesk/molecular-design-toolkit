@@ -1,7 +1,7 @@
 symmol_build:
   requires:
     - buildbase
-  build_directory: symmol
+  build_directory: buildfiles/symmol
   build: |
     RUN mkdir -p /src/symmol
     ADD symmol.f /src/symmol/symmol.f

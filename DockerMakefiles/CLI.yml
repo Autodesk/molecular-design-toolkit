@@ -10,7 +10,7 @@ opsin:
       && cd /opt/opsin \
       && wget -nv https://bitbucket.org/dan2097/opsin/downloads/opsin-2.2.0-jar-with-dependencies.jar
     RUN cmd='java -jar /opt/opsin/opsin-2.2.0-jar-with-dependencies.jar' \
-      && cmdf='#!/bin/bash\n'$cmd' \$@\n' \
+      && cmdf='#!/bin/bash\n'$cmd' $@\n' \
       && printf "$cmdf" > /usr/local/bin/opsin \
       && chmod +x /usr/local/bin/opsin
 
