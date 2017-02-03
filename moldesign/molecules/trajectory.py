@@ -216,6 +216,8 @@ class Trajectory(object):
             if attr not in properties:
                 properties[attr] = getattr(self.mol, attr)
 
+        properties.update(additional_data)
+
         # add properties to trajectory
         for key, value in properties.iteritems():
             if key not in self._property_keys:

@@ -30,16 +30,16 @@ def precanned_trajectory():
 
     a1.x = 1.0 * u.angstrom
     a3.y = 1.0 * u.angstrom
-    traj.new_frame()
+    traj.new_frame(somenumber=1, someletter='a')
 
     mol.time = 1.0 * u.fs
     a1.x = 2.0 * u.angstrom
-    traj.new_frame()
+    traj.new_frame(somenumber=2, someletter='b')
 
     mol.time = 2.0 * u.fs
     a2.x = -1.0 * u.angstrom
     a3.x = -1.0 * u.angstrom
-    traj.new_frame()
+    traj.new_frame(somenumber=3, someletter='c')
 
     return traj
 
@@ -62,3 +62,11 @@ def test_geometry_analysis_precanned(precanned_trajectory):
     desired = [0.0, 1.0/np.sqrt(3), 1.0] * u.angstrom
     np.testing.assert_allclose(rmsd.value_in(u.angstrom),
                                desired.value_in(u.angstrom))
+
+    time = traj.time
+    desired = [0.0, 1.0, 2.0] * u.fs
+    np.testing.assert_allclose(time.value_in(u.fs),
+                               desired.value_in(u.fs))
+
+    assert traj.somenumber == [1, 2, 3]
+    assert traj.someletter == list('abc')
