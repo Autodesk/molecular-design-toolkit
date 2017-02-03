@@ -348,30 +348,6 @@ class MolPropertyMixin(object):
     calc_forces = calculate_forces
 
 
-class MolDrawingMixin(object):
-    """ Methods for visualizing molecular structure.
-
-    See Also:
-        :class:`moldesign.molecules.atomcollections.AtomGroup`
-
-    Note:
-        This is a mixin class designed only to be mixed into the :class:`Molecule` class. Routines
-        are separated are here for code organization only - they could be included in the main
-        Molecule class without changing any functionality
-    """
-
-    def draw_orbitals(self, **kwargs):
-        """ Visualize any calculated molecular orbitals (Jupyter only).
-
-        Returns:
-            mdt.orbitals.OrbitalViewer
-        """
-        from moldesign.widgets.orbitals import OrbitalViewer
-        if 'wfn' not in self.properties:
-            self.calculate_wfn()
-        return OrbitalViewer(self, **kwargs)
-
-
 class MolTopologyMixin(object):
     """ Functions for building and keeping track of bond topology and biochemical structure.
 
@@ -758,7 +734,6 @@ class MolSimulationMixin(object):
 class Molecule(AtomGroup,
                MolConstraintMixin,
                MolPropertyMixin,
-               MolDrawingMixin,
                MolNotebookMixin,
                MolTopologyMixin, MolSimulationMixin):
     """

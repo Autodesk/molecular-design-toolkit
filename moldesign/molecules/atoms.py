@@ -22,85 +22,17 @@ from . import toplevel, AtomContainer, AtomList, AtomArray, AtomCoordinate, Bond
 from .notebook_display import AtomNotebookMixin
 
 
-class AtomDrawingMixin(object):
-    """ Functions for creating atomic visualizations.
+class AtomPropertyMixin(object):
+    """ Functions accessing computed atomic properties.
 
     Note:
         This is a mixin class designed only to be mixed into the :class:`Atom` class. Routines
         are separated are here for code organization only - they could be included in the main
         Atom class without changing any functionality
     """
-
-    #@utils.args_from(mdt.molecule.Molecule.draw2d, allexcept=['highlight_atoms'])  # import order
-    def draw2d(self, **kwargs):
-        """ Draw a 2D viewer with this atom highlighted (Jupyter only).
-        In biomolecules, only draws the atom's residue.
-
-        Args:
-            width (int): width of viewer in pixels
-            height (int): height of viewer in pixels
-
-        Returns:
-            mdt.ChemicalGraphViewer: viewer object
-        """
-        if self.molecule:
-            if self.molecule.is_small_molecule:
-                return self.molecule.draw2d(highlight_atoms=[self], **kwargs)
-            elif self.molecule.is_biomolecule:
-                return self.residue.draw2d(highlight_atoms=[self], **kwargs)
-            else:
-                raise ValueError('No drawing routine specified')
-        else:
-            raise ValueError('No drawing routine specified')
-
-    #@utils.args_from(mdt.molecule.Molecule.draw2d, allexcept=['highlight_atoms'])  # import order
-    def draw3d(self, **kwargs):
-        """ Draw a 3D viewer with this atom highlighted (Jupyter only).
-
-        Args:
-            width (int): width of viewer in pixels
-            height (int): height of viewer in pixels
-
-        Returns:
-            mdt.GeometryViewer: viewer object
-        """
-        return self.molecule.draw3d(highlight_atoms=[self], **kwargs)
-
-    def draw(self, width=300, height=300):
-        """ Draw a 2D and 3D viewer with this atom highlighted (notebook only)
-
-        Args:
-            width (int): width of viewer in pixels
-            height (int): height of viewer in pixels
-
-        Returns:
-            ipy.HBox: viewer object
-        """
-        import ipywidgets as ipy
-        viz2d = self.draw2d(width=width, height=height, display=False)
-        viz3d = self.draw3d(width=width, height=height, display=False)
-        return ipy.HBox([viz2d, viz3d])
-
-
-class AtomGeometryMixin(object):
-    """ Functions measuring distances between atoms and other things.
-
-    Note:
-        This is a mixin class designed only to be mixed into the :class:`Atom` class. Routines
-        are separated are here for code organization only - they could be included in the main
-        Atom class without changing any functionality
-    """
-    @utils.args_from(AtomContainer.distance)
-    def distance(self, *args, **kwargs):
-        return self._container.distance(*args, **kwargs)
-
-    @utils.args_from(AtomContainer.atoms_within)
-    def atoms_within(self, *args, **kwargs):
-        return self._container.atoms_within(*args, **kwargs)
-
-    @utils.args_from(AtomContainer.residues_within)
-    def residues_within(self, *args, **kwargs):
-        return self._container.residues_within(*args, **kwargs)
+    distance = utils.Alias('_container.distance')
+    atoms_within = utils.Alias('_container.atoms_within')
+    residues_within = utils.Alias('_container.residues_within')
 
     @utils.args_from(AtomContainer.calc_distance_array)
     def calc_distances(self, *args, **kwargs):
@@ -116,15 +48,6 @@ class AtomGeometryMixin(object):
         """
         return AtomList([self])
 
-
-class AtomPropertyMixin(object):
-    """ Functions accessing computed atomic properties.
-
-    Note:
-        This is a mixin class designed only to be mixed into the :class:`Atom` class. Routines
-        are separated are here for code organization only - they could be included in the main
-        Atom class without changing any functionality
-    """
     @property
     def ff(self):
         """ moldesign.utils.DotDict: This atom's force field parameters, if available (``None``
@@ -165,7 +88,7 @@ class AtomPropertyMixin(object):
 
 
 @toplevel
-class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomNotebookMixin):
+class Atom(AtomPropertyMixin, AtomNotebookMixin):
     """ A data structure representing an atom.
 
     ``Atom`` objects store information about individual atoms within a larger molecular system,

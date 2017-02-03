@@ -21,6 +21,7 @@ from moldesign import units as u
 
 from .molecule import MolecularProperties
 from . import toplevel
+from .notebook_display import TrajNotebookMixin
 
 
 class Frame(utils.DotDict):
@@ -53,11 +54,11 @@ class Frame(utils.DotDict):
         super(Frame, self).__init__()
 
     def write(self, *args, **kwargs):
-        self.traj.apply_frame(self)
+        self.traj._apply_frame(self)
         self.traj._tempmol.write(*args, **kwargs)
 
 
-class _TrajAtom(object):
+class _TrajAtom(TrajNotebookMixin):
     """ A helper class for querying individual atoms' dynamics
     """
     def __init__(self, traj, index):
@@ -167,37 +168,6 @@ class Trajectory(object):
 
     def _make_traj_atoms(self):
         return [_TrajAtom(self, i) for i in xrange(self.mol.num_atoms)]
-
-    @utils.kwargs_from(mdt.widgets.trajectory.TrajectoryViewer)
-    def draw3d(self, **kwargs):
-        """TrajectoryViewer: create a trajectory visualization
-
-        Args:
-            **kwargs (dict): kwargs for :class:`moldesign.widgets.trajectory.TrajectoryViewer`
-        """
-        self._viz = mdt.widgets.trajectory.TrajectoryViewer(self, **kwargs)
-        return self._viz
-    draw = draw3d  # synonym for backwards compatibility
-
-    def draw_orbitals(self, align=True):
-        """ Visualize trajectory with molecular orbitals
-
-        Args:
-            align (bool): Align orbital phases (i.e., multiplying by -1 as needed) to prevent sign
-               flips between frames
-
-        Returns:
-            TrajectoryOrbViewer: create a trajectory visualization
-        """
-        from moldesign import widgets
-        for frame in self:
-            if 'wfn' not in frame:
-                raise ValueError("Can't draw orbitals - orbital information missing in at least "
-                                 "one frame. It must be calculated with a QM method.")
-
-        if align: self.align_orbital_phases()
-        self._viz = widgets.trajectory.TrajectoryOrbViewer(self)
-        return self._viz
 
     def __str__(self):
         return 'Trajectory for molecule "%s" (%d frames)' % (self.mol, self.num_frames)
@@ -394,7 +364,7 @@ class Trajectory(object):
 
     DONOTAPPLY = set(['kinetic_energy'])
 
-    def apply_frame(self, frame):
+    def _apply_frame(self, frame):
         """
         Reconstruct the underlying molecule with the given frame.
         Right now, any data not passed is ignored, which may result in properties that aren't synced up
@@ -417,31 +387,6 @@ class Trajectory(object):
     #                 append_docstring_description=True)
     def write(self, *args, **kwargs):
         return mdt.fileio.write_trajectory(self, *args, **kwargs)
-
-    def plot(self, x, y, **kwargs):
-        """ Create a matplotlib plot of property x against property y
-
-        Args:
-            x,y (str): names of the properties
-            **kwargs (dict): kwargs for :meth:`matplotlib.pylab.plot`
-
-        Returns:
-            List[matplotlib.lines.Lines2D]: the lines that were plotted
-
-        """
-        from matplotlib import pylab
-        xl = yl = None
-        if type(x) is str:
-            strx = x
-            x = getattr(self, x)
-            xl = '%s / %s' % (strx, x.units)
-        if type(y) is str:
-            stry = y
-            y = getattr(self, y)
-            yl = '%s / %s' % (stry, y.units)
-        plt = pylab.plot(x, y, **kwargs)
-        pylab.xlabel(xl); pylab.ylabel(yl); pylab.grid()
-        return plt
 
     def align_orbital_phases(self, reference_frame=None):
         """

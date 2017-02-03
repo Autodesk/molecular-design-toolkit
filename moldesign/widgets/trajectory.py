@@ -37,7 +37,7 @@ class TrajectoryViewer(selector.SelectionGroup):
         self.default_fps = 10
         self.traj = trajectory
         self.pane = ipy.VBox()
-        trajectory.apply_frame(trajectory.frames[0])
+        trajectory._apply_frame(trajectory.frames[0])
         self.viewer, self.view_container = self.make_viewer()
         for frame in self.traj.frames[1:]:
             self.viewer.append_frame(positions=frame.positions,
