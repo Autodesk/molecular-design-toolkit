@@ -11,22 +11,136 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from moldesign import utils
+from moldesign import data, utils
+from moldesign import units as u
 
 
-def sequence_view(chain):
-    """ Creates a simple primary structure viewer
+class AtomNotebookMixin(object):
+    """ Functions for printing out various strings related to the atom.
+
+    Note:
+        This is a mixin class designed only to be mixed into the :class:`Atom` class. Routines
+        are separated are here for code organization only - they could be included in the main
+        Atom class without changing any functionality
     """
-    from IPython.display import HTML
+    def markdown_summary(self):
+        """Return a markdown-formatted string describing this atom
 
-    html = ['<span style="word-wrap:break-word">']
-    for residue in chain.residues:
-        html.append('<span title="%s (idx %d), chain %s">%s</a>' %
-                    (residue.name, residue.index, residue.chain.name,
-                     residue.code))
-    html.append("</span>")
+        Returns:
+            str: markdown-formatted string
+        """
+        if self.molecule is None:
+            lines = ["<h3>Atom %s</h3>" % self.name]
+        else:
+            lines = ["<h3>Atom %s (index %d)</h3>" % (self.name, self.index)]
 
-    return HTML(''.join(html))
+        lines.append('**Atomic number**: %d' % self.atnum)
+        lines.append("**Mass**: %s" % self.mass)
+        lines.append('**Formal charge**: %s' % self.formal_charge)
+
+        if self.molecule is not None:
+            lines.append('\n')
+            if self.molecule.is_biomolecule:
+                if self.pdbindex is not None:
+                    lines.append('**PDB serial #**: %s'%self.pdbindex)
+                lines.append("**Residue**: %s (index %d)" % (self.residue.name, self.residue.index))
+                lines.append("**Chain**: %s" % self.chain.name)
+            lines.append("**Molecule**: %s" % self.molecule.name)
+            for ibond, (nbr, order) in enumerate(self.bond_graph.iteritems()):
+                lines.append('**Bond %d** (order = %d): %s (index %s) in %s' % (
+                    ibond + 1, order, nbr.name, nbr.index, nbr.residue.name))
+
+        if self.basis_functions:
+            lines.append('**Basis functions:**<br>' + '<br>'.join(map(str,self.basis_functions)))
+
+        if self.ff:
+            lines.append('**Forcefield partial charge**: %s' % self.ff.partialcharge)
+            # TODO: deal with other LJ types, e.g., AB?
+            lines.append(u'**Forcefield LJ params**: '
+                         u'\u03C3=%s, \u03B5=%s' % (
+                             self.ff.lj.sigma.defunits(),
+                             self.ff.lj.epsilon.defunits()))
+
+        # position and momentum
+        table = utils.MarkdownTable('', 'x', 'y', 'z')
+
+        table.add_line(['**position /** {}'.format(u.default.length)] +
+                       ['%12.3f' % x.defunits_value() for x in self.position])
+        table.add_line(['**momentum /** {}'.format(u.default.momentum)] +
+                       ['%12.3e' % m.defunits_value() for m in self.momentum])
+
+        if self.molecule is not None and 'forces' in self.molecule.properties:
+            table.add_line(['**force /** {.units}'.format(self.force.defunits())] +
+                           ['%12.3e' % m.defunits_value() for m in self.force])
+
+        lines.append('\n\n' + table.markdown() + '\n\n')
+        # All other assigned properties
+
+        return '<br>'.join(lines)
+
+    def _repr_markdown_(self):
+        return self.markdown_summary()
+
+
+class ResidueNotebookMixin(object):
+    """ Mixin class for Residues with notebook-relevenat classes
+    """
+
+    def _repr_markdown_(self):
+        return self.markdown_summary()
+
+    def markdown_summary(self):
+        """ Markdown-formatted information about this residue
+
+        Returns:
+            str: markdown-formatted string
+        """
+        if self.type == 'placeholder':
+            return '`%s`' % repr(self)
+
+        if self.molecule is None:
+            lines = ["<h3>Residue %s</h3>" % self.name]
+        else:
+            lines = ["<h3>Residue %s (index %d)</h3>" % (self.name, self.index)]
+
+        if self.type == 'protein':
+            lines.append('**Residue codes**: %s / %s' % (self.resname, self.code))
+        else:
+            lines.append("**Residue code**: %s" % self.resname)
+        lines.append('**Type**: %s' % self.type)
+        if self.resname in data.RESIDUE_DESCRIPTIONS:
+            lines.append('**Description**: %s' % data.RESIDUE_DESCRIPTIONS[self.resname])
+
+        lines.append('**<p>Chain:** %s' % self.chain.name)
+
+        lines.append('**PDB sequence #**: %d' % self.pdbindex)
+
+        terminus = None
+        if self.type == 'dna':
+            if self.is_3prime_end:
+                terminus = "3' end"
+            elif self.is_5prime_end:
+                terminus = "5' end"
+        elif self.type == 'protein':
+            if self.is_n_terminal:
+                terminus = 'N-terminus'
+            elif self.is_c_terminal:
+                terminus = 'C-terminus'
+        if terminus is not None:
+            lines.append('**Terminal residue**: %s of chain %s' % (terminus, self.chain.name))
+
+        if self.molecule is not None:
+            lines.append("**Molecule**: %s" % self.molecule.name)
+
+        lines.append("**<p>Number of atoms**: %s" % self.num_atoms)
+        if self.backbone:
+            lines.append("**Backbone atoms:** %s" % ', '.join(x.name for x in self.backbone))
+            lines.append("**Sidechain atoms:** %s" % ', '.join(x.name for x in self.sidechain))
+        else:
+            lines.append("**Atom:** %s" % ', '.join(x.name for x in self.atoms))
+
+        return '<br>'.join(lines)
+
 
 class MolNotebookMixin(object):
     """ Methods for displaying molecular information in Jupyter notebooks
