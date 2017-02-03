@@ -96,7 +96,6 @@ class ExclusiveList(object):
     __str__ = __repr__
 
 
-
 class DotDict(object):
     """Class for use as a dictionary with attribute-style access.
 
@@ -112,28 +111,19 @@ class DotDict(object):
     def __init__(self, *args, **kwargs):
         self.update(dict(*args, **kwargs))
 
-    __getitem__ = Alias('__dict__.__getitem__')
-    __setitem__ = Alias('__dict__.__setitem__')
-    __contains__ = Alias('__dict__.__contains__')
-    __iter__ = Alias('__dict__.__iter__')
-    __delitem__ = Alias('__dict__.__delitem__')
-
-    keys = Alias('__dict__.keys')
-    values = Alias('__dict__.values')
-    items = Alias('__dict__.items')
-    iterkeys = Alias('__dict__.iterkeys')
-    itervalues = Alias('__dict__.itervalues')
-    iteritems = Alias('__dict__.iteritems')
-    pop = Alias('__dict__.pop')
-    update = Alias('__dict__.update')
-    get = Alias('__dict__.get')
-    __len__ = Alias('__dict__.__len__')
+    def __getattr__(self, item):
+        return getattr(self.__dict__, item)
 
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__, repr(self.__dict__))
 
     def copy(self):
         return self.__class__(self.iteritems())
+
+# add dictionary magic method aliases
+for _delegate in ['__getitem__', '__setitem__', '__contains__', '__iter__',
+                  '__delitem__', '__len__']:
+    setattr(DotDict, _delegate, Alias('__dict__.%s' % _delegate))
 
 
 class OrderedDotDict(DotDict):
@@ -143,6 +133,9 @@ class OrderedDotDict(DotDict):
         self.update(*args, **kwargs)
 
     __iter__ = Alias('__keyorder__.__iter__')
+    keys = Alias('__keyorder__.keys')
+    __len__ = Alias('__keyorder__.__len__')
+
     iterkeys = __iter__
 
     def itervalues(self):
@@ -152,10 +145,6 @@ class OrderedDotDict(DotDict):
     def iteritems(self):
         for k in self:
             yield k, self[k]
-
-    keys = Alias('__keyorder__.keys')
-
-    __len__ = Alias('__keyorder__.__len__')
 
     def __repr__(self):
         return '%s({%s})'%(self.__class__.__name__, self.items())
