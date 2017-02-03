@@ -24,7 +24,7 @@ from . import toplevel
 from .notebook_display import TrajNotebookMixin
 
 
-class Frame(utils.DotDict):
+class Frame(object):
     """ A snapshot of a molecule during its motion. This is really just a dictionary of properties.
     These properties are those accessed as ``molecule.properties``, and can vary
     substantially depending on the origin of the trajectory. They also include relevant dynamical
@@ -151,7 +151,7 @@ class Trajectory(object):
         self.frames = []
         self.mol = mol
         self.unit_system = utils.if_not_none(unit_system, mdt.units.default)
-        self._property_keys = None
+        self._property_keys = set()
         self._tempmol = mdt.Molecule(self.mol.atoms, copy_atoms=True)
         self._tempmol.dynamic_dof = self.mol.dynamic_dof
         self._viz = None
@@ -171,9 +171,8 @@ class Trajectory(object):
         """int: number of frames in this trajectory"""
         return len(self)
 
-    def __len__(self):
-        """overrides len(trajectory) to return number of frames"""
-        return len(self.frames)
+    __len__ = mdt.utils.Alias('frames.__len__')
+    __iter__ = mdt.utils.Alias('frames.__iter__')
 
     @property
     def atoms(self):
@@ -257,7 +256,7 @@ class Trajectory(object):
             proplist.append(value)
         else:
             try:
-                proplist = u.array([value])
+                proplist = self.unit_system.convert(u.array([value]))
             except TypeError:
                 proplist = [value]
             else:
