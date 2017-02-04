@@ -358,4 +358,4 @@ class Residue(BioContainer, ResidueNotebookMixin):
         return self.resname in mdt.data.RESIDUE_DESCRIPTIONS
 
     def __str__(self):
-        return 'Residue %s (index %d, chain %s)' % (self.name, self.index, self.chain.name)
+        return 'Residue %s (index %s, chain %s)' % (self.name, self.index, self.chain.name)

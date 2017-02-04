@@ -549,21 +549,24 @@ def test_molecule_types(molkey, request):
 @pytest.mark.parametrize('objkey', all_objects)
 def test_pickling(objkey, request):
     obj = request.getfuncargvalue(objkey)
-    x = pickle.dumps(obj, protocol=2)
-    y = pickle.loads(x)
-    assert type(y) == type(obj)
+    for iprotocol in (0,1,2):
+        x = pickle.dumps(obj, protocol=iprotocol)
+        y = pickle.loads(x)
+        assert type(y) == type(obj)
 
 
 @pytest.mark.parametrize('objkey', registered_types['equality'])
 def test_pickled_equality(objkey, request):
     obj = request.getfuncargvalue(objkey)
-    x = pickle.dumps(obj, protocol=2)
-    y = pickle.loads(x)
-    assert type(y) == type(obj)
-    try:
-        assert y == obj
-    except ValueError:
-        assert (y == obj).all()
+
+    for iprotocol in (0,1,2):
+        x = pickle.dumps(obj, protocol=iprotocol)
+        y = pickle.loads(x)
+        assert type(y) == type(obj)
+        try:
+            assert y == obj
+        except ValueError:
+            assert (y == obj).all()
 
 
 @pytest.mark.parametrize('fixture_key', ['h2_harmonic_atoms',

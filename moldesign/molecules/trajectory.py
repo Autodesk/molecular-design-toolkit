@@ -244,11 +244,6 @@ class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
     MOL_ATTRIBUTES = ['positions', 'momenta', 'time']
     """List[str]: Always store these molecular attributes"""
 
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        state.pop('_atoms', None)
-        return state
-
     @property
     def num_frames(self):
         """int: number of frames in this trajectory"""
@@ -259,8 +254,7 @@ class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
 
     def __getattr__(self, attr):
         if attr == 'properties' or attr not in self.properties:
-            return self.__getattribute__('properties')
-
+            return self.__getattribute__(attr)
         else:
             return self.properties[attr]
 
