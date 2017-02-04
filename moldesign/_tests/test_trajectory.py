@@ -70,3 +70,34 @@ def test_geometry_analysis_precanned(precanned_trajectory):
 
     assert traj.somenumber == [1, 2, 3]
     assert traj.someletter == list('abc')
+
+
+def test_frame_to_molecule_conversion(precanned_trajectory):
+    traj = precanned_trajectory
+
+    f0_position = u.angstrom*[[1, 0, 0],
+                              [0, 0, 0],
+                              [0, 1, 0]]
+
+    f2_position = u.angstrom*[[2, 0, 0],
+                              [-1, 0, 0],
+                              [-1, 1, 0]]
+
+    f0 = traj.frames[0]
+    mol = f0.as_molecule()
+    assert mol.same_topology(traj.mol)
+    assert (mol.positions == f0_position).all()
+    assert mol.time == 0.0 * u.fs
+
+    # test ability to directly write a frame
+    readmol = mdt.read(f0.write('xyz'), format='xyz')
+    np.testing.assert_allclose(readmol.positions.value_in(u.angstrom),
+                               f0_position.value_in(u.angstrom))
+
+
+    m2 = traj.frames[-1].as_molecule()
+    assert m2.same_topology(mol)
+    assert (m2.positions == f2_position).all()
+    assert m2.time == 2.0 * u.fs
+
+

@@ -24,7 +24,7 @@ from . import toplevel
 from .notebook_display import TrajNotebookMixin
 
 
-class Frame(object):
+class Frame(utils.DotDict):
     """ A snapshot of a molecule during its motion. This is really just a dictionary of properties.
     These properties are those accessed as ``molecule.properties``, and can vary
     substantially depending on the origin of the trajectory. They also include relevant dynamical
@@ -53,31 +53,30 @@ class Frame(object):
         self.traj = traj
         self.frameidx = traj.num_frames
         super(Frame, self).__init__()
+        for key in self.traj._property_keys:
+            self[key] = traj[key][self.frameidx]
+
+    def __str__(self):
+        return 'Frame %d in trajectory "%s"' % (self.frameidx, self.traj.name)
+
+    def __repr__(self):
+        try:
+            return '<%s>' % self
+        except (KeyError, AttributeError):
+            return '<Frame at %x (exception in __repr__)>' % id(self)
 
     def write(self, *args, **kwargs):
         self.traj._apply_frame(self)
-        self.traj._tempmol.write(*args, **kwargs)
-
-    @property
-    def properties(self):
-        return {key: getattr(self.traj, key)[self.frameidx]
-                for key in self.traj._property_keys}
+        return self.traj._tempmol.write(*args, **kwargs)
 
     def as_molecule(self):
         self.traj._apply_frame(self)
         return mdt.Molecule(self.traj._tempmol)
 
-    def __getattr__(self, item):
-        if item == 'traj':
-            return self.__getattribute__('traj')
-        val = getattr(self.traj, item)
-        try:
-            return val[self.frameidx]
-        except TypeError:
-            raise AttributeError('No frame property named "%s" % item')
 
 
-class _TrajAtom(TrajNotebookMixin):
+
+class _TrajAtom(object):
     """ A helper class for querying individual atoms' dynamics
     """
     def __init__(self, traj, index):
@@ -122,8 +121,93 @@ class _TrajAtom(TrajNotebookMixin):
         return mdt.geom.distance(self, other)
 
 
+class TrajectoryAnalysisMixin(object):
+    """
+    Organizational class with analysis methods for trajectories
+    """
+    @property
+    def kinetic_energy(self):
+        convert_units = True
+        energies = []
+        for frame in self.frames:
+            if 'momenta' in frame:
+                energies.append(
+                    helpers.kinetic_energy(frame.momenta, self.mol.dim_masses))
+            else:
+                convert_units = False
+                energies.append(None)
+        if convert_units:
+            arr = u.array(energies)
+            return u.default.convert(arr)
+        else:
+            return energies
+
+    @property
+    def kinetic_temperature(self):
+        convert_units = True
+        temps = []
+        energies = self.kinetic_energy
+        dof = self.mol.dynamic_dof
+        for energy, frame in zip(energies, self.frames):
+            if energy is not None:
+                temps.append(helpers.kinetic_temperature(energy, dof))
+            else:
+                convert_units = False
+                temps.append(None)
+        if convert_units:
+            arr = u.array(temps)
+            return u.default.convert(arr)
+        else:
+            return temps
+
+    def distance(self, a1, a2):
+        a1, a2 = map(self._get_traj_atom, (a1, a2))
+        return mdt.distance(a1, a2)
+
+    def angle(self, a1, a2, a3):
+        a1, a2, a3 = map(self._get_traj_atom, (a1, a2, a3))
+        return mdt.angle(a1, a2, a3)
+
+    def dihedral(self, a1, a2, a3=None, a4=None):
+        a1, a2, a3, a4 = map(self._get_traj_atom, (a1, a2, a3, a4))
+        return mdt.dihedral(a1, a2, a3, a4)
+
+    def rmsd(self, atoms=None, reference=None):
+        r""" Calculate root-mean-square displacement for each frame in the trajectory.
+
+        The RMSD between times :math:`t` and :math:`t0` is given by
+
+        :math:`\text{RMSD}(t;t_0) =\sqrt{\sum_{i \in \text{atoms}} \left( \mathbf{R}_i(t) -
+        \mathbf{R}_i(t_0) \right)^2}`,
+
+        where :math:`\mathbf{R}_i(t)` is the position of atom *i* at time *t*.
+
+
+        Args:
+            atoms (list[mdt.Atom]): list of atoms to calculate the RMSD for (all atoms in the
+                ``Molecule``)
+            reference (u.Vector[length]): Reference positions for RMSD. (default:
+                ``traj.frames[0].positions``)
+
+        Returns:
+            u.Vector[length]: list of RMSD displacements for each frame in the trajectory
+
+        """
+        if reference is None: refpos = self.frames[0].positions
+        else: refpos = reference.positions
+
+        atoms = mdt.utils.if_not_none(atoms, self.mol.atoms)
+        indices = np.array([atom.index for atom in atoms])
+
+        rmsds = []
+        for f in self.frames:
+            diff = (refpos[indices] - f.positions[indices])
+            rmsds.append(np.sqrt((diff*diff).sum()/len(atoms)))
+        return u.array(rmsds).defunits()
+
+
 @toplevel
-class Trajectory(object):
+class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
     """ A ``Trajectory`` stores information about a molecule's motion and how its properties
     change as it moves.
 
@@ -145,7 +229,7 @@ class Trajectory(object):
         info (str): text describing this trajectory
         unit_system (u.UnitSystem): convert all attributes to this unit system
     """
-    def __init__(self, mol, unit_system=None, first_frame=False):
+    def __init__(self, mol, unit_system=None, first_frame=False, name=None):
         self._init = True
         self.info = "Trajectory"
         self.frames = []
@@ -156,6 +240,7 @@ class Trajectory(object):
         self._tempmol.dynamic_dof = self.mol.dynamic_dof
         self._viz = None
         self._atoms = None
+        self.name = utils.if_not_none(name, 'untitled')
         if first_frame: self.new_frame()
 
     MOL_ATTRIBUTES = ['positions', 'momenta', 'time']
@@ -227,7 +312,7 @@ class Trajectory(object):
                 assert len(proplist) == self.num_frames
                 proplist.append(value)
 
-        self.frames.append(Frame(self))  # probably don't need to do this
+        self.frames.append(Frame(self))  # TODO: less flubby way of keeping track of # of frames
 
         # backfill missing data with None
         for key in self._property_keys:
@@ -277,91 +362,9 @@ class Trajectory(object):
         else:
             assert isinstance(a, _TrajAtom)
 
-    def distance(self, a1, a2):
-        a1, a2 = map(self._get_traj_atom, (a1, a2))
-        return mdt.distance(a1, a2)
-
-    def angle(self, a1, a2, a3):
-        a1, a2, a3 = map(self._get_traj_atom, (a1, a2, a3))
-        return mdt.angle(a1, a2, a3)
-
-    def dihedral(self, a1, a2, a3=None, a4=None):
-        a1, a2, a3, a4 = map(self._get_traj_atom, (a1, a2, a3, a4))
-        return mdt.dihedral(a1, a2, a3, a4)
-
-    def __dir__(self):
-        return list(self._property_keys.union(dir(self.__class__)).union(self.__dict__))
-
     def __getitem__(self, item):
-        return self.frames[item]
-
-    def rmsd(self, atoms=None, reference=None):
-        r""" Calculate root-mean-square displacement for each frame in the trajectory.
-
-        The RMSD between times :math:`t` and :math:`t0` is given by
-
-        :math:`\text{RMSD}(t;t_0) =\sqrt{\sum_{i \in \text{atoms}} \left( \mathbf{R}_i(t) -
-        \mathbf{R}_i(t_0) \right)^2}`,
-
-        where :math:`\mathbf{R}_i(t)` is the position of atom *i* at time *t*.
-
-
-        Args:
-            atoms (list[mdt.Atom]): list of atoms to calculate the RMSD for (all atoms in the
-                ``Molecule``)
-            reference (u.Vector[length]): Reference positions for RMSD. (default:
-                ``traj.frames[0].positions``)
-
-        Returns:
-            u.Vector[length]: list of RMSD displacements for each frame in the trajectory
-
-        """
-        if reference is None: refpos = self.frames[0].positions
-        else: refpos = reference.positions
-
-        atoms = mdt.utils.if_not_none(atoms, self.mol.atoms)
-        indices = np.array([atom.index for atom in atoms])
-
-        rmsds = []
-        for f in self.frames:
-            diff = (refpos[indices] - f.positions[indices])
-            rmsds.append(np.sqrt((diff*diff).sum()/len(atoms)))
-        return u.array(rmsds).defunits()
-
-    @property
-    def kinetic_energy(self):
-        convert_units = True
-        energies = []
-        for frame in self.frames:
-            if 'momenta' in frame:
-                energies.append(
-                    helpers.kinetic_energy(frame.momenta, self.mol.dim_masses))
-            else:
-                convert_units = False
-                energies.append(None)
-        if convert_units:
-            arr = u.array(energies)
-            return u.default.convert(arr)
-        else:
-            return energies
-
-    @property
-    def kinetic_temperature(self):
-        convert_units = True
-        temps = []
-        energies = self.kinetic_energy
-        dof = self.mol.dynamic_dof
-        for energy, frame in zip(energies, self.frames):
-            if energy is not None:
-                temps.append(helpers.kinetic_temperature(energy, dof))
-            else:
-                convert_units = False
-                temps.append(None)
-        if convert_units:
-            arr = u.array(temps)
-            return u.default.convert(arr)
-        else:
-            return temps
+        if item in self._property_keys:
+            return getattr(self, item)
 
     DONOTAPPLY = set(['kinetic_energy'])
 
@@ -374,9 +377,9 @@ class Trajectory(object):
         # TODO: need to prevent multiple things using the _tempmol from conflicting with each other
         m = self._tempmol
         for prop in self.MOL_ATTRIBUTES:
-            if prop in self.DONOTAPPLY:
-                continue
-            if prop in frame:
+            if (prop not in self.DONOTAPPLY
+                and prop in self._property_keys
+                and prop is not None):
                 setattr(m, prop, frame[prop])
         m.properties = MolecularProperties(m)
         for attr in frame:
