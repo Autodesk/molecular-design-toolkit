@@ -30,6 +30,8 @@ except ImportError:
 else:  # this should be configurable
     force_remote = False  # debugging
 
+debugging = True # debugging
+
 import parmed as med
 import tempfile
 import os
@@ -119,7 +121,6 @@ class LAMMPSPotential(EnergyModelBase):
             run_for (int): number of timesteps OR amount of time to run for
             self.params.timestep (float): timestep length
         """   
-
         # Ensure force fields are assigned 
         if 'amber_params' not in self.mol.ff:
             raise NotImplementedError('Assign forcefield parameters to the system')
@@ -132,7 +133,7 @@ class LAMMPSPotential(EnergyModelBase):
         # initialize lammps object
         lmp = lammps()
         pylmp = PyLammps(ptr=lmp)
-        
+
         # create temporary file system
         tmpdir = tempfile.mkdtemp()
         saved_umask = os.umask(0077)
@@ -143,9 +144,11 @@ class LAMMPSPotential(EnergyModelBase):
         pylmp.command("pair_style lj/charmm/coul/long 8.0 10.0 10.0")
         pylmp.command("bond_style harmonic")
         pylmp.command("angle_style harmonic")
-        pylmp.command("dihedral_style charmm")
+        pylmp.command("dihedral_style harmonic")
         pylmp.command("improper_style harmonic")
         pylmp.command("kspace_style pppm 0.0001")
+
+        
         pylmp.command("read_data " + dataPath)
 
         # securely remove temporary filesystem
@@ -154,20 +157,20 @@ class LAMMPSPotential(EnergyModelBase):
         os.rmdir(tmpdir)
         
         # group hbonds
-        hbond_command = self.group_hbonds(parmedmol)
-        if len(hbond_command) > 0:
-            pylmp.command(hbond_command)
-            self.hbond_exists = True
-        else:
-            self.hbond_exists = False
+        # hbond_command = self.group_hbonds(parmedmol)
+        # if len(hbond_command) > 0:
+        #     pylmp.command(hbond_command)
+        #     self.hbond_exists = True
+        # else:
+        #     self.hbond_exists = False
 
         # group water
-        water_command = self.group_water(parmedmol)
-        if len(water_command) > 0:
-            pylmp.command(water_command)
-            self.water_exists = True
-        else:
-            self.water_exists = False
+        # water_command = self.group_water(parmedmol)
+        # if len(water_command) > 0:
+        #     pylmp.command(water_command)
+        #     self.water_exists = True
+        # else:
+        #     self.water_exists = False
 
         self.lammps_system = pylmp
         
@@ -213,7 +216,7 @@ class LAMMPSPotential(EnergyModelBase):
         
         water_group = ""
         if min_index != sys.maxint :
-            water_group = "group water molecule <> {0} {1}" .format(min_index, max_index)
+            water_group = "group water molecule <> {0} {1}" .format(min_index+1, max_index+1)
 
         return water_group
 
@@ -257,188 +260,189 @@ class LAMMPSPotential(EnergyModelBase):
 
         """    
         predictable_filename = 'data.lammps_mol'
+
         path = os.path.join(tmpdir, predictable_filename)
 
-        with open(path, "w") as lammps_data:   
-
-            # print description
-            lammps_data.write("LAMMPS Description\r\n\r\n")
-            lammps_data.write("{0} atoms\r\n" .format(len(parmedmol.atoms)))
-            lammps_data.write("{0} bonds\r\n" .format(len(parmedmol.bonds)))
-            lammps_data.write("{0} angles\r\n" .format(len(parmedmol.angles)))
-            lammps_data.write("{0} dihedrals\r\n" .format(len(parmedmol.dihedrals)))
-            lammps_data.write("{0} impropers\r\n" .format(len(parmedmol.impropers)))
-            
-            lammps_data.write("\r\n")
-            
-            # Get non-bond atom types
-            max_idx = 0
-            for nonbond_idx in parmedmol.LJ_types.itervalues():
-                if(nonbond_idx > max_idx):
-                    max_idx = nonbond_idx
-
-            lammps_data.write("{0} atom types\r\n" .format(max_idx))
-            lammps_data.write("{0} bond types\r\n" .format(len(parmedmol.bond_types)))
-            lammps_data.write("{0} angle types\r\n" .format(len(parmedmol.angle_types)))
-            lammps_data.write("{0} dihedral types\r\n" .format(len(parmedmol.dihedral_types)))
-            lammps_data.write("{0} improper types\r\n" .format(len(parmedmol.improper_types)))
-            
-            lammps_data.write("\r\n")
-
-            # calculate lo and hi coordinates for Box size
-            xlo = xhi = ylo = yhi = zlo = zhi = None
-            for atom in self.mol.atoms:
-                if xlo == None:
-                    xlo = atom.x.value_in(u.angstrom)
-                    xhi = atom.x.value_in(u.angstrom)
-                    ylo = atom.y.value_in(u.angstrom)
-                    yhi = atom.y.value_in(u.angstrom)
-                    zlo = atom.z.value_in(u.angstrom)
-                    zhi = atom.z.value_in(u.angstrom)
-                else:
-                    xlo = min(xlo, atom.x.value_in(u.angstrom))
-                    xhi = max(xhi, atom.x.value_in(u.angstrom))
-                    ylo = min(ylo, atom.y.value_in(u.angstrom))
-                    yhi = max(yhi, atom.y.value_in(u.angstrom))
-                    zlo = min(zlo, atom.z.value_in(u.angstrom))
-                    zhi = max(zhi, atom.z.value_in(u.angstrom))
-
-            lammps_data.write("{0} {1} xlo xhi\r\n" .format(xlo, xhi))
-            lammps_data.write("{0} {1} ylo yhi\r\n" .format(ylo, yhi))
-            lammps_data.write("{0} {1} zlo zhi\r\n" .format(zlo, zhi))
-            
-            lammps_data.write("\r\n")
-
-
-            # print masses -- Number of atom types
-            lammps_data.write("Masses\r\n\r\n")
-            for i in range(1, max_idx+1):
-                for atom in parmedmol.atoms:
-                    if atom.nb_idx == i:
-                        lammps_data.write("{0} {1}\r\n" .format(i, atom.mass))
-                        break
-            
-            lammps_data.write("\r\n")
-            
-
-            # Pair Coeffs -- Number of atom types
-            lammps_data.write("Pair Coeffs\r\n\r\n")
-            for i in range(1, max_idx+1):
-                for atom in parmedmol.atoms:
-                    if atom.nb_idx == i:
-                        lammps_data.write("{0} {1} {2} {3} {4}\r\n" .format(i, atom.epsilon, atom.sigma, 
-                                                                            atom.epsilon_14, atom.sigma_14))
-                        break
-            
-            lammps_data.write("\r\n")
-            
-
-            # Bond Coeffs - Harmonic
-            if parmedmol.bond_types:
-                lammps_data.write("Bond Coeffs\r\n\r\n")
-                for bt in parmedmol.bond_types:
-                    lammps_data.write("{0} {1} {2}\r\n" .format(bt.idx+1, bt.k, bt.req))
-                
-                lammps_data.write("\r\n")
-
-
-            # Angle Coeffs - Harmonic
-            if parmedmol.angle_types:
-                lammps_data.write("Angle Coeffs\r\n\r\n")
-                for at in parmedmol.angle_types:
-                    lammps_data.write("{0} {1} {2}\r\n" .format(at.idx+1, at.k, at.theteq))
-               
-                lammps_data.write("\r\n")
-
-
-            # Dihedral Coeffs - Charmm
-            if parmedmol.dihedral_types:
-                lammps_data.write("Dihedral Coeffs\r\n\r\n")
-                for dt in parmedmol.dihedral_types:
-                    lammps_data.write("{0} {1} {2} {3} {4}\r\n" .format(dt.idx+1, dt.phi_k, dt.per, 
-                        (180 if dt.phase >= 180 else 0), 
-                        (1.0 if dt.scnb == 1.0 else 0.0)))
-                
-                lammps_data.write("\r\n")
-
-
-            # Improper Coeffs - Harmonic
-            if parmedmol.improper_types:
-                lammps_data.write("Improper Coeffs\r\n\r\n")
-                for it in parmedmol.improper_types:
-                    print
-                    lammps_data.write("{0} {1} {2}\r\n" .format(it.idx+1, it.psi_k, it.psi_eq))
-                
-                lammps_data.write("\r\n")
-
-
-            # print atoms
-            lammps_data.write("Atoms\r\n\r\n")
-            for atom in parmedmol.atoms:
-                lammps_data.write("{0} {1} {2} {3} " .format(atom.idx+1, atom.residue.idx, atom.nb_idx, atom.charge))
-                if not self.mol.positions.any():        
-                    lammps_data.write("{0} {1} {2} " .format(0.00, 0.00, 0.00))        
-                else:
-                    pos = self.mol.positions[atom.idx]
-                    lammps_data.write("{0} {1} {2} " .format(pos[0].value_in(u.angstrom), pos[1].value_in(u.angstrom), 
-                        pos[2].value_in(u.angstrom)))
-                lammps_data.write("{0} {1} {2}\r\n" .format(0, 0, 0)) # nx, ny, nz not defined    
-
-            lammps_data.write("\r\n")
-
-
-            # print velocities
-            lammps_data.write("Velocities\r\n\r\n")
-            for atom in self.mol.atoms:
-                xvel = atom.vx.value_in(u.angstrom/u.fs)
-                yvel = atom.vy.value_in(u.angstrom/u.fs)
-                zvel = atom.vz.value_in(u.angstrom/u.fs)
-                lammps_data.write("{0} {1} {2} {3}\r\n" .format(atom.index+1, xvel, yvel, zvel))
-                
-            lammps_data.write("\r\n")
-
-
-            # print bonds
-            lammps_data.write("Bonds\r\n\r\n")
-            for idx, bond in enumerate(parmedmol.bonds):
-                lammps_data.write("{0} {1} {2} {3}\r\n" .format(idx+1, bond.type.idx+1, 
-                  bond.atom1.idx+1, bond.atom2.idx+1))
-                
-            lammps_data.write("\r\n")
-
-
-            # print angles
-            lammps_data.write("Angles\r\n\r\n")
-            for idx, angle in enumerate(parmedmol.angles):
-                lammps_data.write("{0} {1} {2} {3} {4}\r\n" .format(idx+1, angle.type.idx+1,
-                  angle.atom1.idx+1, 
-                  angle.atom2.idx+1, angle.atom3.idx+1))
-                
-            lammps_data.write("\r\n")
-
-
-            # print dihedrals
-            if parmedmol.dihedrals:
-                lammps_data.write("Dihedrals\r\n\r\n")
-                for idx, di in enumerate(parmedmol.dihedrals):
-                    lammps_data.write("{0} {1} {2} {3} {4} {5}\r\n" .format(idx+1, di.type.idx+1, 
-                      di.atom1.idx+1, di.atom2.idx+1, 
-                      di.atom3.idx+1, di.atom4.idx+1))
+        datalines =  ""
+        datalines += "LAMMPS Description\r\n\r\n"
+        datalines += "{0} atoms\r\n".format(len(parmedmol.atoms))
+        datalines += "{0} bonds\r\n".format(len(parmedmol.bonds))
+        datalines += "{0} angles\r\n".format(len(parmedmol.angles))
+        datalines += "{0} dihedrals\r\n".format(len(parmedmol.dihedrals))
+        datalines += "{0} impropers\r\n".format(len(parmedmol.impropers))
+        datalines += "\r\n"
                     
-                lammps_data.write("\r\n")
+        # Get non-bond atom types
+        parmedmol.fill_LJ()
+        max_idx = 0
+        for nonbond_idx in parmedmol.LJ_types.itervalues():
+            if(nonbond_idx > max_idx):
+                max_idx = nonbond_idx
+
+        datalines += "{0} atom types\r\n".format(max_idx)
+        if len(parmedmol.bond_types) > 0:
+            datalines += "{0} bond types\r\n".format(len(parmedmol.bond_types))
+        if len(parmedmol.angle_types) > 0:
+            datalines += "{0} angle types\r\n".format(len(parmedmol.angle_types))
+        if len(parmedmol.dihedral_types) > 0:
+            datalines += "{0} dihedral types\r\n".format(len(parmedmol.dihedral_types))
+        if len(parmedmol.improper_types) > 0:
+            datalines += "{0} improper types\r\n".format(len(parmedmol.improper_types))
+    
+        datalines += "\r\n"
 
 
-            # print impropers
-            if parmedmol.impropers:
-                lammps_data.write("Impropers\r\n\r\n")
-                for im in parmedmol.impropers:
-                    lammps_data.write("{0} {1} {2} {3} {4} {5}\r\n" .format(im.idx+1, im.type.idx+1, 
-                      im.atom1.idx+1, im.atom2.idx+1, 
-                      im.atom3.idx+1, im.atom4.idx+1))
-                
-                lammps_data.write("\r\n")
+        # calculate lo and hi coordinates for Box size
+        xlo = xhi = ylo = yhi = zlo = zhi = None
+        for atom in self.mol.atoms:
+            if xlo == None:
+                xlo = atom.x.value_in(u.angstrom)
+                xhi = atom.x.value_in(u.angstrom)
+                ylo = atom.y.value_in(u.angstrom)
+                yhi = atom.y.value_in(u.angstrom)
+                zlo = atom.z.value_in(u.angstrom)
+                zhi = atom.z.value_in(u.angstrom)
+            else:
+                xlo = min(xlo, atom.x.value_in(u.angstrom))
+                xhi = max(xhi, atom.x.value_in(u.angstrom))
+                ylo = min(ylo, atom.y.value_in(u.angstrom))
+                yhi = max(yhi, atom.y.value_in(u.angstrom))
+                zlo = min(zlo, atom.z.value_in(u.angstrom))
+                zhi = max(zhi, atom.z.value_in(u.angstrom))
 
+        datalines += "{0} {1} xlo xhi\r\n".format(xlo, xhi)
+        datalines += "{0} {1} ylo yhi\r\n".format(ylo, yhi)
+        datalines += "{0} {1} zlo zhi\r\n".format(zlo, zhi)
+
+        datalines += "\r\n"
+
+        # Masses
+        datalines += "Masses\r\n\r\n"
+        for i in range(1, max_idx+1):
+            for atom in parmedmol.atoms:
+                if atom.nb_idx == i:
+                    datalines += "{0} {1}\r\n".format(i, atom.mass)
+                    break
+
+        datalines += "\r\n"
         
+        # Pair coefficients                   
+        datalines += "Pair Coeffs\r\n\r\n"
+        for i in range(1, max_idx+1):
+            for atom in parmedmol.atoms:
+                if atom.nb_idx == i:
+                    datalines += "{0} {1} {2} {3} {4}\r\n".format(i, atom.epsilon, atom.sigma, atom.epsilon_14, atom.sigma_14)
+                    break
+
+        datalines += "\r\n"
+                    
+        # Bond Coeffs - Harmonic
+        if parmedmol.bond_types:
+            datalines += "Bond Coeffs\r\n\r\n"
+            for bt in parmedmol.bond_types:
+                datalines += "{0} {1} {2}\r\n".format(bt.idx+1, bt.k, bt.req)
+            
+            datalines += "\r\n"
+
+
+        # Angle Coeffs - Harmonic
+        if parmedmol.angle_types:
+            datalines += "Angle Coeffs\r\n\r\n"
+            for at in parmedmol.angle_types:
+                datalines +="{0} {1} {2}\r\n".format(at.idx+1, at.k, at.theteq)
+           
+            datalines +="\r\n"
+
+
+        # Dihedral Coeffs - Charmm
+        if parmedmol.dihedral_types:
+            datalines += "Dihedral Coeffs\r\n\r\n"
+            for dt in parmedmol.dihedral_types:
+                datalines += "{0} {1} {2} {3}\r\n".format(dt.idx+1, dt.phi_k, (-1 if dt.phase >= 180 else 1), dt.per)
+            
+            datalines += "\r\n" 
+
+
+        # Improper Coeffs - Harmonic
+        if parmedmol.improper_types:
+            datalines += "Improper Coeffs\r\n\r\n"
+            for it in parmedmol.improper_types:
+                datalines += "{0} {1} {2}\r\n".format(it.idx+1, it.psi_k, it.psi_eq)
+            
+            datalines += "\r\n"
+
+
+        # print atoms
+        datalines += "Atoms\r\n\r\n"
+        for atom in parmedmol.atoms:
+            datalines += "{0} {1} {2} {3} ".format(atom.idx+1, atom.residue.idx+1, atom.nb_idx, atom.charge)
+            if not self.mol.positions.any():        
+                datalines += "{0} {1} {2} ".format(0.00, 0.00, 0.00)    
+            else:
+                pos = self.mol.positions[atom.idx]
+                datalines += "{0} {1} {2} ".format(pos[0].value_in(u.angstrom), pos[1].value_in(u.angstrom), 
+                    pos[2].value_in(u.angstrom))
+            datalines += "{0} {1} {2}\r\n".format(0, 0, 0) # nx, ny, nz not defined    
+
+        datalines += "\r\n"
+
+
+        # print velocities
+        datalines += "Velocities\r\n\r\n"
+        for atom in self.mol.atoms:
+            xvel = atom.vx.value_in(u.angstrom/u.fs)
+            yvel = atom.vy.value_in(u.angstrom/u.fs)
+            zvel = atom.vz.value_in(u.angstrom/u.fs)
+            datalines += "{0} {1} {2} {3}\r\n".format(atom.index+1, xvel, yvel, zvel)
+            
+        datalines += "\r\n"
+
+
+        # print bonds
+        datalines += "Bonds\r\n\r\n"
+        for idx, bond in enumerate(parmedmol.bonds):
+            datalines += "{0} {1} {2} {3}\r\n".format(idx+1, bond.type.idx+1, 
+              bond.atom1.idx+1, bond.atom2.idx+1)
+            
+        datalines += "\r\n"
+
+
+        # print angles
+        datalines += "Angles\r\n\r\n"
+        for idx, angle in enumerate(parmedmol.angles):
+            datalines += "{0} {1} {2} {3} {4}\r\n".format(idx+1, angle.type.idx+1,
+              angle.atom1.idx+1, 
+              angle.atom2.idx+1, angle.atom3.idx+1)
+            
+        datalines += "\r\n"
+
+
+        # print dihedrals
+        if parmedmol.dihedrals:
+            datalines += "Dihedrals\r\n\r\n"
+            for idx, di in enumerate(parmedmol.dihedrals):
+                datalines += "{0} {1} {2} {3} {4} {5}\r\n".format(idx+1, di.type.idx+1, 
+                  di.atom1.idx+1, di.atom2.idx+1, 
+                  di.atom3.idx+1, di.atom4.idx+1)
+                
+            datalines += "\r\n"
+
+
+        # print impropers
+        if parmedmol.impropers:
+            datalines += "Impropers\r\n\r\n"
+            for im in parmedmol.impropers:
+                datalines += "{0} {1} {2} {3} {4} {5}\r\n".format(im.idx+1, im.type.idx+1, 
+                  im.atom1.idx+1, im.atom2.idx+1, 
+                  im.atom3.idx+1, im.atom4.idx+1)
+            
+            datalines += "\r\n"
+
+        with open(path, "w") as lammps_data:   
+            lammps_data.write(datalines)
+            
+       # print datalines
+
         return path
 
 

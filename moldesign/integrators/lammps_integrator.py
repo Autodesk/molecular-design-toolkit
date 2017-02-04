@@ -84,20 +84,21 @@ class LAMMPSNvt(ConstantTemperatureBase):
         lmps.command("dump velocity all custom {0} {1} id vx vy vz".format(output_freq, vel_path))
         lmps.command("dump_modify position sort id")
         lmps.command("dump_modify velocity sort id")
-
+        lmps.command("thermo_style custom step temp pe etotal")
+        lmps.command("thermo 5")
         # Set up trajectory and record the first frame
         self.mol.time = 0.0 * u.fs
         lammps_units = self.model.unit_system
-        # self.traj = Trajectory(self.mol, unit_system=lammps_units, first_frame=True)
-        # self.mol.calculate()
-        
+        self.traj = Trajectory(self.mol, unit_system=lammps_units)
+        self.mol.calculate()
+
         # run simulation
         lmps.run(tot_it)
 
         # Dynamics loop
         for istep in xrange(tot_it/output_freq):
             self.step(istep, pos_path, vel_path)
-            # self.traj.new_frame()
+            self.traj.new_frame()
 
         lmps.command("undump position")
         lmps.command("undump velocity")
@@ -109,7 +110,7 @@ class LAMMPSNvt(ConstantTemperatureBase):
         os.umask(saved_umask)
         os.rmdir(tmpdir)
         
-        # return self.traj
+        return self.traj
 
         
 
@@ -145,19 +146,19 @@ class LAMMPSNvt(ConstantTemperatureBase):
         lammps_system.command("timestep " + str(self.params.timestep.value_in(u.fs)))
         
         # TODO:
-        nvt_command = "fix 1 all nvt temp {0} {1} {2}" .format(self.params.temperature.value_in(u.kelvin), 
+        nvt_command = "fix 1 all nvt temp {0} {1} {2} tchain 1" .format(self.params.temperature.value_in(u.kelvin), 
             self.params.temperature.value_in(u.kelvin), 100.0)
         lammps_system.command(nvt_command)
 
         # NOTE: Can you help me figure out the parameters for fix shake?
-        if self.params.constrain_hbonds and self.model.hbond_exists == True :
-            shake_hbond_command = "fix 2 hbond rattle 0.0001 10 0 b 4 6 8 10 12 14 18 a 31"
-            lammps_system.command(shake_hbond_command)
+        # if self.params.constrain_hbonds and self.model.hbond_exists == True :
+        #     shake_hbond_command = "fix 2 hbond rattle 0.0001 10 0 b 4 6 8 10 12 14 18 a 31"
+        #     lammps_system.command(shake_hbond_command)
 
         # NOTE: Can you help me figure out the parameters for fix shake?
-        if self.params.constrain_water and self.model.water_exists == True :
-            shake_water_command = "fix 3 water rattle 0.0001 10 0 b 4 6 8 10 12 14 18 a 31"
-            lammps_system.command(shake_water_command)
+        # if self.params.constrain_water and self.model.water_exists == True :
+        #     shake_water_command = "fix 3 water rattle 0.0001 10 0 b 4 6 8 10 12 14 18 a 31"
+        #     lammps_system.command(shake_water_command)
 
         self.lammps_system = lammps_system
 
@@ -177,7 +178,8 @@ class LAMMPSNvt(ConstantTemperatureBase):
 
         self.mol.positions = pos_array * u.angstrom
         # print self.mol.positions[1004] # Debugging
-        
+        # print pos_array
+        # print "\r\n"
         vel = open(vel_filepath, "rw+")
         tmp = list(islice(vel.readlines(), 9*(idx+1) + lmps.atoms.natoms*idx, (lmps.atoms.natoms+9)*(idx+1)))
         tmp = list(item.split()[1:] for item in tmp)
@@ -185,7 +187,6 @@ class LAMMPSNvt(ConstantTemperatureBase):
 
         self.mol.velocities = vel_array * u.angstrom / u.fs
         # print self.mol.velocities[1004] # Debugging
-
         self.time += self.params.frame_interval
         self.mol.time = self.time
 
