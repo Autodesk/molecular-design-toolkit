@@ -49,12 +49,12 @@ class Frame(utils.DotDict):
         >>> assert starting_frame.potential_energy >= traj.frames[-1].potential_energy
         >>> assert starting_frame.minimization_step == 0
     """
-    def __init__(self, traj):
+    def __init__(self, traj, frameidx):
         self.traj = traj
-        self.frameidx = traj.num_frames
+        self.frameidx = frameidx
         super(Frame, self).__init__()
-        for key in self.traj._property_keys:
-            self[key] = traj[key][self.frameidx]
+        for key in self.traj.properties:
+            self[key] = getattr(traj, key)[self.frameidx]
 
     def __str__(self):
         return 'Frame %d in trajectory "%s"' % (self.frameidx, self.traj.name)
@@ -72,8 +72,6 @@ class Frame(utils.DotDict):
     def as_molecule(self):
         self.traj._apply_frame(self)
         return mdt.Molecule(self.traj._tempmol)
-
-
 
 
 class _TrajAtom(object):
@@ -235,7 +233,7 @@ class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
         self.frames = []
         self.mol = mol
         self.unit_system = utils.if_not_none(unit_system, mdt.units.default)
-        self._property_keys = set()
+        self.properties = utils.DotDict()
         self._tempmol = mdt.Molecule(self.mol.atoms, copy_atoms=True)
         self._tempmol.dynamic_dof = self.mol.dynamic_dof
         self._viz = None
@@ -259,6 +257,13 @@ class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
     __len__ = mdt.utils.Alias('frames.__len__')
     __iter__ = mdt.utils.Alias('frames.__iter__')
 
+    def __getattr__(self, attr):
+        if attr == 'properties' or attr not in self.properties:
+            return self.__getattribute__('properties')
+
+        else:
+            return self.properties[attr]
+
     @property
     def atoms(self):
         if self._atoms is None:
@@ -279,7 +284,8 @@ class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
 
     def __add__(self, other):
         newtraj = Trajectory(self.mol, unit_system=self.unit_system)
-        newtraj.frames = self.frames + other.frames
+        for frame in self.frames + other.frames:
+            newtraj.new_frame(**frame)
         return newtraj
 
     def new_frame(self, properties=None, **additional_data):
@@ -294,37 +300,40 @@ class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
             int: frame number (0-based)
         """
         # get list of properties for this frame
-        if properties is None:
-            properties = self.mol.properties
-        properties = dict(properties)  # make a copy to avoid modifying the input
-        for attr in self.MOL_ATTRIBUTES:
-            if attr not in properties:
-                properties[attr] = getattr(self.mol, attr)
+        props = dict(self.mol.properties)
+        if properties is not None:
+            props.update(properties)
 
-        properties.update(additional_data)
+        for attr in self.MOL_ATTRIBUTES:
+            if attr not in props:
+                props[attr] = getattr(self.mol, attr)
+
+        props.update(additional_data)
 
         # add properties to trajectory
-        for key, value in properties.iteritems():
-            if key not in self._property_keys:
+        for key, value in props.iteritems():
+            if key not in self.properties:
                 self._new_property(key, value)
             else:
                 proplist = getattr(self, key)
                 assert len(proplist) == self.num_frames
                 proplist.append(value)
 
-        self.frames.append(Frame(self))  # TODO: less flubby way of keeping track of # of frames
-
         # backfill missing data with None
-        for key in self._property_keys:
-            proplist = getattr(self, key)
-            if len(proplist) < self.num_frames:
-                assert len(proplist) == self.num_frames - 1
+        for key in self.properties:
+            proplist = self.properties[key]
+            if len(proplist) < self.num_frames+1:
+                assert len(proplist) == self.num_frames
                 try:
                     proplist.append(None)
                 except TypeError:
                     newpl = list(proplist)
                     newpl.append(None)
-                    setattr(self, key, newpl)
+                    self.properties[key] = newpl
+
+        # TODO: less flubby way of keeping track of # of frames
+        self.frames.append(Frame(self, self.num_frames))
+
 
     def _new_property(self, key, value):
         """ Create a new list of properties for each frame. To facilitate analysis, will try
@@ -336,7 +345,7 @@ class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
         The list of properties will be backfilled with ``None`` if this property wasn't already
         present
         """
-        assert key not in self._property_keys
+        assert key not in self.properties
 
         if self.num_frames != 0:
             proplist = [None] * self.num_frames
@@ -351,8 +360,7 @@ class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
                 if proplist.dimensionless:
                     proplist = proplist._magnitude
 
-        setattr(self, key, proplist)
-        self._property_keys.add(key)
+        self.properties[key] = proplist
 
     def _get_traj_atom(self, a):
         if a is None:
@@ -361,10 +369,6 @@ class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
             return self.atoms[a.index]
         else:
             assert isinstance(a, _TrajAtom)
-
-    def __getitem__(self, item):
-        if item in self._property_keys:
-            return getattr(self, item)
 
     DONOTAPPLY = set(['kinetic_energy'])
 
@@ -378,7 +382,7 @@ class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
         m = self._tempmol
         for prop in self.MOL_ATTRIBUTES:
             if (prop not in self.DONOTAPPLY
-                and prop in self._property_keys
+                and prop in self.properties
                 and prop is not None):
                 setattr(m, prop, frame[prop])
         m.properties = MolecularProperties(m)

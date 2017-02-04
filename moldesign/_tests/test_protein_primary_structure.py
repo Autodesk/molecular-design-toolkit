@@ -192,7 +192,7 @@ def test_molecule_links(fixture, request):
     mol = request.getfuncargvalue(fixture)
 
     for obj in itertools.chain(mol.atoms, mol.residues, mol.chains):
-        assert obj.molecule == mol
+        assert obj.molecule is mol
 
 
 @pytest.mark.parametrize('fixture', fixture_types['protein'])

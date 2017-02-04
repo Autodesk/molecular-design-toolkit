@@ -41,7 +41,7 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
     def run(self, run_for, wait=False):
         assert self.mol.energy_model._openmm_compatible
 
-        if not self.mol.energy_model._constraints_ok():
+        if not self.mol.energy_model.constraints_supported():
             raise NotImplementedError('OpenMM only supports position and bond constraints')
 
         try:

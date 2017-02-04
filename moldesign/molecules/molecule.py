@@ -560,12 +560,13 @@ class MolTopologyMixin(object):
             if a1.name != a2.name:
                 return False
 
+        if (self.masses != other.masses).any():
+            return False
+
         for a1, a2 in zip(self.atoms, other.atoms):
-            if a1.mass != a2.mass:
-                return False
             if a1.atnum != a2.atnum:
                 return False
-            if a1.mass != a2.mass:
+            if a1.name != a2.name:
                 return False
 
             bonds1 = self.bond_graph[a1]

@@ -101,3 +101,11 @@ def test_frame_to_molecule_conversion(precanned_trajectory):
     assert m2.time == 2.0 * u.fs
 
 
+def test_property_backfill(precanned_trajectory):
+    traj = precanned_trajectory
+    oldnumframes = len(traj)
+
+    traj.mol.time += 1.0*u.fs
+    traj.new_frame(somenewthing=5)
+
+    assert traj.somenewthing == [None] * oldnumframes + [5]

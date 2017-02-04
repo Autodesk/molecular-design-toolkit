@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cStringIO import StringIO
-
 import moldesign.molecules
 from moldesign import compute
 from moldesign import forcefields as ff
@@ -102,7 +100,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         self._set_constraints()
 
     def minimize(self, **kwargs):
-        if self.constraints_ok():
+        if self.constraints_supported():
             traj = self._minimize(**kwargs)
 
             if opm.force_remote or (not kwargs.get('wait', False)):
@@ -180,7 +178,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
 
         return self.mdtforcefield
 
-    def _constraints_ok(self):
+    def constraints_supported(self):
         """ Check whether this molecule's constraints can be enforced in OpenMM
         """
         for constraint in self.mol.constraints:
