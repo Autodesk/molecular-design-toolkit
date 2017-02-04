@@ -67,7 +67,7 @@ class LAMMPSNvt(ConstantTemperatureBase):
         output_freq = self.time_to_steps(self.params.frame_interval, self.params.timestep)
         
         if tot_it < output_freq:
-            raise ValueError("Run duration can\'t be smaller than frame interval")
+            raise ValueError("Run duration {0} can\'t be smaller than frame interval {1}".format(tot_it, output_freq))
 
         #int(self.params.frame_interval.value_in(u.fs) / self.params.timestep.value_in(u.fs))
         
@@ -84,13 +84,14 @@ class LAMMPSNvt(ConstantTemperatureBase):
         lmps.command("dump velocity all custom {0} {1} id vx vy vz".format(output_freq, vel_path))
         lmps.command("dump_modify position sort id")
         lmps.command("dump_modify velocity sort id")
-        lmps.command("thermo_style custom step temp pe etotal")
-        lmps.command("thermo 5")
+        lmps.command("thermo 0")
+        
         # Set up trajectory and record the first frame
         self.mol.time = 0.0 * u.fs
         lammps_units = self.model.unit_system
         self.traj = Trajectory(self.mol, unit_system=lammps_units)
         self.mol.calculate()
+        self.traj.new_frame()
 
         # run simulation
         lmps.run(tot_it)
@@ -98,7 +99,6 @@ class LAMMPSNvt(ConstantTemperatureBase):
         # Dynamics loop
         for istep in xrange(tot_it/output_freq):
             self.step(istep, pos_path, vel_path)
-            self.traj.new_frame()
 
         lmps.command("undump position")
         lmps.command("undump velocity")
@@ -142,23 +142,17 @@ class LAMMPSNvt(ConstantTemperatureBase):
         lammps_system = self.model.lammps_system
 
         # NOTE: Ensure time step is in femtoseconds 
-        print self.params.timestep.value_in(u.fs)
         lammps_system.command("timestep " + str(self.params.timestep.value_in(u.fs)))
         
         # TODO:
-        nvt_command = "fix 1 all nvt temp {0} {1} {2} tchain 1" .format(self.params.temperature.value_in(u.kelvin), 
+        nvt_command = "fix 1 all nvt temp {0} {1} {2}".format(self.params.temperature.value_in(u.kelvin), 
             self.params.temperature.value_in(u.kelvin), 100.0)
         lammps_system.command(nvt_command)
 
         # NOTE: Can you help me figure out the parameters for fix shake?
-        # if self.params.constrain_hbonds and self.model.hbond_exists == True :
-        #     shake_hbond_command = "fix 2 hbond rattle 0.0001 10 0 b 4 6 8 10 12 14 18 a 31"
-        #     lammps_system.command(shake_hbond_command)
-
-        # NOTE: Can you help me figure out the parameters for fix shake?
-        # if self.params.constrain_water and self.model.water_exists == True :
-        #     shake_water_command = "fix 3 water rattle 0.0001 10 0 b 4 6 8 10 12 14 18 a 31"
-        #     lammps_system.command(shake_water_command)
+        if self.params.constrain_hbonds and self.model.hydrogen_atom_types is not None:
+            rattle_h_cmd = "fix 2 all rattle 0.0001 20 0 t " + str(self.model.hydrogen_atom_types)
+            lammps_system.command(rattle_h_cmd)
 
         self.lammps_system = lammps_system
 
@@ -168,27 +162,26 @@ class LAMMPSNvt(ConstantTemperatureBase):
     """
     def step(self, idx, pos_filepath, vel_filepath):
         lmps = self.lammps_system
-        
-        po = open(pos_filepath, "rw+")
         # start at 9, stop at 9+L.atoms.natoms
         # start at 14+L.atoms.natoms
+        
+        po = open(pos_filepath, "rw+")
         tmp = list(islice(po.readlines(), 9*(idx+1) + lmps.atoms.natoms*idx, (lmps.atoms.natoms+9)*(idx+1)))
         tmp = list(item.split()[1:] for item in tmp)
         pos_array = np.array(tmp).astype(np.float)
-
         self.mol.positions = pos_array * u.angstrom
-        # print self.mol.positions[1004] # Debugging
-        # print pos_array
-        # print "\r\n"
+
         vel = open(vel_filepath, "rw+")
         tmp = list(islice(vel.readlines(), 9*(idx+1) + lmps.atoms.natoms*idx, (lmps.atoms.natoms+9)*(idx+1)))
         tmp = list(item.split()[1:] for item in tmp)
         vel_array = np.array(tmp).astype(np.float)
-
         self.mol.velocities = vel_array * u.angstrom / u.fs
-        # print self.mol.velocities[1004] # Debugging
+
         self.time += self.params.frame_interval
         self.mol.time = self.time
+
+        self.traj.new_frame()
+
 
     #################################################
     # "Private" methods for managing LAMMPS are below

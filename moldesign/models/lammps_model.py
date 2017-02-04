@@ -66,8 +66,7 @@ class LAMMPSPotential(EnergyModelBase):
         self._prepped = False # is the model prepped?
 
         self.lammps_system = None # LAMMPS object for this molecule
-        self.water_exists = False # are hbonds grouped?
-        self.hbond_exists = False # are water molecules grouped?
+        self.hydrogen_atom_types = None # are water molecules grouped?
         self._last_velocity = None # keep track of previous velocities of the molecule
         self.unit_system = None
 
@@ -147,7 +146,6 @@ class LAMMPSPotential(EnergyModelBase):
         pylmp.command("dihedral_style harmonic")
         pylmp.command("improper_style harmonic")
         pylmp.command("kspace_style pppm 0.0001")
-
         
         pylmp.command("read_data " + dataPath)
 
@@ -157,27 +155,14 @@ class LAMMPSPotential(EnergyModelBase):
         os.rmdir(tmpdir)
         
         # group hbonds
-        # hbond_command = self.group_hbonds(parmedmol)
-        # if len(hbond_command) > 0:
-        #     pylmp.command(hbond_command)
-        #     self.hbond_exists = True
-        # else:
-        #     self.hbond_exists = False
-
-        # group water
-        # water_command = self.group_water(parmedmol)
-        # if len(water_command) > 0:
-        #     pylmp.command(water_command)
-        #     self.water_exists = True
-        # else:
-        #     self.water_exists = False
+        self.group_hydrogen(parmedmol)
 
         self.lammps_system = pylmp
         
         self._last_velocity = self.mol.velocities.copy() #Keep track of last velocity that was used to create the LAMMPS system 
 
     
-    def group_hbonds(self, parmedmol):
+    def group_hydrogen(self, parmedmol):
         """
         Get indices of non-bond atom types that contain hydrogen bonds
         
@@ -185,41 +170,11 @@ class LAMMPSPotential(EnergyModelBase):
             parmed: parmed struct to iterate through all nonbond types to find hbonds
 
         """
-        hbond_group = ""
-        
-        if len(parmedmol.LJ_types) <= 0:
-            return hbond_group
-
-        for nonbond_name, nonbond_idx in parmedmol.LJ_types.iteritems():
-            if(nonbond_name[0] == 'H'):
-                hbond_group = hbond_group + " " + str(nonbond_idx)
-        
-        return "group hbond type" + hbond_group
-
-
-    def group_water(self, parmedmol):
-        """
-        Get indices of residues that are type 'water'
-       
-        Arguments:
-            parmed: parmed struct to iterate through all residues to find water residues
-
-        """
-        min_index = sys.maxint;
-        max_index = 0;
-        for res in parmedmol.residues:
-            if res.name == 'WAT':
-                if res.idx < min_index:
-                    min_index = res.idx
-                elif res.idx > max_index:
-                    max_index = res.idx
-        
-        water_group = ""
-        if min_index != sys.maxint :
-            water_group = "group water molecule <> {0} {1}" .format(min_index+1, max_index+1)
-
-        return water_group
-
+        if len(parmedmol.LJ_types) > 0:    
+            for nonbond_name, nonbond_idx in parmedmol.LJ_types.iteritems():
+                if(nonbond_name == "H"):
+                    self.hydrogen_atom_types = nonbond_idx
+                    break
 
 
     # In order to simluate using LAMMPS, we need:
@@ -316,7 +271,7 @@ class LAMMPSPotential(EnergyModelBase):
 
         datalines += "\r\n"
 
-        # Masses
+        # Masses - atom types
         datalines += "Masses\r\n\r\n"
         for i in range(1, max_idx+1):
             for atom in parmedmol.atoms:
