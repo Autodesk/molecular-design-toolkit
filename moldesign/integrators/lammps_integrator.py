@@ -91,7 +91,6 @@ class LAMMPSNvt(ConstantTemperatureBase):
         lammps_units = self.model.unit_system
         self.traj = Trajectory(self.mol, unit_system=lammps_units)
         self.mol.calculate()
-        self.traj.new_frame()
 
         # run simulation
         lmps.run(tot_it)
@@ -152,7 +151,7 @@ class LAMMPSNvt(ConstantTemperatureBase):
         # NOTE: Can you help me figure out the parameters for fix shake?
         if self.params.constrain_hbonds and self.model.hydrogen_atom_types is not None:
             rattle_h_cmd = "fix 2 all rattle 0.0001 20 0 t " + str(self.model.hydrogen_atom_types)
-            lammps_system.command(rattle_h_cmd)
+            # lammps_system.command(rattle_h_cmd)
 
         self.lammps_system = lammps_system
 

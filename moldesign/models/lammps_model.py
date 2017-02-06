@@ -139,6 +139,7 @@ class LAMMPSPotential(EnergyModelBase):
         dataPath = self.create_lammps_data(tmpdir, parmedmol)
 
         pylmp.command("units real")
+        pylmp.command("dimension 3")
         pylmp.command("atom_style full")
         pylmp.command("pair_style lj/charmm/coul/long 8.0 10.0 10.0")
         pylmp.command("bond_style harmonic")
@@ -146,8 +147,10 @@ class LAMMPSPotential(EnergyModelBase):
         pylmp.command("dihedral_style harmonic")
         pylmp.command("improper_style harmonic")
         pylmp.command("kspace_style pppm 0.0001")
-        
         pylmp.command("read_data " + dataPath)
+
+        pylmp.command("neighbor    1 multi")
+        pylmp.command("neigh_modify    delay 0")
 
         # securely remove temporary filesystem
         os.remove(dataPath)
@@ -248,26 +251,28 @@ class LAMMPSPotential(EnergyModelBase):
 
 
         # calculate lo and hi coordinates for Box size
-        xlo = xhi = ylo = yhi = zlo = zhi = None
-        for atom in self.mol.atoms:
-            if xlo == None:
-                xlo = atom.x.value_in(u.angstrom)
-                xhi = atom.x.value_in(u.angstrom)
-                ylo = atom.y.value_in(u.angstrom)
-                yhi = atom.y.value_in(u.angstrom)
-                zlo = atom.z.value_in(u.angstrom)
-                zhi = atom.z.value_in(u.angstrom)
-            else:
-                xlo = min(xlo, atom.x.value_in(u.angstrom))
-                xhi = max(xhi, atom.x.value_in(u.angstrom))
-                ylo = min(ylo, atom.y.value_in(u.angstrom))
-                yhi = max(yhi, atom.y.value_in(u.angstrom))
-                zlo = min(zlo, atom.z.value_in(u.angstrom))
-                zhi = max(zhi, atom.z.value_in(u.angstrom))
+        # xlo = xhi = ylo = yhi = zlo = zhi = None
+        # for atom in self.mol.atoms:
+        #     if xlo == None:
+        #         xlo = atom.x.value_in(u.angstrom)
+        #         xhi = atom.x.value_in(u.angstrom)
+        #         ylo = atom.y.value_in(u.angstrom)
+        #         yhi = atom.y.value_in(u.angstrom)
+        #         zlo = atom.z.value_in(u.angstrom)
+        #         zhi = atom.z.value_in(u.angstrom)
+        #     else:
+        #         xlo = min(xlo, atom.x.value_in(u.angstrom))
+        #         xhi = max(xhi, atom.x.value_in(u.angstrom))
+        #         ylo = min(ylo, atom.y.value_in(u.angstrom))
+        #         yhi = max(yhi, atom.y.value_in(u.angstrom))
+        #         zlo = min(zlo, atom.z.value_in(u.angstrom))
+        #         zhi = max(zhi, atom.z.value_in(u.angstrom))
 
-        datalines += "{0} {1} xlo xhi\r\n".format(xlo, xhi)
-        datalines += "{0} {1} ylo yhi\r\n".format(ylo, yhi)
-        datalines += "{0} {1} zlo zhi\r\n".format(zlo, zhi)
+        datalines += "{0} {1} xlo xhi\r\n".format(-50, 100)
+        datalines += "{0} {1} ylo yhi\r\n".format(-50, 100)
+        datalines += "{0} {1} zlo zhi\r\n".format(-50, 100)
+
+        print datalines
 
         datalines += "\r\n"
 
@@ -288,10 +293,10 @@ class LAMMPSPotential(EnergyModelBase):
                 if atom.nb_idx == i:
                     datalines += "{0} {1} {2} {3} {4}\r\n".format(i, atom.epsilon, atom.sigma, atom.epsilon_14, atom.sigma_14)
                     break
-
         datalines += "\r\n"
                     
         # Bond Coeffs - Harmonic
+
         if parmedmol.bond_types:
             datalines += "Bond Coeffs\r\n\r\n"
             for bt in parmedmol.bond_types:
