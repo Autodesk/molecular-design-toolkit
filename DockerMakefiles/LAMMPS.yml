@@ -36,6 +36,8 @@ lammps_build:
     RUN cd /opt/lammps/src && \
         make mpi mode=shlib -j4 MPI_INC="-DMPICH_SKIP_MPICXX -I/usr/include/mpich" MPI_LIB="-Wl,-rpath,/usr/lib/mpich/lib -L/usr/lib/mpich/lib -lmpl -lmpich"
 
+    RUN cd /opt/lammps/python && \
+        python install.py
 
 lammps:
   description: Deployable LAMMPS image
