@@ -14,17 +14,13 @@
 import pyccc
 import pyccc.exceptions
 
-from moldesign import units as u
 from moldesign import compute
 from moldesign.interfaces.openmm import force_remote, MdtReporter, pint2simtk, OpenMMPickleMixin
+from moldesign.utils import exports
+
 
 from .base import IntegratorBase, LangevinBase
 
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
 
 
 class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
@@ -39,9 +35,9 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
         self._prepped = True
 
     def run(self, run_for, wait=False):
-        self.prep()
+        assert self.mol.energy_model._openmm_compatible
 
-        if not self.model._constraints_ok:
+        if not self.mol.energy_model.constraints_supported():
             raise NotImplementedError('OpenMM only supports position and bond constraints')
 
         try:

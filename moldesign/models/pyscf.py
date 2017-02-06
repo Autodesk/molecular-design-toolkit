@@ -23,13 +23,7 @@ from moldesign.interfaces.pyscf_interface import force_remote, mol_to_pyscf, \
     StatusLogger, SPHERICAL_NAMES
 from .base import QMBase
 from moldesign import uibase
-from moldesign.utils import DotDict
-
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
+from moldesign.utils import DotDict, exports
 
 
 class LazyClassMap(object):

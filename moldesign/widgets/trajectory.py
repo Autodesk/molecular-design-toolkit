@@ -37,7 +37,7 @@ class TrajectoryViewer(selector.SelectionGroup):
         self.default_fps = 10
         self.traj = trajectory
         self.pane = ipy.VBox()
-        trajectory.apply_frame(trajectory.frames[0])
+        trajectory._apply_frame(trajectory.frames[0])
         self.viewer, self.view_container = self.make_viewer()
         for frame in self.traj.frames[1:]:
             self.viewer.append_frame(positions=frame.positions,
@@ -106,13 +106,13 @@ class FrameInspector(ipy.HTML, selector.Selector):
         else:
             framenum = selection['framenum']
 
-        if hasattr(self.traj[framenum], 'time') and self.traj[framenum].time is not None:
-            result = 'Time: %s; ' % self.traj[framenum].time.defunits()
+        if hasattr(self.traj.frames[framenum], 'time') and self.traj.frames[framenum].time is not None:
+            result = 'Time: %s; ' % self.traj.frames[framenum].time.defunits()
         else:
             result = ''
 
         try:
-            result += self.traj[framenum].annotation
+            result += self.traj.frames[framenum].annotation
         except (KeyError, AttributeError):
             pass
 

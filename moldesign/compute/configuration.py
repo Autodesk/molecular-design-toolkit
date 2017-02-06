@@ -92,7 +92,7 @@ CONFIG_DEFAULTS = utils.DotDict(engine_type='ccc',
                                 default_python_image=None,
                                 default_docker_host='unix://var/run/docker.sock',
                                 default_docker_machine='default',
-                                default_version_tag='0.7.4a1')
+                                default_version_tag='0.7.4a2')
 
 DEF_CONFIG = CONFIG_DEFAULTS.copy()
 """ dict: default configuration to be written to moldesign.yml if it doesn't exist

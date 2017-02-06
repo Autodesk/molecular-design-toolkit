@@ -19,24 +19,22 @@ import gzip
 import os
 
 import moldesign as mdt
+from moldesign import utils
 from moldesign.interfaces import biopython_interface
 import moldesign.interfaces.openbabel as openbabel_interface
-from moldesign.interfaces.openmm import amber_to_mol as read_amber
 from moldesign.interfaces.parmed_interface import write_pdb, write_mmcif
 from moldesign.helpers import pdb
 
-
-def exports(o, name=None):
-    __all__.append(o.__name__)
-    return o
-
-__all__ = ['from_smiles', 'read_amber']
+# imported names
+read_amber = mdt.interfaces.openmm.amber_to_mol
+from_smiles = mdt.interfaces.openbabel.from_smiles
+from_inchi = mdt.interfaces.openbabel.from_inchi
 
 
-from_smiles = openbabel_interface.from_smiles
+utils.exports_names('from_smiles', 'read_amber', 'from_inchi')
 
 
-@exports
+@utils.exports
 def read(f, format=None):
     """Read in a molecule from a file, file-like object, or string.
     Will also depickle a pickled object.
@@ -89,7 +87,7 @@ def read(f, format=None):
     return mol
 
 
-@exports
+@utils.exports
 def write(obj, filename=None, format=None, mode='w'):
     """ Write a molecule to a file or string.
     Will also pickle arbitrary python objects.
@@ -139,7 +137,7 @@ def write(obj, filename=None, format=None, mode='w'):
         fileobj.close()
 
 
-@exports
+@utils.exports
 def write_trajectory(traj, filename=None, format=None, overwrite=True):
     """ Write trajectory a file (if filename provided) or file-like buffer
 
@@ -160,7 +158,6 @@ def write_trajectory(traj, filename=None, format=None, overwrite=True):
 
     # for traditional molecular file formats, write the frames one after another
     else:
-        tempmol = traj._tempmol
         if filename and (not overwrite) and os.path.exists(filename):
             raise IOError('%s exists' % filename)
         if not filename:
@@ -169,8 +166,7 @@ def write_trajectory(traj, filename=None, format=None, overwrite=True):
             fileobj = open(filename, 'w')
 
         for frame in traj.frames:
-            traj.apply_frame(frame)
-            fileobj.write(tempmol.write(format=format))
+            fileobj.write(frame.write(format=format))
 
         if filename is None:
             fileobj.seek(0)
@@ -248,7 +244,7 @@ def read_xyz(f):
 
 
 
-@exports
+@utils.exports
 def mol_to_openmm_sim(mol):
     try:
         return mol.energy_model.get_openmm_simulation()
@@ -256,7 +252,7 @@ def mol_to_openmm_sim(mol):
         raise AttributeError("Can't create an OpenMM object - no OpenMM energy_model present")
 
 
-@exports
+@utils.exports
 def from_pdb(pdbcode, usecif=False):
     """ Import the given molecular geometry from PDB.org
         
@@ -301,7 +297,7 @@ def from_pdb(pdbcode, usecif=False):
     return mol
 
 
-@exports
+@utils.exports
 def from_name(name):
     """Attempt to convert an IUPAC or common name to a molecular geometry.
 

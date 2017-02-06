@@ -17,88 +17,22 @@ import numpy as np
 import moldesign as mdt
 from moldesign import data, utils
 from moldesign import units as u
+
 from . import toplevel, AtomContainer, AtomList, AtomArray, AtomCoordinate, Bond
+from .notebook_display import AtomNotebookMixin
 
 
-class AtomDrawingMixin(object):
-    """ Functions for creating atomic visualizations.
-
-    Note:
-        This is a mixin class designed only to be mixed into the :class:`Atom` class. Routines
-        are separated are here for code organization only - they could be included in the main
-        Atom class without changing any functionality
-    """
-
-    #@utils.args_from(mdt.molecule.Molecule.draw2d, allexcept=['highlight_atoms'])  # import order
-    def draw2d(self, **kwargs):
-        """ Draw a 2D viewer with this atom highlighted (Jupyter only).
-        In biomolecules, only draws the atom's residue.
-
-        Args:
-            width (int): width of viewer in pixels
-            height (int): height of viewer in pixels
-
-        Returns:
-            mdt.ChemicalGraphViewer: viewer object
-        """
-        if self.molecule:
-            if self.molecule.is_small_molecule:
-                return self.molecule.draw2d(highlight_atoms=[self], **kwargs)
-            elif self.molecule.is_biomolecule:
-                return self.residue.draw2d(highlight_atoms=[self], **kwargs)
-            else:
-                raise ValueError('No drawing routine specified')
-        else:
-            raise ValueError('No drawing routine specified')
-
-    #@utils.args_from(mdt.molecule.Molecule.draw2d, allexcept=['highlight_atoms'])  # import order
-    def draw3d(self, **kwargs):
-        """ Draw a 3D viewer with this atom highlighted (Jupyter only).
-
-        Args:
-            width (int): width of viewer in pixels
-            height (int): height of viewer in pixels
-
-        Returns:
-            mdt.GeometryViewer: viewer object
-        """
-        return self.molecule.draw3d(highlight_atoms=[self], **kwargs)
-
-    def draw(self, width=300, height=300):
-        """ Draw a 2D and 3D viewer with this atom highlighted (notebook only)
-
-        Args:
-            width (int): width of viewer in pixels
-            height (int): height of viewer in pixels
-
-        Returns:
-            ipy.HBox: viewer object
-        """
-        import ipywidgets as ipy
-        viz2d = self.draw2d(width=width, height=height, display=False)
-        viz3d = self.draw3d(width=width, height=height, display=False)
-        return ipy.HBox([viz2d, viz3d])
-
-
-class AtomGeometryMixin(object):
-    """ Functions measuring distances between atoms and other things.
+class AtomPropertyMixin(object):
+    """ Functions accessing computed atomic properties.
 
     Note:
         This is a mixin class designed only to be mixed into the :class:`Atom` class. Routines
         are separated are here for code organization only - they could be included in the main
         Atom class without changing any functionality
     """
-    @utils.args_from(AtomContainer.distance)
-    def distance(self, *args, **kwargs):
-        return self._container.distance(*args, **kwargs)
-
-    @utils.args_from(AtomContainer.atoms_within)
-    def atoms_within(self, *args, **kwargs):
-        return self._container.atoms_within(*args, **kwargs)
-
-    @utils.args_from(AtomContainer.residues_within)
-    def residues_within(self, *args, **kwargs):
-        return self._container.residues_within(*args, **kwargs)
+    distance = utils.Alias('_container.distance')
+    atoms_within = utils.Alias('_container.atoms_within')
+    residues_within = utils.Alias('_container.residues_within')
 
     @utils.args_from(AtomContainer.calc_distance_array)
     def calc_distances(self, *args, **kwargs):
@@ -114,15 +48,6 @@ class AtomGeometryMixin(object):
         """
         return AtomList([self])
 
-
-class AtomPropertyMixin(object):
-    """ Functions accessing computed atomic properties.
-
-    Note:
-        This is a mixin class designed only to be mixed into the :class:`Atom` class. Routines
-        are separated are here for code organization only - they could be included in the main
-        Atom class without changing any functionality
-    """
     @property
     def ff(self):
         """ moldesign.utils.DotDict: This atom's force field parameters, if available (``None``
@@ -162,103 +87,8 @@ class AtomPropertyMixin(object):
         return props
 
 
-class AtomReprMixin(object):
-    """ Functions for printing out various strings related to the atom.
-
-    Note:
-        This is a mixin class designed only to be mixed into the :class:`Atom` class. Routines
-        are separated are here for code organization only - they could be included in the main
-        Atom class without changing any functionality
-    """
-    def __str__(self):
-        desc = '%s %s (elem %s)' % (self.__class__.__name__, self.name, self.elem)
-        molstring = ''
-        if self.molecule:
-            molstring = ', index %d' % self.index
-            if self.molecule.is_biomolecule:
-                molstring += ' (res %s chain %s)' % (self.residue.name, self.chain.name)
-        return '%s%s' % (desc, molstring)
-
-    def _shortstr(self):
-        """ A shorter string representation for easier-to-read lists of atoms
-        """
-        fields = [self.name]
-        if self.molecule:
-            fields.append('#%d' % self.index)
-            if self.molecule.is_biomolecule:
-                fields.append('in %s.%s' % (self.chain.name, self.residue.name))
-        return ' '.join(fields)
-
-    def __repr__(self):
-        try:
-            if self.molecule:
-                return '<%s in molecule %s>' % (self, self.molecule)
-            else:
-                return '<%s>' % self
-        except (KeyError, AttributeError):
-            return '<%s at %s (exception in __repr__)>' % (self.__class__.__name__, id(self))
-
-    def markdown_summary(self):
-        """Return a markdown-formatted string describing this atom
-
-        Returns:
-            str: markdown-formatted string
-        """
-        if self.molecule is None:
-            lines = ["<h3>Atom %s</h3>" % self.name]
-        else:
-            lines = ["<h3>Atom %s (index %d)</h3>" % (self.name, self.index)]
-
-        lines.append('**Atomic number**: %d' % self.atnum)
-        lines.append("**Mass**: %s" % self.mass)
-        lines.append('**Formal charge**: %s' % self.formal_charge)
-
-        if self.molecule is not None:
-            lines.append('\n')
-            if self.molecule.is_biomolecule:
-                if self.pdbindex is not None:
-                    lines.append('**PDB serial #**: %s'%self.pdbindex)
-                lines.append("**Residue**: %s (index %d)" % (self.residue.name, self.residue.index))
-                lines.append("**Chain**: %s" % self.chain.name)
-            lines.append("**Molecule**: %s" % self.molecule.name)
-            for ibond, (nbr, order) in enumerate(self.bond_graph.iteritems()):
-                lines.append('**Bond %d** (order = %d): %s (index %s) in %s' % (
-                    ibond + 1, order, nbr.name, nbr.index, nbr.residue.name))
-
-        if self.basis_functions:
-            lines.append('**Basis functions:**<br>' + '<br>'.join(map(str,self.basis_functions)))
-
-        if self.ff:
-            lines.append('**Forcefield partial charge**: %s' % self.ff.partialcharge)
-            # TODO: deal with other LJ types, e.g., AB?
-            lines.append(u'**Forcefield LJ params**: '
-                         u'\u03C3=%s, \u03B5=%s' % (
-                             self.ff.lj.sigma.defunits(),
-                             self.ff.lj.epsilon.defunits()))
-
-        # position and momentum
-        table = utils.MarkdownTable('', 'x', 'y', 'z')
-
-        table.add_line(['**position /** {}'.format(u.default.length)] +
-                       ['%12.3f' % x.defunits_value() for x in self.position])
-        table.add_line(['**momentum /** {}'.format(u.default.momentum)] +
-                       ['%12.3e' % m.defunits_value() for m in self.momentum])
-
-        if self.molecule is not None and 'forces' in self.molecule.properties:
-            table.add_line(['**force /** {.units}'.format(self.force.defunits())] +
-                           ['%12.3e' % m.defunits_value() for m in self.force])
-
-        lines.append('\n\n' + table.markdown() + '\n\n')
-        # All other assigned properties
-
-        return '<br>'.join(lines)
-
-    def _repr_markdown_(self):
-        return self.markdown_summary()
-
-
 @toplevel
-class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin):
+class Atom(AtomPropertyMixin, AtomNotebookMixin):
     """ A data structure representing an atom.
 
     ``Atom`` objects store information about individual atoms within a larger molecular system,
@@ -311,7 +141,7 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
             - :class:`AtomDrawingMixin`
             - :class:`AtomGeometryMixin`
             - :class:`AtomPropertyMixin`
-            - :class:`AtomReprMixin`
+            - :class:`AtomNotebookMixin`
     """
     x, y, z = (AtomCoordinate('position', i) for i in xrange(3))
     vx, vy, vz = (AtomCoordinate('velocity', i) for i in xrange(3))
@@ -353,6 +183,34 @@ class Atom(AtomDrawingMixin, AtomGeometryMixin, AtomPropertyMixin, AtomReprMixin
         self._momentum = np.zeros(3) * (u.default.length*
                                        u.default.mass/u.default.time)
         self._bond_graph = {}
+
+    def __str__(self):
+        desc = '%s %s (elem %s)' % (self.__class__.__name__, self.name, self.elem)
+        molstring = ''
+        if self.molecule:
+            molstring = ', index %d' % self.index
+            if self.molecule.is_biomolecule:
+                molstring += ' (res %s chain %s)' % (self.residue.name, self.chain.name)
+        return '%s%s' % (desc, molstring)
+
+    def _shortstr(self):
+        """ A shorter string representation for easier-to-read lists of atoms
+        """
+        fields = [self.name]
+        if self.molecule:
+            fields.append('#%d' % self.index)
+            if self.molecule.is_biomolecule:
+                fields.append('in %s.%s' % (self.chain.name, self.residue.name))
+        return ' '.join(fields)
+
+    def __repr__(self):
+        try:
+            if self.molecule:
+                return '<%s in molecule %s>' % (self, self.molecule)
+            else:
+                return '<%s>' % self
+        except (KeyError, AttributeError):
+            return '<%s at %s (exception in __repr__)>' % (self.__class__.__name__, id(self))
 
     @utils.args_from(AtomContainer.copy)
     def copy(self, *args, **kwargs):

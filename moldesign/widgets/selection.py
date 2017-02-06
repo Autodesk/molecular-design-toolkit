@@ -16,17 +16,11 @@ import collections
 import ipywidgets as ipy
 import traitlets
 
-from moldesign import viewer
+from moldesign import viewer, utils
 from moldesign.uibase.components import SelBase
 
 
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
-
-
-@exports
+@utils.exports
 class BondSelector(SelBase):
     def __init__(self, mol):
         super(BondSelector, self).__init__(mol)
@@ -78,7 +72,7 @@ class BondSelector(SelBase):
         super(BondSelector, self).clear_selections(*args)
 
 
-@exports
+@utils.exports
 class ResidueSelector(SelBase):
     """
     Selections at the atom/residue/chain level.

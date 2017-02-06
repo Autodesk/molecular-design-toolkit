@@ -14,15 +14,10 @@
 from __future__ import absolute_import
 
 from moldesign import units as u
+from moldesign.utils import exports
 
 from .base import MinimizerBase
 from . import toplevel
-
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
 
 
 class ScipyMinimizer(MinimizerBase):

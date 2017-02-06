@@ -12,22 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cStringIO import StringIO
-
 import moldesign.molecules
 from moldesign import compute
 from moldesign import forcefields as ff
 from moldesign.molecules import Trajectory, MolecularProperties
-from moldesign.utils import from_filepath
+from moldesign.utils import from_filepath, exports
 
 import moldesign.interfaces.openmm as opm
 from .base import MMBase
-
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
 
 
 @exports
@@ -46,7 +38,6 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
     def __init__(self, **kwargs):
         super(OpenMMPotential, self).__init__(**kwargs)
         self.sim = None
-        self._constraints_ok = True  # can OpenMM support these constraints?
 
     def get_openmm_simulation(self):
         if opm.force_remote:
@@ -103,7 +94,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         self._set_constraints()
 
     def minimize(self, **kwargs):
-        if self._constraints_ok:
+        if self.constraints_supported():
             traj = self._minimize(**kwargs)
 
             if opm.force_remote or (not kwargs.get('wait', False)):
@@ -181,11 +172,18 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
 
         return self.mdtforcefield
 
+    def constraints_supported(self):
+        """ Check whether this molecule's constraints can be enforced in OpenMM
+        """
+        for constraint in self.mol.constraints:
+            if constraint.desc not in ('position', 'distance'):
+                return False
+        else:
+            return True
 
     #################################################
     # "Private" methods for managing OpenMM are below
     def _set_constraints(self):
-        self._constraints_ok = True
         system = self.mm_system
         fixed_atoms = set()
 
@@ -204,8 +202,6 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                                      constraint.a2.index,
                                      opm.pint2simtk(constraint.value))
 
-            else:
-                self._constraints_ok = False
 
         # Workaround for OpenMM issue: can't have an atom that's both fixed *and* has a distance constraint.
         # If both atoms in the distance constraint are also fixed, then we can just remove the constraint

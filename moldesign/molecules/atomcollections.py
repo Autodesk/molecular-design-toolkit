@@ -13,20 +13,19 @@
 # limitations under the License.
 
 import copy
-
 import collections
-
 import itertools
+
 import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
 from moldesign import utils, external, mathutils, helpers
+from .notebook_display import AtomGroupNotebookMixin
 from . import toplevel
-import traitlets
 
 
-class AtomGroup(object):
+class AtomGroup(AtomGroupNotebookMixin):
     """ Mixin functions for objects that have a ``self.atoms`` attribute with a list of atoms
 
     Attributes:
@@ -206,88 +205,6 @@ class AtomGroup(object):
             units.Scalar[angle]
         """
         return mdt.geom.dihedral(*map(self._getatom, (a1, a2, a3, a4)))
-
-    def draw(self, width=500, height=500, show_2dhydrogens=None, display=False):
-        """ Visualize this molecule (Jupyter only).
-
-        Creates a 3D viewer, and, for small molecules, a 2D viewer).
-
-        Args:
-            width (int): width of the viewer in pixels
-            height (int): height of the viewer in pixels
-            show_2dhydrogens (bool): whether to show the hydrogens in 2d (default: True if there
-                   are 10 or less heavy atoms, false otherwise)
-            display (bool): immediately display this viewer
-
-        Returns:
-            moldesign.ui.SelectionGroup
-        """
-        import ipywidgets as ipy
-        import IPython.display
-
-        viz2d = None
-        if self.num_atoms < 40:
-
-            viz2d = self.draw2d(width=width, height=height,
-                                display=False,
-                                show_hydrogens=show_2dhydrogens)
-            viz3d = self.draw3d(width=width, height=height,
-                                display=False)
-            traitlets.link((viz3d, 'selected_atom_indices'), (viz2d, 'selected_atom_indices'))
-            views = ipy.HBox([viz2d, viz3d])
-        else:
-            views = self.draw3d(display=False)
-
-        atom_inspector = mdt.uibase.components.AtomInspector()
-        traitlets.directional_link(
-            (viz2d or views, 'selected_atom_indices'),
-            (atom_inspector, 'value'),
-            lambda selected_atom_indices: atom_inspector.indices_to_value(selected_atom_indices, self.atoms)
-        )
-
-        displayobj = mdt.uibase.SelectionGroup([views, atom_inspector])
-
-        if display:
-            IPython.display.display(displayobj)
-        return displayobj
-
-    def draw3d(self, highlight_atoms=None, **kwargs):
-        """ Draw this object in 3D. Jupyter only.
-
-        Args:
-            highlight_atoms (List[Atom]): atoms to highlight when the structure is drawn
-
-        Returns:
-            mdt.GeometryViewer: 3D viewer object
-        """
-        from moldesign import viewer
-        self.viz3d = viewer.GeometryViewer(self, **kwargs)
-        if highlight_atoms is not None:
-            self.viz3d.highlight_atoms(highlight_atoms)
-        return self.viz3d
-
-    def draw2d(self, highlight_atoms=None, show_hydrogens=None, **kwargs):
-        """
-        Draw this object in 2D. Jupyter only.
-
-        Args:
-            highlight_atoms (List[Atom]): atoms to highlight when the structure is drawn
-            show_hydrogens (bool): whether to draw the hydrogens or not (default: True if there
-                   are 10 or less heavy atoms, false otherwise)
-
-        Returns:
-            mdt.ChemicalGraphViewer: 2D viewer object
-        """
-        from moldesign import viewer
-        if show_hydrogens is None:
-            show_hydrogens = len(self.heavy_atoms) <= 10
-        if not show_hydrogens:
-            alist = [atom for atom in self.atoms if atom.atnum > 1]
-        else:
-            alist = self
-        self.viz2d = viewer.DistanceGraphViewer(alist, **kwargs)
-        if highlight_atoms: self.viz2d.highlight_atoms(highlight_atoms)
-        return self.viz2d
 
     def copy(self):
         """
