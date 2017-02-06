@@ -384,8 +384,28 @@ def from_smiles(smi, name=None):
     Returns:
         moldesign.Molecule: the translated molecule
     """
-    if name is None: name = smi
-    pbmol = pb.readstring('smi', str(smi))  # avoid passing unicode by casting to str
+    return _string_to_3d_mol(smi, 'smi', name)
+
+
+@runsremotely(enable=force_remote)
+def from_inchi(inchi, name=None):
+    """ Translate an INCHI string to a 3D structure.
+    This method uses OpenBabel to generate a plausible 3D conformation of the 2D SMILES topology.
+    We only use the first result from the conformation generator.
+
+    Args:
+        smi (str): smiles string
+        name (str): name to assign to molecule (default - the smiles string)
+
+    Returns:
+        moldesign.Molecule: the translated molecule
+    """
+    return _string_to_3d_mol(inchi, 'inchi', name)
+
+
+def _string_to_3d_mol(s, fmt, name):
+    if name is None: name = s
+    pbmol = pb.readstring(fmt, str(s))  # avoid passing unicode by casting to str
     pbmol.addh()
     pbmol.make3D()
     mol = pybel_to_mol(pbmol,
@@ -393,5 +413,5 @@ def from_smiles(smi, name=None):
                        atom_names=False,
                        primary_structure=False)
     for atom in mol.atoms:
-        atom.name = atom.elem + str(atom.index)
+        atom.name = atom.elem+str(atom.index)
     return mol
