@@ -14,14 +14,9 @@
 
 import moldesign as mdt
 from moldesign.parameters import Parameter, WhenParam
+from moldesign.utils import exports
 
 from . import ForceField
-
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
 
 
 @exports

@@ -21,12 +21,7 @@ import moldesign as mdt
 from moldesign.utils import from_filepath
 from moldesign import units as u
 from moldesign import compute
-
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
+from moldesign.utils import exports
 
 
 try:

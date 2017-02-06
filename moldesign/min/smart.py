@@ -17,14 +17,9 @@ from . import toplevel, BFGS, GradientDescent, SequentialLeastSquares
 
 from moldesign import utils
 from moldesign import units as u
+from moldesign.utils import exports
 
 GDTHRESH = 1.5*u.eV/u.angstrom
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
-
 
 @exports
 class SmartMin(MinimizerBase):

@@ -32,13 +32,8 @@ import moldesign as mdt
 from moldesign.compute.runsremotely import runsremotely
 import moldesign.molecules.atoms
 from moldesign import units as u
+from moldesign.utils import exports
 
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-
-__all__ = []
 
 
 def read_file(filename, name=None, format=None):

@@ -21,6 +21,7 @@ import numpy as np
 import moldesign as mdt
 from moldesign import units as u
 from moldesign import compute
+from moldesign.utils import exports
 
 from . import openmm as opm
 
@@ -31,12 +32,6 @@ except (ImportError, OSError) as exc:
     force_remote = True
 else:
     force_remote = False
-
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
 
 
 @exports

@@ -21,15 +21,10 @@ Currently, everything here is an alias. However, more complicated logic (includi
 dispatch) may be used to determine the best implementation in a given situation
 """
 from moldesign import utils
+from moldesign.utils import exports
 
 from . import PySCFPotential
 from . import OpenMMPotential
-
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
 
 
 ##################

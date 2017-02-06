@@ -19,12 +19,7 @@ import parmed
 import moldesign as mdt
 from moldesign import units as u
 from moldesign import utils
-
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
+from moldesign.utils import exports
 
 
 def read_mmcif(f, reassign_chains=True):

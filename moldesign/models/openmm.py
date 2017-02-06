@@ -16,16 +16,10 @@ import moldesign.molecules
 from moldesign import compute
 from moldesign import forcefields as ff
 from moldesign.molecules import Trajectory, MolecularProperties
-from moldesign.utils import from_filepath
+from moldesign.utils import from_filepath, exports
 
 import moldesign.interfaces.openmm as opm
 from .base import MMBase
-
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
 
 
 @exports

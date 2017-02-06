@@ -18,12 +18,7 @@ import ipywidgets as ipy
 
 from moldesign.uibase import UnitText, ReadOnlyRepr
 from moldesign import utils
-
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
+from moldesign.utils import exports
 
 
 @exports
