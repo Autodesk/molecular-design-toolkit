@@ -122,3 +122,46 @@ def test_minimization_reduces_energy(objkey, request):
     mol = request.getfuncargvalue(objkey)
     traj = mol.minimize()
     assert mol.calculate_potential_energy() < e1
+
+
+
+@typedfixture('hasmodel')
+def protein_stripped_lammps_amber_forcefield():
+    mol = mdt.from_pdb('1yu8')
+    mol = mdt.Molecule([res for res in mol.residues if res.type == "protein"])
+    newmol = mdt.assign_forcefield(mol)
+    newmol.set_energy_model(mdt.models.LAMMPSPotential)
+    return newmol
+
+@typedfixture('hasmodel')
+def protein_lammps_amber_forcefield():
+    mol = mdt.from_pdb('1yu8')
+    newmol = mdt.assign_forcefield(mol)
+    newmol.set_energy_model(mdt.models.LAMMPSPotential)
+    return newmol
+
+# TODO
+def test_lammps_shake_constrain_hbonds(protein_stripped_lammps_amber_forcefield):
+    mdmol = protein_stripped_lammps_amber_forcefield
+    hydrogens = [atom for atom in mdmol.atoms if atom.atnum == 1]
+    dist_before = []
+    for atom in hydrogens:
+        assert atom.num_bonds ==1
+        d = atom.distance(atom.bonded_atoms[0])
+        dist_before.append(d)
+   
+    mdmol.set_integrator(mdt.integrators.LAMMPSNvt, timestep=2.0*u.fs, temperature=300*u.kelvin, frame_interval=10.0*u.fs)
+    mdmol.run(100.0*u.fs)
+    
+    numNonConstrained = 0
+    for idx, atom in enumerate(hydrogens):
+        assert atom.num_bonds ==1
+        d = atom.distance(atom.bonded_atoms[0])
+        if abs(d-dist_before[idx]).value_in(u.angstrom) > 0.0001:
+            numNonConstrained += 1
+
+    assert numNonConstrained < len(hydrogens)*0.1
+
+# # TODO:
+# def test_lammps_shake_constrain_water(protein_lammps_amber_forcefield):
+

@@ -66,7 +66,7 @@ class LAMMPSPotential(EnergyModelBase):
         self._prepped = False # is the model prepped?
 
         self.lammps_system = None # LAMMPS object for this molecule
-        self.hydrogen_atom_types = None # are water molecules grouped?
+        self.hbond_group = None # are water molecules grouped?
         self._last_velocity = None # keep track of previous velocities of the molecule
         self.unit_system = None
 
@@ -125,9 +125,6 @@ class LAMMPSPotential(EnergyModelBase):
             raise NotImplementedError('Assign forcefield parameters to the system')
 
         # Store the PRMTOP file if ff are assigned and use it to create lammps molecule data
-        self.mol.ff.amber_params.prmtop.put('/tmp/tmp.prmtop')
-
-        parmedmol = med.load_file('/tmp/tmp.prmtop')
 
         # initialize lammps object
         lmp = lammps()
@@ -136,7 +133,7 @@ class LAMMPSPotential(EnergyModelBase):
         # create temporary file system
         tmpdir = tempfile.mkdtemp()
         saved_umask = os.umask(0077)
-        dataPath = self.create_lammps_data(tmpdir, parmedmol)
+        dataPath = self.create_lammps_data(tmpdir)
 
         pylmp.command("units real")
         pylmp.command("dimension 3")
@@ -149,36 +146,21 @@ class LAMMPSPotential(EnergyModelBase):
         pylmp.command("kspace_style pppm 0.0001")
         pylmp.command("read_data " + dataPath)
 
-        pylmp.command("neighbor    1 multi")
-        pylmp.command("neigh_modify    delay 0")
+        # pylmp.command("neighbor    1 multi")
+        # pylmp.command("neigh_modify    delay 0")
 
+        pylmp.command("neighbor    2.0 bin")
+        pylmp.command("neigh_modify    delay 5")        
+        
         # securely remove temporary filesystem
         os.remove(dataPath)
         os.umask(saved_umask)
         os.rmdir(tmpdir)
-        
-        # group hbonds
-        self.group_hydrogen(parmedmol)
 
         self.lammps_system = pylmp
         
         self._last_velocity = self.mol.velocities.copy() #Keep track of last velocity that was used to create the LAMMPS system 
-
     
-    def group_hydrogen(self, parmedmol):
-        """
-        Get indices of non-bond atom types that contain hydrogen bonds
-        
-        Arguments:
-            parmed: parmed struct to iterate through all nonbond types to find hbonds
-
-        """
-        if len(parmedmol.LJ_types) > 0:    
-            for nonbond_name, nonbond_idx in parmedmol.LJ_types.iteritems():
-                if(nonbond_name == "H"):
-                    self.hydrogen_atom_types = nonbond_idx
-                    break
-
 
     # In order to simluate using LAMMPS, we need:
     #   get molecule from pdb, cif, or name
@@ -207,7 +189,7 @@ class LAMMPSPotential(EnergyModelBase):
     # See http://parmed.github.io/ParmEd/html/index.html for ParmEd units
 
     
-    def create_lammps_data(self, tmpdir, parmedmol):
+    def create_lammps_data(self, tmpdir):
         """
         Create a data. file that contains all necessary information regarding the molecule
         in order to create the appropirate LAMMPS system for it
@@ -217,8 +199,12 @@ class LAMMPSPotential(EnergyModelBase):
             parmed: parmed struct to iterate through all nonbond types to find hbonds
 
         """    
-        predictable_filename = 'data.lammps_mol'
+        # Create parmed object
+        self.mol.ff.amber_params.prmtop.put('/tmp/tmp.prmtop')
+        parmedmol = med.load_file('/tmp/tmp.prmtop')
 
+        # Create temperary data file
+        predictable_filename = 'data.lammps_mol'
         path = os.path.join(tmpdir, predictable_filename)
 
         datalines =  ""
@@ -236,7 +222,7 @@ class LAMMPSPotential(EnergyModelBase):
         for nonbond_idx in parmedmol.LJ_types.itervalues():
             if(nonbond_idx > max_idx):
                 max_idx = nonbond_idx
-
+            
         datalines += "{0} atom types\r\n".format(max_idx)
         if len(parmedmol.bond_types) > 0:
             datalines += "{0} bond types\r\n".format(len(parmedmol.bond_types))
@@ -248,7 +234,6 @@ class LAMMPSPotential(EnergyModelBase):
             datalines += "{0} improper types\r\n".format(len(parmedmol.improper_types))
     
         datalines += "\r\n"
-
 
         # calculate lo and hi coordinates for Box size
         # xlo = xhi = ylo = yhi = zlo = zhi = None
@@ -272,14 +257,14 @@ class LAMMPSPotential(EnergyModelBase):
         datalines += "{0} {1} ylo yhi\r\n".format(-50, 100)
         datalines += "{0} {1} zlo zhi\r\n".format(-50, 100)
 
-        print datalines
-
         datalines += "\r\n"
 
         # Masses - atom types
         datalines += "Masses\r\n\r\n"
         for i in range(1, max_idx+1):
             for atom in parmedmol.atoms:
+                if atom.atomic_number == 1 and self.hbond_group is None:
+                    self.hbond_group = atom.mass
                 if atom.nb_idx == i:
                     datalines += "{0} {1}\r\n".format(i, atom.mass)
                     break
@@ -303,6 +288,18 @@ class LAMMPSPotential(EnergyModelBase):
                 datalines += "{0} {1} {2}\r\n".format(bt.idx+1, bt.k, bt.req)
             
             datalines += "\r\n"
+
+
+        # Find all hbonds
+        # hbond_group = ""
+        # hydrogens = [atom for atom in parmedmol.atoms if atom.atomic_number == 1]
+        # for atom in hydrogens:
+        #     assert len(atom.bond_partners) == 1
+        #     bond = atom.bonds[0]
+        #     hbonds = hbond_group.split()
+        #     if str(bond.type.idx+1) not in hbonds:
+        #         hbond_group += str(bond.type.idx+1) + " "
+        # self.hbond_group = hbond_group
 
 
         # Angle Coeffs - Harmonic
@@ -400,8 +397,8 @@ class LAMMPSPotential(EnergyModelBase):
 
         with open(path, "w") as lammps_data:   
             lammps_data.write(datalines)
-            
-       # print datalines
+        
+        # print datalines
 
         return path
 

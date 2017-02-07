@@ -75,16 +75,13 @@ class LAMMPSNvt(ConstantTemperatureBase):
         tmpdir = tempfile.mkdtemp()
         saved_umask = os.umask(0077)
 
-        pos_path = os.path.join(tmpdir, "dump.position")
-        vel_path = os.path.join(tmpdir, "dump.velocity")
+        result_path = os.path.join(tmpdir, "dump.result")
 
         lmps = self.lammps_system
 
-        lmps.command("dump position all custom {0} {1} id x y z".format(output_freq, pos_path))
-        lmps.command("dump velocity all custom {0} {1} id vx vy vz".format(output_freq, vel_path))
-        lmps.command("dump_modify position sort id")
-        lmps.command("dump_modify velocity sort id")
-        lmps.command("thermo 0")
+        lmps.command("dump result all custom {0} {1} id x y z vx vy vz".format(output_freq, result_path))
+        lmps.command("dump_modify result sort id")
+        # lmps.command("thermo_style custom step temp")
         
         # Set up trajectory and record the first frame
         self.mol.time = 0.0 * u.fs
@@ -95,17 +92,18 @@ class LAMMPSNvt(ConstantTemperatureBase):
         # run simulation
         lmps.run(tot_it)
 
+        dump = open(result_path, "rw+")
+        results = dump.readlines()
+
         # Dynamics loop
         for istep in xrange(tot_it/output_freq):
-            self.step(istep, pos_path, vel_path)
+            self.step(istep, results)
 
-        lmps.command("undump position")
-        lmps.command("undump velocity")
+        lmps.command("undump result")
         self.lammps_system = lmps
          
         # securely remove temporary filesystem
-        os.remove(pos_path)
-        os.remove(vel_path)
+        os.remove(result_path)
         os.umask(saved_umask)
         os.rmdir(tmpdir)
         
@@ -123,10 +121,6 @@ class LAMMPSNvt(ConstantTemperatureBase):
             self.params.timestep (float): timestep length
 
         """
-        # sanity check of parameters
-        # NOTE: DO I NEED THIS??
-        if self.params.timestep.value_in(u.fs) > self.params.frame_interval.value_in(u.fs):
-            raise ValueError
 
         #if self._prepped and self.model is self.mol.energy_model and self.model._prepped: return
         
@@ -142,16 +136,22 @@ class LAMMPSNvt(ConstantTemperatureBase):
 
         # NOTE: Ensure time step is in femtoseconds 
         lammps_system.command("timestep " + str(self.params.timestep.value_in(u.fs)))
-        
+        # print self.params.timestep.value_in(u.fs)
+
         # TODO:
         nvt_command = "fix 1 all nvt temp {0} {1} {2}".format(self.params.temperature.value_in(u.kelvin), 
             self.params.temperature.value_in(u.kelvin), 100.0)
+        # print nvt_command
         lammps_system.command(nvt_command)
 
         # NOTE: Can you help me figure out the parameters for fix shake?
-        if self.params.constrain_hbonds and self.model.hydrogen_atom_types is not None:
-            rattle_h_cmd = "fix 2 all rattle 0.0001 20 0 t " + str(self.model.hydrogen_atom_types)
-            # lammps_system.command(rattle_h_cmd)
+        if self.params.constrain_hbonds and self.model.hbond_group is not None:
+            shake_cmd = "fix 2 all shake 0.0001 20 0 m {0}".format(self.model.hbond_group)
+            # print shake_cmd
+            lammps_system.command(shake_cmd)
+
+        lammps_system.command("thermo_style custom step temp")
+        lammps_system.command("thermo 0")
 
         self.lammps_system = lammps_system
 
@@ -159,21 +159,19 @@ class LAMMPSNvt(ConstantTemperatureBase):
         Update molecule's position and velocity at each step of the simulation
 
     """
-    def step(self, idx, pos_filepath, vel_filepath):
+    def step(self, idx, results):
         lmps = self.lammps_system
         # start at 9, stop at 9+L.atoms.natoms
         # start at 14+L.atoms.natoms
         
-        po = open(pos_filepath, "rw+")
-        tmp = list(islice(po.readlines(), 9*(idx+1) + lmps.atoms.natoms*idx, (lmps.atoms.natoms+9)*(idx+1)))
-        tmp = list(item.split()[1:] for item in tmp)
-        pos_array = np.array(tmp).astype(np.float)
+        tmp = list(islice(results, 9*(idx+1) + lmps.atoms.natoms*idx, (lmps.atoms.natoms+9)*(idx+1)))
+        pos = list(item.split()[1:4] for item in tmp)
+        vel = list(item.split()[4:] for item in tmp)
+        
+        pos_array = np.array(pos).astype(np.float)
+        vel_array = np.array(vel).astype(np.float)
+        
         self.mol.positions = pos_array * u.angstrom
-
-        vel = open(vel_filepath, "rw+")
-        tmp = list(islice(vel.readlines(), 9*(idx+1) + lmps.atoms.natoms*idx, (lmps.atoms.natoms+9)*(idx+1)))
-        tmp = list(item.split()[1:] for item in tmp)
-        vel_array = np.array(tmp).astype(np.float)
         self.mol.velocities = vel_array * u.angstrom / u.fs
 
         self.time += self.params.frame_interval
