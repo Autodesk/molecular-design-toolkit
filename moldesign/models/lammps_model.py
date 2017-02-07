@@ -96,9 +96,9 @@ class LAMMPSPotential(EnergyModelBase):
         This will rebuild this OpenMM simulation if: A) it's not built yet, or B)
         there's a new integrator
         """ 
-        
+
         # If current molecule's velocity is not the same as last recorded velocity, create a new system
-        if self._last_velocity is None or (self._last_velocity == self.mol.velocities).all():
+        if self._last_velocity is None or (self._last_velocity == self.mol.velocities).all() == False:
             self._create_system()
 
         self.unit_system = u.UnitSystem(length=u.angstrom, force=u.kcalpermol/u.fs, energy=u.kcalpermol, time=u.fs, 
@@ -113,6 +113,7 @@ class LAMMPSPotential(EnergyModelBase):
     # "Private" methods for managing LAMMPS are below
     
     def _create_system(self):
+
         """
         Create a LAMMPS system. Use MDT molecule object to construct a LAMMPS system
         
@@ -120,6 +121,7 @@ class LAMMPSPotential(EnergyModelBase):
             run_for (int): number of timesteps OR amount of time to run for
             self.params.timestep (float): timestep length
         """   
+
         # Ensure force fields are assigned 
         if 'amber_params' not in self.mol.ff:
             raise NotImplementedError('Assign forcefield parameters to the system')
@@ -158,7 +160,6 @@ class LAMMPSPotential(EnergyModelBase):
         os.rmdir(tmpdir)
 
         self.lammps_system = pylmp
-        
         self._last_velocity = self.mol.velocities.copy() #Keep track of last velocity that was used to create the LAMMPS system 
     
 

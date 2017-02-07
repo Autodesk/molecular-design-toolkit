@@ -32,7 +32,6 @@ import tempfile
 import os
 import sys
 from itertools import islice
-import time
 
 def exports(o):
     __all__.append(o.__name__)
@@ -60,8 +59,7 @@ class LAMMPSNvt(ConstantTemperatureBase):
 
         """
 
-        if not self._prepped:
-            self.prep()
+        self.prep()
 
         tot_it = self.time_to_steps(run_for, self.params.timestep)
         output_freq = self.time_to_steps(self.params.frame_interval, self.params.timestep)
@@ -146,7 +144,7 @@ class LAMMPSNvt(ConstantTemperatureBase):
 
         # NOTE: Can you help me figure out the parameters for fix shake?
         if self.params.constrain_hbonds and self.model.hbond_group is not None:
-            shake_cmd = "fix 2 all shake 0.0001 20 0 m {0}".format(self.model.hbond_group)
+            shake_cmd = "fix 2 all rattle 0.0001 20 0 m {0}".format(self.model.hbond_group)
             # print shake_cmd
             lammps_system.command(shake_cmd)
 
