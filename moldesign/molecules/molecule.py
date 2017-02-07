@@ -348,30 +348,6 @@ class MolPropertyMixin(object):
     calc_forces = calculate_forces
 
 
-class MolDrawingMixin(object):
-    """ Methods for visualizing molecular structure.
-
-    See Also:
-        :class:`moldesign.molecules.atomcollections.AtomGroup`
-
-    Note:
-        This is a mixin class designed only to be mixed into the :class:`Molecule` class. Routines
-        are separated are here for code organization only - they could be included in the main
-        Molecule class without changing any functionality
-    """
-
-    def draw_orbitals(self, **kwargs):
-        """ Visualize any calculated molecular orbitals (Jupyter only).
-
-        Returns:
-            mdt.orbitals.OrbitalViewer
-        """
-        from moldesign.widgets.orbitals import OrbitalViewer
-        if 'wfn' not in self.properties:
-            self.calculate_wfn()
-        return OrbitalViewer(self, **kwargs)
-
-
 class MolTopologyMixin(object):
     """ Functions for building and keeping track of bond topology and biochemical structure.
 
@@ -537,7 +513,8 @@ class MolTopologyMixin(object):
          - momenta
          - chain names
          - residue names
-         - atom names
+         - atom names / numbers / masses
+         - bonds
 
         Note:
             This tests geometry and topology only; it does not test
@@ -556,10 +533,51 @@ class MolTopologyMixin(object):
             or (self.momenta != other.momenta).any()):
             return False
 
-        for a1, a2 in zip(itertools.chain(self.atoms, self.residues, self.chains),
-                          itertools.chain(other.atoms, other.residues, other.chains)):
+        return self.same_topology(other)
+
+    def same_topology(self, other):
+        """ Test whether two molecules have equivalent topologies
+
+        We specifically test these quantities for equality:
+         - chain names
+         - residue names
+         - atom names / numbers / masses
+         - bonds
+
+        Note:
+            This tests geometry and topology only; it does not test
+            energy models or any calculated properties; it also ignores the ``time`` attribute.
+
+        Args:
+            other (moldesign.Molecule): molecule to test against
+
+        Returns:
+            bool: true if all tested quantities are equal
+        """
+        for a1, a2 in itertools.izip_longest(
+                itertools.chain(self.atoms, self.residues, self.chains),
+                itertools.chain(other.atoms, other.residues, other.chains)):
             if a1.name != a2.name:
                 return False
+
+        if (self.masses != other.masses).any():
+            return False
+
+        for a1, a2 in zip(self.atoms, other.atoms):
+            if a1.atnum != a2.atnum:
+                return False
+            if a1.name != a2.name:
+                return False
+
+            bonds1 = self.bond_graph[a1]
+            bonds2 = other.bond_graph[a2]
+            if len(bonds1) != len(bonds2):
+                return False
+
+            for mynbr, myorder in bonds1.iteritems():
+                othernbr = other.atoms[mynbr.index]
+                if othernbr not in bonds2 or bonds2[othernbr] != myorder:
+                    return False
 
         return True
 
@@ -758,7 +776,6 @@ class MolSimulationMixin(object):
 class Molecule(AtomGroup,
                MolConstraintMixin,
                MolPropertyMixin,
-               MolDrawingMixin,
                MolNotebookMixin,
                MolTopologyMixin, MolSimulationMixin):
     """
@@ -840,10 +857,9 @@ class Molecule(AtomGroup,
     **Molecule methods and properties**
 
     See also methods offered by the mixin superclasses:
-
             - :class:`moldesign.molecules.AtomContainer`
             - :class:`moldesign.molecules.MolPropertyMixin`
-            - :class:`moldesign.molecules.MolDrawingMixin`
+            - :class:`moldesign.notebook_display.MolNotebookMixin`
             - :class:`moldesign.molecules.MolSimulationMixin`
             - :class:`moldesign.molecules.MolTopologyMixin`
             - :class:`moldesign.molecules.MolConstraintMixin`
@@ -857,27 +873,16 @@ class Molecule(AtomGroup,
                  copy_atoms=False,
                  pdbname=None,
                  charge=None,
-                 electronic_state_index=0,
                  metadata=None):
         super(Molecule, self).__init__()
 
-        # copy atoms from another object (i.e., a molecule)
-        oldatoms = helpers.get_all_atoms(atomcontainer)
+        atoms, name = self._get_initializing_atoms(atomcontainer, name, copy_atoms)
 
-        if copy_atoms or (oldatoms[0].molecule is not None):
-            atoms = oldatoms.copy()
-            if name is None:  # Figure out a reasonable name
-                if oldatoms[0].molecule is not None:
-                    name = oldatoms[0].molecule.name + ' copy'
-                elif hasattr(atomcontainer, 'name') and isinstance(atomcontainer.name, str):
-                    name = utils.if_not_none(name, atomcontainer.name + ' copy')
-                else:
-                    name = 'unnamed'
-        else:
-            atoms = oldatoms
+        if metadata is None:
+            metadata = getattr(atomcontainer, 'metadata', utils.DotDict())
 
         self.atoms = atoms
-        self.time = 0.0 * u.default.time
+        self.time = getattr(atomcontainer, 'time', 0.0 * u.default.time)
         self.name = 'uninitialized molecule'
         self._defres = None
         self._defchain = None
@@ -885,15 +890,15 @@ class Molecule(AtomGroup,
         self.constraints = utils.ExclusiveList(key=utils.methodcaller('_constraintsig'))
         self.energy_model = None
         self.integrator = None
-        self.metadata = utils.if_not_none(metadata, utils.DotDict())
-        self.electronic_state_index = electronic_state_index
+        self.metadata = metadata
 
         if charge is not None:
             self.charge = charge
             if not hasattr(charge, 'units'):  # assume fundamental charge units if not explicitly set
                 self.charge *= u.q_e
         else:
-            self.charge = sum(atom.formal_charge for atom in self.atoms)
+            self.charge = getattr(atomcontainer, 'charge',
+                                  sum(atom.formal_charge for atom in self.atoms))
 
         # Builds the internal memory structures
         self.chains = Instance(molecule=self)
@@ -909,6 +914,24 @@ class Molecule(AtomGroup,
 
         self._properties = MolecularProperties(self)
         self.ff = utils.DotDict()
+
+    def _get_initializing_atoms(self, atomcontainer, name, copy_atoms):
+        """ Make a copy of the passed atoms as necessary, return the name of the molecule
+        """
+        # copy atoms from another object (i.e., a molecule)
+        oldatoms = helpers.get_all_atoms(atomcontainer)
+        if copy_atoms or (oldatoms[0].molecule is not None):
+            atoms = oldatoms.copy()
+            if name is None:  # Figure out a reasonable name
+                if oldatoms[0].molecule is not None:
+                    name = oldatoms[0].molecule.name+' copy'
+                elif hasattr(atomcontainer, 'name') and isinstance(atomcontainer.name, str):
+                    name = utils.if_not_none(name, atomcontainer.name+' copy')
+                else:
+                    name = 'unnamed'
+        else:
+            atoms = oldatoms
+        return atoms, name
 
     def __repr__(self):
         try:

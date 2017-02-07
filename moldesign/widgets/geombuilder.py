@@ -18,13 +18,8 @@ import moldesign as mdt
 from moldesign import utils
 from moldesign import units as u
 
+from moldesign.utils import exports
 from moldesign.uibase import ViewerToolBase, ReadoutFloatSlider
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
-
 
 @exports
 class GeometryBuilder(ViewerToolBase):

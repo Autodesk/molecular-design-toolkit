@@ -14,14 +14,10 @@
 import moldesign as mdt
 from moldesign import units as u
 from moldesign.molecules import Trajectory
+from moldesign.utils import exports
 
 from .base import IntegratorBase
 
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
 
 
 @exports

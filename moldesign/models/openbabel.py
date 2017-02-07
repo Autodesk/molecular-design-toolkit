@@ -19,13 +19,10 @@ import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
+from moldesign.utils import exports
+
 from .base import EnergyModelBase
 
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
 
 # uff disabled because it doesn't pass tests
 FFNAMES = {n: n.capitalize() for n in ['ghemical', 'mmff94', 'mmff94s']}

@@ -112,7 +112,7 @@ class MinimizerBase(object):
             moldesign.Trajectory: the minimization trajectory
         """
         self.run()
-        if self.traj.num_frames == 0 or self.traj[-1].minimization_step != self.current_step:
+        if self.traj.num_frames == 0 or self.traj.frames[-1].minimization_step != self.current_step:
             self.traj.new_frame(minimization_step=self.current_step,
                                 annotation='minimization result (%d steps) (energy=%s)'%
                                            (self.current_step, self.mol.potential_energy))

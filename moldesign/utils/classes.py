@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from bisect import bisect_left, bisect_right
-
 import collections
+
+from .descriptors import Alias
 
 
 class Categorizer(dict):
@@ -95,132 +96,90 @@ class ExclusiveList(object):
     __str__ = __repr__
 
 
-class DotDict(dict):
-    """Dict with items accessible as attributes"""
-    def __getstate__(self):
-        retval = dict(__dict__=self.__dict__.copy(),
-                      items=self.items())
-        return retval
+class DotDict(object):
+    """Class for use as a dictionary with attribute-style access.
 
-    def __setstate__(self, d):
-        self.__dict__.update(d['__dict__'])
-        self.update(d['items'])
+    This class is our explicit container for storing data in an object's __dict__.
+    For convenience, it also supports item-style access.
+
+    These classes are provided as an IDE feature - real-time autocomplete in ipython is much
+    easier to use with attribute access. They little-to-no value in other environments, but
+    are not actively harmful.
+
+    All the standard dictionary functions can be accessed at this object's __dict__ attribute.
+    """
+    def __init__(self, *args, **kwargs):
+        self.update(dict(*args, **kwargs))
 
     def __getattr__(self, item):
-        try:
-            return self[item]
-        except KeyError:
-            raise AttributeError("'%s' object has no attribute '%s'"
-                                 % (self.__class__.__name__, item))
+        return getattr(self.__dict__, item)
 
-    def __setattr__(self, item, val):
-        self[item] = val
+    def __repr__(self):
+        return '%s(%s)' % (self.__class__.__name__, repr(self.__dict__))
 
-    def __dir__(self):
-        return dir(self.__class__) + self.keys()
+    def copy(self):
+        return self.__class__(self.iteritems())
+
+# add dictionary magic method aliases
+for _delegate in ['__getitem__', '__setitem__', '__contains__', '__iter__',
+                  '__delitem__', '__len__']:
+    setattr(DotDict, _delegate, Alias('__dict__.%s' % _delegate))
 
 
-class OrderedDotDict(collections.OrderedDict):
+class OrderedDotDict(DotDict):
     """Dict with items accessible as attributes"""
-    def __getstate__(self):
-        retval = dict(__dict__=self.__dict__.copy(),
-                      items=self.items())
-        return retval
+    def __init__(self, *args, **kwargs):
+        self.__keyorder__ = collections.OrderedDict()
+        self.update(*args, **kwargs)
 
-    def __setstate__(self, d):
-        self.__dict__.update(d['__dict__'])
-        self.update(d['items'])
+    __iter__ = Alias('__keyorder__.__iter__')
+    keys = Alias('__keyorder__.keys')
+    __len__ = Alias('__keyorder__.__len__')
 
-    def __getattr__(self, item):
-        try:
-            return self[item]
-        except KeyError:
-            raise AttributeError("'%s' object has no attribute '%s'"
-                                 % (self.__class__.__name__, item))
+    iterkeys = __iter__
 
-    def __setattr__(self, item, val):
-        if item.startswith('_OrderedDict__') or item.startswith('__'):
-            self.__dict__[item] = val
-        else:
-            self[item] = val
+    def itervalues(self):
+        for k in self:
+            yield self[k]
 
-    def __dir__(self):
-        return dir(self.__class__) + self.keys()
+    def iteritems(self):
+        for k in self:
+            yield k, self[k]
 
+    def __repr__(self):
+        return '%s({%s})'%(self.__class__.__name__, self.items())
 
-class Alias(object):
-    """
-    Descriptor that calls a child object's method.
-    e.g.
-    >>> class A(object):
-    >>>     childkeys = Alias('child.keys')
-    >>>     child = dict()
-    >>>
-    >>> a = A()
-    >>> a.child['key'] = 'value'
-    >>> a.childkeys() #calls a.child.keys(), returns ['key']
-    ['key']
-    """
-    def __init__(self, objmethod):
-        objname, methodname = objmethod.split('.')
-        self.objname = objname
-        self.methodname = methodname
+    def values(self):
+        return list(self.itervalues())
 
-    def __get__(self, instance, owner):
-        proxied = getattr(instance, self.objname)
-        return getattr(proxied,self.methodname)
+    def items(self):
+        return list(self.iteritems())
 
+    def __setitem__(self, key, value):
+        super(OrderedDotDict, self).__setitem__(key, value)
+        self.__keyorder__[key] = None
 
-class Synonym(object):
-    """ An attribute (class or intance) that is just a synonym for another.
-    """
-    def __init__(self, name):
-        self.name = name
+    def __setattr__(self, key, value):
+        super(OrderedDotDict, self).__setattr__(key, value)
+        if key[:2] != '__':
+            self.__keyorder__[key] = None
 
-    def __get__(self, instance, owner):
-        return getattr(instance, self.name)
+    def __delitem__(self, key):
+        super(OrderedDotDict, self).__delitem__(key)
+        self.__keyorder__.__delitem__(key)
 
-    def __set__(self, instance, value):
-        setattr(instance, self.name, value)
+    def __delattr__(self, attr):
+        super(OrderedDotDict, self).__delattr__(attr)
+        self.__keyorder__.__delitem__(attr)
 
+    def pop(self, *args, **kwargs):
+        rv = super(OrderedDotDict, self).pop( *args, **kwargs)
+        self.__keyorder__.pop(*args, **kwargs)
+        return rv
 
-class DictLike(object):
-    """
-    This just wraps normal dicts so that other classes don't have to inherit from a built-in class,
-    which apparently breaks pickle quite frequently.
-    """
-    def __getstate__(self):
-        retval = dict(__dict__=self.__dict__.copy())
-        return retval
-
-    def __setstate__(self, d):
-        self.__dict__.update(d['__dict__'])
-
-    def __init__(self, **kwargs):
-        self.children = {}
-        self.children.update(kwargs)
-
-    def __getattr__(self, k):
-        return getattr(self.children, k)
-
-    __setitem__ = Alias('children.__setitem__')
-    __getitem__ = Alias('children.__getitem__')
-
-    def __len__(self):
-        return len(self.children)
-
-
-class Attribute(object):
-    """For overriding a property in a superclass - turns the attribute back
-    into a normal instance attribute"""
-    def __init__(self, name):
-        self.name = name
-
-    def __get__(self, instance, cls):
-        return getattr(instance, self.name)
-
-    def __set__(self, instance, value):
-        return setattr(instance, self.name, value)
+    def update(self, *args, **kwargs):
+        for k,v in collections.OrderedDict(*args, **kwargs).iteritems():
+            self[k] = v
 
 
 class SortedCollection(object):

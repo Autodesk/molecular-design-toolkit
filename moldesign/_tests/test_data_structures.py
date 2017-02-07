@@ -1,9 +1,10 @@
 """ Tests Molecule instances and other base classes they depend on
 """
-
+import collections
 import pickle
 import random
 
+import itertools
 import numpy as np
 import pytest
 
@@ -32,33 +33,65 @@ def typedfixture(*types, **kwargs):
 
 ######################################
 # Test the basic data structures
+
+TESTDICT = collections.OrderedDict((('a', 'b'),
+                                    ('c', 3),
+                                    ('d', 'e'),
+                                    ('a', 1),
+                                    (3, 35)))
+
+
 @typedfixture('object')
 def dotdict():
-    dd = moldesign.utils.classes.DotDict(a='b',
-                                         c=3,
-                                         d='e')
+    dd = moldesign.utils.classes.DotDict(TESTDICT)
     return dd
 
 
 @typedfixture('object')
-def dictlike():
-    dd = moldesign.utils.classes.DictLike(a='b',
-                                          c=3,
-                                          d='e')
+def ordered_dotdict():
+    dd = moldesign.utils.classes.OrderedDotDict(TESTDICT)
     return dd
 
 
-def test_dotdict(dotdict):
-    dd = dotdict
-    assert dd.a == 'b'
-    assert dd.d == 'e'
-
-
-@pytest.mark.parametrize('objkey', 'dictlike dotdict'.split())
-def test_dictlike(objkey, request):
+@pytest.mark.parametrize('objkey', 'dotdict ordered_dotdict'.split())
+def test_dotdict(objkey, request):
     dd = request.getfuncargvalue(objkey)
-    assert set(dd.keys()) == {'a', 'c', 'd'}
-    assert set(dd.values()) == {'b', 3, 'e'}
+
+    # basic lookups and functions
+    assert len(dd) == len(TESTDICT)
+    assert dd.a == TESTDICT['a']
+    assert dd.d == TESTDICT['d']
+    assert set(dd.keys()) == set(TESTDICT.keys())
+    assert set(dd.values()) == set(TESTDICT.values())
+
+    # __contains__ methods
+    for item in TESTDICT:
+        assert item in dd
+
+    # item deletion
+    del dd.d
+    assert 'd' not in dd
+    assert len(dd) == len(TESTDICT) - 1
+    del dd[3]
+    assert 3 not in dd
+
+    # equivalence of items and attrs
+    dd['k'] = 12345
+    assert getattr(dd, 'k') == 12345
+    setattr(dd, 'newkey', -42)
+    assert dd['newkey'] == -42
+
+
+def test_ordered_dotdict(ordered_dotdict):
+    assert ordered_dotdict.keys() == TESTDICT.keys()
+    assert ordered_dotdict.values() == TESTDICT.values()
+    assert ordered_dotdict.items() == TESTDICT.items()
+
+    for iterator_method in '__iter__ iterkeys itervalues iteritems'.split():
+        odd_iter = getattr(ordered_dotdict, iterator_method)()
+        test_iter = getattr(TESTDICT, iterator_method)()
+        for gotval, testval in itertools.izip_longest(odd_iter, test_iter, fillvalue=None):
+            assert gotval == testval, 'Iterator %s failed' % iterator_method
 
 
 # Some objects with units
@@ -516,21 +549,24 @@ def test_molecule_types(molkey, request):
 @pytest.mark.parametrize('objkey', all_objects)
 def test_pickling(objkey, request):
     obj = request.getfuncargvalue(objkey)
-    x = pickle.dumps(obj, protocol=2)
-    y = pickle.loads(x)
-    assert type(y) == type(obj)
+    for iprotocol in (0,1,2):
+        x = pickle.dumps(obj, protocol=iprotocol)
+        y = pickle.loads(x)
+        assert type(y) == type(obj)
 
 
 @pytest.mark.parametrize('objkey', registered_types['equality'])
 def test_pickled_equality(objkey, request):
     obj = request.getfuncargvalue(objkey)
-    x = pickle.dumps(obj, protocol=2)
-    y = pickle.loads(x)
-    assert type(y) == type(obj)
-    try:
-        assert y == obj
-    except ValueError:
-        assert (y == obj).all()
+
+    for iprotocol in (0,1,2):
+        x = pickle.dumps(obj, protocol=iprotocol)
+        y = pickle.loads(x)
+        assert type(y) == type(obj)
+        try:
+            assert y == obj
+        except ValueError:
+            assert (y == obj).all()
 
 
 @pytest.mark.parametrize('fixture_key', ['h2_harmonic_atoms',

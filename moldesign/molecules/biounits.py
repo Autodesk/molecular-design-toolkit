@@ -61,8 +61,8 @@ class ChildList(AtomContainer):
             return (item in self._childinorder)
 
     def __getattr__(self, item):
-        if '_childbyname' not in self.__dict__ or '_childinorder' not in self.__dict__:
-            raise AttributeError('Uninitialized')
+        if item == '_childbyname':
+            return self.__getattribute__('_childbyname')
 
         try:
             return self._childbyname[item]

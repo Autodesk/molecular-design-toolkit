@@ -18,13 +18,7 @@ import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
-
-
-def exports(o):
-    __all__.append(o.__name__)
-    return o
-__all__ = []
-
+from moldesign.utils import exports
 
 @exports
 class Symmetrizer(ipy.Box):
