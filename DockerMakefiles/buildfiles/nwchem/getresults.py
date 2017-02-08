@@ -99,7 +99,10 @@ def get_symmetry():
     return nwchem.rtdb_get('geometry:geometry:group name')
 
 def get_spin_multiplicity():
-    return nwchem.rtdb_get('dft:mult')
+    try:
+        return nwchem.rtdb_get('dft:mult')
+    except SystemError:
+        return None
 
 def get_total_charge():
     return int(nwchem.rtdb_get('charge'))
@@ -117,7 +120,10 @@ def get_atom_names():
     return nwchem.rtdb_get('geometry:geometry:tags')
 
 def get_functional():
-    return nwchem.rtdb_get('dft:xc_spec')
+    try:
+        return nwchem.rtdb_get('dft:xc_spec')
+    except SystemError:
+        return None
 
 
 ##### Caculated quantities #####
@@ -129,13 +135,16 @@ def get_converged():
     return 1 == nwchem.rtdb_get('%s:converged' % _PROPERTYGROUP)
 
 def get_dipole():
-    return nwchem.rtdb_get('%s:dipole' % _PROPERTYGROUP)
+    try:
+        return nwchem.rtdb_get('%s:dipole' % _PROPERTYGROUP)
+    except SystemError:
+        return None
 
 def get_forces():
     try:
         forces = nwchem.rtdb_get('%s:gradient' % _PROPERTYGROUP)
         return _reshape_atom_vector([-f for f in forces])
-    except:
+    except SystemError:
         return None
 
 def get_potential_energy():
