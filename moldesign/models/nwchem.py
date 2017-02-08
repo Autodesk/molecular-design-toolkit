@@ -63,7 +63,7 @@ class NWChemQM(QMBase):
                 image=IMAGE,
                 command='run.py && getresults.py',
                 inputs={'input.xyz': self.mol.write(format='xyz'),
-                        'params.json': json.dumps(parameters)},
+                        'params.json': json.dumps(dict(parameters))},
                 when_finished=self.finish,
                 name='nwchem/%s'%self.mol.name)
         return job
@@ -123,7 +123,7 @@ class NWChemQM(QMBase):
                 image=IMAGE,
                 command='run.py && getresults.py',
                 inputs={'input.xyz': self.mol.write(format='xyz'),
-                        'params.json': json.dumps(parameters)},
+                        'params.json': json.dumps(dict(parameters))},
                 when_finished=self.finish_min,
                 name='nwchem/%s' % self.mol.name)
         return job
