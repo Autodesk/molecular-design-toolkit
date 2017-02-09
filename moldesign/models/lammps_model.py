@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import
+
 import moldesign as mdt
 import moldesign.units as u
 
 from moldesign import compute
 from moldesign import forcefields as ff
-
 
 from .base import EnergyModelBase
 
@@ -54,20 +55,14 @@ class LAMMPSPotential(EnergyModelBase):
     """
     # NEWFEATURE: need to set/get platform (and properties, e.g. number of threads)
     DEFAULT_PROPERTIES = ['potential_energy', 'forces']
-    
-    PARAMETERS = [
-        mdt.parameters.Parameter(
-            'skin', 'Extra distance beyond force cutoff',
-            type=u.angstrom, default=2.0)]
 
-    
     def __init__(self, **kwargs):
         super(LAMMPSPotential, self).__init__(**kwargs)
         self._prepped = False # is the model prepped?
-
-        self.lammps_system = None # LAMMPS object for this molecule
-        self.hbond_group = None # are water molecules grouped?
-        self._last_velocity = None # keep track of previous velocities of the molecule
+        
+        # Other classes have access to these attributes
+        self.lammps_system = None # Basic LAMMPS system for this molecule
+        self.hbond_group = None # Hydrogen mass 
         self.unit_system = None
 
 
@@ -75,10 +70,16 @@ class LAMMPSPotential(EnergyModelBase):
     def calculate(self, requests):
         
         # Recreate system if molecule changed
+        results = self.evaluate_molecule()
+        return results
+
+    def evaluate_molecule(self):
+        # Recreate system if molecule changed
         self.prep()
 
         # Run for 0 fs to evaluate system
         my_lmps = self.lammps_system
+        my_lmps.command("thermo_style one")
         my_lmps.run(0)
 
         # Evaluate potential energy and forces
@@ -88,8 +89,7 @@ class LAMMPSPotential(EnergyModelBase):
             force_array.append(my_lmps.atoms[i].force)
         return {'potential_energy': pe * u.kcalpermol,
                 'forces': force_array * u.kcalpermol / u.angstrom}
-    
-      
+
     def prep(self):
         """
         Drive the construction of the LAMMPS simulation
@@ -97,18 +97,14 @@ class LAMMPSPotential(EnergyModelBase):
         there's a new integrator
         """ 
 
-        # If current molecule's velocity is not the same as last recorded velocity, create a new system
-        if self._last_velocity is None or (self._last_velocity == self.mol.velocities).all() == False:
-            self._create_system()
-
-        self.unit_system = u.UnitSystem(length=u.angstrom, force=u.kcalpermol/u.fs, energy=u.kcalpermol, time=u.fs, 
-            mass=u.gpermol, charge=u.electron_charge)
+        if not self._prepped or self.lammps_system is None:
+            self.lammps_system = self._create_system()
+            
+            self.unit_system = u.UnitSystem(length=u.angstrom, force=u.kcalpermol/u.fs, energy=u.kcalpermol, time=u.fs,
+                mass=u.gpermol, charge=u.electron_charge)
 
         self._prepped = True
-        
-        # TODO: wiring integrator
 
-    
     #################################################
     # "Private" methods for managing LAMMPS are below
     
@@ -116,11 +112,8 @@ class LAMMPSPotential(EnergyModelBase):
 
         """
         Create a LAMMPS system. Use MDT molecule object to construct a LAMMPS system
-        
-        Arguments:
-            run_for (int): number of timesteps OR amount of time to run for
-            self.params.timestep (float): timestep length
-        """   
+
+        """
 
         # Ensure force fields are assigned 
         if 'amber_params' not in self.mol.ff:
@@ -148,25 +141,15 @@ class LAMMPSPotential(EnergyModelBase):
         pylmp.command("kspace_style pppm 0.0001")
         pylmp.command("read_data " + dataPath)
 
-        # pylmp.command("neighbor    1 multi")
-        # pylmp.command("neigh_modify    delay 0")
-
         pylmp.command("neighbor    2.0 bin")
-        pylmp.command("neigh_modify    delay 5")        
-        
+        # pylmp.command("neigh_modify    delay 5")
+
         # securely remove temporary filesystem
         os.remove(dataPath)
         os.umask(saved_umask)
         os.rmdir(tmpdir)
 
-        self.lammps_system = pylmp
-        self._last_velocity = self.mol.velocities.copy() #Keep track of last velocity that was used to create the LAMMPS system 
-    
-
-    # In order to simluate using LAMMPS, we need:
-    #   get molecule from pdb, cif, or name
-    #   assign forcefields
-    #   load parmed structure
+        return pylmp
 
 
     # LAMMPS UNITS:
@@ -188,16 +171,14 @@ class LAMMPSPotential(EnergyModelBase):
     # density = gram/cm^dim
 
     # See http://parmed.github.io/ParmEd/html/index.html for ParmEd units
-
     
-    def create_lammps_data(self, tmpdir):
+    def create_lammps_data(self, tmp_dir):
         """
         Create a data. file that contains all necessary information regarding the molecule
         in order to create the appropirate LAMMPS system for it
         
         Arguments:
             tmpdir: temporary directory to store the data file
-            parmed: parmed struct to iterate through all nonbond types to find hbonds
 
         """    
         # Create parmed object
@@ -206,7 +187,7 @@ class LAMMPSPotential(EnergyModelBase):
 
         # Create temperary data file
         predictable_filename = 'data.lammps_mol'
-        path = os.path.join(tmpdir, predictable_filename)
+        path = os.path.join(tmp_dir, predictable_filename)
 
         datalines =  ""
         datalines += "LAMMPS Description\r\n\r\n"
@@ -221,7 +202,7 @@ class LAMMPSPotential(EnergyModelBase):
         parmedmol.fill_LJ()
         max_idx = 0
         for nonbond_idx in parmedmol.LJ_types.itervalues():
-            if(nonbond_idx > max_idx):
+            if nonbond_idx > max_idx:
                 max_idx = nonbond_idx
             
         datalines += "{0} atom types\r\n".format(max_idx)
@@ -236,7 +217,7 @@ class LAMMPSPotential(EnergyModelBase):
     
         datalines += "\r\n"
 
-        # calculate lo and hi coordinates for Box size
+        # TODO: calculate lo and hi coordinates for Box size
         # xlo = xhi = ylo = yhi = zlo = zhi = None
         # for atom in self.mol.atoms:
         #     if xlo == None:
@@ -289,19 +270,6 @@ class LAMMPSPotential(EnergyModelBase):
                 datalines += "{0} {1} {2}\r\n".format(bt.idx+1, bt.k, bt.req)
             
             datalines += "\r\n"
-
-
-        # Find all hbonds
-        # hbond_group = ""
-        # hydrogens = [atom for atom in parmedmol.atoms if atom.atomic_number == 1]
-        # for atom in hydrogens:
-        #     assert len(atom.bond_partners) == 1
-        #     bond = atom.bonds[0]
-        #     hbonds = hbond_group.split()
-        #     if str(bond.type.idx+1) not in hbonds:
-        #         hbond_group += str(bond.type.idx+1) + " "
-        # self.hbond_group = hbond_group
-
 
         # Angle Coeffs - Harmonic
         if parmedmol.angle_types:
@@ -402,5 +370,101 @@ class LAMMPSPotential(EnergyModelBase):
         # print datalines
 
         return path
+
+@exports
+class LAMMPSInteractive(EnergyModelBase):
+    NAME_AFFECTED_ATOM = "affected_atom"
+    PARAMETERS = [
+        mdt.parameters.Parameter(
+            'affected_atom', 'Atom affected by user\'s interaction', type=mdt.molecules.Atom)]
+
+    def __init__(self, **kwargs):
+        super(LAMMPSInteractive, self).__init__(**kwargs)
+        self._prepped = False   # is the model prepped?
+        self._potential_model = None
+        self._calculated_properties = None
+
+        self._affected_atom = None
+        self._force_vector = None
+        self._initial_position = None
+        self._saved_position = None
+        self._desired_position = None
+
+        self.lammps_system = None   # LAMMPS object for this molecule
+        self.hbond_group = None
+        self.unit_system = None
+
+    # calculate force to be applied to the molecule
+    def calculate(self, requests):
+        
+        # Recreate system if molecule changed
+        if self._calculated_properties is None:
+            self.prep()
+            self._calculated_properties = self._potential_model.evaluate_molecule()
+
+        return self._calculated_properties
+
+    def reset_position(self):
+        '''
+            For interactive purposes, reset the atom of interest to desired position based on force applied by user
+            Call this function after each round of simulation
+        '''
+        if self._desired_position is None:
+            raise ValueError("Can't call reset position before running any interactive simulation!")
+        
+        self._saved_position = self.mol.positions[self._affected_atom.index].copy()
+        self.mol.positions[self._affected_atom.index] = self._desired_position
+
+    def finish_interaction(self):
+        '''
+            When the user is done interacting with the molecule, reset the atom's position to chemicaly-correct position
+        '''
+        if self._saved_position is None:
+            raise ValueError("Can't finish interaction if haven't run any!")
+    
+        self.mol.positions[self._affected_atom.index] = self._saved_position
+
+    def prep(self):
+        """
+        Drive the construction of the LAMMPS simulation
+        This will rebuild this OpenMM simulation if: A) it's not built yet, or B)
+        there's a new integrator
+        """ 
+        if not self._prepped or self._potential_model is None or self.lammps_system is None:
+            self._potential_model = mdt.models.LAMMPSPotential()
+            self._potential_model.mol = self.mol
+            self._potential_model.prep()
+            self._calculated_properties = None
+            self.lammps_system = self._potential_model.lammps_system
+
+            # Group affected atom
+            lmps = self.lammps_system
+            self._affected_atom = self.params.affected_atom
+            self._initial_position = self.mol.positions[self._affected_atom.index].copy()
+            group_atom = "group {0} id {1}".format(self.NAME_AFFECTED_ATOM, self._affected_atom.index + 1)
+            lmps.command(group_atom.rstrip())
+
+            # Get settings from lammps model
+            self.unit_system = self._potential_model.unit_system
+            self.hbond_group = self._potential_model.hbond_group
+
+        # get mouse cursor position
+        # If mouse cursor different position, change self._initial_position to current position
+
+        pos_vector = [10.0, 0.0, 0.0]
+        vel_vector = [p / 125 * 1.0 for p in pos_vector]
+        mass = self._affected_atom.mass.value_in(u.amu)
+        force_vector = [pow(v, 2) * mass for v in vel_vector]
+        if self._saved_position is not None:
+            self.mol.positions[self._affected_atom.index] = self._saved_position.copy()
+        self._desired_position = self._initial_position + (pos_vector * u.angstrom)
+
+        # Apply user force fix
+        lmps = self.lammps_system
+        lmps.command("fix apply_user_force {0} addforce {1} {2} {3}"
+                     .format(self.NAME_AFFECTED_ATOM, force_vector[0], force_vector[1], force_vector[2]))
+
+        self._prepped = True
+
 
 

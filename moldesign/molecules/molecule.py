@@ -612,6 +612,23 @@ class MolSimulationMixin(object):
         print 'Done - integrated "%s" from %s to %s' % (self, init_time, self.time)
         return traj
 
+    def run_simulation(self, force_vector):
+        """ Starts the integrator's default integration
+
+        Args:
+            run_for (int or [time]): number of steps or amount of time to run for
+
+        Returns:
+            moldesign.trajectory.Trajectory
+        """
+        if type(self.integrator) is not mdt.integrators.LAMMPSNvt:
+            raise ValueError('Cannot simulate; no integrator set for %s' % self)
+
+        init_time = self.time
+        traj = self.integrator.run_simulation(force_vector)
+        print 'Done - integrated "%s" from %s to %s' % (self, init_time, self.time)
+        return traj
+
     def calculate(self, requests=None, wait=True, use_cache=True):
         """
         Runs a potential energy calculation on the current geometry, returning the requested quantities.

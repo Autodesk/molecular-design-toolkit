@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import
+
 import moldesign as mdt
 from moldesign import units as u
 from moldesign.molecules import Trajectory
@@ -30,7 +32,7 @@ else:  # this should be configurable
 
 import tempfile
 import os
-import sys
+from copy import deepcopy
 from itertools import islice
 
 def exports(o):
@@ -41,12 +43,17 @@ __all__ = []
 
 @exports
 class LAMMPSNvt(ConstantTemperatureBase):
+
+    NAME_RESULT = "result"
+    NAME_NVT_SIM = "nvt_sim"
     
     # TODO: raise exception if any constraints are requested ...
     def __init__(self, *args, **kwargs):
         super(LAMMPSNvt, self).__init__(*args, **kwargs)
         self._prepped = False # is the model prepped?
-        self.lammps_system = None        
+        self._model = None
+        self.lammps_system = None
+        self.traj = None
         
     def run(self, run_for):
         """
@@ -59,47 +66,66 @@ class LAMMPSNvt(ConstantTemperatureBase):
 
         """
 
+        # Prepare lammps system
         self.prep()
+        self._configure_system()
 
         tot_it = self.time_to_steps(run_for, self.params.timestep)
-        output_freq = self.time_to_steps(self.params.frame_interval, self.params.timestep)
+        if type(self._model) is mdt.models.LAMMPSInteractive:
+            self.params.frame_interval = run_for
+            output_freq = tot_it
+        else:
+            output_freq = self.time_to_steps(self.params.frame_interval, self.params.timestep)
         
         if tot_it < output_freq:
             raise ValueError("Run duration {0} can\'t be smaller than frame interval {1}".format(tot_it, output_freq))
-
-        #int(self.params.frame_interval.value_in(u.fs) / self.params.timestep.value_in(u.fs))
         
         # create temporary file system
         tmpdir = tempfile.mkdtemp()
         saved_umask = os.umask(0077)
-
         result_path = os.path.join(tmpdir, "dump.result")
 
         lmps = self.lammps_system
 
-        lmps.command("dump result all custom {0} {1} id x y z vx vy vz".format(output_freq, result_path))
-        lmps.command("dump_modify result sort id")
-        # lmps.command("thermo_style custom step temp")
-        
-        # Set up trajectory and record the first frame
-        self.mol.time = 0.0 * u.fs
-        lammps_units = self.model.unit_system
-        self.traj = Trajectory(self.mol, unit_system=lammps_units)
-        self.mol.calculate()
+        # TODO: shake not working properly
+        # if self.params.constrain_hbonds and self._model.hbond_group is not None:
+        #     shake_cmd = "fix constrain_hbonds all shake 0.0001 50 0 m {0}".format(self._model.hbond_group)
+        #     # print shake_cmd
+        #     lmps.command(shake_cmd)
+        #     lmps.command("run_style respa 2 2")
+
+        lmps.command("dump {0} all custom {1} {2} id x y z vx vy vz".format(self.NAME_RESULT, output_freq, result_path))
+        lmps.command("dump_modify {0} sort id".format(self.NAME_RESULT))
 
         # run simulation
-        lmps.run(tot_it)
+        lmps.run(tot_it, "post no")
 
+        # Reset lammps system by undumping and unfixing
+        for dmp in lmps.dumps:
+            lmps.command("undump " + dmp.get('name'))
+
+        for fix in lmps.fixes:
+            lmps.command("unfix " + fix.get('name'))
+
+        # Read dynamic simulation results
         dump = open(result_path, "rw+")
         results = dump.readlines()
 
+        # Create trajectory unless interactive model
+        if type(self._model) is not mdt.models.LAMMPSInteractive:
+            self.traj = Trajectory(self.mol, unit_system=self._model.unit_system)
+            self.mol.calculate()
+
         # Dynamics loop
         for istep in xrange(tot_it/output_freq):
-            self.step(istep, results)
+            # Start reading from index 1 since the first round of positions/vectors 
+            # would be the same as the positions before the simulation
+            self.step(istep+1, results)
+            if type(self._model) is not mdt.models.LAMMPSInteractive:
+                self.traj.new_frame()
 
-        lmps.command("undump result")
-        self.lammps_system = lmps
-         
+        self.mol.time += self.time
+
         # securely remove temporary filesystem
         os.remove(result_path)
         os.umask(saved_umask)
@@ -107,9 +133,6 @@ class LAMMPSNvt(ConstantTemperatureBase):
         
         return self.traj
 
-        
-
-    
     def prep(self):
         """
         Prepare the LAMMPS system by configuring it for NVT simulation
@@ -119,45 +142,38 @@ class LAMMPSNvt(ConstantTemperatureBase):
             self.params.timestep (float): timestep length
 
         """
-
-        #if self._prepped and self.model is self.mol.energy_model and self.model._prepped: return
-        
         # prepare lammps model prior to preparing the integrator
-        self.model = self.mol.energy_model
-        self.model.prep()
+        self._model = self.mol.energy_model
+        self._model.prep()
 
         self.time = 0.0 * self.params.timestep
         self._prepped = True
 
+    def _configure_system(self):
         # get lammps object from model
-        lammps_system = self.model.lammps_system
+        lmps = self._model.lammps_system
 
-        # NOTE: Ensure time step is in femtoseconds 
-        lammps_system.command("timestep " + str(self.params.timestep.value_in(u.fs)))
+        # NOTE: Ensure time step is in femtoseconds
+        lmps.command("timestep " + str(self.params.timestep.value_in(u.fs)))
         # print self.params.timestep.value_in(u.fs)
 
-        # TODO:
-        nvt_command = "fix 1 all nvt temp {0} {1} {2}".format(self.params.temperature.value_in(u.kelvin), 
-            self.params.temperature.value_in(u.kelvin), 100.0)
+        nvt_command = "fix {0} all nvt temp {1} {2} {3}".format(self.NAME_NVT_SIM,
+                                                                self.params.temperature.value_in(u.kelvin),
+                                                                self.params.temperature.value_in(u.kelvin), 100.0)
         # print nvt_command
-        lammps_system.command(nvt_command)
+        lmps.command(nvt_command)
 
-        # NOTE: Can you help me figure out the parameters for fix shake?
-        if self.params.constrain_hbonds and self.model.hbond_group is not None:
-            shake_cmd = "fix 2 all rattle 0.0001 20 0 m {0}".format(self.model.hbond_group)
-            # print shake_cmd
-            lammps_system.command(shake_cmd)
+        lmps.command("thermo_style custom step")
+        # lmps.command("thermo 1000")
 
-        lammps_system.command("thermo_style custom step temp")
-        lammps_system.command("thermo 0")
+        self.lammps_system = lmps  # Save lammps configuration
 
-        self.lammps_system = lammps_system
-
-    """
-        Update molecule's position and velocity at each step of the simulation
-
-    """
     def step(self, idx, results):
+        
+        """
+            Update molecule's position and velocity at each step of the simulation
+
+        """
         lmps = self.lammps_system
         # start at 9, stop at 9+L.atoms.natoms
         # start at 14+L.atoms.natoms
@@ -165,7 +181,7 @@ class LAMMPSNvt(ConstantTemperatureBase):
         tmp = list(islice(results, 9*(idx+1) + lmps.atoms.natoms*idx, (lmps.atoms.natoms+9)*(idx+1)))
         pos = list(item.split()[1:4] for item in tmp)
         vel = list(item.split()[4:] for item in tmp)
-        
+
         pos_array = np.array(pos).astype(np.float)
         vel_array = np.array(vel).astype(np.float)
         
@@ -173,13 +189,6 @@ class LAMMPSNvt(ConstantTemperatureBase):
         self.mol.velocities = vel_array * u.angstrom / u.fs
 
         self.time += self.params.frame_interval
-        self.mol.time = self.time
-
-        self.traj.new_frame()
-
-
-    #################################################
-    # "Private" methods for managing LAMMPS are below
 
 
 
