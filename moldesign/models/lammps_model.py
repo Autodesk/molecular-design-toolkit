@@ -437,7 +437,7 @@ class LAMMPSInteractive(EnergyModelBase):
         pos_vector = new_pos
         vel_vector = [p / 125 * 1.0 for p in pos_vector]
         mass = self._affected_atom.mass.value_in(u.amu)
-        self._force_vector = [ v * abs(v)  * mass for v in vel_vector]
+        self._force_vector = [v * abs(v) * mass / 2 for v in vel_vector]
         print self._force_vector
         self._desired_position = self._initial_position + (pos_vector * u.angstrom)
 
