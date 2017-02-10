@@ -59,13 +59,12 @@ class NWChemQM(QMBase):
         parameters['properties'] = list(requests)
         if self.mol.constraints:
             self.write_constraints(parameters)
-        job = pyccc.Job(  # image=mdt.compute.get_image_path(IMAGE),
-                image=IMAGE,
-                command='run.py && getresults.py',
-                inputs={'input.xyz': self.mol.write(format='xyz'),
-                        'params.json': json.dumps(dict(parameters))},
-                when_finished=self.finish,
-                name='nwchem/%s'%self.mol.name)
+        job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
+                        command='run.py && getresults.py',
+                        inputs={'input.xyz': self.mol.write(format='xyz'),
+                                'params.json': json.dumps(dict(parameters))},
+                        when_finished=self.finish,
+                        name='nwchem/%s'%self.mol.name)
         return job
 
     def write_constraints(self, parameters):
@@ -119,13 +118,12 @@ class NWChemQM(QMBase):
         parameters['runType'] = 'minimization'
         if nsteps is not None:
             parameters['minimization_steps'] = 100
-        job = pyccc.Job(  # image=mdt.compute.get_image_path(IMAGE),
-                image=IMAGE,
-                command='run.py && getresults.py',
-                inputs={'input.xyz': self.mol.write(format='xyz'),
-                        'params.json': json.dumps(dict(parameters))},
-                when_finished=self.finish_min,
-                name='nwchem/%s' % self.mol.name)
+        job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
+                        command='run.py && getresults.py',
+                        inputs={'input.xyz': self.mol.write(format='xyz'),
+                                'params.json': json.dumps(dict(parameters))},
+                        when_finished=self.finish_min,
+                        name='nwchem/%s' % self.mol.name)
         return job
 
     def finish_min(self, job):
