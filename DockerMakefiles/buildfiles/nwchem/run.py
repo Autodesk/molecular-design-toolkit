@@ -223,10 +223,10 @@ def _chargeblock(calc):
 
 
 def _theorylines(calc):
+    lines = ['direct']
     if _taskname(calc) == 'dft':
-        return 'XC %s' % calc['functional']
-    else:
-        return ''
+        lines.append('XC %s' % calc['functional'])
+    return '\n'.join(lines)
 
 
 if __name__ == '__main__':
