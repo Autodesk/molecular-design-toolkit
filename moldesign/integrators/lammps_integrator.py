@@ -52,9 +52,12 @@ class LAMMPSNvt(ConstantTemperatureBase):
         super(LAMMPSNvt, self).__init__(*args, **kwargs)
         self._prepped = False # is the model prepped?
         self._model = None
+
         self.lammps_system = None
+        self.total_iter = None      # How many iterations of timesteps before end of simulation
+        self.output_iter = None     # How often we dump the positions of the atoms during the simulation
         self.traj = None
-        
+
     def run(self, run_for):
         """
         Users won't call this directly - instead, use mol.run
@@ -65,21 +68,17 @@ class LAMMPSNvt(ConstantTemperatureBase):
             self.params.timestep (float): timestep length
 
         """
+        self.total_iter = self.time_to_steps(run_for, self.params.timestep)
+        self.output_iter = self.time_to_steps(self.params.frame_interval, self.params.timestep)
+
+        if self.total_iter < self.output_iter:
+            raise ValueError("Run duration {0} "
+                             "can\'t be smaller than frame interval {1}".format(self.total_iter, self.output_iter))
 
         # Prepare lammps system
         self.prep()
         self._configure_system()
 
-        tot_it = self.time_to_steps(run_for, self.params.timestep)
-        if type(self._model) is mdt.models.LAMMPSInteractive:
-            self.params.frame_interval = run_for
-            output_freq = tot_it
-        else:
-            output_freq = self.time_to_steps(self.params.frame_interval, self.params.timestep)
-        
-        if tot_it < output_freq:
-            raise ValueError("Run duration {0} can\'t be smaller than frame interval {1}".format(tot_it, output_freq))
-        
         # create temporary file system
         tmpdir = tempfile.mkdtemp()
         saved_umask = os.umask(0077)
@@ -94,11 +93,12 @@ class LAMMPSNvt(ConstantTemperatureBase):
         #     lmps.command(shake_cmd)
         #     lmps.command("run_style respa 2 2")
 
-        lmps.command("dump {0} all custom {1} {2} id x y z vx vy vz".format(self.NAME_RESULT, output_freq, result_path))
+        lmps.command("dump {0} all custom {1} {2} id x y z vx vy vz".format(self.NAME_RESULT,
+                                                                            self.output_iter, result_path))
         lmps.command("dump_modify {0} sort id".format(self.NAME_RESULT))
 
         # run simulation
-        lmps.run(tot_it, "post no")
+        lmps.run(self.total_iter, "post no")
 
         # Reset lammps system by undumping and unfixing
         for dmp in lmps.dumps:
@@ -111,17 +111,21 @@ class LAMMPSNvt(ConstantTemperatureBase):
         dump = open(result_path, "rw+")
         results = dump.readlines()
 
-        # Create trajectory unless interactive model
-        if type(self._model) is not mdt.models.LAMMPSInteractive:
+        # Create trajectory only if total iteration is greater than output iteration
+        # i.e. more than one set of positions being captured
+        if self.total_iter > self.output_iter:
             self.traj = Trajectory(self.mol, unit_system=self._model.unit_system)
             self.mol.calculate()
 
         # Dynamics loop
-        for istep in xrange(tot_it/output_freq):
+        for istep in xrange(self.total_iter/self.output_iter):
             # Start reading from index 1 since the first round of positions/vectors 
             # would be the same as the positions before the simulation
             self.step(istep+1, results)
-            if type(self._model) is not mdt.models.LAMMPSInteractive:
+
+            # Create trajectory only if total iteration is greater than output iteration
+            # i.e. more than one set of positions being captured
+            if self.total_iter > self.output_iter:
                 self.traj.new_frame()
 
         self.mol.time += self.time
@@ -147,6 +151,7 @@ class LAMMPSNvt(ConstantTemperatureBase):
         self._model.prep()
 
         self.time = 0.0 * self.params.timestep
+
         self._prepped = True
 
     def _configure_system(self):
