@@ -372,8 +372,9 @@ class LAMMPSPotential(EnergyModelBase):
 
 @exports
 class LAMMPSInteractive(EnergyModelBase):
-    NAME_AFFECTED_ATOM = "affected_atom"
+    NAME_AFFECTED_ATOMS = "affected_atom"
     NAME_NEARBY_ATOMS = "nearby_atoms"
+    NUM_AFFECTED_RADIUS = 5
 
     PARAMETERS = [
         mdt.parameters.Parameter(
@@ -385,12 +386,12 @@ class LAMMPSInteractive(EnergyModelBase):
         self._potential_model = None
         self._calculated_properties = None
 
-        self._affected_atom = None
-        self._force_vector = None
-        self._initial_position = None
-        self._saved_positions = None
-        self._desired_position = None
-        self._stretch_factor = None
+        self._affected_atom = None  # atom that the user is directly interacting with
+        self._force_vector = None   # force that acts on the molecule
+        self._initial_position = None   # initial position of atom that the user is interacting with
+        self._saved_positions = []  # Saved positions of the affected atom and its nearby atoms
+        self._desired_position = None   # desired position of the affected atom
+        self._stretch_factor = None     # stretch factor of the affected atom's neighbor atoms due to indirect force
 
         self.lammps_system = None   # LAMMPS object for this molecule
         self.hbond_group = None
@@ -417,16 +418,20 @@ class LAMMPSInteractive(EnergyModelBase):
         if self._desired_position is None:
             raise ValueError("Can't call reset position before running any interactive simulation!")
 
-        # for i in xrange(10):
-        self._saved_positions = self.mol.positions[self._affected_atom.index].copy()
-        self.mol.positions[self._affected_atom.index] = self._desired_position
+        # Save positions after simulation
+        for idx in range(0, self.NUM_AFFECTED_RADIUS*2+1):
+            nearby_atom_pos = self.mol.positions[self._affected_atom.index - self.NUM_AFFECTED_RADIUS + idx].copy()
+            if traj is not None:
+                nearby_atom_pos = traj.positions[self._affected_atom.index - self.NUM_AFFECTED_RADIUS + idx].copy()
 
+            self._saved_positions.insert(idx, nearby_atom_pos)
+
+        # render appropriate positions to affected atom + nearby atoms
+        self.mol.positions[self._affected_atom.index] = self._desired_position
         if traj is not None:
-            self._saved_positions = traj.positions[self._affected_atom.index].copy()
             traj.positions[self._affected_atom.index] = self._desired_position
 
-        # render appropriate positions affected atom + nearby atoms
-        for i in xrange(10):
+        for i in xrange(self.NUM_AFFECTED_RADIUS):
             self.mol.positions[self._affected_atom.index - (i + 1)] += self._stretch_factor.copy()
             self.mol.positions[self._affected_atom.index + (i + 1)] += self._stretch_factor.copy()
 
@@ -444,7 +449,10 @@ class LAMMPSInteractive(EnergyModelBase):
         if self._saved_positions is None:
             raise ValueError("Can't finish interaction if haven't run any!")
 
-        self.mol.positions[self._affected_atom.index] = self._saved_positions
+        # Save positions after simulation
+        for idx in range(0, self.NUM_AFFECTED_RADIUS*2+1):
+            saved_pos = self._saved_positions[idx];
+            self.mol.positions[self._affected_atom.index - self.NUM_AFFECTED_RADIUS + idx] = saved_pos
 
     def apply_force(self, new_pos):
         '''
@@ -453,12 +461,11 @@ class LAMMPSInteractive(EnergyModelBase):
         '''
         pos_vector = new_pos.value_in(u.angstrom)
         pointer_vector = [10 * p / abs(p) if p != 0.0 else p for p in pos_vector]
-        vel_vector = [p / 75 * 1.0 for p in pos_vector]
+        vel_vector = [p / 65 * 1.0 for p in pos_vector]
         mass = self._affected_atom.mass.value_in(u.amu)
         self._force_vector = [v * abs(v) * mass / 2 for v in vel_vector]
-        # self._force_vector = [p / 10 if p != 0.0 else p for p in pos_vector]
         self._desired_position = self._initial_position + (pointer_vector * u.angstrom)
-        self._stretch_factor = [p / 3 for p in pointer_vector] * u.angstrom
+        self._stretch_factor = [p / 2 for p in pointer_vector] * u.angstrom
 
     def prep(self):
         """
@@ -481,7 +488,9 @@ class LAMMPSInteractive(EnergyModelBase):
             lmps = self.lammps_system
             self._affected_atom = self.params.affected_atom
             self._initial_position = self.mol.positions[self._affected_atom.index].copy()
-            group_atom = "group {0} id {1}:{2}".format(self.NAME_AFFECTED_ATOM, self._affected_atom.index-9, self._affected_atom.index+11)
+            group_atom = "group {0} id {1}:{2}".format(self.NAME_AFFECTED_ATOMS,
+                                                       self._affected_atom.index - self.NUM_AFFECTED_RADIUS + 1,
+                                                       self._affected_atom.index + self.NUM_AFFECTED_RADIUS + 1)
             lmps.command(group_atom.rstrip())
 
             # Get settings from lammps model
@@ -493,20 +502,20 @@ class LAMMPSInteractive(EnergyModelBase):
             lmps = self.lammps_system
             force_vector = self._force_vector
             print force_vector
-            lmps.command("fix apply_user_force {0} addforce {1} {2} {3}"
-                         .format(self.NAME_AFFECTED_ATOM, force_vector[0], force_vector[1], force_vector[2]))
+            # lmps.command("fix apply_user_force {0} addforce {1} {2} {3}"
+            #              .format(self.NAME_AFFECTED_ATOMS, force_vector[0], force_vector[1], force_vector[2]))
 
-            # lmps.command("fix apply_user_force all addforce {0} {1} {2}".format(force_vector[0],
-            #                                                                     force_vector[1],
-            #                                                                     force_vector[2]))
+            lmps.command("fix apply_user_force all addforce {0} {1} {2}".format(force_vector[0],
+                                                                                force_vector[1],
+                                                                                force_vector[2]))
 
         # Dump positions only once throughout the simulation
-        # if type(self.mol.integrator) is mdt.integrators.LAMMPSNvt:
-        #     self.mol.integrator.output_iter = self.mol.integrator.total_iter
 
         # Reset to chemically stable position before resuming interactive simulation
-        if self._saved_positions is not None:
-            self.mol.positions[self._affected_atom.index] = self._saved_positions
+        if self._saved_positions:
+            for idx in range(0, self.NUM_AFFECTED_RADIUS*2+1):
+                saved_pos = self._saved_positions[idx]
+                self.mol.positions[self._affected_atom.index - self.NUM_AFFECTED_RADIUS + idx] = saved_pos
 
         self._prepped = True
 
