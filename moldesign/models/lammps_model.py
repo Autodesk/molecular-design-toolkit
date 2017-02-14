@@ -234,9 +234,9 @@ class LAMMPSPotential(EnergyModelBase):
         #         zlo = min(zlo, atom.z.value_in(u.angstrom))
         #         zhi = max(zhi, atom.z.value_in(u.angstrom))
 
-        datalines += "{0} {1} xlo xhi\r\n".format(-50, 100)
-        datalines += "{0} {1} ylo yhi\r\n".format(-50, 100)
-        datalines += "{0} {1} zlo zhi\r\n".format(-50, 100)
+        datalines += "{0} {1} xlo xhi\r\n".format(-200, 200)
+        datalines += "{0} {1} ylo yhi\r\n".format(-200, 200)
+        datalines += "{0} {1} zlo zhi\r\n".format(-200, 200)
 
         datalines += "\r\n"
 
@@ -415,11 +415,11 @@ class LAMMPSInteractive(EnergyModelBase):
             raise ValueError("Can't call reset position before running any interactive simulation!")
 
         self._saved_position = self.mol.positions[self._affected_atom.index].copy()
+        self.mol.positions[self._affected_atom.index] = self._desired_position
 
         if traj is not None:
+            self._saved_position = traj.positions[self._affected_atom.index].copy()
             traj.positions[self._affected_atom.index] = self._desired_position
-
-        self.mol.positions[self._affected_atom.index] = self._desired_position
 
     def finish_interaction(self):
         '''
@@ -430,16 +430,16 @@ class LAMMPSInteractive(EnergyModelBase):
         '''
         if self._saved_position is None:
             raise ValueError("Can't finish interaction if haven't run any!")
-    
-        self.mol.positions[self._affected_atom.index] = self._saved_position.copy()
+
+        self.mol.positions[self._affected_atom.index] = self._saved_position
 
     def apply_force(self, new_pos):
         '''
             :param new_pos: amount by which we want to change the selected atom's position
             Call this function each time user applies a different force (i.e. move the mouse cursor somewhere else)
         '''
-        pos_vector = new_pos
-        vel_vector = [p / 125 * 1.0 for p in pos_vector]
+        pos_vector = new_pos.value_in(u.angstrom)
+        vel_vector = [p / 150 * 1.0 for p in pos_vector]
         mass = self._affected_atom.mass.value_in(u.amu)
         self._force_vector = [v * abs(v) * mass / 2 for v in vel_vector]
         print self._force_vector
@@ -477,12 +477,15 @@ class LAMMPSInteractive(EnergyModelBase):
         if self._force_vector is not None:
             lmps = self.lammps_system
             force_vector = self._force_vector
-            lmps.command("fix apply_user_force {0} addforce {1} {2} {3}"
-                         .format(self.NAME_AFFECTED_ATOM, force_vector[0], force_vector[1], force_vector[2]))
+            # lmps.command("fix apply_user_force {0} addforce {1} {2} {3}"
+            #              .format(self.NAME_AFFECTED_ATOM, force_vector[0], force_vector[1], force_vector[2]))
+            lmps.command("fix apply_user_force all addforce {0} {1} {2}".format(force_vector[0],
+                                                                                force_vector[1],
+                                                                                force_vector[2]))
 
         # Dump positions only once throughout the simulation
-        if type(self.mol.integrator) is mdt.integrators.LAMMPSNvt:
-            self.mol.integrator.output_iter = self.mol.integrator.total_iter
+        # if type(self.mol.integrator) is mdt.integrators.LAMMPSNvt:
+        #     self.mol.integrator.output_iter = self.mol.integrator.total_iter
 
         # Reset to chemically stable position before resuming interactive simulation
         if self._saved_position is not None:
