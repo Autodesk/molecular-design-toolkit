@@ -92,11 +92,11 @@ class NWChemQM(QMBase):
         assert len(results['states']) == 1
         jsonprops = results['states'][0]['calculated']
         result = mdt.MolecularProperties(self.mol,
-                                         **self._get_properties(jsonprops))
+                                         **self._json_to_quantities(jsonprops))
         return result
 
     @staticmethod
-    def _get_properties(jsonprops):
+    def _json_to_quantities(jsonprops):
         props = {}
         for name, property in jsonprops.iteritems():
             if isinstance(property, dict) and len(property) == 2 and \
@@ -128,11 +128,15 @@ class NWChemQM(QMBase):
 
     def finish_min(self, job):
         # TODO: parse more data than just the final minimization state
-        properties = self.finish(job)
         traj = mdt.Trajectory(self.mol)
         traj.new_frame()
-        self.mol.positions = properties.positions
-        self.mol.properties = properties
+
+        results = json.loads(job.get_output('results.json').read())
+        new_state = self._json_to_quantities(results['states'][0])
+        properties = self._process_results(results)
+
+        self.mol.positions = new_state['positions']
+        self.mol.properties = self._process_results(results)
         traj.new_frame()
         return traj
 
