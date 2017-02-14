@@ -98,9 +98,7 @@ class LAMMPSNvt(ConstantTemperatureBase):
         lmps.command("dump_modify {0} sort id".format(self.NAME_RESULT))
 
         # run simulation
-        print "About to run\r\n"
         lmps.run(self.total_iter, "post no")
-        print "Done\r\n"
 
         # Reset lammps system by undumping and unfixing
         for dmp in lmps.dumps:
