@@ -1,11 +1,13 @@
 """ Tests basic QM functionality and data structures
 """
-
+import itertools
 import pytest
 import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
+
+from . import helpers
 
 registered_types = {}
 
@@ -25,7 +27,7 @@ def typedfixture(*types, **kwargs):
     return fixture_wrapper
 
 
-@typedfixture('molecule')
+@typedfixture('molecule', scope='function')
 def h2():
     mol = mdt.Molecule([mdt.Atom('H'),
                         mdt.Atom('H')])
@@ -33,13 +35,51 @@ def h2():
     return mol
 
 
-@typedfixture('molecule')
+@typedfixture('molecule', scope='function')
 def heh_plus():
     mol = mdt.Molecule([mdt.Atom('H'),
                         mdt.Atom('He')])
     mol.atoms[1].z = 1.0 * u.angstrom
     mol.charge = 1 * u.q_e
     return mol
+
+
+# Note that this is an incomplete set of models
+models_to_test = list(itertools.product((mdt.models.NWChemQM, mdt.models.PySCFPotential),
+                                        'sto-3g 6-31g'.split(),
+                                        'rhf rks'.split()))
+model_ids = ['/'.join((model.__name__, theory, basis)) for (model, theory, basis) in models_to_test]
+
+
+@pytest.fixture(params=models_to_test, ids=model_ids, scope='function')
+def h2_with_model(request, h2):
+    model, basis, theory = request.param
+    h2.set_energy_model(model, basis=basis, theory=theory)
+    return h2
+
+
+def test_minimization_trajectory(h2_with_model):
+    helpers.minimization_tester(h2_with_model)
+
+
+@typedfixture('model')
+def pyscf_rhf():
+    return mdt.models.PySCFPotential(basis='sto-3g', theory='rhf')
+
+
+@typedfixture('model')
+def pyscf_dft():
+    return mdt.models.PySCFPotential(basis='sto-3g', theory='rks', functional='b3lyp')
+
+
+@typedfixture('model')
+def nwchem_rhf():
+    return mdt.models.NWChemQM(basis='sto-3g', theory='rhf', functional='b3lyp')
+
+
+@typedfixture('model')
+def nwchem_dft():
+    return mdt.models.NWChemQM(basis='sto-3g', theory='rks', functional='b3lyp')
 
 
 @pytest.mark.parametrize('objkey', registered_types['molecule'])
@@ -80,4 +120,3 @@ def test_pyscf_rhf_sto3g_forces(objkey, request):
     forces = mol.calc_forces()
 
     assert forces.shape == (mol.num_atoms, 3)
-

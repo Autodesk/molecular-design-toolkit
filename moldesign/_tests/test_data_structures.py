@@ -331,6 +331,7 @@ def copy_atoms_from_h2_harmonic(h2_harmonic):
     atoms = h2_harmonic.atoms.copy()
     return atoms
 
+
 @typedfixture('molecule')
 def h2_harmonic_thats_been_copied(h2_harmonic):
     temp = mdt.Molecule(h2_harmonic)

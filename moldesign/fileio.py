@@ -137,6 +137,14 @@ def write(obj, filename=None, format=None, mode='w'):
         fileobj.close()
 
 
+def write_xyz(mol, fileobj):
+    print >> fileobj, "   %d" % mol.num_atoms
+    print >> fileobj, mol.name
+    for atom in mol.atoms:
+        x, y, z = atom.position.value_in(mdt.units.angstrom)
+        print >> fileobj, "%s   %24.14f   %24.14f   %24.14f" % (atom.element, x, y, z)
+
+
 @utils.exports
 def write_trajectory(traj, filename=None, format=None, overwrite=True):
     """ Write trajectory a file (if filename provided) or file-like buffer
@@ -386,7 +394,8 @@ READERS = {'pdb': read_pdb,
            'xyz': read_xyz}
 
 WRITERS = {'pdb': write_pdb,
-           'mmcif': write_mmcif}
+           'mmcif': write_mmcif,
+           'xyz': write_xyz}
 
 PICKLE_EXTENSIONS = set("p pkl pickle mdt".split())
 COMPRESSION = {'gz': gzip.open,
