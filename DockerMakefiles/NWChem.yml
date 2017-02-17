@@ -32,7 +32,7 @@ nwchem_build:
  build: |
     RUN         apt-get install -y patch curl perl
     WORKDIR      /opt
-    ENV          NWCHEM_MODULES="nwdft driver stepper" \
+    ENV          NWCHEM_MODULES="nwdft driver stepper mm qmmm nwmd" \
                    PYTHONVERSION=2.7 \
                    PYTHONHOME="/usr" \
                    USE_PYTHONCONFIG=Y \
@@ -48,22 +48,21 @@ nwchem_build:
                    && cd nwchem \
                    && svn co --depth empty https://svn.pnl.gov/svn/nwchem/trunk/src \
                    && cd src \
-                   && svn update GNUmakefile nwchem.F config \
-                        tools include basis geom inp input  \
+                   && svn update GNUmakefile nwchem.F config mm qmmm nwmd \
+                        tools include basis geom inp input qhop fft cafe \
                         pstat rtdb task symmetry util peigs perfm bq cons blas lapack \
-                        NWints atomscf cphf ddscf driver gradients hessian nwdft optim property stepper symmetry vib \
+                        NWints atomscf cphf ddscf driver gradients hessian nwdft \
+                        optim property stepper symmetry vib space \
                    && rm -rf /opt/nwchem/.svn \
                    && cd tools \
                    && svn export --non-interactive --username nwchem --password nwchem \
                           https://svn.pnl.gov/svn/hpctools/branches/ga-5-5  \
                    && cd .. \
-                   #strip native compiler options as Fedora does
                    && sed -i 's|-march=native||' config/makefile.h \
                    && sed -i 's|-mtune=native|-mtune=generic|' config/makefile.h \
                    && sed -i 's|-mfpmath=sse||' config/makefile.h \
                    && sed -i 's|-msse3||' config/makefile.h  \
-                   && make nwchem_config && make -j3  \
-                   #clean unnecessary source to reduce docker size
+                   && make nwchem_config && make -j 8  \
                    && rm -rf tce tools nwdft NWints geom symmetry util nwxc ddscf lapack blas rism \
                           argos peigs rmdft gradients symmetry property smd lucia dplot propery \
                           hessian ccsd mp2_grad moints cafe analyz dimqm /opt/nwchem/lib
@@ -82,11 +81,14 @@ nwchem:
     - python_deploy_base
     - nwchem_requirements
   build: |
-    COPY run.sh run.py getresults.py /usr/bin/
-    RUN chmod +x /usr/bin/getresults.py /usr/bin/run.py /usr/bin/run.sh
     RUN pip install pint
     ENV NWCHEMFILE="From https://svn.pnl.gov/svn/nwchem/trunk/src"
     ENV PYTHONPATH=$PYTHONPATH:/opt
+    COPY run.py runqmmm.py getresults.py /usr/local/bin/
+    RUN chmod +x /usr/local/bin/getresults.py \
+     /usr/local/bin/run.py \
+     /usr/local/bin/runqmmm.py
+
   copy_from:
     nwchem_build:
       /usr/local/lib/python2.7/dist-packages: /usr/local/lib/python2.7/
