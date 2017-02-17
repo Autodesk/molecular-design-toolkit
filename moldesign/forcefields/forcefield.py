@@ -12,6 +12,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import moldesign as mdt
+from moldesign import units as u
+
+
+class ForceField(object):
+    def __init__(self, mol, amber_params=None, parmed_obj=None):
+        if sum(x is not None
+               for x in (amber_params, parmed_obj)) > 1:
+            raise ValueError('Multiple forcefield definitions passed to %s object'
+                             % self.__class__.__name__)
+
+        self.mol = mol
+        self.amber_params = self.parmed_obj = self._source_of_truth = None
+
+        if amber_params is not None:
+            self.amber_params = amber_params
+            self._source_of_truth = 'amber_params'
+        elif parmed_obj is not None:
+            self.parmed_obj = parmed_obj
+            self._source_of_truth = 'parmed_obj'
+
+    def to_parmed(self):
+        """ Convert parameters to a parmed structure
+
+        Returns:
+            parmed.Structure: a ParmEd object with this parameter set
+        """
+        if self._source_of_truth == 'parmed_obj':
+            return self.parmed_obj
+        elif self._source_of_truth == 'amber_params':
+            import parmed, os, tempfile
+
+            prmtoppath = os.path.join(tempfile.mkdtemp(), 'prmtop')
+            self.amber_params.prmtop.put(prmtoppath)
+            pmd = parmed.load_file(prmtoppath,
+                                   xyz=self.mol.positions.value_in(u.angstrom))
+            return pmd
 
 class FFTerm(object):
     pass

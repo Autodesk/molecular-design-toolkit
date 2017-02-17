@@ -990,7 +990,7 @@ class Molecule(AtomGroup,
             self.name = self.get_stoichiometry()
 
         self._properties = MolecularProperties(self)
-        self.ff = utils.DotDict()
+        self.ff = None
 
     def _get_initializing_atoms(self, atomcontainer, name, copy_atoms):
         """ Make a copy of the passed atoms as necessary, return the name of the molecule
