@@ -127,7 +127,14 @@ class LAMMPSPotential(EnergyModelBase):
         # create temporary file system
         tmpdir = tempfile.mkdtemp()
         saved_umask = os.umask(0077)
-        dataPath = self.create_lammps_data(tmpdir)
+        fromatted_data = self.format_lammps_data()
+
+        # Create temperary data file
+        predictable_filename = 'data.lammps_mol'
+        data_path = os.path.join(tmpdir, predictable_filename)
+
+        with open(data_path, "w") as lammps_data:
+            lammps_data.write(fromatted_data)
 
         pylmp.command("units real")
         pylmp.command("dimension 3")
@@ -138,13 +145,13 @@ class LAMMPSPotential(EnergyModelBase):
         pylmp.command("dihedral_style harmonic")
         pylmp.command("improper_style harmonic")
         pylmp.command("kspace_style pppm 0.0001")
-        pylmp.command("read_data " + dataPath)
+        pylmp.command("read_data " + data_path)
 
         pylmp.command("neighbor    2.0 bin")
         # pylmp.command("neigh_modify    delay 5")
 
         # securely remove temporary filesystem
-        os.remove(dataPath)
+        os.remove(data_path)
         os.umask(saved_umask)
         os.rmdir(tmpdir)
 
@@ -171,22 +178,14 @@ class LAMMPSPotential(EnergyModelBase):
 
     # See http://parmed.github.io/ParmEd/html/index.html for ParmEd units
     
-    def create_lammps_data(self, tmp_dir):
+    def format_lammps_data(self):
         """
-        Create a data. file that contains all necessary information regarding the molecule
-        in order to create the appropirate LAMMPS system for it
-        
-        Arguments:
-            tmpdir: temporary directory to store the data file
+        Parse molecule and force fields info to generate a formatted data
 
         """    
         # Create parmed object
         self.mol.ff.amber_params.prmtop.put('/tmp/tmp.prmtop')
         parmedmol = med.load_file('/tmp/tmp.prmtop')
-
-        # Create temperary data file
-        predictable_filename = 'data.lammps_mol'
-        path = os.path.join(tmp_dir, predictable_filename)
 
         datalines =  ""
         datalines += "LAMMPS Description\r\n\r\n"
@@ -363,12 +362,7 @@ class LAMMPSPotential(EnergyModelBase):
             
             datalines += "\r\n"
 
-        with open(path, "w") as lammps_data:   
-            lammps_data.write(datalines)
-        
-        # print datalines
-
-        return path
+        return datalines
 
 @exports
 class LAMMPSInteractive(EnergyModelBase):
