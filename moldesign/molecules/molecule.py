@@ -713,7 +713,7 @@ class MolSimulationMixin(object):
 
         # Figure out what needs to be calculated,
         # and either launch the job or set the result
-        to_calculate = set(requests + self.energy_model.DEFAULT_PROPERTIES)
+        to_calculate = set(list(requests) + self.energy_model.DEFAULT_PROPERTIES)
         if use_cache:
             to_calculate = to_calculate.difference(self.properties)
         if len(to_calculate) == 0:
