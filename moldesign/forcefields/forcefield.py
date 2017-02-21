@@ -30,12 +30,19 @@ class ForceField(object):
         import parmed
 
         self.mol = mol
+
         if isinstance(ffobj, parmed.Structure):
             self.parmed_obj = ffobj.copy(ffobj.__class__)
+            self.sourcedata = ffobj
         elif hasattr(ffobj, 'to_parmed'):
+            self.sourcedata = ffobj
             self.parmed_obj = ffobj.to_parmed()
         else:
             raise ValueError('Unrecognized force field class "%s"' % ffobj.__class__.__name__)
+
+    def copy_to(self, mol):
+        mol.ff = self.__class__(mol, self.parmed_obj)
+        return mol.ff
 
     def get_atom_terms(self, atom):
         return AtomTerms(atom, self.parmed_obj.atoms[atom.index])
