@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import re
+import os
+import tempfile
 
 import moldesign as mdt
 import pyccc
@@ -32,6 +34,13 @@ class AmberParameters(object):
         self.prmtop = prmtop
         self.inpcrd = inpcrd
         self.job = job
+
+    def to_parmed(self):
+        import parmed
+        prmtoppath = os.path.join(tempfile.mkdtemp(), 'prmtop')
+        self.prmtop.put(prmtoppath)
+        pmd = parmed.load_file(prmtoppath)
+        return pmd
 
 
 class ExtraAmberParameters(object):
@@ -276,7 +285,7 @@ def assign_forcefield(mol, **kwargs):
         inpcrd = job.get_output('output.inpcrd')
         params = AmberParameters(prmtop, inpcrd, job)
         newmol = mdt.read_amber(params.prmtop, params.inpcrd)
-        newmol.ff = mdt.forcefields.ForceField(newmol, amber_params=params)
+        newmol.ff = mdt.forcefields.ForceField(newmol, params)
     else:
         newmol = None
 

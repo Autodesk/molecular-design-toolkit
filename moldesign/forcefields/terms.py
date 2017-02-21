@@ -17,8 +17,13 @@ import math
 import numpy as np
 
 from moldesign import units as u
-from moldesign.forcefields.forcefield import FFTerm
 from moldesign.geom import coords as geo
+
+
+# TODO: These object needs to be rationalized into the parmed-based ForceField class
+
+class FFTerm(object):
+    pass
 
 
 class HarmonicBondTerm(FFTerm):
