@@ -53,14 +53,7 @@ class AtomPropertyMixin(object):
         """ moldesign.utils.DotDict: This atom's force field parameters, if available (``None``
         otherwise)
         """
-        try:
-            ff = self.molecule.energy_model.mdtforcefield
-        except AttributeError:
-            return None
-        if ff is None: return None
-
-        return utils.DotDict(partialcharge=ff.partial_charges[self],
-                             lj=ff.lennard_jones[self])
+        return self.molecule.ff.get_atom_terms(self)
 
     @property
     def basis_functions(self):
@@ -155,7 +148,8 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
     #################################################################
     # Methods for BUILDING the atom and indexing it in a molecule
     def __init__(self, name=None, atnum=None, mass=None, chain=None, residue=None,
-                 formal_charge=None, pdbname=None, pdbindex=None, element=None):
+                 formal_charge=None, pdbname=None, pdbindex=None, element=None,
+                 metadata=None):
 
         # Allow user to instantiate an atom as Atom(6) or Atom('C')
         if atnum is None and element is None:
@@ -183,6 +177,9 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         self._momentum = np.zeros(3) * (u.default.length*
                                        u.default.mass/u.default.time)
         self._bond_graph = {}
+        self.metadata = mdt.utils.DotDict()
+        if metadata:
+            self.metadata.update(metadata)
 
     def __str__(self):
         desc = '%s %s (elem %s)' % (self.__class__.__name__, self.name, self.elem)
