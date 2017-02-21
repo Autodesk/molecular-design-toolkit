@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import itertools
+import json
 import numpy as np
 
 import pyccc
+
+import moldesign as mdt
 
 from moldesign.utils import exports
 from moldesign import units as u
@@ -59,7 +62,7 @@ class NWChemQM(JsonModelBase, QMBase):
 @exports
 class NWChemQMMM(NWChemQM):
     """ Interface with NWChem package for QM/MM only. Note that this is currently only set up for
-    optimizations
+    optimizations, and only of the QM geometry - the MM region cannot move.
     """
     IMAGE = 'nwchem'
     MODELNAME = 'nwchem_qmmmm'
@@ -145,3 +148,22 @@ class NWChemQMMM(NWChemQM):
         lines.append('end')
 
         return pyccc.files.StringContainer('\n'.join(lines))
+
+
+    def finish_min(self, job):
+        traj = mdt.Trajectory(self.mol)
+        traj.new_frame()
+
+        results = json.loads(job.get_output('results.json').read())
+        new_state = self._json_to_quantities(results['states'][0])
+
+        for iatom in sorted(self.params.qm_indices):
+            for position in new_state['positions']:
+                self.mol.atoms[iatom].position = position
+
+        properties = self._process_results(results)
+        properties.positions = self.mol.positions
+        self.mol.properties = properties
+        traj.new_frame()
+        return traj
+

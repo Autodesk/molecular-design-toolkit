@@ -148,14 +148,11 @@ class QMBase(EnergyModelBase):
 
 
 class QMMMBase(EnergyModelBase):
-    DEFAULT_PROPERTIES = ['potential_energy',
-                          'qm_energy',
-                          'mm_energy',
-                          'interaction_energy'
-                          'qm_dipole_moment',
-                          'orbitals',
-                          'orbital_energies']
-    ALL_PROPERTIES = DEFAULT_PROPERTIES
+    # DEFAULT_PROPERTIES = ['potential_energy',
+    #                       'forces',
+    #                       'qm_props',
+    #                       'mm_props']
+    # ALL_PROPERTIES = DEFAULT_PROPERTIES
 
     PARAMETERS = MMBase.PARAMETERS + QMBase.PARAMETERS
 
