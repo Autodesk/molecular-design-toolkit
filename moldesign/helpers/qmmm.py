@@ -62,7 +62,7 @@ def _get_mm_nbr(mol, qmatom, qmset):
         print ('WARNING: QM/MM bond involving non-carbon atoms: %s - %s' %
                (qmatom, mmatom))
     mm_qm_nbrs = [qmnbr for qmnbr in mmatom.bonded_atoms
-                  if mmatom in qmset]
+                  if qmnbr in qmset]
     if len(mm_qm_nbrs) != 1:
         raise ValueError('MM atom %s is bonded to more than one QM atom'%mmatom)
     return mmatom
@@ -85,7 +85,8 @@ def set_link_atom_positions(linkatoms):
         http://www.nwchem-sw.org/index.php/Qmmm_link_atoms
     """
     for atom in linkatoms:
-        nbr = atom.metadata.qmatom
+        nbr = atom.metadata.mmpartner
         proxy = atom.metadata.mmatom
         dist = LINKBONDRATIO * nbr.distance(proxy)
-        atom.position = nbr.position + dist * mdt.normalized(proxy.position - nbr.position)
+        atom.position = (nbr.position +
+                         dist * mdt.mathutils.normalized(proxy.position - nbr.position))

@@ -122,8 +122,8 @@ class QMMMEmbeddingBase(QMMMBase):
         fullforces[mmatom.index] += (1.0-p) * linkatom.force
 
     def _set_qm_positions(self):
-        for atom in self.qmmol.atoms:
-            atom.position = atom.metadata.real_atom.position
+        for qmatom, realatom in zip(self.qmmol.atoms, self.qm_atoms):
+            qmatom.position = realatom.position
         mdt.helpers.qmmm.set_link_atom_positions(self.qm_link_atoms)
 
     def _term_in_qm_system(self, t, numatoms):

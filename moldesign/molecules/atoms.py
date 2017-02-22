@@ -53,7 +53,10 @@ class AtomPropertyMixin(object):
         """ moldesign.utils.DotDict: This atom's force field parameters, if available (``None``
         otherwise)
         """
-        return self.molecule.ff.get_atom_terms(self)
+        if self.molecule.ff is None:
+            return None
+        else:
+            return self.molecule.ff.get_atom_terms(self)
 
     @property
     def basis_functions(self):

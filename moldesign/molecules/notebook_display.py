@@ -108,12 +108,12 @@ class AtomNotebookMixin(object):
             lines.append('**Basis functions:**<br>' + '<br>'.join(map(str,self.basis_functions)))
 
         if self.ff:
-            lines.append('**Forcefield partial charge**: %s' % self.ff.partialcharge)
+            lines.append('\n**Forcefield partial charge**: %s' % self.ff.partial_charge)
             # TODO: deal with other LJ types, e.g., AB?
             lines.append(u'**Forcefield LJ params**: '
                          u'\u03C3=%s, \u03B5=%s' % (
-                             self.ff.lj.sigma.defunits(),
-                             self.ff.lj.epsilon.defunits()))
+                             self.ff.ljsigma.defunits(),
+                             self.ff.ljepsilon.defunits()))
 
         # position and momentum
         table = utils.MarkdownTable('', 'x', 'y', 'z')
