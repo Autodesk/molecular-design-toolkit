@@ -37,6 +37,20 @@ class Monitor(object):
     def gradient(self):
         return grads._atom_grad_to_mol_grad(self.atoms, self.GRAD(*self.atoms))
 
+    @property
+    def ffterm(self):
+        """ mdt.forcefields.ForceFieldTerm: term associated with this quantity
+
+        Raises:
+            ValueError: if this quantity is not associated with a molecule or a forcefield
+        """
+        mol = self.atoms[0].molecule
+        for atom in self.atoms[1:]:
+            if atom.molecule is not mol:
+                raise ValueError('These atoms are not part of the same molecule')
+
+        return mol.ff.get_term(*self.atoms)
+
     @mdt.utils.kwargs_from(constraints.GeometryConstraint)
     def constrain(self, **kwargs):
         """ Constrain this coordinate.

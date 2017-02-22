@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import moldesign as mdt
-from moldesign import units as u
 from moldesign.molecules import MolecularProperties
 
 from .base import QMMMBase
@@ -33,25 +32,34 @@ class QMMMEmbeddingBase(QMMMBase):
         self.mmmol = None
         self.qm_atoms = None
         self.qm_link_atoms = None
+        self._qm_index_set = None
 
     # TODO: add `qm_atom_indices` to QMMMBase parameters
-    # TODO: add `subsystem_atom_indices` to MMBase parameters
 
     def calculate(self, requests):
+        self.prep()
+
         self.mmmol.positions = self.mol.positions
         self._set_qm_positions()
 
         qmprops = self.qmmol.calculate(requests)
         mmprops = self.mmmol.calculate(requests)
 
+        potential_energy = mmprops.potential_energy+qmprops.potential_energy
+        forces = mmprops.forces.copy()
+        for iatom, realatom in enumerate(self.qm_atoms):
+            forces[realatom.index] = qmprops.forces[iatom]
+        for atom in self.qm_link_atoms:
+            self._distribute_linkatom_forces(forces, atom)
+
         properties = MolecularProperties(self.mol,
                                          mmprops=mmprops,
-                                         qmprops=qmprops)
+                                         qmprops=qmprops,
+                                         wfn=qmprops.wfn,
+                                         potential_energy=potential_energy,
+                                         forces=forces)
 
-        for additive_prop in ('potential_energy', 'forces'):
-            properties['additive_prop'] = (qmprops[additive_prop] +
-                                           mmprops[additive_prop] -
-                                           mmprops.qm_system[additive_prop])
+        return properties
 
     def prep(self):
         if self._prepped:
@@ -62,14 +70,12 @@ class QMMMEmbeddingBase(QMMMBase):
         self._qm_index_set = set(self.params.qm_atom_indices)
 
         self.qmmol = self._setup_qm_subsystem()
+
         self.mmmol = mdt.Molecule(self.mol,
                                   name='%s MM subsystem' % self.mol.name)
-        # Disabled due to https://github.com/ParmEd/ParmEd/issues/839
-        # self.mol.ff.copy_to(self.mmmol)
-        self.mmmol.ff = mdt.forcefields.ForceField(self.mmmol, self.mol.ff.sourcedata)
-
+        self.mol.ff.copy_to(self.mmmol)
+        self._turn_off_qm_forcefield(self.mmmol.ff)
         self.mmmol.set_energy_model(self.params.mm_model, **self.params)
-        self._separate_qm_and_mm_systems(self.mmmol.energy_model)
 
         self._prepped = True
         return True
@@ -78,18 +84,56 @@ class QMMMEmbeddingBase(QMMMBase):
         raise NotImplemented("%s is an abstract class, use one of its subclasses"
                              % self.__class__.__name__)
 
+    def _turn_off_qm_forcefield(self, ff):
+        self._remove_internal_qm_bonds(ff.parmed_obj)
+        self._exclude_internal_qm_ljterms(ff.parmed_obj)
+
+    def _exclude_internal_qm_ljterms(self, pmdobj):
+        # Turn off QM/QM LJ interactions (must be done AFTER _remove_internal_qm_bonds)
+        numqm = len(self.params.qm_atom_indices)
+        for i in xrange(numqm):
+            for j in xrange(i+1, numqm):
+                pmdobj.atoms[i].exclude(pmdobj.atoms[j])
+
+    def _remove_internal_qm_bonds(self, pmdobj):
+        for i, iatom in enumerate(self.params.qm_atom_indices):
+            pmdatom = pmdobj.atoms[iatom]
+            allterms = ((pmdatom.bonds, 2), (pmdatom.angles, 3),
+                        (pmdatom.dihedrals, 4), (pmdatom.impropers, 4))
+
+            for termlist, numatoms in allterms:
+                for term in termlist[:]:  # make a copy so it doesn't change during iteration
+                    if self._term_in_qm_system(term, numatoms):
+                        term.delete()
+
+    @staticmethod
+    def _distribute_linkatom_forces(fullforces, linkatom):
+        """ Distribute forces according to the apparently indescribable and unciteable "lever rule"
+        """
+        # TODO: CHECK THIS!!!!
+
+        mmatom = linkatom.metadata.mmatom
+        qmatom = linkatom.metadata.mmpartner
+        dfull = mmatom.distance(qmatom)
+        d_mm = linkatom.distance(mmatom)
+
+        p = (dfull - d_mm)/dfull
+        fullforces[qmatom.index] += p*linkatom.force
+        fullforces[mmatom.index] += (1.0-p) * linkatom.force
+
     def _set_qm_positions(self):
-        raise NotImplemented("%s is an abstract class, use one of its subclasses"
-                             % self.__class__.__name__)
+        for atom in self.qmmol.atoms:
+            atom.position = atom.metadata.real_atom.position
+        mdt.helpers.qmmm.set_link_atom_positions(self.qm_link_atoms)
 
-    def _separate_qm_and_mm_systems(self, model):
-        calculation_groups = model.params.setdefault('calculation_groups', {})
-        assert 'qm_system' not in calculation_groups
-        assert 'mm_system' not in calculation_groups
-
-        calculation_groups['qm_system'] = sorted(self.params.qm_atom_indices)
-        calculation_groups['mm_system'] = [i for i in xrange(self.mol.num_atoms)
-                                           if i not in self._qm_index_set]
+    def _term_in_qm_system(self, t, numatoms):
+        """ Check if an FF term is entirely within the QM subsystem """
+        for iatom in xrange(numatoms):
+            attrname = 'atom%i' % (iatom + 1)
+            if not getattr(t, attrname).idx in self._qm_index_set:
+                return True
+        else:
+            return False
 
 
 class MechanicalEmbeddingQMMM(QMMMEmbeddingBase):
@@ -99,20 +143,16 @@ class MechanicalEmbeddingQMMM(QMMMEmbeddingBase):
     No electrostatic interactions will be calculated between the QM and MM subsystems.
     No covalent bonds are are allowed between the two susbystems.
     """
-
     def prep(self):
         if not super(MechanicalEmbeddingQMMM, self).prep():
             return  # was already prepped
 
-        # Set forcefield partial charges for the QM subsystem to 0
+        # Set QM partial charges to 0
         self.mmmol.energy_model._prepped = False
-        for atom in self.qm_atoms:
-            atom.ff.partial_charge = 0.0 * u.q_e
-
-    def _set_qm_positions(self):
-        for atom in self.qmmol.atoms:
-            atom.position = atom.metadata.real_atom.position
-            mdt.helpers.qmmm.set_link_atom_positions(self.qm_link_atoms)
+        pmdobj = self.mmmol.ff.parmed_obj
+        for i, iatom in enumerate(self.params.qm_atom_indices):
+            pmdatom = pmdobj.atoms[iatom]
+            pmdatom.charge = 0.0
 
     def _setup_qm_subsystem(self):
         """ QM subsystem for mechanical embedding is the QM atoms + any link atoms

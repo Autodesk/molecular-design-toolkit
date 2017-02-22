@@ -428,7 +428,7 @@ def _parse_tleap_errors(job, molin):
     msg = []
     unknown_res = set()  # so we can print only one error per unkonwn residue
     lineiter = iter(job.stdout.split('\n'))
-    offset = utils.if_not_none(molin.residues[0].pdbindex, 0)
+    offset = utils.if_not_none(molin.residues[0].pdbindex, 1)
     reslookup = {str(i+offset): r for i,r in enumerate(molin.residues)}
 
     def _atom_from_re(s):

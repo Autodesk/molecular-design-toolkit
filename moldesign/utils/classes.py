@@ -112,6 +112,8 @@ class DotDict(object):
         self.update(dict(*args, **kwargs))
 
     def __getattr__(self, item):
+        """ delegates to __dict__ methods
+        """
         return getattr(self.__dict__, item)
 
     def __repr__(self):

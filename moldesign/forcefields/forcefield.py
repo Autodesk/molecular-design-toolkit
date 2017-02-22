@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import copy
+
 import moldesign as mdt
 from moldesign import units as u
 
@@ -32,7 +34,7 @@ class ForceField(object):
         self.mol = mol
 
         if isinstance(ffobj, parmed.Structure):
-            self.parmed_obj = ffobj.copy(ffobj.__class__)
+            self.parmed_obj = copy.copy(ffobj)
             self.sourcedata = ffobj
         elif hasattr(ffobj, 'to_parmed'):
             self.sourcedata = ffobj
@@ -41,7 +43,7 @@ class ForceField(object):
             raise ValueError('Unrecognized force field class "%s"' % ffobj.__class__.__name__)
 
     def copy_to(self, mol):
-        mol.ff = self.__class__(mol, self.parmed_obj)
+        mol.ff = self.__class__(mol, copy.copy(self.parmed_obj))
         return mol.ff
 
     def get_atom_terms(self, atom):
@@ -63,13 +65,13 @@ class ForceField(object):
         else:
             raise ValueError("No ForceField term found for bond: %s" % bond)
 
-    def _get_pmd_term(self, *atoms):
-        LEN_TO_TERM = {2: 'bonds',
-                       3: 'angles',
-                       4: 'dihedrals'}  # todo: deal with impropers
+    def get_term(self, *atoms):
+        pmdterm = self._get_pmd_term(*atoms)
+        return LEN_TO_TERM[len(atoms)](atoms, pmdterm)
 
+    def _get_pmd_term(self, *atoms):
         termlist = getattr(self.parmed_obj.atoms[atoms[0].index],
-                           LEN_TO_TERM[len(atoms)] )
+                           LEN_TO_TERM[len(atoms)].pmdlist)
         searchatoms = [self.parmed_obj.atoms[atom.index] for atom in atoms]
 
         for term in termlist:
@@ -109,8 +111,7 @@ class ParmedTermAttribute(ParmedAtomAttribute):
         raise NotImplementedError()
 
 
-
-class _MdtFfProxy(object):
+class ForceFieldTerm(object):
     """ MDT-like proxy for a forcefield term
     """
 
@@ -127,28 +128,33 @@ class _MdtFfProxy(object):
         return '<%s>' % str(self)
 
 
-class AtomTerms(_MdtFfProxy):
+class AtomTerms(ForceFieldTerm):
     partial_charge = ParmedAtomAttribute('charge', u.q_e)
     ljsigma = ParmedAtomAttribute('sigma', u.angstrom)
     ljepsilon = ParmedAtomAttribute('epsilon', u.kcalpermol)
 
 
-class BondTerm(_MdtFfProxy):
+class BondTerm(ForceFieldTerm):
+    pmdlist = 'bonds'
     force_constant = ParmedTermAttribute('k', u.kcalpermol / u.angstrom)
     equilibrium_length = ParmedTermAttribute('req', u.angstrom)
 
 
-class AngleTerm(_MdtFfProxy):
+class AngleTerm(ForceFieldTerm):
+    pmdlist = 'angles'
     force_constant = ParmedTermAttribute('k', u.kcalpermol / u.degrees)
     equilibrium_length = ParmedTermAttribute('req', u.angstrom)
 
 
-class DihedralTerm(_MdtFfProxy):
+class DihedralTerm(ForceFieldTerm):
+    pmdlist = 'dihedrals'
     force_constant = ParmedTermAttribute('phi_k', u.kcalpermol / u.degrees)
     periodicity = ParmedTermAttribute('per', 1)
     phase = ParmedTermAttribute('phase', u.degrees)
     coulomb_14_factor = ParmedTermAttribute('scee', 1.0)
     lj_14_factor = ParmedTermAttribute('scnb', 1.0)
+
+LEN_TO_TERM = {1: AtomTerms, 2: BondTerm, 3: AngleTerm, 4: DihedralTerm}
 
 
 class FFParameters(object):

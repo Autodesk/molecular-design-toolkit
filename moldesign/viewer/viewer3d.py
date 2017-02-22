@@ -195,7 +195,7 @@ class GeometryViewer(MolViz_3DMol, ColorMixin):
 
         # self.wfn should already be set to the wfn for the current frame
         orbital = self.wfns[framenum].orbitals[orbtype][orbidx]
-        positions = self._frame_positions[framenum]*u.angstrom
+        positions = self.wfns[framenum].positions
         grid = VolumetricGrid(positions,
                               padding=self.DEF_PADDING,
                               npoints=npts)
