@@ -18,17 +18,10 @@ class QMMMRunner(QMRunner):
         return "mm\ncrdparms load %s\nend" % CRDPARAMS
 
     def _taskblock(self):
-        if self.parameters['runType'] != 'minimization':
-            raise ValueError('QMMM only currently supports optimizations')
-
-        if self.parameters['runType'] == 'minimization':
-            tasktype = 'optimize'
-        elif 'forces' in self.parameters['properties']:
-            tasktype = 'gradient'
-        else:
-            tasktype = 'energy'
-
-        return 'task mm %s %s ignore' % (self._taskname(), tasktype)
+        fields = super(QMMMRunner, self)._taskblock().split()
+        fields.insert(1, 'mm')
+        fields.append('ignore')
+        return ' '.join(fields)
 
 if __name__ == '__main__':
     main(QMMMRunner)

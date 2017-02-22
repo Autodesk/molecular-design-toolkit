@@ -105,7 +105,7 @@ class QMRunner(object):
             lines.append('driver\n xyz opt\n print high\n')
             if 'minimization_steps' in self.parameters:
                 lines.append('maxiter %d' % self.parameters['minimization_steps'])
-            lines.append('end')
+            lines.append('end\n')
 
         if 'esp' in self.parameters['properties']:
             lines.append(self._espblock())

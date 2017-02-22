@@ -13,12 +13,22 @@
 # limitations under the License.
 from __future__ import absolute_import
 
-from .exportall import *
-from . import docparsers
-from .callsigs import *
-from .descriptors import *
-from .classes import *
-from .databases import *
-from .utils import *
-from .numerical import *
-from .json_extension import *
+import json
+from . import args_from
+
+
+class JsonEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, 'to_json'):
+            obj = obj.to_json()
+        return obj
+
+
+@args_from(json.dump)
+def json_dump(*args, **kwargs):
+    return json.dump(*args, cls=JsonEncoder, **kwargs)
+
+
+@args_from(json.dumps)
+def json_dumps(*args, **kwargs):
+    return json.dumps(*args, cls=JsonEncoder, **kwargs)

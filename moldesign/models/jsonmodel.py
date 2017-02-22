@@ -53,7 +53,7 @@ class JsonModelBase(EnergyModelBase):
 
     def _make_calculation_job(self, requests=None):
         params, inputfiles = self._prep_calculation(requests)
-        inputfiles['params.json'] = json.dumps(dict(params))
+        inputfiles['params.json'] = mdt.utils.json_dumps(dict(params))
         job = pyccc.Job(image=mdt.compute.get_image_path(self.IMAGE),
                         command='%s && %s' % (self.RUNNER, self.PARSER),
                         inputs=inputfiles,

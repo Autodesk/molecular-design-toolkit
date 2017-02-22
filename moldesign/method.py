@@ -79,6 +79,14 @@ class Method(object):
             if param.name not in self.params:
                 self.params[param.name] = param.default
 
+    @classmethod
+    def supports_parameter(cls, paramname):
+        for parameter in cls.PARAMETERS:
+            if parameter.name == paramname:
+                return True
+        else:
+            return False
+
     def configure(self):
         from moldesign.widgets.configurator import Configurator
         return Configurator(self.params, self.PARAMETERS,

@@ -55,9 +55,10 @@ class QMMMEmbeddingBase(QMMMBase):
         properties = MolecularProperties(self.mol,
                                          mmprops=mmprops,
                                          qmprops=qmprops,
-                                         wfn=qmprops.wfn,
                                          potential_energy=potential_energy,
                                          forces=forces)
+        if 'wfn' in qmprops:
+            properties.wfn = qmprops.wfn
 
         return properties
 
@@ -75,7 +76,7 @@ class QMMMEmbeddingBase(QMMMBase):
                                   name='%s MM subsystem' % self.mol.name)
         self.mol.ff.copy_to(self.mmmol)
         self._turn_off_qm_forcefield(self.mmmol.ff)
-        self.mmmol.set_energy_model(self.params.mm_model, **self.params)
+        self.mmmol.set_energy_model(self.params.mm_model)
 
         self._prepped = True
         return True
@@ -157,13 +158,13 @@ class MechanicalEmbeddingQMMM(QMMMEmbeddingBase):
     def _setup_qm_subsystem(self):
         """ QM subsystem for mechanical embedding is the QM atoms + any link atoms
         """
-        qmatoms = [self.mol.atoms[iatom] for iatom in self.params.qm_atom_indices]
-        self.qm_link_atoms = mdt.helpers.qmmm.create_link_atoms(self.mol, qmatoms)
-        qmmol = mdt.Molecule(qmatoms + self.qm_link_atoms,
+        qm_atoms = [self.mol.atoms[iatom] for iatom in self.params.qm_atom_indices]
+        self.qm_link_atoms = mdt.helpers.qmmm.create_link_atoms(self.mol, qm_atoms)
+        qmmol = mdt.Molecule(qm_atoms + self.qm_link_atoms,
                              name='%s QM subsystem' % self.mol.name)
         for real_atom, qm_atom in zip(self.qm_atoms, qmmol.atoms):
             qm_atom.metadata.real_atom = real_atom
-        qmmol.set_energy_model(self.params.qm_model, **self.params)
+        qmmol.set_energy_model(self.params.qm_model)
         return qmmol
 
 
@@ -178,30 +179,26 @@ class ElectrostaticEmbeddingQMMM(QMMMEmbeddingBase):
     a subset of atoms as the "QM" atoms, using the ``qm_atom_indices`` parameter. 
     The MM models must support the ability to turn of _internal_ interactions for 
     a certain subset of the system, using the ``no_internal_calculations`` parameter.
-
     """
-
-    PARAMETERS = QMMMBase.PARAMETERS + ['qm_model', 'mm_model']
 
     def prep(self):
         if not super(ElectrostaticEmbeddingQMMM, self).prep():
             return  # was already prepped
 
-        if 'qm_atom_indices' not in self.params.qm_model.PARAMETERS:
+        if not self.params.qm_model.supports_parameter('qm_atom_indices'):
             raise TypeError('Supplied QM model ("%s") does not support QM/MM'
                 % self.params.qm_model.__name__)
 
-
-
     def _setup_qm_subsystem(self):
-        qmmol = self.mol.copy()
-        qmmol.set_energy_model(self.params.qm_model, 
-                               qm_atom_indices=list(self.params.qm_atom_indices),
-                               **self.params)
+        qmmol = mdt.Molecule(self.mol)
+        self.mol.ff.copy_to(qmmol)
+
+        self.qm_link_atoms = mdt.helpers.qmmm.create_link_atoms(self.mol, self.qm_atoms)
+        if self.qm_link_atoms:
+            raise ValueError('The %s model does not support link atoms' % self.__class__.__name__)
+
+        qmmol.set_energy_model(self.params.qm_model)
+        qmmol.energy_model.params.qm_atom_indices = self.params.qm_atom_indices
         return qmmol
-
-
-
-
 
 

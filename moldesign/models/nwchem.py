@@ -70,13 +70,14 @@ class NWChemQMMM(NWChemQM):
     ALL_PROPERTIES = DEFAULT_PROPERTIES
     RUNNER = 'runqmmm.py'
     PARSER = 'getresults.py'
+    PARAMETERS = NWChemQM.PARAMETERS + [mdt.parameters.Parameter('qm_atom_indices')]
 
     def _get_inputfiles(self):
         crdparamfile = self._makecrdparamfile()
         return {'nwchem.crdparams': crdparamfile}
 
-    def _makecrdparamfile(self):
-        ffparams = self.mol.ff.to_parmed()
+    def _makecrdparamfile(self, include_mmterms=True):
+        pmdparms = self.mol.ff.parmed_obj
 
         lines = ['qm']
         qmatom_idxes = set(self.params.qm_atom_indices)
@@ -100,7 +101,7 @@ class NWChemQMMM(NWChemQM):
 
         # write MM atoms
         lines.append('end\n\nmm')
-        for atom, patm in zip(self.mol.atoms, ffparams.atoms):
+        for atom, patm in zip(self.mol.atoms, pmdparms.atoms):
             assert atom.index == patm.idx
             assert atom.atnum == patm.element
             x, y, z = atom.position.value_in(u.angstrom)
@@ -109,38 +110,42 @@ class NWChemQMMM(NWChemQM):
                              %(atom.index+1, atom.element, x, y, z, patm.charge))
 
         lines.append('end\n\nbond\n#      i       j       k_ij             r0')
-        for term in ffparams.bonds:
-            if crosses_boundary(term.atom1, term.atom2):
-                lines.append('  %d    %d   %20.10f    %20.10f' %
-                             (term.atom1.idx+1, term.atom2.idx+1, term.type.k, term.type.req))
+        if include_mmterms:
+            for term in pmdparms.bonds:
+                if crosses_boundary(term.atom1, term.atom2):
+                    lines.append('  %d    %d   %20.10f    %20.10f' %
+                                 (term.atom1.idx+1, term.atom2.idx+1, term.type.k, term.type.req))
 
         lines.append('end\n\nangle\n#      i       j       k      k_ijk           theta0')
-        for term in ffparams.angles:
-            if crosses_boundary(term.atom1, term.atom2, term.atom3):
-                lines.append('  %d    %d   %d   %20.10f    %20.10f' %
-                             (term.atom1.idx+1, term.atom2.idx+1, term.atom3.idx+1,
-                              term.type.k, term.type.theteq))
+        if include_mmterms:
+            for term in pmdparms.angles:
+                if crosses_boundary(term.atom1, term.atom2, term.atom3):
+                    lines.append('  %d    %d   %d   %20.10f    %20.10f' %
+                                 (term.atom1.idx+1, term.atom2.idx+1, term.atom3.idx+1,
+                                  term.type.k, term.type.theteq))
 
         lines.append('end\n\ndihedral\n'
                      '#      i       j       k       l      k_ijkl       periodicity        phase')
-        for term in ffparams.dihedrals:
-            if crosses_boundary(term.atom1, term.atom2, term.atom3, term.atom4):
-                lines.append('  %d    %d   %d   %d   %20.10f   %d    %20.10f' %
-                             (term.atom1.idx+1, term.atom2.idx+1, term.atom3.idx+1, term.atom4.idx+1,
-                              term.type.phi_k, term.type.per, term.type.phase))
+        if include_mmterms:
+            for term in pmdparms.dihedrals:
+                if crosses_boundary(term.atom1, term.atom2, term.atom3, term.atom4):
+                    lines.append('  %d    %d   %d   %d   %20.10f   %d    %20.10f' %
+                                 (term.atom1.idx+1, term.atom2.idx+1, term.atom3.idx+1, term.atom4.idx+1,
+                                  term.type.phi_k, term.type.per, term.type.phase))
 
         lines.append('end\n\nvdw\n'
                      '#      i       j    A_coeff         B_coeff')
-        for atom1idx, atom2 in itertools.product(qmatom_idxes, ffparams.atoms):
-            if atom2.idx in qmatom_idxes: continue
-            atom1 = ffparams.atoms[atom1idx]
-            epsilon = np.sqrt(atom1.epsilon * atom2.epsilon)
-            if epsilon == 0: continue
-            sigma = (atom1.sigma + atom2.sigma) / 2.0
-            lj_a = 4.0 * epsilon * sigma**12
-            lj_b = 4.0 * epsilon * sigma**6
-            lines.append('  %d    %d  %20.10e   %20.10e' %
-                         (atom1.idx+1, atom2.idx+1, lj_a, lj_b))
+        if include_mmterms:
+            for atom1idx, atom2 in itertools.product(qmatom_idxes, pmdparms.atoms):
+                if atom2.idx in qmatom_idxes: continue
+                atom1 = pmdparms.atoms[atom1idx]
+                epsilon = np.sqrt(atom1.epsilon * atom2.epsilon)
+                if epsilon == 0: continue
+                sigma = (atom1.sigma + atom2.sigma) / 2.0
+                lj_a = 4.0 * epsilon * sigma**12
+                lj_b = 4.0 * epsilon * sigma**6
+                lines.append('  %d    %d  %20.10e   %20.10e' %
+                             (atom1.idx+1, atom2.idx+1, lj_a, lj_b))
 
         lines.append('end\n\nscaled_vdw\n'
                      '#      i       j    A_coeff         B_coeff          one_scnb')

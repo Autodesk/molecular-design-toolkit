@@ -32,7 +32,7 @@ nwchem_build:
  build: |
     RUN         apt-get install -y patch curl perl
     WORKDIR      /opt
-    ENV          NWCHEM_MODULES="nwdft driver stepper mm qmmm nwmd" \
+    ENV          NWCHEM_MODULES="nwdft driver stepper mm qmmm nwmd esp " \
                    PYTHONVERSION=2.7 \
                    PYTHONHOME="/usr" \
                    USE_PYTHONCONFIG=Y \
@@ -52,7 +52,7 @@ nwchem_build:
                         tools include basis geom inp input qhop fft cafe \
                         pstat rtdb task symmetry util peigs perfm bq cons blas lapack \
                         NWints atomscf cphf ddscf driver gradients hessian nwdft \
-                        optim property stepper symmetry vib space \
+                        optim property stepper symmetry vib space esp \
                    && rm -rf /opt/nwchem/.svn \
                    && cd tools \
                    && svn export --non-interactive --username nwchem --password nwchem \
