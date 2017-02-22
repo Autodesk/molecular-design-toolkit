@@ -64,7 +64,6 @@ class LAMMPSPotential(EnergyModelBase):
         self.lammps_system = None # Basic LAMMPS system for this molecule
         self.hbond_group = None # Hydrogen mass 
         self.unit_system = None
-        self.export_to_web = None
         
     # calculate potential energy and force
     def calculate(self, requests):
@@ -195,8 +194,7 @@ class LAMMPSPotential(EnergyModelBase):
                 max_idx = nonbond_idx
 
         datalines =  ""
-        atom_types = ""
-
+        
         datalines += "LAMMPS Description\r\n\r\n"
         datalines += "{0} atoms\r\n".format(len(parmedmol.atoms))
         datalines += "{0} bonds\r\n".format(len(parmedmol.bonds))
@@ -248,11 +246,8 @@ class LAMMPSPotential(EnergyModelBase):
                 if atom.atomic_number == 1 and self.hbond_group is None:
                     self.hbond_group = atom.mass
                 if atom.nb_idx == i:
-                    atom_types += "{0} ".format(self.mol.atoms[atom.idx].symbol)
                     datalines += "{0} {1}\r\n".format(i, atom.mass)
                     break
-
-        atom_types += "\r\n"
         datalines += "\r\n"
         
         # Pair coefficients                   
@@ -367,8 +362,6 @@ class LAMMPSPotential(EnergyModelBase):
             datalines += "\r\n"
 
         # Need both atom types and LAMMPS formatted data for web
-        self.export_to_web = atom_types + datalines
-        # print self.export_to_web
         return datalines
 
 @exports
@@ -519,13 +512,5 @@ class LAMMPSInteractive(EnergyModelBase):
                 self.mol.positions[self._affected_atom.index - self.NUM_AFFECTED_RADIUS + idx] = saved_pos
 
         self._prepped = True
-
-    def get_data_for_web(self):
-        self.prep()
-        if self._potential_model.export_to_web is not None:
-            return self._potential_model.export_to_web
-
-
-
 
 
