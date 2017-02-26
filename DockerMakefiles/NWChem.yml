@@ -94,3 +94,45 @@ nwchem:
       /usr/local/lib/python2.7/dist-packages: /usr/local/lib/python2.7/
       /opt/nwchem: /opt
       /opt/lib: /opt
+
+
+
+#################################
+# Experimental QM/MM images below
+nwchem_amber_qmmmm:
+  description: Image with Amber and NWChem for QM/MM
+  requires:
+     - nwchem
+  build: |
+    RUN apt-get update \
+     && apt-get install -y --no-install-recommends \
+         gcc \
+         gfortran \
+     && cleanapt
+  copy_from:
+    amber_dev_branch_build:
+      /opt/amber16: /opt
+      /root/.bash_profile: /root
+
+
+amber_dev_branch_build:
+  build_directory: buildfiles/nwchem
+  requires:
+    - buildbase
+    - ambertools_requirements
+  build: |
+    ADD amber-dev.tgz /opt
+    RUN apt-get install -y \
+         flex \
+         bison \
+         csh \
+         gfortran \
+         g++ \
+         make \
+         patch \
+         python-dev
+    WORKDIR /opt/amber16
+    RUN echo N | ./configure -noX11 --with-python /usr/bin/python --with-netcdf /usr/ gnu \
+     && make -j6 install \
+     && rm -rf test AmberTools doc  # reduce image size for copying to deployment image
+    RUN echo "test -f /opt/amber16/amber.sh && source /opt/amber16/amber.sh" >> /root/.bash_profile
