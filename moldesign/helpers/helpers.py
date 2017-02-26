@@ -171,3 +171,28 @@ def _cmap_to_rgb(mplmap, values):
     # strip alpha field and rescale to [0,255] RGB integers
     rgb = [map(int, c[:3]*256.0) for c in rgba]
     return rgb
+
+
+def atom_name_check(mol):
+    """ Makes sure atom names are unique in each residue.
+
+    If atoms names aren't unqiue:
+      - if the names are just the names of the elements, rename them
+      - else print a warning
+    """
+    badres = []
+    for residue in mol.residues:
+        names = set(atom.name for atom in residue.atoms)
+        if len(names) != residue.num_atoms:
+            # atom names aren't unique, check if we can change them
+            for atom in residue.atoms:
+                if atom.name.lower() != atom.symbol.lower():
+                    badres.append(residue)
+            else:  # rename the atoms
+                atomnums = {}
+                for atom in residue.atoms:
+                    atom.name = atom.symbol + str(atomnums.setdefault(atom.symbol, 0))
+                    atomnums[atom.symbol] += 1
+
+    if badres:
+        print 'WARNING: residues do not have uniquely named atoms: %s' % badres
