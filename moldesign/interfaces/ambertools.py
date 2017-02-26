@@ -106,7 +106,7 @@ def calc_gasteiger_charges(mol, **kwargs):
 
 def _antechamber_calc_charges(mol, ambname, chargename, kwargs):
     charge = utils.if_not_none(mol.charge, 0)
-    command = 'antechamber -fi pdb -i mol.pdb -fo mol2 -o out.mol2 -c %s -an n'%ambname
+    command = 'antechamber -fi mol2 -i mol.mol2 -fo mol2 -o out.mol2 -c %s -an n'%ambname
     if charge != 0:
         command += ' -nc %d' % charge.value_in(u.q_e)
 
@@ -132,8 +132,8 @@ def _antechamber_calc_charges(mol, ambname, chargename, kwargs):
 
     job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
                     command=command,
-                    name="%s, %s"%(chargename, mol.name),
-                    inputs={'mol.pdb': mol.write(format='pdb')},
+                    name="%s, %s" % (chargename, mol.name),
+                    inputs={'mol.mol2': mol.write(format='mol2')},
                     when_finished=finish_job)
     return compute.run_job(job, _return_result=True, **kwargs)
 
@@ -419,7 +419,7 @@ def _parse_tleap_errors(job, molin):
     msg = []
     unknown_res = set()  # so we can print only one error per unkonwn residue
     lineiter = iter(job.stdout.split('\n'))
-    offset = utils.if_not_none(molin.residues[0].pdbindex, 0)
+    offset = utils.if_not_none(molin.residues[0].pdbindex, 1)
     reslookup = {str(i+offset): r for i,r in enumerate(molin.residues)}
 
     def _atom_from_re(s):
