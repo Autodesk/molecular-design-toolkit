@@ -167,6 +167,12 @@ class AtomGroup(AtomGroupNotebookMixin):
             com += atom.position * atom.mass
         com = com / total_mass
         return com
+
+    @center_of_mass.setter
+    def center_of_mass(self, value):
+        vec = value - self.com
+        self.translate(vec)
+
     com = center_of_mass  # synonym
 
     def _getatom(self, a):

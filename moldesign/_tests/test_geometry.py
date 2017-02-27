@@ -225,6 +225,23 @@ def test_center_of_mass(four_particle_45_twist):
                                    desired_com_angstroms)
 
 
+def test_set_center_of_mass(four_particle_45_twist):
+    # reset COM
+    four_particle_45_twist.com = [0, 0, 0] * u.angstrom
+    np.testing.assert_almost_equal(four_particle_45_twist.com.value_in(u.angstrom),
+                                   ([0, 0, 0] * u.angstrom).value_in(u.angstrom))
+
+    # do a no-op COM set
+    four_particle_45_twist.com = [0, 0, 0] * u.angstrom
+    np.testing.assert_almost_equal(four_particle_45_twist.com.value_in(u.angstrom),
+                                   ([0, 0, 0] * u.angstrom).value_in(u.angstrom))
+
+    # move COM elsewhere
+    four_particle_45_twist.com = [10, 0, -10] * u.angstrom
+    np.testing.assert_almost_equal(four_particle_45_twist.com.value_in(u.angstrom),
+                                   ([10, 0, -10] * u.angstrom).value_in(u.angstrom))
+
+
 def test_distance_gradient(three_particle_right_angle):
     mol = three_particle_right_angle
 
