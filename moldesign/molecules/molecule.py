@@ -357,22 +357,35 @@ class MolTopologyMixin(object):
         Atom class without changing any functionality
     """
     def copy(self, name=None):
-        """ Create a copy of the molecule and all of its substructures
+        """ Create a copy of the molecule and all of its substructures, metadata, and methods
 
         Returns:
             Molecule: copied molecule
-
-        Note:
-            Assigned energy models and integrators are not currently copied, although properties are
         """
         if name is None:
             name = self.name + ' copy'
         newmol = Molecule(self.atoms,
                           name=name,
                           pdbname=self.pdbname,
-                          charge=self.charge)
-        newmol.properties = self.properties.copy()
+                          charge=self.charge,
+                          metadata=self.metadata)
+        newmol.properties = self.properties.copy(mol=newmol)
+        newmodel = self._copy_method(newmol, 'energy_model')
+        if newmodel is not None:
+            self.set_energy_model(newmodel)
+        newintegrator = self._copy_method(newmol, 'integrator')
+        if newintegrator is not None:
+            self.set_integrator(newintegrator)
         return newmol
+
+    def _copy_method(self, newmol, methodname):
+        method = getattr(self, methodname)
+        if method is None:
+            return None
+        newmethod = method.__class__()
+        newmethod.params.clear()
+        newmethod.params.update(method.params)
+        return newmethod
 
     def assert_atom(self, atom):
         """If passed an integer, just return self.atoms[atom].
@@ -534,6 +547,39 @@ class MolTopologyMixin(object):
             return False
 
         return self.same_topology(other)
+
+    def combine(self, *others):
+        """ Create a new molecule from a group of other AtomContainers
+
+        Args:
+            *others (AtomContainer or AtomList or List[moldesign.Atom]):
+
+        Returns:
+            mdt.Molecule: a new Molecule that's the union of this structure with all
+              others. Chains will be renamed as necessary to avoid clashes.
+        """
+        new_atoms = self.atoms[:]
+        charge = self.charge
+        names = [self.name]
+        for obj in others:
+            objatoms = mdt.helpers.get_all_atoms(obj)
+            new_atoms.extend(objatoms)
+            charge += getattr(obj, 'charge', 0*u.q_e)
+            if hasattr(obj, 'name'):
+                names.append(obj.name)
+            elif objatoms[0].molecule is not None:
+                names.append('%d atoms from %s' % (len(objatoms), objatoms[0].molecule.name))
+            else:
+                names.append('list of %d unowned atoms' % len(objatoms))
+
+        return mdt.Molecule(new_atoms,
+                            copy_atoms=True,
+                            charge=charge,
+                            name='%s extended with %d atoms' %
+                                 (self.name, len(objatoms) - self.num_atoms),
+                            metadata=utils.DotDict(description=
+                                                   'Union of %s' % ', '.join(names)))
+
 
     def same_topology(self, other):
         """ Test whether two molecules have equivalent topologies
@@ -809,7 +855,7 @@ class Molecule(AtomGroup,
         pdbname (str): Name of the PDB file
         charge (units.Scalar[charge]): molecule's formal charge
         electronic_state_index (int): index of the molecule's electronic state
-        description (str): arbitrary text description of this molecule
+        metadata (dict): Arbitrary metadata dictionary
 
 
     Examples:
@@ -921,7 +967,7 @@ class Molecule(AtomGroup,
         # copy atoms from another object (i.e., a molecule)
         oldatoms = helpers.get_all_atoms(atomcontainer)
         if copy_atoms or (oldatoms[0].molecule is not None):
-            atoms = oldatoms.copy()
+            atoms = oldatoms.copy_atoms()
             if name is None:  # Figure out a reasonable name
                 if oldatoms[0].molecule is not None:
                     name = oldatoms[0].molecule.name+' copy'

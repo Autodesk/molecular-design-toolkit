@@ -206,7 +206,7 @@ class AtomGroup(AtomGroupNotebookMixin):
         """
         return mdt.geom.dihedral(*map(self._getatom, (a1, a2, a3, a4)))
 
-    def copy(self):
+    def copy_atoms(self):
         """
         Copy a group of atoms which may already have bonds, residues, and a parent molecule
         assigned. Do so by copying only the relevant entities, and creating a "mask" with
@@ -466,6 +466,8 @@ class AtomList(AtomContainer, list):  # order is important, list will override m
             return '<AtomList: [%s]>' % ', '.join(atom._shortstr() for atom in self)
         except (KeyError, AttributeError):
             return '<AtomList at %x (__repr__ failed)>' % id(self)
+
+    copy = AtomContainer.copy_atoms
 
     def intersection(self, *otherlists):
         """ Return a list of atoms that appear in all lists (including this one).

@@ -129,9 +129,14 @@ class Chain(BioContainer):
                              'iterate over them')
 
     def copy(self):
-        newatoms = super(Chain, self).copy()
+        """ Create a copy of this chain and all topology within.
+
+        Returns:
+            Chain: copy of this chain and all atoms/residues it contains. This copy will NOT
+            reference any parent molecule
+        """
+        newatoms = super(Chain, self).copy_atoms()
         return newatoms[0].chain
-    copy.__doc__ = BioContainer.copy.__doc__
 
     @property
     def num_residues(self):
