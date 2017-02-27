@@ -121,7 +121,7 @@ def unit_number():
 
 ######################################
 # Test underlying elements
-@typedfixture('submolecule')
+@typedfixture('atom')
 def carbon_atom():
     atom1 = mdt.Atom('C')
     return atom1
@@ -132,7 +132,7 @@ def test_carbon_atom(carbon_atom):
     assert carbon_atom.mass == 12.0 * u.amu
 
 
-@typedfixture('submolecule')
+@typedfixture('atom')
 def carbon_copy(carbon_atom):
     atoms = carbon_atom.copy()
     return atoms
@@ -162,7 +162,7 @@ def h2_harmonic():
     return mol
 
 
-@typedfixture('submolecule')
+@typedfixture('trajectory')
 def h2_trajectory(h2_harmonic):
     mol = h2_harmonic
     mol.atoms[0].x = 1.0 * u.angstrom
@@ -292,5 +292,8 @@ def test_nucleic_build(nucleic):
     assert len(mol.chains[0].residues) == len(mol.chains[1].residues) == 4
 
 
-moldesign_objects = registered_types['molecule'] + registered_types['submolecule']
+moldesign_objects = (registered_types['molecule'] +
+                     registered_types['submolecule'] +
+                     registered_types['trajectory'] +
+                     registered_types['atom'])
 all_objects = registered_types['object'] + moldesign_objects

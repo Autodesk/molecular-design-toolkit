@@ -84,30 +84,58 @@ def test_atoms_copied_from_h2_harmonic(copy_atoms_from_h2_harmonic, h2_harmonic)
     assert atoms[0].chain is atoms[1].chain
 
 
-@pytest.mark.parametrize('fixture_key', ['h2_harmonic_atoms',
-                                         'ligand_3aid_atoms',
-                                         'random_atoms_from_3aid'])
+@pytest.mark.parametrize('fixture_key',
+                         registered_types['molecule'] + registered_types['submolecule'])
 def test_copy_atoms(fixture_key, request):
-    oldatoms = request.getfuncargvalue(fixture_key)
-    atoms = oldatoms.copy()
+    oldobj = request.getfuncargvalue(fixture_key)
+    oldatoms = oldobj.atoms
+    atoms = oldatoms.copy_atoms()
     assert isinstance(atoms, mdt.AtomList)
+    _test_copy_integrity(atoms, oldatoms)
+
+
+@pytest.mark.parametrize('fixture_key',
+                         registered_types['molecule'] + registered_types['submolecule'])
+def test_copy_atoms_in_containers(fixture_key, request):
+    oldobj = request.getfuncargvalue(fixture_key)
+    if isinstance(oldobj, mdt.molecules.ChildList):
+        pytest.xfail("We haven't defined the behavior for copying ChildLists yet")
+
+    newobj = oldobj.copy()
+    assert newobj.__class__ is oldobj.__class__
+    _test_copy_integrity(newobj.atoms, oldobj.atoms)
+
+
+def _test_copy_integrity(atoms, oldatoms):
     for old, new in zip(oldatoms, atoms):
+        assert (old.position == new.position).all()
+        assert (old.velocity == new.velocity).all()
+
+        new.x += 1.0 * u.angstrom
+        assert all((old.position == new.position) == [False, True, True])
+
+        new.px += 1.0 * u.angstrom * u.amu / u.fs
+        assert all((old.momentum == new.momentum) == [False, True, True])
+
         assert old.residue is not new.residue
         assert old.residue.name == new.residue.name
         assert old.chain is not new.chain
         assert old.chain.name == new.chain.name
-        assert new.molecule is None
+        assert (old.molecule is new.molecule is None) or (old.molecule is not new.molecule)
 
 
 @pytest.mark.parametrize('fixture_key', moldesign_objects)
 def test_copied_types(fixture_key, request):
     obj = request.getfuncargvalue(fixture_key)
+    if isinstance(obj, mdt.molecules.ChildList):
+        pytest.xfail("We haven't defined the behavior for copying ChildLists yet")
     objcopy = obj.copy()
     assert obj.__class__ is objcopy.__class__
 
-    atomcopy = obj.copy_atoms()
-    assert isinstance(atomcopy, mdt.AtomList)
-    assert len(atomcopy) == obj.num_atoms
+    if not (isinstance(obj, mdt.Trajectory) or isinstance(obj, mdt.Atom)):
+        atomcopy = obj.copy_atoms()
+        assert isinstance(atomcopy, mdt.AtomList)
+        assert len(atomcopy) == obj.num_atoms
 
 
 @pytest.mark.parametrize('fixture_key', registered_types['molecule'])

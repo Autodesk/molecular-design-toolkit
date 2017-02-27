@@ -372,10 +372,10 @@ class MolTopologyMixin(object):
         newmol.properties = self.properties.copy(mol=newmol)
         newmodel = self._copy_method(newmol, 'energy_model')
         if newmodel is not None:
-            self.set_energy_model(newmodel)
+            newmol.set_energy_model(newmodel)
         newintegrator = self._copy_method(newmol, 'integrator')
         if newintegrator is not None:
-            self.set_integrator(newintegrator)
+            newmol.set_integrator(newintegrator)
         return newmol
 
     def _copy_method(self, newmol, methodname):

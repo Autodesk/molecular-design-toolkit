@@ -95,7 +95,6 @@ def test_h2_traj_energies(h2_trajectory):
     assert (traj.potential_energy <= 4.0 * u.kcalpermol).all()
 
 
-
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_atom_hierarchy(molkey, request):
     mol = request.getfuncargvalue(molkey)
