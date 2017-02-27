@@ -354,11 +354,16 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
         ExtraAmberParameters: Parameters for the molecule; this object can be used to create
             forcefield parameters for other systems that contain this molecule
     """
+    # Check that there's only 1 residue, give it a name
     assert mol.num_residues == 1
     if mol.residues[0].resname is None:
         mol.residues[0].resname = 'UNL'
         print 'Assigned residue name "UNL" to %s' % mol
     resname = mol.residues[0].resname
+
+    # check that atoms have unique names
+    if len(set(atom.name for atom in mol.atoms)) != mol.num_atoms:
+        raise ValueError('This molecule does not have uniquely named atoms, cannot assign FF')
 
     if charges == 'am1-bcc' and 'am1-bcc' not in mol.properties:
         calc_am1_bcc_charges(mol)

@@ -173,7 +173,7 @@ def _cmap_to_rgb(mplmap, values):
     return rgb
 
 
-def atom_name_check(mol):
+def atom_name_check(mol, force=False):
     """ Makes sure atom names are unique in each residue.
 
     If atoms names aren't unqiue:
@@ -188,6 +188,8 @@ def atom_name_check(mol):
             for atom in residue.atoms:
                 if atom.name.lower() != atom.symbol.lower():
                     badres.append(residue)
+                    if not force:
+                        break
             else:  # rename the atoms
                 atomnums = {}
                 for atom in residue.atoms:
