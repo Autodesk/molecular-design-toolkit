@@ -15,6 +15,7 @@ import collections
 
 import itertools
 import parmed
+from StringIO import StringIO
 
 import moldesign as mdt
 from moldesign import units as u
@@ -70,7 +71,9 @@ def write_pdb(mol, fileobj):
         for obj in itertools.chain(pmedmol.atoms, pmedmol.residues):
             obj.number = _ProtectFloordiv(obj.number)
 
-    pmedmol.write_pdb(fileobj, renumber=not protect_numbers)
+    tempfile = StringIO()
+    pmedmol.write_pdb(tempfile, renumber=not protect_numbers)
+    mdt.helpers.insert_conect_records(mol, tempfile, write_to=fileobj)
 
 
 class _ProtectFloordiv(int):
@@ -226,6 +229,8 @@ def _parmed_to_ff(topo, atom_map):
 def _reassign_chains(f, mol):
     """ Change chain ID assignments to the mmCIF standard (parmed uses author assignments)
 
+    If the required fields don't exist, a copy of the molecule is returned unchanged.
+
     Args:
         f (file): mmcif file/stream
         mol (moldesign.Molecule): molecule with default parmed assignemnts
@@ -235,8 +240,11 @@ def _reassign_chains(f, mol):
     """
     data = mdt.interfaces.biopython_interface.get_mmcif_data(f)
     f.seek(0)
-    newchain_names = set(data['_pdbx_poly_seq_scheme.asym_id']+
-                         data['_pdbx_nonpoly_scheme.asym_id'])
+    try:
+        newchain_names = set(data['_pdbx_poly_seq_scheme.asym_id']+
+                             data['_pdbx_nonpoly_scheme.asym_id'])
+    except KeyError:
+        return mol.copy(name=mol.name)
     newchains = {name: mdt.Chain(name) for name in newchain_names}
 
     residue_iterator = itertools.chain(

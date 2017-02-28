@@ -446,6 +446,22 @@ class AtomContainer(AtomGroup):
                     atoms.append(nbr)
         return atoms
 
+    def bonds_to(self, other):
+        """ Returns list of bonds between this object and another one
+
+        Args:
+            other (AtomContainer): other object
+
+        Returns:
+            List[moldesign.Bond]: bonds between this object and another
+        """
+        bonds = []
+        otheratoms = set(other.atoms)
+        for bond in self.internal_bonds:
+            if bond.a1 in otheratoms or bond.a2 in otheratoms:
+                bonds.append(bond)
+        return bonds
+
 
 @toplevel
 class AtomList(AtomContainer, list):  # order is important, list will override methods otherwise

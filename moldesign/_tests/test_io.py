@@ -163,7 +163,7 @@ def test_1kbu_assembly_build(key, request):
                                   mol.chains[asym.num_chains].positions.defunits_value())
 
 
-@pytest.mark.parametrize('fmt', 'smiles pdb mol2 sdf inchi'.split())
+@pytest.mark.parametrize('fmt', 'smiles pdb mol2 sdf inchi mmcif'.split())
 def test_topology_preserved_in_serialization(bipyridine_smiles, fmt):
     """ Test that bond topology is preserved even if it doesn't make sense from distances
     """
