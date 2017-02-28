@@ -6,7 +6,7 @@ import moldesign.exceptions
 import moldesign.molecules.atomcollections
 import moldesign.utils.classes
 
-from .test_objects import *
+from .object_fixtures import *
 
 
 def test_h2_protected_atom_arrays(h2):
@@ -87,6 +87,23 @@ def h2_properties_raises_not_calculated_yet(h2_harmonic):
         h2_harmonic.properties.forces
     with pytest.raises(moldesign.exceptions.NotCalculatedError):
         h2_harmonic.properties.potential_energy
+
+
+def test_h2_calculation_caching(h2_harmonic):
+    h2 = h2_harmonic
+    h2.properties = mdt.MolecularProperties(h2)
+    true_energy = h2.calc_potential_energy()
+    assert 'potential_energy' in h2.properties
+    assert 'forces' in h2.properties
+    h2.potential_energy
+    h2.forces
+    h2.properties['potential_energy'] = 'banana'
+    assert h2.potential_energy == h2.calc_potential_energy() == 'banana'
+    props = h2.calculate()
+    assert props.potential_energy == h2.potential_energy == h2.calc_potential_energy() == 'banana'
+    props2 = h2.calculate(use_cache=False)
+    assert props2.potential_energy == h2.potential_energy == true_energy
+    assert h2.calc_potential_energy() == true_energy
 
 
 def test_h2_traj_energies(h2_trajectory):

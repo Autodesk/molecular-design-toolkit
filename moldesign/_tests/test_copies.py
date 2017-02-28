@@ -4,7 +4,7 @@ import pytest
 import moldesign as mdt
 from moldesign import units as u
 
-from .test_objects import *
+from .object_fixtures import *
 
 
 def test_carbon_copy(carbon_copy, carbon_atom):
@@ -40,23 +40,6 @@ def test_h2_harmonic_copy_loses_simulation(h2_harmonic_copy, h2_harmonic):
 
     assert mol.atoms[0].bond_graph[mol.atoms[1]] == 1
     assert mol.atoms[1].bond_graph[mol.atoms[0]] == 1
-
-
-def test_h2_calculation_caching(h2_harmonic):
-    h2 = h2_harmonic
-    h2.properties = mdt.MolecularProperties(h2)
-    true_energy = h2.calc_potential_energy()
-    assert 'potential_energy' in h2.properties
-    assert 'forces' in h2.properties
-    h2.potential_energy
-    h2.forces
-    h2.properties['potential_energy'] = 'banana'
-    assert h2.potential_energy == h2.calc_potential_energy() == 'banana'
-    props = h2.calculate()
-    assert props.potential_energy == h2.potential_energy == h2.calc_potential_energy() == 'banana'
-    props2 = h2.calculate(use_cache=False)
-    assert props2.potential_energy == h2.potential_energy == true_energy
-    assert h2.calc_potential_energy() == true_energy
 
 
 def test_copying_doesnt_corrupt_original_h2_harmonic(h2_harmonic):
@@ -160,8 +143,8 @@ def test_chain_rename(pdb3aid):
     newmol = mdt.Molecule([res1, res2])
     assert newmol.num_chains == 2
     assert newmol.num_residues == 2
-    assert newmol.residues[0].name == res1.name
-    assert newmol.residues[1].name == res2.name
+    assert newmol.residues[0].name == res1.residues[0].name
+    assert newmol.residues[1].name == res2.residues[0].name
     assert newmol.chains[0].name == 'A'
     assert newmol.chains[1].name == 'B'
 
