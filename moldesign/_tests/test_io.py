@@ -47,19 +47,12 @@ ATOMDATA = {  # (symbol, valence, mass)
     8: ('O', 2, 15.995 * u.amu)}
 
 
-@pytest.mark.parametrize('key', 'iupac smiles inchi'.split())
+@pytest.mark.parametrize('key', 'iupac smiles inchi xyz sdf'.split())
 def test_auto_unique_atom_names(key, request):
     mol = request.getfuncargvalue('bipyridine_'+key)
 
     atomnames = set(atom.name for atom in mol.atoms)
     assert len(atomnames) == mol.num_atoms
-
-
-@pytest.mark.parametrize('key', 'xyz sdf'.split())
-def test_atom_names_preserved_from_input_file(key, request):
-    mol = request.getfuncargvalue('bipyridine_'+key)
-    for atom in mol.atoms:
-        assert atom.name == atom.symbol
 
 
 def test_atom_names_preserved_from_input_file_mol2(bipyridine_mol2):

@@ -84,6 +84,7 @@ def read(f, format=None):
     if filename is not None and mol.name not in (None, 'untitled'):
         mol.name = filename
 
+    mdt.helpers.atom_name_check(mol)
     return mol
 
 
