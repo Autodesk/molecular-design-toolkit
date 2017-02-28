@@ -501,6 +501,15 @@ class MolTopologyMixin(object):
                 atom.chain.index = len(self.chains)
 
                 assert atom.chain not in self.chains
+                oldname = atom.chain.name
+                while atom.chain.name in self.chains:
+                    if atom.chain.name is None:
+                        atom.chain.name = 'A'
+                    atom.chain.name = chr(ord(atom.chain.name)+1)
+
+                if oldname:
+                    print 'Warning: chain ID conflict. Renamed Chain %s -> %s' % (
+                        oldname, atom.chain.name)
                 self.chains.add(atom.chain)
             else:
                 assert atom.chain.molecule is self
@@ -510,13 +519,12 @@ class MolTopologyMixin(object):
                 atom.residue.molecule = self
                 atom.residue.index = len(self.residues)
                 self.residues.append(atom.residue)
-                if atom.residue.type in ('dna', 'rna', 'protein'): num_biores += 1
+                if atom.residue.type in ('dna', 'rna', 'protein'):
+                    num_biores += 1
             else:
                 assert atom.chain.molecule is self
 
         self.is_biomolecule = (num_biores >= 2)
-        self.nchains = self.n_chains = self.num_chains = len(self.chains)
-        self.nresidues = self.n_residues = self.num_residues = len(self.residues)
 
     def __eq__(self, other):
         """ Test whether two molecules are "equivalent"
@@ -547,6 +555,16 @@ class MolTopologyMixin(object):
             return False
 
         return self.same_topology(other)
+
+    @property
+    def num_residues(self):
+        return len(self.residues)
+    nresidues = numresidues = num_residues
+
+    @property
+    def num_chains(self):
+        return len(self.chains)
+    nchains = numchains = num_chains
 
     def combine(self, *others):
         """ Create a new molecule from a group of other AtomContainers
@@ -579,7 +597,6 @@ class MolTopologyMixin(object):
                                  (self.name, len(objatoms) - self.num_atoms),
                             metadata=utils.DotDict(description=
                                                    'Union of %s' % ', '.join(names)))
-
 
     def same_topology(self, other):
         """ Test whether two molecules have equivalent topologies

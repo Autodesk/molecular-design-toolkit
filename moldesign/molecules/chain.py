@@ -29,15 +29,29 @@ class Chain(BioContainer):
         chain (Chain): the chain this residue belongs to
     """
     @utils.args_from(BioContainer)
-    def __init__(self, pdbname=None, **kwargs):
-        super(Chain, self).__init__(pdbname=pdbname, **kwargs)
-        if self.name is None:
-            self.name = self.pdbname
-        if self.pdbindex is not None:
-            self.pdbindex = self.pdbname
+    def __init__(self, name=None, **kwargs):
+        for key in ('pdbname', 'pdbindex'):
+            val = kwargs.pop(key, None)
+            if val is not None:
+                if name is not None and val != name:
+                    raise ValueError('Inconsistent name for chain: %s' % kwargs)
+                name = val
+
+        super(Chain, self).__init__(name=name, **kwargs)
         self._type = None
 
         self._5p_end = self._3p_end = self._n_terminal = self._c_terminal = None
+
+    @property
+    def pdbindex(self):
+        return self.name
+
+    @pdbindex.setter
+    def pdbindex(self, val):
+        if val is not None:
+            self.name = val
+
+    pdbname = pdbindex
 
     @property
     def type(self):

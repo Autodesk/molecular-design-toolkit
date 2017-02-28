@@ -231,7 +231,7 @@ def test_set_center_of_mass(four_particle_45_twist):
     np.testing.assert_almost_equal(four_particle_45_twist.com.value_in(u.angstrom),
                                    ([0, 0, 0] * u.angstrom).value_in(u.angstrom))
 
-    # do a no-op COM set
+    # set it to its current position
     four_particle_45_twist.com = [0, 0, 0] * u.angstrom
     np.testing.assert_almost_equal(four_particle_45_twist.com.value_in(u.angstrom),
                                    ([0, 0, 0] * u.angstrom).value_in(u.angstrom))

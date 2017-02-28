@@ -147,3 +147,8 @@ def test_molecule_copy(fixture_key, request):
     assert mol.integrator == newmol.integrator
 
 
+def test_molecular_combination(pdb3aid):
+    m2 = pdb3aid.copy()
+    newmol = pdb3aid.combine(m2)
+    assert newmol.num_chains == 2 * pdb3aid.num_chains
+    assert len(set(chain for chain in newmol.chains)) == newmol.num_chains
