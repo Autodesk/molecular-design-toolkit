@@ -502,6 +502,8 @@ class MolTopologyMixin(object):
 
                 assert atom.chain not in self.chains
                 oldname = atom.chain.name
+                if atom.chain.name is None and num_biores > 1:
+                    atom.chain.name = 'A'
                 while atom.chain.name in self.chains:
                     if atom.chain.name is None:
                         atom.chain.name = 'A'
