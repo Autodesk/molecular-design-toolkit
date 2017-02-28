@@ -41,7 +41,6 @@ class Residue(BioContainer, ResidueNotebookMixin):
         """
         newatoms = super(Residue, self).copy_atoms()
         return newatoms[0].residue
-        copy.__doc__ = BioContainer.copy.__doc__
 
     @utils.args_from(BioContainer)
     def __init__(self, **kwargs):

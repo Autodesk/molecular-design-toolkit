@@ -196,7 +196,6 @@ def split_chains(mol, distance_threshold=1.75*u.angstrom):
     """
 
     tempmol = mol.copy()
-    allchains = []
 
     def bonded(r1, r2):
         if r2 not in r1.bonded_residues:
@@ -211,9 +210,9 @@ def split_chains(mol, distance_threshold=1.75*u.angstrom):
         for atom in res:
             atom.chain = chain
 
+    allchains = [mdt.Chain(tempmol.chains[0].name)]
     for chain in tempmol.chains:
         chaintype = chain.residues[0].type
-        allchains = [mdt.Chain(chain.name)]
         solventchain = mdt.Chain(None)
         ligandchain = mdt.Chain(None)
 

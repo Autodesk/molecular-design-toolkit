@@ -596,11 +596,11 @@ class MolTopologyMixin(object):
                             copy_atoms=True,
                             charge=charge,
                             name='%s extended with %d atoms' %
-                                 (self.name, len(objatoms) - self.num_atoms),
+                                 (self.name, len(new_atoms) - self.num_atoms),
                             metadata=utils.DotDict(description=
                                                    'Union of %s' % ', '.join(names)))
 
-    def same_topology(self, other):
+    def same_topology(self, other, verbose=False):
         """ Test whether two molecules have equivalent topologies
 
         We specifically test these quantities for equality:
@@ -623,6 +623,9 @@ class MolTopologyMixin(object):
                 itertools.chain(self.atoms, self.residues, self.chains),
                 itertools.chain(other.atoms, other.residues, other.chains)):
             if a1.name != a2.name:
+                if verbose:
+                    print 'INFO: %s[%d]: names "%s" and "%s"' % (a1.__class__.__name__, a1.index,
+                                                           a1.name, a2.name)
                 return False
 
         if (self.masses != other.masses).any():
@@ -630,20 +633,29 @@ class MolTopologyMixin(object):
 
         for a1, a2 in zip(self.atoms, other.atoms):
             if a1.atnum != a2.atnum:
-                return False
-            if a1.name != a2.name:
-                return False
-
-            bonds1 = self.bond_graph[a1]
-            bonds2 = other.bond_graph[a2]
-            if len(bonds1) != len(bonds2):
+                if verbose:
+                    print 'INFO: atoms[%d]: atom numbers %d and %d' % (a1.index, a1.atnum, a2.atnum)
                 return False
 
-            for mynbr, myorder in bonds1.iteritems():
+        return self.same_bonds(other, verbose=verbose)
+
+    def same_bonds(self, other, verbose=False):
+        for myatom, otheratom in zip(self.atoms, other.atoms):
+            mybonds = self.bond_graph[myatom]
+            otherbonds = other.bond_graph[otheratom]
+            if len(mybonds) != len(otherbonds):
+                if verbose:
+                    print 'INFO: atoms[%d] has %d bonds in self, %d bonds in other' % (
+                        myatom.index, len(mybonds), len(otherbonds))
+                return False
+
+            for mynbr, myorder in mybonds.iteritems():
                 othernbr = other.atoms[mynbr.index]
-                if othernbr not in bonds2 or bonds2[othernbr] != myorder:
+                if othernbr not in otherbonds or otherbonds[othernbr] != myorder:
+                    if verbose:
+                        print 'INFO: atoms[%d] bonded to atom[%d] (order %d) in self but not other' % (
+                            myatom.index, mynbr.index, myorder)
                     return False
-
         return True
 
     def __ne__(self, other):

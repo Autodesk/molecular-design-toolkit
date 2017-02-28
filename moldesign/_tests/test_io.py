@@ -161,3 +161,16 @@ def test_1kbu_assembly_build(key, request):
     new_chain_pos = mol.chains[testchain].positions.T.ldot(rot).T + move[None, :]
     numpy.testing.assert_allclose(new_chain_pos.defunits_value(),
                                   mol.chains[asym.num_chains].positions.defunits_value())
+
+
+@pytest.mark.parametrize('fmt', 'smiles pdb mol2 sdf inchi'.split())
+def test_topology_preserved_in_serialization(bipyridine_smiles, fmt):
+    """ Test that bond topology is preserved even if it doesn't make sense from distances
+    """
+    mol = bipyridine_smiles.copy()  # don't screw up the fixture object
+    mol.bond_graph[mol.atoms[3]][mol.atoms[5]] = 3
+    mol.bond_graph[mol.atoms[5]][mol.atoms[3]] = 3
+    mol.atoms[3].x += 10.0 * u.angstrom
+
+    newmol = mdt.read(mol.write(format=fmt), format=fmt)
+    assert mol.same_bonds(newmol, verbose=True)

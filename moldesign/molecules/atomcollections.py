@@ -165,6 +165,9 @@ class AtomGroup(AtomGroupNotebookMixin):
     @property
     def center_of_mass(self):
         """ units.Vector[length]: The (x,y,z) coordinates of this object's center of mass """
+        if self.num_atoms == 0:  # nicer exception than divide-by-zero
+            raise ValueError('"%s" has no atoms' % str(self))
+
         total_mass = 0.0 * u.default.mass
         com = np.zeros(3) * u.default.length * u.default.mass
         for atom in self.atoms:
@@ -406,6 +409,9 @@ class AtomContainer(AtomGroup):
             for nbr, order in nbrs.iteritems():
                 if atom.index < nbr.index or nbr not in bg:
                     yield mdt.Bond(atom,nbr, order)
+
+    def get_bond(self, a1, a2):
+        return mdt.Bond(a1, a2, order=self.bond_graph[a1][a2])
 
     @property
     def internal_bonds(self):

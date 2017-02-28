@@ -60,7 +60,7 @@ def read(f, format=None):
 
     # Open a file-like object
     if isinstance(f, basestring) and os.path.exists(f):  # it's a path to a file
-        filename = f
+        filename = os.path.expanduser(f)
         format, compression = _get_format(filename, format)
         fileobj = COMPRESSION[compression](filename, mode='r')
     elif hasattr(f, 'open'):  # we can get a file-like object
