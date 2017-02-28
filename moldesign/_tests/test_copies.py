@@ -152,3 +152,16 @@ def test_molecular_combination(pdb3aid):
     newmol = pdb3aid.combine(m2)
     assert newmol.num_chains == 2 * pdb3aid.num_chains
     assert len(set(chain for chain in newmol.chains)) == newmol.num_chains
+
+
+def test_chain_rename(pdb3aid):
+    res1 = mdt.Molecule(pdb3aid.residues[3])
+    res2 = mdt.Molecule(pdb3aid.residues[4])
+    newmol = mdt.Molecule([res1, res2])
+    assert newmol.num_chains == 2
+    assert newmol.num_residues == 2
+    assert newmol.residues[0].name == res1.name
+    assert newmol.residues[1].name == res2.name
+    assert newmol.chains[0].name == 'A'
+    assert newmol.chains[1].name == 'B'
+

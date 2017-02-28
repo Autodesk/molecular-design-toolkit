@@ -507,7 +507,7 @@ class MolTopologyMixin(object):
                         atom.chain.name = 'A'
                     atom.chain.name = chr(ord(atom.chain.name)+1)
 
-                if oldname:
+                if oldname != atom.chain.name:
                     print 'Warning: chain ID conflict. Renamed Chain %s -> %s' % (
                         oldname, atom.chain.name)
                 self.chains.add(atom.chain)
