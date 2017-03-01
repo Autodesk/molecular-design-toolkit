@@ -40,8 +40,12 @@ DOCKER_REPOSITORY = 'docker-hub.autodesk.com/virshua/moldesign:'
 HOME = os.environ['HOME']
 CONFIG_DIR = os.path.join(HOME, '.moldesign')
 EXAMPLE_DIR_TARGET = os.path.join(os.path.curdir, 'moldesign-examples')
-EXAMPLE_DIR_SRC = unit_def_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                                               '_notebooks')
+MOLDESIGN_SRC = os.path.abspath(os.path.dirname(__file__))
+EXAMPLE_DIR_SRC = unit_def_file = os.path.join(MOLDESIGN_SRC, '_notebooks')
+MDTVERSION = subprocess.check_output(['python', '-c',
+                                      "import _version; print _version.get_versions()['version']"],
+                                     cwd=MOLDESIGN_SRC).strip()
+VERFILEPATH = os.path.join(EXAMPLE_DIR_TARGET, '.mdtversion')
 
 
 APPLESCRIPT_INSTALL_DOCKER = ('set response to (display dialog '
@@ -56,6 +60,9 @@ CONFIG_PATH = os.path.join(CONFIG_DIR, 'moldesign.yml')
 
 
 def main():
+    print 'Molecular Design Toolkit v%s Launcher' % MDTVERSION
+
+
     global CONFIG_PATH
     parser = argparse.ArgumentParser('python -m moldesign')
 
@@ -126,18 +133,36 @@ def launch(cwd=None, path=''):
 def copy_example_dir(use_existing=False):
     print 'Copying MDT examples to `%s` ...' % EXAMPLE_DIR_TARGET
     if os.path.exists(EXAMPLE_DIR_TARGET):
-        if use_existing:
-            return
-        else:
-            print '\n'.join(
-                    ['FAILED: directory already exists. Please:'
-                     ' 1) Rename or remove the existing directory at %s,' % EXAMPLE_DIR_TARGET,
-                     ' 2) Run this command in a different location, or'
-                     ' 3) Run `python -m moldesign intro` to launch the example gallery.'])
-            sys.exit(1)
+        check_existing_examples(use_existing)
     else:
         shutil.copytree(EXAMPLE_DIR_SRC, EXAMPLE_DIR_TARGET)
+        with open(VERFILEPATH) as verfile:
+            print >> verfile, MDTVERSION
         print 'Done.'
+
+
+def check_existing_examples(use_existing):
+    if os.path.exists(VERFILEPATH):
+        with open(VERFILEPATH, 'r') as vfile:
+            version = vfile.read().strip()
+    else:
+        version = 'pre-0.7.4'
+
+    if version != MDTVERSION:
+        print ('WARNING - your example directory is out of date! It corresponds to MDT version '
+               '%s, but you are using version %s'%(version, MDTVERSION))
+        print ('If you want to update your examples, please rename or remove "%s"'
+               % EXAMPLE_DIR_TARGET)
+
+    if use_existing:
+        return
+    else:
+        print '\n'.join(
+                ['FAILED: directory already exists. Please:'
+                 ' 1) Rename or remove the existing directory at %s,'%EXAMPLE_DIR_TARGET,
+                 ' 2) Run this command in a different location, or'
+                 ' 3) Run `python -m moldesign intro` to launch the example gallery.'])
+        sys.exit(1)
 
 
 def launch_jupyter_server(cwd=None):
