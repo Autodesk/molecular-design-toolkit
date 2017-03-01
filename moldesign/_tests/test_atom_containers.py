@@ -219,3 +219,17 @@ def test_setlike_atomlist_methods(protein):
     assert l2 - l1 == protein.atoms[10:15]
 
     assert (l1 + l2).unique() == protein.atoms[:15]
+
+
+def test_get_atoms(protein):
+    protein_atoms = set(protein.get_atoms('protein'))
+    water_atoms = set(protein.get_atoms('water'))
+    carbon_atoms = set(protein.get_atoms(symbol='C'))
+    gly_alpha_carbons = set(protein.get_atoms(resname='GLY', name='CA'))
+    for atom in protein.atoms:
+        assert (atom.residue.type == 'protein') == (atom in protein_atoms)
+        assert (atom.residue.resname == 'HOH') == (atom in water_atoms)
+        assert (atom.atnum == 6) == (atom in carbon_atoms)
+        assert (atom.name == 'CA' and atom.residue.resname == 'GLY') == (
+            atom in gly_alpha_carbons)
+
