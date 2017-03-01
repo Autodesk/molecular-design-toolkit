@@ -79,6 +79,9 @@ class Method(object):
             if param.name not in self.params:
                 self.params[param.name] = param.default
 
+    def __eq__(self, other):
+        return self.__class__ is other.__class__ and self.params == other.params
+
     def configure(self):
         from moldesign.widgets.configurator import Configurator
         return Configurator(self.params, self.PARAMETERS,

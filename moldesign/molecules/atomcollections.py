@@ -74,32 +74,37 @@ class AtomGroup(AtomGroupNotebookMixin):
         """
         return helpers.kinetic_energy(self.momenta, self.masses)
 
-    def get_atoms(self, **queries):
-        """Allows keyword-based atom queries.
+    def get_atoms(self, *keywords, **queries):
+        """Allows keyword-based atom queries. Returns atoms that match ALL queries.
 
         Args:
-            **queries (dict): parameters to match
+            *keywords (list): pre-set keywords (currently, just selects by residue type)
+            **queries (dict): attributes (or residue attributes) to match
+
+        Examples:
+            >>> mol.get_atoms('protein')  # returns all atoms in proteins
+            >>> mol.get_atoms(name='CA')  # returns all alpha carbons
+            >>> mol.get_atoms('dna', symbol='P')  # returns all phosphorus in DNA
 
         Returns:
             AtomList: the atoms matching this query
         """
-        if not queries: return self
+        if not (queries or keywords):
+            return mdt.AtomList(self.atoms)
 
-        def atom_callback(atom, attrs):
-            obj = atom
-            for attr in attrs:
-                obj = getattr(obj, attr)
-            return obj
+        atoms = self.atoms
 
-        result = AtomList()
-        for atom in self.atoms:
-            for q, matches in queries.iteritems():
-                attr = atom_callback(atom, q.split('.'))
-                if type(matches) in (list, tuple):
-                    if attr not in matches: break
-                else:
-                    if attr != matches: break
-            else:  # if here, this atom matched all queries
+        for key in keywords:
+            if key in 'protein dna rna water unknown':
+                atoms = mdt.AtomList(atom for atom in atoms
+                                     if atom.residue.type == key)
+
+        result = mdt.AtomList()
+        for atom in atoms:
+            for field, val in queries.iteritems():
+                if getattr(atom, field, None) != val and getattr(atom.residue, field, None) != val:
+                    break
+            else:
                 result.append(atom)
 
         return result
@@ -167,6 +172,12 @@ class AtomGroup(AtomGroupNotebookMixin):
             com += atom.position * atom.mass
         com = com / total_mass
         return com
+
+    @center_of_mass.setter
+    def center_of_mass(self, value):
+        vec = value - self.com
+        self.translate(vec)
+
     com = center_of_mass  # synonym
 
     def _getatom(self, a):
@@ -206,7 +217,7 @@ class AtomGroup(AtomGroupNotebookMixin):
         """
         return mdt.geom.dihedral(*map(self._getatom, (a1, a2, a3, a4)))
 
-    def copy(self):
+    def copy_atoms(self):
         """
         Copy a group of atoms which may already have bonds, residues, and a parent molecule
         assigned. Do so by copying only the relevant entities, and creating a "mask" with
@@ -466,6 +477,8 @@ class AtomList(AtomContainer, list):  # order is important, list will override m
             return '<AtomList: [%s]>' % ', '.join(atom._shortstr() for atom in self)
         except (KeyError, AttributeError):
             return '<AtomList at %x (__repr__ failed)>' % id(self)
+
+    copy = AtomContainer.copy_atoms
 
     def intersection(self, *otherlists):
         """ Return a list of atoms that appear in all lists (including this one).
