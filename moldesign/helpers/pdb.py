@@ -93,53 +93,14 @@ def insert_ter_records(mol, pdbfile):
     else:
         return newf
 
-CONECT = 'CONECT %4d'
 
-def insert_conect_records(mol, pdbfile, write_to=None):
-    """ Inserts TER records to indicate the end of the biopolymeric part of a chain
+def get_conect_pairs(mol):
+    """ Returns a dicitonary of HETATM bonds for a PDB CONECT record
 
-    Put CONECT records at the end of a pdb file that doesn't have them
-
-    Args:
-        mol (moldesign.Molecule): the MDT version of the molecule that pdbfile describes
-        pdbfile (TextIO OR str): pdb file (file-like or string)
-
-    Returns:
-        cStringIO.StringIO OR str: copy of the pdb file with added TER records - it will be
-         returned as the same type passed (i.e., as a filelike buffer or as a string)
+    Note that this doesn't return the text records themselves, because they need
+    to reference a specific PDB sequence number
     """
-    pairs = _get_conect_pairs(mol)
-
-    if isinstance(pdbfile, basestring):
-        pdbfile = StringIO(pdbfile)
-
-    # First, identify where to insert records (if anywhere)
-    ter_residues = set()
-    for chain in mol.chains:
-        if chain.type == 'protein':
-            ter_residues.add((chain.pdbname, chain.c_terminal.pdbindex))
-        elif chain.type == 'dna':
-            ter_residues.add((chain.pdbname, chain.threeprime_end.pdbindex))
-
-    # insert the records (if necessary)
-    if write_to is None:
-        newf = StringIO()
-    else:
-        newf = write_to
-    pdbfile.seek(0)
-
-    for line in pdbfile:
-        if line.split() == ['END']:
-            for a1idx in pairs:
-                for istart in xrange(0, len(pairs[a1idx]), 4):
-                    pairindices = ''.join(("%5d" % idx) for idx in pairs[a1idx][istart:istart+4])
-                    newf.write(CONECT % a1idx + pairindices + '\n')
-
-        newf.write(line)
-
-
-def _get_conect_pairs(mol):
-    bonds = {}
+    conects = collections.OrderedDict()
 
     for residue in mol.residues:
         # intra-residue bonds
@@ -150,18 +111,18 @@ def _get_conect_pairs(mol):
                 else:
                     order = bond.order
                 for i in xrange(order):
-                    bonds.setdefault(bond.a1.index+1, []).append(bond.a2.index+1)
+                    conects.setdefault(bond.a1, []).append(bond.a2)
 
         # inter-residue bonds
         try:
             r2 = residue.next_residue
-        except (StopIteration, NotImplemented, NotImplementedError):
+        except (StopIteration, KeyError, NotImplementedError):
             continue
         if not (residue.is_standard_residue and r2.is_standard_residue):
             for bond in residue.bonds_to(r2):
-                bonds.setdefault(bond.a1.index+1, []).append(bond.a2.index+1)
+                conects.setdefault(bond.a1, []).append(bond.a2)
 
-    return bonds
+    return conects
 
 
 def warn_assemblies(mol, assemblies):
