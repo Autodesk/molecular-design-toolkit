@@ -15,6 +15,7 @@
 import collections
 
 import ipywidgets as ipy
+import yaml
 
 from moldesign.uibase import UnitText, ReadOnlyRepr
 from moldesign import utils
@@ -59,10 +60,12 @@ class Configurator(ipy.Box):
         self.title = ipy.HTML('<center><h4>%s</h4></center><hr>' % title,
                               align_self='center')
 
-        self.currentconfig = ipy.Textarea(description='Current params:',
+        self.currentconfig = ipy.Textarea(description='<i>Current params</i>',
                                           disabled=True,
-                                          value=str(paramlist).replace(', ', ',\n   '),
-                                          width='350px')
+                                          value=self._pretty_print_config(),
+                                          layout=ipy.Layout(width='350px', min_height='300px',
+                                                            max_height='500px',
+                                                            display='flex', flex_flow='column'))
         self.middle = ipy.HBox([ipy.VBox(self.selectors.values()), self.currentconfig])
         self.children = [self.title, self.middle, self.buttons]
 
@@ -81,8 +84,15 @@ class Configurator(ipy.Box):
     def apply_values(self, *args):
         for paramname, selector in self.selectors.iteritems():
             self.paramlist[paramname] = selector.selector.value
-        self.currentconfig.value = str(self.paramlist).replace(', ', ',\n   ')
+        self.currentconfig.value = self._pretty_print_config()
         self.show_relevant_fields()
+
+    def _pretty_print_config(self):
+        def cleanse(v):
+            if isinstance(v, (float,int)): return v
+            else: return str(v)
+        return yaml.dump({k: cleanse(v) for k, v in self.paramlist.iteritems()},
+                         default_flow_style=False)
 
     def show_relevant_fields(self):
         for s in self.selectors.itervalues():
@@ -95,18 +105,18 @@ class Configurator(ipy.Box):
 
 class ParamSelector(ipy.Box):
 
-    WIDGETKWARGS = {'width': '200px'}
+    WIDGETKWARGS = {'layout': ipy.Layout(width='200px')}
 
     def __init__(self, paramdef):
         super(ParamSelector, self).__init__(layout=ipy.Layout(display='flex',
                                                               flex_flow='nowrap',
-                                                              align_content='baseline'))
+                                                              align_content='stretch'))
 
         self.paramdef = paramdef
 
         children = []
         self.name = ipy.HTML("<p style='text-align:right'>%s:</p>" % paramdef.displayname,
-                             width='200px')
+                             layout=ipy.Layout(width='200px'))
         children.append(self.name)
 
         if paramdef.choices:
@@ -131,7 +141,7 @@ class ParamSelector(ipy.Box):
         if paramdef.default:
             self.default_button = ipy.Button(description='Default',
                                              tooltip='Set to default: %s' % self.paramdef.default,
-                                             width='75px')
+                                             layout=ipy.Layout(width='75px'))
             self.default_button.on_click(self.default)
             children.append(self.default_button)
             self.default()
