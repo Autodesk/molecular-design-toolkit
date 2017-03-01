@@ -120,7 +120,7 @@ def write(obj, filename=None, format=None, mode='w'):
     # First, create an object to write to (either file handle or file-like buffer)
     if filename:
         return_string = False
-        fileobj = COMPRESSION[compression](filename, mode=mode)
+        fileobj = COMPRESSION[compression](os.path.expanduser(filename), mode=mode)
     else:
         return_string = True
         fileobj = StringIO.StringIO()
