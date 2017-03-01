@@ -17,6 +17,7 @@ import base64
 
 import collections
 import ipywidgets as ipy
+from ipywidgets import Layout
 from pip._vendor.packaging import version
 
 import moldesign as mdt
@@ -38,7 +39,7 @@ __packageall.append('about')
 
 class MDTConfig(ipy.Box):
     def __init__(self):
-        super(MDTConfig, self).__init__(display='flex', flex_flow='column')
+        super(MDTConfig, self).__init__(layout=Layout(display='flex', flex_flow='column'))
 
         self.compute_config = ComputeConfig()
         self.changelog = ChangeLog()
@@ -75,7 +76,7 @@ class MDTConfig(ipy.Box):
 
 class ChangeLog(ipy.Box):
     def __init__(self):
-        super(ChangeLog, self).__init__(orientation='vertical')
+        super(ChangeLog, self).__init__(layout=Layout(orientation='vertical'))
         try:
             current = version.parse(mdt.__version__)
             latest = self.version_check()
@@ -91,7 +92,7 @@ class ChangeLog(ipy.Box):
             versiontext = '<b>Failed update check</b>: %s' % e
 
         self.version = ipy.HTML(versiontext)
-        self.textarea = ipy.Textarea(width='700px', height='300px')
+        self.textarea = ipy.Textarea(layout=Layout(width='700px', height='300px'))
 
         p1 = os.path.join(mdt.PACKAGEPATH, "HISTORY.rst")
         p2 = os.path.join(mdt.PACKAGEPATH, "..", "HISTORY.rst")
@@ -124,16 +125,16 @@ class ChangeLog(ipy.Box):
 
 class ComputeConfig(ipy.Box):
     def __init__(self):
-        super(ComputeConfig, self).__init__(display='flex', flex_flow='column')
+        super(ComputeConfig, self).__init__(layout=Layout(display='flex', flex_flow='column'))
 
         self.engine_dropdown = ipy.Dropdown(description='Compute engine',
                                             options=ENGINE_DISPLAY,
                                             value=ENGINES.keys()[0],
-                                            height='30px')
+                                            layout=Layout(height='30px'))
         self.engine_dropdown.observe(self.update_engine_display)
 
         self.engine_config_description = ipy.HTML('description')
-        self.engine_config_value = ipy.Text('blank', width='500px')
+        self.engine_config_value = ipy.Text('blank', layout=Layout(width='500px'))
         self.engine_config = ipy.HBox([self.engine_config_description,
                                        self.engine_config_value])
 
@@ -219,8 +220,8 @@ class RegistryConfig(ipy.Box):
 
         self.children = (ipy.HBox([self.repo_field, self.version_field]),
                          ipy.HBox([self._reset_config_button,
-                                                self._apply_changes_button,
-                                                self._pull_button]))
+                                   self._apply_changes_button,
+                                   self._pull_button]))
 
         self._reset_config_button.on_click(self.reset_config)
         self._apply_changes_button.on_click(self.apply_config)
