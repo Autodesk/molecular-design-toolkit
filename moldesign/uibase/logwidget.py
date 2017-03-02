@@ -19,7 +19,7 @@ import IPython.display
 import ipywidgets as ipy
 
 import moldesign as mdt
-
+from moldesign import utils
 from .components import StyledTab
 
 STANDARD = 25  # logging level between INFO and WARN
@@ -34,7 +34,7 @@ _prev_tabs = None
 _current_tabs = None
 _capture_enabled = False
 
-widgets_enabled = mdt.utils.can_use_widgets()
+widgets_enabled = utils.can_use_widgets()
 
 
 def display_log(obj, title=None, show=False):

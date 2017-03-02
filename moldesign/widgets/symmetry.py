@@ -42,7 +42,8 @@ class Symmetrizer(ipy.Box):
         self.reset_button = ipy.Button(description='Reset')
         self.reset_button.on_click(self.reset_coords)
 
-        self.apply_all_button = ipy.Button(description='Apply all', padding=10)
+        self.apply_all_button = ipy.Button(description='Apply all',
+                                           layout=ipy.Layout(padding='10px'))
         self.apply_all_button.on_click(self.set_highest_symmetry)
 
         self.tolerance_descrip = ipy.HTML(u'<small>tolerance/\u212B</small>',)
@@ -58,7 +59,7 @@ class Symmetrizer(ipy.Box):
                                    self.apply_all_button,
                                    ipy.HBox([self.tolerance_chooser, self.recalculate_button]),
                                    self.tolerance_descrip],
-                                  width=325)
+                                  layout=ipy.Layout(width='325px'))
 
         self.symmetry = None
         self.coords_changed()

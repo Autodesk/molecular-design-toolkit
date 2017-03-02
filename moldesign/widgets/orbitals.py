@@ -18,16 +18,20 @@ import ipywidgets as ipy
 
 from moldesign.uibase.selector import SelectionGroup, Selector, create_value_selector
 from moldesign.viewer import GeometryViewer
+from moldesign import utils
 
 
 class OrbitalViewer(SelectionGroup):
+    """
+    Subclass of the standard geometry viewer with added UI for rendering orbitals
+
+    Args:
+        mol (mdt.Molecule): a molecule with A) orbitals, and
+                            B) an energy model with calculate_orbital_grid
+        **kwargs (dict): kwargs for the viewer
+    """
     def __init__(self, mol, **kwargs):
-        """
-        :param mol: a molecule with A) orbitals, and B) an energy model with calculate_orbital_grid
-        :param kwargs: kwargs for the viewer
-        :return:
-        """
-        self.viewer = GeometryViewer(mol=mol, **kwargs)
+        self.viewer = GeometryViewer(mol=mol, **utils.process_widget_kwargs(kwargs))
         self.viewer.wfns = [mol.wfn]
         self.uipane = OrbitalUIPane(self, height=int(self.viewer.height)-50)
         hb = ipy.HBox([self.viewer, self.uipane])
@@ -49,24 +53,26 @@ class OrbitalUIPane(Selector, ipy.Box):
         self.type_dropdown.observe(self.new_orb_type, 'value')
 
         self.orblist = ipy.Dropdown(options={None: None},
-                                  width=str(kwargs['width'])+'px',
-                                  height=str(int(kwargs['height']) - 75)+'px')
+                                    layout=ipy.Layout(
+                                            width=str(kwargs['width'])+'px',
+                                            height=str(int(kwargs['height']) - 75)+'px'))
 
         self.isoval_selector = create_value_selector(ipy.FloatSlider,
                                                      value_selects='orbital_isovalue',
                                                      min=0.0, max=0.075,
                                                      value=0.01, step=0.00075,
-                                                     width=kwargs['width'],
                                                      description='Isovalue',
-                                                     readout_format='.4f')
+                                                     readout_format='.4f',
+                                                     layout=ipy.Layout(width=kwargs['width']))
 
-        self.orb_resolution = ipy.Text(description='Orbital resolution', width=75)
+        self.orb_resolution = ipy.Text(description='Orbital resolution',
+                                       layout=ipy.Layout(width=75))
         self.orb_resolution.value = '40'  # string because it's required for the 'on_submit' method
         self.change_resolution()
         self.orb_resolution.on_submit(self.change_resolution)
 
         children = [self.type_dropdown, self.orblist, self.isoval_selector, self.orb_resolution]
-        super(OrbitalUIPane, self).__init__(children, **kwargs)
+        super(OrbitalUIPane, self).__init__(children, **utils.process_widget_kwargs(kwargs))
         self.new_orb_type()
         self.orblist.observe(self.new_orbital_selection, 'value')
 

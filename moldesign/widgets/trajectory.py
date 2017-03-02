@@ -19,6 +19,7 @@ import moldesign as mdt
 
 from moldesign.uibase.components import AtomInspector
 from moldesign.uibase import selector
+from moldesign import utils
 
 
 class TrajectoryViewer(selector.SelectionGroup):
@@ -44,7 +45,8 @@ class TrajectoryViewer(selector.SelectionGroup):
                                      wfn=frame.get('wfn', None))
         self.make_controls()
         self.pane.children = [self.view_container, self.controls]
-        super(TrajectoryViewer, self).__init__([self.pane, AtomInspector()], **kwargs)
+        super(TrajectoryViewer, self).__init__([self.pane, AtomInspector()],
+                                               **utils.process_widget_kwargs(kwargs))
         self.update_selections('initialization', {'framenum': 0})
         if display:
             displaynow(self)
@@ -98,7 +100,7 @@ class TrajectoryOrbViewer(TrajectoryViewer):
 class FrameInspector(ipy.HTML, selector.Selector):
     def __init__(self, traj, **kwargs):
         self.traj = traj
-        super(FrameInspector, self).__init__(**kwargs)
+        super(FrameInspector, self).__init__(**utils.process_widget_kwargs(kwargs))
 
     def handle_selection_event(self, selection):
         if 'framenum' not in selection:

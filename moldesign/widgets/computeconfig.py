@@ -76,7 +76,8 @@ class MDTConfig(ipy.Box):
 
 class ChangeLog(ipy.Box):
     def __init__(self):
-        super(ChangeLog, self).__init__(layout=Layout(orientation='vertical'))
+        super(ChangeLog, self).__init__(layout=Layout(display='flex',
+                                                      flex_flow='column'))
         try:
             current = version.parse(mdt.__version__)
             latest = self.version_check()

@@ -117,8 +117,9 @@ class UnknownAtom(ForceFieldMessage):
         self.message = message
         self.residue = residue
         self.atom = atom
-        self.desc = 'ERROR: Atom name "%s" was not found in the "%s" template<br>%s' % (
-            self.atom.name, self.residue.resname, self.atom) + '<p>TLeap message:<i>%s</i>' % self.message
+        self.desc = ('ERROR: Atom name "%s" was not found in the "%s" template<br>%s' % (
+            self.atom.name, self.residue.resname, self.atom)
+                     + '<p>TLeap message:<i>%s</i>' % self.message)
         self.short = 'ERR: %s: unknown atom name "%s" for residue %s' % (self.atom,
                                                                          self.atom.name,
                                                                          self.atom.residue.resname)

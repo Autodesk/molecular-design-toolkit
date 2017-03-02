@@ -76,7 +76,7 @@ class ViewerToolBase(ipy.Box):
     def __init__(self, mol):
         self.mol = mol
 
-        self.toolpane = ipy.Box()
+        self.toolpane = ipy.VBox()
         self.viewer = self.VIEWERTYPE(mol)
 
         self.subtools = ipy.Box()
@@ -99,7 +99,8 @@ class SelBase(ViewerToolBase):
         self._atomset = collections.OrderedDict()
 
         self.atom_listname = ipy.HTML('<b>Selected atoms:</b>')
-        self.atom_list = ipy.SelectMultiple(options=list(self.viewer.selected_atom_indices), height=150)
+        self.atom_list = ipy.SelectMultiple(options=list(self.viewer.selected_atom_indices),
+                                            layout=ipy.Layout(height='150px'))
         traitlets.directional_link(
             (self.viewer, 'selected_atom_indices'),
             (self.atom_list, 'options'),

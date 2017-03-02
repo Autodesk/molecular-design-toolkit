@@ -16,7 +16,7 @@ import collections
 import ipywidgets as ipy
 import traitlets
 
-from moldesign import viewer, utils
+from moldesign import utils
 from moldesign.uibase.components import SelBase
 
 
@@ -30,7 +30,7 @@ class BondSelector(SelBase):
 
         self.bond_listname = ipy.HTML('<b>Selected bonds:</b>')
         self.bond_list = ipy.SelectMultiple(options=list(),
-                                            height=150)
+                                            layout=ipy.Layout(height='150px'))
 
         traitlets.directional_link(
             (self.viewer, 'selected_atom_indices'),
@@ -83,14 +83,16 @@ class ResidueSelector(SelBase):
     def __init__(self, mol):
         super(ResidueSelector, self).__init__(mol)
 
-        self.selection_type = ipy.Dropdown(description='Clicks select:',value=self.viewer.selection_type,
+        self.selection_type = ipy.Dropdown(description='Clicks select:',
+                                           value=self.viewer.selection_type,
                                            options=('Atom', 'Residue', 'Chain'))
 
         traitlets.link((self.selection_type, 'value'), (self.viewer, 'selection_type'))
 
         self.residue_listname = ipy.HTML('<b>Selected residues:</b>')
         self.residue_list = ipy.SelectMultiple(options=list(), height=150)
-        traitlets.directional_link((self.viewer, 'selected_atom_indices'), (self.residue_list, 'options'), self._atoms_to_residues)
+        traitlets.directional_link((self.viewer, 'selected_atom_indices'),
+                                   (self.residue_list, 'options'), self._atoms_to_residues)
         self.residue_list.observe(self.remove_atomlist_highlight, 'value')
         self.atom_list.observe(self.remove_reslist_highlight, 'value')
 
@@ -122,7 +124,8 @@ class ResidueSelector(SelBase):
             else:
                 residues[atom.residue.index]['selected_count'] = 1
 
-            if residues[atom.residue.index]['selected_count'] >= residues[atom.residue.index]['total']:
+            if (residues[atom.residue.index]['selected_count'] >=
+                    residues[atom.residue.index]['total']):
                 selected_residues.add(atom.residue)
 
         return list(selected_residues)
