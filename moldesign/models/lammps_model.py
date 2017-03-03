@@ -127,14 +127,15 @@ class LAMMPSPotential(EnergyModelBase):
         # create temporary file system
         tmpdir = tempfile.mkdtemp()
         saved_umask = os.umask(0077)
-        fromatted_data = self.format_lammps_data()
+        formatted_data = self.format_lammps_data()
+        print formatted_data
 
         # Create temperary data file
         predictable_filename = 'data.lammps_mol'
         data_path = os.path.join(tmpdir, predictable_filename)
 
         with open(data_path, "w") as lammps_data:
-            lammps_data.write(fromatted_data)
+            lammps_data.write(formatted_data)
 
         pylmp.command("units real")
         pylmp.command("dimension 3")
@@ -216,26 +217,26 @@ class LAMMPSPotential(EnergyModelBase):
         datalines += "\r\n"
 
         # TODO: calculate lo and hi coordinates for Box size
-        # xlo = xhi = ylo = yhi = zlo = zhi = None
-        # for atom in self.mol.atoms:
-        #     if xlo == None:
-        #         xlo = atom.x.value_in(u.angstrom)
-        #         xhi = atom.x.value_in(u.angstrom)
-        #         ylo = atom.y.value_in(u.angstrom)
-        #         yhi = atom.y.value_in(u.angstrom)
-        #         zlo = atom.z.value_in(u.angstrom)
-        #         zhi = atom.z.value_in(u.angstrom)
-        #     else:
-        #         xlo = min(xlo, atom.x.value_in(u.angstrom))
-        #         xhi = max(xhi, atom.x.value_in(u.angstrom))
-        #         ylo = min(ylo, atom.y.value_in(u.angstrom))
-        #         yhi = max(yhi, atom.y.value_in(u.angstrom))
-        #         zlo = min(zlo, atom.z.value_in(u.angstrom))
-        #         zhi = max(zhi, atom.z.value_in(u.angstrom))
+        xlo = xhi = ylo = yhi = zlo = zhi = None
+        for atom in self.mol.atoms:
+            if xlo == None:
+                xlo = atom.x.value_in(u.angstrom)
+                xhi = atom.x.value_in(u.angstrom)
+                ylo = atom.y.value_in(u.angstrom)
+                yhi = atom.y.value_in(u.angstrom)
+                zlo = atom.z.value_in(u.angstrom)
+                zhi = atom.z.value_in(u.angstrom)
+            else:
+                xlo = min(xlo, atom.x.value_in(u.angstrom))
+                xhi = max(xhi, atom.x.value_in(u.angstrom))
+                ylo = min(ylo, atom.y.value_in(u.angstrom))
+                yhi = max(yhi, atom.y.value_in(u.angstrom))
+                zlo = min(zlo, atom.z.value_in(u.angstrom))
+                zhi = max(zhi, atom.z.value_in(u.angstrom))
 
-        datalines += "{0} {1} xlo xhi\r\n".format(-200, 200)
-        datalines += "{0} {1} ylo yhi\r\n".format(-200, 200)
-        datalines += "{0} {1} zlo zhi\r\n".format(-200, 200)
+        datalines += "{0} {1} xlo xhi\r\n".format(xlo-50, xhi+50)
+        datalines += "{0} {1} ylo yhi\r\n".format(ylo-50, yhi+50)
+        datalines += "{0} {1} zlo zhi\r\n".format(zlo-50, zhi+50)
 
         datalines += "\r\n"
 
