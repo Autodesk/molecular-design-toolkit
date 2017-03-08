@@ -191,6 +191,17 @@ def pint2simtk(quantity):
 
 @compute.runsremotely(enable=force_remote)
 def _amber_to_mol(prmtop_file, inpcrd_file):
+    """ Convert an amber prmtop and inpcrd file to an MDT molecule
+
+    Args:
+        prmtop_file (file-like): topology file in amber prmtop format
+        inpcrd_file (file-like): coordinate file in amber crd format
+        topo (mdt.Molecule): if passed, use this information to assign chains and residue
+            consistent with this structure
+
+    Returns:
+
+    """
     from simtk.openmm import app
 
     prmtop = from_filepath(app.AmberPrmtopFile, prmtop_file)

@@ -198,3 +198,37 @@ def atom_name_check(mol, force=False):
 
     if badres:
         print 'WARNING: residues do not have uniquely named atoms: %s' % badres
+
+
+def restore_topology(mol, topo):
+    """ Restores chain IDs and residue indices (these are stripped by some methods)
+
+    Args:
+        mol (mdt.Molecule): molecule to restore topology to
+        topo (mdt.Molecule): reference topology
+
+    Returns:
+        mdt.Molecule: a copy of ``mol`` with a restored topology
+    """
+    import moldesign as mdt
+
+    assert mol.num_residues == topo.num_residues
+    assert mol.num_chains == 1
+
+    chain_map = {}
+    for chain in topo.chains:
+        chain_map[chain] = mdt.Chain(name=chain.name)
+
+    for res, refres in zip(mol.residues, topo.residues):
+        if refres.resname in ('HID', 'HIE', 'HIP'):
+            rname = 'HIS'
+        else:
+            rname = refres.resname
+        assert res.resname == rname
+        res.pdbindex = refres.pdbindex
+        res.name = refres.name
+        res.chain = chain_map[refres.chain]
+        for atom in res.atoms:
+            atom.chain = res.chain
+
+    return mdt.Molecule(mol.atoms)

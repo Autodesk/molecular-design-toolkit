@@ -284,7 +284,8 @@ def assign_forcefield(mol, **kwargs):
         prmtop = job.get_output('output.prmtop')
         inpcrd = job.get_output('output.inpcrd')
         params = AmberParameters(prmtop, inpcrd, job)
-        newmol = mdt.read_amber(params.prmtop, params.inpcrd)
+        m = mdt.read_amber(params.prmtop, params.inpcrd)
+        newmol = mdt.helpers.restore_topology(m, mol)
         newmol.ff = mdt.forcefields.ForceField(newmol, params)
     else:
         newmol = None
