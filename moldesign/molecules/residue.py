@@ -88,7 +88,7 @@ class Residue(BioContainer, ResidueNotebookMixin):
             residues[atom.residue] = None
         return residues.keys()
 
-    def add(self, atom, key=None):
+    def _add(self, atom, key=None):
         """Deals with atom name clashes within a residue - common for small molecules"""
         if atom.residue is not None:
             assert atom.residue is self, 'Atom already assigned to a residue'
@@ -102,7 +102,6 @@ class Residue(BioContainer, ResidueNotebookMixin):
             return super(Residue, self).add(atom, key=key)
         else:
             return super(Residue, self).add(atom, key='%s%s' % (atom.name, len(self)))
-    add.__doc__ = BioContainer.add.__doc__
 
     @property
     def is_n_terminal(self):

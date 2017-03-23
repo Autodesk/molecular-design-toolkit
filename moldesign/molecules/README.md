@@ -37,3 +37,84 @@ atom.pdbindex |    |    residue.pdbindex                                   atom.
 
 #### Small molecules
 Small molecules can come from a variety of sources with a variety of different metadata available. If a given molecule is provided with PDB-type metadata, we'll name and index it according to the biomolecule conventions above. Otherwise, a 'placeholder' residue and chain will be created to hold the atoms. If the atom names are just the names of the elements (e.g., all carbon atoms are named C), atom.name will be automatically assigned as `"%s%d" % (atom.elem, atom.index)`.
+
+
+### Data model specs
+
+The MDT API is designed to let you manipulate molecules from a variety of levels, with internal components that keep the data consistent. For instance, we do the bookeeping to make sure that these statements are always true:
+  - `residue.atoms[3].residue == residue`
+  - `atom.position == mol.positions[atom.index]`
+ 
+even if you manipulate the structure.
+ 
+This means that any time the  user modifies data, the entire molecule needs to be self-consistently updated. `Molecule` objects are therefore tightly coupled with their `Atom`, `Residue`, and `Chain` components to achieve this.
+
+Here are some general specifications and test for how the molecular data model reacts to changes:
+
+
+##### List indices
+
+Regardless of structure manipulation, it will always be true that
+
+```python
+atom is molecule.atoms[atom.index]
+residue is molecule.residues[residue.index]
+chain is molecule.chains[chain.index]
+```
+
+##### Adding a new object to an existing molecule
+Either by settings its properties:
+```
+atom.molecule = mol
+residue.molecule = mol [...]
+```
+
+Or equivalently:
+```
+mol.atoms.append(atom)
+mol.residues.append(residue)
+mol.chains.append(chain)
+```
+
+All of the object's children and parents (i.e., the associated chains, residues, atoms) will be assigned to this molecule if they're not already (`ValueError` is raised if any one of these objects is already different `Molecule`).
+
+If `atom.residue is None`, the atom will made a child of the molecule's default residue (stored at `molecule._defresidue`). Similarly, unassigned residues become children of `molecule._defchain`.
+
+ 
+##### Moving an atom between residues
+An atom can be moved between residues by simple reassignment:
+```python
+atom = mol.residues[0].atoms[0]
+atom.residue = mol.residues[3]
+assert atom in mol.residues[3]
+assert atom not in mol.residues[0]
+```
+
+##### Adding a new residue
+Adding an atom to a new residue will automatically add that residue to the same molecule in a new chain:
+```python
+initmol = mol.copy()
+
+newres = mdt.Residue(name='UNL')
+atom.residue = newres
+
+assert newres.molecule is atom.molecule
+assert newres.chain.atoms == [atom]
+assert mol.num_chains == initmol.num_chains + 1
+assert mol.num_residues == initmol.num_residues + 1
+assert mol.num_atoms == initmol.num_atoms
+```
+
+##### Changing an atom's name
+Changing an atom's name will automatically update its residue:
+```python
+atom = mol.atoms[0]
+res = atom.residue
+oldname = atom.name
+
+assert oldname in res
+atom.name ='fakename'
+assert atom.name in res
+assert oldname not in res
+assert res['fakename'] == atom
+```

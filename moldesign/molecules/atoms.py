@@ -83,6 +83,20 @@ class AtomPropertyMixin(object):
         return props
 
 
+def _on_name_change(atom, oldname, newname):
+    if getattr(atom, 'residue', None):
+        atom.residue._remove(atom)
+        atom.residue._add(atom)
+
+
+def _on_residue_change(atom, oldres, newres):
+    if oldres is None:
+        newres.molecule = atom.molecule
+    else:
+        oldres._remove(atom)
+    newres._add(atom)
+
+
 @toplevel
 class Atom(AtomPropertyMixin, AtomNotebookMixin):
     """ A data structure representing an atom.
@@ -99,7 +113,6 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         atnum (int): Atomic number (if not passed, determined from element if possible)
         mass (units.Scalar[mass]): The atomic mass (if not passed, set to the most abundant isotopic
             mass)
-        chain (moldesign.Chain): biomolecular chain that this atom belongs to
         residue (moldesign.Residue): biomolecular residue that this atom belongs to
         pdbname (str): name from PDB entry, if applicable
         pdbindex (int): atom serial number in the PDB entry, if applicable
@@ -146,11 +159,15 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
     position = AtomArray('_position', 'positions')
     momentum = AtomArray('_momentum', 'momenta')
 
+    name = utils.EventfulAttr('_name', _on_name_change)
+    residue = utils.EventfulAttr('_residue', _on_residue_change)
+    chain = utils.Alias('residue.chain')
+
     atomic_number = utils.Synonym('atnum')
 
     #################################################################
     # Methods for BUILDING the atom and indexing it in a molecule
-    def __init__(self, name=None, atnum=None, mass=None, chain=None, residue=None,
+    def __init__(self, name=None, atnum=None, mass=None, residue=None,
                  formal_charge=None, pdbname=None, pdbindex=None, element=None,
                  metadata=None):
 
@@ -159,10 +176,13 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
             if isinstance(name, int):
                 atnum = name
                 name = None
-            else: element = name
+            else:
+                element = name
 
-        if element: self.atnum = data.ATOMIC_NUMBERS[element]
-        else: self.atnum = atnum
+        if element:
+            self.atnum = data.ATOMIC_NUMBERS[element]
+        else:
+            self.atnum = atnum
 
         self.name = utils.if_not_none(name, self.elem)
         self.pdbname = utils.if_not_none(pdbname, self.name)
@@ -173,7 +193,6 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
 
         self.formal_charge = utils.if_not_none(formal_charge, 0.0 * u.q_e)
         self.residue = residue
-        self.chain = chain
         self.molecule = None
         self.index = None
         self._position = np.zeros(3) * u.default.length
@@ -227,30 +246,21 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
             state['_momentum'] = self.momentum
         return state
 
-    def _set_molecule(self, molecule):
-        """ Permanently make this atom part of a molecule (private)
+    @property
+    def molecule(self):
+        return self._molecule
 
-        Args:
-            parent (moldesign.Molecule): the molecule that this atom will become a part of
+    @molecule.setter
+    def molecule(self, molecule):
+        """ Set the atom's molecule - only allowed if current molecule is None
         """
         if self.molecule and (molecule is not self.molecule):
-            raise ValueError('Atom is already part of a molecule')
-        self.molecule = molecule
+            raise ValueError('%s is already part of a molecule' % self)
+        self._molecule = molecule
 
-    def _index_into_molecule(self, array_name, moleculearray, index):
-        """ Link the atom's positions and momenta to the parent molecule (private)
-
-        Args:
-            array_name (str): the private name of the array (assumes private name is '_'+array_name)
-            moleculearray (u.Array): the molecule's master array
-            index: the atom's index in the molecule
-
-        Note:
-            This will be called by the molecule's init method
-        """
-        oldarray = getattr(self, array_name)
-        moleculearray[index, :] = oldarray
-        setattr(self, '_' + array_name, None)  # remove the internally stored version
+        # These are now owned by the molecule:
+        self._position = None
+        self._momentum = None
 
     def bond_to(self, other, order):
         """ Create or modify a bond with another atom

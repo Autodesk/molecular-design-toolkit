@@ -4,6 +4,7 @@ import collections
 
 import numpy
 import pytest
+import random
 
 import moldesign as mdt
 mdt.compute.config.engine_type = 'docker'
@@ -12,31 +13,32 @@ from moldesign import units as u
 from .helpers import get_data_path
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def bipyridine_sdf():
     return mdt.read(get_data_path('bipyridine.sdf'))
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def bipyridine_xyz():
     return mdt.read(get_data_path('bipyridine.xyz'))
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def bipyridine_mol2():
     return mdt.read(get_data_path('bipyridine.mol2'))
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def bipyridine_iupac():
     return mdt.from_name('bipyridine')
 
-@pytest.fixture
+
+@pytest.fixture(scope='function')
 def bipyridine_inchi():
     return mdt.from_inchi('InChI=1S/C10H8N2/c1-3-7-11-9(5-1)10-6-2-4-8-12-10/h1-8H')
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def bipyridine_smiles():
     return mdt.from_smiles('c1ccnc(c1)c2ccccn2')
 
@@ -163,13 +165,54 @@ def test_1kbu_assembly_build(key, request):
                                   mol.chains[asym.num_chains].positions.defunits_value())
 
 
-@pytest.mark.parametrize('fmt', 'smiles pdb mol2 sdf inchi mmcif'.split())
-def test_topology_preserved_in_serialization(bipyridine_smiles, fmt):
+def _test_serialized_molecule(mol, fmt):
+    newmol = mdt.read(mol.write(format=fmt), format=fmt)
+    assert mol.num_atoms == newmol.num_atoms
+    for oldatom, newatom in zip(mol.atoms, newmol.atoms):
+        assert oldatom.name == newatom.name
+        assert oldatom.atnum == newatom.atnum
+        numpy.testing.assert_allclose(oldatom.position.value_in(u.angstrom),
+                                      newatom.position.value_in(u.angstrom),
+                                      atol=1e-3)
+    assert mol.same_bonds(newmol, verbose=True)
+
+
+@pytest.mark.parametrize('fmt', 'pdb mol2 sdf mmcif'.split())
+def test_molecule_survives_3d_serialization(bipyridine_smiles, fmt):
+    """ Test that molecules are nearly identical after serialization
+    """
+    _test_serialized_molecule(bipyridine_smiles, fmt)
+
+
+@pytest.mark.parametrize('fmt', 'pdb mol2 sdf mmcif'.split())
+def test_mangled_molecule_survives_3d_serialization(bipyridine_smiles, fmt):
+    """ Test that molecules are nearly identical after serialization,
+    even if the structure is messed up
+    """
+    mol = bipyridine_smiles.copy()  # don't screw up the fixture object
+
+    # mess up the structure, including making bonds that don't correspond to distances
+    tempatoms = list(mol.atoms)
+    random.shuffle(tempatoms)
+    mol = mdt.Molecule(tempatoms)
+    mol.atoms[0].name = mol.atoms[0].element + 'b'
+    mol.atoms[-1].name = mol.atoms[-1].element + 'c'
+    hydrogens = mol.get_atoms(atnum=1)
+    hydrogens[0].bond_graph, hydrogens[1].bond_graph =\
+        hydrogens[1].bond_graph, hydrogens[0].bond_graph
+    mol.atoms[3].x += 10.0 * u.angstrom
+
+    _test_serialized_molecule(mol, fmt)
+
+
+@pytest.mark.parametrize('fmt', 'smiles inchi'.split())
+def test_topology_preserved_in_identifier_serialization(bipyridine_smiles, fmt):
     """ Test that bond topology is preserved even if it doesn't make sense from distances
     """
     mol = bipyridine_smiles.copy()  # don't screw up the fixture object
-    mol.bond_graph[mol.atoms[3]][mol.atoms[5]] = 3
-    mol.bond_graph[mol.atoms[5]][mol.atoms[3]] = 3
+
+    # swap the bonds from two hydrogens
+
     mol.atoms[3].x += 10.0 * u.angstrom
 
     newmol = mdt.read(mol.write(format=fmt), format=fmt)

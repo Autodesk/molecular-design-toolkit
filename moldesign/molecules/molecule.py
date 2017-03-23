@@ -24,7 +24,7 @@ from moldesign.min.base import MinimizerBase
 
 from .notebook_display import MolNotebookMixin
 from .properties import MolecularProperties
-from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond
+from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond, IndexedAtomList
 from .coord_arrays import *
 
 
@@ -216,6 +216,17 @@ class MolPropertyMixin(object):
         """
         return self.get_property('wfn')
 
+    @property
+    def is_biomolecule(self):
+        num_biores = 0
+        for residue in self.residues:
+            if residue.type in ('dna', 'rna', 'protein'):
+                num_biores += 1
+                if num_biores > 1:
+                    return True
+        else:
+            return False
+
     def calc_property(self, name, **kwargs):
         """ Calculate the given property if necessary and return it
 
@@ -401,6 +412,18 @@ class MolTopologyMixin(object):
         self.residues = []
         self._rebuild_topology()
 
+        self.is_biomolecule = False
+        self.ndims = 3 * self.num_atoms
+        reset_positions = u.array([atom.position for atom in self.atoms]).defunits()
+        reset_momenta = u.array([atom.momentum for atom in self.atoms]).defunits()
+        self._positions = reset_positions
+        self._momenta = reset_momenta
+        self.masses = u.array([atom.mass for atom in self.atoms]).defunits()
+        self.dim_masses = u.broadcast_to(self.masses, (3, self.num_atoms)).T
+        atom._molecule = self
+        self._build_primary_structure()
+        self._dof = None
+
     def _rebuild_topology(self, bond_graph=None):
         """ Build the molecule's bond graph based on its atoms' bonds
 
@@ -411,16 +434,6 @@ class MolTopologyMixin(object):
             self.bond_graph = self._build_bonds(self.atoms)
         else:
             self.bond_graph = bond_graph
-
-        self.is_biomolecule = False
-        self.ndims = 3 * self.num_atoms
-        self._positions = np.zeros((self.num_atoms, 3)) * u.default.length
-        self._momenta = np.zeros((self.num_atoms, 3)) * u.default.momentum
-        self.masses = np.zeros(self.num_atoms) * u.default.mass
-        self.dim_masses = u.broadcast_to(self.masses, (3, self.num_atoms)).T  # TODO: pickling
-        self._assign_atom_indices()
-        self._assign_residue_indices()
-        self._dof = None
 
     @staticmethod
     def _build_bonds(atoms):
@@ -449,22 +462,7 @@ class MolTopologyMixin(object):
                     bonds[nbr][atom] = bonds[atom][nbr]
         return bonds
 
-    def _assign_atom_indices(self):
-        """
-        Create geometry-level information based on constituent atoms, and mark the atoms
-        as the property of this molecule
-        """
-        idim = 0
-        for idx, atom in enumerate(self.atoms):
-            atom._set_molecule(self)
-            atom.index = idx
-            idim += 3
-            self.masses[idx] = atom.mass
-            # Here, we index the atom arrays directly into the molecule
-            atom._index_into_molecule('_position', self.positions, idx)
-            atom._index_into_molecule('_momentum', self.momenta, idx)
-
-    def _assign_residue_indices(self):
+    def _build_primary_structure(self):
         """
         Set up the chain/residue/atom hierarchy
         """
@@ -485,8 +483,6 @@ class MolTopologyMixin(object):
             self._defchain.add(self._defres)
 
         default_residue = self._defres
-        default_chain = self._defchain
-        num_biores = 0
         conflicts = set()
 
         last_pdb_idx = None
@@ -500,38 +496,52 @@ class MolTopologyMixin(object):
             # if atom has no chain/residue, assign defaults
             if atom.residue is None:
                 atom.residue = default_residue
-                atom.chain = default_chain
-                atom.residue.add(atom)
 
-            # assign the chain to this molecule if necessary
-            if atom.chain.molecule is None:
-                atom.chain.molecule = self
-                atom.chain.index = len(self.chains)
+            if atom.residue.chain is None:
+                atom.residue.chain = self._defchain
 
-                assert atom.chain not in self.chains
-                oldname = atom.chain.name
-                if atom.chain.name is None and num_biores > 1:
-                    atom.chain.name = 'A'
-                while atom.chain.name in self.chains:
-                    if atom.chain.name is None:
-                        atom.chain.name = 'A'
-                    atom.chain.name = chr(ord(atom.chain.name)+1)
+            self._chain_setup(atom.chain)
+            self._residue_setup(atom.residue)
 
-                if oldname != atom.chain.name:
-                    conflicts.add('chain')
-                self.chains.add(atom.chain)
-            else:
-                assert atom.chain.molecule is self
+    def _chain_setup(self, chain):
+        conflict = False
+        if chain.molecule is not None:
+            assert chain.molecule is self
+            return
 
-            # assign the residue to this molecule
-            if atom.residue.molecule is None:
-                atom.residue.molecule = self
-                atom.residue.index = len(self.residues)
-                self.residues.append(atom.residue)
-                if atom.residue.type in ('dna', 'rna', 'protein'):
-                    num_biores += 1
-            else:
-                assert atom.chain.molecule is self
+        name = chain.name
+        while name in self.chains:
+            name = chr(ord(name)+1)
+        if name != chain.name:
+            conflict = True
+
+        chain._molecule = self
+        self.chains._add(chain)
+
+        return conflict
+
+    def _residue_setup(self, res):
+        conflict = False
+        if res.molecule is not None:
+            assert res.molecule is self
+            return
+
+        if res.chain is None:
+            res.chain = self._defchain
+
+        name = res.name
+        ix = 1
+        while name in res.chain:
+            name = res.name + '.' + ix
+            ix += 1
+        if name != res.name:
+            conflict = True
+
+        self.residues.append(res)
+        res.chain.add(res)
+        res._molecule = self
+
+        return conflict
 
         if conflicts:
             print 'WARNING: %s indices modified due to name clashes' % (
@@ -1006,7 +1016,7 @@ class Molecule(AtomGroup,
         """ Make a copy of the passed atoms as necessary, return the name of the molecule
         """
         # copy atoms from another object (i.e., a molecule)
-        oldatoms = helpers.get_all_atoms(atomcontainer)
+        oldatoms = helpers.get_all_atoms(atomcontainer, cls=IndexedAtomList)
         if copy_atoms or (oldatoms[0].molecule is not None):
             atoms = oldatoms.copy_atoms()
             if name is None:  # Figure out a reasonable name

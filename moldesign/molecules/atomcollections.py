@@ -463,14 +463,7 @@ class AtomContainer(AtomGroup):
         return bonds
 
 
-@toplevel
-class AtomList(AtomContainer, list):  # order is important, list will override methods otherwise
-    """ A list of atoms with various helpful methods for creating and manipulating atom selections
-
-    Args:
-        atomlist (List[AtomContainer]): list of objects that are either atoms or contain a list of
-           atoms at ``atomlist.atoms``
-    """
+class AtomListOperationMixin(AtomContainer):
     def __init__(self, atomlist=()):
         atoms = []
         for obj in atomlist:
@@ -478,17 +471,17 @@ class AtomList(AtomContainer, list):  # order is important, list will override m
                 atoms.extend(obj.atoms)
             else:
                 atoms.append(obj)
-        super(AtomList, self).__init__(atoms)
+        super(AtomListOperationMixin, self).__init__(atoms)
 
     def __getitem__(self, item):
-        result = super(AtomList, self).__getitem__(item)
+        result = super(AtomListOperationMixin, self).__getitem__(item)
         if isinstance(item, slice):
             return type(self)(result)
         else:
             return result
 
     def __getslice__(self, i, j):
-        result = super(AtomList, self).__getslice__(i, j)
+        result = super(AtomListOperationMixin, self).__getslice__(i, j)
         return type(self)(result)
 
     def __str__(self):
@@ -549,3 +542,21 @@ class AtomList(AtomContainer, list):  # order is important, list will override m
     @property
     def atoms(self):
         return self
+
+
+@toplevel
+class AtomList(AtomListOperationMixin, list):
+    """ A list of atoms with various helpful methods for creating and manipulating atom selections
+
+    Args:
+        atomlist (List[AtomContainer]): list of objects that are either atoms or contain a list of
+           atoms at ``atomlist.atoms``
+    """
+
+
+class IndexedAtomList(AtomListOperationMixin, utils.AutoIndexList):
+    """ A list of atoms that keeps the ``atom.index`` attribute up-to-date.
+
+    This class is only for use as the list of atoms in a Molecule.
+    """
+    pass

@@ -65,6 +65,10 @@ class ChildList(AtomContainer):
         else:
             return (item in self._childinorder)
 
+    def _remove(self, item):
+        self._childinorder.remove(item)
+        self._rebuild()
+
     def __getattr__(self, item):
         if item == '_childbyname':
             return self.__getattribute__('_childbyname')
@@ -122,7 +126,8 @@ class BioContainer(AtomContainer):
     __contains__ = utils.Alias('children.__contains__')
     atoms = utils.Alias('children.atoms')
     iteratoms = utils.Alias('children.iteratoms')
-    rebuild = utils.Alias('children.rebuild')
+    _rebuild = utils.Alias('children._rebuild')
+    _remove = utils.Alias('children._remove')
 
     def __init__(self, name=None, molecule=None, index=None, pdbname=None, pdbindex=None,
                  **kwargs):
@@ -143,11 +148,12 @@ class BioContainer(AtomContainer):
 
         self.pdbname = pdbname
         self.pdbindex = pdbindex
+        self.parent = None
 
         for name, val in kwargs.iteritems():
             setattr(self, name, val)
 
-    def add(self, item, key=None):
+    def _add(self, item, key=None):
         """ Add a child to this entity.
 
         Raises:
@@ -161,7 +167,11 @@ class BioContainer(AtomContainer):
             key = item.name
         self.children[key] = item
 
-    __setitem__ = add
+    __setitem__ = _add
+
+    @property
+    def molecule(self):
+        return self._molecule
 
     def __dir__(self):
         return (self.__dict__.keys() +
