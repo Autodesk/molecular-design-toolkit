@@ -123,12 +123,14 @@ if widgets_enabled:
     class LoggingTabs(StyledTab):
         def __init__(self, objects, display=False, **kwargs):
             """
-            :param objects: dict of form {TITLE: <display object>}
-            :param display: directly display the display collection
-            :param kwargs: kwargs to pass to ipywidgets initializers
+            Args:
+                objects (dict): dict-like of the form ``{TITLE: <display object>}``
+                display (bool): directly display the display collection
+                **kwargs (dict): ipywidgets kwargs
             """
             self.objs = OrderedDict(objects)
-            super(LoggingTabs, self).__init__(objects.values(), **kwargs)
+            super(LoggingTabs, self).__init__(objects.values(),
+                                              **utils.process_widget_kwargs(kwargs))
             self.selected_index = -1
             for ikey, key in enumerate(objects.iterkeys()):
                 self.set_title(ikey, key)
@@ -155,7 +157,6 @@ if widgets_enabled:
                     self.selected_index = len(self.children) - 1
 
 
-
 class Logger(ipy.Textarea if widgets_enabled else object):
     # TODO: need a javascript-side widget that will accept a stream - string concatenation is bad
     def __init__(self, title='log', **kwargs):
@@ -164,7 +165,7 @@ class Logger(ipy.Textarea if widgets_enabled else object):
         kwargs.setdefault('font_family', 'monospace')
         self.title = title
         if widgets_enabled:  # try to intialize widget
-            super(Logger, self).__init__(**kwargs)
+            super(Logger, self).__init__(**utils.process_widget_kwargs(kwargs))
             self._is_widget = True
         else:
             self._is_widget = False
@@ -188,7 +189,8 @@ def _capture_logging_displays(display=False, **kwargs):
     global _current_tabs, _prev_tabs
     _prev_tabs = _current_tabs
     if widgets_enabled:
-        _current_tabs = LoggingTabs(OrderedDict(x=ipy.Box()), display=display, **kwargs)
+        _current_tabs = LoggingTabs(OrderedDict(x=ipy.Box()), display=display,
+                                    **utils.process_widget_kwargs(kwargs))
     else:
         _current_tabs = None
         enable_logging_widgets(False)

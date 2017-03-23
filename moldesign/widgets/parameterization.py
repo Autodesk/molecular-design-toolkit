@@ -69,7 +69,9 @@ class ParameterizationDisplay(ipy.Box):
                     ipy.HBox([self.viewer, ipy.VBox([self.listdesc, self.errorlist])]),
                     self.errmsg)
 
-        super(ParameterizationDisplay, self).__init__(children=children)
+        super(ParameterizationDisplay, self).__init__(children=children,
+                                                      layout=ipy.Layout(display='flex',
+                                                                        flex_flow='column'))
 
 
     def switch_display(self, d):
