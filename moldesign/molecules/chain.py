@@ -29,7 +29,7 @@ class Chain(BioContainer):
         chain (Chain): the chain this residue belongs to
     """
     @utils.args_from(BioContainer)
-    def __init__(self, name=None, **kwargs):
+    def __init__(self, name=None, molecule=None, **kwargs):
         for key in ('pdbname', 'pdbindex'):
             val = kwargs.pop(key, None)
             if val is not None:
@@ -39,8 +39,23 @@ class Chain(BioContainer):
 
         super(Chain, self).__init__(name=name, **kwargs)
         self._type = None
-
         self._5p_end = self._3p_end = self._n_terminal = self._c_terminal = None
+
+        self.molecule = molecule
+
+
+    @property
+    def molecule(self):
+        return self._molecule
+
+    @molecule.setter
+    def molecule(self, mol):
+        if self._molecule is mol:
+            return
+        if self._molecule is not None:
+            self._molecule.chains.remove(self)
+        if mol is not None:
+            mol.chains.add(self)
 
     @property
     def pdbindex(self):
@@ -172,7 +187,7 @@ class Chain(BioContainer):
         super(Chain, self).add(residue)
         if self.molecule is not None:
             # Todo - insert atoms in a more contiguous way
-            list.extend(self.molecule.atoms, list(residue.atoms))
+            utils.AutoIndexList.extend(self.molecule.atoms, list(residue.atoms))
 
     def _get_chain_end(self, restype, selfattr, test):
         currval = getattr(self, selfattr)

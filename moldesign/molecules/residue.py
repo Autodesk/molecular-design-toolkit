@@ -116,9 +116,8 @@ class Residue(BioContainer, ResidueNotebookMixin):
         return residues.keys()
 
     def add(self, atom):
-        """Deals with atom name clashes within a residue - common for small molecules"""
+        assert atom not in self
         atom._residue = self
-
         insertidx = 0 if len(self) == 0 else self.atoms[-1].index
         super(Residue, self).add(atom)
         if self.molecule:

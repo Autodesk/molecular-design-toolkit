@@ -247,7 +247,7 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         desc = '%s %s (elem %s)' % (self.__class__.__name__, self.name, self.elem)
         molstring = ''
         if self.molecule:
-            molstring = ', index %d' % self.index
+            molstring = ', index %s' % self.index
             if self.molecule.is_biomolecule:
                 molstring += ' (res %s chain %s)' % (self.residue.name, self.chain.name)
         return '%s%s' % (desc, molstring)

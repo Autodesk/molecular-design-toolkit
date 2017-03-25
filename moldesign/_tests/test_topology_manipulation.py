@@ -13,6 +13,8 @@ def test_add_atom():
     a2 = mdt.Atom('He')
     a3 = mdt.Atom('Li')
     mol = mdt.Molecule([atom])
+    assert mol.num_atoms == 1
+    assert mol.atoms[0] is atom
 
     mol.atoms.append(a2)
     assert mol.num_atoms == 2

@@ -254,6 +254,23 @@ class Instance(BioContainer):
     """
     INDEX_CHILDREN = True
 
+    def __init__(self, molecule):
+        """  Initialization:
+
+        Args:
+            name (str): Name of this biocontainer
+            parent (mdt.Molecule): molecule this biocontainer belongs to
+            index (int): index of this biocontainer in the parent molecule
+            pdbname (str): PDB-format name of this biocontainer
+            pdbindex (str): Index of this biocontainer in PDB format
+        """
+        super(Instance, self).__init__()
+        self._molecule = molecule
+
+    @property
+    def molecule(self):
+        return self._molecule
+
     def __str__(self):
         return str(self.children)
 
@@ -263,7 +280,7 @@ class Instance(BioContainer):
     # TODO: combine this is MolecularChainList
     def add(self, chain):
         super(Instance, self).add(chain)
-        if self.molecule is not None:
-            list.extend(self._mol.residues, list(chain.residues))
-            list.extend(self._mol.atoms, list(chain.atoms))
+        chain._molecule = self.molecule
+        utils.AutoIndexList.extend(self.molecule.residues, list(chain.residues))
+        utils.AutoIndexList.extend(self.molecule.atoms, list(chain.atoms))
 

@@ -24,7 +24,7 @@ from moldesign.min.base import MinimizerBase
 
 from .notebook_display import MolNotebookMixin
 from .properties import MolecularProperties
-from . import toplevel, AtomGroup, Bond
+from . import toplevel, AtomGroup, Bond, Instance
 from . import topology
 from .coord_arrays import *
 
@@ -877,7 +877,7 @@ class Molecule(AtomGroup,
         # Initialize geometry/topology attributes
         self.atoms = topology.MolecularAtomList([], self)
         self.residues = topology.MolecularResidueList([], self)
-        self.chains = topology.MolecularChainList(self)
+        self.chains = Instance(self)
         self.bond_graph = topology.BondGraph()
         self._positions = None
         self._momenta = None
@@ -889,6 +889,7 @@ class Molecule(AtomGroup,
 
         # Add the atoms to the molecule. Doing this will initialize the entire topology
         self.atoms.extend(atoms)
+        assert self.num_atoms == len(atoms)
 
         # Make the rest of the molecular attributes
         if metadata is None:

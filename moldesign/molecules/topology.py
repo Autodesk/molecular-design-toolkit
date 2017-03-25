@@ -11,12 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from itertools import chain
+from itertools import chain as iterchain
 
 from moldesign import utils
 from moldesign import units as u
 from .atomcollections import AtomListOperationMixin
-from .biounits import Instance
 
 
 class MolecularBaseList(utils.AutoIndexList):
@@ -28,7 +27,6 @@ class MolecularBaseList(utils.AutoIndexList):
 
     def _error_if_object_owned(self, obj):
         if obj.molecule is self._mol:
-            assert obj in self
             raise ValueError("%s cannot appear twice in this molecule" % obj)
         elif obj.molecule is not None:
             raise ValueError("%s is already a member of %s" % (obj, obj.molecule))
@@ -104,10 +102,10 @@ class MolecularAtomList(MolecularBaseList, AtomListOperationMixin):
         Not public - requires that the atoms be part of residues/chains already owned by the
         molecule.
         """
-        self.insert(index, atom)
+        utils.AutoIndexList.insert(self, index, atom)
         assert atom.molecule is self._mol
 
-    @utils.doc_inherit
+    #@utils.doc_inherit
     def append(self, atom):
         self.extend([atom])
 
@@ -117,7 +115,16 @@ class MolecularAtomList(MolecularBaseList, AtomListOperationMixin):
             Internally, this is THE place where new atoms are added to a molecular structure
         """
         self._error_if_cant_add_atoms(atoms)
-        super(MolecularAtomList, self).extend(atoms)
+        for o in atoms:
+            self._error_if_object_owned(o)
+
+        # Resize the physics arrays
+        self._mol.ndims = 3 * len(self) + len(atoms)
+        self._mol.masses = u.array([atom.mass for atom in iterchain(self, atoms)]).defunits()
+        self._mol.dim_masses = u.broadcast_to(self._mol.masses, (3, len(self)+len(atoms))).T
+        self._mol._dof = None
+        self._mol._positions = u.array([atom.position for atom in iterchain(self, atoms)])
+        self._mol._momenta = u.array([atom.momentum for atom in iterchain(self, atoms)])
 
         # assign default residues and chains where necessary
         for atom in atoms:
@@ -132,18 +139,13 @@ class MolecularAtomList(MolecularBaseList, AtomListOperationMixin):
                 assert atom.chain.molecule is None
                 self._mol.chains.add(atom.chain)
 
-        # Resize the physics arrays
-        self._mol.ndims = 3 * len(self)
-        self._mol.masses = u.array([atom.mass for atom in self]).defunits()
-        self._mol.dim_masses = u.broadcast_to(self.masses, (3, len(self))).T
-        self._mol._dof = None
-        self._mol._positions = u.array([atom.position for atom in self])
-        self._mol._momenta = u.array([atom.momentum for atom in self])
+            assert atom.residue.molecule is self._mol
+            assert atom.chain.molecule is self._mol
+            assert atom in self._mol.atoms
 
         # Mark the atoms as owned
         for atom in atoms:
             atom._position = atom._momentum = None
-            atom._molecule = self._mol
 
     def _error_if_cant_add_atoms(self, atoms):
         atoms_to_add = set(atoms)
@@ -192,14 +194,6 @@ class MolecularResidueList(MolecularBaseList):
         for r in residues:
             atoms.extend(r.atoms)
         self._mol.atoms.extend(atoms)
-
-
-class MolecularChainList(MolecularBaseList, Instance):
-
-    @utils.kwargs_from(Instance)
-    def __init__(self, mol, **kwargs):
-        self._mol = mol
-        Instance.__init__(self, **kwargs)
 
 
 class BondGraph(object):
