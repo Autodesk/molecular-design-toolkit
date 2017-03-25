@@ -169,9 +169,10 @@ class Chain(BioContainer):
         elif residue.chain is self:
             raise ValueError("%s is already part of %s" % (residue, self))
 
-        super(Chain, self)._add(residue)
-        list.extend(self.molecule.atoms, list(residue.atoms))
-
+        super(Chain, self).add(residue)
+        if self.molecule is not None:
+            # Todo - insert atoms in a more contiguous way
+            list.extend(self.molecule.atoms, list(residue.atoms))
 
     def _get_chain_end(self, restype, selfattr, test):
         currval = getattr(self, selfattr)

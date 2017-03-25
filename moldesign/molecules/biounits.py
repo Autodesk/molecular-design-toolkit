@@ -44,6 +44,8 @@ class ChildList(AtomContainer):
         return self.__dict__.keys() + self.__class__.__dict__.keys() + self._childbyname.keys()
 
     def __getitem__(self, item):
+        if isinstance(item, int) and item < 0:
+            item = len(self) + item
         if isinstance(item, basestring):
             if item not in self._childbyname:
                 raise KeyError('No object in "%s" named "%s"' % (self.parent, item))
@@ -170,12 +172,14 @@ class BioContainer(AtomContainer):
             item (BioContainer or mdt.Atom): the child object to add
             key (str): Key to retrieve this item (default: ``item.name`` )
         """
-        item.name = self._getuniquename(item.name)
+        if item.name in self:
+            item.name = self._getuniquename(item.name)
         self.children[item.name] = item
 
     __setitem__ = add
 
     def _getuniquename(self, key):
+        if key is None: key = ''
         assert isinstance(key, basestring)
         ix = 0
         k = key
@@ -256,8 +260,10 @@ class Instance(BioContainer):
     def __repr__(self):
         return '<Molecule instance: %s>' % str(self.children)
 
+    # TODO: combine this is MolecularChainList
     def add(self, chain):
         super(Instance, self).add(chain)
-        list.extend(self.molecule.residues, list(self.residues))
-        list.extend(self.molecule.atoms, list(self.atoms))
+        if self.molecule is not None:
+            list.extend(self._mol.residues, list(chain.residues))
+            list.extend(self._mol.atoms, list(chain.atoms))
 

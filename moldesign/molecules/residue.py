@@ -70,7 +70,7 @@ class Residue(BioContainer, ResidueNotebookMixin):
         if self.molecule is not None:
             self.molecule.remove(self)
         if mol is not None:
-            self.molecule._add(self)
+            mol.atoms.extend(list(self.atoms))
 
     @property
     def chain(self):
@@ -119,8 +119,8 @@ class Residue(BioContainer, ResidueNotebookMixin):
         """Deals with atom name clashes within a residue - common for small molecules"""
         atom._residue = self
 
-        insertidx = self.atoms[-1].index
-        super(Residue, self)._add(atom, key='%s%s' % (atom.name, len(self)))
+        insertidx = 0 if len(self) == 0 else self.atoms[-1].index
+        super(Residue, self).add(atom)
         if self.molecule:
             self.molecule.atoms._ownedinsert(insertidx, atom)
 
