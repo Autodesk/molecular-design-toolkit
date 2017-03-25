@@ -99,9 +99,9 @@ class Residue(BioContainer, ResidueNotebookMixin):
             assert atom.chain == self.chain, "Atom's chain does not match residue's chain"
 
         if key is not None or atom.name not in self.children:
-            return super(Residue, self).add(atom, key=key)
+            return super(Residue, self)._add(atom, key=key)
         else:
-            return super(Residue, self).add(atom, key='%s%s' % (atom.name, len(self)))
+            return super(Residue, self)._add(atom, key='%s%s' % (atom.name, len(self)))
 
     @property
     def is_n_terminal(self):
@@ -362,4 +362,8 @@ class Residue(BioContainer, ResidueNotebookMixin):
         return self.resname in mdt.data.RESIDUE_DESCRIPTIONS
 
     def __str__(self):
-        return 'Residue %s (index %s, chain %s)' % (self.name, self.index, self.chain.name)
+        if self.chain:
+            chainstr = 'chain %s' % self.chain.name
+        else:
+            chainstr = 'no chain'
+        return 'Residue %s (index %s, %s)' % (self.name, self.index, chainstr)

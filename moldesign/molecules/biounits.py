@@ -33,11 +33,12 @@ class ChildList(AtomContainer):
         except (KeyError, AttributeError):
             return '<ChildList @ %x (exception in self.__repr__)>' % id(self)
 
-    def __init__(self, parent):
+    def __init__(self, parent, index_children=False):
         super(ChildList, self).__init__()
         self.parent = parent
         self._childbyname = {}
         self._childinorder = utils.SortedCollection(key=_sortkey)
+        self.index_children = index_children
 
     def __dir__(self):
         return self.__dict__.keys() + self.__class__.__dict__.keys() + self._childbyname.keys()
@@ -58,6 +59,7 @@ class ChildList(AtomContainer):
             raise KeyError('%s already exists in %s' % (key, self.parent))
         self._childbyname[key] = val
         self._childinorder.insert_right(val)
+        self.rebuild()
 
     def __contains__(self, item):
         if isinstance(item, basestring) or item is None:
@@ -67,7 +69,7 @@ class ChildList(AtomContainer):
 
     def _remove(self, item):
         self._childinorder.remove(item)
-        self._rebuild()
+        self.rebuild()
 
     def __getattr__(self, item):
         if item == '_childbyname':
@@ -100,6 +102,9 @@ class ChildList(AtomContainer):
 
     def rebuild(self):
         self._childbyname = {obj.name: obj for obj in self._childinorder}
+        if self.index_children:
+            for idx, child in enumerate(self._childinorder):
+                child._index = idx
 
 
 def _sortkey(x):
@@ -120,6 +125,8 @@ class BioContainer(AtomContainer):
         BioContainer or mdt.Atom: this entity's children, in order
     """
 
+    INDEX_CHILDREN = False
+
     __getitem__ = utils.Alias('children.__getitem__')
     __len__ = utils.Alias('children.__len__')
     __iter__ = utils.Alias('children.__iter__')
@@ -129,7 +136,7 @@ class BioContainer(AtomContainer):
     _rebuild = utils.Alias('children._rebuild')
     _remove = utils.Alias('children._remove')
 
-    def __init__(self, name=None, molecule=None, index=None, pdbname=None, pdbindex=None,
+    def __init__(self, name=None, molecule=None, pdbname=None, pdbindex=None,
                  **kwargs):
         """  Initialization:
 
@@ -141,10 +148,10 @@ class BioContainer(AtomContainer):
             pdbindex (str): Index of this biocontainer in PDB format
         """
         super(BioContainer, self).__init__()
-        self.children = ChildList(self)
-        self.molecule = molecule
+        self.children = ChildList(self, self.INDEX_CHILDREN)
+        self._molecule = molecule
         self.name = name
-        self.index = index
+        self._index = None
 
         self.pdbname = pdbname
         self.pdbindex = pdbindex
@@ -170,8 +177,24 @@ class BioContainer(AtomContainer):
     __setitem__ = _add
 
     @property
+    def index(self):
+        return self._index
+
+    @property
     def molecule(self):
         return self._molecule
+
+    @molecule.setter
+    def molecule(self, mol):
+        if self.molecule is mol:
+                return
+        elif self.molecule is not None:
+            raise ValueError("This object '%s' is already owned by %s" %
+                             (self, self.molecule))
+        else:
+            self._molecule = mol
+            for atom in self.atoms:
+                atom.molecule = mol
 
     def __dir__(self):
         return (self.__dict__.keys() +
@@ -217,6 +240,8 @@ class Instance(BioContainer):
     """ The singleton biomolecular container for each ``Molecule``. Its children are generally
     PDB chains. Users won't ever really see this object.
     """
+    INDEX_CHILDREN = True
+
     def __str__(self):
         return str(self.children)
 

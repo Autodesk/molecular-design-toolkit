@@ -106,3 +106,4 @@ def test_h2_trajectory(h2_trajectory):
         elif 0.4 < period_progress < 0.6:
             # check for expected troughs of sine wave
             assert frame.positions[0, 0] < -0.1 * u.angstrom
+

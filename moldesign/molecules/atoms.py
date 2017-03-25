@@ -193,8 +193,8 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
 
         self.formal_charge = utils.if_not_none(formal_charge, 0.0 * u.q_e)
         self.residue = residue
-        self.molecule = None
-        self.index = None
+        self._molecule = None
+        self._index = None
         self._position = np.zeros(3) * u.default.length
         self._momentum = np.zeros(3) * (u.default.length*
                                        u.default.mass/u.default.time)
@@ -202,6 +202,10 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         self.metadata = mdt.utils.DotDict()
         if metadata:
             self.metadata.update(metadata)
+
+    @property
+    def index(self):
+        return self._index
 
     def __str__(self):
         desc = '%s %s (elem %s)' % (self.__class__.__name__, self.name, self.elem)
@@ -254,13 +258,12 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
     def molecule(self, molecule):
         """ Set the atom's molecule - only allowed if current molecule is None
         """
-        if self.molecule and (molecule is not self.molecule):
-            raise ValueError('%s is already part of a molecule' % self)
-        self._molecule = molecule
-
-        # These are now owned by the molecule:
-        self._position = None
-        self._momentum = None
+        if molecule is self.molecule:
+            return
+        elif self.molecule is not None:
+            raise ValueError('%s is already part of a molecule' % self.molecule)
+        else:
+            molecule.atoms.append(self)
 
     def bond_to(self, other, order):
         """ Create or modify a bond with another atom

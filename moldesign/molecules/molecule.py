@@ -24,7 +24,7 @@ from moldesign.min.base import MinimizerBase
 
 from .notebook_display import MolNotebookMixin
 from .properties import MolecularProperties
-from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond, IndexedAtomList
+from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond, MolecularAtomList
 from .coord_arrays import *
 
 
@@ -409,10 +409,9 @@ class MolTopologyMixin(object):
 
     def rebuild(self):
         self.chains = Instance(molecule=self)
-        self.residues = []
+        self.residues = utils.AutoIndexList()
         self._rebuild_topology()
 
-        self.is_biomolecule = False
         self.ndims = 3 * self.num_atoms
         reset_positions = u.array([atom.position for atom in self.atoms]).defunits()
         reset_momenta = u.array([atom.momentum for atom in self.atoms]).defunits()
@@ -470,12 +469,10 @@ class MolTopologyMixin(object):
 
         if self._defchain is None:
             self._defchain = Chain(name=None,
-                                   index=None,
                                    molecule=None)
 
         if self._defres is None:
             self._defres = Residue(name=None,
-                                   index=None,
                                    pdbindex=None,
                                    pdbname=None,
                                    chain=self._defchain,
@@ -542,11 +539,6 @@ class MolTopologyMixin(object):
         res._molecule = self
 
         return conflict
-
-        if conflicts:
-            print 'WARNING: %s indices modified due to name clashes' % (
-                ', '.join(conflicts))
-        self.is_biomolecule = (num_biores >= 2)
 
     def __eq__(self, other):
         """ Test whether two molecules are "equivalent"
@@ -680,6 +672,9 @@ class MolTopologyMixin(object):
 
     def __ne__(self, other):
         return not (self == other)
+
+    def __contains__(self, other):
+        return getattr(other, 'molecule', None) is self
 
     __ne__.__doc__ = __eq__.__doc__
 
@@ -978,7 +973,7 @@ class Molecule(AtomGroup,
         if metadata is None:
             metadata = getattr(atomcontainer, 'metadata', utils.DotDict())
 
-        self.atoms = atoms
+        self.atoms = MolecularAtomList(atoms, self)
         self.time = getattr(atomcontainer, 'time', 0.0 * u.default.time)
         self.name = 'uninitialized molecule'
         self._defres = None
@@ -998,9 +993,8 @@ class Molecule(AtomGroup,
                                   sum(atom.formal_charge for atom in self.atoms))
 
         # Builds the internal memory structures
-        self.chains = Instance(molecule=self)
-        self.residues = []
         self._rebuild_topology(bond_graph=bond_graph)
+        self.rebuild()
 
         if name is not None:
             self.name = name
@@ -1016,7 +1010,8 @@ class Molecule(AtomGroup,
         """ Make a copy of the passed atoms as necessary, return the name of the molecule
         """
         # copy atoms from another object (i.e., a molecule)
-        oldatoms = helpers.get_all_atoms(atomcontainer, cls=IndexedAtomList)
+        oldatoms = helpers.get_all_atoms(atomcontainer)
+
         if copy_atoms or (oldatoms[0].molecule is not None):
             atoms = oldatoms.copy_atoms()
             if name is None:  # Figure out a reasonable name

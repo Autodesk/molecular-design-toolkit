@@ -169,7 +169,7 @@ class Chain(BioContainer):
         else:
             assert residue.chain is self, "Residue is not a member of this chain"
 
-        return super(Chain, self).add(residue, **kwargs)
+        return super(Chain, self)._add(residue, **kwargs)
 
     def _get_chain_end(self, restype, selfattr, test):
         currval = getattr(self, selfattr)

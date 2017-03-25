@@ -118,3 +118,61 @@ assert atom.name in res
 assert oldname not in res
 assert res['fakename'] == atom
 ```
+
+
+##### Removing an atom from a molecule
+You can do this in two equivalent ways:
+```python
+atom.molecule = None
+## OR ##
+mol.atoms.remove(atom)
+```
+In both cases, the atom will automatically be removed from all primary and secondary structure, and the bonds it's part of will disappear as well.
+
+However, empty residues and chains will remain in the molecule's primary structure even if they contain no atoms.
+
+
+```
+atom = mol.atoms[3]
+oldres = atom.residue
+oldchain = atom.chain
+mol.atoms.remove(atom)
+
+assert atom.residue is atom.chain is atom.molecule is None
+assert atom not in oldres
+assert atom not in oldchain
+assert atom not in molecule
+```
+
+##### Removing residues and chains from a molecule
+These objects are removed similarly to atoms:
+```python
+chain.molecule = None
+## OR ##
+mol.residues.remove(residue)
+```
+In both cases, these structures and all other structures they contain will be removed from the molecule as well.
+```
+residue = mol.residue[3]
+mol.residues.remove(residue)
+
+assert residue.chain is None
+
+for atom in residue.atoms:
+    assert atom not in mol
+    assert atom in residue
+    assert atom.chain is None
+```
+
+
+#### Behaviors
+Assigning a atom to a molecule (`molecule.atoms.append(atom)`):
+  - IF the atom is already part of this molecule
+     - raise Exception (can't have atom in list twice)
+  - IF the atom is part of a different molecule
+     - raise Exception (can't be part of two different molecules)
+  - IF the atom does NOT have a residue:
+     - automatically assign it to the molecule's default residue
+  - IF the atom is part of a residue and/or chain
+     - raise Excpetion (need to assign the entire residue/chain)
+

@@ -36,7 +36,7 @@ class Categorizer(dict):
 
 
 class AutoIndexList(list):
-    """ Every object in the list has an automatically assigned `index` attribute.
+    """ Every object in the list has an automatically assigned `_index` attribute.
     """
     def __init__(self, *args, **kwargs):
         super(AutoIndexList, self).__init__(*args, **kwargs)
@@ -44,15 +44,15 @@ class AutoIndexList(list):
 
     def _reindex(self):
         for idx, item in enumerate(self):
-            item.index = idx
+            item._index = idx
 
     def append(self, o):
-        o.index = len(self)
+        o._index = len(self)
         super(AutoIndexList, self).append(o)
 
     def extend(self, l):
         for i, o in enumerate(l):
-            o.index = len(self) + i
+            o._index = len(self) + i
         super(AutoIndexList, self).extend(l)
 
     def pop(self, *args):
