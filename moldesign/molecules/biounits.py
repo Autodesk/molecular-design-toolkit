@@ -108,7 +108,7 @@ class ChildList(AtomContainer):
 
 
 def _sortkey(x):
-    return x.pdbindex
+    return x.index
 
 
 @toplevel
@@ -160,7 +160,7 @@ class BioContainer(AtomContainer):
         for name, val in kwargs.iteritems():
             setattr(self, name, val)
 
-    def _add(self, item, key=None):
+    def add(self, item):
         """ Add a child to this entity.
 
         Raises:
@@ -170,11 +170,19 @@ class BioContainer(AtomContainer):
             item (BioContainer or mdt.Atom): the child object to add
             key (str): Key to retrieve this item (default: ``item.name`` )
         """
-        if key is None:
-            key = item.name
-        self.children[key] = item
+        item.name = self._getuniquename(item.name)
+        self.children[item.name] = item
 
-    __setitem__ = _add
+    __setitem__ = add
+
+    def _getuniquename(self, key):
+        assert isinstance(key, basestring)
+        ix = 0
+        k = key
+        while k in self:
+            ix += 1
+            k = "%s.%d" % (key, ix)
+        return k
 
     @property
     def index(self):
@@ -248,4 +256,8 @@ class Instance(BioContainer):
     def __repr__(self):
         return '<Molecule instance: %s>' % str(self.children)
 
+    def add(self, chain):
+        super(Instance, self).add(chain)
+        list.extend(self.molecule.residues, list(self.residues))
+        list.extend(self.molecule.atoms, list(self.atoms))
 

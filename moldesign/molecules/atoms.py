@@ -89,14 +89,6 @@ def _on_name_change(atom, oldname, newname):
         atom.residue._add(atom)
 
 
-def _on_residue_change(atom, oldres, newres):
-    if oldres is None:
-        newres.molecule = atom.molecule
-    else:
-        oldres._remove(atom)
-    newres._add(atom)
-
-
 @toplevel
 class Atom(AtomPropertyMixin, AtomNotebookMixin):
     """ A data structure representing an atom.
@@ -160,8 +152,6 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
     momentum = AtomArray('_momentum', 'momenta')
 
     name = utils.EventfulAttr('_name', _on_name_change)
-    residue = utils.EventfulAttr('_residue', _on_residue_change)
-    chain = utils.Alias('residue.chain')
 
     atomic_number = utils.Synonym('atnum')
 
@@ -192,12 +182,10 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         else: self.mass = mass
 
         self.formal_charge = utils.if_not_none(formal_charge, 0.0 * u.q_e)
-        self.residue = residue
-        self._molecule = None
+        self._residue = residue
         self._index = None
         self._position = np.zeros(3) * u.default.length
-        self._momentum = np.zeros(3) * (u.default.length*
-                                       u.default.mass/u.default.time)
+        self._momentum = np.zeros(3) * (u.default.length * u.default.mass/u.default.time)
         self._bond_graph = {}
         self.metadata = mdt.utils.DotDict()
         if metadata:
@@ -206,6 +194,54 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
     @property
     def index(self):
         return self._index
+
+    @property
+    def molecule(self):
+        if self.residue and self.residue.chain:
+            return self.residue.chain.molecule
+        else:
+            return None
+
+    @molecule.setter
+    def molecule(self, mol):
+        if mol is self.molecule:
+            return
+        if self.molecule is not None:
+            self.molecule.atoms.remove(self)
+        if mol is not None:
+            mol.atoms.append(self)
+            assert self.molecule is mol
+            assert self.chain is mol._defchain
+            assert self.residue is mol._defresidue
+
+    @property
+    def residue(self):
+        return self._residue
+
+    @residue.setter
+    def residue(self, res):
+        if res is self._residue:
+            return
+        if self.molecule is not None:  # pop it out of the molecule now
+            self._molecule.atoms.remove(self)
+        assert self.molecule is None
+        if res is not None:
+            res.add(self)
+
+    @property
+    def chain(self):
+        if self.residue:
+            return self.residue.chain
+        else:
+            return None
+
+    def _add_to_structure(self, struc, attr):
+        if getattr(self, attr) is struc:
+            return
+        if getattr(self, attr) is not None:
+            self.molecule.remove(self)
+        if struc is not None:
+            getattr(self, attr)._add(self)
 
     def __str__(self):
         desc = '%s %s (elem %s)' % (self.__class__.__name__, self.name, self.elem)
@@ -249,21 +285,6 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
             state['_position'] = self.position
             state['_momentum'] = self.momentum
         return state
-
-    @property
-    def molecule(self):
-        return self._molecule
-
-    @molecule.setter
-    def molecule(self, molecule):
-        """ Set the atom's molecule - only allowed if current molecule is None
-        """
-        if molecule is self.molecule:
-            return
-        elif self.molecule is not None:
-            raise ValueError('%s is already part of a molecule' % self.molecule)
-        else:
-            molecule.atoms.append(self)
 
     def bond_to(self, other, order):
         """ Create or modify a bond with another atom

@@ -16,6 +16,7 @@ from itertools import chain
 from moldesign import utils
 from moldesign import units as u
 from .atomcollections import AtomListOperationMixin
+from .biounits import Instance
 
 
 class MolecularBaseList(utils.AutoIndexList):
@@ -88,7 +89,7 @@ class MolecularBaseList(utils.AutoIndexList):
     pop.__doc__ = remove.__doc__
 
 
-class MolecularAtomList(AtomListOperationMixin, MolecularBaseList):
+class MolecularAtomList(MolecularBaseList, AtomListOperationMixin):
     """ The master list of atoms in a molecule.
     """
     def _error_if_obj_owned(self, atom):
@@ -96,6 +97,15 @@ class MolecularAtomList(AtomListOperationMixin, MolecularBaseList):
             raise ValueError("Cannot individually assign %s to %s, because it is part of %s" %
                              (atom, self._mol, atom.residue))
         super(MolecularAtomList, self)._error_if_object_owned(atom)
+
+    def _ownedinsert(self, index, atom):
+        """ Called by residues/chains to insert atoms/residues into the middle of the list
+
+        Not public - requires that the atoms be part of residues/chains already owned by the
+        molecule.
+        """
+        self.insert(index, atom)
+        assert atom.molecule is self._mol
 
     @utils.doc_inherit
     def append(self, atom):
@@ -112,40 +122,23 @@ class MolecularAtomList(AtomListOperationMixin, MolecularBaseList):
         # assign default residues and chains where necessary
         for atom in atoms:
             if atom.residue is None:
-                atom.residue = self._mol._defresidue # inserts the atom into residue structure
+                self._mol._defresidue.add(atom)
 
             if atom.residue.chain is None:
-                atom.residue.chain = self._mol._defchain  # inserts the residue into chain structure
+                self._mol._defchain.add(atom.residue)
 
-            if atom.residue.molecule is not self._mol:
-                assert atom.residue.molecule is None
-                name = atom.residue.name
-                ix = 1
-                while name in atom.residue.chain:
-                    name = atom.residue.name+'.'+ix
-                    ix += 1
-                atom.residue.name = name
-
-                list.append(self._mol.residues, atom.residue)  # bypass extra append logic
-                atom.residue._molecule = self._mol
-
+            # this part sets up all primary structure
             if atom.chain.molecule is not self._mol:
                 assert atom.chain.molecule is None
-                name = atom.chain.name
-                while name in self._mol.chains:
-                    name = chr(ord(name)+1)
-                atom.chain.name = name
-
-                list.append(self._mol.chains, atom.chain)  # bypass extra append logic
-                atom.chain._molecule = self._mol
+                self._mol.chains.add(atom.chain)
 
         # Resize the physics arrays
         self._mol.ndims = 3 * len(self)
         self._mol.masses = u.array([atom.mass for atom in self]).defunits()
         self._mol.dim_masses = u.broadcast_to(self.masses, (3, len(self))).T
         self._mol._dof = None
-        self._mol.positions = u.array([atom.position for atom in self])
-        self._mol.momenta = u.array([atom.momentum for atom in self])
+        self._mol._positions = u.array([atom.position for atom in self])
+        self._mol._momenta = u.array([atom.momentum for atom in self])
 
         # Mark the atoms as owned
         for atom in atoms:
@@ -153,15 +146,17 @@ class MolecularAtomList(AtomListOperationMixin, MolecularBaseList):
             atom._molecule = self._mol
 
     def _error_if_cant_add_atoms(self, atoms):
-        aset = set(atoms)
-        seenres = set()
-        acheckset = set()
+        atoms_to_add = set(atoms)
+        structure_to_add = set()
+        atoms_in_structure = set()
         for atom in atoms:
-            if atom.residue not in seenres:
-                seenres.add(atom.residue)
-                acheckset.update(atom.residue.atoms)
-        if acheckset != aset:
-            raise ValueError("These atoms are a subset of larger chains")
+            for obj in (atom.residue, atom.chain):
+                if obj is not None and obj not in structure_to_add:
+                    structure_to_add.add(obj)
+                    atoms_in_structure.update(obj.atoms)
+
+        if atoms_in_structure > atoms_to_add:
+            raise ValueError("Can't add atoms - they're part of a larger structure")
 
     @utils.doc_inherit
     def pop(self, index=-1):
@@ -199,23 +194,18 @@ class MolecularResidueList(MolecularBaseList):
         self._mol.atoms.extend(atoms)
 
 
+class MolecularChainList(MolecularBaseList, Instance):
 
-def _chain_setup(self, chain):
-    conflict = False
-    if chain.molecule is not None:
-        assert chain.molecule is self
-        return
+    @utils.kwargs_from(Instance)
+    def __init__(self, mol, **kwargs):
+        self._mol = mol
+        Instance.__init__(self, **kwargs)
 
-    name = chain.name
-    while name in self.chains:
-        name = chr(ord(name)+1)
-    if name != chain.name:
-        conflict = True
 
-    chain._molecule = self
-    self.chains._add(chain)
+class BondGraph(object):
+    pass
 
-    return conflict
+
 
 def wutwut():
     # symmetrize bonds between the new atoms and the pre-existing molecule

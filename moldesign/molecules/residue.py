@@ -48,15 +48,42 @@ class Residue(BioContainer, ResidueNotebookMixin):
         Args:
             **kwargs ():
         """
+        self._chain = None
         self.chain = kwargs.get('chain', None)
         super(Residue, self).__init__(**kwargs)
-        if self.index is None and self.molecule is not None:
-            self.index = self.molecule.residues.index(self)
-        self.chainindex = None
         self._backbone = None
         self._sidechain = None
         self._template_name = None
         self._name = None
+
+    @property
+    def molecule(self):
+        if self.chain:
+            return self.chain.molecule
+        else:
+            return None
+
+    @molecule.setter
+    def molecule(self, mol):
+        if self.molecule is mol:
+            return
+        if self.molecule is not None:
+            self.molecule.remove(self)
+        if mol is not None:
+            self.molecule._add(self)
+
+    @property
+    def chain(self):
+        return self._chain
+
+    @chain.setter
+    def chain(self, chain):
+        if self._chain is chain:
+            return
+        if self._chain is not None:
+            self._chain.remove(self)
+        if chain is not None:
+            self._chain.add(self)
 
     @property
     def name(self):
@@ -88,20 +115,15 @@ class Residue(BioContainer, ResidueNotebookMixin):
             residues[atom.residue] = None
         return residues.keys()
 
-    def _add(self, atom, key=None):
+    def add(self, atom):
         """Deals with atom name clashes within a residue - common for small molecules"""
-        if atom.residue is not None:
-            assert atom.residue is self, 'Atom already assigned to a residue'
-        atom.residue = self
-        if atom.chain is None:
-            atom.chain = self.chain
-        else:
-            assert atom.chain == self.chain, "Atom's chain does not match residue's chain"
+        atom._residue = self
 
-        if key is not None or atom.name not in self.children:
-            return super(Residue, self)._add(atom, key=key)
-        else:
-            return super(Residue, self)._add(atom, key='%s%s' % (atom.name, len(self)))
+        insertidx = self.atoms[-1].index
+        super(Residue, self)._add(atom, key='%s%s' % (atom.name, len(self)))
+        if self.molecule:
+            self.molecule.atoms._ownedinsert(insertidx, atom)
+
 
     @property
     def is_n_terminal(self):

@@ -166,7 +166,7 @@ for atom in residue.atoms:
 
 
 #### Behaviors
-Assigning a atom to a molecule (`molecule.atoms.append(atom)`):
+Assigning a atom to a molecule (`molecule.atoms.append(atom)` or `atom.molecule=mol`):
   - IF the atom is already part of this molecule
      - raise Exception (can't have atom in list twice)
   - IF the atom is part of a different molecule
@@ -175,6 +175,12 @@ Assigning a atom to a molecule (`molecule.atoms.append(atom)`):
      - automatically assign it to the molecule's default residue
   - IF the atom is part of a residue and/or chain
      - raise Excpetion (need to assign the entire residue/chain)
+     
+     
+Assigning an atom a residue (`res.atoms.append(atom)` or `atom.residue=res`):
+  - the atom automatically gets the same molecule as res (including `None`) 
+  - the atom is removed from any previous molecule
+  - the atom is added to residue's molecule (if present) at the end of its current residue
 
 Adding a residue to a molecule (`residue.molecule=mol`) is same as with atoms, except:
  - IF the residue has a chain:

@@ -22,7 +22,7 @@ from . import BioContainer, toplevel
 
 @toplevel
 class Chain(BioContainer):
-    """ Biomolecular chain class - its children are almost always residues.
+    """ Biomolecular chain class - its children are residues.
 
     Attributes:
         parent (mdt.Molecule): the molecule this residue belongs to
@@ -163,13 +163,15 @@ class Chain(BioContainer):
         """ChildList: list of residues in this chain """
         return self.children
 
-    def add(self, residue, **kwargs):
+    def add(self, residue):
         if residue.chain is None:
-            residue.chain = self
-        else:
-            assert residue.chain is self, "Residue is not a member of this chain"
+            residue._chain = self
+        elif residue.chain is self:
+            raise ValueError("%s is already part of %s" % (residue, self))
 
-        return super(Chain, self)._add(residue, **kwargs)
+        super(Chain, self)._add(residue)
+        list.extend(self.molecule.atoms, list(residue.atoms))
+
 
     def _get_chain_end(self, restype, selfattr, test):
         currval = getattr(self, selfattr)
