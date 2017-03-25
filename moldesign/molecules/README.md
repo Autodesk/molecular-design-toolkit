@@ -176,3 +176,7 @@ Assigning a atom to a molecule (`molecule.atoms.append(atom)`):
   - IF the atom is part of a residue and/or chain
      - raise Excpetion (need to assign the entire residue/chain)
 
+Adding a residue to a molecule (`residue.molecule=mol`) is same as with atoms, except:
+ - IF the residue has a chain:
+    - raise Exception (need to assign its entire chain)
+ - ALL of the residues atoms will be assigned as well

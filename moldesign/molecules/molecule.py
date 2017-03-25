@@ -24,7 +24,8 @@ from moldesign.min.base import MinimizerBase
 
 from .notebook_display import MolNotebookMixin
 from .properties import MolecularProperties
-from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond, MolecularAtomList
+from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond
+from . import topology
 from .coord_arrays import *
 
 
@@ -407,22 +408,6 @@ class MolTopologyMixin(object):
             assert atom.molecule is self, "Atom %s does not belong to %s" % (atom, self)
         return atom
 
-    def rebuild(self):
-        self.chains = Instance(molecule=self)
-        self.residues = utils.AutoIndexList()
-        self._rebuild_topology()
-
-        self.ndims = 3 * self.num_atoms
-        reset_positions = u.array([atom.position for atom in self.atoms]).defunits()
-        reset_momenta = u.array([atom.momentum for atom in self.atoms]).defunits()
-        self._positions = reset_positions
-        self._momenta = reset_momenta
-        self.masses = u.array([atom.mass for atom in self.atoms]).defunits()
-        self.dim_masses = u.broadcast_to(self.masses, (3, self.num_atoms)).T
-        atom._molecule = self
-        self._build_primary_structure()
-        self._dof = None
-
     def _rebuild_topology(self, bond_graph=None):
         """ Build the molecule's bond graph based on its atoms' bonds
 
@@ -460,85 +445,6 @@ class MolTopologyMixin(object):
                 else:
                     bonds[nbr][atom] = bonds[atom][nbr]
         return bonds
-
-    def _build_primary_structure(self):
-        """
-        Set up the chain/residue/atom hierarchy
-        """
-        # TODO: consistency checks
-
-        if self._defchain is None:
-            self._defchain = Chain(name=None,
-                                   molecule=None)
-
-        if self._defres is None:
-            self._defres = Residue(name=None,
-                                   pdbindex=None,
-                                   pdbname=None,
-                                   chain=self._defchain,
-                                   molecule=None)
-            self._defchain.add(self._defres)
-
-        default_residue = self._defres
-        conflicts = set()
-
-        last_pdb_idx = None
-
-        for atom in self.atoms:
-            if last_pdb_idx is not None and atom.pdbindex <= last_pdb_idx:
-                atom.pdbindex = last_pdb_idx + 1
-                conflicts.add('atom numbers')
-            last_pdb_idx = atom.pdbindex
-
-            # if atom has no chain/residue, assign defaults
-            if atom.residue is None:
-                atom.residue = default_residue
-
-            if atom.residue.chain is None:
-                atom.residue.chain = self._defchain
-
-            self._chain_setup(atom.chain)
-            self._residue_setup(atom.residue)
-
-    def _chain_setup(self, chain):
-        conflict = False
-        if chain.molecule is not None:
-            assert chain.molecule is self
-            return
-
-        name = chain.name
-        while name in self.chains:
-            name = chr(ord(name)+1)
-        if name != chain.name:
-            conflict = True
-
-        chain._molecule = self
-        self.chains._add(chain)
-
-        return conflict
-
-    def _residue_setup(self, res):
-        conflict = False
-        if res.molecule is not None:
-            assert res.molecule is self
-            return
-
-        if res.chain is None:
-            res.chain = self._defchain
-
-        name = res.name
-        ix = 1
-        while name in res.chain:
-            name = res.name + '.' + ix
-            ix += 1
-        if name != res.name:
-            conflict = True
-
-        self.residues.append(res)
-        res.chain.add(res)
-        res._molecule = self
-
-        return conflict
 
     def __eq__(self, other):
         """ Test whether two molecules are "equivalent"
@@ -968,43 +874,41 @@ class Molecule(AtomGroup,
                  metadata=None):
         super(Molecule, self).__init__()
 
+        # Initialize geometry/topology attributes
+        self.atoms = topology.MolecularAtomList([], self)
+        self.residues = topology.MolecularResidueList([], self)
+        self.chains = topology.MolecularChainList([], self)
+        self.bond_graph = topology.BondGraph()
+        self._positions = None
+        self._momenta = None
+        self._defresidue = mdt.Residue()
+        self._defchain = mdt.Chain()
+
+        # Prepare the list of atoms for this molecule
         atoms, name = self._get_initializing_atoms(atomcontainer, name, copy_atoms)
 
+        # Add the atoms to the molecule. Doing this will initialize the entire topology
+        self.atoms.extend(atoms)
+
+        # Make the rest of the molecular attributes
         if metadata is None:
             metadata = getattr(atomcontainer, 'metadata', utils.DotDict())
-
-        self.atoms = MolecularAtomList(atoms, self)
         self.time = getattr(atomcontainer, 'time', 0.0 * u.default.time)
         self.name = 'uninitialized molecule'
-        self._defres = None
-        self._defchain = None
         self.pdbname = pdbname
         self.constraints = utils.ExclusiveList(key=utils.methodcaller('_constraintsig'))
         self.energy_model = None
         self.integrator = None
         self.metadata = metadata
-
+        self._properties = MolecularProperties(self)
+        self.ff = None
         if charge is not None:
             self.charge = charge
-            if not hasattr(charge, 'units'):  # assume fundamental charge units if not explicitly set
+            if not hasattr(charge, 'units'):
                 self.charge *= u.q_e
         else:
             self.charge = getattr(atomcontainer, 'charge',
                                   sum(atom.formal_charge for atom in self.atoms))
-
-        # Builds the internal memory structures
-        self._rebuild_topology(bond_graph=bond_graph)
-        self.rebuild()
-
-        if name is not None:
-            self.name = name
-        elif not self.is_small_molecule:
-            self.name = 'unnamed macromolecule'
-        else:
-            self.name = self.get_stoichiometry()
-
-        self._properties = MolecularProperties(self)
-        self.ff = None
 
     def _get_initializing_atoms(self, atomcontainer, name, copy_atoms):
         """ Make a copy of the passed atoms as necessary, return the name of the molecule
@@ -1066,36 +970,6 @@ class Molecule(AtomGroup,
         return sum(atom.nbonds for atom in self.atoms)/2
 
     nbonds = num_bonds
-
-    def addatom(self, newatom):
-        """  Add a new atom to the molecule
-
-        Args:
-            newatom (moldesign.Atom): The atom to add
-                (it will be copied if it already belongs to a molecule)
-        """
-        self.addatoms([newatom])
-
-    def addatoms(self, newatoms):
-        """Add new atoms to this molecule.
-        For now, we really just rebuild the entire molecule in place.
-
-        Args:
-           newatoms (List[moldesign.Atom]))
-        """
-        self._reset_methods()
-
-        for atom in newatoms: assert atom.molecule is None
-        self.atoms.extend(newatoms)
-
-        # symmetrize bonds between the new atoms and the pre-existing molecule
-        bonds = self._build_bonds(self.atoms)
-        for newatom in newatoms:
-            for nbr in bonds[newatom]:
-                if nbr in self.bond_graph:  # i.e., it's part of the original molecule
-                    bonds[nbr][newatom] = bonds[newatom][nbr]
-
-        self._rebuild_topology(bonds)
 
     def deletebond(self, bond):
         """ Remove this bond from the molecule's topology
