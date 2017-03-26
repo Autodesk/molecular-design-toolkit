@@ -83,11 +83,6 @@ class AtomPropertyMixin(object):
         return props
 
 
-def _on_name_change(atom, oldname, newname):
-    if getattr(atom, 'residue', None):
-        atom.residue._remove(atom)
-        atom.residue._add(atom)
-
 
 @toplevel
 class Atom(AtomPropertyMixin, AtomNotebookMixin):
@@ -150,9 +145,6 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
     fx, fy, fz = (AtomCoordinate('force', i) for i in xrange(3))
     position = AtomArray('_position', 'positions')
     momentum = AtomArray('_momentum', 'momenta')
-
-    name = utils.EventfulAttr('_name', _on_name_change)
-
     atomic_number = utils.Synonym('atnum')
 
     #################################################################
@@ -166,6 +158,7 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         self._position = np.zeros(3) * u.default.length
         self._momentum = np.zeros(3) * (u.default.length * u.default.mass/u.default.time)
         self._bond_graph = {}
+        self._name = None
 
         # Allow user to instantiate an atom as Atom(6) or Atom('C')
         if atnum is None and element is None:
@@ -235,6 +228,16 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
             return self.residue.chain
         else:
             return None
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        if self.residue:
+            self.residue._renamechild(self, name)
+        self._name = name
 
     def __str__(self):
         desc = '%s %s (elem %s)' % (self.__class__.__name__, self.name, self.elem)

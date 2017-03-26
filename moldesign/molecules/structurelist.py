@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import moldesign as mdt
 from moldesign import utils
 from . import AtomContainer, AtomList
@@ -74,6 +73,12 @@ class ChildList(AtomContainer):
         self._childinorder.resort()  # this is a hack because the indices often change
         self._childinorder.remove(item)
         self.rebuild()
+
+    def _rename(self, child, newname):
+        c = self._childbyname.pop(child.name)
+        assert c is child
+        child._name = newname
+        self._childbyname[newname] = child
 
     def __getattr__(self, item):
         if item == '_childbyname':

@@ -41,6 +41,7 @@ class BioContainer(AtomContainer):
     iteratoms = utils.Alias('children.iteratoms')
     _rebuild = utils.Alias('children._rebuild')
     _remove = utils.Alias('children._remove')
+    _renamechild = utils.Alias('children._rename')
 
     def __init__(self, name):
         """  Initialization:
@@ -69,7 +70,7 @@ class BioContainer(AtomContainer):
             key (str): Key to retrieve this item (default: ``item.name`` )
         """
         if item.name in self:
-            item.name = self._getuniquename(item.name)
+            item._name = self._getuniquename(item.name)
         self.children[item.name] = item
 
     __setitem__ = add

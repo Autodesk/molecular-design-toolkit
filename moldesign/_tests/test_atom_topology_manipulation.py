@@ -145,6 +145,14 @@ def test_remove_atom_with_null_molecule(methane):
     _check_topology_is_consistent(mol)
 
 
+def test_change_atom_name(methane):
+    mol = methane
+    atom = mol.atoms[0]
+    atom.name = 'kevin'
+    assert mol.residues[0]['kevin'] is atom
+    _check_topology_is_consistent(mol)
+
+
 def test_add_atom_exceptions():
     atom = mdt.Atom(1)
     a2 = mdt.Atom(1)
