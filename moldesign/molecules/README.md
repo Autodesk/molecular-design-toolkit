@@ -175,6 +175,23 @@ Assigning a atom to a molecule (`molecule.atoms.append(atom)` or `atom.molecule=
      - automatically assign it to the molecule's default residue
   - IF the atom is part of a residue and/or chain
      - raise Excpetion (need to assign the entire residue/chain)
+  - IF the atom is bonded to atoms outside of this molecule
+     - raise Exception (need to assign them all in one go)
+     
+Removing an atom from a molecule:
+  - It is removed from its parent residue
+  - All bonds it is involved in will disappear from the molecule
+  - However, the bonds are RETAINED by the unassigned atom
+  - they bonds will re-appear if the atom is added back into the
+    molecule, even in a different place
+     
+Creating a new bond:
+  - If the atom is unassigned
+     - it can be bonded to anything
+     - its bonds will appear in a molecule when added to that moleclue.
+  - If the atom belongs to a molecule
+     - it can only be bonded to atoms in the same molecule
+     - the bonds can cross residue/chain boundaries without restriciton
      
      
 Assigning an atom a residue (`res.atoms.append(atom)` or `atom.residue=res`):

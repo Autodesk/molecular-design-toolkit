@@ -13,7 +13,7 @@
 # limitations under the License.
 import numpy as np
 
-from .. import utils
+from moldesign import utils
 from . import toplevel
 
 

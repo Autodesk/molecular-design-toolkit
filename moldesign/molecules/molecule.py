@@ -24,7 +24,7 @@ from moldesign.min.base import MinimizerBase
 
 from .notebook_display import MolNotebookMixin
 from .properties import MolecularProperties
-from . import toplevel, AtomGroup, Bond, Instance
+from . import toplevel, AtomGroup, BondGraph, Instance
 from . import topology
 from .coord_arrays import *
 
@@ -408,44 +408,6 @@ class MolTopologyMixin(object):
             assert atom.molecule is self, "Atom %s does not belong to %s" % (atom, self)
         return atom
 
-    def _rebuild_topology(self, bond_graph=None):
-        """ Build the molecule's bond graph based on its atoms' bonds
-
-        Args:
-            bond_graph (dict): graph to build the bonds from
-        """
-        if bond_graph is None:
-            self.bond_graph = self._build_bonds(self.atoms)
-        else:
-            self.bond_graph = bond_graph
-
-    @staticmethod
-    def _build_bonds(atoms):
-        """ Build a bond graph describing bonds between this list of atoms
-
-        Args:
-            atoms (List[moldesign.atoms.Atom])
-        """
-        # TODO: check atom parents
-        bonds = {}
-
-        # First pass - create initial bonds
-        for atom in atoms:
-            assert atom not in bonds, 'Atom appears twice in this list'
-            if hasattr(atom, 'bonds') and atom.bond_graph is not None:
-                bonds[atom] = atom.bond_graph
-            else:
-                bonds[atom] = {}
-
-        # Now make sure both atoms have a record of their bonds
-        for atom in atoms:
-            for nbr in bonds[atom]:
-                if atom in bonds[nbr]:
-                    assert bonds[nbr][atom] == bonds[atom][nbr]
-                else:
-                    bonds[nbr][atom] = bonds[atom][nbr]
-        return bonds
-
     def __eq__(self, other):
         """ Test whether two molecules are "equivalent"
 
@@ -798,10 +760,6 @@ class Molecule(AtomGroup,
                 leaving the original molecule untouched.
 
         name (str): name of the molecule (automatically generated if not provided)
-        bond_graph (dict): dictionary specifying bonds between the atoms - of the form
-            ``{atom1:{atom2:bond_order, atom3:bond_order}, atom2:...}``
-            This structure must be symmetric; we require
-            ``bond_graph[atom1][atom2] == bond_graph[atom2][atom1]``
         copy_atoms (bool): Create the molecule with *copies* of the passed atoms
             (they will be copied automatically if they already belong to another molecule)
         pdbname (str): Name of the PDB file
@@ -823,12 +781,7 @@ class Molecule(AtomGroup,
 
     Attributes:
         atoms (AtomList): List of all atoms in this molecule.
-        bond_graph (dict): symmetric dictionary specifying bonds between the
-           atoms:
-
-               ``bond_graph = {atom1:{atom2:bond_order, atom3:bond_order}, atom2:...}``
-
-               ``bond_graph[atom1][atom2] == bond_graph[atom2][atom1]``
+        bonds (BondGraph): access to this molecule's bonding information
         residues (List[moldesign.Residue]): flat list of all biomolecular residues in this molecule
         chains (Dict[moldesign.Chain]): Biomolecular chains - individual chains can be
             accessed as ``mol.chains[list_index]`` or ``mol.chains[chain_name]``
@@ -867,7 +820,7 @@ class Molecule(AtomGroup,
     momenta = ProtectedArray('_momenta')
 
     def __init__(self, atomcontainer,
-                 name=None, bond_graph=None,
+                 name=None,
                  copy_atoms=False,
                  pdbname=None,
                  charge=None,
@@ -876,10 +829,10 @@ class Molecule(AtomGroup,
 
         # Initialize geometry/topology attributes
         self.name = 'uninitialized molecule'
-        self.atoms = topology.MolecularAtomList([], self)
-        self.residues = topology.MolecularResidueList([], self)
+        self.atoms = topology.AtomMasterList([], self)
+        self.residues = topology.ResidueMasterList([], self)
         self.chains = Instance(self)
-        self.bond_graph = topology.BondGraph()
+        self.bonds = BondGraph(self)
         self._positions = None
         self._momenta = None
         self._defresidue = mdt.Residue()
@@ -944,20 +897,6 @@ class Molecule(AtomGroup,
     def __str__(self):
         return 'Molecule: %s' % self.name
 
-    def newbond(self, a1, a2, order):
-        """ Create a new bond
-
-        Args:
-            a1 (moldesign.Atom): First atom in the bond
-            a2 (moldesign.Atom): Second atom in the bond
-            order (int): order of the bond
-
-        Returns:
-            moldesign.Bond
-        """
-        assert a1.molecule == a2.molecule == self
-        return a1.bond_to(a2, order)
-
     @property
     def velocities(self):
         """ u.Vector[length/time]: Nx3 array of atomic velocities
@@ -974,15 +913,6 @@ class Molecule(AtomGroup,
         return sum(atom.nbonds for atom in self.atoms)/2
 
     nbonds = num_bonds
-
-    def deletebond(self, bond):
-        """ Remove this bond from the molecule's topology
-
-        Args:
-            Bond: bond to remove
-        """
-        self.bond_graph[bond.a1].pop(bond.a2)
-        self.bond_graph[bond.a2].pop(bond.a1)
 
     def _force_converged(self, tolerance):
         """ Return True if the forces on this molecule:
@@ -1019,15 +949,3 @@ class Molecule(AtomGroup,
         """bool: True if molecule's mass is less than 500 Daltons (not mutually exclusive with
         :meth:`self.is_biomolecule <Molecule.is_biomolecule>`)"""
         return self.mass <= 500.0 * u.amu
-
-    @property
-    def bonds(self):
-        """ Iterator over all bonds in the molecule
-
-        Yields:
-            moldesign.atoms.Bond: bond object
-        """
-        for atom in self.bond_graph:
-            for nbr in self.bond_graph[atom]:
-                if atom.index > nbr.index: continue  # don't double count
-                yield Bond(atom, nbr)

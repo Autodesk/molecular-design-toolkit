@@ -187,6 +187,8 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
 
     @property
     def index(self):
+        """ int: atom's index in its molecule's master ``atoms`` list, or ``None`` if unassigned
+        """
         return self._index
 
     @property
@@ -207,6 +209,36 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
             assert self.molecule is mol
             assert self.chain is mol._defchain
             assert self.residue is mol._defresidue
+
+    def _delegate_state_to_molecule(self, mol):
+        """ Private data mangement method.
+
+        When atom becomes part of a molecule, it delegates most of its state to the molecule.
+        This method is called AFTER the atom has been assigned to the molecule
+        """
+        assert self is mol.atoms[self.index]
+        assert self._position == mol.position[self.index]
+        assert self._momentum == mol.momentum[self.index]
+        assert self._bond_graph == mol.bond_graph[self]
+        self._position = np.zeros(3) * u.default.length
+        self._momentum = np.zeros(3) * (u.default.length * u.default.mass/u.default.time)
+        self._bond_graph = {}
+
+    def _recover_state_from_molecule(self, ):
+        """ Private data mangement method.
+
+        When atom is removed from a molecule, it takes back state that was delegated to the
+        molecule.
+        This method is called BEFORE the atom is removed from any molecule structures
+        """
+        mol = self.molecule
+        assert self is mol.atoms[self.index]
+        assert self._position is None
+        assert self._momentum is None
+        assert self._bond_graph is None
+        self._position = mol.positions[self.index].copy()
+        self._momentum = mol.momenta[self.index].copy()
+        self._bond_graph = dict(mol.bond_graph[self])
 
     @property
     def residue(self):

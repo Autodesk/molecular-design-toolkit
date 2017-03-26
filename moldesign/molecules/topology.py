@@ -18,11 +18,11 @@ from moldesign import units as u
 from .atomcollections import AtomListOperationMixin
 
 
-class MolecularBaseList(utils.AutoIndexList):
+class BaseMasterList(utils.AutoIndexList):
     """ Base class for a list of objects (atoms, residues, etc.) in a molecule
     """
     def __init__(self, objs, mol):
-        super(MolecularBaseList, self).__init__(objs)
+        super(BaseMasterList, self).__init__(objs)
         self._mol = mol
 
     def _error_if_object_owned(self, obj):
@@ -45,7 +45,7 @@ class MolecularBaseList(utils.AutoIndexList):
                a larger substructure (such as a chain or residue)
         """
         self._error_if_object_owned(obj)
-        super(MolecularBaseList, self).append(obj)
+        super(BaseMasterList, self).append(obj)
 
     def extend(self, objs):
         """ Adds a list of objects to this molecule. More efficient than adding them individually.
@@ -61,11 +61,11 @@ class MolecularBaseList(utils.AutoIndexList):
         """
         for o in objs:
             self._error_if_object_owned(o)
-        super(MolecularBaseList, self).extend(objs)
+        super(BaseMasterList, self).extend(objs)
 
     def insert(self, index, obj):
         self._error_if_object_owned(obj)
-        super(MolecularBaseList, self).insert(index, obj)
+        super(BaseMasterList, self).insert(index, obj)
     insert.__doc__ = append.__doc__
 
     def remove(self, obj):
@@ -78,14 +78,14 @@ class MolecularBaseList(utils.AutoIndexList):
     pop.__doc__ = remove.__doc__
 
 
-class MolecularAtomList(MolecularBaseList, AtomListOperationMixin):
+class AtomMasterList(BaseMasterList, AtomListOperationMixin):
     """ The master list of atoms in a molecule.
     """
     def _error_if_obj_owned(self, atom):
         if atom.residue is not None and atom.residue.molecule is not self._mol:
             raise ValueError("Cannot individually assign %s to %s, because it is part of %s" %
                              (atom, self._mol, atom.residue))
-        super(MolecularAtomList, self)._error_if_object_owned(atom)
+        super(AtomMasterList, self)._error_if_object_owned(atom)
 
     #@utils.doc_inherit
     def append(self, atom):
@@ -96,6 +96,8 @@ class MolecularAtomList(MolecularBaseList, AtomListOperationMixin):
         Note:
             Internally, this is THE place where new atoms are added to a molecular structure
         """
+        # Do error checking immediately so that we don't get to an inconsistent state.
+        # Any errors after this point will probably screw up the molecule
         self._error_if_cant_add_atoms(atoms)
         for o in atoms:
             self._error_if_object_owned(o)
@@ -121,6 +123,7 @@ class MolecularAtomList(MolecularBaseList, AtomListOperationMixin):
                 assert atom.chain.molecule is None
                 self._mol.chains.add(atom.chain)
 
+            self._mol.bonds._addatom(atom)
             assert atom.residue.molecule is self._mol
             assert atom.residue in self._mol.residues
             assert atom.chain.molecule is self._mol
@@ -129,7 +132,7 @@ class MolecularAtomList(MolecularBaseList, AtomListOperationMixin):
 
         # Mark the atoms as owned
         for atom in atoms:
-            atom._position = atom._momentum = None
+            atom._delegate_state_to_molecule(self._mol)
 
     def _error_if_cant_add_atoms(self, atoms):
         atoms_to_add = set(atoms)
@@ -140,6 +143,12 @@ class MolecularAtomList(MolecularBaseList, AtomListOperationMixin):
                 if obj is not None and obj not in structure_to_add:
                     structure_to_add.add(obj)
                     atoms_in_structure.update(obj.atoms)
+
+            for nbr in atom.bond_graph:
+                if nbr.molecule not in (None, self._mol):
+                    raise ValueError(
+                            "Can't add atoms to %s: %s is bonded to a different molecule ('%s')" %
+                            (self._mol, atom, nbr.molecule))
 
         if atoms_in_structure > atoms_to_add:
             raise ValueError("Can't add atoms - they're part of a larger structure")
@@ -161,29 +170,25 @@ class MolecularAtomList(MolecularBaseList, AtomListOperationMixin):
         Raises:
             ValueError: If obj is not part of this
         """
-        assert atom is self[atom.index]
-        position = atom.position.copy()
-        momentum = atom.momentum.copy()
+        atom._recover_state_from_molecule()
         atom.residue._remove(atom)
-        atom._position = position
-        atom._momentum = momentum
 
 
-class MolecularResidueList(MolecularBaseList):
+class ResidueMasterList(BaseMasterList):
     """ The master list of residues in a molecule.
     """
     def _error_if_obj_owned(self, res):
         if res.chain is not None and res.molecule is not self._mol:
             raise ValueError("Cannot individually assign %s to %s, because it is part of %s" %
                              (res, self._mol, res.residue))
-        super(MolecularResidueList, self)._error_if_object_owned(res)
+        super(ResidueMasterList, self)._error_if_object_owned(res)
 
     @utils.doc_inherit
     def append(self, res):
         self.extend([res])
 
     def pop(self, index=-1):
-        res = super(MolecularResidueList, self).pop(index)
+        res = super(ResidueMasterList, self).pop(index)
         res._chain = None
         return res
 
@@ -196,19 +201,3 @@ class MolecularResidueList(MolecularBaseList):
     def remove(self, residue):
         assert residue is self[residue.index]
         residue.chain = None
-
-
-
-class BondGraph(object):
-    pass
-
-
-
-def wutwut():
-    # symmetrize bonds between the new atoms and the pre-existing molecule
-    bonds = self._build_bonds(self.atoms)
-    for newatom in newatoms:
-        for nbr in bonds[newatom]:
-            if nbr in self.bond_graph:  # i.e., it's part of the original molecule
-                bonds[nbr][newatom] = bonds[newatom][nbr]
-
