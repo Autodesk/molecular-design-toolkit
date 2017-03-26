@@ -875,6 +875,7 @@ class Molecule(AtomGroup,
         super(Molecule, self).__init__()
 
         # Initialize geometry/topology attributes
+        self.name = 'uninitialized molecule'
         self.atoms = topology.MolecularAtomList([], self)
         self.residues = topology.MolecularResidueList([], self)
         self.chains = Instance(self)
@@ -886,6 +887,7 @@ class Molecule(AtomGroup,
 
         # Prepare the list of atoms for this molecule
         atoms, name = self._get_initializing_atoms(atomcontainer, name, copy_atoms)
+        self.name = name
 
         # Add the atoms to the molecule. Doing this will initialize the entire topology
         self.atoms.extend(atoms)
@@ -895,7 +897,6 @@ class Molecule(AtomGroup,
         if metadata is None:
             metadata = getattr(atomcontainer, 'metadata', utils.DotDict())
         self.time = getattr(atomcontainer, 'time', 0.0 * u.default.time)
-        self.name = 'uninitialized molecule'
         self.pdbname = pdbname
         self.constraints = utils.ExclusiveList(key=utils.methodcaller('_constraintsig'))
         self.energy_model = None
@@ -928,6 +929,8 @@ class Molecule(AtomGroup,
                     name = 'unnamed'
         else:
             atoms = oldatoms
+
+        name = utils.if_not_none(name, 'New molecule')
         return atoms, name
 
     def __repr__(self):

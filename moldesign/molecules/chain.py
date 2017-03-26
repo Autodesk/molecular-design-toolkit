@@ -29,20 +29,10 @@ class Chain(BioContainer):
         chain (Chain): the chain this residue belongs to
     """
     @utils.args_from(BioContainer)
-    def __init__(self, name=None, molecule=None, **kwargs):
-        for key in ('pdbname', 'pdbindex'):
-            val = kwargs.pop(key, None)
-            if val is not None:
-                if name is not None and val != name:
-                    raise ValueError('Inconsistent name for chain: %s' % kwargs)
-                name = val
-
-        super(Chain, self).__init__(name=name, **kwargs)
+    def __init__(self, name=None):
         self._type = None
         self._5p_end = self._3p_end = self._n_terminal = self._c_terminal = None
-
-        self.molecule = molecule
-
+        super(Chain, self).__init__(name)
 
     @property
     def molecule(self):
@@ -179,15 +169,19 @@ class Chain(BioContainer):
         return self.children
 
     def add(self, residue):
-        if residue.chain is None:
-            residue._chain = self
-        elif residue.chain is self:
+        if residue.chain is not None:
             raise ValueError("%s is already part of %s" % (residue, self))
-
-        super(Chain, self).add(residue)
+        residue._chain = self
         if self.molecule is not None:
-            # Todo - insert atoms in a more contiguous way
-            utils.AutoIndexList.extend(self.molecule.atoms, list(residue.atoms))
+            utils.AutoIndexList.extend(self.molecule.atoms, residue.atoms)
+            utils.AutoIndexList.append(self.molecule.residues, residue)
+        super(Chain, self).add(residue)
+
+    def remove(self, residue):
+        self.children._remove(residue)
+        if self.molecule:
+            utils.AutoIndexList.remove(self.molecule.residues, residue)
+        residue._chain = None
 
     def _get_chain_end(self, restype, selfattr, test):
         currval = getattr(self, selfattr)

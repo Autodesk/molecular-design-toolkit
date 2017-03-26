@@ -6,6 +6,7 @@ __all__ = []
 
 from .coord_arrays import *
 from .atomcollections import *
+from .structurelist import *
 from .bonds import *
 from .atoms import *
 from .biounits import *

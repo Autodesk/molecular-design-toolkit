@@ -229,7 +229,7 @@ class AtomGroup(AtomGroupNotebookMixin):
         Returns:
             AtomList: list of copied atoms
         """
-        from . import ChildList
+        from molecules.structurelist import ChildList
 
         oldatoms = self.atoms
         old_bond_graph = {a: {} for a in self.atoms}

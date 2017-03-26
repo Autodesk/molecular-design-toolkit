@@ -14,103 +14,7 @@
 import moldesign as mdt
 from moldesign import utils
 
-from . import toplevel, AtomList, AtomContainer
-
-
-class ChildList(AtomContainer):
-    """ A list of biochemical objects that can be accessed by name or by index.
-    """
-    __len__ = utils.Alias('_childinorder.__len__')
-    __iter__ = utils.Alias('_childinorder.__iter__')
-    index = utils.Alias('_childinorder.index')
-
-    def __str__(self):
-        return str(self._childinorder._items)
-
-    def __repr__(self):
-        try:
-            return '<Children of %s: %s>' % (self.parent, self)
-        except (KeyError, AttributeError):
-            return '<ChildList @ %x (exception in self.__repr__)>' % id(self)
-
-    def __init__(self, parent, index_children=False):
-        super(ChildList, self).__init__()
-        self.parent = parent
-        self._childbyname = {}
-        self._childinorder = utils.SortedCollection(key=_sortkey)
-        self.index_children = index_children
-
-    def __dir__(self):
-        return self.__dict__.keys() + self.__class__.__dict__.keys() + self._childbyname.keys()
-
-    def __getitem__(self, item):
-        if isinstance(item, int) and item < 0:
-            item = len(self) + item
-        if isinstance(item, basestring):
-            if item not in self._childbyname:
-                raise KeyError('No object in "%s" named "%s"' % (self.parent, item))
-            return self._childbyname[item]
-        else:
-            try:
-                return self._childinorder[item]
-            except IndexError:
-                raise IndexError("No object with index '%d' in %s" % (item, self.parent))
-
-    def __setitem__(self, key, val):
-        if key in self._childbyname:
-            raise KeyError('%s already exists in %s' % (key, self.parent))
-        self._childbyname[key] = val
-        self._childinorder.insert_right(val)
-        self.rebuild()
-
-    def __contains__(self, item):
-        if isinstance(item, basestring) or item is None:
-            return (item in self._childbyname)
-        else:
-            return (item in self._childinorder)
-
-    def _remove(self, item):
-        self._childinorder.remove(item)
-        self.rebuild()
-
-    def __getattr__(self, item):
-        if item == '_childbyname':
-            return self.__getattribute__('_childbyname')
-
-        try:
-            return self._childbyname[item]
-        except KeyError:
-            raise AttributeError('ChildList object in %s has no attribute %s.' %
-                                 (self.parent.__repr__(), item))
-
-    def iteratoms(self):
-        """Iterate over all atoms
-
-        Yields:
-            Atom: all atoms in this entity and/or its children
-        """
-        for child in self:
-            if isinstance(child, mdt.Atom):
-                yield child
-            else:
-                for atom in child.iteratoms():
-                    yield atom
-
-    @property
-    def atoms(self):
-        """ AtomList: a sorted list of all atoms in this entity and/or its children
-        """
-        return AtomList(self.iteratoms())
-
-    def rebuild(self):
-        self._childbyname = {obj.name: obj for obj in self._childinorder}
-        if self.index_children:
-            for idx, child in enumerate(self._childinorder):
-                child._index = idx
-
-
-def _sortkey(x):
-    return x.index
+from . import toplevel, AtomContainer, ChildList
 
 
 @toplevel
@@ -138,8 +42,7 @@ class BioContainer(AtomContainer):
     _rebuild = utils.Alias('children._rebuild')
     _remove = utils.Alias('children._remove')
 
-    def __init__(self, name=None, molecule=None, pdbname=None, pdbindex=None,
-                 **kwargs):
+    def __init__(self, name):
         """  Initialization:
 
         Args:
@@ -150,17 +53,10 @@ class BioContainer(AtomContainer):
             pdbindex (str): Index of this biocontainer in PDB format
         """
         super(BioContainer, self).__init__()
-        self.children = ChildList(self, self.INDEX_CHILDREN)
-        self._molecule = molecule
-        self.name = name
         self._index = None
-
-        self.pdbname = pdbname
-        self.pdbindex = pdbindex
-        self.parent = None
-
-        for name, val in kwargs.iteritems():
-            setattr(self, name, val)
+        self._molecule = None
+        self.name = name
+        self.children = ChildList(self, self.INDEX_CHILDREN)
 
     def add(self, item):
         """ Add a child to this entity.
@@ -249,7 +145,7 @@ class BioContainer(AtomContainer):
 
 @toplevel
 class Instance(BioContainer):
-    """ The singleton biomolecular container for each ``Molecule``. Its children are generally
+    """ The singleton primary structure container for each ``Molecule``. Its children are generally
     PDB chains. Users won't ever really see this object.
     """
     INDEX_CHILDREN = True
@@ -258,18 +154,23 @@ class Instance(BioContainer):
         """  Initialization:
 
         Args:
-            name (str): Name of this biocontainer
-            parent (mdt.Molecule): molecule this biocontainer belongs to
-            index (int): index of this biocontainer in the parent molecule
-            pdbname (str): PDB-format name of this biocontainer
-            pdbindex (str): Index of this biocontainer in PDB format
+            molecule (moldesign.Molecule): the molecule this Instance represents
+            name (str): Name of this instance
         """
-        super(Instance, self).__init__()
+        super(Instance, self).__init__(None)
         self._molecule = molecule
 
     @property
     def molecule(self):
         return self._molecule
+
+    @property
+    def name(self):
+        return self.molecule.name + 'topology'
+
+    @name.setter
+    def name(self, value):
+        assert value is None  # you don't actually set this name
 
     def __str__(self):
         return str(self.children)
@@ -279,8 +180,16 @@ class Instance(BioContainer):
 
     # TODO: combine this is MolecularChainList
     def add(self, chain):
-        super(Instance, self).add(chain)
-        chain._molecule = self.molecule
         utils.AutoIndexList.extend(self.molecule.residues, list(chain.residues))
         utils.AutoIndexList.extend(self.molecule.atoms, list(chain.atoms))
+
+        # rebuild all indices after adding children to a molecule
+        self.children.rebuild()
+        for chain in self.children:
+            chain.children.rebuild()
+            for residue in chain.children:
+                residue.children.rebuild()
+
+        super(Instance, self).add(chain)
+        chain._molecule = self.molecule
 

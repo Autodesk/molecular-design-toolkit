@@ -157,9 +157,15 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
 
     #################################################################
     # Methods for BUILDING the atom and indexing it in a molecule
-    def __init__(self, name=None, atnum=None, mass=None, residue=None,
+    def __init__(self, name=None, atnum=None, mass=None,
                  formal_charge=None, pdbname=None, pdbindex=None, element=None,
                  metadata=None):
+        # Private attributes
+        self._residue = None
+        self._index = None
+        self._position = np.zeros(3) * u.default.length
+        self._momentum = np.zeros(3) * (u.default.length * u.default.mass/u.default.time)
+        self._bond_graph = {}
 
         # Allow user to instantiate an atom as Atom(6) or Atom('C')
         if atnum is None and element is None:
@@ -182,11 +188,6 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         else: self.mass = mass
 
         self.formal_charge = utils.if_not_none(formal_charge, 0.0 * u.q_e)
-        self._residue = residue
-        self._index = None
-        self._position = np.zeros(3) * u.default.length
-        self._momentum = np.zeros(3) * (u.default.length * u.default.mass/u.default.time)
-        self._bond_graph = {}
         self.metadata = mdt.utils.DotDict()
         if metadata:
             self.metadata.update(metadata)

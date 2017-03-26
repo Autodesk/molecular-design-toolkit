@@ -322,7 +322,11 @@ class SortedCollection(object):
 
     def _setkey(self, key):
         if key is not self._key:
-            self.__init__(self._items, key=key)
+            self._key = key
+            self.resort()
+
+    def resort(self):
+        self.__init__(self._items, key=self._key)
 
     def _delkey(self):
         self._setkey(None)

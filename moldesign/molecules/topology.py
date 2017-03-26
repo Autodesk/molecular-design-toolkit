@@ -69,21 +69,12 @@ class MolecularBaseList(utils.AutoIndexList):
     insert.__doc__ = append.__doc__
 
     def remove(self, obj):
-        """ Removes obj from this molecule. Equivalent to running ``obj.molecule = None``
-
-        The obj is automatically removed from its residue as well.
-
-        Args:
-            obj (object): object to remove
-
-        Raises:
-            ValueError: If obj is not part of the molecule
-        """
-        assert obj is self[obj.index]
-        self.pop(obj.index)
+        raise NotImplementedError()  # must be implemented by subclass
 
     def pop(self, index=-1):
-        return super(MolecularBaseList, self).pop(index)
+        obj = self[index]
+        self.remove(obj)
+        return obj
     pop.__doc__ = remove.__doc__
 
 
@@ -95,15 +86,6 @@ class MolecularAtomList(MolecularBaseList, AtomListOperationMixin):
             raise ValueError("Cannot individually assign %s to %s, because it is part of %s" %
                              (atom, self._mol, atom.residue))
         super(MolecularAtomList, self)._error_if_object_owned(atom)
-
-    def _ownedinsert(self, index, atom):
-        """ Called by residues/chains to insert atoms/residues into the middle of the list
-
-        Not public - requires that the atoms be part of residues/chains already owned by the
-        molecule.
-        """
-        utils.AutoIndexList.insert(self, index, atom)
-        assert atom.molecule is self._mol
 
     #@utils.doc_inherit
     def append(self, atom):
@@ -140,7 +122,9 @@ class MolecularAtomList(MolecularBaseList, AtomListOperationMixin):
                 self._mol.chains.add(atom.chain)
 
             assert atom.residue.molecule is self._mol
+            assert atom.residue in self._mol.residues
             assert atom.chain.molecule is self._mol
+            assert atom.chain in self._mol.chains
             assert atom in self._mol.atoms
 
         # Mark the atoms as owned
@@ -162,11 +146,27 @@ class MolecularAtomList(MolecularBaseList, AtomListOperationMixin):
 
     @utils.doc_inherit
     def pop(self, index=-1):
-        atom = super(MolecularAtomList, self).pop(index)
-        atom._molecule = None
-        atom.residue = None
-        atom.chain = None
+        atom = self[index]
+        self.remove(atom)
         return atom
+
+    def remove(self, atom):
+        """ Removes obj from this molecule. Equivalent to running ``obj.molecule = None``
+
+        The obj is automatically removed from its residue as well.
+
+        Args:
+            obj (object): object to remove
+
+        Raises:
+            ValueError: If obj is not part of the molecule
+        """
+        assert atom is self[atom.index]
+        position = atom.position.copy()
+        momentum = atom.momentum.copy()
+        atom.residue = None
+        atom._position = position
+        atom._momentum = momentum
 
 
 class MolecularResidueList(MolecularBaseList):
@@ -194,6 +194,11 @@ class MolecularResidueList(MolecularBaseList):
         for r in residues:
             atoms.extend(r.atoms)
         self._mol.atoms.extend(atoms)
+
+    def remove(self, residue):
+        assert residue is self[residue.index]
+        residue.chain = None
+
 
 
 class BondGraph(object):

@@ -43,18 +43,22 @@ class Residue(BioContainer, ResidueNotebookMixin):
         return newatoms[0].residue
 
     @utils.args_from(BioContainer)
-    def __init__(self, **kwargs):
+    def __init__(self,  name=None, resname=None, pdbname=None, pdbindex=None):
         """ Initialization
         Args:
             **kwargs ():
         """
-        self._chain = None
-        self.chain = kwargs.get('chain', None)
-        super(Residue, self).__init__(**kwargs)
         self._backbone = None
         self._sidechain = None
         self._template_name = None
+        self._chain = None
         self._name = None
+
+        super(Residue, self).__init__(name)
+
+        self.resname = resname
+        self.pdbname = pdbname
+        self.pdbindex = pdbindex
 
     @property
     def molecule(self):
@@ -83,7 +87,13 @@ class Residue(BioContainer, ResidueNotebookMixin):
         if self._chain is not None:
             self._chain.remove(self)
         if chain is not None:
-            self._chain.add(self)
+            chain.add(self)
+
+    def _remove(self, atom):
+        self.children._remove(atom)
+        if self.molecule:
+            utils.AutoIndexList.remove(self.molecule.atoms, atom)
+        atom._residue = None
 
     @property
     def name(self):
@@ -116,13 +126,16 @@ class Residue(BioContainer, ResidueNotebookMixin):
         return residues.keys()
 
     def add(self, atom):
-        assert atom not in self
-        atom._residue = self
-        insertidx = 0 if len(self) == 0 else self.atoms[-1].index
-        super(Residue, self).add(atom)
-        if self.molecule:
-            self.molecule.atoms._ownedinsert(insertidx, atom)
+        if atom.residue is not None:
+            raise ValueError("%s is already part of %s" % (atom, self))
 
+        super(Residue, self).add(atom)
+        atom._residue = self
+        if self.molecule:
+            if len(self) == 0:
+                utils.AutoIndexList.insert(self.molecule.atoms, self.atoms[-1].index, atom)
+            else:
+                utils.AutoIndexList.append(self.molecule.atoms, atom)
 
     @property
     def is_n_terminal(self):
