@@ -151,20 +151,20 @@ class MolecularAtomList(MolecularBaseList, AtomListOperationMixin):
         return atom
 
     def remove(self, atom):
-        """ Removes obj from this molecule. Equivalent to running ``obj.molecule = None``
+        """ Removes ``atom`` from all larger structures (molecule, chain, and residue).
 
-        The obj is automatically removed from its residue as well.
+        Equivalent to ``obj.residue = None``
 
         Args:
             obj (object): object to remove
 
         Raises:
-            ValueError: If obj is not part of the molecule
+            ValueError: If obj is not part of this
         """
         assert atom is self[atom.index]
         position = atom.position.copy()
         momentum = atom.momentum.copy()
-        atom.residue = None
+        atom.residue._remove(atom)
         atom._position = position
         atom._momentum = momentum
 
@@ -184,9 +184,7 @@ class MolecularResidueList(MolecularBaseList):
 
     def pop(self, index=-1):
         res = super(MolecularResidueList, self).pop(index)
-        res._molecule = None
-        res.residue = None
-        res.chain = None
+        res._chain = None
         return res
 
     def extend(self, residues):

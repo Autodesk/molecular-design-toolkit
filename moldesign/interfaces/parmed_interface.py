@@ -37,7 +37,7 @@ def read_mmcif(f, reassign_chains=True):
     mol = parmed_to_mdt(parmedmol)
     if reassign_chains:
         f.seek(0)
-        mol = _reassign_chains(f, mol)
+        _reassign_chains(f, mol)
     mdt.helpers.assign_biopolymer_bonds(mol)
     return mol
 
@@ -156,7 +156,6 @@ def parmed_to_mdt(pmdmol):
             residues[patm.residue] = mdt.Residue(resname=patm.residue.name,
                                                  pdbindex=patm.residue.number)
             residues[patm.residue].chain = chain
-            chain.add(residues[patm.residue])
         residue = residues[patm.residue]
 
         atom = mdt.Atom(name=patm.name,
@@ -166,8 +165,6 @@ def parmed_to_mdt(pmdmol):
         atom.position = [patm.xx, patm.xy, patm.xz]*u.angstrom
 
         atom.residue = residue
-        residue.add(atom)
-        atom.chain = chain
         assert patm not in atoms
         atoms[patm] = atom
 
@@ -304,11 +301,9 @@ def _reassign_chains(f, mol):
 
     for residue in mol.residues:
         newchain = reschains[residue.resname, str(residue.pdbindex), residue.chain.name]
-
-        for atom in residue.atoms:
-            atom.chain = newchain
         residue.chain = newchain
 
-    return mdt.Molecule(mol.atoms,
-                        name=mol.name, metadata=mol.metadata)
+    for chain in list(mol.chains):
+        if chain.num_residues == 0:
+            chain.molecule = None
 

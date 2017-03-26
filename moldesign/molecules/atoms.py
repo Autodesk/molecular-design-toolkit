@@ -224,7 +224,7 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         if res is self._residue:
             return
         if self.molecule is not None:  # pop it out of the molecule now
-            self._molecule.atoms.remove(self)
+            self.molecule.atoms.remove(self)
         assert self.molecule is None
         if res is not None:
             res.add(self)
@@ -235,14 +235,6 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
             return self.residue.chain
         else:
             return None
-
-    def _add_to_structure(self, struc, attr):
-        if getattr(self, attr) is struc:
-            return
-        if getattr(self, attr) is not None:
-            self.molecule.remove(self)
-        if struc is not None:
-            getattr(self, attr)._add(self)
 
     def __str__(self):
         desc = '%s %s (elem %s)' % (self.__class__.__name__, self.name, self.elem)

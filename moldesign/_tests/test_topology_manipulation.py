@@ -2,7 +2,15 @@ import moldesign as mdt
 
 import pytest
 
-def _test_topology_consistency(mol):
+
+@pytest.fixture(scope='function')
+def methane():
+    mol = mdt.from_smiles('C')
+    assert mol.num_atoms == 5
+    return mol
+
+
+def _check_topology_is_consistent(mol):
     all_residues = set(mol.residues)
     all_chains = set(mol.chains)
     found_chains = set(atom.chain for atom in mol.atoms)
@@ -40,6 +48,15 @@ def _test_topology_consistency(mol):
     assert residues_from_chains == all_residues
 
 
+def _check_added(mol, atom):
+    assert atom in mol
+    assert atom in mol.atoms
+    assert atom is mol.atoms[atom.index]
+    assert atom.residue.molecule is mol
+    assert atom.residue is mol.residues[atom.residue.index]
+    assert atom.residue[atom.name] is atom
+
+
 def test_mol_init_from_residues():
     atoms = mdt.AtomList()
     resa = mdt.Residue(name='A')
@@ -55,7 +72,7 @@ def test_mol_init_from_residues():
     assert resb.num_atoms == 5
 
     mol = mdt.Molecule(atoms)
-    _test_topology_consistency(mol)
+    _check_topology_is_consistent(mol)
 
     assert mol.num_atoms == 10
     assert mol.num_residues == 2
@@ -63,21 +80,69 @@ def test_mol_init_from_residues():
     assert mol.chains[0].num_residues == 2
 
 
-def test_add_atom():
-    atom = mdt.Atom('H')
+def test_add_atom_with_append(methane):
+    mol = methane
     a2 = mdt.Atom('He')
-    a3 = mdt.Atom('Li')
-    mol = mdt.Molecule([atom])
-    assert mol.num_atoms == 1
-    assert mol.atoms[0] is atom
-
     mol.atoms.append(a2)
-    assert mol.num_atoms == 2
-    _test_topology_consistency(mol)
+    assert mol.num_atoms == 6
+    _check_added(mol, a2)
+    _check_topology_is_consistent(mol)
+    assert mol.num_residues == 1
+    assert mol.num_chains == 1
 
+
+def test_add_atom_by_assigning_molecule(methane):
+    mol = methane
+    a3 = mdt.Atom('Li')
     a3.molecule = mol
-    assert mol.num_atoms == 3
-    _test_topology_consistency(mol)
+    assert mol.num_atoms == 6
+    _check_added(mol, a3)
+    _check_topology_is_consistent(mol)
+    assert mol.num_residues == 1
+    assert mol.num_chains == 1
+
+
+def test_add_atom_in_another_residue(methane):
+    mol = methane
+    a4 = mdt.Atom('Ar')
+    a4.residue = mdt.Residue(name='Be')
+    mol.atoms.append(a4)
+    _check_added(mol, a4)
+    _check_topology_is_consistent(mol)
+    assert mol.num_atoms == 6
+    assert mol.num_residues == 2
+    assert mol.num_chains == 1
+
+def _check_isolated(atom, mol):
+    assert atom.molecule is atom.chain is atom.residue is None
+    assert atom not in mol
+
+
+def test_remove_atom_with_moleculelist(methane):
+    mol = methane
+    hatom = mol.atoms[3]
+    mol.atoms.remove(hatom)
+    assert mol.num_atoms == 4
+    _check_isolated(hatom, mol)
+    _check_topology_is_consistent(mol)
+
+
+def test_remove_atom_with_null_residue(methane):
+    mol = methane
+    hatom = mol.atoms[3]
+    hatom.residue = None
+    assert mol.num_atoms == 4
+    _check_isolated(hatom, mol)
+    _check_topology_is_consistent(mol)
+
+
+def test_remove_atom_with_null_molecule(methane):
+    mol = methane
+    hatom = mol.atoms[3]
+    hatom.molecule = None
+    assert mol.num_atoms == 4
+    _check_isolated(hatom, mol)
+    _check_topology_is_consistent(mol)
 
 
 def test_add_atom_exceptions():
@@ -95,6 +160,7 @@ def test_add_atom_exceptions():
     assert mol.num_atoms == 1
     newatom = mdt.Atom(1)
     newatom.residue = mdt.Residue(name='TT')
+    newatom.residue.add(mdt.Atom(3))
 
     with pytest.raises(ValueError):
         mol.atoms.append(newatom)  # can't add atom that's part of a residue
