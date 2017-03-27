@@ -117,7 +117,6 @@ def _check_isolated(atom, mol):
     assert atom.molecule is atom.chain is atom.residue is None
     assert atom not in mol
 
-
 def test_remove_atom_with_moleculelist(methane):
     mol = methane
     hatom = mol.atoms[3]
@@ -172,3 +171,23 @@ def test_add_atom_exceptions():
 
     with pytest.raises(ValueError):
         mol.atoms.append(newatom)  # can't add atom that's part of a residue
+
+
+def test_move_atom_between_residues(methane):
+    mol = methane.combine(methane)
+    assert mol.num_residues == 2
+    assert mol.num_chains == 2
+
+    assert mol.atoms[0].residue is mol.residues[0]
+    assert mol.atoms[0] in mol.residues[0]
+
+    with pytest.raises(ValueError):
+        # can't do it this way because it already belongs to residue 0
+        mol.residues[1].add(mol.atoms[0])
+
+    mol.atoms[0].residue = mol.residues[1]
+
+    assert mol.residues[0].num_atoms == 4
+    assert mol.residues[1].num_atoms == 6
+    assert mol.atoms[0] not in mol.residues[0]
+    assert mol.atoms[0] in mol.residues[1]

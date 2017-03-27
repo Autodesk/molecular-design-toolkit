@@ -521,8 +521,8 @@ class MolTopologyMixin(object):
 
     def same_bonds(self, other, verbose=False):
         for myatom, otheratom in zip(self.atoms, other.atoms):
-            mybonds = self.bond_graph[myatom]
-            otherbonds = other.bond_graph[otheratom]
+            mybonds = self._graph[myatom]
+            otherbonds = other._graph[otheratom]
             if len(mybonds) != len(otherbonds):
                 if verbose:
                     print 'INFO: atoms[%d] has %d bonds in self, %d bonds in other' % (

@@ -396,44 +396,33 @@ class AtomContainer(AtomGroup):
         return l
 
     @property
-    def bond_graph(self):
-        """ Dict[moldesign.Atom: List[moldesign.Atom]]: bond graph for all atoms in this object
-        """
-        return {atom: atom.bond_graph for atom in self.atoms}
-
-    @property
     def bonds(self):
         """ Iterable[moldesign.Bond]: iterator over bonds from this object's atoms
         """
-        bg = self.bond_graph
-        for atom, nbrs in bg.iteritems():
-            for nbr, order in nbrs.iteritems():
-                if atom.index < nbr.index or nbr not in bg:
-                    yield mdt.Bond(atom,nbr, order)
+        for atom in self.atoms:
+            for nbr in atom.bonded_atoms:
+                if atom.index < nbr.index or nbr not in self:
+                    yield mdt.Bond(atom, nbr)
 
-    def get_bond(self, a1, a2):
-        return mdt.Bond(a1, a2, order=self.bond_graph[a1][a2])
-
+    # TODO: move all these properties into an AtomBonds-like object
     @property
     def internal_bonds(self):
         """ Iterable[moldesign.Bond]: iterator over bonds that connect two atoms in this object
         """
-        bg = self.bond_graph
-        for atom, nbrs in bg.iteritems():
-            for nbr, order in nbrs.iteritems():
-                if atom.index < nbr.index and nbr in bg:
-                    yield mdt.Bond(atom, nbr, order)
+        for atom in self.atoms:
+            for nbr in atom.bonded_atoms:
+                if atom.index < nbr.index and nbr in self:
+                    yield mdt.Bond(atom, nbr)
 
     @property
     def external_bonds(self):
         """
         Iterable[moldesign.Bond]: iterator over bonds that bond these atoms to other atoms
         """
-        bg = self.bond_graph
-        for atom, nbrs in bg.iteritems():
-            for nbr, order in nbrs.iteritems():
-                if nbr not in bg:
-                    yield mdt.Bond(atom, nbr, order)
+        for atom in self.atoms:
+            for nbr in atom.bonded_atoms:
+                if nbr not in self:
+                    yield mdt.Bond(atom, nbr)
 
     @property
     def bonded_atoms(self):

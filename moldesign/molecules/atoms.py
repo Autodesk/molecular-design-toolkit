@@ -18,7 +18,7 @@ import moldesign as mdt
 from moldesign import data, utils
 from moldesign import units as u
 
-from . import toplevel, AtomContainer, AtomList, AtomArray, AtomCoordinate, Bond
+from . import toplevel, AtomContainer, AtomList, AtomArray, AtomCoordinate, AtomBonds
 from .notebook_display import AtomNotebookMixin
 
 
@@ -147,6 +147,11 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
     momentum = AtomArray('_momentum', 'momenta')
     atomic_number = utils.Synonym('atnum')
 
+    # bond_to = utils.Removed('bonds.create')
+    # heavy_bonds = utils.Removed('bonds.heavy')
+    # bond_graph = utils.Removed('bonds')
+    # bonded_atoms = utils.Removed('bonds.atoms')
+
     #################################################################
     # Methods for BUILDING the atom and indexing it in a molecule
     def __init__(self, name=None, atnum=None, mass=None,
@@ -157,7 +162,7 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         self._index = None
         self._position = np.zeros(3) * u.default.length
         self._momentum = np.zeros(3) * (u.default.length * u.default.mass/u.default.time)
-        self._bond_graph = {}
+        self._graph = {}
         self._name = None
 
         # Allow user to instantiate an atom as Atom(6) or Atom('C')
@@ -217,12 +222,12 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         This method is called AFTER the atom has been assigned to the molecule
         """
         assert self is mol.atoms[self.index]
-        assert self._position == mol.position[self.index]
-        assert self._momentum == mol.momentum[self.index]
-        assert self._bond_graph == mol.bond_graph[self]
+        assert (self._position == mol.positions[self.index]).all()
+        assert (self._momentum == mol.momenta[self.index]).all()
+        assert self._graph == mol.bonds._graph[self]
         self._position = np.zeros(3) * u.default.length
         self._momentum = np.zeros(3) * (u.default.length * u.default.mass/u.default.time)
-        self._bond_graph = {}
+        self._graph = {}
 
     def _recover_state_from_molecule(self, ):
         """ Private data mangement method.
@@ -235,10 +240,10 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         assert self is mol.atoms[self.index]
         assert self._position is None
         assert self._momentum is None
-        assert self._bond_graph is None
+        assert self._graph is None
         self._position = mol.positions[self.index].copy()
         self._momentum = mol.momenta[self.index].copy()
-        self._bond_graph = dict(mol.bond_graph[self])
+        self._graph = dict(mol.bonds._graph[self])
 
     @property
     def residue(self):
@@ -309,75 +314,19 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         """Helper for pickling"""
         state = self.__dict__.copy()
         if self.molecule is not None:  # then these don't belong to the atom anymore
-            state['_bond_graph'] = None
+            state['_graph'] = None
             state['_position'] = self.position
             state['_momentum'] = self.momentum
         return state
 
-    def bond_to(self, other, order):
-        """ Create or modify a bond with another atom
-
-        Args:
-            other (Atom): atom to bond to
-            order (int): bond order
-
-        Returns:
-            moldesign.molecules.bonds.Bond: bond object
-        """
-        if self.molecule is other.molecule:
-            self.bond_graph[other] = other.bond_graph[self] = order
-        else:  # allow unassigned atoms to be bonded to anything for building purposes
-            self.bond_graph[other] = order
-        return Bond(self, other, order)
-
-    @property
-    def bond_graph(self):
-        """ Mapping[Atom, int]: dictionary of this atoms bonded neighbors, of the form
-        ``{bonded_atom1, bond_order1, ...}``
-        """
-        if self.molecule is None:
-            return self._bond_graph
-        else:
-            self._bond_graph = None
-            try:
-                return self.molecule.bond_graph[self]
-            except KeyError:
-                self.molecule.bond_graph[self] = {}
-                return self.molecule.bond_graph[self]
-
-    @bond_graph.setter
-    def bond_graph(self, value):
-        if self.molecule is None:
-            self._bond_graph = value
-        else:
-            self._bond_graph = None
-            self.molecule.bond_graph[self] = value
-
     @property
     def bonds(self):
-        """ List[Bond]: list of all bonds this atom is involved in
+        """ moldesign.molecules.AtomBonds: view on this atom's bonds
         """
-        return [Bond(self, nbr, order) for nbr, order in self.bond_graph.iteritems()]
-
-    @property
-    def heavy_bonds(self):
-        """ List[Bond]: list of all heavy atom bonds (where BOTH atoms are not hydrogen)
-
-        Note:
-            this returns an empty list if called on a hydrogen atom
-        """
-        if self.atnum == 1:
-            return []
+        if self.molecule:
+            return self.molecule.bonds[self]
         else:
-            return [Bond(self, nbr, order)
-                    for nbr, order in self.bond_graph.iteritems()
-                    if nbr.atnum > 1]
-
-    @property
-    def bonded_atoms(self):
-        """ List[moldesign.Atom]: a list of the atoms this atom is bonded to
-        """
-        return [bond.partner(self) for bond in self.bonds]
+            return AtomBonds(self, self._graph)
 
     @property
     def force(self):
@@ -405,14 +354,14 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
     def num_bonds(self):
         """ int: the number of other atoms this atom is bonded to
         """
-        return len(self.bond_graph)
+        return len(self._graph)
     nbonds = num_bonds
 
     @property
     def valence(self):
         """ int: the sum of this atom's bond orders
         """
-        return sum(v for v in self.bond_graph.itervalues())
+        return sum(v.order for v in self.bonds)
 
     @property
     def symbol(self):

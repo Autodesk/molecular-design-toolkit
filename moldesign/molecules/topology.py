@@ -144,7 +144,7 @@ class AtomMasterList(BaseMasterList, AtomListOperationMixin):
                     structure_to_add.add(obj)
                     atoms_in_structure.update(obj.atoms)
 
-            for nbr in atom.bond_graph:
+            for nbr in atom.bonds.atoms:
                 if nbr.molecule not in (None, self._mol):
                     raise ValueError(
                             "Can't add atoms to %s: %s is bonded to a different molecule ('%s')" %

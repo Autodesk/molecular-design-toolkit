@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from moldesign import data, utils
+
 
 class BondGraph(object):
     def __init__(self, mol):
@@ -71,7 +73,7 @@ class BondGraph(object):
         """
         assert atom not in self._graph
         self._graph[atom] = {}
-        for nbr, order in atom.bond_graph.iteritems():
+        for nbr, order in atom._graph.iteritems():
             if nbr.molecule is self._mol:
                 self._graph[atom][nbr] = self._graph[nbr][atom] = order
 
@@ -83,9 +85,107 @@ class BondGraph(object):
         self._graph.pop(atom)
 
     def __getitem__(self, atoms):
-        if atoms[0] not in self._graph or atoms[1] not in self._graph[atoms[0]]:
-            raise ValueError('%s is not bonded to %s' % (atoms[0], atoms[1]))
-        return Bond(atoms[0], atoms[1])
+        try:
+            a1, a2 = atoms
+        except TypeError:
+            return AtomBonds(atoms)
+        else:
+            return Bond(a1, a2)
+
+
+class AtomBonds(object):
+    """ A view of one atom's bonds
+    """
+    __len__ = utils.Alias('_graph.__len__')
+
+    def __init__(self, atom, graphdict):
+        self.atom = atom
+        self._graph = graphdict
+
+    def __getitem__(self, atom):
+        return Bond(self.atom, atom)
+
+    def __iter__(self):
+        for nbr in self._graph:
+            yield Bond(self.atom, nbr)
+
+    def __contains__(self, other):
+        return other in self._graph
+
+    def iteritems(self):
+        """ Yield tuples of this atom's bonded neighbors and the corresponding bond orders
+
+        Yields:
+            Tuple[moldesign.Atom, int]: ([atom bonded to this one], [order of the bond])
+        """
+        return self._graph.iteritems()
+
+    @property
+    def heavy(self):
+        """ Iterator[Bond]: list of all heavy atom bonds (where BOTH atoms are not hydrogen)
+
+        Note:
+            this returns an empty list if called on a hydrogen atom
+        """
+        for bond in self:
+            if bond.a1.atnum > 1 and bond.a2.atnum > 1:
+                yield bond
+
+    @property
+    def atoms(self):
+        """ List[Atom]: list of atoms this atom is bonded to
+        """
+        return self._graph.keys()
+
+    def create(self, other, order):
+        """ Create or modify a bond with another atom
+
+        Args:
+            other (Atom): atom to bond to
+            order (int): bond order
+
+        Returns:
+            moldesign.molecules.bonds.Bond: bond object
+        """
+        if self.atom.molecule is other.molecule:
+            self.atom.molecule.bonds.create(self, other, order)
+        else:  # allow unassigned atoms to be bonded to anything for building purposes
+            if self.atom.molecule is None:
+                self._graph[other] = order
+            if other.molecule is None:
+                other._graph[self] = order
+            if self.atom.molecule is not None and other.molecule is not None:
+                raise ValueError("Can't bond atom in different molecules")
+        return Bond(self, other)
+
+    def delete(self, other):
+        """ Delete the bond between this atom and another
+
+        Args:
+            other (moldesign.Atom): Atom to delete the bond with
+
+        Raises:
+            ValueError: if the two atoms are not bonded
+        """
+        if self.atom.molecule is other.molecule:
+            self.atom.molecule.bonds.delete(self, other)
+        else:
+            if self.atom.molecule is None:
+                self._graph.pop(other)
+            if other.molecule is None:
+                other._graph.pop(self, None)
+            if self.atom.molecule is not None and other.molecule is not None:
+                raise ValueError("Can't bond atom in different molecules")
+
+    def __str__(self):
+        start = "%s bonds to:" % self.atom
+        s = ', '.join('%s (%s)' % (nbr, data.BONDNAMES.get(order, 0))
+                      for nbr, order in self._graph[self].iteritems())
+        return start + s
+
+    def __repr__(self):
+        return '<%s>' % self
+
 
 
 class Bond(object):
