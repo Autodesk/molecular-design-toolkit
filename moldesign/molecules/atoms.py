@@ -215,6 +215,36 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
             assert self.chain is mol._defchain
             assert self.residue is mol._defresidue
 
+    def _subcopy(self, memo=None):
+        """ Private data mangement method for copying the local substructure of an atom.
+        This is a shallow copy, and is intended to be deepcopied to avoid corrupting the original
+        atom's data.
+
+        See :method:`moldesign.AtomContainer.copy_atoms` for the public interface that uses this.
+        """
+        import copy
+        if memo is None:
+            memo = {}
+        if self in memo:
+            return
+        newatom = copy.copy(self)
+        if self.molecule:
+            newatom._recover_state_from_molecule(ascopy=True)
+        newatom._residue = None
+        memo[self] = newatom
+
+        # bond graph takes ONLY the bonds that involve already-copied atoms
+        newatom._graph = {memo[atom]: order
+                          for atom, order in newatom._graph.iteritems()
+                          if atom in memo}
+        for atom, order in newatom._graph.iteritems():
+            atom._graph[newatom] = order
+
+        if self._residue is not None:
+            if self._residue not in memo:
+                self._residue._subcopy(memo)
+            newatom.residue = memo[self._residue]
+
     def _delegate_state_to_molecule(self, mol):
         """ Private data mangement method.
 
@@ -225,25 +255,28 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         assert (self._position == mol.positions[self.index]).all()
         assert (self._momentum == mol.momenta[self.index]).all()
         assert self._graph == mol.bonds._graph[self]
-        self._position = np.zeros(3) * u.default.length
-        self._momentum = np.zeros(3) * (u.default.length * u.default.mass/u.default.time)
-        self._graph = {}
+        self._position = None
+        self._momentum = None
+        self._graph = None
 
-    def _recover_state_from_molecule(self, ):
+    def _recover_state_from_molecule(self, ascopy=False):
         """ Private data mangement method.
 
         When atom is removed from a molecule, it takes back state that was delegated to the
         molecule.
-        This method is called BEFORE the atom is removed from any molecule structures
+        This method is called BEFORE the atom is removed from any molecule structures. It's also
+        used to put state back into a COPIED version of the atom.
         """
         mol = self.molecule
-        assert self is mol.atoms[self.index]
+        if not ascopy:
+            assert self is mol.atoms[self.index]
         assert self._position is None
         assert self._momentum is None
         assert self._graph is None
         self._position = mol.positions[self.index].copy()
         self._momentum = mol.momenta[self.index].copy()
-        self._graph = dict(mol.bonds._graph[self])
+        self._graph = dict(mol.bonds._graph[mol.atoms[self.index]])
+        self._index = None
 
     @property
     def residue(self):
@@ -315,8 +348,8 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         state = self.__dict__.copy()
         if self.molecule is not None:  # then these don't belong to the atom anymore
             state['_graph'] = None
-            state['_position'] = self.position
-            state['_momentum'] = self.momentum
+            state['_position'] = None
+            state['_momentum'] = None
         return state
 
     @property

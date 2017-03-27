@@ -174,7 +174,8 @@ def test_add_atom_exceptions():
 
 
 def test_move_atom_between_residues(methane):
-    mol = methane.combine(methane)
+    mol = methane.combine(methane.copy())
+    _check_topology_is_consistent(mol)
     assert mol.num_residues == 2
     assert mol.num_chains == 2
 
@@ -186,6 +187,7 @@ def test_move_atom_between_residues(methane):
         mol.residues[1].add(mol.atoms[0])
 
     mol.atoms[0].residue = mol.residues[1]
+    _check_topology_is_consistent(mol)
 
     assert mol.residues[0].num_atoms == 4
     assert mol.residues[1].num_atoms == 6

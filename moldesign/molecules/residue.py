@@ -95,6 +95,29 @@ class Residue(BioContainer, ResidueNotebookMixin):
             utils.AutoIndexList.remove(self.molecule.atoms, atom)
         atom._residue = None
 
+    def _subcopy(self, memo=None):
+        import copy
+        from . import ChildList
+
+        if memo is None:
+            memo = {}
+        if self in memo:
+            return
+
+        newresidue = copy.copy(self)
+        newresidue._chain = None
+        newresidue.children = ChildList(newresidue)
+
+        memo[self] = newresidue
+        if self._chain not in memo:
+            newchain = copy.copy(self._chain)
+            if newchain is not None:
+                newchain._molecule = None
+                newchain.children = ChildList(newchain)
+            memo[self._chain] = newchain
+
+        newresidue.chain = memo[self._chain]
+
     @property
     def name(self):
         if self._name is not None:

@@ -221,73 +221,26 @@ class AtomGroup(AtomGroupNotebookMixin):
         return mdt.geom.dihedral(*map(self._getatom, (a1, a2, a3, a4)))
 
     def copy_atoms(self):
-        """
-        Copy a group of atoms which may already have bonds, residues, and a parent molecule
-        assigned. Do so by copying only the relevant entities, and creating a "mask" with
-        deepcopy's memo function to stop anything else from being copied.
+        """ Copy a group of atoms along and relevant topological information.
+
+        This specifically copies:
+          - the atoms themselves (along with their positions, momenta, and bond graphs)
+          - any residues they are are part of
+          - any chains they are part of
+          - any bonds between them
+        It does NOT copy:
+          - other atoms that are part of these atoms' residues
+          - other residues that are part of these atoms chains
+          - the molecule these atoms are part of
 
         Returns:
             AtomList: list of copied atoms
         """
-        from molecules.structurelist import ChildList
-
-        oldatoms = self.atoms
-        old_bond_graph = {a: {} for a in self.atoms}
+        memo = {}
         for atom in self.atoms:
-            for nbr in atom.bond_graph:
-                if nbr in old_bond_graph:
-                    old_bond_graph[atom][nbr] = atom.bond_graph[nbr]
-
-        # Figure out which bonds, residues and chains to copy
-        # Work with shallow copies to avoid modifying originals
-        tempatoms = AtomList([copy.copy(atom) for atom in oldatoms])
-        old_to_new = dict(zip(oldatoms, tempatoms))
-        temp_bond_graph = {a: {} for a in tempatoms}
-        replaced = {}
-        for atom, oldatom in zip(tempatoms, oldatoms):
-            atom._molecule = None
-            atom.bond_graph = {}
-
-            if atom.chain is not None:
-                if atom.chain not in replaced:
-                    chain = copy.copy(atom.chain)
-                    chain._molecule = None
-                    chain.children = ChildList(chain)
-                    replaced[atom.chain] = chain
-                else:
-                    chain = replaced[atom.chain]
-
-                atom.chain = chain
-
-            if atom.residue is not None:
-                if atom.residue not in replaced:
-                    res = copy.copy(atom.residue)
-                    res._molecule = None
-                    res.chain = atom.chain
-                    res.children = ChildList(res)
-
-                    res.chain.add(res)
-                    replaced[atom.residue] = res
-                else:
-                    res = replaced[atom.residue]
-
-                atom.residue = res
-                assert atom.residue.chain is atom.chain
-                res.add(atom)
-
-            for oldnbr, bondorder in oldatom.bond_graph.iteritems():
-                if oldnbr not in old_to_new: continue
-                newnbr = old_to_new[oldnbr]
-                temp_bond_graph[atom][newnbr] = bondorder
-
-        # Finally, do a deepcopy, which bring all the information along without linking it
-        newatoms, new_bond_graph = copy.deepcopy((tempatoms, temp_bond_graph))
-
-        for atom, original in zip(newatoms, oldatoms):
-            atom.bond_graph = new_bond_graph[atom]
-            atom.position = original.position
-            atom.momentum = original.momentum
-
+            atom._subcopy(memo)
+        tempatoms = [memo[atom] for atom in self.atoms]
+        newatoms = copy.deepcopy(tempatoms)
         return AtomList(newatoms)
 
     ###########################################

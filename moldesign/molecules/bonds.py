@@ -80,7 +80,9 @@ class BondGraph(object):
         self._graph[atom] = {}
         for nbr, order in atom._graph.iteritems():
             if nbr.molecule is self._mol:
-                self._graph[atom][nbr] = self._graph[nbr][atom] = order
+                self._graph[atom][nbr] = order
+                if nbr in self._graph:
+                    self._graph[nbr][atom] = order
 
     def _removeatom(self, atom):
         """ Private data mangement method - removes this atom from the bond graph.
@@ -197,7 +199,7 @@ class AtomBonds(object):
     def __str__(self):
         start = "%s bonds to:" % self.atom
         s = ', '.join('%s (%s)' % (nbr, data.BONDNAMES.get(order, 0))
-                      for nbr, order in self._graph[self].iteritems())
+                      for nbr, order in self._graph.iteritems())
         return start + s
 
     def __repr__(self):

@@ -75,8 +75,17 @@ class BioContainer(AtomContainer):
 
     __setitem__ = add
 
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, n):
+        self._name = n
+
     def _getuniquename(self, key):
-        if key is None: key = ''
+        if key is None:
+            key = ''
         assert isinstance(key, basestring)
         ix = 0
         k = key
@@ -186,9 +195,9 @@ class Instance(BioContainer):
 
         # rebuild all indices after adding children to a molecule
         self.children.rebuild()
-        for chain in self.children:
-            chain.children.rebuild()
-            for residue in chain.children:
+        for c in self.children:
+            c.children.rebuild()
+            for residue in c.children:
                 residue.children.rebuild()
 
         super(Instance, self).add(chain)
