@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import moldesign
 from moldesign import data, utils
 
 
@@ -38,12 +39,16 @@ class BondGraph(object):
         Returns:
             Bond: record of the bond
         """
+        if a1 is a2:
+            raise ValueError("Cannot bond atom to itself!")
+
         if a2 in self._graph[a1]:
             raise ValueError("%s and %s already bonded, can't create another bond" %
                              (a1, a2))
-        bond = Bond(a1, a2)
-        bond.order = order
-        return bond
+
+        self._graph[a1][a2] = order
+        self._graph[a2][a1] = order
+        return Bond(a1, a2)
 
     def delete(self, atom_or_bond, a2=None):
         """ Delete a bond
@@ -88,7 +93,7 @@ class BondGraph(object):
         try:
             a1, a2 = atoms
         except TypeError:
-            return AtomBonds(atoms)
+            return AtomBonds(atoms, self._graph[atoms])
         else:
             return Bond(a1, a2)
 
@@ -110,7 +115,17 @@ class AtomBonds(object):
             yield Bond(self.atom, nbr)
 
     def __contains__(self, other):
-        return other in self._graph
+        if isinstance(other, moldesign.Atom):
+            return other in self._graph
+        elif isinstance(other, Bond):
+            if other.a1 is self:
+                return other.a2 in self
+            elif other.a2 is self:
+                return other.a1 in self
+            else:
+                return False
+        else:
+            return False
 
     def iteritems(self):
         """ Yield tuples of this atom's bonded neighbors and the corresponding bond orders
@@ -147,16 +162,18 @@ class AtomBonds(object):
         Returns:
             moldesign.molecules.bonds.Bond: bond object
         """
-        if self.atom.molecule is other.molecule:
-            self.atom.molecule.bonds.create(self, other, order)
+        if other is self:
+            raise ValueError("Cannot bond atom to itself!")
+        if self.atom.molecule and (self.atom.molecule is other.molecule):
+            self.atom.molecule.bonds.create(self.atom, other, order)
         else:  # allow unassigned atoms to be bonded to anything for building purposes
             if self.atom.molecule is None:
                 self._graph[other] = order
             if other.molecule is None:
-                other._graph[self] = order
+                other._graph[self.atom] = order
             if self.atom.molecule is not None and other.molecule is not None:
                 raise ValueError("Can't bond atom in different molecules")
-        return Bond(self, other)
+        return Bond(self.atom, other)
 
     def delete(self, other):
         """ Delete the bond between this atom and another
@@ -187,7 +204,6 @@ class AtomBonds(object):
         return '<%s>' % self
 
 
-
 class Bond(object):
     """
     A bond between two atoms.
@@ -216,7 +232,7 @@ class Bond(object):
         else:
             self.molecule = a1.molecule
 
-        if not a1.bonded_to(a2):
+        if a2 not in a1.bonds:
             raise ValueError('%s is not bonded to %s' % (a1, a2))
 
         self._exists = True

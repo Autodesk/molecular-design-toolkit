@@ -354,7 +354,7 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
     def num_bonds(self):
         """ int: the number of other atoms this atom is bonded to
         """
-        return len(self._graph)
+        return len(self.bonds)
     nbonds = num_bonds
 
     @property
