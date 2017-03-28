@@ -178,6 +178,9 @@ Assigning a atom to a molecule (`molecule.atoms.append(atom)` or `atom.molecule=
   - IF the atom is bonded to atoms outside of this molecule
      - raise Exception (need to assign them all in one go)
      
+Assigning a list of atoms to a molecule:
+  - The order of the atoms will be preserved, even if it conflicts with the order of the residues
+     
 Removing an atom from a molecule:
   - It is removed from its parent residue
   - All bonds it is involved in will disappear from the molecule

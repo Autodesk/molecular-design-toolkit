@@ -71,6 +71,8 @@ class BioContainer(AtomContainer):
         """
         if item.name in self:
             item._name = self._getuniquename(item.name)
+        assert item._name == item.name
+        assert item.name not in self.children
         self.children[item.name] = item
 
     __setitem__ = add
@@ -188,10 +190,10 @@ class Instance(BioContainer):
     def __repr__(self):
         return '<Molecule instance: %s>' % str(self.children)
 
-    # TODO: combine this is MolecularChainList
-    def add(self, chain):
+    def add(self, chain, _addatoms=True):
         utils.AutoIndexList.extend(self.molecule.residues, list(chain.residues))
-        utils.AutoIndexList.extend(self.molecule.atoms, list(chain.atoms))
+        if _addatoms:
+            utils.AutoIndexList.extend(self.molecule.atoms, list(chain.atoms))
 
         # rebuild all indices after adding children to a molecule
         self.children.rebuild()

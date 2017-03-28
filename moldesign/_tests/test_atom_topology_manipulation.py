@@ -79,6 +79,9 @@ def test_mol_init_from_residues():
     assert mol.num_chains == 1
     assert mol.chains[0].num_residues == 2
 
+    for a1, a2 in zip(atoms, mol.atoms):
+        assert a1 is a2
+
 
 def test_add_atom_with_append(methane):
     mol = methane
@@ -186,10 +189,11 @@ def test_move_atom_between_residues(methane):
         # can't do it this way because it already belongs to residue 0
         mol.residues[1].add(mol.atoms[0])
 
-    mol.atoms[0].residue = mol.residues[1]
+    moveatom = mol.atoms[0]
+    moveatom.residue = mol.residues[1]
     _check_topology_is_consistent(mol)
 
     assert mol.residues[0].num_atoms == 4
     assert mol.residues[1].num_atoms == 6
-    assert mol.atoms[0] not in mol.residues[0]
-    assert mol.atoms[0] in mol.residues[1]
+    assert moveatom not in mol.residues[0]
+    assert moveatom in mol.residues[1]

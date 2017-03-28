@@ -198,6 +198,11 @@ class MdtQuantity(ureg.Quantity):
     def defunits_value(self):
         return self.defunits().magnitude
 
+    def numerically_equal(self, other):
+        v1 = self.defunits_value()
+        v2 = other.defunits_value()
+        return np.allclose(v1, v2)
+
     # defunits = ureg.Quantity.to_base_units  # replacing this with the new pint implementation
     def defunits(self):
         """Return this quantity in moldesign's default unit system (as specified in moldesign.units.default)"""

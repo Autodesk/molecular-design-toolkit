@@ -168,13 +168,14 @@ class Chain(BioContainer):
         """ChildList: list of residues in this chain """
         return self.children
 
-    def add(self, residue):
+    def add(self, residue, _addatoms=True):
         if residue.chain is not None:
             raise ValueError("%s is already part of %s" % (residue, self))
         residue._chain = self
         if self.molecule is not None:
-            utils.AutoIndexList.extend(self.molecule.atoms, residue.atoms)
             utils.AutoIndexList.append(self.molecule.residues, residue)
+            if _addatoms:
+                utils.AutoIndexList.extend(self.molecule.atoms, residue.atoms)
         super(Chain, self).add(residue)
 
     def remove(self, residue):

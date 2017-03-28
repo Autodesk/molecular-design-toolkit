@@ -96,7 +96,7 @@ def h2():
     atom2 = mdt.Atom(atnum=1)
     atom2.position = [-0.5, 0.0, 0.0] * u.angstrom
     h2 = mdt.Molecule([atom1, atom2], name='h2')
-    atom1.bond_to(atom2, 1)
+    atom1.bonds.create(atom2, 1)
     return h2
 
 

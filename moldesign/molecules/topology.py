@@ -98,6 +98,7 @@ class AtomMasterList(BaseMasterList, AtomListOperationMixin):
         """
         # Do error checking immediately so that we don't get to an inconsistent state.
         # Any errors after this point will probably screw up the molecule
+        numinitial = len(self)
         self._error_if_cant_add_atoms(atoms)
         for o in atoms:
             self._error_if_object_owned(o)
@@ -111,17 +112,18 @@ class AtomMasterList(BaseMasterList, AtomListOperationMixin):
         self._mol._momenta = u.array([atom.momentum for atom in iterchain(self, atoms)])
 
         # assign default residues and chains where necessary
-        for atom in atoms:
+        for iatom, atom in enumerate(atoms):
+            utils.AutoIndexList.append(self, atom)
+
             if atom.residue is None:
-                self._mol._defresidue.add(atom)
+                self._mol._defresidue.add(atom, _addatoms=False)
 
             if atom.residue.chain is None:
-                self._mol._defchain.add(atom.residue)
+                self._mol._defchain.add(atom.residue, _addatoms=False)
 
-            # this part sets up all primary structure
             if atom.chain.molecule is not self._mol:
                 assert atom.chain.molecule is None
-                self._mol.chains.add(atom.chain)
+                self._mol.chains.add(atom.chain, _addatoms=False)
 
             self._mol.bonds._addatom(atom)
             assert atom.residue.molecule is self._mol
@@ -131,7 +133,7 @@ class AtomMasterList(BaseMasterList, AtomListOperationMixin):
             assert atom in self._mol.atoms
 
         # Mark the atoms as owned
-        for atom in atoms:
+        for iatom, atom in enumerate(atoms):
             atom._delegate_state_to_molecule(self._mol)
 
     def _error_if_cant_add_atoms(self, atoms):
@@ -145,7 +147,7 @@ class AtomMasterList(BaseMasterList, AtomListOperationMixin):
                     atoms_in_structure.update(obj.atoms)
 
             for nbr in atom.bonds.atoms:
-                if nbr.molecule not in (None, self._mol):
+                if nbr.molecule is not None and nbr.molecule is not self._mol:
                     raise ValueError(
                             "Can't add atoms to %s: %s is bonded to a different molecule ('%s')" %
                             (self._mol, atom, nbr.molecule))

@@ -148,17 +148,18 @@ class Residue(BioContainer, ResidueNotebookMixin):
             residues[atom.residue] = None
         return residues.keys()
 
-    def add(self, atom):
+    def add(self, atom, _addatoms=True):
         if atom.residue is not None:
             raise ValueError("%s is already part of %s" % (atom, self))
 
-        super(Residue, self).add(atom)
-        atom._residue = self
-        if self.molecule:
+        if self.molecule and _addatoms:
             if len(self) == 0:
                 utils.AutoIndexList.insert(self.molecule.atoms, self.atoms[-1].index, atom)
             else:
                 utils.AutoIndexList.append(self.molecule.atoms, atom)
+
+        super(Residue, self).add(atom)
+        atom._residue = self
 
     @property
     def is_n_terminal(self):

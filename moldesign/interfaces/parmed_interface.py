@@ -149,7 +149,7 @@ def parmed_to_mdt(pmdmol):
     chains = {}
     for patm in pmdmol.atoms:
         if patm.residue.chain not in chains:
-            chains[patm.residue.chain] = mdt.Chain(pdbname=patm.residue.chain)
+            chains[patm.residue.chain] = mdt.Chain(name=patm.residue.chain)
         chain = chains[patm.residue.chain]
 
         if patm.residue not in residues:

@@ -252,8 +252,8 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         This method is called AFTER the atom has been assigned to the molecule
         """
         assert self is mol.atoms[self.index]
-        assert (self._position == mol.positions[self.index]).all()
-        assert (self._momentum == mol.momenta[self.index]).all()
+        assert self._position.numerically_equal(mol.positions[self.index])
+        assert self._momentum.numerically_equal(mol.momenta[self.index])
         assert self._graph == mol.bonds._graph[self]
         self._position = None
         self._momentum = None
