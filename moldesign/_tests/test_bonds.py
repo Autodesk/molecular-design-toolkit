@@ -87,4 +87,11 @@ def test_modify_bond_order(hch):
             assert order == 55
 
 
-
+def test_delete_bond(hch):
+    mol = hch
+    assert mol.num_bonds == 2
+    bond = mol.atoms[0].bonds[mol.atoms[1]]
+    assert bond in mol.bonds
+    bond.delete()
+    assert mol.num_bonds == 1
+    assert mol.atoms[1] not in mol.atoms[0].bonds

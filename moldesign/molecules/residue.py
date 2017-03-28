@@ -72,7 +72,7 @@ class Residue(BioContainer, ResidueNotebookMixin):
         if self.molecule is mol:
             return
         if self.molecule is not None:
-            self.molecule.remove(self)
+            self.chain.remove(self)
         if mol is not None:
             mol.atoms.extend(list(self.atoms))
 

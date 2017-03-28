@@ -179,9 +179,11 @@ class Chain(BioContainer):
         super(Chain, self).add(residue)
 
     def remove(self, residue):
-        self.children._remove(residue)
         if self.molecule:
+            for atom in residue: atom._recover_state_from_molecule()
+            for atom in residue: utils.AutoIndexList.remove(self.molecule.atoms, atom)
             utils.AutoIndexList.remove(self.molecule.residues, residue)
+        self.children._remove(residue)
         residue._chain = None
 
     def _get_chain_end(self, restype, selfattr, test):

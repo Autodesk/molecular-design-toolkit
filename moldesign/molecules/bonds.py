@@ -261,7 +261,7 @@ class Bond(object):
 
     def delete(self):
         self.molecule.bonds._graph[self.a1].pop(self.a2)
-        self.molecule.bonds_graph[self.a2].pop(self.a1)
+        self.molecule.bonds._graph[self.a2].pop(self.a1)
         self._exists = False
 
     def __hash__(self):
