@@ -14,12 +14,16 @@
 
 import moldesign
 from moldesign import data, utils
+from . import toplevel
 
 
 class BondGraph(object):
     def __init__(self, mol):
         self._mol = mol
         self._graph = {}
+
+    def __len__(self):
+        return sum(map(len, self._graph.itervalues()))/2
 
     def __iter__(self):
         for atom in self._graph:
@@ -206,6 +210,7 @@ class AtomBonds(object):
         return '<%s>' % self
 
 
+@toplevel
 class Bond(object):
     """
     A bond between two atoms.
@@ -215,10 +220,11 @@ class Bond(object):
         a2 (Atom): Second atom (the order of atoms doesn't matter)
 
     Notes:
-        Comparisons and hashes involving bonds will return True if the atoms involved in the bonds
-        are the same. Bond orders are not compared.
+        These objects are suitable for hashing; two bond objects have the same hash if they have
+        the same atoms and bond order.
 
-        These objects are used to represent and pass bond data only - they are not used for storage.
+        However, the ``is`` comparison should NOT be used to compare bonds, as bond objects are
+        created and reused liberally. Use the equals ``==`` operator only.
 
     Raises:
         ValueError: if these two atoms are not bonded
@@ -245,13 +251,16 @@ class Bond(object):
         self.a2 = a2
 
     def __eq__(self, other):
-        return (self.a1 is other.a1) and (self.a2 is other.a2)
+        return (self.a1 is other.a1) and (self.a2 is other.a2) and (self.order == other.order)
 
     @property
     def order(self):
         if not self._exists:
             raise ValueError("This bond has been deleted.")
-        return self.molecule.bonds._graph[self.a1][self.a2]
+        if self.molecule:
+            return self.molecule.bonds._graph[self.a1][self.a2]
+        else:
+            return self.a1._graph[self.a2]
 
     @order.setter
     def order(self, o):

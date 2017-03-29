@@ -72,9 +72,9 @@ class Residue(BioContainer, ResidueNotebookMixin):
         if self.molecule is mol:
             return
         if self.molecule is not None:
-            self.chain.remove(self)
+            self.chain._remove(self)
         if mol is not None:
-            mol.atoms.extend(list(self.atoms))
+            mol._defchain.add(self)
 
     @property
     def chain(self):
@@ -85,14 +85,14 @@ class Residue(BioContainer, ResidueNotebookMixin):
         if self._chain is chain:
             return
         if self._chain is not None:
-            self._chain.remove(self)
+            self._chain._remove(self)
         if chain is not None:
             chain.add(self)
 
     def _remove(self, atom):
         self.children._remove(atom)
         if self.molecule:
-            utils.AutoIndexList.remove(self.molecule.atoms, atom)
+            self.molecule.atoms._remove_from_list_and_bonds(atom)
         atom._residue = None
 
     def _subcopy(self, memo=None):
@@ -154,9 +154,9 @@ class Residue(BioContainer, ResidueNotebookMixin):
 
         if self.molecule and _addatoms:
             if len(self) == 0:
-                utils.AutoIndexList.insert(self.molecule.atoms, self.atoms[-1].index, atom)
+                self.molecule.atoms._insert_and_update_bonds(self.atoms[-1].index, atom)
             else:
-                utils.AutoIndexList.append(self.molecule.atoms, atom)
+                self.molecule.atoms._append_and_update_bonds(atom)
 
         super(Residue, self).add(atom)
         atom._residue = self

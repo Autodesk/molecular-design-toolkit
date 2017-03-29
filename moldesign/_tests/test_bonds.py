@@ -95,3 +95,21 @@ def test_delete_bond(hch):
     bond.delete()
     assert mol.num_bonds == 1
     assert mol.atoms[1] not in mol.atoms[0].bonds
+
+
+def test_deleting_atom_deletes_its_bonds_from_the_molecule_only(hch):
+    mol = hch
+    atom = mol.atoms[0]
+    nbr = mol.atoms[1]
+    assert atom.num_bonds == 1
+    assert nbr.num_bonds == 2
+    assert mol.num_bonds == 2
+
+    atom.molecule = None
+    assert atom.num_bonds == 1  # it keeps its bonds, but they are not in the molecule any more
+    assert mol.num_bonds == 1
+    assert nbr.num_bonds == 1
+
+    assert len(mol.bonds._graph) == 2
+    for v in mol.bonds._graph.itervalues():
+        assert len(v) == 1

@@ -205,3 +205,12 @@ class Instance(BioContainer):
         super(Instance, self).add(chain)
         chain._molecule = self.molecule
 
+    def remove(self, chain):
+        for atom in chain.atoms:
+            atom._recover_state_from_molecule()
+        for residue in chain.residues:
+            self.molecule.residues._remove_from_list(residue)
+        for atom in chain.atoms:
+            self.molecule.atoms._remove_from_list_and_bonds(atom)
+        chain._molecule = None
+        self.children._remove(chain)

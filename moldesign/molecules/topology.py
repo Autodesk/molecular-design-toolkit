@@ -71,6 +71,9 @@ class BaseMasterList(utils.AutoIndexList):
     def remove(self, obj):
         raise NotImplementedError()  # must be implemented by subclass
 
+    def _remove_from_list(self, obj):
+        super(BaseMasterList, self).remove(obj)
+
     def pop(self, index=-1):
         obj = self[index]
         self.remove(obj)
@@ -173,7 +176,24 @@ class AtomMasterList(BaseMasterList, AtomListOperationMixin):
             ValueError: If obj is not part of this
         """
         atom._recover_state_from_molecule()
-        atom.residue._remove(atom)
+        atom.residue._remove(atom)  # this removes the atom
+
+    def _remove_from_list_and_bonds(self, atom):
+        self._mol.bonds._removeatom(atom)
+        self._remove_from_list(atom)
+
+    def _append_and_update_bonds(self, atom):
+        self._mol.bonds._addatom(atom)
+        utils.AutoIndexList.append(self, atom)
+
+    def _insert_and_update_bonds(self, index, atom):
+        self._mol.bonds._addatom(atom)
+        utils.AutoIndexList.insert(self, index, atom)
+
+    def _extend_and_update_bonds(self, atoms):
+        for atom in atoms:
+            self._mol.bonds._addatom(atom)
+        utils.AutoIndexList.extend(self, atoms)
 
 
 class ResidueMasterList(BaseMasterList):
@@ -202,4 +222,4 @@ class ResidueMasterList(BaseMasterList):
 
     def remove(self, residue):
         assert residue is self[residue.index]
-        residue.chain = None
+        residue.chain._remove(residue)

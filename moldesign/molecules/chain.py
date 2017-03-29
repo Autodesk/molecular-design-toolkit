@@ -175,14 +175,16 @@ class Chain(BioContainer):
         if self.molecule is not None:
             utils.AutoIndexList.append(self.molecule.residues, residue)
             if _addatoms:
-                utils.AutoIndexList.extend(self.molecule.atoms, residue.atoms)
+                self.molecule.atoms._extend_and_update_bonds(residue.atoms)
         super(Chain, self).add(residue)
 
-    def remove(self, residue):
+    def _remove(self, residue):
         if self.molecule:
-            for atom in residue: atom._recover_state_from_molecule()
-            for atom in residue: utils.AutoIndexList.remove(self.molecule.atoms, atom)
-            utils.AutoIndexList.remove(self.molecule.residues, residue)
+            for atom in residue:
+                atom._recover_state_from_molecule()
+            for atom in residue:
+                self.molecule.atoms._remove_from_list_and_bonds(atom)
+            self.molecule.residues._remove_from_list(residue)
         self.children._remove(residue)
         residue._chain = None
 
