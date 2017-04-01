@@ -856,23 +856,6 @@ class MolSimulationMixin(object):
         if self.integrator is not None:
             self.integrator._prepped = False
 
-    def configure_methods(self):
-        """ Interactively configure this molecule's simulation methods (notebooks only)
-
-        Returns:
-            ipywidgets.Box: configuration widget
-        """
-        import ipywidgets as ipy
-
-        children = []
-        if self.energy_model:
-            children.append(self.energy_model.configure())
-
-        if self.integrator:
-            children.append(self.integrator.configure())
-
-        return ipy.VBox(children)
-
 
 @toplevel
 class Molecule(AtomGroup,
