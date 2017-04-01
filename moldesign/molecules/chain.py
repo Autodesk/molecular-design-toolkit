@@ -29,7 +29,11 @@ class Chain(BioContainer):
         chain (Chain): the chain this residue belongs to
     """
     @utils.args_from(BioContainer)
-    def __init__(self, name=None):
+    def __init__(self, name=None, pdbname=None):
+        if name is not None and pdbname is not None and name != pdbname:
+            raise ValueError('Pass one of "name" and "pdbname" but not both')
+        elif name is None:
+            name = pdbname
         self._type = None
         self._5p_end = self._3p_end = self._n_terminal = self._c_terminal = None
         super(Chain, self).__init__(name)

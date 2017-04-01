@@ -193,7 +193,7 @@ class Instance(BioContainer):
     def add(self, chain, _addatoms=True):
         utils.AutoIndexList.extend(self.molecule.residues, list(chain.residues))
         if _addatoms:
-            utils.AutoIndexList.extend(self.molecule.atoms, list(chain.atoms))
+            self.molecule.atoms._extend_and_update_bonds(list(chain.atoms))
 
         # rebuild all indices after adding children to a molecule
         self.children.rebuild()

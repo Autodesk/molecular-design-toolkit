@@ -117,6 +117,7 @@ class AtomMasterList(BaseMasterList, AtomListOperationMixin):
         # assign default residues and chains where necessary
         for iatom, atom in enumerate(atoms):
             utils.AutoIndexList.append(self, atom)
+            self._mol.bonds._graph.setdefault(atom, {})
 
             if atom.residue is None:
                 self._mol._defresidue.add(atom, _addatoms=False)
@@ -128,7 +129,7 @@ class AtomMasterList(BaseMasterList, AtomListOperationMixin):
                 assert atom.chain.molecule is None
                 self._mol.chains.add(atom.chain, _addatoms=False)
 
-            self._mol.bonds._addatom(atom)
+            # Dev-mode consistency checks
             assert atom.residue.molecule is self._mol
             assert atom.residue in self._mol.residues
             assert atom.chain.molecule is self._mol
@@ -136,8 +137,13 @@ class AtomMasterList(BaseMasterList, AtomListOperationMixin):
             assert atom in self._mol.atoms
 
         # Mark the atoms as owned
-        for iatom, atom in enumerate(atoms):
+        for atom in atoms:
+            self._mol.bonds._addatom(atom)
+
+        for atom in atoms:
             atom._delegate_state_to_molecule(self._mol)
+
+        self._mol.bonds._assert_symmetric()
 
     def _error_if_cant_add_atoms(self, atoms):
         atoms_to_add = set(atoms)
@@ -179,6 +185,9 @@ class AtomMasterList(BaseMasterList, AtomListOperationMixin):
         atom.residue._remove(atom)  # this removes the atom
 
     def _remove_from_list_and_bonds(self, atom):
+        for nbr, order in atom.bonds.iteritems():
+            atom._graph[nbr] = order
+            nbr._graph[atom] = order
         self._mol.bonds._removeatom(atom)
         self._remove_from_list(atom)
 

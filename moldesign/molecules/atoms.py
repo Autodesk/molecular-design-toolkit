@@ -254,10 +254,10 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         assert self is mol.atoms[self.index]
         assert self._position.numerically_equal(mol.positions[self.index])
         assert self._momentum.numerically_equal(mol.momenta[self.index])
-        assert self._graph == mol.bonds._graph[self]
+        for nbr in self._graph:
+            assert nbr.molecule is not mol
         self._position = None
         self._momentum = None
-        self._graph = None
 
     def _recover_state_from_molecule(self, ascopy=False):
         """ Private data mangement method.
@@ -272,10 +272,8 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
             assert self is mol.atoms[self.index]
         assert self._position is None
         assert self._momentum is None
-        assert self._graph is None
         self._position = mol.positions[self.index].copy()
         self._momentum = mol.momenta[self.index].copy()
-        self._graph = dict(mol.bonds._graph[mol.atoms[self.index]])
         self._index = None
 
     @property
@@ -347,7 +345,6 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         """Helper for pickling"""
         state = self.__dict__.copy()
         if self.molecule is not None:  # then these don't belong to the atom anymore
-            state['_graph'] = None
             state['_position'] = None
             state['_momentum'] = None
         return state

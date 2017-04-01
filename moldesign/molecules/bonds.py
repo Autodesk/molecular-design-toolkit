@@ -80,13 +80,12 @@ class BondGraph(object):
         """ Private data mangement method - adds entry for this atom in the bond graph.
         Only adds bonds for atoms that are already tracked in this graph.
         """
-        assert atom not in self._graph
-        self._graph[atom] = {}
-        for nbr, order in atom._graph.iteritems():
-            if nbr.molecule is self._mol:
+        for nbr, order in atom._graph.items():
+            if nbr in self._mol:
                 self._graph[atom][nbr] = order
-                if nbr in self._graph:
-                    self._graph[nbr][atom] = order
+                self._graph[nbr][atom] = order
+                atom._graph.pop(nbr)
+                nbr._graph.pop(atom, None)
 
     def _removeatom(self, atom):
         """ Private data mangement method - removes this atom from the bond graph.
@@ -102,6 +101,11 @@ class BondGraph(object):
             return AtomBonds(atoms, self._graph[atoms])
         else:
             return Bond(a1, a2)
+
+    def _assert_symmetric(self):
+        for atom, nbrs in self._graph.iteritems():
+            for nbr, order in nbrs.iteritems():
+                assert self._graph[nbr][atom] == order
 
 
 class AtomBonds(object):
@@ -235,43 +239,58 @@ class Bond(object):
         order (int): bond order (can be ``None``); not used in comparisons
     """
     def __init__(self, a1, a2):
-        if a1.molecule is not a2.molecule:
-            raise ValueError('Cannot create bond for atoms in different molecules.')
-        else:
-            self.molecule = a1.molecule
-
-        if a2 not in a1.bonds:
-            raise ValueError('%s is not bonded to %s' % (a1, a2))
-
-        self._exists = True
-
         if a1.index > a2.index:
             a1, a2 = a2, a1
+
         self.a1 = a1
         self.a2 = a2
+
+        if a1.molecule is not a2.molecule and a1.molecule is not None and a2.molecule is not None:
+            raise ValueError('Cannot create bond for atoms in different molecules.')
+
+        if self.molecule and a1 not in a2.bonds:
+            raise ValueError('%s is not bonded to %s' % (a1, a2))
+
 
     def __eq__(self, other):
         return (self.a1 is other.a1) and (self.a2 is other.a2) and (self.order == other.order)
 
     @property
     def order(self):
-        if not self._exists:
-            raise ValueError("This bond has been deleted.")
         if self.molecule:
             return self.molecule.bonds._graph[self.a1][self.a2]
         else:
             return self.a1._graph[self.a2]
 
+    @property
+    def molecule(self):
+        if self.a1.molecule is None or self.a2.molecule is None:
+            return None
+        elif self.a1.molecule is not self.a2.molecule:
+            raise ValueError("Atoms in different molecules can't be bonded")
+        else:
+            return self.a1.molecule
+
     @order.setter
     def order(self, o):
-        self.molecule.bonds._graph[self.a1][self.a2] = o
-        self.molecule.bonds._graph[self.a2][self.a1] = o
-        self._exists = True
+        if self.molecule:
+            self.molecule.bonds._graph[self.a1][self.a2] = o
+            self.molecule.bonds._graph[self.a2][self.a1] = o
+        else:
+            if not self.a1.molecule:
+                self.a1.bonds._graph[self.a2] = o
+            if not self.a2.molecule:
+                self.a2.bonds._graph[self.a1] = o
 
     def delete(self):
-        self.molecule.bonds._graph[self.a1].pop(self.a2)
-        self.molecule.bonds._graph[self.a2].pop(self.a1)
-        self._exists = False
+        if self.molecule:
+            self.molecule.bonds._graph[self.a1].pop(self.a2)
+            self.molecule.bonds._graph[self.a2].pop(self.a1)
+        else:
+            if not self.a1.molecule:
+                self.a1.bonds._graph.pop(self.a2)
+            if not self.a2.molecule:
+                self.a2.bonds._graph.pop(self.a1)
 
     def __hash__(self):
         """Has this object using the atoms involved in its bond"""
@@ -303,11 +322,11 @@ class Bond(object):
     @property
     def name(self):
         """ str: name of the bond """
-        if self._exists:
+        if self.molecule:
             return '{a1.name} (#{a1.index}) - {a2.name} (#{a2.index}) (order: {order})'.format(
                             a1=self.a1, a2=self.a2, order=self.order)
         else:
-            return '{a1.name} (#{a1.index}) - {a2.name} (#{a2.index}) (deleted)'.format(
+            return '{a1.name} (#{a1.index}) - {a2.name} (#{a2.index}) (not in molecule)'.format(
                             a1=self.a1, a2=self.a2)
 
     @property

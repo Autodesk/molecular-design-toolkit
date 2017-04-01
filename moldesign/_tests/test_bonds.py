@@ -1,6 +1,8 @@
 import pytest
 import moldesign as mdt
 
+from .helpers import check_topology_consistency
+
 
 @pytest.fixture(scope='function')
 def hch():
@@ -113,3 +115,24 @@ def test_deleting_atom_deletes_its_bonds_from_the_molecule_only(hch):
     assert len(mol.bonds._graph) == 2
     for v in mol.bonds._graph.itervalues():
         assert len(v) == 1
+
+
+def test_deleting_and_recreating_preserves_bonds(hch):
+    mol = hch
+    toremove = list(mol.atoms[:2])
+    assert toremove[0] in toremove[1].bonds
+
+    for atom in toremove:
+        atom.molecule = None
+        assert atom._index is None
+        for bond in list(atom.bonds):
+            if bond.a1 not in toremove or bond.a2 not in toremove:
+                bond.delete()
+
+    newmol = mdt.Molecule(toremove)
+    assert newmol.num_bonds == 1
+    assert newmol.num_atoms == 2
+    assert toremove[0].molecule is toremove[1].molecule is newmol
+    assert toremove[0] in toremove[1].bonds
+    check_topology_consistency(newmol)
+

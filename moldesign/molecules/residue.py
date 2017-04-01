@@ -54,6 +54,14 @@ class Residue(BioContainer, ResidueNotebookMixin):
         self._chain = None
         self._name = None
 
+        if name is None:
+            if resname is None:
+                name = 'UNL'
+            elif pdbindex is None:
+                name = resname
+            else:
+                name = resname + int(pdbindex)
+
         super(Residue, self).__init__(name)
 
         self.resname = resname
@@ -120,19 +128,12 @@ class Residue(BioContainer, ResidueNotebookMixin):
 
     @property
     def name(self):
-        if self._name is not None:
-            return self._name
-        elif self.pdbname is None:
-            return None
-        elif self.pdbindex is None:
-            return self.pdbname
-        elif self.pdbname[-1].isdigit():
-            return '%s (seq # %s)' % (self.pdbname, self.pdbindex)
-        else:
-            return self.pdbname + str(self.pdbindex)
+        return self._name
 
     @name.setter
     def name(self, value):
+        if self.chain is not None and value != self._name:
+            self.chain._renamechild(self, value)
         self._name = value
 
     @property
