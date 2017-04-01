@@ -19,6 +19,7 @@ import moldesign as mdt
 import pyccc
 from moldesign import compute, utils, display
 from moldesign import units as u
+from moldesign.forcefields import parameterization_errors as pe
 
 IMAGE = 'ambertools'
 
@@ -426,9 +427,6 @@ ATOMSPEC = re.compile(r'\.R<(\S+) ([\-0-9]+)>\.A<(\S+) ([\-0-9]+)>')
 
 
 def _parse_tleap_errors(job, molin):
-    from moldesign.widgets.parameterization import (UnusualBond, UnknownAtom,
-                                                    UnknownResidue, MissingTerms)
-
     # TODO: special messages for known problems (e.g. histidine)
     msg = []
     unknown_res = set()  # so we can print only one error per unkonwn residue
@@ -450,7 +448,7 @@ def _parse_tleap_errors(job, molin):
             a1 = a2 = None
         r1 = reslookup[atomre1[1]]
         r2 = reslookup[atomre2[1]]
-        return UnusualBond(l, (a1, a2), (r1, r2))
+        return pe.UnusualBond(l, (a1, a2), (r1, r2))
 
     while True:
         try:
@@ -463,7 +461,7 @@ def _parse_tleap_errors(job, molin):
             # EX: "Unknown residue: 3TE   number: 499   type: Terminal/beginning"
             res = molin.residues[int(fields[4])]
             unknown_res.add(res)
-            msg.append(UnknownResidue(line, res))
+            msg.append(pe.UnknownResidue(line, res))
 
         elif fields[:4] == 'Warning: Close contact of'.split():
             # EX: "Warning: Close contact of 1.028366 angstroms between .R<DC5 1>.A<HO5' 1> and .R<DC5 81>.A<P 9>"
@@ -481,11 +479,11 @@ def _parse_tleap_errors(job, molin):
             residue = reslookup[fields[-1][:-1]]
             if residue in unknown_res: continue  # suppress atoms from an unknown res ...
             atom = residue[fields[5]]
-            msg.append(UnknownAtom(line, residue, atom))
+            msg.append(pe.UnknownAtom(line, residue, atom))
 
         elif (fields[:5] == '** No torsion terms for'.split() or
                       fields[:5] == 'Could not find angle parameter:'.split()):
             # EX: " ** No torsion terms for  ca-ce-c3-hc"
-            msg.append(MissingTerms(line.strip()))
+            msg.append(pe.MissingTerms(line.strip()))
 
     return msg

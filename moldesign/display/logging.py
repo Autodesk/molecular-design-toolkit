@@ -14,7 +14,7 @@
 
 
 try:
-    from nbmolviz.uibase import Logger
+    from nbmolviz.uibase import Logger, display_log
 except ImportError:
     class Logger(object):
         def __init__(self, title='log', **kwargs):
@@ -31,3 +31,14 @@ except ImportError:
 
         # temporary so that we can use this like a logging module later
         error = warning = info = handled = debug = status = _write
+
+    def display_log(obj, title=None, show=False):
+        """
+        Registers a new view. This is mostly so that we can
+        display all views from a cell in a LoggingTabs object.
+        :param obj: The object to display. If it has a "get_display_object" method, \
+            its return value is displayed
+        :param title: A name for the object (otherwise, str(obj) is used)
+        :return:
+        """
+        print obj

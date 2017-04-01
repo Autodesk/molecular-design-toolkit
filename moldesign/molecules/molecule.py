@@ -205,6 +205,21 @@ class MolPropertyMixin(object):
             This assumes a closed shell ground state! """
         return self.num_electrons/2
 
+    def get_stoichiometry(self, html=False):
+        """ Return this molecule's stoichiometry
+
+        Returns:
+            str
+        """
+        counts = {}
+        for atom in self.atoms:
+            counts[atom.symbol] = counts.get(atom.symbol, 0) + 1
+
+        my_elements = sorted(counts.keys())
+        if html: template = '%s<sub>%d</sub>'
+        else: template = '%s%d'
+        return ''.join([template % (k, counts[k]) for k in my_elements])
+
     @property
     def wfn(self):
         """ moldesign.orbitals.ElectronicWfn: return the molecule's current electronic state,
