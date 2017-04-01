@@ -22,7 +22,7 @@ from moldesign import units as u
 
 from .molecule import MolecularProperties
 from . import toplevel
-from .notebook_display import TrajNotebookMixin
+from ..display.notebook_mixins import TrajNotebookMixin
 
 
 class Frame(utils.DotDict):

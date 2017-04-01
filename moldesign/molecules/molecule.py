@@ -22,7 +22,7 @@ from moldesign.compute import DummyJob
 from moldesign.exceptions import NotCalculatedError
 from moldesign.min.base import MinimizerBase
 
-from .notebook_display import MolNotebookMixin
+from ..display.notebook_mixins import MolNotebookMixin
 from .properties import MolecularProperties
 from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond
 from .coord_arrays import *

@@ -17,7 +17,7 @@ import moldesign as mdt
 from moldesign import utils, data
 
 from . import BioContainer, AtomList, toplevel
-from .notebook_display import ResidueNotebookMixin
+from ..display.notebook_mixins import ResidueNotebookMixin
 
 
 @toplevel
