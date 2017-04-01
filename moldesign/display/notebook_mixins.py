@@ -12,33 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+from .displays import nbmolviz_installed
+
+
 class NotebookNotInstalledMixin(object):
     def _raise_error(self, *args, **kwargs):
         raise ImportError("The `nbmolviz` package is not installed; this function is not availble.")
 
     draw = draw2d = draw3d = _raise_error
 
-try:
-    from nbmolviz import AtomNotebookMixin
-except ImportError:
-    AtomNotebookMixin = NotebookNotInstalledMixin
 
-try:
-    from nbmolviz import AtomGroupNotebookMixin
-except ImportError:
-    AtomGroupNotebookMixin = NotebookNotInstalledMixin
-
-try:
-    from nbmolviz import ResidueNotebookMixin
-except ImportError:
-    ResidueNotebookMixin = NotebookNotInstalledMixin
-
-try:
-    from nbmolviz import TrajNotebookMixin
-except ImportError:
-    TrajNotebookMixin = NotebookNotInstalledMixin
-
-try:
-    from nbmolviz import MolNotebookMixin
-except ImportError:
-    MolNotebookMixin = NotebookNotInstalledMixin
+if nbmolviz_installed():
+    from nbmolviz.markdown import AtomNotebookMixin, AtomGroupNotebookMixin, \
+        TrajNotebookMixin, MolNotebookMixin, ResidueNotebookMixin
+else:
+    AtomNotebookMixin = AtomGroupNotebookMixin = TrajNotebookMixin = MolNotebookMixin = \
+        ResidueNotebookMixin = \
+        NotebookNotInstalledMixin

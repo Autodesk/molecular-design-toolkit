@@ -19,3 +19,12 @@ def show_parameterization_results(errormessages, molin, molout=None):
     for err in errormessages:
         print utils.html_to_text(err.desc)
 
+
+def nbmolviz_installed():
+    import imp
+    try:
+        imp.find_module('nbmolviz')
+    except ImportError:
+        return False
+    else:
+        return True
