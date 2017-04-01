@@ -17,9 +17,8 @@ import tempfile
 
 import moldesign as mdt
 import pyccc
-from moldesign import compute, utils
+from moldesign import compute, utils, display
 from moldesign import units as u
-from moldesign.widgets.parameterization import show_parameterization_results
 
 IMAGE = 'ambertools'
 
@@ -292,7 +291,7 @@ def assign_forcefield(mol, **kwargs):
 
     errors = _parse_tleap_errors(job, clean_molecule)
 
-    show_parameterization_results(errors, clean_molecule, molout=newmol)
+    display.show_parameterization_results(errors, clean_molecule, molout=newmol)
 
     if newmol is not None:
         return newmol
