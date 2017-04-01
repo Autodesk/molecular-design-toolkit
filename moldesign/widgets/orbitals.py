@@ -33,7 +33,7 @@ class OrbitalViewer(SelectionGroup):
     def __init__(self, mol, **kwargs):
         self.viewer = GeometryViewer(mol=mol, **utils.process_widget_kwargs(kwargs))
         self.viewer.wfns = [mol.wfn]
-        self.uipane = OrbitalUIPane(self, height=int(self.viewer.height)-50)
+        self.uipane = OrbitalUIPane(self, hostheight=self.viewer.layout.height)
         hb = ipy.HBox([self.viewer, self.uipane])
         super(OrbitalViewer, self).__init__([hb])
 
@@ -41,9 +41,9 @@ class OrbitalViewer(SelectionGroup):
 class OrbitalUIPane(Selector, ipy.Box):
     # TODO: deal with orbitals not present in all frames of a trajectory
     # TODO: deal with orbital properties (occupation and energy) changing over a trajectory
-    def __init__(self, viz, **kwargs):
+    def __init__(self, viz, hostheight, **kwargs):
         self.viz = viz
-        kwargs.setdefault('width', 325)
+        kwargs.setdefault('width', '325px')
 
         self.type_dropdown = ipy.Dropdown(options=self.viz.viewer.wfn.orbitals.keys())
         initial_orb = 'canonical'
@@ -52,10 +52,13 @@ class OrbitalUIPane(Selector, ipy.Box):
         self.type_dropdown.value = initial_orb
         self.type_dropdown.observe(self.new_orb_type, 'value')
 
+        kwargs['height'] = str(int(hostheight.rstrip('px')) - 50) + 'px'
+        height = str(int(hostheight.rstrip('px')) - 125) + 'px'
+
         self.orblist = ipy.Dropdown(options={None: None},
                                     layout=ipy.Layout(
-                                            width=str(kwargs['width'])+'px',
-                                            height=str(int(kwargs['height']) - 75)+'px'))
+                                            width=kwargs['width'],
+                                            height=height))
 
         self.isoval_selector = create_value_selector(ipy.FloatSlider,
                                                      value_selects='orbital_isovalue',
@@ -66,7 +69,7 @@ class OrbitalUIPane(Selector, ipy.Box):
                                                      layout=ipy.Layout(width=kwargs['width']))
 
         self.orb_resolution = ipy.Text(description='Orbital resolution',
-                                       layout=ipy.Layout(width=75))
+                                       layout=ipy.Layout(width='75px'))
         self.orb_resolution.value = '40'  # string because it's required for the 'on_submit' method
         self.change_resolution()
         self.orb_resolution.on_submit(self.change_resolution)

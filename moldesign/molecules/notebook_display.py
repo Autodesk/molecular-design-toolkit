@@ -292,7 +292,7 @@ class MolNotebookMixin(object):
         """
         if 'wfn' not in self.properties:
             self.calculate_wfn()
-        return mdtwidgets.OrbitalViewer(self, **kwargs)
+        return mdtwidgets.orbitals.OrbitalViewer(self, **kwargs)
 
 
     def markdown_summary(self):
