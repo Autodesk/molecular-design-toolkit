@@ -4,7 +4,7 @@ import numpy as np
 import moldesign as mdt
 from moldesign import units as u
 
-from .test_data_structures import h2_harmonic, h2_trajectory
+from .object_fixtures import h2_harmonic, h2_trajectory
 
 def test_frames_synched_with_trajectory(h2_trajectory):
     traj = h2_trajectory

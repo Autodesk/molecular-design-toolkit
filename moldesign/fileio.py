@@ -60,7 +60,7 @@ def read(f, format=None):
 
     # Open a file-like object
     if isinstance(f, basestring) and os.path.exists(f):  # it's a path to a file
-        filename = f
+        filename = os.path.expanduser(f)
         format, compression = _get_format(filename, format)
         fileobj = COMPRESSION[compression](filename, mode='r')
     elif hasattr(f, 'open'):  # we can get a file-like object
@@ -120,7 +120,7 @@ def write(obj, filename=None, format=None, mode='w'):
     # First, create an object to write to (either file handle or file-like buffer)
     if filename:
         return_string = False
-        fileobj = COMPRESSION[compression](filename, mode=mode)
+        fileobj = COMPRESSION[compression](os.path.expanduser(filename), mode=mode)
     else:
         return_string = True
         fileobj = StringIO.StringIO()

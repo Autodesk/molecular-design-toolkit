@@ -7,6 +7,8 @@ import pytest
 import moldesign as mdt
 from moldesign import units as u
 
+from .helpers import get_data_path
+
 
 registered_types = {}
 
@@ -90,5 +92,19 @@ def test_add_hydrogen_to_c2(c2_no_hydrogen_from_smiles):
                 assert bondgraph[nbr] == 1
 
 
+def test_split_chains_3p3k():
+    mol = mdt.read(get_data_path('3p3k.pdb'))
+    assert mol.num_chains == 1  # not really testing this, just for sanity's sake
 
+    newmol = mdt.split_chains(mol)
+    assert newmol.num_chains == 3
+
+    assert newmol.chains['A'] is newmol.chains[0]
+    assert newmol.chains['A'].type == 'protein'
+
+    assert newmol.chains['B'] is newmol.chains[1]
+    assert newmol.chains['B'].type == 'protein'
+
+    assert newmol.chains['C'] is newmol.chains[2]
+    assert newmol.chains['C'].type == 'water'
 

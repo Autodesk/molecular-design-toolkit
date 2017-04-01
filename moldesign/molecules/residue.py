@@ -33,9 +33,14 @@ class Residue(BioContainer, ResidueNotebookMixin):
     """
 
     def copy(self):
-        newatoms = super(Residue, self).copy()
+        """ Create a copy of this residue and all topology within.
+
+        Returns:
+            Residue: copy of this residue and all its atoms. This copy will NOT
+            reference any parent molecule
+        """
+        newatoms = super(Residue, self).copy_atoms()
         return newatoms[0].residue
-    copy.__doc__ = BioContainer.copy.__doc__
 
     @utils.args_from(BioContainer)
     def __init__(self, **kwargs):

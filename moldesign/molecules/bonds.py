@@ -37,6 +37,11 @@ class Bond(object):
         order (int): bond order (can be ``None``); not used in comparisons
     """
     def __init__(self, a1, a2, order=None):
+        if a1.molecule is not a2.molecule:
+            raise ValueError('Cannot create bond for atoms in different molecules.')
+        else:
+            self.molecule = a1.molecule
+
         if a1.index > a2.index:
             a1, a2 = a2, a1
         self.a1 = a1
@@ -74,6 +79,10 @@ class Bond(object):
             raise ValueError('%s is not part of this bond' % atom)
 
     @property
+    def length(self):
+        return self.a1.distance(self.a2)
+
+    @property
     def name(self):
         """ str: name of the bond """
         return '{a1.name} (#{a1.index}) - {a2.name} (#{a2.index}) (order: {order})'.format(
@@ -84,15 +93,4 @@ class Bond(object):
         """mdt.forcefield.BondTerm: the force-field term for this bond (or ``None`` if no
             forcefield is present)
         """
-        try: ff = self.a1.molecule.energy_model.get_forcefield()
-        except (NotImplementedError, AttributeError): return None
-        return ff.bond_term[self]
-
-    def __repr__(self):
-        try:
-            return '<Bond: %s>'%str(self)
-        except (KeyError, AttributeError):
-            return '<Bond @ %s (exception in __repr__)>' % id(self)
-
-    def __str__(self):
-        return self.name
+        return self.molecule.ff.get_bond_term(self)

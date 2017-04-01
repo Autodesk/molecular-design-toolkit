@@ -15,6 +15,7 @@ import collections
 
 import itertools
 import parmed
+from StringIO import StringIO
 
 import moldesign as mdt
 from moldesign import units as u
@@ -58,19 +59,18 @@ def read_pdb(f):
 def write_pdb(mol, fileobj):
     pmedmol = mol_to_parmed(mol)
 
-    # Check if we have appropriate indices for the PDB file
-    for obj in itertools.chain(mol.atoms, mol.residues):
-        if obj.pdbindex is None:
-            protect_numbers = False
-            break
-    else:
-        protect_numbers = True
+    # Assign fixed indices
+    # TODO: respect the original pdbindex values as much as possible
+    for iatom, atom in enumerate(pmedmol.atoms):
+        atom.number = iatom + 1
+    for ires, residue in enumerate(pmedmol.residues):
+        residue.number = ires + 1
+    for obj in itertools.chain(pmedmol.atoms, pmedmol.residues):
+        obj.number = _ProtectFloordiv(obj.number)
 
-    if protect_numbers:  # a hack to prevent parmed from changing negative numbers
-        for obj in itertools.chain(pmedmol.atoms, pmedmol.residues):
-            obj.number = _ProtectFloordiv(obj.number)
-
-    pmedmol.write_pdb(fileobj, renumber=not protect_numbers)
+    tempfile = StringIO()
+    pmedmol.write_pdb(tempfile, renumber=False)
+    _insert_conect_records(mol, pmedmol, tempfile, write_to=fileobj)
 
 
 class _ProtectFloordiv(int):
@@ -84,6 +84,50 @@ class _ProtectFloordiv(int):
 
     def __nonzero__(self):
         return True
+
+
+CONECT = 'CONECT %4d'
+
+def _insert_conect_records(mol, pmdmol, pdbfile, write_to=None):
+    """ Inserts TER records to indicate the end of the biopolymeric part of a chain
+
+    Put CONECT records at the end of a pdb file that doesn't have them
+
+    Args:
+        mol (moldesign.Molecule): the MDT version of the molecule that pdbfile describes
+        pdbfile (TextIO OR str): pdb file (file-like or string)
+
+    Returns:
+        cStringIO.StringIO OR str: copy of the pdb file with added TER records - it will be
+         returned as the same type passed (i.e., as a filelike buffer or as a string)
+    """
+    conect_bonds = mdt.helpers.get_conect_pairs(mol)
+
+    def get_atomseq(atom):
+        return pmdmol.atoms[atom.index].number
+
+    pairs = collections.OrderedDict()
+    for atom, nbrs in conect_bonds.iteritems():
+        pairs[get_atomseq(atom)] = map(get_atomseq, nbrs)
+
+    if isinstance(pdbfile, basestring):
+        pdbfile = StringIO(pdbfile)
+
+    if write_to is None:
+        newf = StringIO()
+    else:
+        newf = write_to
+    pdbfile.seek(0)
+
+    for line in pdbfile:
+        if line.split() == ['END']:
+            for a1idx in pairs:
+                for istart in xrange(0, len(pairs[a1idx]), 4):
+                    pairindices = ''.join(("%5d" % idx) for idx in pairs[a1idx][istart:istart+4])
+                    newf.write(CONECT % a1idx + pairindices + '\n')
+
+        newf.write(line)
+
 
 
 def write_mmcif(mol, fileobj):
@@ -226,6 +270,8 @@ def _parmed_to_ff(topo, atom_map):
 def _reassign_chains(f, mol):
     """ Change chain ID assignments to the mmCIF standard (parmed uses author assignments)
 
+    If the required fields don't exist, a copy of the molecule is returned unchanged.
+
     Args:
         f (file): mmcif file/stream
         mol (moldesign.Molecule): molecule with default parmed assignemnts
@@ -235,8 +281,11 @@ def _reassign_chains(f, mol):
     """
     data = mdt.interfaces.biopython_interface.get_mmcif_data(f)
     f.seek(0)
-    newchain_names = set(data['_pdbx_poly_seq_scheme.asym_id']+
-                         data['_pdbx_nonpoly_scheme.asym_id'])
+    try:
+        newchain_names = set(data['_pdbx_poly_seq_scheme.asym_id']+
+                             data['_pdbx_nonpoly_scheme.asym_id'])
+    except KeyError:
+        return mol.copy(name=mol.name)
     newchains = {name: mdt.Chain(name) for name in newchain_names}
 
     residue_iterator = itertools.chain(

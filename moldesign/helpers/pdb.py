@@ -94,6 +94,37 @@ def insert_ter_records(mol, pdbfile):
         return newf
 
 
+def get_conect_pairs(mol):
+    """ Returns a dicitonary of HETATM bonds for a PDB CONECT record
+
+    Note that this doesn't return the text records themselves, because they need
+    to reference a specific PDB sequence number
+    """
+    conects = collections.OrderedDict()
+
+    for residue in mol.residues:
+        # intra-residue bonds
+        if not residue.is_standard_residue:
+            for bond in residue.bonds:
+                if bond.order <= 1:
+                    order = 1
+                else:
+                    order = bond.order
+                for i in xrange(order):
+                    conects.setdefault(bond.a1, []).append(bond.a2)
+
+        # inter-residue bonds
+        try:
+            r2 = residue.next_residue
+        except (StopIteration, KeyError, NotImplementedError):
+            continue
+        if not (residue.is_standard_residue and r2.is_standard_residue):
+            for bond in residue.bonds_to(r2):
+                conects.setdefault(bond.a1, []).append(bond.a2)
+
+    return conects
+
+
 def warn_assemblies(mol, assemblies):
     """ Print a warning message if the PDB structure contains a biomolecular assembly
     """
