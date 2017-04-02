@@ -113,9 +113,15 @@ def write_string(mol, format):
 
     Returns:
         str: contents of the file
+
+    References:
+        https://openbabel.org/docs/dev/FileFormats/Overview.html
     """
     pbmol = mol_to_pybel(mol)
-    outstr = pbmol.write(format=format)
+    if format == 'smi':  # TODO: always kekulize, never aromatic
+        outstr = pbmol.write(format=format).strip()
+    else:
+        outstr = pbmol.write(format=format)
     return outstr
 
 

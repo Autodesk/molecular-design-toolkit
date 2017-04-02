@@ -19,7 +19,7 @@ from moldesign import data, utils
 from moldesign import units as u
 
 from . import toplevel, AtomContainer, AtomList, AtomArray, AtomCoordinate, AtomBonds
-from .notebook_display import AtomNotebookMixin
+from ..display.notebook_mixins import AtomNotebookMixin
 
 
 class AtomPropertyMixin(object):

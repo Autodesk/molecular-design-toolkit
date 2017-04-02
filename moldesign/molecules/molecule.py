@@ -22,7 +22,7 @@ from moldesign.compute import DummyJob
 from moldesign.exceptions import NotCalculatedError
 from moldesign.min.base import MinimizerBase
 
-from .notebook_display import MolNotebookMixin
+from ..display.notebook_mixins import MolNotebookMixin
 from .properties import MolecularProperties
 from . import toplevel, AtomGroup, BondGraph, Instance
 from . import topology
@@ -205,6 +205,21 @@ class MolPropertyMixin(object):
         Note:
             This assumes a closed shell ground state! """
         return self.num_electrons/2
+
+    def get_stoichiometry(self, html=False):
+        """ Return this molecule's stoichiometry
+
+        Returns:
+            str
+        """
+        counts = {}
+        for atom in self.atoms:
+            counts[atom.symbol] = counts.get(atom.symbol, 0) + 1
+
+        my_elements = sorted(counts.keys())
+        if html: template = '%s<sub>%d</sub>'
+        else: template = '%s%d'
+        return ''.join([template % (k, counts[k]) for k in my_elements])
 
     @property
     def wfn(self):
@@ -713,23 +728,6 @@ class MolSimulationMixin(object):
             self.energy_model._prepped = False
         if self.integrator is not None:
             self.integrator._prepped = False
-
-    def configure_methods(self):
-        """ Interactively configure this molecule's simulation methods (notebooks only)
-
-        Returns:
-            ipywidgets.Box: configuration widget
-        """
-        import ipywidgets as ipy
-
-        children = []
-        if self.energy_model:
-            children.append(self.energy_model.configure())
-
-        if self.integrator:
-            children.append(self.integrator.configure())
-
-        return ipy.VBox(children)
 
 
 @toplevel

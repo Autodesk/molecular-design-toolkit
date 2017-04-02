@@ -21,7 +21,7 @@ import numpy as np
 import moldesign as mdt
 from moldesign import units as u
 from moldesign import utils, external, mathutils, helpers
-from .notebook_display import AtomGroupNotebookMixin
+from ..display.notebook_mixins import AtomGroupNotebookMixin
 from . import toplevel
 
 

@@ -21,7 +21,7 @@ install:
   - source scripts/conda_deploy.sh
 
 
-script: py.test -n 2
+script: py.test -n 4
 
 
 deploy:
