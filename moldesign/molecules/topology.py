@@ -193,14 +193,17 @@ class AtomMasterList(BaseMasterList, AtomListOperationMixin):
 
     def _append_and_update_bonds(self, atom):
         self._mol.bonds._addatom(atom)
+        self._mol.bonds._graph.setdefault(atom, {})
         utils.AutoIndexList.append(self, atom)
 
     def _insert_and_update_bonds(self, index, atom):
         self._mol.bonds._addatom(atom)
+        self._mol.bonds._graph.setdefault(atom, {})
         utils.AutoIndexList.insert(self, index, atom)
 
     def _extend_and_update_bonds(self, atoms):
         for atom in atoms:
+            self._mol.bonds._graph.setdefault(atom, {})
             self._mol.bonds._addatom(atom)
         utils.AutoIndexList.extend(self, atoms)
 
