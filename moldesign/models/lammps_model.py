@@ -46,12 +46,7 @@ __all__ = []
 
 @exports
 class LAMMPSPotential(EnergyModelBase):
-    """Creates an OpenMM "context" to drive energy calculations.
-    Note that, while a dummy integrator is assigned, a different context will
-    be created for any MD calculations.
-
-    :ivar sim: openmm simulation object
-    :type sim: simtk.openmm.app.Simulation
+    """Creates a LAMMPS system to drive energy calculations.
     """
     # NEWFEATURE: need to set/get platform (and properties, e.g. number of threads)
     DEFAULT_PROPERTIES = ['potential_energy', 'forces']
@@ -88,6 +83,17 @@ class LAMMPSPotential(EnergyModelBase):
             force_array.append(my_lmps.atoms[i].force)
         return {'potential_energy': pe * u.kcalpermol,
                 'forces': force_array * u.kcalpermol / u.angstrom}
+
+
+    # NOTE: Used by workflows to create lammps formatted data file
+    def export_lammps_data(self)
+	# Ensure force fields are assigned 
+        if 'amber_params' not in self.mol.ff:
+            raise NotImplementedError('Assign forcefield parameters to the system')
+
+       # initialize lammps object
+       formatted_data = self.format_lammps_data()
+       return formatted_data
 
     def prep(self):
         """
