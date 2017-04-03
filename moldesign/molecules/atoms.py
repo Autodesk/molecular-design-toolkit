@@ -235,7 +235,7 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
 
         # bond graph takes ONLY the bonds that involve already-copied atoms
         newatom._graph = {memo[atom]: order
-                          for atom, order in newatom._graph.iteritems()
+                          for atom, order in self.bonds.iteritems()
                           if atom in memo}
         for atom, order in newatom._graph.iteritems():
             atom._graph[newatom] = order

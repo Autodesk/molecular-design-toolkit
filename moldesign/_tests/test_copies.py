@@ -11,7 +11,7 @@ def test_carbon_copy(carbon_copy, carbon_atom):
     atom = carbon_copy
     assert atom.symbol == carbon_atom.symbol
     assert atom.mass == carbon_atom.mass
-    assert atom.bond_graph == {}
+    assert atom.num_bonds == 0
 
 
 def test_copy_breaks_link(h2):
@@ -21,6 +21,8 @@ def test_copy_breaks_link(h2):
     np.testing.assert_almost_equal(h2.positions[0,1].value_in(u.bohr),
                                    4.0, 7)
     assert h2copy.positions[0, 1] == 0.0 * u.bohr
+
+    assert h2copy.atoms[0] in h2copy.atoms[1].bonds
 
     h2copy.momenta[1, 0] = 2.0 * u.default.momentum
     np.testing.assert_almost_equal(h2copy.atoms[1].px.value_in(u.default.momentum),
@@ -38,8 +40,8 @@ def test_h2_harmonic_copy_loses_simulation(h2_harmonic_copy, h2_harmonic):
         except ValueError:
             assert (getattr(h2_harmonic_copy, name) == getattr(h2_harmonic, name)).all()
 
-    assert mol.atoms[0].bond_graph[mol.atoms[1]] == 1
-    assert mol.atoms[1].bond_graph[mol.atoms[0]] == 1
+    assert mol.atoms[0].bonds[mol.atoms[1]].order == 1
+    assert mol.atoms[1].bonds[mol.atoms[0]].order == 1
 
 
 def test_copying_doesnt_corrupt_original_h2_harmonic(h2_harmonic):
@@ -65,6 +67,8 @@ def test_atoms_copied_from_h2_harmonic(copy_atoms_from_h2_harmonic, h2_harmonic)
     assert atom.chain is not h2_harmonic.atoms[0].chain
     assert atoms[0].residue is atoms[1].residue
     assert atoms[0].chain is atoms[1].chain
+    assert atoms[0] in atoms[1].bonds
+    assert atoms[1] in atoms[0].bonds
 
 
 @pytest.mark.parametrize('fixture_key',
@@ -134,6 +138,9 @@ def test_molecular_combination(pdb3aid):
     m2 = pdb3aid.copy()
     newmol = pdb3aid.combine(m2)
     assert newmol.num_chains == 2 * pdb3aid.num_chains
+    assert newmol.num_residues == 2 * pdb3aid.num_residues
+    assert newmol.num_atoms == 2 * pdb3aid.num_atoms
+    assert newmol.num_bonds == 2 * pdb3aid.num_bonds
     assert len(set(chain for chain in newmol.chains)) == newmol.num_chains
 
 

@@ -60,7 +60,7 @@ class Residue(BioContainer, ResidueNotebookMixin):
             elif pdbindex is None:
                 name = resname
             else:
-                name = resname + int(pdbindex)
+                name = resname + str(pdbindex)
 
         super(Residue, self).__init__(name)
 

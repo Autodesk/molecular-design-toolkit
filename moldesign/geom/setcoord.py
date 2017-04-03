@@ -147,7 +147,7 @@ def _get_fragment(mol, a1, a2):
     visited = set([a2])
     def dfs_dive(atom):
         visited.add(atom)
-        for nbr in atom.bond_graph:
+        for nbr in atom.bonds.atoms:
             if nbr is a2 and atom is not a1:
                 raise ValueError("a1 and a2 are in a cyclic moiety")
             if nbr not in visited:

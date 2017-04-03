@@ -353,7 +353,7 @@ class AtomContainer(AtomGroup):
         """ Iterable[moldesign.Bond]: iterator over bonds from this object's atoms
         """
         for atom in self.atoms:
-            for nbr in atom.bonded_atoms:
+            for nbr in atom.bonds.atoms:
                 if atom.index < nbr.index or nbr not in self:
                     yield mdt.Bond(atom, nbr)
 
@@ -363,7 +363,7 @@ class AtomContainer(AtomGroup):
         """ Iterable[moldesign.Bond]: iterator over bonds that connect two atoms in this object
         """
         for atom in self.atoms:
-            for nbr in atom.bonded_atoms:
+            for nbr in atom.bonds.atoms:
                 if atom.index < nbr.index and nbr in self:
                     yield mdt.Bond(atom, nbr)
 
@@ -372,22 +372,24 @@ class AtomContainer(AtomGroup):
         """
         Iterable[moldesign.Bond]: iterator over bonds that bond these atoms to other atoms
         """
+        bonds = []
         for atom in self.atoms:
-            for nbr in atom.bonded_atoms:
-                if nbr not in self:
-                    yield mdt.Bond(atom, nbr)
+            for bond in atom.bonds:
+                if bond.partner(atom) not in self:
+                    bonds.append(bond)
+        return bonds
+
 
     @property
     def bonded_atoms(self):
         """ List[moldesign.Atom]: list of external atoms this object is bonded to
         """
-        bg = self.bond_graph
-        atoms = []
-        for atom, nbrs in bg.iteritems():
-            for nbr, order in nbrs.iteritems():
-                if nbr not in bg:
-                    atoms.append(nbr)
-        return atoms
+        atoms = set()
+        for atom in self.atoms:
+            for nbr in atom.bonds:
+                if nbr not in self:
+                    atoms.add(nbr)
+        return mdt.AtomList(sorted(atoms, key=lambda x: x.index))
 
     def bonds_to(self, other):
         """ Returns list of bonds between this object and another one
@@ -399,11 +401,11 @@ class AtomContainer(AtomGroup):
             List[moldesign.Bond]: bonds between this object and another
         """
         bonds = []
-        otheratoms = set(other.atoms)
-        for bond in self.internal_bonds:
-            if bond.a1 in otheratoms or bond.a2 in otheratoms:
+        for bond in self.external_bonds:
+            if bond.a1 or bond.a2 in other:
                 bonds.append(bond)
         return bonds
+
 
 
 class AtomListOperationMixin(AtomContainer):
@@ -419,13 +421,13 @@ class AtomListOperationMixin(AtomContainer):
     def __getitem__(self, item):
         result = super(AtomListOperationMixin, self).__getitem__(item)
         if isinstance(item, slice):
-            return type(self)(result)
+            return AtomList(result)
         else:
             return result
 
-    def __getslice__(self, i, j):
-        result = super(AtomListOperationMixin, self).__getslice__(i, j)
-        return type(self)(result)
+    def __getslice__(self, *args):
+        result = super(AtomListOperationMixin, self).__getslice__(*args)
+        return AtomList(result)
 
     def __str__(self):
         return '[Atoms: %s]' % ', '.join(atom._shortstr() for atom in self)

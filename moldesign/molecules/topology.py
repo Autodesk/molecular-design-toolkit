@@ -81,9 +81,12 @@ class BaseMasterList(utils.AutoIndexList):
     pop.__doc__ = remove.__doc__
 
 
-class AtomMasterList(BaseMasterList, AtomListOperationMixin):
+class AtomMasterList(AtomListOperationMixin, BaseMasterList):
     """ The master list of atoms in a molecule.
     """
+    def __init__(self, atoms, mol):
+        BaseMasterList.__init__(self, atoms, mol)
+
     def _error_if_obj_owned(self, atom):
         if atom.residue is not None and atom.residue.molecule is not self._mol:
             raise ValueError("Cannot individually assign %s to %s, because it is part of %s" %

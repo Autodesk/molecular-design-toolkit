@@ -64,7 +64,7 @@ def four_particle_45_twist():
         _apply_random_offsets(mol, idim)
 
     for iatom in xrange(3):
-        mol.atoms[iatom].bond_to(mol.atoms[iatom+1], 1)
+        mol.atoms[iatom].bonds.create(mol.atoms[iatom+1], 1)
 
     return mol
 
