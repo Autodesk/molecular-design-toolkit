@@ -115,7 +115,7 @@ def calc_gasteiger_charges(mol, **kwargs):
 
 def _antechamber_calc_charges(mol, ambname, chargename, kwargs):
     charge = utils.if_not_none(mol.charge, 0)
-    command = 'antechamber -fi pdb -i mol.pdb -fo mol2 -o out.mol2 -c %s -an n'%ambname
+    command = 'antechamber -fi mol2 -i mol.mol2 -fo mol2 -o out.mol2 -c %s -an n'%ambname
     if charge != 0:
         command += ' -nc %d' % charge.value_in(u.q_e)
 
@@ -141,8 +141,8 @@ def _antechamber_calc_charges(mol, ambname, chargename, kwargs):
 
     job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
                     command=command,
-                    name="%s, %s"%(chargename, mol.name),
-                    inputs={'mol.pdb': mol.write(format='pdb')},
+                    name="%s, %s" % (chargename, mol.name),
+                    inputs={'mol.mol2': mol.write(format='mol2')},
                     when_finished=finish_job)
     return compute.run_job(job, _return_result=True, **kwargs)
 
@@ -363,11 +363,16 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
         ExtraAmberParameters: Parameters for the molecule; this object can be used to create
             forcefield parameters for other systems that contain this molecule
     """
+    # Check that there's only 1 residue, give it a name
     assert mol.num_residues == 1
     if mol.residues[0].resname is None:
         mol.residues[0].resname = 'UNL'
         print 'Assigned residue name "UNL" to %s' % mol
     resname = mol.residues[0].resname
+
+    # check that atoms have unique names
+    if len(set(atom.name for atom in mol.atoms)) != mol.num_atoms:
+        raise ValueError('This molecule does not have uniquely named atoms, cannot assign FF')
 
     if charges == 'am1-bcc' and 'am1-bcc' not in mol.properties:
         calc_am1_bcc_charges(mol)

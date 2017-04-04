@@ -86,6 +86,8 @@ class Method(object):
                 return True
         else:
             return False
+    def __eq__(self, other):
+        return self.__class__ is other.__class__ and self.params == other.params
 
     def configure(self):
         from moldesign.widgets.configurator import Configurator

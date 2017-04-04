@@ -79,6 +79,10 @@ class Bond(object):
             raise ValueError('%s is not part of this bond' % atom)
 
     @property
+    def length(self):
+        return self.a1.distance(self.a2)
+
+    @property
     def name(self):
         """ str: name of the bond """
         return '{a1.name} (#{a1.index}) - {a2.name} (#{a2.index}) (order: {order})'.format(

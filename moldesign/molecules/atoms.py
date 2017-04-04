@@ -212,11 +212,11 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         except (KeyError, AttributeError):
             return '<%s at %s (exception in __repr__)>' % (self.__class__.__name__, id(self))
 
-    @utils.args_from(AtomContainer.copy)
+    @utils.args_from(AtomContainer.copy_atoms)
     def copy(self, *args, **kwargs):
         """ Copy an atom (delegate to AtomContainer)
         """
-        return self._container.copy(*args, **kwargs)[0]
+        return self._container.copy_atoms(*args, **kwargs)[0]
 
     def __getstate__(self):
         """Helper for pickling"""

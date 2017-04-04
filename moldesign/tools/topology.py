@@ -172,6 +172,73 @@ def guess_histidine_states(mol):
             print 'Renaming %s from HIS to %s' % (oldname, residue.resname)
 
 
+@toplevel
+def split_chains(mol, distance_threshold=1.75*u.angstrom):
+    """ Split a molecule's chains into unbroken biopolymers and groups of non-polymers
+
+    This function is non-destructive - the passed molecule will not be modified.
+
+    Specifically, this function will:
+       - Split any chain with non-contiguous biopolymeric pieces into single, contiguous polymers
+       - Remove any solvent molecules from a chain into their own chain
+       - Isolate ligands from each chain into their own chains
+
+    Args:
+        mol (mdt.Molecule): Input molecule
+        distance_threshold (u.Scalar[length]): if not ``None``, the maximum distance between
+           adjacent residues for which we consider them "contiguous". For PDB data, values greater
+           than 1.4 Angstrom are eminently reasonable; the default threshold of 1.75 Angstrom is
+           purposefully set to be extremely cautious (and still much lower than the distance to
+           the *next* nearest neighbor, generally around 2.5 Angstrom)
+
+    Returns:
+        mdt.Molecule: molecule with separated chains
+    """
+
+    tempmol = mol.copy()
+
+    def bonded(r1, r2):
+        if r2 not in r1.bonded_residues:
+            return False
+        if distance_threshold is not None and r1.distance(r2) > distance_threshold:
+            return False
+        return True
+
+    def addto(chain, res):
+        res.chain = None
+        chain.add(res)
+        for atom in res:
+            atom.chain = chain
+
+    allchains = [mdt.Chain(tempmol.chains[0].name)]
+    for chain in tempmol.chains:
+        chaintype = chain.residues[0].type
+        solventchain = mdt.Chain(None)
+        ligandchain = mdt.Chain(None)
+
+        for ires, residue in enumerate(chain.residues):
+            if residue.type == 'unknown':
+                thischain = ligandchain
+            elif residue.type in ('water', 'solvent', 'ion'):
+                thischain = solventchain
+            else:
+                assert residue.type == chaintype
+                if ires != 0 and not bonded(residue.prev_residue, residue):
+                    allchains.append(mdt.Chain(None))
+                thischain = allchains[-1]
+
+            addto(thischain, residue)
+
+        for c in (solventchain, ligandchain):
+            if c.num_atoms > 0:
+                allchains.append(c)
+
+    return mdt.Molecule(allchains)
+
+
+
+
+
 
 
 

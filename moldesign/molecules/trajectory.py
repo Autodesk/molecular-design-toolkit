@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import copy
 import time
 
 import numpy as np
@@ -236,15 +237,26 @@ class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
         self.mol = mol
         self.unit_system = utils.if_not_none(unit_system, mdt.units.default)
         self.properties = utils.DotDict()
-        self._tempmol = mdt.Molecule(self.mol.atoms, copy_atoms=True)
+        self._reset()
         self._tempmol.dynamic_dof = self.mol.dynamic_dof
-        self._viz = None
-        self._atoms = None
         self.name = utils.if_not_none(name, 'untitled')
         if first_frame: self.new_frame()
 
+    def _reset(self):
+        self._viz = None
+        self._atoms = None
+        self._tempmol = mdt.Molecule(self.mol.atoms, copy_atoms=True)
+
+
     MOL_ATTRIBUTES = ['positions', 'momenta', 'time']
     """List[str]: Always store these molecular attributes"""
+
+    def copy(self):
+        newtraj = copy.copy(self)
+        newtraj.frames = self.frames[:]
+        newtraj.properties = self.properties.copy()
+        newtraj._reset()
+        return newtraj
 
     @property
     def num_frames(self):

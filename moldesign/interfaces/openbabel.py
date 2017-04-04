@@ -35,7 +35,6 @@ from moldesign import units as u
 from moldesign.utils import exports
 
 
-
 def read_file(filename, name=None, format=None):
     """ Read a molecule from a file
 
@@ -272,7 +271,6 @@ def mol_to_pybel(mdtmol):
 
 @exports
 def pybel_to_mol(pbmol,
-                 atom_names=True,
                  reorder_atoms_by_residue=False,
                  primary_structure=True,
                  **kwargs):
@@ -283,7 +281,6 @@ def pybel_to_mol(pbmol,
 
     Args:
         pbmol (pybel.Molecule): molecule to translate
-        atom_names (bool): use pybel's atom names (default True)
         reorder_atoms_by_residue (bool): change atom order so that all atoms in a residue are stored
             contiguously
         primary_structure (bool): translate primary structure data as well as atomic data
@@ -300,10 +297,7 @@ def pybel_to_mol(pbmol,
 
     for pybatom in pbmol.atoms:
         obres = pybatom.OBAtom.GetResidue()
-        if atom_names:
-            name = obres.GetAtomID(pybatom.OBAtom).strip()
-        else:
-            name = None
+        name = obres.GetAtomID(pybatom.OBAtom).strip()
 
         if pybatom.atomicnum == 67:
             print ("WARNING: openbabel parsed atom serial %d (name:%s) as Holmium; "
@@ -418,8 +412,6 @@ def _string_to_3d_mol(s, fmt, name):
     pbmol.make3D()
     mol = pybel_to_mol(pbmol,
                        name=name,
-                       atom_names=False,
                        primary_structure=False)
-    for atom in mol.atoms:
-        atom.name = atom.elem+str(atom.index)
+    mdt.helpers.atom_name_check(mol)
     return mol

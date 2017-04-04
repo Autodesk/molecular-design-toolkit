@@ -119,6 +119,9 @@ class DotDict(object):
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__, repr(self.__dict__))
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
     def copy(self):
         return self.__class__(self.iteritems())
 
@@ -128,6 +131,7 @@ for _delegate in ['__getitem__', '__setitem__', '__contains__', '__iter__',
     setattr(DotDict, _delegate, Alias('__dict__.%s' % _delegate))
 
 
+# TODO: just subclass OrderedDict, come on now
 class OrderedDotDict(DotDict):
     """Dict with items accessible as attributes"""
     def __init__(self, *args, **kwargs):
