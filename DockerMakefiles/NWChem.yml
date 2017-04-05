@@ -61,11 +61,19 @@ nwchem_build:
                    && sed -i 's|-march=native||' config/makefile.h \
                    && sed -i 's|-mtune=native|-mtune=generic|' config/makefile.h \
                    && sed -i 's|-mfpmath=sse||' config/makefile.h \
-                   && sed -i 's|-msse3||' config/makefile.h  \
-                   && make nwchem_config && make -j 8  \
-                   && rm -rf tce tools nwdft NWints geom symmetry util nwxc ddscf lapack blas rism \
-                          argos peigs rmdft gradients symmetry property smd lucia dplot propery \
-                          hessian ccsd mp2_grad moints cafe analyz dimqm /opt/nwchem/lib
+                   && sed -i 's|-msse3||' config/makefile.h
+
+    RUN  cd /opt/nwchem/src \
+         && make nwchem_config \
+         && make -j 8
+
+    RUN mkdir nwchem/contrib \
+       && cd nwchem/contrib \
+       && svn co https://svn.pnl.gov/svn/nwchem/trunk/contrib/mov2asc \
+       && cd mov2asc \
+       && FC=gfortran make \
+       && mv mov2asc asc2mov /opt/nwchem/bin/LINUX64
+
     RUN git clone https://github.com/NWChem-Python/nwapi \
        && cd nwapi \
        && make -f makefile.linux \
@@ -89,12 +97,12 @@ nwchem:
      /usr/local/bin/run.py \
      /usr/local/bin/runqmmm.py
 
+
   copy_from:
     nwchem_build:
       /usr/local/lib/python2.7/dist-packages: /usr/local/lib/python2.7/
       /opt/nwchem: /opt
       /opt/lib: /opt
-
 
 
 #################################

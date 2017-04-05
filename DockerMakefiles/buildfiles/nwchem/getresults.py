@@ -11,6 +11,8 @@ Note:
 import json
 import os
 import nwchem
+import numpy
+import subprocess
 
 FORMAT = {'format': 'MolecularDesignInterchange',
           'version': '0.8alpha'}
@@ -36,14 +38,11 @@ def get_docker_image(): # TODO: do this properly
 
 def prep():
     global _PROPERTYGROUP
-
     nwchem.rtdb_open('perm/mol.db', 'old')
-
     _PROPERTYGROUP = nwchem.rtdb_get('task:theory')
 
 
 ##### Units #####
-
 def get_position_units():
     return 'a0'
 
@@ -103,6 +102,40 @@ def get_spin_multiplicity():
         return nwchem.rtdb_get('dft:mult')
     except SystemError:
         return None
+
+def get_orbitals():
+    # using https://github.com/jeffhammond/nwchem/blob/master/contrib/mov2asc/asc2mov.F
+    # as a format reference
+    _convert_movecs()
+    with open('./perm/mol.movecs.txt', 'r') as movfile:
+        lines = iter(movfile)
+        for i in xrange(10):
+            # reads: basissum, geomsum, bqsum, scftype20, date, scftype20,
+            # lentit, title, lenbas (length of the NAME, not basis length)
+            lines.next()
+
+        basis_name = lines.next().strip()
+        nsets = int(lines.next().strip())
+        nbf = int(lines.next().strip())
+
+        nmo = map(int, lines.next().split())
+        assert len(nmo) == nsets
+
+        orbital_sets = []
+
+        for iset, num_mo in enumerate(nmo):
+            orbset = {}
+            orbital_sets.append(orbset)
+
+            orbset['occupations'] = _read_float_fields(lines, num_mo)
+            orbset['energies'] = {'value':_read_float_fields(lines, num_mo),
+                                  'units': get_energy_units()}
+            mymos = []
+            for i in xrange(num_mo):
+                mymos.append(_read_float_fields(lines, nbf))
+            orbset['coefficients'] = mymos
+
+        return orbital_sets
 
 def get_total_charge():
     return int(nwchem.rtdb_get('charge'))
@@ -174,14 +207,35 @@ def _get_method_description():
 
     return result
 
+
 def _get_calculated_properties():
     props = {'method': _get_method_description()}
 
     _insert_if_present(props, 'dipole', get_dipole(), get_dipole_units())
     _insert_if_present(props, 'forces', get_forces(), get_force_units())
     _insert_if_present(props, 'potential_energy', get_potential_energy(), get_energy_units())
+    props['orbitals'] = get_orbitals()
 
     return props
+
+
+def _read_float_fields(lineiter, numfields):
+    fields = []
+    while len(fields) < numfields:
+        fields.extend(map(float, lineiter.next().split()))
+    assert len(fields) == numfields
+    return fields
+
+
+def _convert_movecs():
+    try:
+        subprocess.check_call('mov2asc 1000 mol.movecs mol.movecs.txt'.split(),
+                              cwd='./perm/')
+    except subprocess.CalledProcessError as exc:
+        fields = exc.output.strip()
+        assert fields[:7] == 'Guessed too small for NBF.  Actual is'.split()
+        subprocess.check_call(('mov2asc %d mol.movecs mol.movecs.txt' % int(fields[7])).split(),
+                              cwd='./perm/')
 
 
 def _insert_if_present(d, key, val, unitval=None):
@@ -201,7 +255,7 @@ def _main():
 
              'charge': get_total_charge(),
              'spin_multiplicity': get_spin_multiplicity(),
-             'symmetry': get_symmetry()
+             'symmetry': get_symmetry(),
              }
 
     topology = {'atomArray':
