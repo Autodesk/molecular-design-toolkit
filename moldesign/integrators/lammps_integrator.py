@@ -44,8 +44,10 @@ __all__ = []
 @exports
 class LAMMPSNvt(ConstantTemperatureBase):
 
-    NAME_RESULT = "result"
-    NAME_NVT_SIM = "nvt_sim"
+    NAME_RESULT = "result"  # Name used for dump
+    NAME_AFFECTED_ATOMS = "affected_atoms"  # Name used for grouped atoms
+    NAME_NVT_SIM = "nvt_sim"    # Name used for nvt
+    NAME_ADDFORCE = "add_user_force"    # Name used for addforce
     
     # TODO: raise exception if any constraints are requested ...
     def __init__(self, *args, **kwargs):
@@ -78,23 +80,16 @@ class LAMMPSNvt(ConstantTemperatureBase):
         # Prepare lammps system
         self.prep()
         self._configure_system()
-
-        # create temporary file system
-        tmpdir = tempfile.mkdtemp()
-        saved_umask = os.umask(0077)
-        result_path = os.path.join(tmpdir, "dump.result")
-
         lmps = self.lammps_system
 
-        # TODO: shake not working properly
-        # if self.params.constrain_hbonds and self._model.hbond_group is not None:
-        #     shake_cmd = "fix constrain_hbonds all shake 0.0001 50 0 m {0}".format(self._model.hbond_group)
-        #     # print shake_cmd
-        #     lmps.command(shake_cmd)
-        #     lmps.command("run_style respa 2 2")
+        predictable_filename = "dump.result"
+        dump_filepath = os.path.join(self.mol.energy_model.tmpdir, predictable_filename)
+        self.mol.energy_model.files.append(dump_filepath)
 
-        lmps.command("dump {0} all custom {1} {2} id x y z vx vy vz".format(self.NAME_RESULT,
-                                                                            self.output_iter, result_path))
+        dump_command = "dump {0} all custom {1} {2} id x y z vx vy vz".format(self.NAME_RESULT,
+                                                                            self.output_iter, dump_filepath)
+
+        lmps.command(dump_command)
         lmps.command("dump_modify {0} sort id".format(self.NAME_RESULT))
 
         # run simulation
@@ -107,33 +102,21 @@ class LAMMPSNvt(ConstantTemperatureBase):
         for fix in lmps.fixes:
             lmps.command("unfix " + fix.get('name'))
 
-        # Read dynamic simulation results
-        dump = open(result_path, "rw+")
-        results = dump.readlines()
+        # Create trajectory object
+        self.traj = Trajectory(self.mol, unit_system=self._model.unit_system)
+        self.mol.calculate()
 
-        # Create trajectory only if total iteration is greater than output iteration
-        # i.e. more than one set of positions being captured
-        if self.total_iter > self.output_iter:
-            self.traj = Trajectory(self.mol, unit_system=self._model.unit_system)
-            self.mol.calculate()
-        # Dynamics loop
+        # Dynamics loop over the dump file
+        dump = open(dump_filepath, "rw+")
+        content = dump.readlines()
         for istep in xrange(self.total_iter/self.output_iter):
-            # Start reading from index 1 since the first round of positions/vectors 
-            # would be the same as the positions before the simulation
-            self.step(istep+1, results)
+            self.step(istep, content)
+            self.traj.new_frame()
+        dump.close()
 
-            # Create trajectory only if total iteration is greater than output iteration
-            # i.e. more than one set of positions being captured
-            if self.total_iter > self.output_iter:
-                self.traj.new_frame()
-
+        # Set time
         self.mol.time += self.time
 
-        # securely remove temporary filesystem
-        os.remove(result_path)
-        os.umask(saved_umask)
-        os.rmdir(tmpdir)
-        
         return self.traj
 
     def prep(self):
@@ -154,22 +137,32 @@ class LAMMPSNvt(ConstantTemperatureBase):
         self._prepped = True
 
     def _configure_system(self):
-        # get lammps object from model
+        # Get lammps object from model
         lmps = self._model.lammps_system
 
-        # NOTE: Ensure time step is in femtoseconds
+        # Set timestep
         lmps.command("timestep " + str(self.params.timestep.value_in(u.fs)))
-        # print self.params.timestep.value_in(u.fs)
-
+        
+        # Set NVT settings
         nvt_command = "fix {0} all nvt temp {1} {2} {3}".format(self.NAME_NVT_SIM,
                                                                 self.params.temperature.value_in(u.kelvin),
                                                                 self.params.temperature.value_in(u.kelvin), 100.0)
-        # print nvt_command
         lmps.command(nvt_command)
 
-        lmps.command("thermo_style custom step")
-        # lmps.command("thermo 1000")
+        # Group affected atom
+        if self._model.affected_atoms is not None:
+            group_atom_cmd = "group {0} id ".format(self.NAME_AFFECTED_ATOMS)
+            atoms = self._model.affected_atoms
+            for atom in atoms:
+                group_atom_cmd +=  "{0} ".format(atom.index+1)
+            lmps.command(group_atom_cmd.rstrip())
 
+        # Apply user force fix
+        if self._model.force_vector is not None:
+            force_vector = self._model.force_vector
+            lmps.command("fix {0} all addforce {1} {2} {3}".format(self.NAME_ADDFORCE, force_vector[0],
+                                                                           force_vector[1], force_vector[2]))
+        lmps.command("thermo_style custom step")
         self.lammps_system = lmps  # Save lammps configuration
 
     def step(self, idx, results):
