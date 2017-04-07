@@ -81,9 +81,9 @@ class Lammps:
             L.append(`self.dihedral_types` + ' dihedral types\n')
 	L.append('\n')
         
-        L.append(`self.xlo` + ' ' + `self.xhi` + ' xlo xhi\n')
-        L.append(`self.ylo` + ' ' + `self.yhi` + ' ylo yhi\n')
-        L.append(`self.zlo` + ' ' + `self.zhi` + ' zlo zhi\n\n')
+        L.append(`self.xlo - 50` + ' ' + `self.xhi + 50` + ' xlo xhi\n')
+        L.append(`self.ylo - 50` + ' ' + `self.yhi + 50` + ' ylo yhi\n')
+        L.append(`self.zlo - 50` + ' ' + `self.zhi + 50` + ' zlo zhi\n\n')
 
         if self.atom_types != 0:
             L.append('Masses\n\n')
