@@ -62,6 +62,7 @@ from .viewer import *
 from .widgets import *
 
 # Set up cloud computing
+_lastjobs = []
 compute.init_config()
 
 

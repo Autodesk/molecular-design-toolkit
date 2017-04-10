@@ -13,6 +13,7 @@ import os
 import nwchem
 import numpy
 import subprocess
+import collections
 
 FORMAT = {'format': 'MolecularDesignInterchange',
           'version': '0.8alpha'}
@@ -40,7 +41,6 @@ def prep():
     global _PROPERTYGROUP
     nwchem.rtdb_open('perm/mol.db', 'old')
     _PROPERTYGROUP = nwchem.rtdb_get('task:theory')
-
 
 ##### Units #####
 def get_position_units():
@@ -88,9 +88,8 @@ def get_scftype():
     else:
         return nwchem.rtdb_get('scf:scftype')
 
-def get_basis():
+def get_basisname():
     return nwchem.rtdb_get('basis:ao basis:star bas type')
-
 
 ##### Molecular information #####
 
@@ -137,11 +136,32 @@ def get_orbitals():
 
         return orbital_sets
 
+BasisFn = collections.namedtuple('BasisFn', 'atomidx shell coeff alpha')
+
+def get_aobasis():
+    cclibobj = _get_cclib_object()
+    basis_fns = []
+    for iatom, atombasis in enumerate(cclibobj.gbasis):
+        for shell in atombasis:
+            shellname = shell[0]
+            primitives = []
+            for fn in shell[1]:
+                primitives.append({'alpha': fn[0],
+                                   'coeff': fn[1]})
+            basis_fns.append({'shell': shellname,
+                              'atomIdx': iatom,
+                              'primitives': primitives})
+
+    return basis_fns
+
+
 def get_total_charge():
     return int(nwchem.rtdb_get('charge'))
 
+
 def get_positions():
     return _reshape_atom_vector(nwchem.rtdb_get('geometry:geometry:coords'))
+
 
 def get_atomic_numbers():
     return map(int, nwchem.rtdb_get('geometry:geometry:charges'))
@@ -190,7 +210,7 @@ def get_potential_energy():
 ################################# helper functions below ###########################
 def _reshape_atom_vector(v):
     assert len(v) % 3 == 0
-    return [v[i:i+3] for i in xrange(0,len(v), 3)]
+    return [v[i:i+3] for i in xrange(0, len(v), 3)]
 
 
 def _get_method_description():
@@ -198,9 +218,11 @@ def _get_method_description():
         'package': {'name': get_package_name(),
                     'version': get_package_version(),
                     'citation': get_package_citation()},
-        'basis': get_basis(),
+        'basis': get_basisname(),
         'scf': get_scftype(),
-        'theory': get_theory()}
+        'theory': get_theory(),
+        'basisArray': get_aobasis()
+    }
 
     if result['theory'] == 'dft':
         result['functional'] = get_functional()
@@ -271,6 +293,12 @@ def _main():
 
     with open('results.json', 'w') as outfile:
         json.dump(result, outfile)
+
+
+def _get_cclib_object():
+    import cclib
+    data = cclib.parser.NWChem('nw.out').parse()
+    return data
 
 
 if __name__ == '__main__':

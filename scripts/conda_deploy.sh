@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-conda install pyyaml jupyter
+conda install pyyaml
 conda env create
 source activate moldesign_env
 pip install pytest-xdist

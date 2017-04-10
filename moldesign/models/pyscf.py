@@ -444,11 +444,12 @@ class PySCFPotential(QMBase):
                     n = int(''.join(x for x in label[2] if x.isdigit()))
 
                     primitives = [orbitals.SphericalGaussian(atom.position.copy(),
-                                                       exp, n, l, m,
-                                                       coeff=coeff[ictr])
+                                                             exp, n, l, m,
+                                                             coeff=coeff[ictr])
                                   for exp, coeff in zip(exps, coeffs)]
-                    bfs.append(orbitals.AtomicBasisFunction(atom, n=n, l=angular, m=m,
-                                                      primitives=primitives))
+                    bfs.append(orbitals.AtomicBasisFunction(atom,
+                                                            n=n, l=angular, m=m,
+                                                            primitives=primitives))
 
         return bfs
 

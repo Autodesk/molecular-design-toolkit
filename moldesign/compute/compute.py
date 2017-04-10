@@ -91,6 +91,8 @@ def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True,
         pyccc job object OR function's return value
     """
 
+    mdt._lastjobs.append(job)
+
     engine = utils.if_not_none(engine, mdt.compute.get_engine())
 
     if engine is None:

@@ -78,7 +78,7 @@ class QMRunner(object):
         return {'nw.in': '\n'.join(nwin)}
 
     def _header(self):
-        return '\nstart mol\n\npermanent_dir ./perm\n'
+        return '\nstart mol\n\npermanent_dir ./perm\nprint medium\n'
 
     def _geom_block(self):
         if not os.path.isfile('input.xyz'):

@@ -78,9 +78,23 @@ class JsonModelBase(EnergyModelBase):
     def _process_results(self, results):
         assert len(results['states']) == 1
         jsonprops = results['states'][0]['calculated']
+        if 'orbitals' in jsonprops:
+            wfn = self._make_wfn(jsonprops)
+        else:
+            wfn = None
+
         result = mdt.MolecularProperties(self.mol,
                                          **self._json_to_quantities(jsonprops))
+        if wfn:
+            result['wfn'] = wfn
         return result
+
+
+    def _make_wfn(self, state):
+        from moldesign import orbitals
+        orbitals.wfn.ElectronicWfn(self.mol,
+                                   self.mol.num_electrons,
+                                   description=state['theory'])
 
     @staticmethod
     def _json_to_quantities(jsonprops):
