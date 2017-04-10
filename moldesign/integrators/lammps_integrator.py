@@ -42,16 +42,16 @@ __all__ = []
 
 
 @exports
-class LAMMPSNvt(ConstantTemperatureBase):
+class LAMMPSLangevin(ConstantTemperatureBase):
 
     NAME_RESULT = "result"  # Name used for dump
     NAME_AFFECTED_ATOMS = "affected_atoms"  # Name used for grouped atoms
-    NAME_NVT_SIM = "nvt_sim"    # Name used for nvt
+    NAME_LANGEVIN = "langevin_sim"    # Name used for Langevin
     NAME_ADDFORCE = "add_user_force"    # Name used for addforce
     
     # TODO: raise exception if any constraints are requested ...
     def __init__(self, *args, **kwargs):
-        super(LAMMPSNvt, self).__init__(*args, **kwargs)
+        super(LAMMPSLangevin, self).__init__(*args, **kwargs)
         self._prepped = False # is the model prepped?
         self._model = None
 
@@ -63,7 +63,7 @@ class LAMMPSNvt(ConstantTemperatureBase):
     def run(self, run_for):
         """
         Users won't call this directly - instead, use mol.run
-        Propagate position, momentum by a single timestep using LAMMPS NVT
+        Propagate position, momentum by a single timestep using LAMMPS Langevin
         
         Arguments:
             run_for (int): number of timesteps OR amount of time to run for
@@ -103,7 +103,7 @@ class LAMMPSNvt(ConstantTemperatureBase):
             lmps.command("unfix " + fix.get('name'))
 
         # Create trajectory object
-        self.traj = Trajectory(self.mol, unit_system=self._model.unit_system)
+        self.traj = Trajectory(self.mol)
         self.mol.calculate()
 
         # Dynamics loop over the dump file
@@ -121,7 +121,7 @@ class LAMMPSNvt(ConstantTemperatureBase):
 
     def prep(self):
         """
-        Prepare the LAMMPS system by configuring it for NVT simulation
+        Prepare the LAMMPS system by configuring it for Langevin simulation
         
         Arguments:
             run_for (int): number of timesteps OR amount of time to run for
@@ -140,21 +140,31 @@ class LAMMPSNvt(ConstantTemperatureBase):
         # Get lammps object from model
         lmps = self._model.lammps_system
 
+        # Check if we need to constrain hbonds
+        if self.params.get('constrain_hbonds', False):
+            raise NotImplementedError('SHAKE not implemented')
+
+        # Check if we need to constrain water
+        if self.params.get('constrain_water', False):
+            raise NotImplementedError('SHAKE not implemented')
+
         # Set timestep
         lmps.command("timestep " + str(self.params.timestep.value_in(u.fs)))
         
-        # Set NVT settings
-        nvt_command = "fix {0} all nvt temp {1} {2} {3}".format(self.NAME_NVT_SIM,
+        # Set Langevin settings
+        lmps.command("fix lange_nve all nve")
+        langevin_command = "fix {0} all langevin {1} {2} {3} 48279".format(self.NAME_LANGEVIN,
                                                                 self.params.temperature.value_in(u.kelvin),
                                                                 self.params.temperature.value_in(u.kelvin), 100.0)
-        lmps.command(nvt_command)
+        lmps.command(langevin_command)
 
         # Group affected atom
         if self._model.affected_atoms is not None:
             group_atom_cmd = "group {0} id ".format(self.NAME_AFFECTED_ATOMS)
             atoms = self._model.affected_atoms
             for atom in atoms:
-                group_atom_cmd +=  "{0} ".format(atom.index+1)
+                group_atom_cmd += "{0} ".format(atom.index+1)
+            print group_atom_cmd
             lmps.command(group_atom_cmd.rstrip())
 
         # Apply user force fix
@@ -186,8 +196,3 @@ class LAMMPSNvt(ConstantTemperatureBase):
         self.mol.velocities = vel_array * u.angstrom / u.fs
 
         self.time += self.params.frame_interval
-
-
-
-
-
