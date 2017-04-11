@@ -48,7 +48,7 @@ class LAMMPSLangevin(ConstantTemperatureBase):
     NAME_AFFECTED_ATOMS = "affected_atoms"  # Name used for grouped atoms
     NAME_LANGEVIN = "langevin_sim"    # Name used for Langevin
     NAME_ADDFORCE = "add_user_force"    # Name used for addforce
-    
+
     # TODO: raise exception if any constraints are requested ...
     def __init__(self, *args, **kwargs):
         super(LAMMPSLangevin, self).__init__(*args, **kwargs)
@@ -158,20 +158,23 @@ class LAMMPSLangevin(ConstantTemperatureBase):
                                                                 self.params.temperature.value_in(u.kelvin), 100.0)
         lmps.command(langevin_command)
 
-        # Group affected atom
-        if self._model.affected_atoms is not None:
-            group_atom_cmd = "group {0} id ".format(self.NAME_AFFECTED_ATOMS)
-            atoms = self._model.affected_atoms
-            for atom in atoms:
-                group_atom_cmd += "{0} ".format(atom.index+1)
-            print group_atom_cmd
-            lmps.command(group_atom_cmd.rstrip())
+        # Apply force to group of atoms
+        if hasattr(self._model, 'affected_atoms') and hasattr(self._model, 'force_vector'):
+            if self._model.affected_atoms is not None and self._model.force_vector is not None:
+                # Group selected atoms
+                atoms = self._model.affected_atoms
 
-        # Apply user force fix
-        if self._model.force_vector is not None:
-            force_vector = self._model.force_vector
-            lmps.command("fix {0} all addforce {1} {2} {3}".format(self.NAME_ADDFORCE, force_vector[0],
-                                                                           force_vector[1], force_vector[2]))
+                group_atom_cmd = "group {0} id ".format(self.NAME_AFFECTED_ATOMS)
+                for atom in atoms:
+                    group_atom_cmd += "{0} ".format(atom.index+1)
+                lmps.command(group_atom_cmd.rstrip())
+
+                # Apply force to selected atoms
+                force_in_real_units = self._model.force_vector
+                lmps.command("fix {0} all addforce {1} {2} {3}".format(self.NAME_ADDFORCE, force_in_real_units[0],
+                                                                       force_in_real_units[1], force_in_real_units[2]))
+
+        # Set thermo style
         lmps.command("thermo_style custom step")
         self.lammps_system = lmps  # Save lammps configuration
 
