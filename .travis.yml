@@ -9,6 +9,7 @@ addons:
       - git
 
 sudo: required
+
 services:
   - docker
 
@@ -16,13 +17,15 @@ before_install:
   - source scripts/install_conda.sh
   - source scripts/use_local_docker.sh
 
-
 install:
   - source scripts/conda_deploy.sh
+  - python -m moldesign pull # pull old docker images
+  - python -m moldesign devbuild
 
+script: py.test -n 2 coveralls -v --cov coveralls --cov-report
 
-script: py.test -n 2
-
+after_success:
+  - coveralls
 
 deploy:
   provider: pypi
