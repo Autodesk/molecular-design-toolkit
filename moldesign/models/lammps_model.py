@@ -140,7 +140,7 @@ class LAMMPSPotential(EnergyModelBase):
         """
     
         # Ensure force fields are assigned 
-        if 'amber_params' not in self.mol.ff:
+        if self.mol.ff is None or self.mol.ff.parmed_obj is None:
             raise NotImplementedError('Assign forcefield parameters to the system')
 
         # initialize lammps object
@@ -181,9 +181,8 @@ class LAMMPSPotential(EnergyModelBase):
         Parse molecule and force fields info to generate a formatted data
 
         """    
-        # Create parmed object
-        self.mol.ff.amber_params.prmtop.put('/tmp/tmp.prmtop')
-        parmedmol = med.load_file('/tmp/tmp.prmtop')
+
+        parmedmol = self.mol.ff.parmed_obj
 
          # Get non-bond atom types
         parmedmol.fill_LJ()
