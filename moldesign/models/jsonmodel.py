@@ -92,9 +92,26 @@ class JsonModelBase(EnergyModelBase):
 
     def _make_wfn(self, state):
         from moldesign import orbitals
-        orbitals.wfn.ElectronicWfn(self.mol,
-                                   self.mol.num_electrons,
-                                   description=state['theory'])
+
+        bfs = [orbitals.AtomicBasisFunction(**bdata) for bdata in
+               state['calculated']['method']['aobasis']]
+        basis_set = orbitals.BasisSet(self.mol,
+                                      orbitals=bfs,
+                                      name=self.params.basis)
+        wfn = orbitals.ElectronicWfn(self.mol,
+                                     self.mol.num_electrons,
+                                     aobasis=basis_set)
+
+        for setname, orbdata in state['calculated']['orbitals'].iteritems():
+            orbs = []
+            for iorb in xrange(len(orbdata['coefficients'])):
+                orbs.append(orbitals.Orbital(orbdata['coefficients'][iorb]))
+                if 'occupations' in orbs:
+                    orbs[-1].occupation = orbdata['occupations'][iorb]
+            wfn.add_orbitals(orbs, orbtype=setname)
+
+        return wfn
+
 
     @staticmethod
     def _json_to_quantities(jsonprops):

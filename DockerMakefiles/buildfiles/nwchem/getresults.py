@@ -120,11 +120,11 @@ def get_orbitals():
         nmo = map(int, lines.next().split())
         assert len(nmo) == nsets
 
-        orbital_sets = []
+        orbital_sets = {}
 
         for iset, num_mo in enumerate(nmo):
             orbset = {}
-            orbital_sets.append(orbset)
+            orbital_sets['canonical'] = orbset
 
             orbset['occupations'] = _read_float_fields(lines, num_mo)
             orbset['energies'] = {'value':_read_float_fields(lines, num_mo),
@@ -138,20 +138,40 @@ def get_orbitals():
 
 BasisFn = collections.namedtuple('BasisFn', 'atomidx shell coeff alpha')
 
-def get_aobasis():
+
+SHELLS = {'s': 0,
+          'p': 1,
+          'd': 2,
+          'f': 3,
+          'g': 4}
+
+def get_aobasis_cartesian():
     cclibobj = _get_cclib_object()
     basis_fns = []
+    numbasis = 0
     for iatom, atombasis in enumerate(cclibobj.gbasis):
+        energylevels = {}
         for shell in atombasis:
+
             shellname = shell[0]
+            if shellname not in energylevels:
+                energylevels[shellname] = 0
+            energylevels[shellname] += 1
+
             primitives = []
             for fn in shell[1]:
                 primitives.append({'alpha': fn[0],
                                    'coeff': fn[1]})
-            basis_fns.append({'shell': shellname,
-                              'atomIdx': iatom,
-                              'primitives': primitives})
-
+            l = SHELLS[shellname].lower()
+            for m in xrange(-l, l+1):
+                basis_fns.append({'n': energylevels[shellname],
+                                  'l': l,
+                                  'powers': [m == i for i in xrange(3)],
+                                  'atomIdx': iatom,
+                                  'primitives': primitives,
+                                  'type': 'cartesian',
+                                  'name': cclobobj.aonames[numbasis]})
+                numbasis += 1
     return basis_fns
 
 
@@ -221,8 +241,7 @@ def _get_method_description():
         'basis': get_basisname(),
         'scf': get_scftype(),
         'theory': get_theory(),
-        'basisArray': get_aobasis()
-    }
+        'aobasis': get_aobasis_cartesian()}
 
     if result['theory'] == 'dft':
         result['functional'] = get_functional()
