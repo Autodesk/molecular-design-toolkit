@@ -44,9 +44,14 @@ class ChildList(AtomContainer):
 
     def __getitem__(self, item):
         if isinstance(item, basestring):
+            if item not in self._childbyname:
+                raise KeyError('No object in "%s" named "%s"' % (self.parent, item))
             return self._childbyname[item]
         else:
-            return self._childinorder[item]
+            try:
+                return self._childinorder[item]
+            except IndexError:
+                raise IndexError("No object with index '%d' in %s" % (item, self.parent))
 
     def __setitem__(self, key, val):
         if key in self._childbyname:

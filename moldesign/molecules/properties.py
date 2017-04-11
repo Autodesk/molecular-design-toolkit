@@ -30,7 +30,13 @@ class MolecularProperties(utils.DotDict):
             **properties (dict): values of molecular properties (MUST include positions as a key)
         """
         # ADD_FEATURE: always return stored properties in the default unit systems
-        super(MolecularProperties, self).__init__(positions=mol.positions.copy(), **properties)
+        positions = properties.pop('positions', mol.positions)
+        super(MolecularProperties, self).__init__(positions=positions.copy(), **properties)
+
+    def copy(self, mol):
+        props = self.__dict__.copy()
+        props['mol'] = mol
+        return self.__class__(**props)
 
     def geometry_matches(self, mol):
         """Returns:

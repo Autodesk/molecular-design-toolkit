@@ -357,22 +357,35 @@ class MolTopologyMixin(object):
         Atom class without changing any functionality
     """
     def copy(self, name=None):
-        """ Create a copy of the molecule and all of its substructures
+        """ Create a copy of the molecule and all of its substructures, metadata, and methods
 
         Returns:
             Molecule: copied molecule
-
-        Note:
-            Assigned energy models and integrators are not currently copied, although properties are
         """
         if name is None:
             name = self.name + ' copy'
         newmol = Molecule(self.atoms,
                           name=name,
                           pdbname=self.pdbname,
-                          charge=self.charge)
-        newmol.properties = self.properties.copy()
+                          charge=self.charge,
+                          metadata=self.metadata)
+        newmol.properties = self.properties.copy(mol=newmol)
+        newmodel = self._copy_method(newmol, 'energy_model')
+        if newmodel is not None:
+            newmol.set_energy_model(newmodel)
+        newintegrator = self._copy_method(newmol, 'integrator')
+        if newintegrator is not None:
+            newmol.set_integrator(newintegrator)
         return newmol
+
+    def _copy_method(self, newmol, methodname):
+        method = getattr(self, methodname)
+        if method is None:
+            return None
+        newmethod = method.__class__()
+        newmethod.params.clear()
+        newmethod.params.update(method.params)
+        return newmethod
 
     def assert_atom(self, atom):
         """If passed an integer, just return self.atoms[atom].
@@ -474,8 +487,16 @@ class MolTopologyMixin(object):
         default_residue = self._defres
         default_chain = self._defchain
         num_biores = 0
+        conflicts = set()
+
+        last_pdb_idx = None
 
         for atom in self.atoms:
+            if last_pdb_idx is not None and atom.pdbindex <= last_pdb_idx:
+                atom.pdbindex = last_pdb_idx + 1
+                conflicts.add('atom numbers')
+            last_pdb_idx = atom.pdbindex
+
             # if atom has no chain/residue, assign defaults
             if atom.residue is None:
                 atom.residue = default_residue
@@ -488,6 +509,16 @@ class MolTopologyMixin(object):
                 atom.chain.index = len(self.chains)
 
                 assert atom.chain not in self.chains
+                oldname = atom.chain.name
+                if atom.chain.name is None and num_biores > 1:
+                    atom.chain.name = 'A'
+                while atom.chain.name in self.chains:
+                    if atom.chain.name is None:
+                        atom.chain.name = 'A'
+                    atom.chain.name = chr(ord(atom.chain.name)+1)
+
+                if oldname != atom.chain.name:
+                    conflicts.add('chain')
                 self.chains.add(atom.chain)
             else:
                 assert atom.chain.molecule is self
@@ -497,13 +528,15 @@ class MolTopologyMixin(object):
                 atom.residue.molecule = self
                 atom.residue.index = len(self.residues)
                 self.residues.append(atom.residue)
-                if atom.residue.type in ('dna', 'rna', 'protein'): num_biores += 1
+                if atom.residue.type in ('dna', 'rna', 'protein'):
+                    num_biores += 1
             else:
                 assert atom.chain.molecule is self
 
+        if conflicts:
+            print 'WARNING: %s indices modified due to name clashes' % (
+                ', '.join(conflicts))
         self.is_biomolecule = (num_biores >= 2)
-        self.nchains = self.n_chains = self.num_chains = len(self.chains)
-        self.nresidues = self.n_residues = self.num_residues = len(self.residues)
 
     def __eq__(self, other):
         """ Test whether two molecules are "equivalent"
@@ -535,7 +568,49 @@ class MolTopologyMixin(object):
 
         return self.same_topology(other)
 
-    def same_topology(self, other):
+    @property
+    def num_residues(self):
+        return len(self.residues)
+    nresidues = numresidues = num_residues
+
+    @property
+    def num_chains(self):
+        return len(self.chains)
+    nchains = numchains = num_chains
+
+    def combine(self, *others):
+        """ Create a new molecule from a group of other AtomContainers
+
+        Args:
+            *others (AtomContainer or AtomList or List[moldesign.Atom]):
+
+        Returns:
+            mdt.Molecule: a new Molecule that's the union of this structure with all
+              others. Chains will be renamed as necessary to avoid clashes.
+        """
+        new_atoms = self.atoms[:]
+        charge = self.charge
+        names = [self.name]
+        for obj in others:
+            objatoms = mdt.helpers.get_all_atoms(obj)
+            new_atoms.extend(objatoms)
+            charge += getattr(obj, 'charge', 0*u.q_e)
+            if hasattr(obj, 'name'):
+                names.append(obj.name)
+            elif objatoms[0].molecule is not None:
+                names.append('%d atoms from %s' % (len(objatoms), objatoms[0].molecule.name))
+            else:
+                names.append('list of %d unowned atoms' % len(objatoms))
+
+        return mdt.Molecule(new_atoms,
+                            copy_atoms=True,
+                            charge=charge,
+                            name='%s extended with %d atoms' %
+                                 (self.name, len(new_atoms) - self.num_atoms),
+                            metadata=utils.DotDict(description=
+                                                   'Union of %s' % ', '.join(names)))
+
+    def same_topology(self, other, verbose=False):
         """ Test whether two molecules have equivalent topologies
 
         We specifically test these quantities for equality:
@@ -558,6 +633,9 @@ class MolTopologyMixin(object):
                 itertools.chain(self.atoms, self.residues, self.chains),
                 itertools.chain(other.atoms, other.residues, other.chains)):
             if a1.name != a2.name:
+                if verbose:
+                    print 'INFO: %s[%d]: names "%s" and "%s"' % (a1.__class__.__name__, a1.index,
+                                                           a1.name, a2.name)
                 return False
 
         if (self.masses != other.masses).any():
@@ -565,20 +643,29 @@ class MolTopologyMixin(object):
 
         for a1, a2 in zip(self.atoms, other.atoms):
             if a1.atnum != a2.atnum:
-                return False
-            if a1.name != a2.name:
-                return False
-
-            bonds1 = self.bond_graph[a1]
-            bonds2 = other.bond_graph[a2]
-            if len(bonds1) != len(bonds2):
+                if verbose:
+                    print 'INFO: atoms[%d]: atom numbers %d and %d' % (a1.index, a1.atnum, a2.atnum)
                 return False
 
-            for mynbr, myorder in bonds1.iteritems():
+        return self.same_bonds(other, verbose=verbose)
+
+    def same_bonds(self, other, verbose=False):
+        for myatom, otheratom in zip(self.atoms, other.atoms):
+            mybonds = self.bond_graph[myatom]
+            otherbonds = other.bond_graph[otheratom]
+            if len(mybonds) != len(otherbonds):
+                if verbose:
+                    print 'INFO: atoms[%d] has %d bonds in self, %d bonds in other' % (
+                        myatom.index, len(mybonds), len(otherbonds))
+                return False
+
+            for mynbr, myorder in mybonds.iteritems():
                 othernbr = other.atoms[mynbr.index]
-                if othernbr not in bonds2 or bonds2[othernbr] != myorder:
+                if othernbr not in otherbonds or otherbonds[othernbr] != myorder:
+                    if verbose:
+                        print 'INFO: atoms[%d] bonded to atom[%d] (order %d) in self but not other' % (
+                            myatom.index, mynbr.index, myorder)
                     return False
-
         return True
 
     def __ne__(self, other):
@@ -653,7 +740,7 @@ class MolSimulationMixin(object):
 
         # Figure out what needs to be calculated,
         # and either launch the job or set the result
-        to_calculate = set(requests + self.energy_model.DEFAULT_PROPERTIES)
+        to_calculate = set(list(requests) + self.energy_model.DEFAULT_PROPERTIES)
         if use_cache:
             to_calculate = to_calculate.difference(self.properties)
         if len(to_calculate) == 0:
@@ -826,7 +913,7 @@ class Molecule(AtomGroup,
         pdbname (str): Name of the PDB file
         charge (units.Scalar[charge]): molecule's formal charge
         electronic_state_index (int): index of the molecule's electronic state
-        description (str): arbitrary text description of this molecule
+        metadata (dict): Arbitrary metadata dictionary
 
 
     Examples:
@@ -930,7 +1017,7 @@ class Molecule(AtomGroup,
             self.name = self.get_stoichiometry()
 
         self._properties = MolecularProperties(self)
-        self.ff = utils.DotDict()
+        self.ff = None
 
     def _get_initializing_atoms(self, atomcontainer, name, copy_atoms):
         """ Make a copy of the passed atoms as necessary, return the name of the molecule
@@ -938,7 +1025,7 @@ class Molecule(AtomGroup,
         # copy atoms from another object (i.e., a molecule)
         oldatoms = helpers.get_all_atoms(atomcontainer)
         if copy_atoms or (oldatoms[0].molecule is not None):
-            atoms = oldatoms.copy()
+            atoms = oldatoms.copy_atoms()
             if name is None:  # Figure out a reasonable name
                 if oldatoms[0].molecule is not None:
                     name = oldatoms[0].molecule.name+' copy'
