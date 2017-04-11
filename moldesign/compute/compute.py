@@ -34,16 +34,21 @@ def get_image_path(image_name):
     """
     from . import config
 
+    if config.devmode:
+        return image_name + ':dev'
+
     if not config.default_repository:
         name = image_name
-    else:
+    elif config.default_repository[-1] in '/:':
         name = '%s%s' % (config.default_repository, image_name)
+    else:
+        name = '%s/%s' % (config.default_repository, image_name)
 
     if not config.default_repository:
         img = name
     elif config.default_repository[-1] == ':':
         img = '%s-%s' % (name, config.default_version_tag)
-    elif config.version_tag:
+    elif config.default_version_tag:
         img = '%s:%s' % (name, config.default_version_tag)
     else:
         raise ValueError('Faulty docker repository configuration not recognized')

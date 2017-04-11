@@ -16,11 +16,7 @@ _ALL_:
   - ambertools
   - opsin
   - symmol
-  - openmm
-  - openbabel
-  - pyscf
   - nwchem
-  - chem_python
   - moldesign_complete
   - moldesign_notebook
   - moldesign_minimal
@@ -38,7 +34,7 @@ buildbase:
   requires:
     - base
   build: |
-    RUN apt-get update && apt-get upgrade
+    RUN apt-get update
     RUN apt-get install -y \
           autoconf        \
           automake        \

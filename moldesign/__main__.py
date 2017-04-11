@@ -40,8 +40,8 @@ DOCKER_REPOSITORY = 'docker-hub.autodesk.com/virshua/moldesign:'
 HOME = os.environ['HOME']
 CONFIG_DIR = os.path.join(HOME, '.moldesign')
 EXAMPLE_DIR_TARGET = os.path.join(os.path.curdir, 'moldesign-examples')
-EXAMPLE_DIR_SRC = unit_def_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                                               '_notebooks')
+MODULEDIR = os.path.abspath(os.path.dirname(__file__))
+EXAMPLE_DIR_SRC = unit_def_file = os.path.join(MODULEDIR, '_notebooks')
 
 
 APPLESCRIPT_INSTALL_DOCKER = ('set response to (display dialog '
@@ -67,6 +67,7 @@ def main():
     subparsers.add_parser('pull', help='download docker containers that MDT requires ('
                                        'only when a docker client is configured)')
     subparsers.add_parser('config', help='print configuration and exit')
+    subparsers.add_parser('devbuild', help='rebuild required docker containers locally')
 
     parser.add_argument('-f', '--config-file', type=str,
                         help='Path to config file')
@@ -87,6 +88,9 @@ def main():
     elif args.command == 'launch':
         launch()
 
+    elif args.command == 'devbuild':
+        devbuild()
+
     elif args.command == 'config':
         print 'Reading config file from: %s' % CONFIG_PATH
         print '----------------------------'
@@ -97,17 +101,19 @@ def main():
     else:
         assert False
 
-DOCKER_IMAGES = 'ambertools14 moldesign moldesign_notebook opsin symmol python_install'.split()
+DOCKER_IMAGES = 'ambertools moldesign_complete opsin symmol nwchem'.split()
 def pull():
     from moldesign import compute
-    streams = []
     for img in DOCKER_IMAGES:
         imgurl = compute.get_image_path(img)
         print 'Pulling %s' % imgurl
-        streams.append(compute.get_engine().client.pull(imgurl))
-    for s in streams:
-        for line in s.split('\n'):
-            print line
+        subprocess.check_call(['docker', 'pull', imgurl])
+
+
+def devbuild():
+    subprocess.check_call('docker-make --all --tag dev'.split(),
+                          cwd=os.path.join(MODULEDIR, '..', 'DockerMakefiles'))
+
 
 
 def launch(cwd=None, path=''):
