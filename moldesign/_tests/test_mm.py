@@ -123,45 +123,53 @@ def test_minimization_reduces_energy(objkey, request):
     traj = mol.minimize()
     assert mol.calculate_potential_energy() < e1
 
-
-
 @typedfixture('hasmodel')
-def protein_stripped_lammps_amber_forcefield():
+def protein_stripped_amber_forcefield_lammps():
     mol = mdt.from_pdb('1yu8')
     mol = mdt.Molecule([res for res in mol.residues if res.type == "protein"])
     newmol = mdt.assign_forcefield(mol)
+    
+    # Set Potential energy model
     newmol.set_energy_model(mdt.models.LAMMPSPotential)
+    newmol.calculate()
+    
+    # Set Interactive energy model
+    newmol.set_energy_model(mdt.models.LAMMPSInteractive)
+    newmol.calculate()
+    newmol.energy_model.apply_force(atoms=newmol.atoms[11:20], vector=[10.0, 10.0, 0.0] * u.kcalpermol / u.angstrom)
+    newmol.energy_model.reset_force()
     return newmol
 
 @typedfixture('hasmodel')
-def protein_lammps_amber_forcefield():
+def protein_amber_forcefield_lammps():
+    mol = mdt.from_pdb('1yu8')
+    newmol = mdt.assign_forcefield(mol)
+    
+    # Set Potential energy model
+    newmol.set_energy_model(mdt.models.LAMMPSPotential)
+    newmol.calculate()
+    
+    # Set Interactive energy model
+    newmol.set_energy_model(mdt.models.LAMMPSInteractive)
+    newmol.calculate()
+    newmol.energy_model.apply_force(atoms=newmol.atoms[11:20], vector=[10.0, 10.0, 0.0] * u.kcalpermol / u.angstrom)
+    newmol.energy_model.reset_force()
+    return newmol
+
+def test_lammps_shake_constrain_hbonds(protein_stripped_amber_forcefield_lammps):
+    mdmol = protein_stripped_amber_forcefield_lammps
     mol = mdt.from_pdb('1yu8')
     newmol = mdt.assign_forcefield(mol)
     newmol.set_energy_model(mdt.models.LAMMPSPotential)
-    return newmol
-
-# TODO
-def test_lammps_shake_constrain_hbonds(protein_stripped_lammps_amber_forcefield):
-    mdmol = protein_stripped_lammps_amber_forcefield
-    hydrogens = [atom for atom in mdmol.atoms if atom.atnum == 1]
-    dist_before = []
-    for atom in hydrogens:
-        assert atom.num_bonds ==1
-        d = atom.distance(atom.bonded_atoms[0])
-        dist_before.append(d)
-   
-    mdmol.set_integrator(mdt.integrators.LAMMPSNvt, timestep=2.0*u.fs, temperature=300*u.kelvin, frame_interval=10.0*u.fs)
-    mdmol.run(100.0*u.fs)
     
-    numNonConstrained = 0
-    for idx, atom in enumerate(hydrogens):
-        assert atom.num_bonds ==1
-        d = atom.distance(atom.bonded_atoms[0])
-        if abs(d-dist_before[idx]).value_in(u.angstrom) > 0.0001:
-            numNonConstrained += 1
-
-    assert numNonConstrained < len(hydrogens)*0.1
-
-# # TODO:
-# def test_lammps_shake_constrain_water(protein_lammps_amber_forcefield):
-
+    # Test without constraints
+    mdmol.set_integrator(mdt.integrators.LAMMPSLangevin, timestep=2.0*u.fs, temperature=300*u.kelvin, frame_interval=10.0*u.fs, constrain_hbonds=False, constrain_water=False)
+    traj = mdmol.run(1000*u.fs)
+   
+    assert len(traj) > 0
+    
+    # Test with constraints. Should raise NotImplementedError
+    mdmol.set_integrator(mdt.integrators.LAMMPSLangevin, timestep=2.0*u.fs, temperature=300*u.kelvin, frame_interval=10.0*u.fs, constrain_hbonds=True, constrain_water=True)
+    with pytest.raises(NotImplementedError):
+	traj = mdmol.run(1000*u.fs);
+ 
