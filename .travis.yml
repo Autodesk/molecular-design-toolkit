@@ -10,6 +10,12 @@ addons:
 
 sudo: required
 
+cache:
+ directories:
+  - $HOME/virtualenv
+  - $HOME/miniconda
+  - $HOME/.cache/pip
+
 services:
   - docker
 
