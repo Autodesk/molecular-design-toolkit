@@ -28,9 +28,10 @@ before_install:
   - source scripts/use_local_docker.sh
 
 install:
+  - source scripts/conda_deploy.sh
   - pip install pytest-xdist python-coveralls pytest-cov coveralls
   - pip install -r DockerMakefiles/requirements.txt
-  - source scripts/conda_deploy.sh
+  - pip freeze
   - python -m moldesign pull # pull old docker images
   - python -m moldesign devbuild
 
