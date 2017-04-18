@@ -20,6 +20,13 @@ _ALL_:
   - moldesign_complete
   - moldesign_notebook
   - moldesign_minimal
+  - nwchem_build
+  - openblas_build
+  - ambertools_build
+  - biopython_build
+  - pyscf_build
+  - parmed_build
+  - openmm_build
 
 
 ##################################################

@@ -102,18 +102,27 @@ def main():
         assert False
 
 DOCKER_IMAGES = 'ambertools moldesign_complete opsin symmol nwchem'.split()
-def pull():
-    from moldesign import compute
-    for img in DOCKER_IMAGES:
-        imgurl = compute.get_image_path(img)
-        print 'Pulling %s' % imgurl
-        subprocess.check_call(['docker', 'pull', imgurl])
 
+def pull():
+    for img in DOCKER_IMAGES:
+        _pull_img(img)
+
+
+def _pull_img(img):
+    from moldesign import compute
+    imgurl = compute.get_image_path(img)
+    print 'Pulling %s' % imgurl
+    subprocess.check_call(['docker', 'pull', imgurl])
+
+
+BUILD_FILES = ("nwchem_build openblas_build ambertools_build biopython_build "
+               "pyscf_build parmed_build openmm_build").split()
 
 def devbuild():
+    for img in DOCKER_IMAGES + BUILD_FILES:
+        _pull_img(img)
     subprocess.check_call('docker-make --all --tag dev'.split(),
                           cwd=os.path.join(MODULEDIR, '..', 'DockerMakefiles'))
-
 
 
 def launch(cwd=None, path=''):
