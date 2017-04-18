@@ -110,7 +110,7 @@ def pull():
 
 def _pull_img(img):
     from moldesign import compute
-    imgurl = compute.get_image_path(img)
+    imgurl = compute.get_image_path(img, devmode=False)
     print 'Pulling %s' % imgurl
     subprocess.check_call(['docker', 'pull', imgurl])
 

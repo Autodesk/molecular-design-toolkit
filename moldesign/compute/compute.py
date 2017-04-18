@@ -15,7 +15,7 @@ import moldesign as mdt
 from moldesign import utils
 
 
-def get_image_path(image_name):
+def get_image_path(image_name, _devmode=None):
     """ Returns a fully qualified tag that points to the correct registry
 
     Args:
@@ -34,7 +34,10 @@ def get_image_path(image_name):
     """
     from . import config
 
-    if config.devmode:
+    if _devmode is None:
+        _devmode = config.devmode
+
+    if _devmode:
         return image_name + ':dev'
 
     if not config.default_repository:
