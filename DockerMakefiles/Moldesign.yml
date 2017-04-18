@@ -5,17 +5,14 @@ moldesign_requirements:
 
 
 moldesign:
- description: Base installation of the MDT library. Built by cloning the current git repo.
+ description: Base installation of the MDT library. Built from the current directory.
  requires:
   - notebook
   - moldesign_requirements
  build_directory: ../
  build: |
   COPY . /opt/molecular-design-toolkit
-  RUN cd /opt \
-   && mv molecular-design-toolkit molecular-design-toolkit_dirty \
-   && git clone molecular-design-toolkit_dirty molecular-design-toolkit \
-   && rm -rf molecular-design-toolkit_dirty \
+  RUN cd /opt
    && cd molecular-design-toolkit && python setup.py sdist \
    && pip install dist/* \
    && cd / && rm -rf /opt/molecular-design-toolkit

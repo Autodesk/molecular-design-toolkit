@@ -21,7 +21,7 @@ _ALL_:
   - moldesign_notebook
   - moldesign_minimal
   - nwchem_build
-  - openblas_build
+  - openblas
   - ambertools_build
   - biopython_build
   - pyscf_build

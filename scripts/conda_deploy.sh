@@ -3,5 +3,4 @@
 conda install pyyaml jupyter
 conda env create
 source activate moldesign_env
-pip install pytest-xdist python-coveralls pytest-cov
 python setup.py install

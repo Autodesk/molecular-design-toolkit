@@ -18,11 +18,13 @@ before_install:
   - source scripts/use_local_docker.sh
 
 install:
+  - pip install pytest-xdist python-coveralls pytest-cov coveralls
+  - pip install -r DockerMakefiles/requirements.txt
   - source scripts/conda_deploy.sh
   - python -m moldesign pull # pull old docker images
   - python -m moldesign devbuild
 
-script: py.test -n 2 coveralls -v --cov coveralls --cov-report
+script: py.test -n 4 --cov moldesign
 
 after_success:
   - coveralls

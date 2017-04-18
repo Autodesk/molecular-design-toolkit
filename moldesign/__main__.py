@@ -118,9 +118,21 @@ def _pull_img(img):
 BUILD_FILES = ("nwchem_build openblas_build ambertools_build biopython_build "
                "pyscf_build parmed_build openmm_build").split()
 
+
 def devbuild():
+    print '-' * 80
+    print "Molecular design toolkit is downloading and building local, up-to-date copies of "
+    print "all docker containers it depends on. To use them, set:"
+    print "   devmode: true"
+    print "in ~/.moldesign/moldesign.yml."
+    print ('-' * 80) + '\n'
+
     for img in DOCKER_IMAGES + BUILD_FILES:
-        _pull_img(img)
+        try:
+            _pull_img(img)
+        except subprocess.CalledProcessError:
+            print '"%s " not found. Will rebuild locally ...' % img
+
     subprocess.check_call('docker-make --all --tag dev'.split(),
                           cwd=os.path.join(MODULEDIR, '..', 'DockerMakefiles'))
 
