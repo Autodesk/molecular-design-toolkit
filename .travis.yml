@@ -32,6 +32,7 @@ install:
   - pip install pytest-xdist python-coveralls pytest-cov coveralls
   - pip install -r DockerMakefiles/requirements.txt
   - pip freeze
+  - conda info -a
   - python -m moldesign pull # pull old docker images
   - python -m moldesign devbuild
 
