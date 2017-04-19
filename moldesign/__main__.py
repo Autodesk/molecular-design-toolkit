@@ -115,7 +115,7 @@ def _pull_img(img):
     subprocess.check_call(['docker', 'pull', imgurl])
 
 
-BUILD_FILES = ("nwchem_build openblas_build ambertools_build biopython_build "
+BUILD_FILES = ("nwchem_build openblas ambertools_build biopython_build "
                "pyscf_build parmed_build openmm_build").split()
 
 
