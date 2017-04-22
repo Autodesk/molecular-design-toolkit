@@ -37,7 +37,9 @@
    - cache_pyscf_build
    - cache_ambertools
    - cache_nwchem_build
-  command: "Dummy command to force caching"
+  type: parallel
+  steps:
+    - command: echo "Dummy command to force caching"
 
 - name: tests
   type: parallel
