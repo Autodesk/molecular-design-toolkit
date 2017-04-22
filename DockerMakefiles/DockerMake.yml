@@ -1,19 +1,14 @@
 _SOURCES_:
-  - AmberTools.yml
-  - BioPython.yml
   - CLI.yml
   - Libraries.yml
   - Moldesign.yml
   - NWChem.yml
-  - OpenMM.yml
-  - ParmEd.yml
   - PySCF.yml
   - PythonTools.yml
   - SymMol.yml
 
 
 _ALL_:
-  - ambertools
   - opsin
   - symmol
   - nwchem
@@ -22,11 +17,7 @@ _ALL_:
   - moldesign_minimal
   - nwchem_build
   - openblas
-  - ambertools_build
-  - biopython_build
   - pyscf_build
-  - parmed_build
-  - openmm_build
 
 
 ##################################################
@@ -88,7 +79,7 @@ buildbase:
 
 
 deploybase:
-  description: lightweight image for deployment
+  description: lightweight image for deployment of CLI binaries
   requires:
     - base
   build_directory: buildfiles/deploybase
@@ -105,17 +96,9 @@ deploybase:
 
 
 python_deploy_base:
-  requires:
-    - deploybase
+  FROM: continuumio/miniconda:4.3.11
+  build_directory: buildfiles/deploybase
   build: |
-    RUN apt-get update \
-        && apt-get install -y --no-install-recommends \
-          python \
-          python-numpy \
-          python-scipy \
-          python-yaml \
-        && cleanapt
-    RUN cd /tmp \
-      && wget https://bootstrap.pypa.io/get-pip.py \
-      && python get-pip.py
-    ENV PYTHONPATH=/opt
+    ADD cleanapt /usr/local/bin
+    RUN chmod +x /usr/local/bin/cleanapt
+    RUN conda install -qy numpy scipy pyyaml

@@ -67,6 +67,7 @@ def main():
     subparsers.add_parser('pull', help='download docker containers that MDT requires ('
                                        'only when a docker client is configured)')
     subparsers.add_parser('config', help='print configuration and exit')
+    subparsers.add_parser('copyexamples', help='Copy example notebooks')
     subparsers.add_parser('devbuild', help='rebuild required docker containers locally')
     subparsers.add_parser('devpull', help='Pull development images for latest release')
 
@@ -95,6 +96,9 @@ def main():
     elif args.command == 'devpull':
         devpull()
 
+    elif args.command == 'copyexamples':
+        copy_example_dir(use_existing=False)
+
     elif args.command == 'config':
         print 'Reading config file from: %s' % CONFIG_PATH
         print '----------------------------'
@@ -119,9 +123,7 @@ def _pull_img(img):
     subprocess.check_call(['docker', 'pull', imgurl])
 
 
-BUILD_FILES = ("nwchem_build openblas ambertools_build biopython_build "
-               "pyscf_build parmed_build openmm_build").split()
-
+BUILD_FILES = "nwchem_build pyscf_build".split()
 
 def devbuild():
     print '-' * 80
