@@ -11,3 +11,6 @@ build
 .cloudcomputecannon
 __pycache__
 .idea
+.coverage*
+codeship.aes
+tokens
