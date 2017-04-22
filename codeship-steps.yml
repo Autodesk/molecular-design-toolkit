@@ -13,9 +13,6 @@
     - command: docker-make --tag dev ambertools
     - command: docker-make --tag dev opsin
     - command: docker-make --tag dev pyscf_build
-    - command: docker-make --tag dev openmm_build
-    - command: docker-make --tag dev biopython_build
-    - command: docker-make --tag dev parmed_build
     - command: docker-make --tag dev symmol
 
 - name: dependency_image_build

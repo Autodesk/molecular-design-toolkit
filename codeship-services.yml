@@ -1,7 +1,7 @@
 builder:
   build:
     context: .
-    dockerfile: scripts/BuildEnv.dockerfile
+    dockerfile: Dockerfile.build_environment
   working_dir: /opt/molecular-design-toolkit/DockerMakefiles/
   add_docker: true
   encrypted_env_file: tokens.crypt
