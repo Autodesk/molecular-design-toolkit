@@ -1,13 +1,32 @@
-builder:
+docker_make:
   build:
-    context: .
+    context: ./DockerMakefiles/
     dockerfile: Dockerfile.build_environment
-  working_dir: /opt/molecular-design-toolkit/DockerMakefiles/
-  add_docker: true
-  encrypted_env_file: tokens.crypt
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
   add_docker: true
   encrypted_env_file: tokens.crypt
   cached: true
 
+test_moldesign_minimal:
+  image: moldesign_minimal:dev
+  cached: true
+  working_dir: /usr/local/lib/python2.7/dist-packages/moldesign
+
+test_moldesign_complete:
+  image: moldesign_complete:dev
+  cached: true
+  working_dir: /usr/local/lib/python2.7/dist-packages/moldesign
+
+# cache the larger built images - these won't change often
+cache_nwchem_build:
+  image: nwchem_build:dev
+  cached: true
+
+cache_ambertools:
+  image: ambertools:dev
+  cached: true
+
+cache_pyscf_build:
+  image: pyscf_build:dev
+  cached: true

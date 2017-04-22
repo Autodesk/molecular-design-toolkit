@@ -1,14 +1,13 @@
 - name: prep_docker_builds
-  service: builder
+  service: docker_make
   type: serial
   steps:
-    - command: python -m moldesign devpull
     - command: docker-make --tag dev buildbase deploybase python_deploy_base
     - command: docker images
 
 - name: supporting_image_build
   type: parallel
-  service: builder
+  service: docker_make
   steps:
     - command: docker-make --tag dev nwchem
       name: nwchem
@@ -20,32 +19,33 @@
       name: pyscf
     - command: docker-make --tag dev symmol
       name: symmol
+    - command: docker-make --tag dev moldesign_minimal
+      name: notebook
 
 - name: print_current_images
-  service: builder
+  service: docker_make
   command: docker images
 
 - name: dependency_image_build
-  service: builder
+  service: docker_make
   command: docker-make --all --tag dev
 
 - name: tests
   type: parallel
-  service: builder
+  services:
+    - test_moldesign_minimal
+    - test_moldesign_complete
   steps:  # we test 2 environments: one without tools locally installed, and one with
-    - command: bash -c -l "cd /opt/molecular-design-toolkit/ && py.test -n 4 --cov coveralls"
-      name: minimal_environment
-    - command: docker run moldesign_complete:dev bash -c "pip install pytest-xdist && cd /usr/local/lib/python2.7/dist-packages/moldesign && py.test -n 4"
-      name: complete_environment
+    - command: py.test -n 4 --cov=..
 
 # TODO: test the merged versions of PRs; test additional environments sometimes
 
 - name: code_coverage
-  service: builder
+  service: test_moldesign_complete
   command: cd /opt/molecular-design-toolkit/ && coveralls
 
 - name: publish
-  service: builder
+  service: docker_make
   tag: "^(master/.*)$"  # deploy only on tagged commits in master
   type: serial
   steps:
