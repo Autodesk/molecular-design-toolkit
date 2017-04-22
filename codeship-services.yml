@@ -1,7 +1,7 @@
 docker_make:
   build:
-    context: ./DockerMakefiles/
-    dockerfile: Dockerfile.build_environment
+    context: .
+    dockerfile: ./DockerMakefiles/Dockerfile.build_environment
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
   add_docker: true

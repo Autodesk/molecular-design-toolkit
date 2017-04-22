@@ -1,11 +1,15 @@
-- name: prep_docker_builds
+- name: base_image_build
   service: docker_make
-  type: serial
+  type: parallel
   steps:
-    - command: docker-make --tag dev buildbase deploybase python_deploy_base
-    - command: docker images
+    - command: docker-make --tag dev buildbase
+      name: master_build_image
+    - command: docker-make --tag dev python_deploy_base
+      name: miniconda
+    - command: docker-make --tag dev deploybase
+      name: minidebian
 
-- name: supporting_image_build
+- name: dependency_image_build
   type: parallel
   service: docker_make
   steps:
@@ -22,15 +26,11 @@
     - command: docker-make --tag dev moldesign_minimal
       name: notebook
 
-- name: print_current_images
-  service: docker_make
-  command: docker images
-
-- name: dependency_image_build
+- name: mdt_stack_build
   service: docker_make
   command: docker-make --all --tag dev
 
-- name: cache_images
+- name: cache_built_images
   services:
    - test_moldesign_minimal
    - test_moldesign_complete
