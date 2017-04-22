@@ -7,3 +7,7 @@ builder:
   encrypted_env_file: tokens.crypt
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
+  add_docker: true
+  encrypted_env_file: tokens.crypt
+  cached: true
+

@@ -4,16 +4,26 @@
   steps:
     - command: python -m moldesign devpull
     - command: docker-make --tag dev buildbase deploybase python_deploy_base
+    - command: docker images
 
 - name: supporting_image_build
   type: parallel
   service: builder
   steps:
     - command: docker-make --tag dev nwchem
+      name: nwchem
     - command: docker-make --tag dev ambertools
+      name: ambertools
     - command: docker-make --tag dev opsin
+      name: opsin
     - command: docker-make --tag dev pyscf_build
+      name: pyscf
     - command: docker-make --tag dev symmol
+      name: symmol
+
+- name: print_current_images
+  service: builder
+  command: docker images
 
 - name: dependency_image_build
   service: builder
@@ -23,8 +33,12 @@
   type: parallel
   service: builder
   steps:  # we test 2 environments: one without tools locally installed, and one with
-    - command: bash -c -l "cd /opt/molecular-design-toolkit/ && py.test -n 4 -cov coveralls"
-    - command: docker run moldesign_complete bash -c "pip install pytest-xdist && cd /usr/local/lib/python2.7/dist-packages/moldesign && py.test -n 4"
+    - command: bash -c -l "cd /opt/molecular-design-toolkit/ && py.test -n 4 --cov coveralls"
+      name: minimal_environment
+    - command: docker run moldesign_complete:dev bash -c "pip install pytest-xdist && cd /usr/local/lib/python2.7/dist-packages/moldesign && py.test -n 4"
+      name: complete_environment
+
+# TODO: test the merged versions of PRs; test additional environments sometimes
 
 - name: code_coverage
   service: builder
@@ -36,5 +50,8 @@
   type: serial
   steps:
     - command: test that the code has the right version (and test that it's a good semver?)
+      name: verify_version
     - command: tag and push docker images
+      name: docker_deploy
     - command: upload package to pypi
+      name: pypi_deploy
