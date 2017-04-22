@@ -12,8 +12,8 @@ moldesign:
  build_directory: ../
  build: |
   COPY . /opt/molecular-design-toolkit
-  RUN cd /opt
-   && cd molecular-design-toolkit && python setup.py sdist \
+  RUN cd /opt/molecular-design-toolkit \
+   && python setup.py sdist \
    && pip install dist/* \
    && cd / && rm -rf /opt/molecular-design-toolkit
 

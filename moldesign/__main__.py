@@ -68,6 +68,7 @@ def main():
                                        'only when a docker client is configured)')
     subparsers.add_parser('config', help='print configuration and exit')
     subparsers.add_parser('devbuild', help='rebuild required docker containers locally')
+    subparsers.add_parser('devpull', help='Pull development images for latest release')
 
     parser.add_argument('-f', '--config-file', type=str,
                         help='Path to config file')
@@ -91,6 +92,9 @@ def main():
     elif args.command == 'devbuild':
         devbuild()
 
+    elif args.command == 'devpull':
+        devpull()
+
     elif args.command == 'config':
         print 'Reading config file from: %s' % CONFIG_PATH
         print '----------------------------'
@@ -99,7 +103,7 @@ def main():
                 print '%s: %s' % (key, value)
 
     else:
-        assert False
+        raise ValueError("Unhandled CLI command '%s'" % args.command)
 
 DOCKER_IMAGES = 'ambertools moldesign_complete opsin symmol nwchem'.split()
 
@@ -127,14 +131,18 @@ def devbuild():
     print "in ~/.moldesign/moldesign.yml."
     print ('-' * 80) + '\n'
 
-    for img in DOCKER_IMAGES + BUILD_FILES:
-        try:
-            _pull_img(img)
-        except subprocess.CalledProcessError:
-            print '"%s " not found. Will rebuild locally ...' % img
+    devpull()
 
     subprocess.check_call('docker-make --all --tag dev'.split(),
                           cwd=os.path.join(MODULEDIR, '..', 'DockerMakefiles'))
+
+
+def devpull():
+    for img in DOCKER_IMAGES+BUILD_FILES:
+        try:
+            _pull_img(img)
+        except subprocess.CalledProcessError:
+            print '"%s " not found. Will rebuild locally ...'%img
 
 
 def launch(cwd=None, path=''):

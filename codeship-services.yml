@@ -1,0 +1,9 @@
+builder:
+  build:
+    context: .
+    dockerfile: scripts/BuildEnv.dockerfile
+  working_dir: /opt/molecular-design-toolkit/DockerMakefiles/
+  add_docker: true
+  encrypted_env_file: tokens.crypt
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock

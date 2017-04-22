@@ -1,0 +1,43 @@
+- name: prep_docker_builds
+  service: builder
+  type: serial
+  steps:
+    - command: python -m moldesign devpull
+    - command: docker-make --tag dev buildbase deploybase python_deploy_base
+
+- name: supporting_image_build
+  type: parallel
+  service: builder
+  steps:
+    - command: docker-make --tag dev nwchem
+    - command: docker-make --tag dev ambertools
+    - command: docker-make --tag dev opsin
+    - command: docker-make --tag dev pyscf_build
+    - command: docker-make --tag dev openmm_build
+    - command: docker-make --tag dev biopython_build
+    - command: docker-make --tag dev parmed_build
+    - command: docker-make --tag dev symmol
+
+- name: dependency_image_build
+  service: builder
+  command: docker-make --all --tag dev
+
+- name: tests
+  type: parallel
+  service: builder
+  steps:  # we test 2 environments: one without tools locally installed, and one with
+    - command: bash -c -l "cd /opt/molecular-design-toolkit/ && py.test -n 4 -cov coveralls"
+    - command: docker run moldesign_complete bash -c "pip install pytest-xdist && cd /usr/local/lib/python2.7/dist-packages/moldesign && py.test -n 4"
+
+- name: code_coverage
+  service: builder
+  command: cd /opt/molecular-design-toolkit/ && coveralls
+
+- name: publish
+  service: builder
+  tag: "^(master/.*)$"  # deploy only on tagged commits in master
+  type: serial
+  steps:
+    - command: test that the code has the right version (and test that it's a good semver?)
+    - command: tag and push docker images
+    - command: upload package to pypi
