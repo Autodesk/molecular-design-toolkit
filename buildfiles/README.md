@@ -1,0 +1,1 @@
+Files in this directory are used with the CodeShip CI/CD service, and generally aren't useful for anyone except the project's maintainers.

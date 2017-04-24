@@ -1,7 +1,7 @@
 docker_make:
   build:
     context: .
-    dockerfile: ./DockerMakefiles/Dockerfile.build_environment
+    dockerfile: ./buildfiles/build-env.dockerfile
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
   add_docker: true
@@ -9,24 +9,33 @@ docker_make:
   cached: true
 
 test_moldesign_minimal:
-  image: moldesign_minimal:dev
+  build:
+    dockerfile: ./buildfiles/moldesign-minimal-cache.dockerfile
   cached: true
   working_dir: /usr/local/lib/python2.7/dist-packages/moldesign
 
 test_moldesign_complete:
-  image: moldesign_complete:dev
+  build:
+    dockerfile: ./buildfiles/moldesign-complete-cache.dockerfile
   cached: true
   working_dir: /usr/local/lib/python2.7/dist-packages/moldesign
 
-# cache the larger built images - these won't change often
 cache_nwchem_build:
-  image: nwchem_build:dev
+  build:
+    dockerfile: ./buildfiles/nwchem-cache.dockerfile
   cached: true
 
 cache_ambertools:
-  image: ambertools:dev
+  build:
+    dockerfile: ./buildfiles/ambertools-cache.dockerfile
   cached: true
 
 cache_pyscf_build:
-  image: pyscf_build:dev
+  build:
+    dockerfile: ./buildfiles/pyscf-cache.dockerfile
+  cached: true
+
+cache_openblas:
+  build:
+    dockerfile: ./buildfiles/openblas-cache.dockerfile
   cached: true

@@ -9,7 +9,7 @@
     - command: docker-make --tag dev deploybase
       name: minidebian
 
-- name: dependency_image_build
+- name: parallel_image_build
   type: parallel
   service: docker_make
   steps:
