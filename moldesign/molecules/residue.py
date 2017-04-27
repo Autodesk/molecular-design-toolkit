@@ -43,7 +43,7 @@ class Residue(BioContainer, ResidueNotebookMixin):
         return newatoms[0].residue
 
     @utils.args_from(BioContainer)
-    def __init__(self,  name=None, resname=None, pdbname=None, pdbindex=None):
+    def __init__(self,  name=None, resname=None, pdbindex=None):
         """ Initialization
         Args:
             **kwargs ():
@@ -65,8 +65,11 @@ class Residue(BioContainer, ResidueNotebookMixin):
         super(Residue, self).__init__(name)
 
         self.resname = resname
-        self.pdbname = pdbname
         self.pdbindex = pdbindex
+
+    @property
+    def pdbname(self):
+        return self.resname
 
     @property
     def molecule(self):
@@ -297,11 +300,7 @@ class Residue(BioContainer, ResidueNotebookMixin):
                 except KeyError:  # missing atoms are normal (often hydrogen)
                     pass
                 else:
-                    bond_graph[atom][nbr] = bond_graph[nbr][atom] = order
-
-        # copy bonds into the right structure (do this last to avoid mangling the graph)
-        for atom in bond_graph:
-            atom.bond_graph.update(bond_graph[atom])
+                    atom.bonds.create(nbr, order)
 
     @property
     def next_residue(self):
@@ -348,15 +347,6 @@ class Residue(BioContainer, ResidueNotebookMixin):
                 return nbr.residue
         else:
             raise StopIteration('%s reached' % name)
-
-    @property
-    def resname(self):
-        """str: Synonym for pdbname"""
-        return self.pdbname
-
-    @resname.setter
-    def resname(self, val):
-        self.pdbname = val
 
     @property
     def type(self):

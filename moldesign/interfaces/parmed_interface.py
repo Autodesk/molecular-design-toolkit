@@ -155,6 +155,7 @@ def parmed_to_mdt(pmdmol):
         if patm.residue not in residues:
             residues[patm.residue] = mdt.Residue(resname=patm.residue.name,
                                                  pdbindex=patm.residue.number)
+            assert residues[patm.residue].resname is not None
             residues[patm.residue].chain = chain
         residue = residues[patm.residue]
 

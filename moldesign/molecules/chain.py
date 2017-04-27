@@ -248,11 +248,11 @@ class Chain(BioContainer):
 
             # Create the bonds
             if restype == 'protein':
-                bond_graph[r1['C']] = {r2['N']: 1}
-                bond_graph[r2['N']] = {r1['C']: 1}
+                if r2['N'] not in r1['C'].bonds:
+                    r1['C'].bonds.create(r2['N'], 1)
             elif restype == 'dna':
-                bond_graph[r1["O3'"]] = {r2['P']: 1}
-                bond_graph[r2['P']] = {r1["O3'"]: 1}
+                if r1["O3'"] not in r2['P'].bonds:
+                    r1["O3'"].bonds.create(r2['P'], 1)
             elif restype == 'rna':
                 raise NotImplementedError('RNA not yet implemented')
 
