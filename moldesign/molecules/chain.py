@@ -257,8 +257,10 @@ class Chain(BioContainer):
                 raise NotImplementedError('RNA not yet implemented')
 
         # copy bonds into the right structure (do this last to avoid mangling the graph)
-        for atom in bond_graph:
-            atom.bond_graph.update(bond_graph[atom])
+        for atom, nbrs in bond_graph.iteritems():
+            for nbr, order in nbrs.iteritems():
+                if nbr not in atom.bonds.atoms:
+                    atom.bonds.create(nbr,order)
 
     @property
     def sequence(self):

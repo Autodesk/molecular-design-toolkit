@@ -292,15 +292,17 @@ class Residue(BioContainer, ResidueNotebookMixin):
                 raise KeyError("No bonding template for residue '%s'" % resname)
 
         # intra-residue bonds
-        bond_graph = {atom: {} for atom in self}
         for atom in self:
             for nbrname, order in bonds_by_name.get(atom.name, {}).iteritems():
                 try:
                     nbr = self[nbrname]
                 except KeyError:  # missing atoms are normal (often hydrogen)
-                    pass
-                else:
+                    continue
+
+                if nbr not in atom.bonds:
                     atom.bonds.create(nbr, order)
+                elif nbr in atom.bonds and atom.bonds[nbr].order == 1:
+                    atom.bonds[nbr].order = order
 
     @property
     def next_residue(self):
@@ -342,7 +344,7 @@ class Residue(BioContainer, ResidueNotebookMixin):
         """Return the first residue found that's bound to the passed atom name
         """
         conn_atom = self[atomname]
-        for nbr in conn_atom.bond_graph:
+        for nbr in conn_atom.bonds.atoms:
             if nbr.residue is not self:
                 return nbr.residue
         else:
