@@ -8,9 +8,9 @@ opsin:
 
 ambertools:
   FROM: continuumio/miniconda3:4.3.11
-  build_directory: buildfiles/ambertools
   build: |
-    ADD .amberrc /root/
+    RUN python -c "print('name = molecular-design-toolkit-builder\ninstitution = Autodesk\ncity = San Francisco\nstate or province = CA\ncountry = USA')" > /root/.amberrc
+
     RUN conda install -qy -c ambermd ambertools=16.21.1
 
 

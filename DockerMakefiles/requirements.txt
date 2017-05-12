@@ -1,1 +1,1 @@
-DockerMake >= 0.5.2
+DockerMake >= 0.5.3

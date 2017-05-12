@@ -1,13 +1,16 @@
-- name: base_image_build
+- name: generate_dockerfiles
   service: docker_make
+  command: bash -c "docker-make -p -n nwchem_build pyscf_build ambertools --dockerfile-dir /makefiles && cat /makefiles/Dockerfile.nwchem_build"
+
+- name: trigger_caches
   type: parallel
+  services:
+    - cache_nwchem_build
+    - cache_ambertools
+    - cache_pyscf_build
   steps:
-    - command: docker-make --tag dev buildbase
-      name: master_build_image
-    - command: docker-make --tag dev python_deploy_base
-      name: miniconda
-    - command: docker-make --tag dev deploybase
-      name: minidebian
+   - command: echo checking in
+
 
 - name: parallel_image_build
   type: parallel
@@ -34,9 +37,11 @@
     - command: docker-make --tag dev moldesign_complete
       name: mdt_complete
 
+
 - name: mdt_stack_build
   service: docker_make
   command: docker-make --all --tag dev
+
 
 - name: tests
   type: parallel
