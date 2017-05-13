@@ -22,7 +22,6 @@ from moldesign import units as u
 
 from .molecule import MolecularProperties
 from . import toplevel
-from ..display.notebook_mixins import TrajNotebookMixin
 
 
 class Frame(utils.DotDict):
@@ -206,7 +205,7 @@ class TrajectoryAnalysisMixin(object):
 
 
 @toplevel
-class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
+class Trajectory(TrajectoryAnalysisMixin):
     """ A ``Trajectory`` stores information about a molecule's motion and how its properties
     change as it moves.
 

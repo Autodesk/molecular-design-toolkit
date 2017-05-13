@@ -22,9 +22,9 @@ from moldesign.compute import DummyJob
 from moldesign.exceptions import NotCalculatedError
 from moldesign.min.base import MinimizerBase
 
-from ..display.notebook_mixins import MolNotebookMixin
 from .properties import MolecularProperties
 from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond
+from ..helpers import WidgetMethod
 from .coord_arrays import *
 
 
@@ -361,6 +361,54 @@ class MolPropertyMixin(object):
     calc_dipole = calculate_dipole
     calc_potential_energy = calculate_potential_energy
     calc_forces = calculate_forces
+
+    def _repr_markdown_(self):
+        return self.markdown_summary()
+
+    def biomol_summary_markdown(self):
+        """A markdown description of biomolecular structure.
+
+        Returns:
+            str: Markdown string"""
+        lines = []
+        if len(self.residues) > 1:
+            table = self.get_residue_table()
+            lines.append('### Residues')
+            # extra '|' here may be workaround for a bug in ipy.markdown?
+            lines.append(table.markdown(replace={0: ' '})+'|')
+
+            lines.append('### Biopolymer chains')
+            seqs = []
+            for chain in self.chains:
+                seq = chain._get_sequence(_html=True)
+                if not seq.strip():  # don't write anything if there's no sequence
+                    continue
+
+                seqs.append('**%s**: %s'%(chain.name, seq))
+            lines.append('<br>'.join(seqs))
+
+        return lines
+
+    def get_residue_table(self):
+        """Creates a data table summarizing this molecule's primary structure.
+
+        Returns:
+            moldesign.utils.MarkdownTable"""
+        table = utils.MarkdownTable(*(['chain']+
+                                      'protein dna rna unknown water solvent'.split()))
+        for chain in self.chains:
+            counts = {}
+            unk = []
+            for residue in chain.residues:
+                cat = residue.type
+                if cat == 'unknown':
+                    unk.append(residue.name)
+                counts[cat] = counts.get(cat, 0)+1
+            counts['chain'] = '<b>%s</b>'%chain.name
+            if 0 < len(unk) <= 4:
+                counts['unknown'] = ','.join(unk)
+            table.add_line(counts)
+        return table
 
 
 class MolTopologyMixin(object):
@@ -861,7 +909,6 @@ class MolSimulationMixin(object):
 class Molecule(AtomGroup,
                MolConstraintMixin,
                MolPropertyMixin,
-               MolNotebookMixin,
                MolTopologyMixin, MolSimulationMixin):
     """
     ``Molecule`` objects store a molecular system, including atoms, 3D coordinates, molecular
@@ -952,6 +999,8 @@ class Molecule(AtomGroup,
     """
     positions = ProtectedArray('_positions')
     momenta = ProtectedArray('_momenta')
+
+    draw_orbitals = WidgetMethod('molecules.draw_orbitals')
 
     def __init__(self, atomcontainer,
                  name=None, bond_graph=None,

@@ -21,16 +21,19 @@ import numpy as np
 import moldesign as mdt
 from moldesign import units as u
 from moldesign import utils, external, mathutils, helpers
-from ..display.notebook_mixins import AtomGroupNotebookMixin
 from . import toplevel
 
 
-class AtomGroup(AtomGroupNotebookMixin):
+class AtomGroup(object):
     """ Mixin functions for objects that have a ``self.atoms`` attribute with a list of atoms
 
     Attributes:
         atoms (List[Atom]): a list of atoms
     """
+    draw2d = helpers.WidgetMethod('atomgroups.draw2d')
+    draw3d = helpers.WidgetMethod('atomgroups.draw3d')
+    draw = helpers.WidgetMethod('atomgroups.draw')
+
     def __init__(self, *args, **kwargs):
         """ This should never be called directly - it will be called by the `super` methods
         of its subclasses """

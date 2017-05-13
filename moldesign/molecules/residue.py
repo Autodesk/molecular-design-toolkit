@@ -17,11 +17,10 @@ import moldesign as mdt
 from moldesign import utils, data
 
 from . import BioContainer, AtomList, toplevel
-from ..display.notebook_mixins import ResidueNotebookMixin
 
 
 @toplevel
-class Residue(BioContainer, ResidueNotebookMixin):
+class Residue(BioContainer):
     """ A biomolecular residue - most often an amino acid, a nucleic base, or a solvent
     molecule. In PDB structures, also often refers to non-biochemical molecules.
 

@@ -20,8 +20,6 @@ import funcsigs
 import moldesign as mdt
 from moldesign.utils import DotDict
 
-from .display.notebook_mixins import MethodConfigurationMixin
-
 
 class _InitKeywordMeta(type):
     """ Constructs a custom call signature for __init__ based on cls.PARAMETERS.
@@ -41,7 +39,7 @@ class _InitKeywordMeta(type):
         return self.__customsig
 
 
-class Method(MethodConfigurationMixin):
+class Method(object):
     """Abstract Base class for energy models, integrators, and "heavy duty" simulation objects
 
     Args:

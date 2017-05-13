@@ -17,12 +17,12 @@ import numpy as np
 import moldesign as mdt
 from moldesign import data, utils
 from moldesign import units as u
+from ..helpers import WidgetMethod
 
 from . import toplevel, AtomContainer, AtomList, AtomArray, AtomCoordinate, Bond
-from ..display.notebook_mixins import AtomNotebookMixin
 
 
-class AtomPropertyMixin(object):
+class AtomPropertyMixin(object):  # TODO: this isn't worth it, just put it back into Atom
     """ Functions accessing computed atomic properties.
 
     Note:
@@ -84,7 +84,7 @@ class AtomPropertyMixin(object):
 
 
 @toplevel
-class Atom(AtomPropertyMixin, AtomNotebookMixin):
+class Atom(AtomPropertyMixin):
     """ A data structure representing an atom.
 
     ``Atom`` objects store information about individual atoms within a larger molecular system,
@@ -134,10 +134,8 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
 
     See also methods offered by the mixin superclasses:
 
-            - :class:`AtomDrawingMixin`
             - :class:`AtomGeometryMixin`
             - :class:`AtomPropertyMixin`
-            - :class:`AtomNotebookMixin`
     """
     x, y, z = (AtomCoordinate('position', i) for i in xrange(3))
     vx, vy, vz = (AtomCoordinate('velocity', i) for i in xrange(3))
@@ -147,6 +145,10 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
     momentum = AtomArray('_momentum', 'momenta')
 
     atomic_number = utils.Synonym('atnum')
+
+    draw2d = WidgetMethod('atoms.draw2d')
+    draw3d = WidgetMethod('atoms.draw3d')
+    draw = WidgetMethod('atoms.draw')
 
     #################################################################
     # Methods for BUILDING the atom and indexing it in a molecule
@@ -359,4 +361,60 @@ class Atom(AtomPropertyMixin, AtomNotebookMixin):
         return data.ELEMENTS.get(self.atnum, '?')
     elem = element = symbol
 
+    def markdown_summary(self):
+        """Return a markdown-formatted string describing this atom
 
+        Returns:
+            str: markdown-formatted string
+        """
+        if self.molecule is None:
+            lines = ["<h3>Atom %s</h3>"%self.name]
+        else:
+            lines = ["<h3>Atom %s (index %d)</h3>"%(self.name, self.index)]
+
+        lines.append('**Atomic number**: %d'%self.atnum)
+        lines.append("**Mass**: %s"%self.mass)
+        lines.append('**Formal charge**: %s'%self.formal_charge)
+
+        if self.molecule is not None:
+            lines.append('\n')
+            if self.molecule.is_biomolecule:
+                if self.pdbindex is not None:
+                    lines.append('**PDB serial #**: %s'%self.pdbindex)
+                lines.append("**Residue**: %s (index %d)"%(self.residue.name, self.residue.index))
+                lines.append("**Chain**: %s"%self.chain.name)
+            lines.append("**Molecule**: %s"%self.molecule.name)
+            for ibond, (nbr, order) in enumerate(self.bond_graph.iteritems()):
+                lines.append('**Bond %d** (order = %d): %s (index %s) in %s' % (
+                    ibond + 1, order, nbr.name, nbr.index, nbr.residue.name))
+
+        if self.basis_functions:
+            lines.append('**Basis functions:**<br>'+ '<br>'.join(map(str, self.basis_functions)))
+
+        if self.ff:
+            lines.append('\n**Forcefield partial charge**: %s'%self.ff.partial_charge)
+            # TODO: deal with other LJ types, e.g., AB?
+            lines.append(u'**Forcefield LJ params**: '
+                         u'\u03C3=%s, \u03B5=%s'%(
+                             self.ff.ljsigma.defunits(),
+                             self.ff.ljepsilon.defunits()))
+
+        # position and momentum
+        table = utils.MarkdownTable('', 'x', 'y', 'z')
+
+        table.add_line(['**position /** {}'.format(u.default.length)]+
+                       ['%12.3f'%x.defunits_value() for x in self.position])
+        table.add_line(['**momentum /** {}'.format(u.default.momentum)]+
+                       ['%12.3e'%m.defunits_value() for m in self.momentum])
+
+        if self.molecule is not None and 'forces' in self.molecule.properties:
+            table.add_line(['**force /** {.units}'.format(self.force.defunits())]+
+                           ['%12.3e'%m.defunits_value() for m in self.force])
+
+        lines.append('\n\n' + table.markdown() + '\n\n')
+        # All other assigned properties
+
+        return '<br>'.join(lines)
+
+    def _repr_markdown_(self):
+        return self.markdown_summary()
