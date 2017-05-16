@@ -18,7 +18,8 @@ associated data types (force fields, orbitals, basis sets, etc.).
 import funcsigs
 
 import moldesign as mdt
-from moldesign.utils import DotDict
+from .utils import DotDict
+from .helpers import WidgetMethod
 
 
 class _InitKeywordMeta(type):
@@ -59,6 +60,8 @@ class Method(object):
     """ Mapping(str, list): List of supported values for parameters (if a parameter is not found,
      it's assumed that all possible values are supported)
     """
+
+    configure = WidgetMethod('method.configure')
 
     def __reduce__(self):
         return _make_method, (self.__class__, self.params, self.mol)

@@ -227,6 +227,11 @@ class Trajectory(TrajectoryAnalysisMixin):
         info (str): text describing this trajectory
         unit_system (u.UnitSystem): convert all attributes to this unit system
     """
+
+    draw = helpers.WidgetMethod('trajectory.draw')
+    draw_orbitals = helpers.WidgetMethod('trajectory.draw_orbitals')
+    plot = helpers.WidgetMethod('trajectory.plot')
+
     def __init__(self, mol, unit_system=None, first_frame=False, name=None):
         self._init = True
         self.info = "Trajectory"

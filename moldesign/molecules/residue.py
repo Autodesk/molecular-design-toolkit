@@ -70,6 +70,61 @@ class Residue(BioContainer):
         else:
             return self.pdbname + str(self.pdbindex)
 
+    def _repr_markdown_(self):
+        return self.markdown_summary()
+
+    def markdown_summary(self):
+        """ Markdown-formatted information about this residue
+
+        Returns:
+            str: markdown-formatted string
+        """
+        if self.type == 'placeholder':
+            return '`%s`'%repr(self)
+
+        if self.molecule is None:
+            lines = ["<h3>Residue %s</h3>"%self.name]
+        else:
+            lines = ["<h3>Residue %s (index %d)</h3>"%(self.name, self.index)]
+
+        if self.type == 'protein':
+            lines.append('**Residue codes**: %s / %s'%(self.resname, self.code))
+        else:
+            lines.append("**Residue code**: %s"%self.resname)
+        lines.append('**Type**: %s'%self.type)
+        if self.resname in data.RESIDUE_DESCRIPTIONS:
+            lines.append('**Description**: %s'%data.RESIDUE_DESCRIPTIONS[self.resname])
+
+        lines.append('**<p>Chain:** %s'%self.chain.name)
+
+        lines.append('**PDB sequence #**: %d'%self.pdbindex)
+
+        terminus = None
+        if self.type == 'dna':
+            if self.is_3prime_end:
+                terminus = "3' end"
+            elif self.is_5prime_end:
+                terminus = "5' end"
+        elif self.type == 'protein':
+            if self.is_n_terminal:
+                terminus = 'N-terminus'
+            elif self.is_c_terminal:
+                terminus = 'C-terminus'
+        if terminus is not None:
+            lines.append('**Terminal residue**: %s of chain %s'%(terminus, self.chain.name))
+
+        if self.molecule is not None:
+            lines.append("**Molecule**: %s"%self.molecule.name)
+
+        lines.append("**<p>Number of atoms**: %s"%self.num_atoms)
+        if self.backbone:
+            lines.append("**Backbone atoms:** %s"%', '.join(x.name for x in self.backbone))
+            lines.append("**Sidechain atoms:** %s"%', '.join(x.name for x in self.sidechain))
+        else:
+            lines.append("**Atom:** %s"%', '.join(x.name for x in self.atoms))
+
+        return '<br>'.join(lines)
+
     @name.setter
     def name(self, value):
         self._name = value
