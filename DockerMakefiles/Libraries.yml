@@ -14,7 +14,6 @@ openblas:
                    &&  cp libopenblas.* /opt/lib
 
 
-
 cuda7_0:
   description: Container with Cuda installed
   requires:

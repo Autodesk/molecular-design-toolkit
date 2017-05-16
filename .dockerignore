@@ -11,9 +11,7 @@ docs
 *.egg-info
 .dockerignore
 __pycache__
-Dockerfile
-DockerMakefiles
 moldesign/_static_data/components.ci*
 moldesign/_static_data/aa-variants-v1.ci*
 *.bak
-
+.coverage*

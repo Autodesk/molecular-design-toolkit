@@ -22,5 +22,3 @@ RUN bash -c 'cp -r /molecular-design-toolkit/moldesign/_notebooks /notebooks \
   && jupyter nbextension enable --sys-prefix --python nbmolviz'
 
 WORKDIR /notebooks
-
-

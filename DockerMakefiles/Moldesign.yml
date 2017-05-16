@@ -1,32 +1,22 @@
 moldesign_requirements:
- requires:
-   - biopython
-   - parmed
-
+  requires:
+    - python_deploy_base
+  build: |
+    RUN conda install -qy -c omnia parmed biopython
 
 moldesign:
- description: Base installation of the MDT library. Built by cloning the current git repo.
+ description: Base installation of the MDT library. Built from the current directory.
  requires:
   - notebook
   - moldesign_requirements
  build_directory: ../
  build: |
   COPY . /opt/molecular-design-toolkit
-  RUN cd /opt \
-   && mv molecular-design-toolkit molecular-design-toolkit_dirty \
-   && git clone molecular-design-toolkit_dirty molecular-design-toolkit \
-   && rm -rf molecular-design-toolkit_dirty \
-   && cd molecular-design-toolkit && python setup.py sdist \
+  RUN cd /opt/molecular-design-toolkit \
+   && pip install -r requirements.txt \
+   && python setup.py sdist \
    && pip install dist/* \
    && cd / && rm -rf /opt/molecular-design-toolkit
-
-
-pyccc:
- requires:
-  - python_install
- build: |
-  RUN pip install pyccc==0.6.4
-
 
 nbmolviz:
  requires:
@@ -44,11 +34,9 @@ moldesign_notebook:
   - notebook
   - moldesign
  build: |
-  RUN cp -r /usr/local/lib/python2.7/dist-packages/moldesign/_notebooks /notebooks/moldesign_examples
+  RUN python -m moldesign copyexamples
   RUN jupyter nbextension enable --python --sys-prefix widgetsnbextension \
    && jupyter nbextension enable --python --sys-prefix nbmolviz
-
-
 
 moldesign_complete:
   description: An image with moldesign and all python dependencies
@@ -66,7 +54,7 @@ moldesign_standalone:
      - moldesign_complete
      - nwchem
      - ambertools
-     #- opsin - there's a base image conflict with this
+     - opsin
   build: |
     RUN mkdir -p ~/.moldesign \
      && echo "engine_type: subprocess" > ~/.moldesign/moldesign.yml
@@ -79,7 +67,7 @@ moldesign_minimal:
     - notebook
     - moldesign
    build: |
-     RUN cp -r /usr/local/lib/python2.7/dist-packages/moldesign/_notebooks /notebooks/moldesign_examples
+     RUN python -m moldesign copyexamples
      RUN jupyter nbextension enable --python --sys-prefix widgetsnbextension \
       && jupyter nbextension enable --python --sys-prefix nbmolviz
      ENTRYPOINT []

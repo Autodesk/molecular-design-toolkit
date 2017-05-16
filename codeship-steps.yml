@@ -1,0 +1,70 @@
+- name: generate_dockerfiles
+  service: docker_make
+  command: bash -c "docker-make -p -n nwchem_build pyscf_build ambertools --dockerfile-dir /makefiles && cat /makefiles/Dockerfile.nwchem_build"
+
+- name: trigger_caches
+  type: parallel
+  services:
+    - cache_nwchem_build
+    - cache_ambertools
+    - cache_pyscf_build
+  steps:
+   - command: echo checking in
+
+
+- name: parallel_image_build
+  type: parallel
+  service: docker_make
+  steps:
+  - command: docker-make --tag dev nwchem
+    name: nwchem
+  - type: serial
+    steps:
+    - command: docker-make --tag dev ambertools
+      name: ambertools
+    - command: docker-make --tag dev opsin
+      name: opsin
+    - command: docker-make --tag dev symmol
+      name: symmol
+  - type: serial
+    steps:
+    - command: docker-make --tag dev pyscf_build
+      name: pyscf
+    - command: docker-make --tag dev moldesign_minimal
+      name: mdt_minimal
+    - command: docker-make --tag dev moldesign_notebook
+      name: mdt_notebook
+    - command: docker-make --tag dev moldesign_complete
+      name: mdt_complete
+
+
+- name: mdt_stack_build
+  service: docker_make
+  command: docker-make --all --tag dev
+
+
+- name: tests
+  type: parallel
+  services:
+    - test_moldesign_minimal
+    - test_moldesign_complete
+  steps:  # we test 2 environments: one without tools locally installed, and one with
+    - command: py.test -n 4 --cov=./
+
+# TODO: test the merged versions of PRs; test additional environments sometimes
+
+- name: code_coverage
+  service: test_moldesign_complete
+  command: cd /opt/molecular-design-toolkit/ && coveralls
+
+- name: publish
+  service: docker_make
+  tag: "^(master/.*)$"  # deploy only on tagged commits in master
+  type: serial
+  steps:
+    - command: test that the code has the right version (and test that it's a good semver?)
+      name: verify_version
+    - command: tag and push docker images
+      name: docker_deploy
+    - command: upload package to pypi
+      name: pypi_deploy
