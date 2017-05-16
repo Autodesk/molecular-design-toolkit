@@ -79,6 +79,8 @@ If this variable is not set, ``$HOME/.moldesign/moldesign.yml`` will be used by 
 DEFAULT_CONFIG_PATH = os.path.join(os.environ['HOME'], '.moldesign/moldesign.yml')
 """ str: default search path for moldesign.yml."""
 
+# TODO: we're currently hardcoding this at release - there's got to be a better way
+DEFAULT_VERSION_TAG = '0.7.4a2'
 
 CONFIG_DEFAULTS = utils.DotDict(engine_type='docker',
                                 default_repository='docker.io/autodesk/moldesign:',
@@ -114,8 +116,12 @@ def write_config(path=None):
             os.mkdir(confdir)
             print 'Created moldesign configuration directory %s' % confdir
 
+    configdump = {}
+    for key in CONFIG_DEFAULTS:
+        if key in config and isinstance(config[key], (basestring, int, float)):
+            configdump[key] = config[key]
     with open(path, 'w') as f:
-        yaml.dump(config, f)
+        yaml.safe_dump(configdump, f, default_flow_style=False)
 
     print 'Wrote moldesign configuration to %s' % path
 
@@ -137,14 +143,35 @@ def init_config():
     config.update(CONFIG_DEFAULTS)
 
     path = _get_config_path()
-
     if os.path.exists(path):
-        with open(path, 'r') as infile:
-            print 'Reading configuration from %s' % path
-            config.update(yaml.load(infile))
+        try:
+            with open(path, 'r') as infile:
+                print 'Reading configuration from %s' % path
+                newconf = yaml.load(infile)
+                if not isinstance(newconf, dict):
+                    raise TypeError('Cannot read configuration "%s" from %s.' % (newconf, path))
+        except (IOError, KeyError, TypeError) as e:
+            print ('WARNING: exception while reading configuration: %s. '
+                   'using built-in default configuration') % e
+        else:
+            config.update(newconf)
 
-    if config.default_python_image is None:
-        config.default_python_image = compute.get_image_path('moldesign_complete')
+        _check_override('default_version_tag', DEFAULT_VERSION_TAG, path)
+
+    if 'default_version_tag' not in config:
+        config.default_version_tag = DEFAULT_VERSION_TAG
+
+    expcted_docker_python_image = compute.get_image_path('moldesign_complete')
+    if 'default_python_image' not in config:
+        _check_override('default_python_image', expcted_docker_python_image, path)
+        config.default_python_image = expcted_docker_python_image
+
+
+def _check_override(tagname, expected, path):
+    if tagname in config and config.default_version_tag != expected:
+        print ('WARNING: Configuration file specifies a different value for %s! '
+               "Remove the `%s` field from %s unless you know what you're doing"
+               % (tagname, tagname, path))
 
 
 def _get_config_path():

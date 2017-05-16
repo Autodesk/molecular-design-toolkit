@@ -36,6 +36,9 @@ color_rotation = CyclicList(map(webcolors.name_to_hex, COLOR_LIST))
 
 DEFAULT_FORCE_TOLERANCE = (0.0001 * u.hartree / u.bohr).defunits()  # taken from GAMESS OPTTOL keyword
 
+BONDNAMES = {1: 'single',
+             2: 'double',
+             3: 'triple'}
 
 def print_environment():
     """For reporting bugs - spits out the user's environment"""

@@ -37,7 +37,7 @@ def read_mmcif(f, reassign_chains=True):
     mol = parmed_to_mdt(parmedmol)
     if reassign_chains:
         f.seek(0)
-        mol = _reassign_chains(f, mol)
+        _reassign_chains(f, mol)
     mdt.helpers.assign_biopolymer_bonds(mol)
     return mol
 
@@ -149,14 +149,14 @@ def parmed_to_mdt(pmdmol):
     chains = {}
     for patm in pmdmol.atoms:
         if patm.residue.chain not in chains:
-            chains[patm.residue.chain] = mdt.Chain(pdbname=patm.residue.chain)
+            chains[patm.residue.chain] = mdt.Chain(name=patm.residue.chain)
         chain = chains[patm.residue.chain]
 
         if patm.residue not in residues:
             residues[patm.residue] = mdt.Residue(resname=patm.residue.name,
                                                  pdbindex=patm.residue.number)
+            assert residues[patm.residue].resname is not None
             residues[patm.residue].chain = chain
-            chain.add(residues[patm.residue])
         residue = residues[patm.residue]
 
         atom = mdt.Atom(name=patm.name,
@@ -166,13 +166,11 @@ def parmed_to_mdt(pmdmol):
         atom.position = [patm.xx, patm.xy, patm.xz]*u.angstrom
 
         atom.residue = residue
-        residue.add(atom)
-        atom.chain = chain
         assert patm not in atoms
         atoms[patm] = atom
 
     for pbnd in pmdmol.bonds:
-        atoms[pbnd.atom1].bond_to(atoms[pbnd.atom2], int(pbnd.order))
+        atoms[pbnd.atom1].bonds.create(atoms[pbnd.atom2], int(pbnd.order))
 
     mol = mdt.Molecule(atoms.values(),
                        metadata=_get_pdb_metadata(pmdmol))
@@ -234,39 +232,6 @@ def mol_to_parmed(mol):
     return struc
 
 
-def _parmed_to_ff(topo, atom_map):
-    """ Create an MDT FFParameters object from a ParmEd topology
-
-    Args:
-        topo (parmed.Structure): ParmEd structure (with FF terms)
-        atom_map (Mapping[parmed.Atom, moldesign.Atom]): mapping between MDT and ParmEd atoms
-
-    Returns:
-        moldesign.forcefields.FFParameters: parameters in MDT format
-    """
-    bonds = [mdt.forcefields.HarmonicBondTerm(atom_map[bond.a1],
-                                              atom_map[bond.a2],
-                                              bond.type.k*u.kcalpermol/u.angstrom ** 2,
-                                              bond.type.req*u.angstrom)
-             for bond in topo.bonds]
-
-    angles = [mdt.forcefields.HarmonicAngleTerm(atom_map[angle.a1],
-                                                atom_map[angle.a2],
-                                                atom_map[angle.a3],
-                                                angle.type.k*u.kcalpermol/u.radian ** 2,
-                                                angle.type.theta_eq*u.degrees)
-              for angle in topo.angles]
-
-    dihedrals = [mdt.forcefields.PeriodicTorsionTerm(atom_map[dihedral.a1],
-                                                     atom_map[dihedral.a2],
-                                                     atom_map[dihedral.a3],
-                                                     atom_map[dihedral.a4],
-                                                     dihedral.type.per,
-                                                     dihedral.type.phi_k*u.kcalpermol,
-                                                     dihedral.type.phase*u.degrees)
-                 for dihedral in topo.dihedrals]
-
-
 def _reassign_chains(f, mol):
     """ Change chain ID assignments to the mmCIF standard (parmed uses author assignments)
 
@@ -304,11 +269,9 @@ def _reassign_chains(f, mol):
 
     for residue in mol.residues:
         newchain = reschains[residue.resname, str(residue.pdbindex), residue.chain.name]
-
-        for atom in residue.atoms:
-            atom.chain = newchain
         residue.chain = newchain
 
-    return mdt.Molecule(mol.atoms,
-                        name=mol.name, metadata=mol.metadata)
+    for chain in list(mol.chains):
+        if chain.num_residues == 0:
+            chain.molecule = None
 

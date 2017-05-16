@@ -35,6 +35,47 @@ class Categorizer(dict):
         self[key].append(item)
 
 
+class AutoIndexList(list):
+    """ Every object in the list has an automatically assigned `_index` attribute.
+    """
+    def __init__(self, *args, **kwargs):
+        super(AutoIndexList, self).__init__(*args, **kwargs)
+        self._reindex()
+
+    def _reindex(self):
+        for idx, item in enumerate(self):
+            item._index = idx
+
+    def append(self, o):
+        o._index = len(self)
+        super(AutoIndexList, self).append(o)
+
+    def extend(self, l):
+        for i, o in enumerate(l):
+            o._index = len(self) + i
+        super(AutoIndexList, self).extend(l)
+
+    def pop(self, *args):
+        result = super(AutoIndexList, self).pop(*args)
+        if args:
+            self._reindex()
+        return result
+
+
+# Always reindex after using any of these methods:
+def make_wrapper(name):
+    def w(self, *args, **kwargs):
+        result = getattr(list, name)(self, *args, **kwargs)
+        self._reindex()
+        return result
+    w.__doc__ = getattr(list, name).__doc__
+    w.__name__ = name
+    return w
+
+for _wrapped in ['__setitem__', '__setslice__', 'remove', 'sort', 'insert']:
+    setattr(AutoIndexList, _wrapped, make_wrapper(_wrapped))
+
+
 class ExclusiveList(object):
     """ Behaves like a list, but won't allow duplicate items with duplicate keys to be added.
     """
@@ -69,13 +110,23 @@ class ExclusiveList(object):
         return len(self._keys)
 
     def __getitem__(self, item):
-        return self._keys.values()[item]
+        result = self._keys.values()[item]
+        if isinstance(item, slice):
+            return self.__class__(result, self._keyfn)
+        else:
+            return result
+
+    def __setitem__(self, item, value):
+        raise NotImplementedError()
+
+    def insert(self, index, item):
+        raise NotImplementedError()
 
     def remove(self, obj):
         k = self._keyfn(obj)
         stored = self._keys[k]
         if obj is not stored:
-            raise KeyError(obj)
+            raise ValueError(obj)
         else:
             self._keys.pop(k)
 
@@ -271,7 +322,11 @@ class SortedCollection(object):
 
     def _setkey(self, key):
         if key is not self._key:
-            self.__init__(self._items, key=key)
+            self._key = key
+            self.resort()
+
+    def resort(self):
+        self.__init__(self._items, key=self._key)
 
     def _delkey(self):
         self._setkey(None)

@@ -17,7 +17,7 @@ import moldesign as mdt
 from moldesign import utils, data
 
 from . import BioContainer, AtomList, toplevel
-from .notebook_display import ResidueNotebookMixin
+from ..display.notebook_mixins import ResidueNotebookMixin
 
 
 @toplevel
@@ -43,36 +43,100 @@ class Residue(BioContainer, ResidueNotebookMixin):
         return newatoms[0].residue
 
     @utils.args_from(BioContainer)
-    def __init__(self, **kwargs):
+    def __init__(self,  name=None, resname=None, pdbindex=None):
         """ Initialization
         Args:
             **kwargs ():
         """
-        self.chain = kwargs.get('chain', None)
-        super(Residue, self).__init__(**kwargs)
-        if self.index is None and self.molecule is not None:
-            self.index = self.molecule.residues.index(self)
-        self.chainindex = None
         self._backbone = None
         self._sidechain = None
         self._template_name = None
+        self._chain = None
         self._name = None
+
+        if name is None:
+            if resname is None:
+                name = 'UNL'
+            elif pdbindex is None:
+                name = resname
+            else:
+                name = resname + str(pdbindex)
+
+        super(Residue, self).__init__(name)
+
+        self.resname = resname
+        self.pdbindex = pdbindex
+
+    @property
+    def pdbname(self):
+        return self.resname
+
+    @property
+    def molecule(self):
+        if self.chain:
+            return self.chain.molecule
+        else:
+            return None
+
+    @molecule.setter
+    def molecule(self, mol):
+        if self.molecule is mol:
+            return
+        if self.molecule is not None:
+            self.chain._remove(self)
+        if mol is not None:
+            mol._defchain.add(self)
+
+    @property
+    def chain(self):
+        return self._chain
+
+    @chain.setter
+    def chain(self, chain):
+        if self._chain is chain:
+            return
+        if self._chain is not None:
+            self._chain._remove(self)
+        if chain is not None:
+            chain.add(self)
+
+    def _remove(self, atom):
+        self.children._remove(atom)
+        if self.molecule:
+            self.molecule.atoms._remove_from_list_and_bonds(atom)
+        atom._residue = None
+
+    def _subcopy(self, memo=None):
+        import copy
+        from . import ChildList
+
+        if memo is None:
+            memo = {}
+        if self in memo:
+            return
+
+        newresidue = copy.copy(self)
+        newresidue._chain = None
+        newresidue.children = ChildList(newresidue)
+
+        memo[self] = newresidue
+        if self._chain not in memo:
+            newchain = copy.copy(self._chain)
+            if newchain is not None:
+                newchain._molecule = None
+                newchain.children = ChildList(newchain)
+            memo[self._chain] = newchain
+
+        newresidue.chain = memo[self._chain]
 
     @property
     def name(self):
-        if self._name is not None:
-            return self._name
-        elif self.pdbname is None:
-            return None
-        elif self.pdbindex is None:
-            return self.pdbname
-        elif self.pdbname[-1].isdigit():
-            return '%s (seq # %s)' % (self.pdbname, self.pdbindex)
-        else:
-            return self.pdbname + str(self.pdbindex)
+        return self._name
 
     @name.setter
     def name(self, value):
+        if self.chain is not None and value != self._name:
+            self.chain._renamechild(self, value)
         self._name = value
 
     @property
@@ -88,21 +152,18 @@ class Residue(BioContainer, ResidueNotebookMixin):
             residues[atom.residue] = None
         return residues.keys()
 
-    def add(self, atom, key=None):
-        """Deals with atom name clashes within a residue - common for small molecules"""
+    def add(self, atom, _addatoms=True):
         if atom.residue is not None:
-            assert atom.residue is self, 'Atom already assigned to a residue'
-        atom.residue = self
-        if atom.chain is None:
-            atom.chain = self.chain
-        else:
-            assert atom.chain == self.chain, "Atom's chain does not match residue's chain"
+            raise ValueError("%s is already part of %s" % (atom, self))
 
-        if key is not None or atom.name not in self.children:
-            return super(Residue, self).add(atom, key=key)
-        else:
-            return super(Residue, self).add(atom, key='%s%s' % (atom.name, len(self)))
-    add.__doc__ = BioContainer.add.__doc__
+        if self.molecule and _addatoms:
+            if len(self) == 0:
+                self.molecule.atoms._insert_and_update_bonds(self.atoms[-1].index, atom)
+            else:
+                self.molecule.atoms._append_and_update_bonds(atom)
+
+        super(Residue, self).add(atom)
+        atom._residue = self
 
     @property
     def is_n_terminal(self):
@@ -231,19 +292,17 @@ class Residue(BioContainer, ResidueNotebookMixin):
                 raise KeyError("No bonding template for residue '%s'" % resname)
 
         # intra-residue bonds
-        bond_graph = {atom: {} for atom in self}
         for atom in self:
             for nbrname, order in bonds_by_name.get(atom.name, {}).iteritems():
                 try:
                     nbr = self[nbrname]
                 except KeyError:  # missing atoms are normal (often hydrogen)
-                    pass
-                else:
-                    bond_graph[atom][nbr] = bond_graph[nbr][atom] = order
+                    continue
 
-        # copy bonds into the right structure (do this last to avoid mangling the graph)
-        for atom in bond_graph:
-            atom.bond_graph.update(bond_graph[atom])
+                if nbr not in atom.bonds:
+                    atom.bonds.create(nbr, order)
+                elif nbr in atom.bonds and atom.bonds[nbr].order == 1:
+                    atom.bonds[nbr].order = order
 
     @property
     def next_residue(self):
@@ -285,20 +344,11 @@ class Residue(BioContainer, ResidueNotebookMixin):
         """Return the first residue found that's bound to the passed atom name
         """
         conn_atom = self[atomname]
-        for nbr in conn_atom.bond_graph:
+        for nbr in conn_atom.bonds.atoms:
             if nbr.residue is not self:
                 return nbr.residue
         else:
             raise StopIteration('%s reached' % name)
-
-    @property
-    def resname(self):
-        """str: Synonym for pdbname"""
-        return self.pdbname
-
-    @resname.setter
-    def resname(self, val):
-        self.pdbname = val
 
     @property
     def type(self):
@@ -363,4 +413,8 @@ class Residue(BioContainer, ResidueNotebookMixin):
         return self.resname in mdt.data.RESIDUE_DESCRIPTIONS
 
     def __str__(self):
-        return 'Residue %s (index %s, chain %s)' % (self.name, self.index, self.chain.name)
+        if self.chain:
+            chainstr = 'chain %s' % self.chain.name
+        else:
+            chainstr = 'no chain'
+        return 'Residue %s (index %s, %s)' % (self.name, self.index, chainstr)

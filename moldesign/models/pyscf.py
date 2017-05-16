@@ -22,7 +22,7 @@ from moldesign import compute, orbitals
 from moldesign.interfaces.pyscf_interface import force_remote, mol_to_pyscf, \
     StatusLogger, SPHERICAL_NAMES
 from .base import QMBase
-from moldesign import uibase
+from moldesign import display
 from moldesign.utils import DotDict, exports
 
 
@@ -90,11 +90,11 @@ class PySCFPotential(QMBase):
         self.reference = None
         self.kernel = None
         self.logs = StringIO()
-        self.logger = uibase.Logger('PySCF interface')
+        self.logger = display.Logger('PySCF interface')
 
     @compute.runsremotely(enable=force_remote, is_imethod=True)
     def calculate(self, requests=None):
-        self.logger = uibase.Logger('PySCF calc')
+        self.logger = display.Logger('PySCF calc')
         do_forces = 'forces' in requests
         if do_forces and self.params.theory not in FORCE_CALCULATORS:
             raise ValueError('Forces are only available for the following theories:'

@@ -21,7 +21,7 @@ import numpy as np
 import moldesign as mdt
 from moldesign import units as u
 from moldesign import utils, external, mathutils, helpers
-from .notebook_display import AtomGroupNotebookMixin
+from ..display.notebook_mixins import AtomGroupNotebookMixin
 from . import toplevel
 
 
@@ -221,72 +221,26 @@ class AtomGroup(AtomGroupNotebookMixin):
         return mdt.geom.dihedral(*map(self._getatom, (a1, a2, a3, a4)))
 
     def copy_atoms(self):
-        """
-        Copy a group of atoms which may already have bonds, residues, and a parent molecule
-        assigned. Do so by copying only the relevant entities, and creating a "mask" with
-        deepcopy's memo function to stop anything else from being copied.
+        """ Copy a group of atoms along and relevant topological information.
+
+        This specifically copies:
+          - the atoms themselves (along with their positions, momenta, and bond graphs)
+          - any residues they are are part of
+          - any chains they are part of
+          - any bonds between them
+        It does NOT copy:
+          - other atoms that are part of these atoms' residues
+          - other residues that are part of these atoms chains
+          - the molecule these atoms are part of
 
         Returns:
             AtomList: list of copied atoms
         """
-        from . import ChildList
-
-        oldatoms = self.atoms
-        old_bond_graph = {a: {} for a in self.atoms}
+        memo = {}
         for atom in self.atoms:
-            for nbr in atom.bond_graph:
-                if nbr in old_bond_graph:
-                    old_bond_graph[atom][nbr] = atom.bond_graph[nbr]
-
-        # Figure out which bonds, residues and chains to copy
-        tempatoms = AtomList([copy.copy(atom) for atom in oldatoms])
-        old_to_new = dict(zip(oldatoms, tempatoms))
-        temp_bond_graph = {a: {} for a in tempatoms}
-        replaced = {}
-        for atom, oldatom in zip(tempatoms, oldatoms):
-            atom.molecule = None
-            atom.bond_graph = {}
-
-            if atom.chain is not None:
-                if atom.chain not in replaced:
-                    chain = copy.copy(atom.chain)
-                    chain.molecule = None
-                    chain.children = ChildList(chain)
-                    replaced[atom.chain] = chain
-                else:
-                    chain = replaced[atom.chain]
-
-                atom.chain = chain
-
-            if atom.residue is not None:
-                if atom.residue not in replaced:
-                    res = copy.copy(atom.residue)
-                    res.molecule = None
-                    res.chain = atom.chain
-                    res.children = ChildList(res)
-
-                    res.chain.add(res)
-                    replaced[atom.residue] = res
-                else:
-                    res = replaced[atom.residue]
-
-                atom.residue = res
-                assert atom.residue.chain is atom.chain
-                res.add(atom)
-
-            for oldnbr, bondorder in oldatom.bond_graph.iteritems():
-                if oldnbr not in old_to_new: continue
-                newnbr = old_to_new[oldnbr]
-                temp_bond_graph[atom][newnbr] = bondorder
-
-        # Finally, do a deepcopy, which bring all the information along without linking it
-        newatoms, new_bond_graph = copy.deepcopy((tempatoms, temp_bond_graph))
-
-        for atom, original in zip(newatoms, oldatoms):
-            atom.bond_graph = new_bond_graph[atom]
-            atom.position = original.position
-            atom.momentum = original.momentum
-
+            atom._subcopy(memo)
+        tempatoms = [memo[atom] for atom in self.atoms]
+        newatoms = copy.deepcopy(tempatoms)
         return AtomList(newatoms)
 
     ###########################################
@@ -395,56 +349,47 @@ class AtomContainer(AtomGroup):
         return l
 
     @property
-    def bond_graph(self):
-        """ Dict[moldesign.Atom: List[moldesign.Atom]]: bond graph for all atoms in this object
-        """
-        return {atom: atom.bond_graph for atom in self.atoms}
-
-    @property
     def bonds(self):
         """ Iterable[moldesign.Bond]: iterator over bonds from this object's atoms
         """
-        bg = self.bond_graph
-        for atom, nbrs in bg.iteritems():
-            for nbr, order in nbrs.iteritems():
-                if atom.index < nbr.index or nbr not in bg:
-                    yield mdt.Bond(atom,nbr, order)
+        for atom in self.atoms:
+            for nbr in atom.bonds.atoms:
+                if atom.index < nbr.index or nbr not in self:
+                    yield mdt.Bond(atom, nbr)
 
-    def get_bond(self, a1, a2):
-        return mdt.Bond(a1, a2, order=self.bond_graph[a1][a2])
-
+    # TODO: move all these properties into an AtomBonds-like object
     @property
     def internal_bonds(self):
         """ Iterable[moldesign.Bond]: iterator over bonds that connect two atoms in this object
         """
-        bg = self.bond_graph
-        for atom, nbrs in bg.iteritems():
-            for nbr, order in nbrs.iteritems():
-                if atom.index < nbr.index and nbr in bg:
-                    yield mdt.Bond(atom, nbr, order)
+        for atom in self.atoms:
+            for nbr in atom.bonds.atoms:
+                if atom.index < nbr.index and nbr in self:
+                    yield mdt.Bond(atom, nbr)
 
     @property
     def external_bonds(self):
         """
         Iterable[moldesign.Bond]: iterator over bonds that bond these atoms to other atoms
         """
-        bg = self.bond_graph
-        for atom, nbrs in bg.iteritems():
-            for nbr, order in nbrs.iteritems():
-                if nbr not in bg:
-                    yield mdt.Bond(atom, nbr, order)
+        bonds = []
+        for atom in self.atoms:
+            for bond in atom.bonds:
+                if bond.partner(atom) not in self:
+                    bonds.append(bond)
+        return bonds
+
 
     @property
     def bonded_atoms(self):
         """ List[moldesign.Atom]: list of external atoms this object is bonded to
         """
-        bg = self.bond_graph
-        atoms = []
-        for atom, nbrs in bg.iteritems():
-            for nbr, order in nbrs.iteritems():
-                if nbr not in bg:
-                    atoms.append(nbr)
-        return atoms
+        atoms = set()
+        for atom in self.atoms:
+            for nbr in atom.bonds:
+                if nbr not in self:
+                    atoms.add(nbr)
+        return mdt.AtomList(sorted(atoms, key=lambda x: x.index))
 
     def bonds_to(self, other):
         """ Returns list of bonds between this object and another one
@@ -456,21 +401,14 @@ class AtomContainer(AtomGroup):
             List[moldesign.Bond]: bonds between this object and another
         """
         bonds = []
-        otheratoms = set(other.atoms)
-        for bond in self.internal_bonds:
-            if bond.a1 in otheratoms or bond.a2 in otheratoms:
+        for bond in self.external_bonds:
+            if bond.a1 or bond.a2 in other:
                 bonds.append(bond)
         return bonds
 
 
-@toplevel
-class AtomList(AtomContainer, list):  # order is important, list will override methods otherwise
-    """ A list of atoms with various helpful methods for creating and manipulating atom selections
 
-    Args:
-        atomlist (List[AtomContainer]): list of objects that are either atoms or contain a list of
-           atoms at ``atomlist.atoms``
-    """
+class AtomListOperationMixin(AtomContainer):
     def __init__(self, atomlist=()):
         atoms = []
         for obj in atomlist:
@@ -478,18 +416,18 @@ class AtomList(AtomContainer, list):  # order is important, list will override m
                 atoms.extend(obj.atoms)
             else:
                 atoms.append(obj)
-        super(AtomList, self).__init__(atoms)
+        super(AtomListOperationMixin, self).__init__(atoms)
 
     def __getitem__(self, item):
-        result = super(AtomList, self).__getitem__(item)
+        result = super(AtomListOperationMixin, self).__getitem__(item)
         if isinstance(item, slice):
-            return type(self)(result)
+            return AtomList(result)
         else:
             return result
 
-    def __getslice__(self, i, j):
-        result = super(AtomList, self).__getslice__(i, j)
-        return type(self)(result)
+    def __getslice__(self, *args):
+        result = super(AtomListOperationMixin, self).__getslice__(*args)
+        return AtomList(result)
 
     def __str__(self):
         return '[Atoms: %s]' % ', '.join(atom._shortstr() for atom in self)
@@ -549,3 +487,13 @@ class AtomList(AtomContainer, list):  # order is important, list will override m
     @property
     def atoms(self):
         return self
+
+
+@toplevel
+class AtomList(AtomListOperationMixin, list):
+    """ A list of atoms with various helpful methods for creating and manipulating atom selections
+
+    Args:
+        atomlist (List[AtomContainer]): list of objects that are either atoms or contain a list of
+           atoms at ``atomlist.atoms``
+    """

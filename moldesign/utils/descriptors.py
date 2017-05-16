@@ -50,7 +50,7 @@ class Synonym(object):
 
 
 class Attribute(object):
-    """For overriding a property in a superclass - turns the attribute back
+    """For overriding a property in a superclass - turns the property back
     into a normal instance attribute"""
     def __init__(self, name):
         self.name = name
@@ -60,3 +60,26 @@ class Attribute(object):
 
     def __set__(self, instance, value):
         return setattr(instance, self.name, value)
+
+
+class EventfulAttr(object):
+    """ An attribute that fires events when it changes
+
+    Args:
+        name (str): name of the instance attribute
+        on_change(callable): callback function called with
+           ``on_change(instance, oldval, newval)``
+
+    """
+    def __init__(self, name, on_change):
+        self.name = name
+        self.on_change = on_change
+
+    def __get__(self, instance, cls):
+        return getattr(instance, self.name)
+
+    def __set__(self, instance, value):
+        oldval = getattr(instance, self.name, None)
+        setattr(instance, self.name, value)
+        if value != oldval:
+            self.on_change(instance, oldval, value)

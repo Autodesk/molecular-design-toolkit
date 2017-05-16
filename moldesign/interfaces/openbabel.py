@@ -113,9 +113,15 @@ def write_string(mol, format):
 
     Returns:
         str: contents of the file
+
+    References:
+        https://openbabel.org/docs/dev/FileFormats/Overview.html
     """
     pbmol = mol_to_pybel(mol)
-    outstr = pbmol.write(format=format)
+    if format == 'smi':  # TODO: always kekulize, never aromatic
+        outstr = pbmol.write(format=format).strip()
+    else:
+        outstr = pbmol.write(format=format)
     return outstr
 
 
@@ -336,18 +342,13 @@ def pybel_to_mol(pbmol,
 
         newatoms.append(mdtatom)
 
-    newtopo = {}
     for ibond in xrange(pbmol.OBMol.NumBonds()):
         obbond = pbmol.OBMol.GetBond(ibond)
         a1 = newatom_map[obbond.GetBeginAtomIdx()]
         a2 = newatom_map[obbond.GetEndAtomIdx()]
         order = obbond.GetBondOrder()
-        if a1 not in newtopo:
-            newtopo[a1] = {}
-        if a2 not in newtopo:
-            newtopo[a2] = {}
-        newtopo[a1][a2] = order
-        newtopo[a2][a1] = order
+
+        a1.bonds.create(a2, order)
 
     if reorder_atoms_by_residue and primary_structure:
         resorder = {}
@@ -356,7 +357,6 @@ def pybel_to_mol(pbmol,
         newatoms.sort(key=lambda a: resorder[a.residue])
 
     return mdt.Molecule(newatoms,
-                        bond_graph=newtopo,
                         **kwargs)
 
 

@@ -22,25 +22,34 @@ from . import BioContainer, toplevel
 
 @toplevel
 class Chain(BioContainer):
-    """ Biomolecular chain class - its children are almost always residues.
+    """ Biomolecular chain class - its children are residues.
 
     Attributes:
         parent (mdt.Molecule): the molecule this residue belongs to
         chain (Chain): the chain this residue belongs to
     """
     @utils.args_from(BioContainer)
-    def __init__(self, name=None, **kwargs):
-        for key in ('pdbname', 'pdbindex'):
-            val = kwargs.pop(key, None)
-            if val is not None:
-                if name is not None and val != name:
-                    raise ValueError('Inconsistent name for chain: %s' % kwargs)
-                name = val
-
-        super(Chain, self).__init__(name=name, **kwargs)
+    def __init__(self, name=None, pdbname=None):
+        if name is not None and pdbname is not None and name != pdbname:
+            raise ValueError('Pass one of "name" and "pdbname" but not both')
+        elif name is None:
+            name = pdbname
         self._type = None
-
         self._5p_end = self._3p_end = self._n_terminal = self._c_terminal = None
+        super(Chain, self).__init__(name)
+
+    @property
+    def molecule(self):
+        return self._molecule
+
+    @molecule.setter
+    def molecule(self, mol):
+        if self._molecule is mol:
+            return
+        if self._molecule is not None:
+            self._molecule.chains.remove(self)
+        if mol is not None:
+            mol.chains.add(self)
 
     @property
     def pdbindex(self):
@@ -163,13 +172,25 @@ class Chain(BioContainer):
         """ChildList: list of residues in this chain """
         return self.children
 
-    def add(self, residue, **kwargs):
-        if residue.chain is None:
-            residue.chain = self
-        else:
-            assert residue.chain is self, "Residue is not a member of this chain"
+    def add(self, residue, _addatoms=True):
+        if residue.chain is not None:
+            raise ValueError("%s is already part of %s" % (residue, self))
+        residue._chain = self
+        if self.molecule is not None:
+            utils.AutoIndexList.append(self.molecule.residues, residue)
+            if _addatoms:
+                self.molecule.atoms._extend_and_update_bonds(residue.atoms)
+        super(Chain, self).add(residue)
 
-        return super(Chain, self).add(residue, **kwargs)
+    def _remove(self, residue):
+        if self.molecule:
+            for atom in residue:
+                atom._recover_state_from_molecule()
+            for atom in residue:
+                self.molecule.atoms._remove_from_list_and_bonds(atom)
+            self.molecule.residues._remove_from_list(residue)
+        self.children._remove(residue)
+        residue._chain = None
 
     def _get_chain_end(self, restype, selfattr, test):
         currval = getattr(self, selfattr)
@@ -227,17 +248,19 @@ class Chain(BioContainer):
 
             # Create the bonds
             if restype == 'protein':
-                bond_graph[r1['C']] = {r2['N']: 1}
-                bond_graph[r2['N']] = {r1['C']: 1}
+                if r2['N'] not in r1['C'].bonds:
+                    r1['C'].bonds.create(r2['N'], 1)
             elif restype == 'dna':
-                bond_graph[r1["O3'"]] = {r2['P']: 1}
-                bond_graph[r2['P']] = {r1["O3'"]: 1}
+                if r1["O3'"] not in r2['P'].bonds:
+                    r1["O3'"].bonds.create(r2['P'], 1)
             elif restype == 'rna':
                 raise NotImplementedError('RNA not yet implemented')
 
         # copy bonds into the right structure (do this last to avoid mangling the graph)
-        for atom in bond_graph:
-            atom.bond_graph.update(bond_graph[atom])
+        for atom, nbrs in bond_graph.iteritems():
+            for nbr, order in nbrs.iteritems():
+                if nbr not in atom.bonds.atoms:
+                    atom.bonds.create(nbr,order)
 
     @property
     def sequence(self):

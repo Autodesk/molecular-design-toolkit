@@ -31,7 +31,7 @@ def four_particle_45_twist():
                           [0.2, -0.2, 0.5]]
 
     for iatom in xrange(3):
-        mol.atoms[iatom].bond_to(mol.atoms[iatom+1], 1)
+        mol.atoms[iatom].bonds.create(mol.atoms[iatom+1], 1)
 
     return mol
 

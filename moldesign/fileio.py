@@ -238,10 +238,10 @@ def read_mmcif(f):
 
 def read_xyz(f):
     tempmol = openbabel_interface.read_stream(f, 'xyz')
-    for atom in tempmol.atoms:
-        atom.residue = None
-        atom.chain = None
-    return mdt.Molecule(tempmol.atoms)
+    newatoms = list(tempmol.atoms)
+    for atom in newatoms:
+        atom.molecule = None  # remove the atom from openbabel's default residue and chain
+    return mdt.Molecule(newatoms)
 
 
 

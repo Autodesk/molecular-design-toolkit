@@ -267,8 +267,7 @@ class SphericalGaussian(AbstractFunction):
         return ("<Gaussian (coeff: {coeff:4.2f}, "
                 "exponent: {exp:4.2f}, "
                 "(n,l,m) = {qnums}").format(
-                center=self.center, exp=self.exp,
-                powers=tuple(self.powers), coeff=self.coeff,
+                center=self.center, exp=self.exp, coeff=self.coeff,
                 qnums=(self.n, self.l, self.m))
 
     def __call__(self, coords, _include_spherical=True):

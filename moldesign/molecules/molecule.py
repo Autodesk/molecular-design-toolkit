@@ -22,9 +22,10 @@ from moldesign.compute import DummyJob
 from moldesign.exceptions import NotCalculatedError
 from moldesign.min.base import MinimizerBase
 
-from .notebook_display import MolNotebookMixin
+from ..display.notebook_mixins import MolNotebookMixin
 from .properties import MolecularProperties
-from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond
+from . import toplevel, AtomGroup, BondGraph, Instance
+from . import topology
 from .coord_arrays import *
 
 
@@ -205,6 +206,21 @@ class MolPropertyMixin(object):
             This assumes a closed shell ground state! """
         return self.num_electrons/2
 
+    def get_stoichiometry(self, html=False):
+        """ Return this molecule's stoichiometry
+
+        Returns:
+            str
+        """
+        counts = {}
+        for atom in self.atoms:
+            counts[atom.symbol] = counts.get(atom.symbol, 0) + 1
+
+        my_elements = sorted(counts.keys())
+        if html: template = '%s<sub>%d</sub>'
+        else: template = '%s%d'
+        return ''.join([template % (k, counts[k]) for k in my_elements])
+
     @property
     def wfn(self):
         """ moldesign.orbitals.ElectronicWfn: return the molecule's current electronic state,
@@ -215,6 +231,17 @@ class MolPropertyMixin(object):
                 geometry
         """
         return self.get_property('wfn')
+
+    @property
+    def is_biomolecule(self):
+        num_biores = 0
+        for residue in self.residues:
+            if residue.type in ('dna', 'rna', 'protein'):
+                num_biores += 1
+                if num_biores > 1:
+                    return True
+        else:
+            return False
 
     def calc_property(self, name, **kwargs):
         """ Calculate the given property if necessary and return it
@@ -396,148 +423,6 @@ class MolTopologyMixin(object):
             assert atom.molecule is self, "Atom %s does not belong to %s" % (atom, self)
         return atom
 
-    def rebuild(self):
-        self.chains = Instance(molecule=self)
-        self.residues = []
-        self._rebuild_topology()
-
-    def _rebuild_topology(self, bond_graph=None):
-        """ Build the molecule's bond graph based on its atoms' bonds
-
-        Args:
-            bond_graph (dict): graph to build the bonds from
-        """
-        if bond_graph is None:
-            self.bond_graph = self._build_bonds(self.atoms)
-        else:
-            self.bond_graph = bond_graph
-
-        self.is_biomolecule = False
-        self.ndims = 3 * self.num_atoms
-        self._positions = np.zeros((self.num_atoms, 3)) * u.default.length
-        self._momenta = np.zeros((self.num_atoms, 3)) * u.default.momentum
-        self.masses = np.zeros(self.num_atoms) * u.default.mass
-        self.dim_masses = u.broadcast_to(self.masses, (3, self.num_atoms)).T  # TODO: pickling
-        self._assign_atom_indices()
-        self._assign_residue_indices()
-        self._dof = None
-
-    @staticmethod
-    def _build_bonds(atoms):
-        """ Build a bond graph describing bonds between this list of atoms
-
-        Args:
-            atoms (List[moldesign.atoms.Atom])
-        """
-        # TODO: check atom parents
-        bonds = {}
-
-        # First pass - create initial bonds
-        for atom in atoms:
-            assert atom not in bonds, 'Atom appears twice in this list'
-            if hasattr(atom, 'bonds') and atom.bond_graph is not None:
-                bonds[atom] = atom.bond_graph
-            else:
-                bonds[atom] = {}
-
-        # Now make sure both atoms have a record of their bonds
-        for atom in atoms:
-            for nbr in bonds[atom]:
-                if atom in bonds[nbr]:
-                    assert bonds[nbr][atom] == bonds[atom][nbr]
-                else:
-                    bonds[nbr][atom] = bonds[atom][nbr]
-        return bonds
-
-    def _assign_atom_indices(self):
-        """
-        Create geometry-level information based on constituent atoms, and mark the atoms
-        as the property of this molecule
-        """
-        idim = 0
-        for idx, atom in enumerate(self.atoms):
-            atom._set_molecule(self)
-            atom.index = idx
-            idim += 3
-            self.masses[idx] = atom.mass
-            # Here, we index the atom arrays directly into the molecule
-            atom._index_into_molecule('_position', self.positions, idx)
-            atom._index_into_molecule('_momentum', self.momenta, idx)
-
-    def _assign_residue_indices(self):
-        """
-        Set up the chain/residue/atom hierarchy
-        """
-        # TODO: consistency checks
-
-        if self._defchain is None:
-            self._defchain = Chain(name=None,
-                                   index=None,
-                                   molecule=None)
-
-        if self._defres is None:
-            self._defres = Residue(name=None,
-                                   index=None,
-                                   pdbindex=None,
-                                   pdbname=None,
-                                   chain=self._defchain,
-                                   molecule=None)
-            self._defchain.add(self._defres)
-
-        default_residue = self._defres
-        default_chain = self._defchain
-        num_biores = 0
-        conflicts = set()
-
-        last_pdb_idx = None
-
-        for atom in self.atoms:
-            if last_pdb_idx is not None and atom.pdbindex <= last_pdb_idx:
-                atom.pdbindex = last_pdb_idx + 1
-                conflicts.add('atom numbers')
-            last_pdb_idx = atom.pdbindex
-
-            # if atom has no chain/residue, assign defaults
-            if atom.residue is None:
-                atom.residue = default_residue
-                atom.chain = default_chain
-                atom.residue.add(atom)
-
-            # assign the chain to this molecule if necessary
-            if atom.chain.molecule is None:
-                atom.chain.molecule = self
-                atom.chain.index = len(self.chains)
-
-                assert atom.chain not in self.chains
-                oldname = atom.chain.name
-                if atom.chain.name is None and num_biores > 1:
-                    atom.chain.name = 'A'
-                while atom.chain.name in self.chains:
-                    if atom.chain.name is None:
-                        atom.chain.name = 'A'
-                    atom.chain.name = chr(ord(atom.chain.name)+1)
-
-                if oldname != atom.chain.name:
-                    conflicts.add('chain')
-                self.chains.add(atom.chain)
-            else:
-                assert atom.chain.molecule is self
-
-            # assign the residue to this molecule
-            if atom.residue.molecule is None:
-                atom.residue.molecule = self
-                atom.residue.index = len(self.residues)
-                self.residues.append(atom.residue)
-                if atom.residue.type in ('dna', 'rna', 'protein'):
-                    num_biores += 1
-            else:
-                assert atom.chain.molecule is self
-
-        if conflicts:
-            print 'WARNING: %s indices modified due to name clashes' % (
-                ', '.join(conflicts))
-        self.is_biomolecule = (num_biores >= 2)
-
     def __eq__(self, other):
         """ Test whether two molecules are "equivalent"
 
@@ -651,8 +536,8 @@ class MolTopologyMixin(object):
 
     def same_bonds(self, other, verbose=False):
         for myatom, otheratom in zip(self.atoms, other.atoms):
-            mybonds = self.bond_graph[myatom]
-            otherbonds = other.bond_graph[otheratom]
+            mybonds = self._graph[myatom]
+            otherbonds = other._graph[otheratom]
             if len(mybonds) != len(otherbonds):
                 if verbose:
                     print 'INFO: atoms[%d] has %d bonds in self, %d bonds in other' % (
@@ -670,6 +555,9 @@ class MolTopologyMixin(object):
 
     def __ne__(self, other):
         return not (self == other)
+
+    def __contains__(self, other):
+        return getattr(other, 'molecule', None) is self
 
     __ne__.__doc__ = __eq__.__doc__
 
@@ -841,23 +729,6 @@ class MolSimulationMixin(object):
         if self.integrator is not None:
             self.integrator._prepped = False
 
-    def configure_methods(self):
-        """ Interactively configure this molecule's simulation methods (notebooks only)
-
-        Returns:
-            ipywidgets.Box: configuration widget
-        """
-        import ipywidgets as ipy
-
-        children = []
-        if self.energy_model:
-            children.append(self.energy_model.configure())
-
-        if self.integrator:
-            children.append(self.integrator.configure())
-
-        return ipy.VBox(children)
-
 
 @toplevel
 class Molecule(AtomGroup,
@@ -887,10 +758,6 @@ class Molecule(AtomGroup,
                 leaving the original molecule untouched.
 
         name (str): name of the molecule (automatically generated if not provided)
-        bond_graph (dict): dictionary specifying bonds between the atoms - of the form
-            ``{atom1:{atom2:bond_order, atom3:bond_order}, atom2:...}``
-            This structure must be symmetric; we require
-            ``bond_graph[atom1][atom2] == bond_graph[atom2][atom1]``
         copy_atoms (bool): Create the molecule with *copies* of the passed atoms
             (they will be copied automatically if they already belong to another molecule)
         pdbname (str): Name of the PDB file
@@ -912,12 +779,7 @@ class Molecule(AtomGroup,
 
     Attributes:
         atoms (AtomList): List of all atoms in this molecule.
-        bond_graph (dict): symmetric dictionary specifying bonds between the
-           atoms:
-
-               ``bond_graph = {atom1:{atom2:bond_order, atom3:bond_order}, atom2:...}``
-
-               ``bond_graph[atom1][atom2] == bond_graph[atom2][atom1]``
+        bonds (BondGraph): access to this molecule's bonding information
         residues (List[moldesign.Residue]): flat list of all biomolecular residues in this molecule
         chains (Dict[moldesign.Chain]): Biomolecular chains - individual chains can be
             accessed as ``mol.chains[list_index]`` or ``mol.chains[chain_name]``
@@ -956,57 +818,57 @@ class Molecule(AtomGroup,
     momenta = ProtectedArray('_momenta')
 
     def __init__(self, atomcontainer,
-                 name=None, bond_graph=None,
+                 name=None,
                  copy_atoms=False,
                  pdbname=None,
                  charge=None,
                  metadata=None):
         super(Molecule, self).__init__()
 
-        atoms, name = self._get_initializing_atoms(atomcontainer, name, copy_atoms)
+        # Initialize geometry/topology attributes
+        self.name = 'uninitialized molecule'
+        self.atoms = topology.AtomMasterList([], self)
+        self.residues = topology.ResidueMasterList([], self)
+        self.chains = Instance(self)
+        self.bonds = BondGraph(self)
+        self._positions = None
+        self._momenta = None
+        self._defresidue = mdt.Residue()
+        self._defchain = mdt.Chain()
 
+        # Prepare the list of atoms for this molecule
+        atoms, name = self._get_initializing_atoms(atomcontainer, name, copy_atoms)
+        self.name = name
+
+        # Add the atoms to the molecule. Doing this will initialize the entire topology
+        self.atoms.extend(atoms)
+        assert self.num_atoms == len(atoms)
+
+        # Make the rest of the molecular attributes
         if metadata is None:
             metadata = getattr(atomcontainer, 'metadata', utils.DotDict())
-
-        self.atoms = atoms
         self.time = getattr(atomcontainer, 'time', 0.0 * u.default.time)
-        self.name = 'uninitialized molecule'
-        self._defres = None
-        self._defchain = None
         self.pdbname = pdbname
         self.constraints = utils.ExclusiveList(key=utils.methodcaller('_constraintsig'))
         self.energy_model = None
         self.integrator = None
         self.metadata = metadata
-
+        self._properties = MolecularProperties(self)
+        self.ff = None
         if charge is not None:
             self.charge = charge
-            if not hasattr(charge, 'units'):  # assume fundamental charge units if not explicitly set
+            if not hasattr(charge, 'units'):
                 self.charge *= u.q_e
         else:
             self.charge = getattr(atomcontainer, 'charge',
                                   sum(atom.formal_charge for atom in self.atoms))
-
-        # Builds the internal memory structures
-        self.chains = Instance(molecule=self)
-        self.residues = []
-        self._rebuild_topology(bond_graph=bond_graph)
-
-        if name is not None:
-            self.name = name
-        elif not self.is_small_molecule:
-            self.name = 'unnamed macromolecule'
-        else:
-            self.name = self.get_stoichiometry()
-
-        self._properties = MolecularProperties(self)
-        self.ff = None
 
     def _get_initializing_atoms(self, atomcontainer, name, copy_atoms):
         """ Make a copy of the passed atoms as necessary, return the name of the molecule
         """
         # copy atoms from another object (i.e., a molecule)
         oldatoms = helpers.get_all_atoms(atomcontainer)
+
         if copy_atoms or (oldatoms[0].molecule is not None):
             atoms = oldatoms.copy_atoms()
             if name is None:  # Figure out a reasonable name
@@ -1018,6 +880,8 @@ class Molecule(AtomGroup,
                     name = 'unnamed'
         else:
             atoms = oldatoms
+
+        name = utils.if_not_none(name, 'New molecule')
         return atoms, name
 
     def __repr__(self):
@@ -1030,20 +894,6 @@ class Molecule(AtomGroup,
 
     def __str__(self):
         return 'Molecule: %s' % self.name
-
-    def newbond(self, a1, a2, order):
-        """ Create a new bond
-
-        Args:
-            a1 (moldesign.Atom): First atom in the bond
-            a2 (moldesign.Atom): Second atom in the bond
-            order (int): order of the bond
-
-        Returns:
-            moldesign.Bond
-        """
-        assert a1.molecule == a2.molecule == self
-        return a1.bond_to(a2, order)
 
     @property
     def velocities(self):
@@ -1061,45 +911,6 @@ class Molecule(AtomGroup,
         return sum(atom.nbonds for atom in self.atoms)/2
 
     nbonds = num_bonds
-
-    def addatom(self, newatom):
-        """  Add a new atom to the molecule
-
-        Args:
-            newatom (moldesign.Atom): The atom to add
-                (it will be copied if it already belongs to a molecule)
-        """
-        self.addatoms([newatom])
-
-    def addatoms(self, newatoms):
-        """Add new atoms to this molecule.
-        For now, we really just rebuild the entire molecule in place.
-
-        Args:
-           newatoms (List[moldesign.Atom]))
-        """
-        self._reset_methods()
-
-        for atom in newatoms: assert atom.molecule is None
-        self.atoms.extend(newatoms)
-
-        # symmetrize bonds between the new atoms and the pre-existing molecule
-        bonds = self._build_bonds(self.atoms)
-        for newatom in newatoms:
-            for nbr in bonds[newatom]:
-                if nbr in self.bond_graph:  # i.e., it's part of the original molecule
-                    bonds[nbr][newatom] = bonds[newatom][nbr]
-
-        self._rebuild_topology(bonds)
-
-    def deletebond(self, bond):
-        """ Remove this bond from the molecule's topology
-
-        Args:
-            Bond: bond to remove
-        """
-        self.bond_graph[bond.a1].pop(bond.a2)
-        self.bond_graph[bond.a2].pop(bond.a1)
 
     def _force_converged(self, tolerance):
         """ Return True if the forces on this molecule:
@@ -1136,15 +947,3 @@ class Molecule(AtomGroup,
         """bool: True if molecule's mass is less than 500 Daltons (not mutually exclusive with
         :meth:`self.is_biomolecule <Molecule.is_biomolecule>`)"""
         return self.mass <= 500.0 * u.amu
-
-    @property
-    def bonds(self):
-        """ Iterator over all bonds in the molecule
-
-        Yields:
-            moldesign.atoms.Bond: bond object
-        """
-        for atom in self.bond_graph:
-            for nbr in self.bond_graph[atom]:
-                if atom.index > nbr.index: continue  # don't double count
-                yield Bond(atom, nbr)

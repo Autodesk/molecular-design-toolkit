@@ -12,10 +12,9 @@ import string
 import sys
 import tempfile
 import threading
+from HTMLParser import HTMLParser
 from cStringIO import StringIO
 from uuid import uuid4
-from HTMLParser import HTMLParser
-
 
 import webcolors
 
@@ -72,27 +71,6 @@ def html_to_text(html):
     s.unescape = True  # convert HTML entities to text
     s.feed(html)
     return s.get_data()
-
-
-def can_use_widgets():
-    """ Expanded from from http://stackoverflow.com/a/34092072/1958900
-    """
-    if 'IPython' not in sys.modules:
-        # IPython hasn't been imported, definitely not
-        return False
-    from IPython import get_ipython
-
-    # check for `kernel` attribute on the IPython instance
-    if getattr(get_ipython(), 'kernel', None) is None:
-        return False
-
-    try:
-        import ipywidgets as ipy
-        import traitlets
-    except ImportError:
-        return False
-
-    return True
 
 
 def printflush(s, newline=True):
@@ -447,21 +425,3 @@ def from_filepath(func, filelike):
             result = func(outfile.name)
         return result
 
-
-
-def running_in_notebook():
-    """ Attempts to discover if this python interpreter is connected to a notebook or not
-
-    Returns:
-        bool: True if there is a connection to a notebook kernel
-
-    References:
-        Copied from
-        http://stackoverflow.com/a/34092072/1958900
-    """
-    if 'IPython' not in sys.modules:
-        # IPython hasn't been imported, definitely not
-        return False
-    from IPython import get_ipython
-    # check for `kernel` attribute on the IPython instance
-    return getattr(get_ipython(), 'kernel', None) is not None

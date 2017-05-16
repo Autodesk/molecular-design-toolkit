@@ -2,6 +2,8 @@ import pytest
 
 import moldesign as mdt
 
+from . import helpers
+
 
 @pytest.fixture(scope='function')
 def mol_from_xyz():
@@ -124,3 +126,32 @@ def _test_succesful_parameterization(mol, params):
     mol.calculate()
     assert 'potential_energy' in mol.properties
     assert 'forces' in mol.properties
+
+
+def test_ff_assignment_doesnt_change_topology():
+    m = mdt.read(helpers.get_data_path('3aid.pdb'))
+    protein = mdt.Molecule(m.get_atoms('protein'))
+    ligand = mdt.Molecule(m.get_atoms('unknown'))
+    ligff = mdt.parameterize(ligand, charges='gasteiger')
+
+    mdt.guess_histidine_states(protein)
+    mol = protein.combine(ligand)
+    mdready = mdt.assign_forcefield(mol, parameters=ligff)
+
+    assert mdready.num_residues == mol.num_residues
+    assert mdready.num_chains == mol.num_chains
+    for c1, c2 in zip(mdready.chains, mol.chains):
+        assert c1.name == c2.name
+        assert c1.num_residues == c2.num_residues
+        assert c1.index == c2.index
+
+    for newr, oldr in zip(mdready.residues, mol.residues):
+        assert newr.index == oldr.index
+        if newr.resname == 'HIS':
+            assert oldr.resname in 'HIS HID HIE HIP'.split()
+        else:
+            assert newr.resname == oldr.resname
+        assert newr.pdbindex == oldr.pdbindex
+        assert newr.chain.index == oldr.chain.index
+        for atom in oldr:
+            assert atom.name in newr
