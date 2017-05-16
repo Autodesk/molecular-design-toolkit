@@ -1,7 +1,10 @@
 <img src="moldesign/_notebooks/img/Header.png">
-[![PyPI version](https://badge.fury.io/py/moldesign.svg)](https://badge.fury.io/py/moldesign) <a href="https://badge.fury.io/gh/Autodesk%2Fmolecular-design-toolkit" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: rgb(70, 61, 84);">
-                                    <img src="https://badge.fury.io/gh/Autodesk%2Fmolecular-design-toolkit.svg" alt="GitHub version" height="20">&nbsp;
-                                </a> <a href="https://github.com/autodesk/molecular-design-toolkit/blob/master/LICENSE" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: rgb(70, 61, 84);"><img src="https://img.shields.io/badge/license-Apache%202-blue.svg"> </a> [![Gitter](https://badges.gitter.im/molecular-design-toolkit/Lobby.svg)](https://gitter.im/molecular-design-toolkit/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![Build Status](https://travis-ci.org/Autodesk/molecular-design-toolkit.svg?branch=master)](https://travis-ci.org/Autodesk/molecular-design-toolkit)
+
+[![PyPI version](https://badge.fury.io/py/moldesign.svg)](https://badge.fury.io/py/moldesign)
+[![GitHub version](https://badge.fury.io/gh/autodesk%2Fmolecular-design-toolkit.svg)](https://badge.fury.io/gh/autodesk%2Fmolecular-design-toolkit)
+<a href="https://github.com/autodesk/molecular-design-toolkit/blob/master/LICENSE" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: rgb(70, 61, 84);"><img src="https://img.shields.io/badge/license-Apache%202-blue.svg"> </a>
+[ ![Codeship Status for Autodesk/molecular-design-toolkit](https://app.codeship.com/projects/5ed079f0-08f6-0135-3493-3696d72919a3/status?branch=master)](https://app.codeship.com/projects/214515)
+[![Coverage Status](https://coveralls.io/repos/github/Autodesk/molecular-design-toolkit/badge.svg?branch=master)](https://coveralls.io/github/Autodesk/molecular-design-toolkit?branch=master)
                                 
 **Try it now:** [![Binder](http://mybinder.org/badge.svg)](http://mybinder.org:/repo/avirshup/mdt-gallery-test)
 

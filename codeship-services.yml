@@ -1,0 +1,41 @@
+docker_make:
+  build:
+    context: .
+    dockerfile: ./buildfiles/build-env.dockerfile
+  volumes:
+    - ./tmp/makefiles:/makefiles
+  add_docker: true
+  encrypted_env_file: tokens.crypt
+  cached: true
+
+test_moldesign_minimal:
+  build:
+    dockerfile: ./buildfiles/moldesign-minimal-cache.dockerfile
+  cached: true
+  working_dir: /opt/conda/lib/python2.7/site-packages/moldesign
+
+test_moldesign_complete:
+  build:
+    dockerfile: ./buildfiles/moldesign-complete-cache.dockerfile
+  cached: true
+  working_dir: /opt/conda/lib/python2.7/site-packages/moldesign
+
+cache_nwchem_build:
+  build:
+    dockerfile: ./tmp/makefiles/Dockerfile.nwchem_build
+  cached: true
+
+cache_ambertools:
+  build:
+    dockerfile: ./tmp/makefiles/Dockerfile.ambertools
+  cached: true
+
+cache_pyscf_build:
+  build:
+    dockerfile: ./tmp/makefiles/Dockerfile.pyscf_build
+  cached: true
+
+cache_openblas:
+  build:
+    dockerfile: ./tmp/makefiles/Dockerfile.openblas
+  cached: true
