@@ -32,8 +32,6 @@
       name: pyscf
     - command: docker-make --tag dev moldesign_minimal
       name: mdt_minimal
-    - command: docker-make --tag dev moldesign_notebook
-      name: mdt_notebook
     - command: docker-make --tag dev moldesign_complete
       name: mdt_complete
 
@@ -58,12 +56,14 @@
   command: cd /opt/molecular-design-toolkit/ && coveralls
 
 - name: publish
-  service: docker_make
+  service: publisher
   tag: "^(master/.*)$"  # deploy only on tagged commits in master
   type: serial
   steps:
     - command: test that the code has the right version (and test that it's a good semver?)
       name: verify_version
+    - command: build any additional images for deployment (moldesign_notebook, at least?)
+      tag: build_notebook
     - command: tag and push docker images
       name: docker_deploy
     - command: upload package to pypi

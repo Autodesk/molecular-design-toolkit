@@ -5,8 +5,11 @@ docker_make:
   volumes:
     - ./tmp/makefiles:/makefiles
   add_docker: true
-  encrypted_env_file: tokens.crypt
   cached: true
+
+publisher:
+  extends: docker_make
+  encrypted_env_file: tokens.crypt
 
 test_moldesign_minimal:
   build:
