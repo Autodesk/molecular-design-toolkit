@@ -22,7 +22,6 @@ from moldesign import units as u
 
 from .molecule import MolecularProperties
 from . import toplevel
-from .notebook_display import TrajNotebookMixin
 
 
 class Frame(utils.DotDict):
@@ -206,7 +205,7 @@ class TrajectoryAnalysisMixin(object):
 
 
 @toplevel
-class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
+class Trajectory(TrajectoryAnalysisMixin):
     """ A ``Trajectory`` stores information about a molecule's motion and how its properties
     change as it moves.
 
@@ -228,6 +227,11 @@ class Trajectory(TrajNotebookMixin, TrajectoryAnalysisMixin):
         info (str): text describing this trajectory
         unit_system (u.UnitSystem): convert all attributes to this unit system
     """
+
+    draw = helpers.WidgetMethod('trajectory.draw')
+    draw_orbitals = helpers.WidgetMethod('trajectory.draw_orbitals')
+    plot = helpers.WidgetMethod('trajectory.plot')
+
     def __init__(self, mol, unit_system=None, first_frame=False, name=None):
         self._init = True
         self.info = "Trajectory"

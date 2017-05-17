@@ -14,18 +14,7 @@ moldesign:
   COPY . /opt/molecular-design-toolkit
   RUN cd /opt/molecular-design-toolkit \
    && pip install -r requirements.txt \
-   && python setup.py sdist \
-   && pip install dist/* \
-   && cd / && rm -rf /opt/molecular-design-toolkit
-
-nbmolviz:
- requires:
-  - python_install
- build: |
-  RUN pip install nbmolviz
-  RUN jupyter nbextension enable --python --sys-prefix nbmolviz==0.6.5 &&
-      jupyter nbextension enable --python --sys-prefix widgetsnbextensions
-
+   && pip install -e .
 
 moldesign_notebook:
  description: A production-ready, fully outfitted jupyter server container
@@ -34,6 +23,7 @@ moldesign_notebook:
   - notebook
   - moldesign
  build: |
+  RUN pip install nbmolviz # == 0.7.0
   RUN python -m moldesign copyexamples
   RUN jupyter nbextension enable --python --sys-prefix widgetsnbextension \
    && jupyter nbextension enable --python --sys-prefix nbmolviz
@@ -67,8 +57,5 @@ moldesign_minimal:
     - notebook
     - moldesign
    build: |
-     RUN python -m moldesign copyexamples
-     RUN jupyter nbextension enable --python --sys-prefix widgetsnbextension \
-      && jupyter nbextension enable --python --sys-prefix nbmolviz
      ENTRYPOINT []
      CMD ''
