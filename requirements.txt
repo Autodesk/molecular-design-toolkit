@@ -7,7 +7,7 @@ matplotlib
 numpy
 parmed >= 2.0.0
 pint >= 0.7
-pyccc >= 0.6.7a0
+pyccc >= 0.7.2
 pytest
 pyyaml
 requests

@@ -1,9 +1,7 @@
 import itertools
 
-import numpy as np
 import pytest
 
-from moldesign import units as u
 from .object_fixtures import *
 
 

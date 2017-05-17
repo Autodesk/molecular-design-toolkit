@@ -13,7 +13,6 @@ _ALL_:
   - symmol
   - nwchem
   - moldesign_complete
-  - moldesign_notebook
   - moldesign_minimal
   - nucleic_acid_builder
   - nwchem_build

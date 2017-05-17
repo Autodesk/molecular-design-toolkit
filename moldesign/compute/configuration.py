@@ -162,9 +162,9 @@ def init_config():
         config.default_version_tag = DEFAULT_VERSION_TAG
 
     expcted_docker_python_image = compute.get_image_path('moldesign_complete')
-    if 'default_python_image' not in config:
-        _check_override('default_python_image', expcted_docker_python_image, path)
+    if config.get('default_python_image', None) is None:
         config.default_python_image = expcted_docker_python_image
+
 
 
 def _check_override(tagname, expected, path):
