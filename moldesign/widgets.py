@@ -15,4 +15,9 @@
 from helpers.widgets import nbmolviz_installed
 
 if nbmolviz_installed:
-    from nbmolviz.widgets import *
+    from nbmolviz.widgets import BondSelector, GeometryBuilder, ResidueSelector, Symmetrizer
+else:
+    from helpers.widgets import not_installed_method
+    BondSelector = GeometryBuilder = ResidueSelector = Symmetrizer = not_installed_method
+
+__all__ = 'BondSelector GeometryBuilder ResidueSelector Symmetrizer'.split()

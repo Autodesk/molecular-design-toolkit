@@ -47,6 +47,9 @@ class WidgetMethod(object):
 
 
 def not_installed_method(*args, **kwargs):
+    """ This routine is not available. Please install the nbmolviz library to use it:
+      `pip install nbmolviz`
+    """
     raise ImportError(
             "To use MDT's graphical user interfaces in a Noteobook, please install "
             "the nbmolviz library: `pip install nbmolviz`")
