@@ -21,22 +21,6 @@ moldesign:
    && cd / && rm -rf /opt/molecular-design-toolkit
 
 
-pyccc:
- requires:
-  - python_install
- build: |
-  RUN pip install pyccc==0.6.4
-
-
-nbmolviz:
- requires:
-  - python_install
- build: |
-  RUN pip install nbmolviz
-  RUN jupyter nbextension enable --python --sys-prefix nbmolviz==0.6.5 &&
-      jupyter nbextension enable --python --sys-prefix widgetsnbextensions
-
-
 moldesign_notebook:
  description: A production-ready, fully outfitted jupyter server container
  requires:
@@ -45,6 +29,7 @@ moldesign_notebook:
   - moldesign
  build: |
   RUN cp -r /usr/local/lib/python2.7/dist-packages/moldesign/_notebooks /notebooks/moldesign_examples
+  RUN pip install nbmolviz # == 0.7.0
   RUN jupyter nbextension enable --python --sys-prefix widgetsnbextension \
    && jupyter nbextension enable --python --sys-prefix nbmolviz
 
