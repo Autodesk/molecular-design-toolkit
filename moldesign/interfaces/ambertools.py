@@ -212,7 +212,7 @@ def build_dna_helix(sequence, helix_type='B', **kwargs):
         return mol
 
     job = pyccc.Job(command='nab -o buildbdna build.nab && ./buildbdna',
-                    image=mdt.compute.get_image_path(IMAGE),
+                    image=mdt.compute.get_image_path('nucleic_acid_builder'),
                     inputs={'build.nab': '\n'.join(infile)},
                     name='NAB_build_dna',
                     when_finished=finish_job)

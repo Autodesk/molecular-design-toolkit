@@ -10,8 +10,16 @@ ambertools:
   FROM: continuumio/miniconda3:4.3.11
   build: |
     RUN python -c "print('name = molecular-design-toolkit-builder\ninstitution = Autodesk\ncity = San Francisco\nstate or province = CA\ncountry = USA')" > /root/.amberrc
-
     RUN conda install -qy -c ambermd ambertools=16.21.1
+    ENV AMBERHOME=/opt/conda/
+
+nucleic_acid_builder:
+  requires:
+   - ambertools
+  build: |
+    RUN apt-get update \
+     && apt-get install --no-install-recommends -y gcc gfortran libfftw3-dev libnetcdf-dev \
+     && apt-get -y clean && apt-get autoremove -y --purge && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
 dssp:
