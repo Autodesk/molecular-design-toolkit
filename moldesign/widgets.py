@@ -12,4 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import molviz
+from helpers.widgets import nbmolviz_installed
+
+if nbmolviz_installed:
+    from nbmolviz.widgets import *

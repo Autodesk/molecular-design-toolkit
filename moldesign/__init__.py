@@ -45,6 +45,7 @@ from . import method
 from . import orbitals
 from . import molecules
 from . import tools
+from . import widgets
 
 
 # Populate the top-level namespace (imports everything from each <submodule>.__all__ variable)

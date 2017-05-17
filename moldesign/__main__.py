@@ -173,7 +173,7 @@ def copy_example_dir(use_existing=False):
         check_existing_examples(use_existing)
     else:
         shutil.copytree(EXAMPLE_DIR_SRC, EXAMPLE_DIR_TARGET)
-        with open(VERFILEPATH) as verfile:
+        with open(VERFILEPATH, 'w') as verfile:
             print >> verfile, MDTVERSION
         print 'Done.'
 
