@@ -19,14 +19,11 @@ nwchem_requirements:
                    CHARMM_S=${NWCHEM_TOP}/src/data/charmm_s/ \
                    CHARMM_X=${NWCHEM_TOP}/src/data/charmm_x/ \
                    PATH=$PATH:${NWCHEM_TOP}/bin/LINUX64
-  copy_from:
-    openblas:
-      /opt/lib: /opt
 
 
 nwchem_build:
  requires:
-  - buildbase
+  - openblas
   - nwchem_requirements
  description: Build image for NWChem. Based on https://github.com/edoapra/docker-file/tree/master/nwchem-dev
  build: |
@@ -91,4 +88,7 @@ nwchem:
     nwchem_build:
       /usr/local/lib/python2.7/dist-packages: /usr/local/lib/python2.7/
       /opt/nwchem: /opt
+      /opt/lib: /opt
+  copy_from:
+    openblas:
       /opt/lib: /opt

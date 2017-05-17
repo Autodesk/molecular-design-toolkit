@@ -23,20 +23,17 @@ from . import compute
 
 default_engine = None
 
-FREE_COMPUTE_CANNON = 'cloudcomputecannon.bionano.autodesk.com:9000'
-
 RUNNING_ON_WORKER = (os.environ.get('IS_PYCCC_JOB', '0') == '1')
 
 COMPUTE_CONNECTION_WARNING = """
-WARNING: Failed to connect to a computational engine - MDT won't be able to run anything outside of Python.
+WARNING: Failed to connect to a computational engine - MDT won't be able to run
+anything outside of Python.
 
 You can fix this either:
   1) interactively, in a notebook, by running `moldesign.configure()`, or,
   2) by modifying the configuration dictionary `moldesign.compute.config`, then
      running `moldesign.compute.reset_compute_engine()` to try again."""
 
-
-# TODO: *write* configuration plus initial install default; sensible defaults
 
 config = utils.DotDict()
 """ dict: dictionary of parameters (read from user's moldesign.yml at startup)
@@ -53,8 +50,8 @@ Notes:
 Configuration is specified using the following keys:
 
 Args:
-    engine_type (str): The computational job engine to use. Default: 'ccc'. Currently supported:
-        'docker', 'ccc', or 'subprocess'
+    engine_type (str): The computational job engine to use. Currently supported:
+        'docker' (default) or 'subprocess'
     default_repository (str): Repository to pull MDT's standard images from.
         default: 'docker.io/autodesk/moldesign:'
     default_python_image (str): Image to run python commands in
@@ -62,9 +59,6 @@ Args:
         [VERSION] is the version of MDT)
     default_version_tag (str): Default version tag for docker images
          (default: ``moldesign.__version__``)
-    default_docker_machine (str): Name of the docker machine to connect to; if
-        ``engine_type=='docker'``, EITHER this OR ``default_docker_url`` (but not both) must
-        be set. (default: 'default')
     default_docker_url (str): URL for the docker daemon to run; if ``engine_type=='docker'``,
         EITHER this OR ``default_docker_machine`` (but not both) must be set.
         (default: ``unix://var/run/docker.sock``, the URL for a local docker instance)
@@ -88,16 +82,16 @@ DEFAULT_CONFIG_PATH = os.path.join(os.environ['HOME'], '.moldesign/moldesign.yml
 # TODO: we're currently hardcoding this at release - there's got to be a better way
 DEFAULT_VERSION_TAG = '0.7.4a2'
 
-CONFIG_DEFAULTS = utils.DotDict(engine_type='ccc',
+CONFIG_DEFAULTS = utils.DotDict(engine_type='docker',
                                 default_repository='docker.io/autodesk/moldesign:',
-                                default_ccc_host=FREE_COMPUTE_CANNON,
+                                default_python_image=None,
                                 default_docker_host='unix://var/run/docker.sock',
-                                default_docker_machine='default')
+                                default_version_tag='0.7.4a2',
+                                devmode=False)
 
 DEF_CONFIG = CONFIG_DEFAULTS.copy()
 """ dict: default configuration to be written to moldesign.yml if it doesn't exist
 """
-for x in 'default_docker_machine'.split(): DEF_CONFIG.pop(x)
 
 
 def registry_login(client, login):
@@ -200,12 +194,7 @@ def reset_compute_engine():
 
     compute.default_engine = None
 
-    if config.engine_type == 'docker-machine':
-        with utils.textnotify('Connecting to docker-machine "%s"' % config.default_docker_machine):
-            compute.default_engine = engines.DockerMachine(config.default_docker_machine)
-        _connect_docker_registry()
-
-    elif config.engine_type == 'docker':
+    if config.engine_type == 'docker':
         with utils.textnotify('Connecting to docker host at %s' % config.default_docker_host):
             compute.default_engine = engines.Docker(config.default_docker_host)
         _connect_docker_registry()
@@ -216,11 +205,11 @@ def reset_compute_engine():
 This requires that you have all necessary software installed locally.
 To change the engine, call moldesign.configure() or modify moldesign.compute.config ."""
 
-    elif config.engine_type in ('ccc', 'cloudcomputecannon'):
-        with utils.textnotify('Connecting to CloudComputeCannon host at %s'
-                              % config.default_ccc_host):
-            compute.default_engine = engines.CloudComputeCannon(config.default_ccc_host)
-            compute.default_engine.test_connection()
+    elif config.engine_type in ('ccc', 'docker-machine'):
+        raise ValueError('Computational engine type "%s" is no longer supported by MDT. '
+                         'Please install docker (https://docker.io) and set: \n'
+                         '   engine_type: docker'
+                         'in ~/.moldesign/moldesign.yml')
 
     else:
         raise ValueError('Unrecognized engine %s' % config.engine_type)

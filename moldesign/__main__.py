@@ -74,6 +74,9 @@ def main():
     subparsers.add_parser('pull', help='download docker containers that MDT requires ('
                                        'only when a docker client is configured)')
     subparsers.add_parser('config', help='print configuration and exit')
+    subparsers.add_parser('copyexamples', help='Copy example notebooks')
+    subparsers.add_parser('devbuild', help='rebuild required docker containers locally')
+    subparsers.add_parser('devpull', help='Pull development images for latest release')
 
     parser.add_argument('-f', '--config-file', type=str,
                         help='Path to config file')
@@ -94,6 +97,15 @@ def main():
     elif args.command == 'launch':
         launch()
 
+    elif args.command == 'devbuild':
+        devbuild()
+
+    elif args.command == 'devpull':
+        devpull()
+
+    elif args.command == 'copyexamples':
+        copy_example_dir(use_existing=False)
+
     elif args.command == 'config':
         print 'Reading config file from: %s' % CONFIG_PATH
         print '----------------------------'
@@ -102,19 +114,44 @@ def main():
                 print '%s: %s' % (key, value)
 
     else:
-        assert False
+        raise ValueError("Unhandled CLI command '%s'" % args.command)
 
-DOCKER_IMAGES = 'ambertools14 moldesign moldesign_notebook opsin symmol python_install'.split()
+DOCKER_IMAGES = 'ambertools moldesign_complete opsin symmol nwchem'.split()
+
 def pull():
-    from moldesign import compute
-    streams = []
     for img in DOCKER_IMAGES:
-        imgurl = compute.get_image_path(img)
-        print 'Pulling %s' % imgurl
-        streams.append(compute.get_engine().client.pull(imgurl))
-    for s in streams:
-        for line in s.split('\n'):
-            print line
+        _pull_img(img)
+
+
+def _pull_img(img):
+    from moldesign import compute
+    imgurl = compute.get_image_path(img, _devmode=False)
+    print 'Pulling %s' % imgurl
+    subprocess.check_call(['docker', 'pull', imgurl])
+
+
+BUILD_FILES = "nwchem_build pyscf_build".split()
+
+def devbuild():
+    print '-' * 80
+    print "Molecular design toolkit is downloading and building local, up-to-date copies of "
+    print "all docker containers it depends on. To use them, set:"
+    print "   devmode: true"
+    print "in ~/.moldesign/moldesign.yml."
+    print ('-' * 80) + '\n'
+
+    devpull()
+
+    subprocess.check_call('docker-make --all --tag dev'.split(),
+                          cwd=os.path.join(MOLDESIGN_SRC, '..', 'DockerMakefiles'))
+
+
+def devpull():
+    for img in DOCKER_IMAGES+BUILD_FILES:
+        try:
+            _pull_img(img)
+        except subprocess.CalledProcessError:
+            print '"%s " not found. Will rebuild locally ...'%img
 
 
 def launch(cwd=None, path=''):
