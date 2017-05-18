@@ -6,8 +6,8 @@ pyquante.log
 _docker_make_tmp
 lastfailed
 docs
-./dist/
-./build/
+dist
+build
 *.egg-info
 .dockerignore
 __pycache__
@@ -15,3 +15,4 @@ moldesign/_static_data/components.ci*
 moldesign/_static_data/aa-variants-v1.ci*
 *.bak
 .coverage*
+docs/_build
