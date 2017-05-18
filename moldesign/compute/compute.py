@@ -15,7 +15,7 @@ import moldesign as mdt
 from moldesign import utils
 
 
-def get_image_path(image_name):
+def get_image_path(image_name, _devmode=None):
     """ Returns a fully qualified tag that points to the correct registry
 
     Args:
@@ -34,16 +34,24 @@ def get_image_path(image_name):
     """
     from . import config
 
+    if _devmode is None:
+        _devmode = config.devmode
+
+    if _devmode:
+        return image_name + ':dev'
+
     if not config.default_repository:
         name = image_name
-    else:
+    elif config.default_repository[-1] in '/:':
         name = '%s%s' % (config.default_repository, image_name)
+    else:
+        name = '%s/%s' % (config.default_repository, image_name)
 
     if not config.default_repository:
         img = name
     elif config.default_repository[-1] == ':':
         img = '%s-%s' % (name, config.default_version_tag)
-    elif config.version_tag:
+    elif config.default_version_tag:
         img = '%s:%s' % (name, config.default_version_tag)
     else:
         raise ValueError('Faulty docker repository configuration not recognized')
@@ -104,7 +112,7 @@ def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True,
     jobname = utils.if_not_none(jobname, job.name)
 
     if display:
-        mdt.uibase.display_log(job.get_display_object(), jobname)
+        mdt.display.display_log(job.get_display_object(), jobname)
 
     if wait:
         job.wait()

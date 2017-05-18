@@ -40,8 +40,12 @@ DOCKER_REPOSITORY = 'docker-hub.autodesk.com/virshua/moldesign:'
 HOME = os.environ['HOME']
 CONFIG_DIR = os.path.join(HOME, '.moldesign')
 EXAMPLE_DIR_TARGET = os.path.join(os.path.curdir, 'moldesign-examples')
-EXAMPLE_DIR_SRC = unit_def_file = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                                               '_notebooks')
+MOLDESIGN_SRC = os.path.abspath(os.path.dirname(__file__))
+EXAMPLE_DIR_SRC = unit_def_file = os.path.join(MOLDESIGN_SRC, '_notebooks')
+MDTVERSION = subprocess.check_output(['python', '-c',
+                                      "import _version; print _version.get_versions()['version']"],
+                                     cwd=MOLDESIGN_SRC).strip()
+VERFILEPATH = os.path.join(EXAMPLE_DIR_TARGET, '.mdtversion')
 
 
 APPLESCRIPT_INSTALL_DOCKER = ('set response to (display dialog '
@@ -56,6 +60,9 @@ CONFIG_PATH = os.path.join(CONFIG_DIR, 'moldesign.yml')
 
 
 def main():
+    print 'Molecular Design Toolkit v%s Launcher' % MDTVERSION
+
+
     global CONFIG_PATH
     parser = argparse.ArgumentParser('python -m moldesign')
 
@@ -67,6 +74,9 @@ def main():
     subparsers.add_parser('pull', help='download docker containers that MDT requires ('
                                        'only when a docker client is configured)')
     subparsers.add_parser('config', help='print configuration and exit')
+    subparsers.add_parser('copyexamples', help='Copy example notebooks')
+    subparsers.add_parser('devbuild', help='rebuild required docker containers locally')
+    subparsers.add_parser('devpull', help='Pull development images for latest release')
 
     parser.add_argument('-f', '--config-file', type=str,
                         help='Path to config file')
@@ -87,6 +97,15 @@ def main():
     elif args.command == 'launch':
         launch()
 
+    elif args.command == 'devbuild':
+        devbuild()
+
+    elif args.command == 'devpull':
+        devpull()
+
+    elif args.command == 'copyexamples':
+        copy_example_dir(use_existing=False)
+
     elif args.command == 'config':
         print 'Reading config file from: %s' % CONFIG_PATH
         print '----------------------------'
@@ -95,19 +114,44 @@ def main():
                 print '%s: %s' % (key, value)
 
     else:
-        assert False
+        raise ValueError("Unhandled CLI command '%s'" % args.command)
 
-DOCKER_IMAGES = 'ambertools14 moldesign moldesign_notebook opsin symmol python_install'.split()
+DOCKER_IMAGES = 'ambertools moldesign_complete opsin symmol nwchem'.split()
+
 def pull():
-    from moldesign import compute
-    streams = []
     for img in DOCKER_IMAGES:
-        imgurl = compute.get_image_path(img)
-        print 'Pulling %s' % imgurl
-        streams.append(compute.get_engine().client.pull(imgurl))
-    for s in streams:
-        for line in s.split('\n'):
-            print line
+        _pull_img(img)
+
+
+def _pull_img(img):
+    from moldesign import compute
+    imgurl = compute.get_image_path(img, _devmode=False)
+    print 'Pulling %s' % imgurl
+    subprocess.check_call(['docker', 'pull', imgurl])
+
+
+BUILD_FILES = "nwchem_build pyscf_build".split()
+
+def devbuild():
+    print '-' * 80
+    print "Molecular design toolkit is downloading and building local, up-to-date copies of "
+    print "all docker containers it depends on. To use them, set:"
+    print "   devmode: true"
+    print "in ~/.moldesign/moldesign.yml."
+    print ('-' * 80) + '\n'
+
+    devpull()
+
+    subprocess.check_call('docker-make --all --tag dev'.split(),
+                          cwd=os.path.join(MOLDESIGN_SRC, '..', 'DockerMakefiles'))
+
+
+def devpull():
+    for img in DOCKER_IMAGES+BUILD_FILES:
+        try:
+            _pull_img(img)
+        except subprocess.CalledProcessError:
+            print '"%s " not found. Will rebuild locally ...'%img
 
 
 def launch(cwd=None, path=''):
@@ -126,18 +170,36 @@ def launch(cwd=None, path=''):
 def copy_example_dir(use_existing=False):
     print 'Copying MDT examples to `%s` ...' % EXAMPLE_DIR_TARGET
     if os.path.exists(EXAMPLE_DIR_TARGET):
-        if use_existing:
-            return
-        else:
-            print '\n'.join(
-                    ['FAILED: directory already exists. Please:'
-                     ' 1) Rename or remove the existing directory at %s,' % EXAMPLE_DIR_TARGET,
-                     ' 2) Run this command in a different location, or'
-                     ' 3) Run `python -m moldesign intro` to launch the example gallery.'])
-            sys.exit(1)
+        check_existing_examples(use_existing)
     else:
         shutil.copytree(EXAMPLE_DIR_SRC, EXAMPLE_DIR_TARGET)
+        with open(VERFILEPATH, 'w') as verfile:
+            print >> verfile, MDTVERSION
         print 'Done.'
+
+
+def check_existing_examples(use_existing):
+    if os.path.exists(VERFILEPATH):
+        with open(VERFILEPATH, 'r') as vfile:
+            version = vfile.read().strip()
+    else:
+        version = 'pre-0.7.4'
+
+    if version != MDTVERSION:
+        print ('WARNING - your example directory is out of date! It corresponds to MDT version '
+               '%s, but you are using version %s'%(version, MDTVERSION))
+        print ('If you want to update your examples, please rename or remove "%s"'
+               % EXAMPLE_DIR_TARGET)
+
+    if use_existing:
+        return
+    else:
+        print '\n'.join(
+                ['FAILED: directory already exists. Please:'
+                 ' 1) Rename or remove the existing directory at %s,'%EXAMPLE_DIR_TARGET,
+                 ' 2) Run this command in a different location, or'
+                 ' 3) Run `python -m moldesign intro` to launch the example gallery.'])
+        sys.exit(1)
 
 
 def launch_jupyter_server(cwd=None):

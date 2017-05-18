@@ -1,33 +1,34 @@
 opsin:
   requires:
-    - deploybase
+    - python_deploy_base
   description: IUPAC nomenclature parser, see doi:10.1021/ci100384d
   build: |
+    RUN conda install -qy -c bioconda opsin=2.1.0
+
+
+ambertools:
+  FROM: continuumio/miniconda3:4.3.11
+  build: |
+    RUN python -c "print('name = molecular-design-toolkit-builder\ninstitution = Autodesk\ncity = San Francisco\nstate or province = CA\ncountry = USA')" > /root/.amberrc
+    RUN conda install -qy -c ambermd ambertools=16.21.1
+    ENV AMBERHOME=/opt/conda/
+
+nucleic_acid_builder:
+  requires:
+   - ambertools
+  build: |
     RUN apt-get update \
-      && apt-get install -y default-jre --no-install-recommends \
-      && cleanapt
-    RUN mkdir -p /opt/opsin \
-      && cd /opt/opsin \
-      && wget -nv https://bitbucket.org/dan2097/opsin/downloads/opsin-2.2.0-jar-with-dependencies.jar
-    RUN cmd='java -jar /opt/opsin/opsin-2.2.0-jar-with-dependencies.jar' \
-      && cmdf='#!/bin/bash\n'$cmd' $@\n' \
-      && printf "$cmdf" > /usr/local/bin/opsin \
-      && chmod +x /usr/local/bin/opsin
+     && apt-get install --no-install-recommends -y gcc gfortran libfftw3-dev libnetcdf-dev \
+     && apt-get -y clean && apt-get autoremove -y --purge && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
 dssp:
   requires:
-   - base
+   - python_deploy_base
   description: Protein secondary structure analysis
   build: |
-    RUN apt-get update \
-      && apt-get install -y --no-install-recommends wget  \
-      && wget ftp://ftp.cmbi.ru.nl/pub/software/dssp/dssp-2.0.4-linux-i386 \
-      && mv dssp-2.0.4-linux-i386 /usr/local/bin/dssp.exe \
-      && chmod +x /usr/local/bin/dssp.exe \
-      && apt-get -y clean \
-      && apt-get autoremove -y --purge \
-      && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    conda install -qy -c salilab dssp=2.2.1
+
 
 edtsurf:
   description: Molecular surface calculator

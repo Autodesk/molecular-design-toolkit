@@ -18,7 +18,8 @@ associated data types (force fields, orbitals, basis sets, etc.).
 import funcsigs
 
 import moldesign as mdt
-from moldesign.utils import DotDict
+from .utils import DotDict
+from .helpers import WidgetMethod
 
 
 class _InitKeywordMeta(type):
@@ -60,6 +61,8 @@ class Method(object):
      it's assumed that all possible values are supported)
     """
 
+    configure = WidgetMethod('method.configure')
+
     def __reduce__(self):
         return _make_method, (self.__class__, self.params, self.mol)
 
@@ -88,11 +91,6 @@ class Method(object):
             return False
     def __eq__(self, other):
         return self.__class__ is other.__class__ and self.params == other.params
-
-    def configure(self):
-        from moldesign.widgets.configurator import Configurator
-        return Configurator(self.params, self.PARAMETERS,
-                            title='Configuration for %s' % self.__class__.__name__)
 
     @classmethod
     def get_parameters(cls):

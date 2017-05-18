@@ -70,8 +70,9 @@ class PostInstall(install):
         print('Thank you for installing the Molecular Design Toolkit!!!')
         print('For help, documentation, and any questions, visit us at ')
         print('    http://moldesign.bionano.autodesk.com/')
-        print('\nTo get started, please run:')
-        print(' >>> python -m moldesign intro')
+        print("\nFor visualization functionality inside python notebooks, please also install")
+        print("the `mdtwidgets` package.")
+
 
 
 cmdclass = versioneer.get_cmdclass()

@@ -25,11 +25,10 @@ PACKAGEPATH = data.PACKAGEPATH
 # Base subpackages - import these first
 from . import utils
 from . import units
-from . import uibase
-from . import widgets
 
 # Functional subpackages
 from . import compute
+from . import display
 from . import fileio
 from . import exceptions
 from . import external
@@ -46,7 +45,7 @@ from . import method
 from . import orbitals
 from . import molecules
 from . import tools
-from . import viewer
+from . import widgets
 
 
 # Populate the top-level namespace (imports everything from each <submodule>.__all__ variable)
@@ -58,8 +57,6 @@ from .min import *
 from .orbitals import *
 from .molecules import *
 from .tools import *
-from .viewer import *
-from .widgets import *
 
 # Set up cloud computing
 _lastjobs = []

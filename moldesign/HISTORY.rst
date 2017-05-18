@@ -1,3 +1,14 @@
+0.8 - WIP
+=========
+Changes:
+  - To make installation easier, we've removed all Jupyter-specific functionality to the
+     ``Autodesk/mdtwidgets`` project (formerly known as ``nbolviz``), which vastly simplifies
+     MDT's dependencies. To use the notebook visualization utilities, run `pip install mdtwidgets`
+
+NEW MODELING FEATURES
+  - QM/MM
+
+
 0.7.3 - October 17, 2016
 ========================
 NEW MODELING FEATURES

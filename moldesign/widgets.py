@@ -11,19 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import
 
-from .exportall import *
-from . import docparsers
-from .callsigs import *
-from .descriptors import *
-from .classes import *
-from .databases import *
-from .utils import *
-from .numerical import *
-<<<<<<< HEAD
-from .json_extension import *
-=======
+from helpers.widgets import nbmolviz_installed
 
+if nbmolviz_installed:
+    from nbmolviz.widgets import BondSelector, GeometryBuilder, ResidueSelector, Symmetrizer
+else:
+    from helpers.widgets import not_installed_method
+    BondSelector = GeometryBuilder = ResidueSelector = Symmetrizer = not_installed_method
 
->>>>>>> widgetcleanup
+__all__ = 'BondSelector GeometryBuilder ResidueSelector Symmetrizer'.split()

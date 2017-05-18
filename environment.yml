@@ -16,13 +16,9 @@ dependencies:
  - "openbabel>=2.3,<2000"  # don't use old versions that were marked as "2015.X.Y"
  - openmm
  - pip:
-   - ipython
-   - ipykernel!=4.5.1
-   - notebook
    - webcolors
    - funcsigs
    - docker-py
    - fortranformat
-   - pyccc >= 0.6.7a0
-   - ipywidgets >= 5.1
-   - nbmolviz == 0.6.7rc2  # increment for release as appropriate
+   - pyccc >= 0.7.2
+

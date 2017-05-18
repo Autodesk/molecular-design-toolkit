@@ -19,14 +19,11 @@ nwchem_requirements:
                    CHARMM_S=${NWCHEM_TOP}/src/data/charmm_s/ \
                    CHARMM_X=${NWCHEM_TOP}/src/data/charmm_x/ \
                    PATH=$PATH:${NWCHEM_TOP}/bin/LINUX64
-  copy_from:
-    openblas:
-      /opt/lib: /opt
 
 
 nwchem_build:
  requires:
-  - buildbase
+  - openblas
   - nwchem_requirements
  description: Build image for NWChem. Based on https://github.com/edoapra/docker-file/tree/master/nwchem-dev
  build: |
@@ -101,7 +98,8 @@ nwchem:
       /usr/local/lib/python2.7/dist-packages: /usr/local/lib/python2.7/
       /opt/nwchem: /opt
       /opt/lib: /opt
-
+    openblas:
+      /opt/lib: /opt
 
 #################################
 # Experimental QM/MM images below
@@ -142,3 +140,4 @@ amber_dev_branch_build:
      && make -j6 install \
      && rm -rf test AmberTools doc  # reduce image size for copying to deployment image
     RUN echo "test -f /opt/amber16/amber.sh && source /opt/amber16/amber.sh" >> /root/.bash_profile
+

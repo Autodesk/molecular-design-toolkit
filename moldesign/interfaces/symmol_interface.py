@@ -49,7 +49,7 @@ def run_symmol(mol,
                           command,
                           inputs=inputs,
                           name="symmol, %s" % mol.name)
-    mdt.uibase.display_log(job.get_display_object(), "symmol, %s"%mol.name)
+    mdt.display.display_log(job.get_display_object(), "symmol, %s"%mol.name)
     job.wait()
 
     data = parse_output(job.get_output('symmol.out'))

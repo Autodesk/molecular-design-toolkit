@@ -11,19 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import
 
-from .exportall import *
-from . import docparsers
-from .callsigs import *
-from .descriptors import *
-from .classes import *
-from .databases import *
-from .utils import *
-from .numerical import *
-<<<<<<< HEAD
-from .json_extension import *
-=======
+from moldesign import utils
+
+def show_parameterization_results(errormessages, molin, molout=None):
+    print 'Forcefield assignment: %s' % ('Success' if molout is not None else 'Failure')
+    for err in errormessages:
+        print utils.html_to_text(err.desc)
 
 
->>>>>>> widgetcleanup
+def nbmolviz_installed():
+    import imp
+    try:
+        imp.find_module('nbmolviz')
+    except ImportError:
+        return False
+    else:
+        return True
