@@ -50,7 +50,8 @@ class ForceField(object):
         return mol.ff
 
     def __setstate__(self, state):
-        """ Attempt at a workaround for https://github.com/ParmEd/ParmEd/issues/874
+        """ Workaround for https://github.com/ParmEd/ParmEd/issues/874
+        This function can be removed once parmed 0.7.4 is released - AMV 5.19.17
         """
         self.__dict__.update(state)
         self.parmed_obj.initialize_topology()
