@@ -13,20 +13,32 @@ publisher:
     context: .
     dockerfile: ./buildfiles/build-env.dockerfile
   add_docker: true
+  volumes:
+  - ./tmp/reports:/opt/reports
 
 test_moldesign_minimal:
   build:
+    context: ./buildfiles
     dockerfile: ./buildfiles/moldesign-minimal-cache.dockerfile
   cached: true
   working_dir: /opt/molecular-design-toolkit/moldesign/_tests
   add_docker: true
+  environment:
+    TESTENV: minimal
+  volumes:
+    - ./tmp/reports:/opt/reports
 
 test_moldesign_complete:
   build:
+    context: ./buildfiles
     dockerfile: ./buildfiles/moldesign-complete-cache.dockerfile
   cached: true
   working_dir: /opt/molecular-design-toolkit/moldesign/_tests
   add_docker: true
+  environment:
+    TESTENV: complete
+  volumes:
+    - ./tmp/reports:/opt/reports
 
 cache_nwchem_build:
   build:
@@ -41,6 +53,11 @@ cache_ambertools:
 cache_pyscf_build:
   build:
     dockerfile: ./tmp/makefiles/Dockerfile.pyscf_build
+  cached: true
+
+cache_moldesign_minimal:
+  build:
+    dockerfile: ./tmp/makefiles/Dockerfile.moldesign_minimal
   cached: true
 
 cache_openblas:

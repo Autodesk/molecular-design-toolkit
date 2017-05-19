@@ -1,6 +1,6 @@
 - name: generate_dockerfiles
   service: docker_make
-  command: bash -c "docker-make -p -n nwchem_build pyscf_build ambertools --dockerfile-dir /makefiles && cat /makefiles/Dockerfile.nwchem_build"
+  command: bash -c "docker-make -p -n nwchem_build pyscf_build ambertools moldesign_minimal --dockerfile-dir /makefiles && cat /makefiles/Dockerfile.nwchem_build"
 
 - name: trigger_caches
   type: parallel
@@ -8,6 +8,7 @@
     - cache_nwchem_build
     - cache_ambertools
     - cache_pyscf_build
+    - cache_moldesign_minimal
   steps:
    - command: echo checking in
 
@@ -47,17 +48,18 @@
     - test_moldesign_minimal
     - test_moldesign_complete
   steps:  # we test 2 environments: one without tools locally installed, and one with
-    - command: py.test -n 4 --cov=../
+    - command: ../../buildfiles/codeship_runtests.sh
 
 # TODO: test the merged versions of PRs; test additional environments sometimes
 
-- name: code_coverage
-  service: test_moldesign_complete
-  command: cd /opt/molecular-design-toolkit/ && coveralls
+#- name: code_coverage
+#  service: test_moldesign_complete
+#  command: cd /opt/molecular-design-toolkit/ && coveralls
 
 - name: publish
   service: publisher
-  tag: "^(master/.*)$"  # deploy only on tagged commits in master
+  # tests for semantic versions
+  tag: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$'
   type: serial
   steps:
     - command: test that the code has the right version (and test that it's a good semver?)

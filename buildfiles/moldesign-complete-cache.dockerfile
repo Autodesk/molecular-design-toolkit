@@ -1,4 +1,3 @@
 FROM moldesign_complete:dev
-RUN mkdir -p ~/.moldesign \
- && echo devmode: true >> ~/.moldesign/moldesign.yml \
- && pip install pytest-xdist pytest-cov python-coveralls
+ADD requirements.txt provision.sh /tmp/
+RUN cd /tmp && ./provision_testrunner_image.sh
