@@ -8,6 +8,10 @@ import pytest
 import moldesign as mdt
 from .helpers import get_data_path
 
+import parmed
+
+from distutils.version import LooseVersion
+
 
 @pytest.fixture
 def pdb_3ac2():
@@ -61,6 +65,10 @@ def pdb_2jaj_roundtrip(pdb_2jaj):
 
 @pytest.mark.parametrize('mol', 'pdb_2jaj pdb_2jaj_roundtrip'.split())
 def test_negative_residue_numbers_2jaj(request, mol):
+    if (mol == 'pdb_2jaj_roundtrip' and
+            LooseVersion(getattr(parmed, '__version__', '0.0.0')) <= LooseVersion('2.7.3')):
+        pytest.xfail("This test requires ParmEd 2.7.4 (not yet released as of this writing)")
+
     mol = request.getfuncargvalue(mol)
     res = mol.chains['B'].residues[0]
     assert res.pdbindex == -4
