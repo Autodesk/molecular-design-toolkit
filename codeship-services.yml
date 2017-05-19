@@ -8,8 +8,11 @@ docker_make:
   cached: true
 
 publisher:
-  extends: docker_make
   encrypted_env_file: tokens.crypt
+  build:
+    context: .
+    dockerfile: ./buildfiles/build-env.dockerfile
+  add_docker: true
 
 test_moldesign_minimal:
   build:
