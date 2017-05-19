@@ -47,7 +47,7 @@
     - test_moldesign_minimal
     - test_moldesign_complete
   steps:  # we test 2 environments: one without tools locally installed, and one with
-    - command: py.test -n 4 --cov=./
+    - command: py.test -n 4 --cov=../
 
 # TODO: test the merged versions of PRs; test additional environments sometimes
 

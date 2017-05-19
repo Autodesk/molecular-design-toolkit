@@ -18,13 +18,15 @@ test_moldesign_minimal:
   build:
     dockerfile: ./buildfiles/moldesign-minimal-cache.dockerfile
   cached: true
-  working_dir: /opt/conda/lib/python2.7/site-packages/moldesign
+  working_dir: /opt/molecular-design-toolkit/moldesign/_tests
+  add_docker: true
 
 test_moldesign_complete:
   build:
     dockerfile: ./buildfiles/moldesign-complete-cache.dockerfile
   cached: true
-  working_dir: /opt/conda/lib/python2.7/site-packages/moldesign
+  working_dir: /opt/molecular-design-toolkit/moldesign/_tests
+  add_docker: true
 
 cache_nwchem_build:
   build:
