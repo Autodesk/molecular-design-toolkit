@@ -26,6 +26,9 @@ class ForceField(object):
     Args:
         mol (mdt.Molecule): Molecule this force field is for
         ffobj (parmed.Structure OR mdt.AmberParms OR Forcefield): forcefield specification
+
+    Attributes:
+        parmed_obj (parmed.Structure): parmed object containing the forcefield parameters
     """
 
     def __init__(self, mol, ffobj):
@@ -45,6 +48,13 @@ class ForceField(object):
     def copy_to(self, mol):
         mol.ff = self.__class__(mol, copy.copy(self.parmed_obj))
         return mol.ff
+
+    def __setstate__(self, state):
+        """ Workaround for https://github.com/ParmEd/ParmEd/issues/874
+        This function can be removed once parmed 0.7.4 is released - AMV 5.19.17
+        """
+        self.__dict__.update(state)
+        self.parmed_obj.initialize_topology()
 
     def get_atom_terms(self, atom):
         return AtomTerms(atom, self.parmed_obj.atoms[atom.index])

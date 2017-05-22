@@ -150,7 +150,7 @@ def h2_harmonic_atoms(h2_harmonic):
 # Tests around PDB ID 3AID
 @typedfixture('molecule', scope='session')
 def pdb3aid():
-    mol = mdt.from_pdb('3AID')
+    mol = mdt.read(get_data_path('3aid.pdb'))
     return mol
 
 

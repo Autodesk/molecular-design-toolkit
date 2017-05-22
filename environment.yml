@@ -20,4 +20,5 @@ dependencies:
    - funcsigs
    - docker-py
    - fortranformat
-   - pyccc >= 0.6.7a0
+   - pyccc >= 0.7.3
+

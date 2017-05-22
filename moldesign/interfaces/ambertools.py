@@ -212,7 +212,7 @@ def build_dna_helix(sequence, helix_type='B', **kwargs):
         return mol
 
     job = pyccc.Job(command='nab -o buildbdna build.nab && ./buildbdna',
-                    image=mdt.compute.get_image_path(IMAGE),
+                    image=mdt.compute.get_image_path('nucleic_acid_builder'),
                     inputs={'build.nab': '\n'.join(infile)},
                     name='NAB_build_dna',
                     when_finished=finish_job)
@@ -450,40 +450,57 @@ def _parse_tleap_errors(job, molin):
         r2 = reslookup[atomre2[1]]
         return pe.UnusualBond(l, (a1, a2), (r1, r2))
 
-    while True:
-        try:
-            line = lineiter.next()
-        except StopIteration:
-            break
-
+    def _parse_tleap_logline(line):
         fields = line.split()
         if fields[0:2] == ['Unknown', 'residue:']:
             # EX: "Unknown residue: 3TE   number: 499   type: Terminal/beginning"
             res = molin.residues[int(fields[4])]
             unknown_res.add(res)
-            msg.append(pe.UnknownResidue(line, res))
+            return pe.UnknownResidue(line, res)
 
         elif fields[:4] == 'Warning: Close contact of'.split():
             # EX: "Warning: Close contact of 1.028366 angstroms between .R<DC5 1>.A<HO5' 1> and .R<DC5 81>.A<P 9>"
-            msg.append(unusual_bond(line))
+            return unusual_bond(line)
 
         elif fields[:6] == 'WARNING: There is a bond of'.split():
             # Matches two lines, EX:
             # "WARNING: There is a bond of 34.397700 angstroms between:"
             # "-------  .R<DG 92>.A<O3' 33> and .R<DG 93>.A<P 1>"
             nextline = lineiter.next()
-            msg.append(unusual_bond(line + nextline))
+            return unusual_bond(line+nextline)
 
         elif fields[:5] == 'Created a new atom named:'.split():
             # EX: "Created a new atom named: P within residue: .R<DC5 81>"
             residue = reslookup[fields[-1][:-1]]
-            if residue in unknown_res: continue  # suppress atoms from an unknown res ...
+            if residue in unknown_res:
+                return None  # suppress atoms from an unknown res ...
             atom = residue[fields[5]]
-            msg.append(pe.UnknownAtom(line, residue, atom))
+            return pe.UnknownAtom(line, residue, atom)
 
         elif (fields[:5] == '** No torsion terms for'.split() or
                       fields[:5] == 'Could not find angle parameter:'.split()):
             # EX: " ** No torsion terms for  ca-ce-c3-hc"
-            msg.append(pe.MissingTerms(line.strip()))
+            return pe.MissingTerms(line.strip())
+
+        else:  # ignore this line
+            return None
+
+    while True:
+        try:
+            line = lineiter.next()
+        except StopIteration:
+            break
+
+        try:
+            errmsg = _parse_tleap_logline(line)
+        except (KeyError, ValueError):
+            print("WARNING: failed to process TLeap message '%s'" % line)
+            msg.append(pe.ForceFieldMessage(line))
+
+        else:
+            if errmsg is not None:
+                msg.append(errmsg)
 
     return msg
+
+

@@ -59,31 +59,9 @@ def read_pdb(f):
 def write_pdb(mol, fileobj):
     pmedmol = mol_to_parmed(mol)
 
-    # Assign fixed indices
-    # TODO: respect the original pdbindex values as much as possible
-    for iatom, atom in enumerate(pmedmol.atoms):
-        atom.number = iatom + 1
-    for ires, residue in enumerate(pmedmol.residues):
-        residue.number = ires + 1
-    for obj in itertools.chain(pmedmol.atoms, pmedmol.residues):
-        obj.number = _ProtectFloordiv(obj.number)
-
     tempfile = StringIO()
     pmedmol.write_pdb(tempfile, renumber=False)
     _insert_conect_records(mol, pmedmol, tempfile, write_to=fileobj)
-
-
-class _ProtectFloordiv(int):
-    """ Total hack class to prevent parmed from changing our numbering.
-
-    ParmEd uses a __floordiv__ to renumber negatively-numbered atoms and residues.
-    Also always evaluates to True even if it's 0.
-    """
-    def __floordiv__(self, other):
-        return 0
-
-    def __nonzero__(self):
-        return True
 
 
 CONECT = 'CONECT %4d'
