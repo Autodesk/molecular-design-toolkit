@@ -1,6 +1,19 @@
 - name: generate_dockerfiles
   service: docker_make
-  command: bash -c "docker-make -p -n nwchem_build pyscf_build ambertools moldesign_minimal --dockerfile-dir /makefiles && cat /makefiles/Dockerfile.nwchem_build"
+  type: serial
+  steps:
+    - command:
+       docker-make -p -n --dockerfile-dir /makefiles
+         nwchem_build
+         pyscf_build
+         ambertools
+         deploybase
+         python_deploy_base
+         chem_python_conda
+      name: write_dockerfiles
+    - command: cp buildfiles/deploybase/cleanapt buildfiles/notebook/run_notebook.sh /makefiles
+      name: copy_contexts
+
 
 - name: trigger_caches
   type: parallel
@@ -8,7 +21,9 @@
     - cache_nwchem_build
     - cache_ambertools
     - cache_pyscf_build
-    - cache_moldesign_minimal
+    - cache_deploybase
+    - cache_python_deploy_base
+    - cache_chem_python_conda
   steps:
    - command: echo checking in
 
@@ -19,6 +34,8 @@
   steps:
   - command: docker-make --tag dev nwchem
     name: nwchem
+  - command: docker-make --tag dev moldesign_minimal
+    name: mdt_minimal
   - type: serial
     steps:
     - command: docker-make --tag dev ambertools
@@ -31,8 +48,6 @@
     steps:
     - command: docker-make --tag dev pyscf_build
       name: pyscf
-    - command: docker-make --tag dev moldesign_minimal
-      name: mdt_minimal
     - command: docker-make --tag dev moldesign_complete
       name: mdt_complete
 
@@ -62,7 +77,7 @@
   tag: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$'
   type: serial
   steps:
-    - command: test that the code has the right version (and test that it's a good semver?)
+    - command: exit 1 # test that the code has the right version (and test that it's a good semver?)
       name: verify_version
     - command: build any additional images for deployment (moldesign_notebook, at least?)
       tag: build_notebook

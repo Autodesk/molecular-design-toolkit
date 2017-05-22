@@ -19,7 +19,7 @@ publisher:
 test_moldesign_minimal:
   build:
     context: ./buildfiles
-    dockerfile: ./buildfiles/moldesign-minimal-cache.dockerfile
+    dockerfile: moldesign-minimal-cache.dockerfile
   cached: true
   working_dir: /opt/molecular-design-toolkit/moldesign/_tests
   add_docker: true
@@ -31,7 +31,7 @@ test_moldesign_minimal:
 test_moldesign_complete:
   build:
     context: ./buildfiles
-    dockerfile: ./buildfiles/moldesign-complete-cache.dockerfile
+    dockerfile: moldesign-complete-cache.dockerfile
   cached: true
   working_dir: /opt/molecular-design-toolkit/moldesign/_tests
   add_docker: true
@@ -42,25 +42,36 @@ test_moldesign_complete:
 
 cache_nwchem_build:
   build:
-    dockerfile: ./tmp/makefiles/Dockerfile.nwchem_build
+    dockerfile: Dockerfile.nwchem_build
+    context: ./tmp/makefiles
   cached: true
 
 cache_ambertools:
   build:
-    dockerfile: ./tmp/makefiles/Dockerfile.ambertools
+    dockerfile: Dockerfile.ambertools
+    context: ./tmp/makefiles
   cached: true
 
 cache_pyscf_build:
   build:
-    dockerfile: ./tmp/makefiles/Dockerfile.pyscf_build
+    dockerfile: Dockerfile.pyscf_build
+    context: ./tmp/makefiles
   cached: true
 
-cache_moldesign_minimal:
+cache_python_deploy_base:
   build:
-    dockerfile: ./tmp/makefiles/Dockerfile.moldesign_minimal
+    dockerfile: Dockerfile.python_deploy_base
+    context: ./tmp/makefiles
   cached: true
 
-cache_openblas:
+cache_deploybase:
   build:
-    dockerfile: ./tmp/makefiles/Dockerfile.openblas
+    dockerfile: Dockerfile.deploybase
+    context: ./tmp/makefiles
+  cached: true
+
+cache_chem_python_conda:
+  build:
+    dockerfile: Dockerfile.chem_python_conda
+    context: ./tmp/makefiles
   cached: true
