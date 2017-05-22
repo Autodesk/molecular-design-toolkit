@@ -8,6 +8,6 @@ statline="$(tail -n1 /opt/reports/pytest.${TESTENV}.log)"
 echo 'Test status:'
 echo ${statline}
 
-python ../../buildfiles/send_test_status.py ${exitstat} "${statline}"
+python ../../deployment/send_test_status.py ${exitstat} "${statline}"
 
 exit ${exitstat}

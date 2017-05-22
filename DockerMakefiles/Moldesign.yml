@@ -4,18 +4,25 @@ moldesign_requirements:
   build: |
     RUN conda install -qy -c omnia parmed biopython
 
-moldesign:
+moldesign_minimal:
  description: Base installation of the MDT library. Built from the current directory.
  requires:
   - moldesign_requirements
  build_directory: ../
  build: |
-  COPY requirements.txt /opt/mdtreqs.txt
+  COPY requirements.txt /tmp/mdtreqs.txt
   RUN apt-get update \
    && apt-get install -y gcc \
-   && pip install -r /opt/mdtreqs.txt
+   && pip install -r /tmp/mdtreqs.txt
   COPY . /opt/molecular-design-toolkit
   RUN pip install -e /opt/molecular-design-toolkit
+
+
+moldesign_complete:
+  description: An image with moldesign and all python dependencies
+  requires:
+   - chem_python
+   - moldesign_minimal
 
 moldesign_notebook:
  description: A production-ready, fully outfitted jupyter server container
@@ -27,12 +34,6 @@ moldesign_notebook:
   RUN python -m moldesign copyexamples
   RUN jupyter nbextension enable --python --sys-prefix widgetsnbextension \
    && jupyter nbextension enable --python --sys-prefix nbmolviz
-
-moldesign_complete:
-  description: An image with moldesign and all python dependencies
-  requires:
-   - chem_python
-   - moldesign
 
 
 moldesign_standalone:
@@ -47,14 +48,3 @@ moldesign_standalone:
   build: |
     RUN mkdir -p ~/.moldesign \
      && echo "engine_type: subprocess" > ~/.moldesign/moldesign.yml
-
-moldesign_minimal:
-   description: |
-      Same as moldesign_notebook, but *without* any dependencies (OpenBabel, OpenMM etc.).
-      Used for testing remote execution environment
-   requires:
-    - notebook
-    - moldesign
-   build: |
-     ENTRYPOINT []
-     CMD ''
