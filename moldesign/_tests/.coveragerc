@@ -1,0 +1,5 @@
+[run]
+omit =
+   ../_notebooks/
+   ../_static_data/
+   ../_tests/
