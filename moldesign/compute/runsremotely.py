@@ -17,8 +17,9 @@ import types
 from pyccc import python as bpy
 
 import moldesign as mdt
-from moldesign import utils, display
+from moldesign import utils
 from . import configuration
+from ..helpers import display_log
 
 class RunsRemotely(object):
     def __init__(self, enable=True,
@@ -99,7 +100,7 @@ class RunsRemotely(object):
                                 sendsource=self.sendsource)
 
             if self.display:
-                display.display_log(job.get_display_object(), title=f.__name__)
+                display_log(job.get_display_object(), title=f.__name__)
 
             if wait:
                 job.wait()
