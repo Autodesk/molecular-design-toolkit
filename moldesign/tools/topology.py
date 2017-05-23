@@ -22,11 +22,11 @@ from . import toplevel, __all__ as _pkgall
 
 from moldesign.interfaces.openbabel import add_hydrogen, guess_bond_orders, set_protonation
 from moldesign.interfaces.pdbfixer_interface import mutate, add_water
-from moldesign.interfaces.ambertools import assign_forcefield, parameterize
+from moldesign.interfaces.ambertools import parameterize
 from moldesign.interfaces.ambertools import calc_am1_bcc_charges, calc_gasteiger_charges
 
 _pkgall.extend(('add_hydrogen guess_bond_orders mutate add_water'
-                ' assign_forcefield parameterize calc_am1_bcc_charges calc_gasteiger_charges '
+                ' parameterize calc_am1_bcc_charges calc_gasteiger_charges '
                 'set_protonation').split())
 
 ATNUM_VALENCE_CHARGE = {6: {3: -1, 4: 0},

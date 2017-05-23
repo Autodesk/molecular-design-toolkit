@@ -5,4 +5,5 @@ __all__ = []
 
 from .terms import *
 from .ffparams import *
+from .forcefieldbase import *
 from .amber import *
