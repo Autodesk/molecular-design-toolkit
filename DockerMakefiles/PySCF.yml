@@ -31,12 +31,19 @@ pyscf_build:
      && cmake .. \
      && make \
      && rm -rf /opt/pyscf/lib/build
+  RUN mkdir -p /opt/shared_libs/lib \
+   && cp -v /opt/pyscf/lib/*.so* /opt/pyscf/lib/deps/lib/*.so* \
+         /opt/shared_libs/lib
 
 
 pyscf:
   requires:
     - python_deploy_base
     - pyscf_dependencies
+  build: |
+    RUN conda install h5py
   copy_from:
     pyscf_build:
-      /opt/pyscf: /opt
+      /opt/pyscf: /opt/conda/lib/python2.7/site-packages/  # assumes conda installation, obvs
+      /opt/shared_libs/lib: /usr/
+

@@ -21,13 +21,20 @@ pyquante2:
   RUN pip install git+git://github.com/rpmuller/pyquante2.git
 
 
-chem_python:
- description: All of the external python chemistry libraries in one place
+chem_python_conda:
  requires:
-  - pyscf
+  - python_deploy_base
+ description: All of the external python chemistry libraries in one place
  build: |
    RUN conda install -qy -c openbabel openbabel=2.4.1
    RUN conda install -qy -c omnia biopython openmm parmed pdbfixer
+
+
+chem_python:
+  requires:
+    - pyscf
+    - chem_python_conda
+
 
 chem_notebook:
  requires:

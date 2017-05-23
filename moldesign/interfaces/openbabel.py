@@ -113,9 +113,15 @@ def write_string(mol, format):
 
     Returns:
         str: contents of the file
+
+    References:
+        https://openbabel.org/docs/dev/FileFormats/Overview.html
     """
     pbmol = mol_to_pybel(mol)
-    outstr = pbmol.write(format=format)
+    if format == 'smi':  # TODO: always kekulize, never aromatic
+        outstr = pbmol.write(format=format).strip()
+    else:
+        outstr = pbmol.write(format=format)
     return outstr
 
 
@@ -360,7 +366,6 @@ def pybel_to_mol(pbmol,
                         **kwargs)
 
 
-@runsremotely(enable=force_remote)
 def from_smiles(smi, name=None):
     """ Translate a smiles string to a 3D structure.
     This method uses OpenBabel to generate a plausible 3D conformation of the 2D SMILES topology.
@@ -376,7 +381,6 @@ def from_smiles(smi, name=None):
     return _string_to_3d_mol(smi, 'smi', name)
 
 
-@runsremotely(enable=force_remote)
 def from_inchi(inchi, name=None):
     """ Translate an INCHI string to a 3D structure.
     This method uses OpenBabel to generate a plausible 3D conformation of the 2D SMILES topology.
@@ -391,7 +395,7 @@ def from_inchi(inchi, name=None):
     """
     return _string_to_3d_mol(inchi, 'inchi', name)
 
-
+@runsremotely(enable=force_remote)
 def _string_to_3d_mol(s, fmt, name):
     if name is None: name = s
     pbmol = pb.readstring(fmt, str(s))  # avoid passing unicode by casting to str
