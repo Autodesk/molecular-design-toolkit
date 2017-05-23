@@ -15,58 +15,18 @@
 import moldesign as mdt
 
 from .. import data
-from ..utils import doc_inherit, exports
-from .forcefieldbase import Forcefield
-
-from ..interfaces import ambertools
-
+from ..utils import exports
+from . import TLeapForcefield
 
 
 @exports
-class TLeapForcefield(Forcefield):
-    """ Amber-type forcefield.
+class DefaultAmber(TLeapForcefield):
+    def __init__(self):
+        sourcelines = ['source %s' % data.AMBER_LEAPRC[ffname] for ffname in data.AMBER_DEFAULT]
+        super(DefaultAmber, self).__init__(sourcelines)
 
-    Assignment routines for these forcefields are backed by ambertools in general (and
-    tleap specifically)
 
-    Args:
-        fflines (List[str]): commands to load this forcefield
-        file_list (Dict[str, pyccc.FileReference]): any files necessary for assigning parameters
-             (e.g. lib files, frcmod files)
-    """
-    TYPE = 'amber'
-
-    def __init__(self, fflines, file_list=None):
-        self._fflines = fflines
-        self._file_list = file_list if file_list is not None else {}
-        super(TLeapForcefield, self).__init__()
-
-    @doc_inherit
-    def assign(self, mol, display=True):
-        clean_molecule = ambertools._prep_for_tleap(mol)
-
-        job = ambertools.run_tleap(clean_molecule)
-
-        if 'output.inpcrd' in job.get_output():
-            prmtop = job.get_output('output.prmtop')
-            inpcrd = job.get_output('output.inpcrd')
-            params = ambertools.AmberParameters(prmtop, inpcrd, job)
-            m = mdt.read_amber(params.prmtop, params.inpcrd)
-            newmol = mdt.helpers.restore_topology(m, mol)
-            newmol.ff = mdt.forcefields.ForcefieldParams(newmol, params)
-        else:
-            newmol = None
-
-        errors = ambertools._parse_tleap_errors(job, clean_molecule)
-
-        display.show_parameterization_results(errors, clean_molecule, molout=newmol)
-
-        if newmol is not None:
-            return newmol
-        else:
-            raise ParameterizationError('TLeap failed to assign force field parameters for %s'%mol,
-                                        job)
-
-    @doc_inherit
-    def add_ff(self, ff):
-        self._fflines.extend(ff._fflines)
+@exports
+class GAFF2ForceField(TLeapForcefield):
+    def __init__(self):
+        super(DefaultAmber, self).__init__(['source leaprc.gaff2'])

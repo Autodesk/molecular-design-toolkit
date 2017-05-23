@@ -19,7 +19,7 @@ import moldesign as mdt
 import pyccc
 from .. import compute, utils, display
 from .. import units as u
-from ..forcefields import parameterization_errors as pe, TLeapForcefield
+from ..forcefields import errors as pe, TLeapForcefield
 
 IMAGE = 'ambertools'
 
@@ -54,9 +54,6 @@ class ExtraAmberParameters(object):
         self.frcmod = frcmod
         self.job = job
 
-
-class ParameterizationError(Exception):
-    pass
 
 
 @utils.kwargs_from(mdt.compute.run_job)
@@ -200,7 +197,7 @@ def build_dna_helix(sequence, helix_type='B', **kwargs):
 
 
 @utils.kwargs_from(compute.run_job)
-def run_tleap(mol, leapcmds, files, **kwargs):
+def _run_tleap_assignment(mol, leapcmds, files=None, **kwargs):
     """
     Drives tleap to create a prmtop and inpcrd file. Specifically uses the AmberTools 16
     tleap distribution.
@@ -219,7 +216,9 @@ def run_tleap(mol, leapcmds, files, **kwargs):
         recommendations.
     """
     leapstr = leapcmds
-    inputs = files.copy()
+    inputs = {}
+    if files is not None:
+        inputs.update(files)
     inputs['input.pdb'] = mol.write(format='pdb')
 
     leapstr.append('mol = loadpdb input.pdb\n'
