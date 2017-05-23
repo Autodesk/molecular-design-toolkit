@@ -17,9 +17,9 @@ import tempfile
 
 import moldesign as mdt
 import pyccc
-from moldesign import compute, utils, display
-from moldesign import units as u
-from moldesign.forcefields import parameterization_errors as pe
+from .. import compute, utils, display
+from .. import units as u
+from ..forcefields import parameterization_errors as pe, TLeapForcefield
 
 IMAGE = 'ambertools'
 
@@ -53,27 +53,6 @@ class ExtraAmberParameters(object):
         self.lib = lib
         self.frcmod = frcmod
         self.job = job
-
-DNA_FF = {ff: 'leaprc.DNA.%s'%ff for ff in ['OL15', 'bsc1']}
-RNA_FF = {ff: 'leaprc.RNA.%s'%ff for ff in ['OL3', 'YIL']}
-PROTEIN_FF = {ff: 'leaprc.protein.%s'%ff for ff in
-              ['ff14SB',
-               'ff14SBonlysc',
-               'ff14SB.redq',
-               'ff15ipq',
-               'ff15ipq-vac',
-               'ff03.r1',
-               'ff03ua',
-               'fb15']}
-LIPID_FF = {'lipid14': 'leaprc.lipid14'}
-WATER_FF = {ff: 'leaprc.water.%s'%ff for ff in
-            ['tip3p', 'tip4pew', 'spce', 'opc']}
-CARB_FF = {ff: 'leaprc.%s'%ff for ff in ['GLYCAM_06EPb', 'GLYCAM_06j-1']}
-ORGANIC_FF = {ff: 'leaprc.%s'%ff for ff in ['gaff', 'gaff2']}
-OTHER_FF = {ff: 'leaprc.%s'%ff for ff in ['phosaa10', 'modrna08', 'xFPchromophores']}
-LEAPRCFILES = {}
-for ffiles in (DNA_FF, RNA_FF, PROTEIN_FF, LIPID_FF, CARB_FF, WATER_FF, ORGANIC_FF, OTHER_FF):
-    LEAPRCFILES.update(ffiles)
 
 
 class ParameterizationError(Exception):
@@ -221,7 +200,7 @@ def build_dna_helix(sequence, helix_type='B', **kwargs):
 
 
 @utils.kwargs_from(compute.run_job)
-def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
+def run_tleap(mol, leapcmds, files, **kwargs):
     """
     Drives tleap to create a prmtop and inpcrd file. Specifically uses the AmberTools 16
     tleap distribution.
@@ -230,32 +209,18 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
 
     Args:
         mol (moldesign.Molecule): Molecule to set up
-        forcefields (List[str]): list of the names of forcefields to use
-            (see AmberTools manual for descriptions)
-        parameters (List[ExtraAmberParameters]): (optional) list of amber parameters
-            for non-standard residues
+        leapcmds (List[str]): list of the commands to load the forcefields
+        files (List[pyccc.FileReference]): (optional) list of additional files
+           to send
         **kwargs: keyword arguments to :meth:`compute.run_job`
 
     References:
         Ambertools Manual, http://ambermd.org/doc12/Amber16.pdf. See page 33 for forcefield
         recommendations.
     """
-    # Prepare input for tleap
-    if forcefields is None:
-        forcefields = mdt.forcefields.ffdefaults.values()
-    leapstr = ['source %s' % LEAPRCFILES[ff] for ff in forcefields]
-    inputs = {'input.pdb': mol.write(format='pdb')}
-
-    if parameters:
-        if hasattr(parameters, 'lib') or hasattr(parameters, 'frcmod'):
-            parameters = [parameters]
-        for ipmtr, p in enumerate(parameters):
-            frcname = 'res%d.frcmod' % ipmtr
-            libname = 'res%d.lib' % ipmtr
-            inputs[frcname] = p.frcmod
-            inputs[libname] = p.lib
-            leapstr.append('loadAmberParams %s' % frcname)
-            leapstr.append('loadoff %s' % libname)
+    leapstr = leapcmds
+    inputs = files.copy()
+    inputs['input.pdb'] = mol.write(format='pdb')
 
     leapstr.append('mol = loadpdb input.pdb\n'
                    "check mol\n"
@@ -272,33 +237,6 @@ def run_tleap(mol, forcefields=None, parameters=None, **kwargs):
 
     return compute.run_job(job, **kwargs)
 
-
-@utils.args_from(run_tleap)
-def assign_forcefield(mol, **kwargs):
-    """ see run_tleap docstring """
-    clean_molecule = _prep_for_tleap(mol)
-
-    job = run_tleap(clean_molecule, **kwargs)
-
-    if 'output.inpcrd' in job.get_output():
-        prmtop = job.get_output('output.prmtop')
-        inpcrd = job.get_output('output.inpcrd')
-        params = AmberParameters(prmtop, inpcrd, job)
-        m = mdt.read_amber(params.prmtop, params.inpcrd)
-        newmol = mdt.helpers.restore_topology(m, mol)
-        newmol.ff = mdt.forcefields.ForceField(newmol, params)
-    else:
-        newmol = None
-
-    errors = _parse_tleap_errors(job, clean_molecule)
-
-    display.show_parameterization_results(errors, clean_molecule, molout=newmol)
-
-    if newmol is not None:
-        return newmol
-    else:
-        raise ParameterizationError('TLeap failed to assign force field parameters for %s' % mol,
-                                    job)
 
 
 def _prep_for_tleap(mol):
@@ -407,11 +345,16 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
                                    "quit\n"])
 
     def finish_job(j):
-        param = ExtraAmberParameters(j.get_output('mol.lib'),
-                                     j.get_output('mol.frcmod'),
-                                     j)
-        tempmol = mdt.assign_forcefield(mol, parameters=param)
-        mol.ff = tempmol.ff
+        leapcmds = ['source leaprc.gaff2']
+        files = {}
+        for fname, f in j.glob_output("*.lib"):
+            leapcmds.append('loadoff %s' % fname)
+            files[fname] = f
+        for fname, f in j.glob_output("*.frcmod"):
+            leapcmds.append('loadAmberParams %s' % fname)
+            files[fname] = f
+
+        param = TLeapForcefield(leapcmds, files)
         return param
 
     job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),

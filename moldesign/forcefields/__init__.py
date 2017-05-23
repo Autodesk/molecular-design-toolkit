@@ -4,4 +4,5 @@ def toplevel(o):
 __all__ = []
 
 from .terms import *
-from .forcefield import *
+from .ffparams import *
+from .amber import *
