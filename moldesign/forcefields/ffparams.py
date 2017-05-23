@@ -17,8 +17,8 @@ import moldesign as mdt
 from moldesign import units as u
 
 
-class ForceField(object):
-    """ Stores a forcefield definition.
+class ForcefieldParams(object):
+    """ Stores the forcefield parameters for a specific molecule.
 
     The current implementation is heavily based on a ParmEd object,
     with fairly thin MDT wrappers providing an interface and handling unit conversions.
@@ -192,12 +192,3 @@ class FFParameters(object):
             self.dihedral_term.setdefault(tuple(term.atoms), []).append(term)
             self.dihedral_term.setdefault(tuple(reversed(term.atoms)), []).append(term)
 
-
-
-ffdefaults = dict(protein='ff14SB',
-                  dna='OL15',
-                  rna='OL3',
-                  carbohydrate='GLYCAM_06j-1',
-                  lipid='lipid14',
-                  water='tip3p',
-                  organic='gaff2')

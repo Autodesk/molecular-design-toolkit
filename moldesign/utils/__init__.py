@@ -21,9 +21,4 @@ from .classes import *
 from .databases import *
 from .utils import *
 from .numerical import *
-<<<<<<< HEAD
 from .json_extension import *
-=======
-
-
->>>>>>> widgetcleanup
