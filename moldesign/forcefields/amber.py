@@ -20,13 +20,25 @@ from . import TLeapForcefield
 
 
 @exports
-class DefaultAmber(TLeapForcefield):
-    def __init__(self):
-        sourcelines = ['source %s' % data.AMBER_LEAPRC[ffname] for ffname in data.AMBER_DEFAULT]
-        super(DefaultAmber, self).__init__(sourcelines)
+class TLeapLib(TLeapForcefield):
+    """ A forcefield from TLeap's library
+    """
+    def __init__(self, *ffnames):
+        self.names = [ffnames]
+        sourcelines = ['source %s' % data.AMBER_LEAPRC[ffn] for ffn in ffnames]
+        super(TLeapLib, self).__init__(sourcelines)
+
+    def __str__(self):
+        return "TLeap data: %s' % ','.join(self.names)"
 
 
 @exports
-class GAFF2ForceField(TLeapForcefield):
+class DefaultAmber(TLeapLib):
     def __init__(self):
-        super(DefaultAmber, self).__init__(['source leaprc.gaff2'])
+        super(DefaultAmber, self).__init__(*data.AMBER_DEFAULT)
+
+
+@exports
+class GAFF2ForceField(TLeapLib):
+    def __init__(self):
+        super(GAFF2ForceField, self).__init__('gaff2')

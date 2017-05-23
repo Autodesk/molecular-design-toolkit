@@ -28,7 +28,6 @@ from . import units
 
 # Functional subpackages
 from . import compute
-from . import display
 from . import fileio
 from . import exceptions
 from . import external

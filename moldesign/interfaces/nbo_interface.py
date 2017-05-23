@@ -36,7 +36,7 @@ def run_nbo(mol, requests=('nlmo', 'nbo'),
                           command,
                           inputs=inputs,
                           name="nbo, %s" % mol.name)
-    moldesign.display.display_log(job.get_display_object(), "nbo, %s"%mol.name)
+    moldesign.helpers.display_log(job.get_display_object(), "nbo, %s"%mol.name)
 
     job.wait()
     parsed_data = parse_nbo(job.get_output('FILE.10'),

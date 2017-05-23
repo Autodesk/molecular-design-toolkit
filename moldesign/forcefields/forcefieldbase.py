@@ -19,7 +19,9 @@ from ..utils import exports
 
 class Forcefield(object):
     """ Abstract base class representing a biomolecular forcefield definition,
-    such as amber14sb or charm22
+    such as amber14sb or charm22.
+
+    These contain both atom type templates AND forcefield parameters.
     """
 
     def assign(self, mol, display=True):
@@ -102,10 +104,26 @@ class TLeapForcefield(Forcefield):
     """
     TYPE = 'amber'
 
+    def __str__(self):
+        return "TLeap data at %x" % id(self)
+
     def __init__(self, fflines, file_list=None):
+        self.names = None
         self._fflines = fflines
         self._file_list = file_list if file_list is not None else {}
         super(TLeapForcefield, self).__init__()
+
+    def assign(self, mol):
+        newmol = self.create_prepped_molecule(mol)
+        if newmol.num_atoms != mol.num_atoms:
+            # TODO: much better error message here
+            raise ForcefieldAssignmentError()
+
+        else:
+            # TODO: much more rigorous consistency checking
+            newmol.ff.copy_to(mol)
+
+
 
     def create_prepped_molecule(self, mol, display=True):
         from ..interfaces import ambertools

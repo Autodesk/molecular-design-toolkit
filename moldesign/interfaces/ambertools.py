@@ -17,7 +17,7 @@ import tempfile
 
 import moldesign as mdt
 import pyccc
-from .. import compute, utils, display
+from .. import compute, utils
 from .. import units as u
 from ..forcefields import errors as pe, TLeapForcefield
 
@@ -278,7 +278,7 @@ def _prep_for_tleap(mol):
 
 
 @utils.kwargs_from(mdt.compute.run_job)
-def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
+def create_ff_parameters(mol, charges='esp', ffname='gaff2', **kwargs):
     """Parameterize ``mol``, typically using GAFF parameters.
 
     This will both assign a forcefield to the molecule (at ``mol.ff``) and produce the parameters
@@ -316,6 +316,9 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
         calc_am1_bcc_charges(mol)
     elif charges == 'gasteiger' and 'gasteiger' not in mol.properties:
         calc_gasteiger_charges(mol)
+    elif charges == 'esp' and 'esp' not in mol.properties:
+        # TODO: use NWChem ESP to calculate
+        raise NotImplementedError()
 
     if charges == 'zero':
         charge_array = [0.0 for atom in mol.atoms]
@@ -346,10 +349,10 @@ def parameterize(mol, charges='esp', ffname='gaff2', **kwargs):
     def finish_job(j):
         leapcmds = ['source leaprc.gaff2']
         files = {}
-        for fname, f in j.glob_output("*.lib"):
+        for fname, f in j.glob_output("*.lib").iteritems():
             leapcmds.append('loadoff %s' % fname)
             files[fname] = f
-        for fname, f in j.glob_output("*.frcmod"):
+        for fname, f in j.glob_output("*.frcmod").iteritems():
             leapcmds.append('loadAmberParams %s' % fname)
             files[fname] = f
 
