@@ -59,9 +59,9 @@ Args:
         [VERSION] is the version of MDT)
     default_version_tag (str): Default version tag for docker images
          (default: ``moldesign.__version__``)
-    default_docker_url (str): URL for the docker daemon to run; if ``engine_type=='docker'``,
-        EITHER this OR ``default_docker_machine`` (but not both) must be set.
-        (default: ``unix://var/run/docker.sock``, the URL for a local docker instance)
+    default_docker_url (str): URL for communicating with docker if ``engine_type=='docker'``.
+        (default: Determined from $DOCKER_HOST, usually this will be the client you run on
+        the command line)
 
 MDT uses a non-standard docker tagging system to store its docker images. Generally,
 a given image is pulled from a URL of the form:
@@ -85,7 +85,7 @@ DEFAULT_VERSION_TAG = '0.7.4a2'
 CONFIG_DEFAULTS = utils.DotDict(engine_type='docker',
                                 default_repository='docker.io/autodesk/moldesign:',
                                 default_python_image=None,
-                                default_docker_host='unix://var/run/docker.sock',
+                                default_docker_host=None,
                                 default_version_tag='0.7.4a2',
                                 devmode=False)
 

@@ -1,5 +1,6 @@
 notebook_backups
 my_first_molecule.xyz
 Untitled*.ipynb
-.cloudcomputecannon
-
+*.P
+*.pkl
+*.gz

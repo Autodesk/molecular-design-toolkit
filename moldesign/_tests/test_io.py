@@ -182,10 +182,13 @@ def test_1kbu_assembly_build(key, request):
                                   mol.chains[asym.num_chains].positions.defunits_value())
 
 
-@pytest.mark.parametrize('fmt', 'smiles pdb mol2 sdf inchi mmcif'.split())
+@pytest.mark.parametrize('fmt', 'smiles pdb mol2 sdf inchi mmcif pkl'.split())
 def test_topology_preserved_in_serialization(bipyridine_smiles, fmt):
     """ Test that bond topology is preserved even if it doesn't make sense from distances
     """
+    if fmt != 'pkl':
+        pytest.xfail("We are currently unable to get an unambiguous representation of a molecular "
+                     "sructure with ANY current file formats or parsers.")
     mol = bipyridine_smiles.copy()  # don't screw up the fixture object
     mol.bond_graph[mol.atoms[3]][mol.atoms[5]] = 3
     mol.bond_graph[mol.atoms[5]][mol.atoms[3]] = 3

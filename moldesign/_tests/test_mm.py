@@ -74,7 +74,7 @@ def openbabel_ghemical(small_molecule):
 
 @typedfixture('hasmodel', scope='function')
 def protein_default_amber_forcefield():
-    mol = mdt.read(helpers.get_data_path('1yu8'))
+    mol = mdt.read(helpers.get_data_path('1yu8.pdb'))
     newmol = mdt.assign_forcefield(mol)
     newmol.set_energy_model(mdt.models.ForceField)
     return newmol

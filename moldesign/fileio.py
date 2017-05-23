@@ -59,7 +59,7 @@ def read(f, format=None):
     filename = None
 
     # Open a file-like object
-    if isinstance(f, basestring) and os.path.exists(f):  # it's a path to a file
+    if isinstance(f, basestring) and _isfile(f):  # it's a path to a file
         filename = os.path.expanduser(f)
         format, compression = _get_format(filename, format)
         fileobj = COMPRESSION[compression](filename, mode='r')
@@ -86,6 +86,13 @@ def read(f, format=None):
 
     mdt.helpers.atom_name_check(mol)
     return mol
+
+
+def _isfile(f):
+    try:
+        return os.path.isfile(f)
+    except TypeError:
+        return False
 
 
 @utils.exports
@@ -167,7 +174,7 @@ def write_trajectory(traj, filename=None, format=None, overwrite=True):
 
     # for traditional molecular file formats, write the frames one after another
     else:
-        if filename and (not overwrite) and os.path.exists(filename):
+        if filename and (not overwrite) and _isfile(filename):
             raise IOError('%s exists' % filename)
         if not filename:
             fileobj = StringIO.StringIO()

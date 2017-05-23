@@ -1,3 +1,4 @@
+.cloudcomputecannon
 *.pyc
 *.pyo
 .ipynb_checkpoints/
@@ -14,3 +15,7 @@ __pycache__
 .coverage*
 codeship.aes
 tokens
+moldesign/_static_data/components.ci*
+moldesign/_static_data/aa-variants-v1.ci*
+tmp
+

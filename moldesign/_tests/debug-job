@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+
+function echocmd(){ #echo the command and then run it
+   echo "> $@"
+   $@
+}
+
+function get_container_cmd(){
+       echo $(docker inspect  -f "{{.Config.Cmd}}" ${1})
+}
+
+function denter(){ # Open a terminal in this container or image
+    info=$(docker inspect $1)
+    exists=$?
+    entrypt=$2
+    args=$3
+    if [ "$2" == '--socket' ] ; then
+       flags='-v /var/run/docker.sock:/var/run/docker.sock'
+    else
+       flags=''
+    fi
+    echo $info | grep -s "RepoTags" > /dev/null
+    if [ $? -eq 0 ]; then  # it's an image
+       echocmd docker run -it $1 $2 $3
+    elif [ $exists -eq 0 ] ; then  # it's a container
+        echo " -- Container was run with command: $(get_container_cmd ${1}) --"
+        echo
+
+	    echo $info | grep -s '"Running": true,' > /dev/null
+        if [ $? -eq 0 ]; then # it's running now
+            echocmd docker exec -it $1 $2 $3
+        else # it's stopped
+            echocmd docker commit $1 mdt_debugjob_tmpimage
+            echocmd docker run $flags --entrypoint=$2 -it mdt_debugjob_tmpimage $3
+        fi
+    else
+       echo "No image or container named '$1'"
+    fi
+}
+
+function headcut(){ #don't print first N lines
+   awk "NR>$1" $2
+}
+
+function col(){
+   awk "{print \$$1}" $2
+}
+
+function lastcontainer(){
+  containerid=`docker ps -l -f status=exited | headcut 1 | col 1`
+  echo ${containerid}
+}
+
+function parse_cmd_line(){
+    objid=$1
+    option=$2
+
+    if [ $# -ne 2 ] && [ $# -ne 1 ] ; then
+        printhelp
+        exit 1
+    fi
+
+    case $objid in
+        -h|--help|"")
+        printhelp
+        exit 0
+        ;;
+        "last")
+        objid=$(lastcontainer)
+        ;;
+    esac
+
+    case $option in
+        "--pdb")
+        cmd="python"
+        args="-m pdb run_job.py --debug"
+        ;;
+        ""|"--shell")
+        cmd="bash"
+        args=""
+        ;;
+        "--ipython")
+        cmd="ipython"
+        args=""
+        ;;
+        *)
+        printhelp
+        exit 1
+        ;;
+    esac
+
+    denter $objid "$cmd" "$args"
+}
+
+function printhelp(){
+        echo " USAGE: debug-job (Container) [Flag]
+
+ Container: \"last\", image ID, or container ID.
+    Note:
+    - If \"last\", this will launch the _most recently stopped_ container. Otherwise, similar
+    to the docker CLI, you can just give it enough characters of an ID to uniquely identify
+    the container.
+
+ Flags:
+   --shell     open a shell in the docker container (default)
+   --pdb       run Python debugger (PDB) on the execution script (for python jobs only)
+   --ipython   launch ipython in the docker container (if installed)
+   -h,--help   print this message and exit
+        "
+        if [ -z $objid ]; then exit 1
+        else exit 0
+        fi
+}
+
+parse_cmd_line $@

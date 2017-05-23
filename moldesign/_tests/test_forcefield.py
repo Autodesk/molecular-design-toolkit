@@ -4,6 +4,7 @@ import moldesign as mdt
 
 from . import helpers
 
+# TODO: test parameterization error detection
 
 @pytest.fixture(scope='function')
 def mol_from_xyz():

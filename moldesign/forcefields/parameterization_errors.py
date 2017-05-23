@@ -20,21 +20,26 @@ import cgi
 
 
 class ForceFieldMessage(object):
-    pass
-
-
-class StructureOk(ForceFieldMessage):
-    """
-    A blank message if no other warnings are generated.
-    """
-    message = 'No errors or warnings'
-    desc = 'No errors or warnings'
+    def __init__(self, message):
+        self.message = message
+        self.desc = message
+        self.short = message
 
     def show(self, viewer):
         viewer.ribbon(opacity=0.7)
 
     def unshow(self, viewer):
         pass
+
+
+class StructureOk(ForceFieldMessage):
+    """
+    A blank message if no other warnings are generated.
+    """
+    MSG = 'No errors or warnings'
+
+    def __init__(self):
+        super(StructureOk, self).__init__(self.MSG)
 
 
 class MissingTerms(ForceFieldMessage):
@@ -42,12 +47,6 @@ class MissingTerms(ForceFieldMessage):
         self.message = message
         self.desc = self.message
         self.short = self.message
-
-    def show(self, viewer):
-        viewer.ribbon(opacity=0.7)
-
-    def unshow(self, viewer):
-        pass
 
 
 class UnknownAtom(ForceFieldMessage):
