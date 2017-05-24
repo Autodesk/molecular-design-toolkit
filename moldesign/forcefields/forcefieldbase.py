@@ -123,8 +123,6 @@ class TLeapForcefield(Forcefield):
             # TODO: much more rigorous consistency checking
             newmol.ff.copy_to(mol)
 
-
-
     def create_prepped_molecule(self, mol, display=True):
         from ..interfaces import ambertools
 
@@ -154,3 +152,8 @@ class TLeapForcefield(Forcefield):
 
     def add_ff(self, ff):
         self._fflines.extend(ff._fflines)
+        for fname, fobj in ff._file_list.iteritems():
+            if fname in self._file_list:
+                raise ValueError("Can't combine forcefields - two files with same name (%s)"
+                                 %fname)
+        self._file_list.update(ff._file_list)

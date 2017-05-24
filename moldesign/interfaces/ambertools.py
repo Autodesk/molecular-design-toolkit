@@ -215,7 +215,7 @@ def _run_tleap_assignment(mol, leapcmds, files=None, **kwargs):
         Ambertools Manual, http://ambermd.org/doc12/Amber16.pdf. See page 33 for forcefield
         recommendations.
     """
-    leapstr = leapcmds
+    leapstr = leapcmds[:]
     inputs = {}
     if files is not None:
         inputs.update(files)
@@ -235,7 +235,6 @@ def _run_tleap_assignment(mol, leapcmds, files=None, **kwargs):
                     name="tleap, %s" % mol.name)
 
     return compute.run_job(job, **kwargs)
-
 
 
 def _prep_for_tleap(mol):
