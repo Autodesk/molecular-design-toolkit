@@ -104,24 +104,38 @@ def mol_from_smiles():
 def test_parameterization_from_formats(objkey, request):
     mol = request.getfuncargvalue(objkey)
     assert not mol.ff
-    params = mdt.parameterize(mol, charges='gasteiger')
-    _test_succesful_parameterization(mol, params)
+    params = mdt.create_ff_parameters(mol, charges='gasteiger')
+    assert params is not None
+    _test_succesful_parameterization(mol)
+
+
+def test_parameterize_multiple_identical_small_molecules():
+    m1 = mdt.from_smiles('O')
+    params = mdt.create_ff_parameters(m1, charges='am1-bcc')
+    assert params is not None
+    m2 = m1.copy()
+    m2.translate([4.0, 0.0, 0.0] * mdt.units.angstrom)
+    mol = m1.combine(m2)
+    ff = mdt.forcefields.DefaultAmber()
+    ff.add_ff(params)
+
+    ff.assign(mol)
+    _test_succesful_parameterization(mol)
 
 
 @pytest.mark.parametrize('chargemodel',
                          'esp gasteiger zero am1-bcc'.split())
 def test_charge_models(mol_from_smiles, chargemodel):
     mol = mol_from_smiles
-
     if chargemodel == 'esp':
         pytest.xfail("ESP not yet implemented")
     assert not mol.ff
-    params = mdt.parameterize(mol, charges=chargemodel)
-    _test_succesful_parameterization(mol, params)
-
-
-def _test_succesful_parameterization(mol, params):
+    params = mdt.create_ff_parameters(mol, charges=chargemodel)
     assert params is not None
+    _test_succesful_parameterization(mol)
+
+
+def _test_succesful_parameterization(mol):
     assert mol.ff
     mol.set_energy_model(mdt.models.ForceField)
     mol.calculate()
@@ -129,15 +143,26 @@ def _test_succesful_parameterization(mol, params):
     assert 'forces' in mol.properties
 
 
+def test_1yu8_default_amber_fix_and_assignment():
+    ff = mdt.forcefields.DefaultAmber()
+    mol = mdt.read(helpers.get_data_path('1yu8.pdb'))
+    newmol = ff.create_prepped_molecule(mol)
+    _test_succesful_parameterization(newmol)
+
+
 def test_ff_assignment_doesnt_change_topology():
     m = mdt.read(helpers.get_data_path('3aid.pdb'))
     protein = mdt.Molecule(m.get_atoms('protein'))
     ligand = mdt.Molecule(m.get_atoms('unknown'))
-    ligff = mdt.parameterize(ligand, charges='gasteiger')
+    ligff = mdt.create_ff_parameters(ligand, charges='gasteiger')
 
     mdt.guess_histidine_states(protein)
     mol = protein.combine(ligand)
-    mdready = mdt.assign_forcefield(mol, parameters=ligff)
+
+    ff = mdt.forcefields.DefaultAmber()
+    ff.add_ff(ligff)
+
+    mdready = ff.create_prepped_molecule(mol)
 
     assert mdready.num_residues == mol.num_residues
     assert mdready.num_chains == mol.num_chains

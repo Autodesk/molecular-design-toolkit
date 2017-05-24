@@ -3,7 +3,7 @@
 # this script expects to run from the moldesign/_tests directory
 
 function check_if_tests_should_run(){
-	echo "Should I run the tests in this environment?"
+    echo "Should I run the tests in this environment?"
 
    if [ "${TESTENV}" == "complete" ]; then
        runthem=true
@@ -33,19 +33,19 @@ function check_if_tests_should_run(){
 
 
 function run_tests(){
-	if [ "${TESTENV}" == "complete" ]; then
+    if [ "${TESTENV}" == "complete" ]; then
            coverageflags="--cov .. --cov-config=./.coveragerc"
-	fi
+    fi
 
-	py.test -n 4 --junit-xml=/opt/reports/junit.${TESTENV}.xml $coverageflags | tee /opt/reports/pytest.${TESTENV}.log
-	exitstat=${PIPESTATUS[0]}
+    py.test -n 4 --durations=20 --junit-xml=/opt/reports/junit.${TESTENV}.xml ${coverageflags} | tee /opt/reports/pytest.${TESTENV}.log
+    exitstat=${PIPESTATUS[0]}
 
-	statline="$(tail -n1 /opt/reports/pytest.${TESTENV}.log)"
+    statline="$(tail -n1 /opt/reports/pytest.${TESTENV}.log)"
 
-	echo 'Test status:'
-	echo ${statline}
+    echo 'Test status:'
+    echo ${statline}
 
-	python ../../deployment/send_test_status.py "${exitstat}" "${statline}"
+    python ../../deployment/send_test_status.py "${exitstat}" "${statline}"
 
     if [ "${TESTENV}" == "complete" ]; then
        if [[ ${exitstat} == 0 && "$CI_BRANCH" != "" ]]; then
@@ -55,7 +55,7 @@ function run_tests(){
        fi
     fi
 
-	exit ${exitstat}
+    exit ${exitstat}
 }
 
 

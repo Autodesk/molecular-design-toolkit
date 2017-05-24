@@ -20,7 +20,7 @@ from . import ForceField
 
 
 @exports
-class GAFF(ForceField):
+class GaffSmallMolecule(ForceField):
     """ Model the energy using the GAFF forcefield
 
     This is implemented as a special case of the ForceField energy model; it automates small
@@ -42,16 +42,17 @@ class GAFF(ForceField):
 
     def prep(self, force=False):
         self._parameterize()
-        return super(GAFF, self).prep()
+        return super(GaffSmallMolecule, self).prep()
 
     def calculate(self, requests=None):
         if not self._prepped:
             self._parameterize()
-        return super(GAFF, self).calculate(requests=requests)
+        return super(GaffSmallMolecule, self).calculate(requests=requests)
 
     def _parameterize(self):
         if not self.mol.ff:
-            mdt.parameterize(self.mol,
-                             charges=self.params.partial_charges,
-                             ffname=self.params.gaff_version)
+            params = mdt.create_ff_parameters(self.mol,
+                                              charges=self.params.partial_charges,
+                                              baseff=self.params.gaff_version)
+            params.assign(self.mol)
 

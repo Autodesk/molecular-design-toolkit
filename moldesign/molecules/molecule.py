@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import itertools
+import string
 
+import collections
 import numpy as np
 
 import moldesign as mdt
@@ -644,6 +646,11 @@ class MolTopologyMixin(object):
     def combine(self, *others):
         """ Create a new molecule from a group of other AtomContainers
 
+        Notes:
+            - Chain IDs and sequence numbers are automatically assigned if they are missing
+            - Chains will be renamed to prevent chain ID clashes
+            - Residue resnames are not changed.
+
         Args:
             *others (AtomContainer or AtomList or List[moldesign.Atom]):
 
@@ -651,11 +658,25 @@ class MolTopologyMixin(object):
             mdt.Molecule: a new Molecule that's the union of this structure with all
               others. Chains will be renamed as necessary to avoid clashes.
         """
-        new_atoms = self.atoms[:]
-        charge = self.charge
-        names = [self.name]
-        for obj in others:
-            objatoms = mdt.helpers.get_all_atoms(obj)
+        new_atoms = []
+        charge = 0
+        names = []
+
+        chain_names = collections.OrderedDict((x, None) for x in string.ascii_uppercase)
+        taken_names = set()
+        seen_chains = set()
+
+        for obj in itertools.chain([self], others):
+            objatoms = mdt.helpers.get_all_atoms(obj).copy()
+            for atom in objatoms:
+                chain = atom.chain
+                if chain not in seen_chains:
+                    seen_chains.add(chain)
+                    if chain.pdbindex is None or chain.pdbindex in taken_names:
+                        chain.pdbindex = chain.name = chain_names.iterkeys().next()
+                    chain_names.pop(chain.pdbindex, None)
+                    taken_names.add(chain.pdbindex)
+
             new_atoms.extend(objatoms)
             charge += getattr(obj, 'charge', 0*u.q_e)
             if hasattr(obj, 'name'):
