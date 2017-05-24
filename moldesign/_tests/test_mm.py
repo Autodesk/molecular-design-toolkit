@@ -32,20 +32,19 @@ def small_molecule():
 
 @typedfixture('hasmodel')
 def parameterize_zeros(small_molecule):
-    params = mdt.create_ff_parameters(small_molecule, charges='zero', baseff='gaff2')
-    ff = mdt.forcefields.GAFF2()
-    mol = ff.create_prepped_molecule(small_molecule)
-    mol.set_energy_model(mdt.models.ForceField)
-    return mol
+    return _param_small_mol(small_molecule, 'zero')
 
 
 @typedfixture('hasmodel')
 def parameterize_am1bcc(small_molecule):
-    params = mdt.create_ff_parameters(small_molecule, charges='am1-bcc', baseff='gaff')
-    ff = mdt.forcefields.TLeapLib('gaff2')
-    mol = ff.create_prepped_molecule(small_molecule)
-    mol.set_energy_model(mdt.models.ForceField)
-    return mol
+    return _param_small_mol(small_molecule, 'am1-bcc')
+
+
+def _param_small_mol(small_molecule, chargemodel):
+    params = mdt.create_ff_parameters(small_molecule, charges=chargemodel, baseff='gaff2')
+    params.assign(small_molecule)
+    small_molecule.set_energy_model(mdt.models.ForceField)
+    return small_molecule
 
 
 @typedfixture('hasmodel')
@@ -85,7 +84,7 @@ def protein_default_amber_forcefield():
 
 @typedfixture('hasmodel')
 def gaff_model_gasteiger(small_molecule):
-    small_molecule.set_energy_model(mdt.models.GAFF, partial_charges='gasteiger')
+    small_molecule.set_energy_model(mdt.models.GaffSmallMolecule, partial_charges='gasteiger')
     return small_molecule
 
 
