@@ -67,3 +67,36 @@ Established techniques and general simulation tools that will be useful for **3-
  * Visualization and UI: visualizations for specific systems (not generally applicable); 
 
 
+# Development guidelines
+
+### Whenever commiting changes anywhere
+
+Make SURE that you've run `nb-output-filter.sh` at the project base. You only need to do this once (per copy of the repository). This will make sure that you don't accidentally commit any `ipynb` output fields into the repository. You can check to make sure the filters are working by running `git diff` on any notebook file that has output in it: all `output` and `metadata` fields should remain blank.
+
+
+### Maintainers: Accepting a PR
+
+Work can be merged into `master` or a feature branch, as appropriate. Don't merge broken code
+into master, but it doesn't need to be totally production-ready either: only releases (below)
+are considered "stable".
+
+1. Review the code.
+1. Make sure that there's appropriate functional tests.
+1. Check that the travis build is at least running all the way to the end. The tests don't *necessarily* need to pass, but you need to undertand why  what's passing and what's not.
+
+
+### Releases
+
+1. Decide on the new version number (using [semantic versioning](http://semver.org/)). For our purposes here, we'll pretend it's `0.9.3`.
+1. Tag the relevant commit (the build must be passing) with a release candidate version number, e.g., `0.9.3rc1`.
+1. Codeship will automatically deploy the updated release to PyPI and DockerHub (still WIP 5/17)
+
+### Maintainers: updating the documentation
+
+Documentation is NOT coupled to the package releases; docs tend to get updated continuously.
+
+1. In the `master` branch, update the version numbers in `docs/conf.py`
+1. Run `cd docs; make clean; make html`. 
+1. In a separate directory, check out a fresh copy of the repo and run `git checkout gh-pages`
+1. Copy the contents of `[master branch]/docs/_build/html` into the root of the `gh-pages` branch.
+1. Commit your changes to the `gh-pages` branch and push them back to GitHub.
