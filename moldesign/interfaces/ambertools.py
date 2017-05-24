@@ -240,11 +240,15 @@ def _run_tleap_assignment(mol, leapcmds, files=None, **kwargs):
 def _prep_for_tleap(mol):
     """ Returns a modified *copy* that's been modified for input to tleap
 
-    Currently, this just looks for disulfide bonds
+    Makes the following modifications:
+       1. Reassigns all residue IDs
+       2. Assigns tleap-appropriate cysteine resnames
     """
     change = False
     clean = mdt.Molecule(mol.atoms)
     for residue in clean.residues:
+        residue.pdbindex = residue.index+1
+
         if residue.resname == 'CYS':  # deal with cysteine states
             if 'SG' not in residue.atoms or 'HG' in residue.atoms:
                 continue  # sulfur's missing, we'll let tleap create it

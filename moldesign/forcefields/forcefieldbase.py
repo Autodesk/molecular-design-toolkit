@@ -128,7 +128,7 @@ class TLeapForcefield(Forcefield):
 
         clean_molecule = ambertools._prep_for_tleap(mol)
 
-        job = ambertools._run_tleap_assignment(mol, self._fflines, self._file_list)
+        job = ambertools._run_tleap_assignment(clean_molecule, self._fflines, self._file_list)
 
         if 'output.inpcrd' in job.get_output():
             prmtop = job.get_output('output.prmtop')
