@@ -105,7 +105,6 @@ def test_parameterization_from_formats(objkey, request):
     mol = request.getfuncargvalue(objkey)
     assert not mol.ff
     params = mdt.create_ff_parameters(mol, charges='gasteiger')
-    params.assign(mol)
     assert params is not None
     _test_succesful_parameterization(mol)
 
@@ -122,7 +121,6 @@ def test_parameterize_multiple_identical_small_molecules():
 
     ff.assign(mol)
     _test_succesful_parameterization(mol)
-
 
 
 @pytest.mark.parametrize('chargemodel',
