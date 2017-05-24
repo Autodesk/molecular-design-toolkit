@@ -53,5 +53,5 @@ class GAFF(ForceField):
         if not self.mol.ff:
             mdt.create_ff_parameters(self.mol,
                                      charges=self.params.partial_charges,
-                                     ffname=self.params.gaff_version)
+                                     baseff=self.params.gaff_version)
 

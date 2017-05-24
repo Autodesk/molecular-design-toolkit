@@ -24,12 +24,12 @@ class TLeapLib(TLeapForcefield):
     """ A forcefield from TLeap's library
     """
     def __init__(self, *ffnames):
-        self.names = [ffnames]
+        self.names = ffnames
         sourcelines = ['source %s' % data.AMBER_LEAPRC[ffn] for ffn in ffnames]
         super(TLeapLib, self).__init__(sourcelines)
 
     def __str__(self):
-        return "TLeap data: %s' % ','.join(self.names)"
+        return "TLeap data: %s" % ','.join(self.names)
 
 
 @exports

@@ -105,7 +105,7 @@ def test_numeric_residue_name_1PYN(request, mol):
     mol = request.getfuncargvalue(mol)
     ligand = mdt.Molecule(mol.residues[283])
 
-    params = mdt.parameterize(ligand, charges='gasteiger')
+    params = mdt.create_ff_parameters(ligand, charges='gasteiger')
     params.lib.put('/tmp/tmp.lib')
 
     contents = parmed.load_file('/tmp/tmp.lib')

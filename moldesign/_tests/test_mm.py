@@ -32,16 +32,18 @@ def small_molecule():
 
 @typedfixture('hasmodel', scope='function')
 def parameterize_zeros(small_molecule):
-    params = mdt.parameterize(small_molecule, charges='zero')
-    mol = mdt.assign_forcefield(small_molecule, parameters=params)
+    params = mdt.create_ff_parameters(small_molecule, charges='zero', baseff='gaff2')
+    ff = mdt.forcefields.GAFF2()
+    mol = ff.create_prepped_molecule(small_molecule)
     mol.set_energy_model(mdt.models.ForceField)
     return mol
 
 
 @typedfixture('hasmodel', scope='function')
 def parameterize_am1bcc(small_molecule):
-    params = mdt.parameterize(small_molecule, charges='am1-bcc', ffname='gaff')
-    mol = mdt.assign_forcefield(small_molecule, parameters=params)
+    params = mdt.create_ff_parameters(small_molecule, charges='am1-bcc', baseff='gaff')
+    ff = mdt.forcefields.TLeapLib('gaff2')
+    mol = ff.create_prepped_molecule(small_molecule)
     mol.set_energy_model(mdt.models.ForceField)
     return mol
 
@@ -75,7 +77,8 @@ def openbabel_ghemical(small_molecule):
 @typedfixture('hasmodel', scope='function')
 def protein_default_amber_forcefield():
     mol = mdt.read(helpers.get_data_path('1yu8.pdb'))
-    newmol = mdt.assign_forcefield(mol)
+    ff = mdt.forcefields.DefaultAmber()
+    newmol = ff.create_prepped_molecule(mol)
     newmol.set_energy_model(mdt.models.ForceField)
     return newmol
 
