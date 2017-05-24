@@ -34,7 +34,7 @@ function check_if_tests_should_run(){
 
 function run_tests(){
 	if [ "${TESTENV}" == "complete" ]; then
-	   coverageflags="--cov .. --cov-report=term-missing:/opt/reports/coverage --cov-report="
+           coverageflags="--cov .. --cov-config=./.coveragerc"
 	fi
 
 	py.test -n 4 --junit-xml=/opt/reports/junit.${TESTENV}.xml $coverageflags | tee /opt/reports/pytest.${TESTENV}.log
@@ -45,14 +45,13 @@ function run_tests(){
 	echo 'Test status:'
 	echo ${statline}
 
-	python ../../deployment/send_test_status.py ${exitstat} "${statline}"
+	python ../../deployment/send_test_status.py "${exitstat}" "${statline}"
 
-	if [ "${TESTENV}" == "complete" ]; then
-       if [ ${exitstat} -eq 0 ]; then
+    if [ "${TESTENV}" == "complete" ]; then
+       if [[ ${exitstat} == 0 && "$CI_BRANCH" != "" ]]; then
           coveralls || echo "Failed to upload code coverage stats"
        else
-       	  echo "Skipping coveralls upload: tests not passing."
-       	  coverage report
+          echo "Skipping coveralls upload: tests not passing or \$CI_COMMIT not set."
        fi
     fi
 
