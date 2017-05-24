@@ -130,11 +130,22 @@ def test_molecule_copy(fixture_key, request):
     assert mol.integrator == newmol.integrator
 
 
-def test_molecular_combination(pdb3aid):
-    m2 = pdb3aid.copy()
-    newmol = pdb3aid.combine(m2)
-    assert newmol.num_chains == 2 * pdb3aid.num_chains
+@pytest.mark.parametrize('fixturename', 'pdb3aid h2'.split())
+def test_molecular_combination_chains(request, fixturename):
+    mol = request.getfuncargvalue(fixturename)
+    m2 = mol.copy()
+    newmol = mol.combine(m2)
+    assert newmol.num_chains == 2*mol.num_chains
     assert len(set(chain for chain in newmol.chains)) == newmol.num_chains
+    _assert_unique_chainids(newmol)
+
+
+def _assert_unique_chainids(mol):
+    chain_names = set()
+    for chain in mol.chains:
+        assert chain.name == chain.pdbindex
+        assert chain.name not in chain_names
+        chain_names.add(chain.name)
 
 
 def test_chain_rename(pdb3aid):
