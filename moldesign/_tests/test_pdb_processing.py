@@ -106,7 +106,7 @@ def test_numeric_residue_name_1PYN(request, mol):
     ligand = mdt.Molecule(mol.residues[283])
 
     params = mdt.create_ff_parameters(ligand, charges='gasteiger')
-    params.lib.put('/tmp/tmp.lib')
+    params._file_list['mol.lib'].put('/tmp/tmp.lib')
 
     contents = parmed.load_file('/tmp/tmp.lib')
     assert len(contents) == 1
@@ -119,9 +119,3 @@ MISSINGRES_2JAJ = [('A', 'GLY', -4), ('A', 'PRO', -3), ('A', 'LEU', -2), ('A', '
                    ('A', 'SER', 284), ('B', 'GLY', 34), ('B', 'GLU', 35), ('B', 'ALA', 168),
                    ('B', 'ASP', 169), ('B', 'GLY', 170), ('B', 'VAL', 282), ('B', 'ASP', 283),
                    ('B', 'SER', 284)]
-
-
-
-
-
-
