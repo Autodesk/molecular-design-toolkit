@@ -3,3 +3,7 @@ omit =
    ../_notebooks/
    ../_static_data/
    ../_tests/
+   ./*.py
+   ../_version.py
+   ../external
+
