@@ -1,4 +1,4 @@
 PyGithub
 pytest-xdist
 pytest-cov
-python-coveralls
+coveralls
