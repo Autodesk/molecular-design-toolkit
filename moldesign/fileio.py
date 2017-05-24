@@ -145,6 +145,14 @@ def write(obj, filename=None, format=None, mode='w'):
         fileobj.close()
 
 
+def write_xyz(mol, fileobj):
+    print >> fileobj, "   %d" % mol.num_atoms
+    print >> fileobj, mol.name
+    for atom in mol.atoms:
+        x, y, z = atom.position.value_in(mdt.units.angstrom)
+        print >> fileobj, "%s   %24.14f   %24.14f   %24.14f" % (atom.element, x, y, z)
+
+
 @utils.exports
 def write_trajectory(traj, filename=None, format=None, overwrite=True):
     """ Write trajectory a file (if filename provided) or file-like buffer
@@ -250,6 +258,27 @@ def read_xyz(f):
         atom.chain = None
     return mdt.Molecule(tempmol.atoms)
 
+
+def read_smiles_file(f):
+    return _get_mol_from_identifier_file(f, from_smiles)
+
+
+def read_inchi_file(f):
+    return _get_mol_from_identifier_file(f, from_inchi)
+
+
+def read_iupac_file(f):
+    return _get_mol_from_identifier_file(f, from_name)
+
+
+def _get_mol_from_identifier_file(fileobj, mol_constructor):
+    for line in fileobj:
+        if line.strip()[0] == '#':
+            continue
+        else:
+            return mol_constructor(line.strip())
+    else:
+        raise IOError("Didn't find any chemical identifiers in the passed file.")
 
 
 @utils.exports
@@ -366,10 +395,15 @@ def _get_format(filename, format):
 READERS = {'pdb': read_pdb,
            'cif': read_mmcif,
            'mmcif': read_mmcif,
+           'smi': read_smiles_file,
+           'smiles': read_smiles_file,
+           'inchi': read_inchi_file,
+           'iupac': read_iupac_file,
            'xyz': read_xyz}
 
 WRITERS = {'pdb': write_pdb,
-           'mmcif': write_mmcif}
+           'mmcif': write_mmcif,
+           'xyz': write_xyz}
 
 PICKLE_EXTENSIONS = set("p pkl pickle mdt".split())
 COMPRESSION = {'gz': gzip.open,

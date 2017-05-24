@@ -12,19 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from moldesign import utils
+import os
+import yaml
 
-def show_parameterization_results(errormessages, molin, molout=None):
-    print 'Forcefield assignment: %s' % ('Success' if molout is not None else 'Failure')
-    for err in errormessages:
-        print utils.html_to_text(err.desc)
+from . import PACKAGEPATH
+from ..utils import exports_names
 
+exports_names('AMBER_DEFAULT', 'AMBER_LEAPRC', 'AMBER_SYSTEM')
 
-def nbmolviz_installed():
-    import imp
-    try:
-        imp.find_module('nbmolviz')
-    except ImportError:
-        return False
-    else:
-        return True
+AMBER_DEFAULT = ('GLYCAM_06j-1', 'tip3p', 'gaff2', 'lipid14', 'OL15', 'OL3', 'ff14SB')
+
+with open(os.path.join(PACKAGEPATH, '_static_data', 'amber_ffs.yml'), 'r') as _ambfile:
+    ambff = yaml.load(_ambfile)
+
+AMBER_LEAPRC = {}
+AMBER_SYSTEM = {}
+for system, ffs in ambff.items():
+    for ff, leaprc in ffs.items():
+        AMBER_LEAPRC[ff] = leaprc
+        AMBER_SYSTEM[ff] = system

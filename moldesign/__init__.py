@@ -28,7 +28,6 @@ from . import units
 
 # Functional subpackages
 from . import compute
-from . import display
 from . import fileio
 from . import exceptions
 from . import external
@@ -59,6 +58,7 @@ from .molecules import *
 from .tools import *
 
 # Set up cloud computing
+_lastjobs = []
 compute.init_config()
 
 

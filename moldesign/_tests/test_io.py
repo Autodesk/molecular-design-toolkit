@@ -31,6 +31,7 @@ def bipyridine_mol2():
 def bipyridine_iupac():
     return mdt.from_name('bipyridine')
 
+
 @pytest.fixture
 def bipyridine_inchi():
     return mdt.from_inchi('InChI=1S/C10H8N2/c1-3-7-11-9(5-1)10-6-2-4-8-12-10/h1-8H')
@@ -59,6 +60,24 @@ def test_atom_names_preserved_from_input_file_mol2(bipyridine_mol2):
     mol = bipyridine_mol2
     for atom in mol.atoms:
         assert atom.name == atom.symbol + str(atom.index)
+
+
+@pytest.fixture
+def propane_pdb():
+    return mdt.read(get_data_path('propane.pdb'))
+
+
+def test_pdb_with_missing_chains(propane_pdb):
+    """ In response to an observed bug where various conversions would fail with a PDB file
+    that's missing chain data
+    """
+    mol = propane_pdb
+
+    pbmol = mdt.interfaces.mol_to_pybel(mol)
+    assert len(pbmol.atoms) == mol.num_atoms
+
+    pmedmol = mdt.interfaces.mol_to_parmed(mol)
+    assert len(pmedmol.atoms) == mol.num_atoms
 
 
 @pytest.mark.parametrize('key', 'mol2 xyz sdf iupac smiles inchi'.split())

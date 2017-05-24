@@ -1,0 +1,32 @@
+carb:
+  GLYCAM_06EPb: leaprc.GLYCAM_06EPb
+  GLYCAM_06j-1: leaprc.GLYCAM_06j-1
+dna:
+  OL15: leaprc.DNA.OL15
+  bsc1: leaprc.DNA.bsc1
+lipid:
+  lipid14: leaprc.lipid14
+organic:
+  gaff: leaprc.gaff
+  gaff2: leaprc.gaff2
+other:
+  modrna08: leaprc.modrna08
+  phosaa10: leaprc.phosaa10
+  xFPchromophores: leaprc.xFPchromophores
+protein:
+  fb15: leaprc.protein.fb15
+  ff03.r1: leaprc.protein.ff03.r1
+  ff03ua: leaprc.protein.ff03ua
+  ff14SB: leaprc.protein.ff14SB
+  ff14SB.redq: leaprc.protein.ff14SB.redq
+  ff14SBonlysc: leaprc.protein.ff14SBonlysc
+  ff15ipq: leaprc.protein.ff15ipq
+  ff15ipq-vac: leaprc.protein.ff15ipq-vac
+rna:
+  OL3: leaprc.RNA.OL3
+  YIL: leaprc.RNA.YIL
+water:
+  opc: leaprc.water.opc
+  spce: leaprc.water.spce
+  tip3p: leaprc.water.tip3p
+  tip4pew: leaprc.water.tip4pew

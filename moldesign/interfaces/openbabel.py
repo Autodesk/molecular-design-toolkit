@@ -232,11 +232,24 @@ def mol_to_pybel(mdtmol):
         if atom.residue and atom.residue not in resmap:
             obres = obmol.NewResidue()
             resmap[atom.residue] = obres
-            obres.SetChain(bytes(
-                    mdt.utils.if_not_none(atom.chain.name, 'Z')[0] ))
-            obres.SetName(bytes(
-                    mdt.utils.if_not_none(atom.residue.pdbname, 'UNL') ))
-            obres.SetNum(mdt.utils.if_not_none(atom.residue.pdbindex, '0'))
+
+            if not atom.chain.name:
+                chain_name = 'Z'
+            else:
+                chain_name = bytes(atom.chain.name[0])
+            obres.SetChain(chain_name)
+
+            if not atom.residue.name:
+                resname = 'UNL'
+            else:
+                resname = bytes(mdt.utils.if_not_none(atom.residue.pdbname, 'UNL'))
+            obres.SetName(resname)
+
+            if not atom.residue.pdbindex:
+                pdbindex = '0'
+            else:
+                pdbindex = str(int(atom.residue.pdbindex))
+            obres.SetNum(pdbindex)
         else:
             obres = resmap[atom.residue]
 

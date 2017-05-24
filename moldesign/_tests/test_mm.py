@@ -23,36 +23,38 @@ def typedfixture(*types, **kwargs):
     return fixture_wrapper
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def small_molecule():
     mol = mdt.from_smiles('CNCOS(=O)C')
     mol.positions += 0.001*np.random.random(mol.positions.shape)*u.angstrom  # move out of minimum
     return mol
 
 
-@typedfixture('hasmodel')
+@typedfixture('hasmodel', scope='function')
 def parameterize_zeros(small_molecule):
-    params = mdt.parameterize(small_molecule, charges='zero')
-    mol = mdt.assign_forcefield(small_molecule, parameters=params)
+    params = mdt.create_ff_parameters(small_molecule, charges='zero', baseff='gaff2')
+    ff = mdt.forcefields.GAFF2()
+    mol = ff.create_prepped_molecule(small_molecule)
     mol.set_energy_model(mdt.models.ForceField)
     return mol
 
 
-@typedfixture('hasmodel')
+@typedfixture('hasmodel', scope='function')
 def parameterize_am1bcc(small_molecule):
-    params = mdt.parameterize(small_molecule, charges='am1-bcc', ffname='gaff')
-    mol = mdt.assign_forcefield(small_molecule, parameters=params)
+    params = mdt.create_ff_parameters(small_molecule, charges='am1-bcc', baseff='gaff')
+    ff = mdt.forcefields.TLeapLib('gaff2')
+    mol = ff.create_prepped_molecule(small_molecule)
     mol.set_energy_model(mdt.models.ForceField)
     return mol
 
 
-@typedfixture('hasmodel')
+@typedfixture('hasmodel', scope='function')
 def openbabel_mmff94(small_molecule):
     small_molecule.set_energy_model(mdt.models.OpenBabelPotential, forcefield='mmff94')
     return small_molecule
 
 
-@typedfixture('hasmodel')
+@typedfixture('hasmodel', scope='function')
 def openbabel_mmff94s(small_molecule):
     small_molecule.set_energy_model(mdt.models.OpenBabelPotential, forcefield='mmff94s')
     return small_molecule
@@ -72,15 +74,16 @@ def openbabel_ghemical(small_molecule):
     return small_molecule
 
 
-@typedfixture('hasmodel')
+@typedfixture('hasmodel', scope='function')
 def protein_default_amber_forcefield():
     mol = mdt.read(helpers.get_data_path('1yu8.pdb'))
-    newmol = mdt.assign_forcefield(mol)
+    ff = mdt.forcefields.DefaultAmber()
+    newmol = ff.create_prepped_molecule(mol)
     newmol.set_energy_model(mdt.models.ForceField)
     return newmol
 
 
-@typedfixture('hasmodel')
+@typedfixture('hasmodel', scope='function')
 def gaff_model_gasteiger(small_molecule):
     small_molecule.set_energy_model(mdt.models.GAFF, partial_charges='gasteiger')
     return small_molecule
@@ -116,9 +119,7 @@ def test_analytical_vs_numerical_forces(objkey, request):
 
 
 @pytest.mark.parametrize('objkey', registered_types['hasmodel'])
-def test_minimization_reduces_energy(objkey, request):
+def test_minimization_trajectory(request, objkey):
     mol = request.getfuncargvalue(objkey)
-    e1 = mol.calculate_potential_energy()
-    mol = request.getfuncargvalue(objkey)
-    traj = mol.minimize()
-    assert mol.calculate_potential_energy() < e1
+    helpers.minimization_tester(mol)
+

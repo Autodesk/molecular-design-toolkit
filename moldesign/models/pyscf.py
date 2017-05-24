@@ -17,13 +17,13 @@ from cStringIO import StringIO
 import numpy as np
 
 import moldesign as mdt
-from moldesign import units as u
-from moldesign import compute, orbitals
-from moldesign.interfaces.pyscf_interface import force_remote, mol_to_pyscf, \
-    StatusLogger, SPHERICAL_NAMES
+
+from .. import units as u
+from .. import compute, orbitals
+from ..interfaces.pyscf_interface import force_remote, mol_to_pyscf,  StatusLogger, SPHERICAL_NAMES
 from .base import QMBase
-from moldesign import display
-from moldesign.utils import DotDict, exports
+from ..utils import DotDict, exports
+from ..helpers import Logger
 
 
 class LazyClassMap(object):
@@ -90,11 +90,11 @@ class PySCFPotential(QMBase):
         self.reference = None
         self.kernel = None
         self.logs = StringIO()
-        self.logger = display.Logger('PySCF interface')
+        self.logger = Logger('PySCF interface')
 
     @compute.runsremotely(enable=force_remote, is_imethod=True)
     def calculate(self, requests=None):
-        self.logger = display.Logger('PySCF calc')
+        self.logger = Logger('PySCF calc')
         do_forces = 'forces' in requests
         if do_forces and self.params.theory not in FORCE_CALCULATORS:
             raise ValueError('Forces are only available for the following theories:'
@@ -444,11 +444,12 @@ class PySCFPotential(QMBase):
                     n = int(''.join(x for x in label[2] if x.isdigit()))
 
                     primitives = [orbitals.SphericalGaussian(atom.position.copy(),
-                                                       exp, n, l, m,
-                                                       coeff=coeff[ictr])
+                                                             exp, n, l, m,
+                                                             coeff=coeff[ictr])
                                   for exp, coeff in zip(exps, coeffs)]
-                    bfs.append(orbitals.AtomicBasisFunction(atom, n=n, l=angular, m=m,
-                                                      primitives=primitives))
+                    bfs.append(orbitals.AtomicBasisFunction(atom,
+                                                            n=n, l=angular, m=m,
+                                                            primitives=primitives))
 
         return bfs
 

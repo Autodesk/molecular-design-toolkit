@@ -13,6 +13,7 @@
 # limitations under the License.
 import inspect
 
+__all__ = 'exports exports_names'.split()
 
 def exports(f):
     """ Add a function to its module's __all__ attribute
