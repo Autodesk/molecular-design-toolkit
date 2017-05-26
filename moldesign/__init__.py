@@ -17,8 +17,6 @@ import os as _os
 
 _building_docs = bool(_os.environ.get('SPHINX_IS_BUILDING_DOCS', ""))
 
-import moldesign.__main__
-
 from . import data
 PACKAGEPATH = data.PACKAGEPATH
 

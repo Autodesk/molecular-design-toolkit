@@ -43,7 +43,7 @@ class Bond(object):
         else:
             self.molecule = a1.molecule
 
-        if a1.index > a2.index:
+        if a1.index is not None and a2.index is not None and a1.index > a2.index:
             a1, a2 = a2, a1
         self.a1 = a1
         self.a2 = a2

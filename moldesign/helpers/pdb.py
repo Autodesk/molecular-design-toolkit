@@ -270,7 +270,7 @@ def get_pdb_missing_residues(fileobj):
     lineiter = iter(fileobj)
     while True:
         try:
-            fields = lineiter.next().split()
+            fields = next(lineiter).split()
         except StopIteration:
             missing = {}  # no missing residues found in file
             break
@@ -291,7 +291,7 @@ def get_pdb_missing_residues(fileobj):
 def _parse_missing_xtal(fileobj):
     missing = []
     while True:
-        fields = fileobj.next().split()
+        fields = next(fileobj).split()
         if fields[:2] != ['REMARK', '465']:
             break
 
@@ -309,12 +309,12 @@ def _parse_missing_xtal(fileobj):
 
 
 def _parse_missing_nmr(fileobj):
-    header = fileobj.next().split()
+    header = next(fileobj).split()
     assert header == ['REMARK', '465', 'RES', 'C', 'SSSEQI']
 
     missing = []
     while True:
-        fields = fileobj.next().split()
+        fields = next(fileobj).split()
 
         if fields[:2] != ['REMARK', '465']:
             break

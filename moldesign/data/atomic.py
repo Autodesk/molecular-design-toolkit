@@ -52,7 +52,7 @@ ATOMIC_MASSES = {i: m*u.amu for i, m in zip(range(1, 55), (
     119.902197, 120.903818,
     129.906223, 126.904468, 131.904154))}
 
-for atnum, mass in ATOMIC_MASSES.items():
+for atnum, mass in list(ATOMIC_MASSES.items()):
     ATOMIC_MASSES[ELEMENTS[atnum]] = mass  # index by atnum and symbol
 
 ATOMIC_MASSES[-1] = -1.0*u.amu

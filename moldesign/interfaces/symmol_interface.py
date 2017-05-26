@@ -87,7 +87,7 @@ def parse_output(outfile):
         elif fields == MATRIXSTRING:  # get coordinates along principal axes
             data.orthmat = np.zeros((3, 3))
             for i in range(3):
-                data.orthmat[i] = list(map(float, lines.next().split()))
+                data.orthmat[i] = list(map(float, next(lines).split()))
 
         elif fields[:2] == 'Schoenflies symbol'.split():
             data.symbol = fields[3]

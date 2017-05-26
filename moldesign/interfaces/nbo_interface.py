@@ -232,7 +232,7 @@ def _get_wrapped_separated_vals(lineiter, nbasis):
 def _get_wrapped_column_vals(lineiter, nbasis):
     vals = []
     while True:
-        l = lineiter.next()[1:]
+        l = next(lineiter.next)[1:]
         lenl = len(l)
         for i in range(20):
             if lenl <= 3*i + 1: break

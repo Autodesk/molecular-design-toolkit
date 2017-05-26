@@ -1,5 +1,6 @@
 biopython
 docker >= 2.0
+future
 fortranformat
 funcsigs
 markdown2

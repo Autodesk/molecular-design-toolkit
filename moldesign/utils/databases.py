@@ -14,7 +14,6 @@
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
-import os
 import dbm.dumb
 import json
 import zlib
@@ -25,7 +24,7 @@ from . import Alias
 class CompressedJsonDbm(object):
     """ Quick-and-dirty interface to a DBM file
     """
-    def __init__(self, filename, flag='r', dbm=dumbdbm):
+    def __init__(self, filename, flag='r', dbm=dbm.dumb):
         self.dbm = dbm
         if hasattr(dbm, 'open'):
             self.db = self.dbm.open(filename, flag)
@@ -43,7 +42,7 @@ class CompressedJsonDbm(object):
 
     def __getitem__(self, key):
         gzvalue = self.db[key]
-        return json.loads(zlib.decompress(gzvalue))
+        return json.loads(zlib.decompress(gzvalue).decode())
 
     def __setitem__(self, key, value):
         gzvalue = zlib.compress(json.dumps(value))
