@@ -15,6 +15,9 @@
 """
 This module contains various utility functions that are exposed to API users
 """
+from __future__ import print_function
+from builtins import str
+from builtins import zip
 import moldesign as mdt
 from moldesign import units as u
 
@@ -169,7 +172,7 @@ def guess_histidine_states(mol):
                 residue.resname = 'HIE'
             else:
                 residue.resname = 'HID'
-            print 'Renaming %s from HIS to %s' % (oldname, residue.resname)
+            print('Renaming %s from HIS to %s' % (oldname, residue.resname))
 
 
 @toplevel

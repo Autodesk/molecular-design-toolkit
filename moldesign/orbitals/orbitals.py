@@ -23,13 +23,16 @@ Notes:
       - adiabatic electronic states are indexed using capital letters, _N_, _L_, _M_, etc.
 
 """
+from builtins import zip
+from builtins import str
+from builtins import object
 import numpy as np
 
 from moldesign import units as u
 from moldesign.utils import Alias
 
 SHELLS = {0: 's', 1: 'p', 2: 'd', 3: 'f', 4: 'g', 5: 'h'}
-ANGMOM = {v: k for k, v in SHELLS.iteritems()}
+ANGMOM = {v: k for k, v in SHELLS.items()}
 
 # See https://en.wikipedia.org/wiki/Table_of_spherical_harmonics#Real_spherical_harmonics
 SPHERICALNAMES = {(0, 0): 's', (1, -1): 'p(x)', (1, 0): 'p(z)', (1, 1): 'p(y)',

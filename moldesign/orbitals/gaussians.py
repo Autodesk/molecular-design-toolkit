@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Note: this code is currently unused and untested and will be refactored soon"""
+from __future__ import division
+from builtins import range
+from past.utils import old_div
+from builtins import object
 import numpy as np
 
 from .orbitals import Orbital, SHELLS, SPHERICALNAMES
@@ -176,7 +180,7 @@ class CartesianGaussian(AbstractFunction):
         a = self.exp
         b = other.exp
         exp = a + b
-        center = (a*self.center + b*other.center)/(a+b)
+        center = old_div((a*self.center + b*other.center),(a+b))
         powers = self.powers + other.powers
         return CartesianGaussian(center=center, exp=exp,
                                  powers=powers, coeff=self.coeff*other.coeff)
@@ -200,7 +204,7 @@ class CartesianGaussian(AbstractFunction):
             Dwight, Herbert B. Tables of Integrals and other Mathematical Data, 3rd ed.
                 Macmillan 1957. 201.
         """
-        integ = (np.pi/self.exp)**(self.ndim/2.0)
+        integ = (old_div(np.pi,self.exp))**(old_div(self.ndim,2.0))
         for p in self.powers:
             if p == 0:  # no contribution
                 continue
@@ -209,7 +213,7 @@ class CartesianGaussian(AbstractFunction):
             elif p < 0:
                 raise ValueError('Powers must be positive or 0')
             else:
-                integ *= _ODD_FACTORIAL[p-1]/(2 ** (p+1))
+                integ *= old_div(_ODD_FACTORIAL[p-1],(2 ** (p+1)))
         return self.coeff * integ
 
 
@@ -344,7 +348,7 @@ class AtomicBasisFunction(Orbital):
     def normalize(self):
         """ Scale primitive coefficients to normalize this basis function
         """
-        prefactor = 1.0/np.sqrt(self.norm)
+        prefactor = old_div(1.0,np.sqrt(self.norm))
         for primitive in self.primitives:
             primitive *= prefactor
 
@@ -397,7 +401,7 @@ class AtomicBasisFunction(Orbital):
 # Precompute odd factorial values (N!!)
 _ODD_FACTORIAL = {0: 1}  #by convention
 _ofact = 1
-for _i in xrange(1, 20, 2):
+for _i in range(1, 20, 2):
     _ofact *= _i
     _ODD_FACTORIAL[_i] = float(_ofact)
 
@@ -418,12 +422,12 @@ def cart_to_powers(s):
     lastchar = None
     while True:
         try:
-            char = chars.next()
+            char = next(chars)
         except StopIteration:
             break
 
         if char == '^':
-            power = int(chars.next())
+            power = int(next(chars))
             powers[DIMLABELS[lastchar]] += power - 1
             lastchar = None
         else:
@@ -443,8 +447,8 @@ class ERI4FoldTensor(object):
         nbasis = len(self.basis_orbitals)
         mapping = np.zeros((nbasis, nbasis), dtype='int')
         ij = 0
-        for i in xrange(nbasis):
-            for j in xrange(i + 1):
+        for i in range(nbasis):
+            for j in range(i + 1):
                 mapping[i, j] = mapping[j, i] = ij
                 ij += 1
         self.mapping = mapping

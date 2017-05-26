@@ -16,6 +16,7 @@ This module contains python "descriptors" (nothing to do with chemoinformatic "d
 help maintain the links between an atom's coordinates and its molecule's coordinates
 """
 
+from builtins import object
 class ProtectedArray(object):
     """
     Descriptor for arrays that shouldn't be reassigned.

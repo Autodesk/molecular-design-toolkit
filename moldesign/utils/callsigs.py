@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import object
 import functools
 import inspect
 import os
@@ -75,13 +76,13 @@ def args_from(original_function,
             for param in only:
                 newparams.append(sig.parameters[param])
         elif allexcept:
-            for name, param in sig.parameters.iteritems():
+            for name, param in sig.parameters.items():
                 if name not in allexcept:
                     newparams.append(param)
         else:
-            newparams = sig.parameters.values()
+            newparams = list(sig.parameters.values())
         if inject_kwargs:
-            for name, default in inject_kwargs.iteritems():
+            for name, default in inject_kwargs.items():
                 newp = funcsigs.Parameter(name, funcsigs.Parameter.POSITIONAL_OR_KEYWORD,
                                           default=default)
                 newparams.append(newp)
@@ -147,7 +148,7 @@ def kwargs_from(reference_function, mod_docs=True):
     origname = get_qualified_name(reference_function)
 
     kwparams = []
-    for name, param in refsig.parameters.iteritems():
+    for name, param in refsig.parameters.items():
         if param.default != param.empty or param.kind in (param.VAR_KEYWORD, param.KEYWORD_ONLY):
             if param.name[0] != '_':
                 kwparams.append(param)
@@ -161,7 +162,7 @@ def kwargs_from(reference_function, mod_docs=True):
         fparams = []
         found_varkeyword = None
 
-        for name, param in sig.parameters.iteritems():
+        for name, param in sig.parameters.items():
             if param.kind == param.VAR_KEYWORD:
                 fparams.extend(kwparams)
                 found_varkeyword = name
@@ -176,7 +177,7 @@ def kwargs_from(reference_function, mod_docs=True):
         if mod_docs:
             docs = GoogleDocArgumentInjector(f.__doc__)
             new_args = collections.OrderedDict()
-            for argname, doc in docs.args.iteritems():
+            for argname, doc in docs.args.items():
                 if argname == found_varkeyword:
                     for param in kwparams:
                         default_argdoc = '%s: argument for %s' % (param.name, origname)
@@ -199,7 +200,7 @@ def kwargs_from(reference_function, mod_docs=True):
 def get_qualified_name(original_function):
     if inspect.ismethod(original_function):
         origname = '.'.join([original_function.__module__,
-                             original_function.im_class.__name__,
+                             original_function.__self__.__class__.__name__,
                              original_function.__name__])
         return ':meth:`%s`' % origname
     else:
@@ -246,7 +247,7 @@ class DocInherit(object):
 
     def use_parent_doc(self, func, source):
         if source is None:
-            raise NameError, ("Can't find '%s' in parents"%self.name)
+            raise NameError("Can't find '%s' in parents"%self.name)
         func.__doc__ = source.__doc__
         return func
 

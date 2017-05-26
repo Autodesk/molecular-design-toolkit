@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import str
 import string
 
 import moldesign as mdt
@@ -58,7 +59,7 @@ def build_assembly(mol, assembly_name):
         raise KeyError(('The specified assembly name ("%s") was not found. The following '
                         'assemblies are present: %s') %
                        (assembly_name,
-                        ', '.join(mol.properties.bioassemblies.keys())))
+                        ', '.join(list(mol.properties.bioassemblies.keys()))))
 
     # Make sure each chain gets a unique name - up to all the letters in the alphabet, anyway
     used_chain_names = set()
@@ -72,7 +73,7 @@ def build_assembly(mol, assembly_name):
             chain.transform(t)
 
             while chain.name in used_chain_names:
-                chain.name = alpha.next()
+                chain.name = next(alpha)
             used_chain_names.add(chain.name)
             chain.pdbname = chain.pdbindex = chain.name
             all_atoms.extend(chain.atoms)

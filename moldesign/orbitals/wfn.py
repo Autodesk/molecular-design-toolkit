@@ -1,3 +1,4 @@
+from __future__ import division
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,6 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import str
+from builtins import object
+from past.utils import old_div
 import numpy as np
 
 from moldesign.utils import DotDict
@@ -57,7 +61,7 @@ class ElectronicWfn(object):
         self.orbitals = DotDict()
         self.fock_ao = fock_ao
         self.num_electrons = num_electrons
-        self.homo = self.num_electrons/2 - 1
+        self.homo = old_div(self.num_electrons,2) - 1
         self.lumo = self.homo + 1
         self._has_canonical = False
         self.density_matrix_ao = density_matrix_ao

@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import range
 import moldesign.molecules
 from moldesign import compute
 from moldesign.molecules import Trajectory, MolecularProperties
@@ -91,7 +93,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         self._set_constraints()
         self.sim = app.Simulation(self.mol.ff.parmed_obj.topology, self.mm_system, integrator)
         self._prepped = True
-        print 'Created OpenMM kernel (Platform: %s)' % self.sim.context.getPlatform().getName()
+        print('Created OpenMM kernel (Platform: %s)' % self.sim.context.getPlatform().getName())
         self._prep_integrator = self.mol.integrator
 
     def reset_constraints(self):
@@ -275,4 +277,4 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
 def list_openmmplatforms():
     from simtk import openmm
     return [openmm.Platform.getPlatform(ip).getName()
-            for ip in xrange(openmm.Platform.getNumPlatforms())]
+            for ip in range(openmm.Platform.getNumPlatforms())]

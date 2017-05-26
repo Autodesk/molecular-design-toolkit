@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import range
 import itertools
 import numpy as np
 
@@ -86,10 +88,10 @@ class EnergyModelBase(Method):
         else:
             assert direction == 0, 'Finite difference direction must be -1, 0, or 1'
 
-        for iatom, idim in itertools.product(xrange(self.mol.num_atoms), xrange(3)):
-            print '\rFinite differencing %s for atom %d/%d'%('xyz'[iatom],
+        for iatom, idim in itertools.product(range(self.mol.num_atoms), range(3)):
+            print('\rFinite differencing %s for atom %d/%d'%('xyz'[iatom],
                                                              iatom+1,
-                                                             self.mol.num_atoms),
+                                                             self.mol.num_atoms), end=' ')
             if direction == 0:
                 self.mol.positions[iatom, idim] += stepsize / 2.0
                 eplus = self.mol.calc_potential_energy()
@@ -123,7 +125,7 @@ class MMBase(EnergyModelBase):
     """Common interface for molecular mechanics"""
 
     PARAMETERS = (EnergyModelBase.PARAMETERS +
-                  mdt.parameters.mm_model_parameters.values())
+                  list(mdt.parameters.mm_model_parameters.values()))
 
     def __init__(self, *args, **kwargs):
         super(MMBase, self).__init__(*args, **kwargs)
@@ -133,7 +135,7 @@ class MMBase(EnergyModelBase):
 class QMBase(EnergyModelBase):
     """Common interface for quantum mechanics"""
 
-    PARAMETERS = mdt.parameters.qm_model_parameters.values()
+    PARAMETERS = list(mdt.parameters.qm_model_parameters.values())
 
     DEFAULT_PROPERTIES = ['potential_energy',
                           'nuclear_repulsion',

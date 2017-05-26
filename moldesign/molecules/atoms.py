@@ -1,3 +1,4 @@
+from __future__ import division
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import map
+from builtins import range
+from past.utils import old_div
+from builtins import object
 import numpy as np
 
 import moldesign as mdt
@@ -77,7 +82,7 @@ class AtomPropertyMixin(object):  # TODO: this isn't worth it, just put it back 
         """ moldesign.utils.DotDict: Returns any calculated properties for this atom
         """
         props = utils.DotDict()
-        for name, p in self.molecule.properties.iteritems():
+        for name, p in self.molecule.properties.items():
             if hasattr(p, 'type') and p.type == 'atomic':
                 props[name] = p[self]
         return props
@@ -137,10 +142,10 @@ class Atom(AtomPropertyMixin):
             - :class:`AtomGeometryMixin`
             - :class:`AtomPropertyMixin`
     """
-    x, y, z = (AtomCoordinate('position', i) for i in xrange(3))
-    vx, vy, vz = (AtomCoordinate('velocity', i) for i in xrange(3))
-    px, py, pz = (AtomCoordinate('momentum', i) for i in xrange(3))
-    fx, fy, fz = (AtomCoordinate('force', i) for i in xrange(3))
+    x, y, z = (AtomCoordinate('position', i) for i in range(3))
+    vx, vy, vz = (AtomCoordinate('velocity', i) for i in range(3))
+    px, py, pz = (AtomCoordinate('momentum', i) for i in range(3))
+    fx, fy, fz = (AtomCoordinate('force', i) for i in range(3))
     position = AtomArray('_position', 'positions')
     momentum = AtomArray('_momentum', 'momenta')
 
@@ -297,7 +302,7 @@ class Atom(AtomPropertyMixin):
     def bonds(self):
         """ List[Bond]: list of all bonds this atom is involved in
         """
-        return [Bond(self, nbr, order) for nbr, order in self.bond_graph.iteritems()]
+        return [Bond(self, nbr, order) for nbr, order in self.bond_graph.items()]
 
     @property
     def heavy_bonds(self):
@@ -310,7 +315,7 @@ class Atom(AtomPropertyMixin):
             return []
         else:
             return [Bond(self, nbr, order)
-                    for nbr, order in self.bond_graph.iteritems()
+                    for nbr, order in self.bond_graph.items()
                     if nbr.atnum > 1]
 
     @property
@@ -335,7 +340,7 @@ class Atom(AtomPropertyMixin):
         """ u.Vector[length/time, 3]: velocity of this atom; equivalent to
         ``self.momentum/self.mass``
         """
-        return (self.momentum / self.mass).defunits()
+        return (old_div(self.momentum, self.mass)).defunits()
 
     @velocity.setter
     def velocity(self, value):
@@ -352,7 +357,7 @@ class Atom(AtomPropertyMixin):
     def valence(self):
         """ int: the sum of this atom's bond orders
         """
-        return sum(v for v in self.bond_graph.itervalues())
+        return sum(v for v in self.bond_graph.values())
 
     @property
     def symbol(self):
@@ -384,7 +389,7 @@ class Atom(AtomPropertyMixin):
                 lines.append("**Residue**: %s (index %d)"%(self.residue.name, self.residue.index))
                 lines.append("**Chain**: %s"%self.chain.name)
             lines.append("**Molecule**: %s"%self.molecule.name)
-            for ibond, (nbr, order) in enumerate(self.bond_graph.iteritems()):
+            for ibond, (nbr, order) in enumerate(self.bond_graph.items()):
                 lines.append('**Bond %d** (order = %d): %s (index %s) in %s' % (
                     ibond + 1, order, nbr.name, nbr.index, nbr.residue.name))
 

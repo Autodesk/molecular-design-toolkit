@@ -15,6 +15,7 @@
 """
 from __future__ import absolute_import
 
+from builtins import zip
 import numpy as np
 
 import moldesign as mdt

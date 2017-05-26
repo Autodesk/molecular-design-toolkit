@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import range
 import collections
 
 import moldesign as mdt
@@ -71,7 +72,7 @@ class Chain(BioContainer):
         if self._type is None:
 
             counts = collections.Counter(x.type for x in self.residues)
-            unique_types = sum(bool(v) for v in counts.itervalues())
+            unique_types = sum(bool(v) for v in counts.values())
             if unique_types == 1:
                 if self.num_residues == 1:
                     self._type = data.CHAIN_MONOMER_NAMES.get(self.residues[0].type,
@@ -130,12 +131,12 @@ class Chain(BioContainer):
         """
         iterator = self.unclassified_residues
         try:
-            ligand = iterator.next()
+            ligand = next(iterator)
         except StopIteration:
             raise ValueError('This chain does not appear to contain any ligands')
 
         try:
-            nextligand = iterator.next()
+            nextligand = next(iterator)
         except StopIteration:
             return ligand
         else:
@@ -214,7 +215,7 @@ class Chain(BioContainer):
         residues = list(self)
         residues.sort(key=lambda x: int(x.pdbindex))
         bond_graph = {}
-        for ires in xrange(len(residues)-1):
+        for ires in range(len(residues)-1):
             r1 = residues[ires]
             r2 = residues[ires+1]
 
@@ -255,7 +256,7 @@ class Chain(BioContainer):
         missing = self.molecule.metadata.get('missing_residues', {}).get(self.pdbname, {})
         all_residues = list(self.residues)
         all_residues.extend(mdt.helpers.MissingResidue(self.pdbname, resname, resnum)
-                            for resnum, resname  in missing.iteritems())
+                            for resnum, resname  in missing.items())
         all_residues.sort(key=lambda r: r.pdbindex)
 
         bracket_open = False

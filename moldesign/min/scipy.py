@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import
+from __future__ import print_function
 
 from moldesign import units as u
 from moldesign.utils import exports
@@ -37,8 +38,8 @@ class ScipyMinimizer(MinimizerBase):
     def run(self):
         import scipy.optimize
 
-        print 'Starting geometry optimization: SciPy/%s with %s gradients'%(
-            self._METHOD_NAME, self.gradtype)
+        print('Starting geometry optimization: SciPy/%s with %s gradients'%(
+            self._METHOD_NAME, self.gradtype))
         options = {'disp': True}
         if self.nsteps is not None:
             options['maxiter'] = self.nsteps

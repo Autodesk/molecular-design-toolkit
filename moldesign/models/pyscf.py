@@ -12,7 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import  # prevent clashes between this and the "pyscf" package
-from cStringIO import StringIO
+from future import standard_library
+from functools import reduce
+standard_library.install_aliases()
+from builtins import map
+from builtins import zip
+from builtins import range
+from builtins import object
+from io import StringIO
 
 import numpy as np
 
@@ -192,7 +199,7 @@ class PySCFPotential(QMBase):
                                                       self.params.state_average)
             casresult = casobj.kernel()
             result['state_energies'] = (casresult[0] * u.hartree).defunits()
-            result['ci_vectors'] = map(self._parse_fci_vector, casresult[2])
+            result['ci_vectors'] = list(map(self._parse_fci_vector, casresult[2]))
 
             # potential_energy is the energy of the molecule's assigned state
             result['state_averaged_energy'] = result['potential_energy']
@@ -207,8 +214,8 @@ class PySCFPotential(QMBase):
             # TODO: this is general, put it somewhere else
             oscs = {}
             nstates = len(result['state_energies'])
-            for i in xrange(nstates):
-                for j in xrange(i+1, nstates):
+            for i in range(nstates):
+                for j in range(i+1, nstates):
                     excitation_energy = result['state_energies'][j]-result['state_energies'][i]
                     tdip = result['transition_dipole_moments'][i, j].norm()
                     oscs[i, j] = (2.0*tdip ** 2*u.m_e*excitation_energy/
@@ -303,7 +310,7 @@ class PySCFPotential(QMBase):
         # this probably won't converge, but is intended to get us in the right basin for the next step
         # NEWFEATURE: should dynamically adjust level shift instead of hardcoded cycles
         self.logger.handled('SCF failed to converge. Performing %d iterations with level shift of -0.5 hartree'
-                            % (method.max_cycle / 2))
+                            % (old_div(method.max_cycle, 2)))
         failed.append(method)
         method.init_guess = 'minao'
         method.level_shift = -0.5
@@ -330,8 +337,8 @@ class PySCFPotential(QMBase):
                                     self.params.active_electrons)
 
             if name != 'casci' and self.params.state_average > 1:
-                theory = theory.state_average_([1.0/self.params.state_average
-                                                for i in xrange(self.params.state_average)])
+                theory = theory.state_average_([old_div(1.0,self.params.state_average)
+                                                for i in range(self.params.state_average)])
         else:
             theory = THEORIES[name](refobj)
 
@@ -389,8 +396,8 @@ class PySCFPotential(QMBase):
              '02': 4.0}
         """
         from pyscf.fci import cistring
-        conf_bin = cistring.gen_strings4orblist(range(self.params.active_orbitals),
-                                                self.params.active_electrons/2)
+        conf_bin = cistring.gen_strings4orblist(list(range(self.params.active_orbitals)),
+                                                old_div(self.params.active_electrons,2))
         civecs = {}
         for i, ca in enumerate(conf_bin):
             for j, cb in enumerate(conf_bin):
@@ -426,7 +433,7 @@ class PySCFPotential(QMBase):
 
         orblabels = iter(pmol.spheric_labels())
 
-        for ishell in xrange(pmol.nbas):  # loop over shells (n,l)
+        for ishell in range(pmol.nbas):  # loop over shells (n,l)
             atom = self.mol.atoms[pmol.bas_atom(ishell)]
             angular = pmol.bas_angular(ishell)
             num_momentum_states = angular*2 + 1
@@ -434,9 +441,9 @@ class PySCFPotential(QMBase):
             num_contractions = pmol.bas_nctr(ishell)
             coeffs = pmol.bas_ctr_coeff(ishell)
 
-            for ictr in xrange(num_contractions):  # loop over contractions in shell
-                for ibas in xrange(num_momentum_states):  # loop over angular states in shell
-                    label = orblabels.next()
+            for ictr in range(num_contractions):  # loop over contractions in shell
+                for ibas in range(num_momentum_states):  # loop over angular states in shell
+                    label = next(orblabels)
                     sphere_label = label[3]
                     l, m = SPHERICAL_NAMES[sphere_label]
                     assert l == angular
@@ -497,9 +504,9 @@ def _get_multiconf_dipoles(basis, mcstate, nstates):
     References:
         https://github.com/sunqm/pyscf/blob/e4d824853c49b7c19eb35cd6f9fe6ea675de932d/examples/1-advanced/030-transition_dipole.py
     """
-    nuc_charges = [basis.atom_charge(i) for i in xrange(basis.natm)]
-    nuc_coords = [basis.atom_coord(i) for i in xrange(basis.natm)]
     nuc_charge_center = np.einsum('z,zx->x', nuc_charges, nuc_coords)/sum(nuc_charges)
+    nuc_charges = [basis.atom_charge(i) for i in range(basis.natm)]
+    nuc_coords = [basis.atom_coord(i) for i in range(basis.natm)]
     basis.set_common_orig_(nuc_charge_center)
     nuc_dip = np.einsum('i,ix->x', nuc_charges, nuc_coords-nuc_charge_center) * u.a0 * u.q_e
 
@@ -507,8 +514,8 @@ def _get_multiconf_dipoles(basis, mcstate, nstates):
     orbcas = mcstate.mo_coeff[:, mcstate.ncore:mcstate.ncore+mcstate.ncas]
 
     dipoles, transitions = [], {}
-    for istate in xrange(nstates):
-        for fstate in xrange(istate, nstates):
+    for istate in range(nstates):
+        for fstate in range(istate, nstates):
             t_dm1 = mcstate.fcisolver.trans_rdm1(mcstate.ci[istate], mcstate.ci[fstate],
                                                  mcstate.ncas, mcstate.nelecas)
             t_dm1_ao = reduce(np.dot, (orbcas, t_dm1, orbcas.T))

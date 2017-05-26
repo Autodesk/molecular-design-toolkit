@@ -11,6 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import zip
+from builtins import map
+from builtins import hex
+from builtins import str
+from builtins import range
+from builtins import object
 import copy
 import time
 
@@ -159,15 +165,15 @@ class TrajectoryAnalysisMixin(object):
             return temps
 
     def distance(self, a1, a2):
-        a1, a2 = map(self._get_traj_atom, (a1, a2))
+        a1, a2 = list(map(self._get_traj_atom, (a1, a2)))
         return mdt.distance(a1, a2)
 
     def angle(self, a1, a2, a3):
-        a1, a2, a3 = map(self._get_traj_atom, (a1, a2, a3))
+        a1, a2, a3 = list(map(self._get_traj_atom, (a1, a2, a3)))
         return mdt.angle(a1, a2, a3)
 
     def dihedral(self, a1, a2, a3=None, a4=None):
-        a1, a2, a3, a4 = map(self._get_traj_atom, (a1, a2, a3, a4))
+        a1, a2, a3, a4 = list(map(self._get_traj_atom, (a1, a2, a3, a4)))
         return mdt.dihedral(a1, a2, a3, a4)
 
     def rmsd(self, atoms=None, reference=None):
@@ -281,7 +287,7 @@ class Trajectory(TrajectoryAnalysisMixin):
         return self._atoms
 
     def _make_traj_atoms(self):
-        return [_TrajAtom(self, i) for i in xrange(self.mol.num_atoms)]
+        return [_TrajAtom(self, i) for i in range(self.mol.num_atoms)]
 
     def __str__(self):
         return 'Trajectory for molecule "%s" (%d frames)' % (self.mol, self.num_frames)
@@ -321,7 +327,7 @@ class Trajectory(TrajectoryAnalysisMixin):
         props.update(additional_data)
 
         # add properties to trajectory
-        for key, value in props.iteritems():
+        for key, value in props.items():
             if key not in self.properties:
                 self._new_property(key, value)
             else:
@@ -428,10 +434,10 @@ class Trajectory(TrajectoryAnalysisMixin):
             relative_alignment = False
 
         if relative_alignment:
-            for i in xrange(iframe+1, self.num_frames):
+            for i in range(iframe+1, self.num_frames):
                 self.frames[i].wfn.align_orbital_phases(
                     self.frames[i-1].wfn)
-            for i in xrange(iframe-1, -1, -1):
+            for i in range(iframe-1, -1, -1):
                 self.frames[i].wfn.align_orbital_phases(
                     self.frames[i+1].wfn)
         else:

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import numpy as np
 
 from moldesign.utils import Attribute
@@ -64,7 +65,7 @@ class BasisSet(MolecularOrbitals):
         self.basisname = name
         self.h1e = h1e
         self.overlaps = overlaps
-        for kw, val in kwargs.iteritems():
+        for kw, val in kwargs.items():
             setattr(self, kw, val)
 
         self.on_atom = {}

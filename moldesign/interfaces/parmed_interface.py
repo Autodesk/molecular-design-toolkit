@@ -11,11 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from future import standard_library
+standard_library.install_aliases()
+from builtins import map
+from builtins import str
+from builtins import zip
+from builtins import range
+from past.builtins import basestring
 import collections
 
 import itertools
 import parmed
-from StringIO import StringIO
+from io import StringIO
 
 import moldesign as mdt
 from moldesign import units as u
@@ -85,8 +92,8 @@ def _insert_conect_records(mol, pmdmol, pdbfile, write_to=None):
         return pmdmol.atoms[atom.index].number
 
     pairs = collections.OrderedDict()
-    for atom, nbrs in conect_bonds.iteritems():
-        pairs[get_atomseq(atom)] = map(get_atomseq, nbrs)
+    for atom, nbrs in conect_bonds.items():
+        pairs[get_atomseq(atom)] = list(map(get_atomseq, nbrs))
 
     if isinstance(pdbfile, basestring):
         pdbfile = StringIO(pdbfile)
@@ -100,7 +107,7 @@ def _insert_conect_records(mol, pmdmol, pdbfile, write_to=None):
     for line in pdbfile:
         if line.split() == ['END']:
             for a1idx in pairs:
-                for istart in xrange(0, len(pairs[a1idx]), 4):
+                for istart in range(0, len(pairs[a1idx]), 4):
                     pairindices = ''.join(("%5d" % idx) for idx in pairs[a1idx][istart:istart+4])
                     newf.write(CONECT % a1idx + pairindices + '\n')
 
@@ -152,7 +159,7 @@ def parmed_to_mdt(pmdmol):
     for pbnd in pmdmol.bonds:
         atoms[pbnd.atom1].bond_to(atoms[pbnd.atom2], int(pbnd.order))
 
-    mol = mdt.Molecule(atoms.values(),
+    mol = mdt.Molecule(list(atoms.values()),
                        metadata=_get_pdb_metadata(pmdmol))
     return mol
 

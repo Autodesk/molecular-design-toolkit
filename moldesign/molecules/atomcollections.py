@@ -12,6 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import zip
+from builtins import str
+from builtins import map
+from past.builtins import basestring
+from builtins import object
 import copy
 import collections
 import itertools
@@ -69,7 +74,7 @@ class AtomGroup(object):
     def velocity(self):
         """ u.Vector[velocity]: center of mass velocity of this object
         """
-        return self.momentum/self.mass
+        return old_div(self.momentum,self.mass)
 
     @property
     def kinetic_energy(self):
@@ -104,7 +109,7 @@ class AtomGroup(object):
 
         result = mdt.AtomList()
         for atom in atoms:
-            for field, val in queries.iteritems():
+            for field, val in queries.items():
                 if getattr(atom, field, None) != val and getattr(atom.residue, field, None) != val:
                     break
             else:
@@ -208,7 +213,7 @@ class AtomGroup(object):
             units.Scalar[angle]
         """
         # TODO: use single dispatch to also accept two bonds
-        return mdt.geom.angle(*map(self._getatom, (a1, a2, a3)))
+        return mdt.geom.angle(*list(map(self._getatom, (a1, a2, a3))))
 
     def dihedral(self, a1, a2, a3=None, a4=None):
         """ Calculate the dihedral angle between atoms a1, a2, a3, a4.
@@ -221,7 +226,7 @@ class AtomGroup(object):
         Returns:
             units.Scalar[angle]
         """
-        return mdt.geom.dihedral(*map(self._getatom, (a1, a2, a3, a4)))
+        return mdt.geom.dihedral(*list(map(self._getatom, (a1, a2, a3, a4))))
 
     def copy_atoms(self):
         """
@@ -277,7 +282,7 @@ class AtomGroup(object):
                 assert atom.residue.chain is atom.chain
                 res.add(atom)
 
-            for oldnbr, bondorder in oldatom.bond_graph.iteritems():
+            for oldnbr, bondorder in oldatom.bond_graph.items():
                 if oldnbr not in old_to_new: continue
                 newnbr = old_to_new[oldnbr]
                 temp_bond_graph[atom][newnbr] = bondorder
@@ -367,7 +372,7 @@ class AtomGroup(object):
         """
         atoms = self.atoms_within(radius, other=other, include_self=include_self)
         residues = collections.OrderedDict((atom.residue, None) for atom in atoms)
-        return residues.keys()
+        return list(residues.keys())
 
 
 class _AtomArray(object):
@@ -408,8 +413,8 @@ class AtomContainer(AtomGroup):
         """ Iterable[moldesign.Bond]: iterator over bonds from this object's atoms
         """
         bg = self.bond_graph
-        for atom, nbrs in bg.iteritems():
-            for nbr, order in nbrs.iteritems():
+        for atom, nbrs in bg.items():
+            for nbr, order in nbrs.items():
                 if atom.index < nbr.index or nbr not in bg:
                     yield mdt.Bond(atom,nbr, order)
 
@@ -421,8 +426,8 @@ class AtomContainer(AtomGroup):
         """ Iterable[moldesign.Bond]: iterator over bonds that connect two atoms in this object
         """
         bg = self.bond_graph
-        for atom, nbrs in bg.iteritems():
-            for nbr, order in nbrs.iteritems():
+        for atom, nbrs in bg.items():
+            for nbr, order in nbrs.items():
                 if atom.index < nbr.index and nbr in bg:
                     yield mdt.Bond(atom, nbr, order)
 
@@ -432,8 +437,8 @@ class AtomContainer(AtomGroup):
         Iterable[moldesign.Bond]: iterator over bonds that bond these atoms to other atoms
         """
         bg = self.bond_graph
-        for atom, nbrs in bg.iteritems():
-            for nbr, order in nbrs.iteritems():
+        for atom, nbrs in bg.items():
+            for nbr, order in nbrs.items():
                 if nbr not in bg:
                     yield mdt.Bond(atom, nbr, order)
 
@@ -443,8 +448,8 @@ class AtomContainer(AtomGroup):
         """
         bg = self.bond_graph
         atoms = []
-        for atom, nbrs in bg.iteritems():
-            for nbr, order in nbrs.iteritems():
+        for atom, nbrs in bg.items():
+            for nbr, order in nbrs.items():
                 if nbr not in bg:
                     atoms.append(nbr)
         return atoms

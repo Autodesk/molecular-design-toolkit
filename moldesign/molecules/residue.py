@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import str
 import collections
 
 import moldesign as mdt
@@ -140,7 +142,7 @@ class Residue(BioContainer):
         residues = collections.OrderedDict()
         for atom in self.bonded_atoms:
             residues[atom.residue] = None
-        return residues.keys()
+        return list(residues.keys())
 
     def add(self, atom, key=None):
         """Deals with atom name clashes within a residue - common for small molecules"""
@@ -221,8 +223,8 @@ class Residue(BioContainer):
             if self.index == len(self.molecule.residues):
                 return True
             else:
-                print 'WARNING: %s is missing expected atoms. Attempting to infer chain end' % \
-                    self
+                print('WARNING: %s is missing expected atoms. Attempting to infer chain end' % \
+                    self)
                 nextres = self.molecule.residues[self.index + 1]
                 return not self._same_polymer(nextres)
 
@@ -243,8 +245,8 @@ class Residue(BioContainer):
                 assert self.index == 0
                 return True
             else:
-                print 'WARNING: %s is missing expected atoms. Attempting to infer chain start' % \
-                    self
+                print('WARNING: %s is missing expected atoms. Attempting to infer chain start' % \
+                    self)
                 nextres = self.molecule.residues[self.index - 1]
                 return not self._same_polymer(nextres)
         else:
@@ -279,7 +281,7 @@ class Residue(BioContainer):
             self._template_name = resname
         except KeyError:
             if len(self) == 1 and self.type not in ('water', 'ion'):
-                print 'INFO: no bonds assigned to residue %s' % self
+                print('INFO: no bonds assigned to residue %s' % self)
                 return
             else:
                 raise KeyError("No bonding template for residue '%s'" % resname)
@@ -287,7 +289,7 @@ class Residue(BioContainer):
         # intra-residue bonds
         bond_graph = {atom: {} for atom in self}
         for atom in self:
-            for nbrname, order in bonds_by_name.get(atom.name, {}).iteritems():
+            for nbrname, order in bonds_by_name.get(atom.name, {}).items():
                 try:
                     nbr = self[nbrname]
                 except KeyError:  # missing atoms are normal (often hydrogen)

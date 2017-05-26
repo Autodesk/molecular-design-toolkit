@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import str
+from past.builtins import basestring
 import moldesign as mdt
 from moldesign import utils
 
@@ -40,7 +42,7 @@ class ChildList(AtomContainer):
         self._childinorder = utils.SortedCollection(key=_sortkey)
 
     def __dir__(self):
-        return self.__dict__.keys() + self.__class__.__dict__.keys() + self._childbyname.keys()
+        return list(self.__dict__.keys()) + list(self.__class__.__dict__.keys()) + list(self._childbyname.keys())
 
     def __getitem__(self, item):
         if isinstance(item, basestring):
@@ -144,7 +146,7 @@ class BioContainer(AtomContainer):
         self.pdbname = pdbname
         self.pdbindex = pdbindex
 
-        for name, val in kwargs.iteritems():
+        for name, val in kwargs.items():
             setattr(self, name, val)
 
     def add(self, item, key=None):
@@ -164,8 +166,8 @@ class BioContainer(AtomContainer):
     __setitem__ = add
 
     def __dir__(self):
-        return (self.__dict__.keys() +
-                self.__class__.__dict__.keys() +
+        return (list(self.__dict__.keys()) +
+                list(self.__class__.__dict__.keys()) +
                 [x.name for x in self.children])
 
     def __hash__(self):
@@ -196,7 +198,7 @@ class BioContainer(AtomContainer):
         """
         retlist = []
         for child in self:
-            for key, val in kwargs.iteritems():
+            for key, val in kwargs.items():
                 if hasattr(child, key) and getattr(child, key) == val:
                     retlist.append(child)
         return retlist

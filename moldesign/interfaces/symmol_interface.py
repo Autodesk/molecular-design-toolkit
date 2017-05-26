@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import map
+from builtins import range
 import re
 
 import fortranformat as ff
@@ -73,7 +75,7 @@ def parse_output(outfile):
     lines = iter(outfile)
     data = mdt.utils.classes.DotDict()
     while True:
-        l = lines.next()
+        l = next(lines)
         fields = l.split()
         if fields == NOSYMM:
             data.symbol = 'C1'
@@ -84,8 +86,8 @@ def parse_output(outfile):
 
         elif fields == MATRIXSTRING:  # get coordinates along principal axes
             data.orthmat = np.zeros((3, 3))
-            for i in xrange(3):
-                data.orthmat[i] = map(float, lines.next().split())
+            for i in range(3):
+                data.orthmat[i] = list(map(float, lines.next().split()))
 
         elif fields[:2] == 'Schoenflies symbol'.split():
             data.symbol = fields[3]
@@ -96,7 +98,7 @@ def parse_output(outfile):
             data.elems = []
             while True:
                 try:
-                    l = lines.next()
+                    l = next(lines)
                 except StopIteration:
                     break
                 if l.strip() == '': break
@@ -114,11 +116,11 @@ def parse_output(outfile):
 
         elif fields == TRANSFORMATIONSTRING:
             data.elems = []
-            l = lines.next()
+            l = next(lines)
 
             while True:
                 while l.strip() == '':
-                    try: l = lines.next()
+                    try: l = next(lines)
                     except StopIteration: return data
                 eleminfo = MATRIXPARSER.findall(l)
 
@@ -128,9 +130,9 @@ def parse_output(outfile):
                 info = eleminfo[0]
 
                 matrix = np.zeros((3, 3))
-                for i in xrange(3):
-                    l = lines.next()
-                    matrix[i, :] = map(float, l.split())
+                for i in range(3):
+                    l = next(lines)
+                    matrix[i, :] = list(map(float, l.split()))
 
                 e = mdt.geom.SymmetryElement(
                         matrix=matrix,
@@ -143,7 +145,7 @@ def parse_output(outfile):
 
                 e.matrix = matrix
                 data.elems.append(e)
-                l = lines.next()
+                l = next(lines)
 
     return data
 

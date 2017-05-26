@@ -14,6 +14,7 @@
 """
 Set up physical constants and unit systems
 """
+from builtins import str
 import operator
 import copy
 from os.path import join, abspath, dirname
@@ -137,7 +138,7 @@ class MdtQuantity(ureg.Quantity):
         """
         x = self
         while True:
-            try: x = x.__iter__().next()
+            try: x = next(x.__iter__())
             except (AttributeError, TypeError): break
         try:
             y = 1.0 * x

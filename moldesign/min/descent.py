@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import range
 import numpy as np
 
 import moldesign as mdt
@@ -63,11 +65,11 @@ class GradientDescent(MinimizerBase):
         self._last_energy = None
 
     def run(self):
-        print 'Starting geometry optimization: built-in gradient descent'
+        print('Starting geometry optimization: built-in gradient descent')
         lastenergy = self.objective(self._coords_to_vector(self.mol.positions))
         current = self._coords_to_vector(self.mol.positions)
 
-        for i in xrange(self.nsteps):
+        for i in range(self.nsteps):
             grad = self.grad(current)
             if np.abs(grad.max()) < self.force_tolerance:  # converged
                 return
@@ -75,7 +77,7 @@ class GradientDescent(MinimizerBase):
             move = self.scale_move(grad)
             armijo_goldstein_prefac = self.control * move.norm()
 
-            for icycle in xrange(0, 10):
+            for icycle in range(0, 10):
                 g = self.gamma**icycle
                 newpos = self._make_move(current, g * move)
 

@@ -99,7 +99,7 @@ class NWChemQM(QMBase):
     @staticmethod
     def _get_properties(jsonprops):
         props = {}
-        for name, property in jsonprops.iteritems():
+        for name, property in jsonprops.items():
             if isinstance(property, dict) and len(property) == 2 and \
                             'units' in property and 'value' in property:
                 props[name] = property['value'] * u.ureg(property['units'])

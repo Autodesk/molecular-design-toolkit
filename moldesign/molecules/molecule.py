@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,6 +12,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import zip
+from builtins import chr
+from past.utils import old_div
+from builtins import object
 import itertools
 import string
 
@@ -197,7 +202,7 @@ class MolPropertyMixin(object):
 
         Note:
             This assumes a closed shell ground state! """
-        return self.num_electrons/2-1
+        return old_div(self.num_electrons,2)-1
 
     @property
     def lumo(self):
@@ -205,7 +210,7 @@ class MolPropertyMixin(object):
 
         Note:
             This assumes a closed shell ground state! """
-        return self.num_electrons/2
+        return old_div(self.num_electrons,2)
 
     def get_stoichiometry(self, html=False):
         """ Return this molecule's stoichiometry
@@ -599,8 +604,8 @@ class MolTopologyMixin(object):
                 assert atom.chain.molecule is self
 
         if conflicts:
-            print 'WARNING: %s indices modified due to name clashes' % (
-                ', '.join(conflicts))
+            print('WARNING: %s indices modified due to name clashes' % (
+                ', '.join(conflicts)))
         self.is_biomolecule = (num_biores >= 2)
 
     def __eq__(self, other):
@@ -673,7 +678,7 @@ class MolTopologyMixin(object):
                 if chain not in seen_chains:
                     seen_chains.add(chain)
                     if chain.pdbindex is None or chain.pdbindex in taken_names:
-                        chain.pdbindex = chain.name = chain_names.iterkeys().next()
+                        chain.pdbindex = chain.name = next(iter(chain_names.keys()))
                     chain_names.pop(chain.pdbindex, None)
                     taken_names.add(chain.pdbindex)
 
@@ -713,13 +718,13 @@ class MolTopologyMixin(object):
         Returns:
             bool: true if all tested quantities are equal
         """
-        for a1, a2 in itertools.izip_longest(
+        for a1, a2 in itertools.zip_longest(
                 itertools.chain(self.atoms, self.residues, self.chains),
                 itertools.chain(other.atoms, other.residues, other.chains)):
             if a1.name != a2.name:
                 if verbose:
-                    print 'INFO: %s[%d]: names "%s" and "%s"' % (a1.__class__.__name__, a1.index,
-                                                           a1.name, a2.name)
+                    print('INFO: %s[%d]: names "%s" and "%s"' % (a1.__class__.__name__, a1.index,
+                                                           a1.name, a2.name))
                 return False
 
         if (self.masses != other.masses).any():
@@ -728,7 +733,7 @@ class MolTopologyMixin(object):
         for a1, a2 in zip(self.atoms, other.atoms):
             if a1.atnum != a2.atnum:
                 if verbose:
-                    print 'INFO: atoms[%d]: atom numbers %d and %d' % (a1.index, a1.atnum, a2.atnum)
+                    print('INFO: atoms[%d]: atom numbers %d and %d' % (a1.index, a1.atnum, a2.atnum))
                 return False
 
         return self.same_bonds(other, verbose=verbose)
@@ -739,16 +744,16 @@ class MolTopologyMixin(object):
             otherbonds = other.bond_graph[otheratom]
             if len(mybonds) != len(otherbonds):
                 if verbose:
-                    print 'INFO: atoms[%d] has %d bonds in self, %d bonds in other' % (
-                        myatom.index, len(mybonds), len(otherbonds))
+                    print('INFO: atoms[%d] has %d bonds in self, %d bonds in other' % (
+                        myatom.index, len(mybonds), len(otherbonds)))
                 return False
 
-            for mynbr, myorder in mybonds.iteritems():
+            for mynbr, myorder in mybonds.items():
                 othernbr = other.atoms[mynbr.index]
                 if othernbr not in otherbonds or otherbonds[othernbr] != myorder:
                     if verbose:
-                        print 'INFO: atoms[%d] bonded to atom[%d] (order %d) in self but not other' % (
-                            myatom.index, mynbr.index, myorder)
+                        print('INFO: atoms[%d] bonded to atom[%d] (order %d) in self but not other' % (
+                            myatom.index, mynbr.index, myorder))
                     return False
         return True
 
@@ -780,7 +785,7 @@ class MolSimulationMixin(object):
 
         init_time = self.time
         traj = self.integrator.run(run_for)
-        print 'Done - integrated "%s" from %s to %s' % (self, init_time, self.time)
+        print('Done - integrated "%s" from %s to %s' % (self, init_time, self.time))
         return traj
 
     def calculate(self, requests=None, wait=True, use_cache=True):
@@ -857,8 +862,8 @@ class MolSimulationMixin(object):
             if model.params.charge is None:
                model.params.charge = self.charge
             elif model.params.charge != self.charge:
-                print "Warning: molecular charge (%d) does not match energy model's charge (%d)" % (
-                    self.charge, model.params.charge)
+                print("Warning: molecular charge (%d) does not match energy model's charge (%d)" % (
+                    self.charge, model.params.charge))
         model._prepped = False
 
     def set_integrator(self, integrator, **params):
@@ -906,8 +911,8 @@ class MolSimulationMixin(object):
             trajectory = self.energy_model.minimize(**kwargs)
         except NotImplementedError:
             trajectory = mdt.minimize(self, **kwargs)
-        print 'Reduced energy from %s to %s' % (trajectory.potential_energy[0],
-                                                trajectory.potential_energy[-1])
+        print('Reduced energy from %s to %s' % (trajectory.potential_energy[0],
+                                                trajectory.potential_energy[-1]))
         if assert_converged:
             raise NotImplementedError()
 
@@ -1126,7 +1131,7 @@ class Molecule(AtomGroup,
     @property
     def num_bonds(self):
         """int: number of chemical bonds in this molecule"""
-        return sum(atom.nbonds for atom in self.atoms)/2
+        return old_div(sum(atom.nbonds for atom in self.atoms),2)
 
     nbonds = num_bonds
 

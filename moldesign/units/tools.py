@@ -65,7 +65,7 @@ def get_units(q):
     """
     x = q
     while True:
-        try: x = x.__iter__().next()
+        try: x = next(x.__iter__())
         except (AttributeError, TypeError): break
     try:
         y = 1.0 * x
