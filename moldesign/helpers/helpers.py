@@ -15,7 +15,11 @@
 """
 This module contains various helper functions used by MDT internally.
 """
+from __future__ import print_function
 
+from builtins import zip
+from builtins import str
+from builtins import object
 import collections
 
 import numpy as np
@@ -80,7 +84,7 @@ def get_all_atoms(*objects):
                 elif hasattr(item, 'atoms'):
                     atoms.update((x, None) for x in item.atoms)
 
-    return molecules.AtomList(atoms.iterkeys())
+    return molecules.AtomList(iter(atoms.keys()))
 
 
 def kinetic_energy(momenta, masses):
@@ -117,7 +121,7 @@ def atom_name_check(mol, force=False):
                     atomnums[atom.symbol] += 1
 
     if badres:
-        print 'WARNING: residues do not have uniquely named atoms: %s' % badres
+        print('WARNING: residues do not have uniquely named atoms: %s' % badres)
 
 
 def restore_topology(mol, topo):

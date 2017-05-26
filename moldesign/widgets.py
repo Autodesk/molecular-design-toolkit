@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from helpers.widgets import nbmolviz_installed
+from .helpers.widgets import nbmolviz_installed
 
 if nbmolviz_installed:
     from nbmolviz.widgets import BondSelector, GeometryBuilder, ResidueSelector, Symmetrizer
 else:
-    from helpers.widgets import not_installed_method
+    from .helpers.widgets import not_installed_method
     BondSelector = GeometryBuilder = ResidueSelector = Symmetrizer = not_installed_method
 
 __all__ = 'BondSelector GeometryBuilder ResidueSelector Symmetrizer'.split()

@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import zip
+from builtins import str
+from builtins import map
+from builtins import range
 import itertools
 import string
 
@@ -153,9 +157,9 @@ def get_mmcif_assemblies(fileobj=None, mmcdata=None):
 
     # Get matrix transformations
     tmat = np.zeros((4, 4)).tolist()
-    for i in xrange(3):  # construct displacement vector
+    for i in range(3):  # construct displacement vector
         tmat[i][3] = mmcdata['_pdbx_struct_oper_list.vector[%d]' % (i+1)]
-    for i, j in itertools.product(xrange(0, 3), xrange(0, 3)):  # construct rotation matrix
+    for i, j in itertools.product(range(0, 3), range(0, 3)):  # construct rotation matrix
         tmat[i][j] = mmcdata['_pdbx_struct_oper_list.matrix[%d][%d]' % (i+1, j+1)]
     transforms = _make_transform_dict(tmat, transform_ids)
 
@@ -178,14 +182,14 @@ def get_mmcif_assemblies(fileobj=None, mmcdata=None):
 
 def _make_transform_dict(tmat, transform_ids):
     if isinstance(transform_ids, list):
-        for i, j in itertools.product(xrange(0, 3), xrange(0, 4)):
-            tmat[i][j] = map(float, tmat[i][j])
+        for i, j in itertools.product(range(0, 3), range(0, 4)):
+            tmat[i][j] = list(map(float, tmat[i][j]))
         tmat[3][3] = [1.0]*len(transform_ids)
         tmat[3][0] = tmat[3][1] = tmat[3][2] = [0.0]*len(transform_ids)
         tmat = np.array(tmat)
         transforms = {id: tmat[:, :, i] for i, id in enumerate(transform_ids)}
     else:
-        for i, j in itertools.product(xrange(0, 4), xrange(0, 4)):
+        for i, j in itertools.product(range(0, 4), range(0, 4)):
             tmat[i][j] = float(tmat[i][j])
         tmat[3][3] = 1.0
         tmat = np.array(tmat)

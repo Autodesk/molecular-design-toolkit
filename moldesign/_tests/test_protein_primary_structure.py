@@ -226,7 +226,7 @@ def test_atoms_iterate_in_order(fixture, request):
 
 def _iter_index_order_tester(iterable):
     iterator = iter(iterable)
-    lastitem = iterator.next()
+    lastitem = next(iterator)
     for item in iterator:
         assert item.index > lastitem.index
         lastitem = item

@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,6 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import map
+from builtins import str
 import os
 import json
 
@@ -31,7 +34,7 @@ COLOR_LIST = ['lightgreen', 'lightblue', 'lightgrey',
               'yellow', 'orange', 'purple', 'IndianRed',
               'PaleTurquoise', 'OldLace', 'Thistle', 'pink']
 
-color_rotation = CyclicList(map(webcolors.name_to_hex, COLOR_LIST))
+color_rotation = CyclicList(list(map(webcolors.name_to_hex, COLOR_LIST)))
 
 
 DEFAULT_FORCE_TOLERANCE = (0.0001 * u.hartree / u.bohr).defunits()  # taken from GAMESS OPTTOL keyword
@@ -72,5 +75,5 @@ def print_environment():
     except Exception as e:
         env['platform_exception'] = str(e)
 
-    print json.dumps({'env': env,
-                      'versions': version})
+    print(json.dumps({'env': env,
+                      'versions': version}))

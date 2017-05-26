@@ -1,5 +1,6 @@
 """ Tests for molecule creation and file i/o
 """
+from builtins import str
 import collections
 
 import numpy

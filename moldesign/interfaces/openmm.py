@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,6 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import zip
+from builtins import str
+from builtins import object
 import itertools
 import imp
 
@@ -27,7 +31,7 @@ from moldesign.utils import exports
 try:
     imp.find_module('simtk')
 except (ImportError, OSError) as exc:
-    print 'OpenMM could not be imported; using remote docker container'
+    print('OpenMM could not be imported; using remote docker container')
     force_remote = True
 else:
     force_remote = False
@@ -104,14 +108,14 @@ def MdtReporter(mol, report_interval):
                 peheader = 'potential / {units}'.format(units=u.default.energy)
                 keheader = 'kinetic / {units}'.format(units=u.default.energy)
                 temperatureheader = 'T / {units}'.format(units=u.default.temperature)
-                print self._row_format.format(timeheader, peheader, keheader, temperatureheader)
+                print(self._row_format.format(timeheader, peheader, keheader, temperatureheader))
                 self._printed_header = True
             ke = mdt.helpers.kinetic_energy(report['momenta'], self.mol.dim_masses)
             t = (2.0 * ke) / (u.k_b * self.mol.dynamic_dof)
-            print self._row_format.format(report['time'].defunits_value(),
+            print(self._row_format.format(report['time'].defunits_value(),
                                           report['potential_energy'].defunits_value(),
                                           ke.defunits_value(),
-                                          t.defunits_value())
+                                          t.defunits_value()))
             self.last_report_time = self.mol.time
 
             self.trajectory.new_frame(properties=report)
@@ -180,7 +184,7 @@ def pint2simtk(quantity):
                    'ps': stku.picosecond}
 
     newvar = quantity._magnitude
-    for dim, exp in quantity._units.iteritems():
+    for dim, exp in quantity._units.items():
         if dim in SIMTK_NAMES:
             stkunit = SIMTK_NAMES[dim]
         else:

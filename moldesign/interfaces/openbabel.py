@@ -12,7 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import
+from __future__ import print_function
 
+from builtins import bytes
+from builtins import str
+from builtins import hex
+from builtins import range
 import os
 import string
 
@@ -58,7 +63,7 @@ def read_file(filename, name=None, format=None):
             mol = read_string(infile.read(), format, name=name)
         return mol
     else:
-        pbmol = pb.readfile(format=format, filename=filename).next()
+        pbmol = next(pb.readfile(format=format, filename=filename))
         if name is None: name = filename
         mol = pybel_to_mol(pbmol, name=os.path.basename(name))
         mol.filename = filename
@@ -141,7 +146,7 @@ def write_file(mol, filename=None, mode='w', format=None):
         return outstr
     else:
         with open(filename, mode) as wrf:
-            print >> wrf, outstr
+            print(outstr, file=wrf)
 
 
 @runsremotely(enable=force_remote)
@@ -248,7 +253,7 @@ def mol_to_pybel(mdtmol):
 
     for atom in mdtmol.bond_graph:
         a1 = atommap[atom]
-        for nbr, order in mdtmol.bond_graph[atom].iteritems():
+        for nbr, order in mdtmol.bond_graph[atom].items():
             a2 = atommap[nbr]
             if a1.GetIdx() > a2.GetIdx():
                 obmol.AddBond(a1.GetIdx(), a2.GetIdx(), order)
@@ -293,13 +298,13 @@ def pybel_to_mol(pbmol,
         name = obres.GetAtomID(pybatom.OBAtom).strip()
 
         if pybatom.atomicnum == 67:
-            print ("WARNING: openbabel parsed atom serial %d (name:%s) as Holmium; "
-                   "correcting to hydrogen. ") % (pybatom.OBAtom.GetIdx(), name)
+            print(("WARNING: openbabel parsed atom serial %d (name:%s) as Holmium; "
+                   "correcting to hydrogen. ") % (pybatom.OBAtom.GetIdx(), name))
             atnum = 1
 
         elif pybatom.atomicnum == 0:
-            print "WARNING: openbabel failed to parse atom serial %d (name:%s); guessing %s. " % (
-                pybatom.OBAtom.GetIdx(), name, name[0])
+            print("WARNING: openbabel failed to parse atom serial %d (name:%s); guessing %s. " % (
+                pybatom.OBAtom.GetIdx(), name, name[0]))
             atnum = moldesign.data.ATOMIC_NUMBERS[name[0]]
         else:
             atnum = pybatom.atomicnum
@@ -320,8 +325,8 @@ def pybel_to_mol(pbmol,
                 # create new chain
                 if not mdt.utils.is_printable(chain_id.strip()) or not chain_id.strip():
                     chain_id = backup_chain_names.pop()
-                    print 'WARNING: assigned name %s to unnamed chain object @ %s' % (
-                        chain_id, hex(chain_id_num))
+                    print('WARNING: assigned name %s to unnamed chain object @ %s' % (
+                        chain_id, hex(chain_id_num)))
                 chn = mdt.Chain(pdbname=str(chain_id))
                 newchains[chain_id_num] = chn
             else:
@@ -343,7 +348,7 @@ def pybel_to_mol(pbmol,
         newatoms.append(mdtatom)
 
     newtopo = {}
-    for ibond in xrange(pbmol.OBMol.NumBonds()):
+    for ibond in range(pbmol.OBMol.NumBonds()):
         obbond = pbmol.OBMol.GetBond(ibond)
         a1 = newatom_map[obbond.GetBeginAtomIdx()]
         a2 = newatom_map[obbond.GetEndAtomIdx()]

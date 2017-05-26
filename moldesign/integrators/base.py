@@ -18,7 +18,7 @@ from moldesign.method import Method
 class IntegratorBase(Method):
     """Base class for all integrators"""
 
-    PARAMETERS = parameters.integrator_parameters.values()
+    PARAMETERS = list(parameters.integrator_parameters.values())
 
     def run(self, run_for):
         """
@@ -50,12 +50,12 @@ class IntegratorBase(Method):
 
 
 class MDBase(IntegratorBase):
-    PARAMETERS = IntegratorBase.PARAMETERS + parameters.md_parameters.values()
+    PARAMETERS = IntegratorBase.PARAMETERS + list(parameters.md_parameters.values())
 
 
 class ConstantTemperatureBase(MDBase):
-    PARAMETERS = MDBase.PARAMETERS + parameters.constant_temp_parameters.values()
+    PARAMETERS = MDBase.PARAMETERS + list(parameters.constant_temp_parameters.values())
 
 
 class LangevinBase(ConstantTemperatureBase):
-    PARAMETERS = ConstantTemperatureBase.PARAMETERS + parameters.langevin_parameters.values()
+    PARAMETERS = ConstantTemperatureBase.PARAMETERS + list(parameters.langevin_parameters.values())

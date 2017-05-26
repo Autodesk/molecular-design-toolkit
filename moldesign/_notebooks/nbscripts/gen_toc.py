@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import sys, os
 from nbformat import v4
 
@@ -20,7 +21,7 @@ if __name__ == '__main__':
     with open(sys.argv[1], 'r') as nbfile:
         nb = v4.reads(nbfile.read())
 
-    print 'Contents\n=======\n---'
+    print('Contents\n=======\n---')
 
     for cell in nb.cells:
         if cell['cell_type'] == 'markdown':
@@ -29,7 +30,7 @@ if __name__ == '__main__':
                 if header is None: continue
 
                 ilevel, name = header
-                print '  '*(ilevel-1) + ' - [%s](#%s)'%(name, name.replace(' ','-'))
+                print('  '*(ilevel-1) + ' - [%s](#%s)'%(name, name.replace(' ','-')))
 
 
 

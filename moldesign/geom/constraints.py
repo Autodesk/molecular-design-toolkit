@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import moldesign as mdt
 import moldesign.molecules.atomcollections
 from moldesign import units as u

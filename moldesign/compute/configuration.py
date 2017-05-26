@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from past.builtins import basestring
 import os
 import sys
 import yaml
@@ -95,7 +97,7 @@ DEF_CONFIG = CONFIG_DEFAULTS.copy()
 
 
 def registry_login(client, login):
-    print 'Logging into docker registry @ %s ...' % login['registry'],
+    print('Logging into docker registry @ %s ...' % login['registry'], end=' ')
     sys.stdout.flush()
     try:
         client.login(**login)
@@ -103,7 +105,7 @@ def registry_login(client, login):
         warnings.warn('Failed to connect to %s. ' % login['registry'] +
                       'Some functions may time out.')
     else:
-        print 'done'
+        print('done')
 
 
 def write_config(path=None):
@@ -114,7 +116,7 @@ def write_config(path=None):
         confdir = os.path.dirname(path)
         if not os.path.exists(confdir):
             os.mkdir(confdir)
-            print 'Created moldesign configuration directory %s' % confdir
+            print('Created moldesign configuration directory %s' % confdir)
 
     configdump = {}
     for key in CONFIG_DEFAULTS:
@@ -123,7 +125,7 @@ def write_config(path=None):
     with open(path, 'w') as f:
         yaml.safe_dump(configdump, f, default_flow_style=False)
 
-    print 'Wrote moldesign configuration to %s' % path
+    print('Wrote moldesign configuration to %s' % path)
 
 
 def get_engine():
@@ -132,7 +134,7 @@ def get_engine():
         try:
             reset_compute_engine()
         except:
-            print COMPUTE_CONNECTION_WARNING
+            print(COMPUTE_CONNECTION_WARNING)
             raise
     return compute.default_engine
 
@@ -146,13 +148,13 @@ def init_config():
     if os.path.exists(path):
         try:
             with open(path, 'r') as infile:
-                print 'Reading configuration from %s' % path
+                print('Reading configuration from %s' % path)
                 newconf = yaml.load(infile)
                 if not isinstance(newconf, dict):
                     raise TypeError('Cannot read configuration "%s" from %s.' % (newconf, path))
         except (IOError, KeyError, TypeError) as e:
-            print ('WARNING: exception while reading configuration: %s. '
-                   'using built-in default configuration') % e
+            print(('WARNING: exception while reading configuration: %s. '
+                   'using built-in default configuration') % e)
         else:
             config.update(newconf)
 
@@ -201,9 +203,9 @@ def reset_compute_engine():
 
     elif config.engine_type == 'subprocess':
         compute.default_engine = engines.Subprocess()
-        print """WARNING: running all computational jobs as subprocesses on this machine.
+        print("""WARNING: running all computational jobs as subprocesses on this machine.
 This requires that you have all necessary software installed locally.
-To change the engine, call moldesign.configure() or modify moldesign.compute.config ."""
+To change the engine, call moldesign.configure() or modify moldesign.compute.config .""")
 
     elif config.engine_type in ('ccc', 'docker-machine'):
         raise ValueError('Computational engine type "%s" is no longer supported by MDT. '

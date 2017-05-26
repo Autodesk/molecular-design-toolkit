@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import object
 import functools
 import imp
 from ..utils import exports, exports_names
@@ -70,7 +72,7 @@ except ImportError:
             self.disabled = True  # so user can't overwrite
 
         def _write(self, string):
-            print string.strip()
+            print(string.strip())
 
         # temporary so that we can use this like a logging module later
         error = warning = info = handled = debug = status = _write
@@ -85,4 +87,4 @@ except ImportError:
         :param title: A name for the object (otherwise, str(obj) is used)
         :return:
         """
-        print obj
+        print(obj)

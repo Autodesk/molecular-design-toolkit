@@ -1,3 +1,4 @@
+from builtins import range
 import itertools
 import random
 
@@ -85,9 +86,9 @@ def test_pairwise_distance_arrays(f1, f2, request):
 
     if o1.num_atoms * o2.num_atoms > 250:  # stochastically test larger matrices
         pairs = ((random.randrange(0, o1.num_atoms), random.randrange(0, o2.num_atoms))
-                 for i in xrange(250))
+                 for i in range(250))
     else:
-        pairs = itertools.product(xrange(o1.num_atoms), xrange(o2.num_atoms))
+        pairs = itertools.product(range(o1.num_atoms), range(o2.num_atoms))
 
     for iatom, jatom in pairs:
         assert o1.atoms[iatom].distance(o2.atoms[jatom]) == array[iatom, jatom]

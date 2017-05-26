@@ -11,8 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import os
-import dumbdbm
+import dbm.dumb
 import json
 import zlib
 
@@ -33,7 +36,7 @@ class CompressedJsonDbm(object):
         return getattr(self.db, item)
 
     def __dir__(self):
-        return self.__dict__.keys() + dir(self.db)
+        return list(self.__dict__.keys()) + dir(self.db)
 
     def __len__(self):
         return len(self.db)
@@ -49,7 +52,7 @@ class CompressedJsonDbm(object):
     __contains__ = Alias('db.__contains__')
 
 
-class ReadOnlyDumb(dumbdbm._Database):
+class ReadOnlyDumb(dbm.dumb._Database):
     """ A read-only subclass of dumbdbm
 
     All possible operations that could result in a disk write have been turned into no-ops or raise

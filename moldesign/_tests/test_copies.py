@@ -1,3 +1,4 @@
+from builtins import zip
 import numpy as np
 import pytest
 

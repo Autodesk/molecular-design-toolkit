@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,9 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from past.builtins import basestring
 import bz2
-import cPickle as pkl  # TODO: if cpickle fails, retry with regular pickle to get a better traceback
-import cStringIO as StringIO
+import pickle as pkl  # TODO: if cpickle fails, retry with regular pickle to get a better traceback
+import io as StringIO
 import functools
 import gzip
 import os
@@ -284,10 +289,10 @@ def from_pdb(pdbcode, usecif=False):
     request = requests.get(url)
 
     if request.status_code == 404 and not usecif:  # if not found, try the cif-format version
-        print 'WARNING: %s.pdb not found in rcsb.org database. Trying %s.cif...' % (
-            pdbcode, pdbcode),
+        print('WARNING: %s.pdb not found in rcsb.org database. Trying %s.cif...' % (
+            pdbcode, pdbcode), end=' ')
         retval = from_pdb(pdbcode, usecif=True)
-        print 'success.'
+        print('success.')
         return retval
 
     elif request.status_code != 200:

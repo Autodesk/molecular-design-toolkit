@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import object
 import moldesign as mdt
 from .errors import ForcefieldAssignmentError, show_parameterization_results
 from ..utils import exports
@@ -152,7 +153,7 @@ class TLeapForcefield(Forcefield):
 
     def add_ff(self, ff):
         self._fflines.extend(ff._fflines)
-        for fname, fobj in ff._file_list.iteritems():
+        for fname, fobj in ff._file_list.items():
             if fname in self._file_list:
                 raise ValueError("Can't combine forcefields - two files with same name (%s)"
                                  %fname)

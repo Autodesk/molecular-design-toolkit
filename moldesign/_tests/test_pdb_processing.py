@@ -110,7 +110,7 @@ def test_numeric_residue_name_1PYN(request, mol):
 
     contents = parmed.load_file('/tmp/tmp.lib')
     assert len(contents) == 1
-    assert contents.keys()[0] == '941'
+    assert list(contents.keys())[0] == '941'
 
 MISSINGRES_2JAJ = [('A', 'GLY', -4), ('A', 'PRO', -3), ('A', 'LEU', -2), ('A', 'GLY', -1),
                    ('A', 'MET', 0), ('A', 'ALA', 1), ('A', 'GLY', 2), ('A', 'LEU', 3),

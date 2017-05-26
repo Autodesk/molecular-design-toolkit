@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import range
 import itertools
 import numpy as np
 import moldesign as mdt
@@ -40,7 +41,7 @@ def shake_positions(mol, prev_positions, max_cycles=100, use_masses=True):
     constraints = []
     for c in mol.constraints:  # Replace FixedPosition with 3 FixedCoordinates - it's better behaved
         if isinstance(c, FixedPosition):
-            for i in xrange(3):
+            for i in range(3):
                 vec = np.zeros(3)
                 vec[i] = 1.0
                 constraints.append(FixedCoordinate(c.atom,  vec, value=c.value[i]))
@@ -65,7 +66,7 @@ def shake_positions(mol, prev_positions, max_cycles=100, use_masses=True):
         dim_masses = np.ones((mol.num_atoms, 3)) * u.default.mass
     flat_masses = dim_masses.defunits_value().flatten()
 
-    for i in xrange(max_cycles):
+    for i in range(max_cycles):
         for c in mol.constraints:
             if not c.satisfied():
                 break

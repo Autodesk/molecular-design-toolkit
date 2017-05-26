@@ -27,7 +27,7 @@ with open(os.path.join(PACKAGEPATH, '_static_data', 'amber_ffs.yml'), 'r') as _a
 
 AMBER_LEAPRC = {}
 AMBER_SYSTEM = {}
-for system, ffs in ambff.items():
-    for ff, leaprc in ffs.items():
+for system, ffs in list(ambff.items()):
+    for ff, leaprc in list(ffs.items()):
         AMBER_LEAPRC[ff] = leaprc
         AMBER_SYSTEM[ff] = system

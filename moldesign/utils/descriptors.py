@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+from builtins import object
 class Alias(object):
     """
     Descriptor that calls a child object's method.

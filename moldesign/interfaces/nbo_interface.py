@@ -11,6 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import map
+from builtins import range
 import numpy as np
 
 import moldesign as mdt
@@ -42,7 +47,7 @@ def run_nbo(mol, requests=('nlmo', 'nbo'),
     parsed_data = parse_nbo(job.get_output('FILE.10'),
                             len(mol.wfn.aobasis))
 
-    for orbtype, data in parsed_data.iteritems():
+    for orbtype, data in parsed_data.items():
         if orbtype[0] == 'P':  # copy data from the orthogonal orbitals
             orthdata = parsed_data[orbtype[1:]]
             for key in 'bond_names iatom jatom stars bondnums num_bonded_atoms'.split():
@@ -55,7 +60,7 @@ def run_nbo(mol, requests=('nlmo', 'nbo'),
 
 def add_orbitals(mol, wfn, orbdata, orbtype):
     orbs = []
-    for i in xrange(len(orbdata.coeffs)):
+    for i in range(len(orbdata.coeffs)):
         bond = None
         atoms = [mol.atoms[orbdata.iatom[i] - 1]]
         if orbdata.bond_names[i] == 'RY':
@@ -123,7 +128,7 @@ def make_nbo_input_file(mol, requests):
     nbofile.append("$COORD\n %s" % mol.name)
     for iatom, atom in enumerate(mol.atoms):
         #TODO: deal with pseudopotential electrons
-        x, y, z = map(repr, atom.position.value_in(u.angstrom))
+        x, y, z = list(map(repr, atom.position.value_in(u.angstrom)))
         nbofile.append("%d %d %s %s %s" % (atom.atnum, atom.atnum,
                                                     x, y, z))
     nbofile.append("$END")
@@ -151,7 +156,7 @@ def parse_nbo(f, nbasis):
     parsed = {}
     while True:
         try:
-            l = lines.next()
+            l = next(lines)
         except StopIteration:
             break
 
@@ -160,7 +165,7 @@ def parse_nbo(f, nbasis):
             orbname = fields[0]
             assert orbname[-1] == 's'
             orbname = orbname[:-1]
-            lines.next()
+            next(lines)
             if orbname[0] == 'P':  # these are pre-orthogonal orbitals, it only prints the coefficients
                 coeffs = _parse_wrapped_matrix(lines, nbasis)
                 parsed[orbname] = DotDict(coeffs=np.array(coeffs))
@@ -174,14 +179,14 @@ def read_orbital_set(lineiter, nbasis):
     mat = _parse_wrapped_matrix(lineiter, nbasis)
 
     # First, occupation numbers
-    occupations = map(float,_get_wrapped_separated_vals(lineiter, nbasis))
+    occupations = list(map(float,_get_wrapped_separated_vals(lineiter, nbasis)))
 
     # Next, a line of things that always appear to be ones (for spin orbitals maybe?)
     oneline = _get_wrapped_separated_vals(lineiter, nbasis)
     for x in oneline: assert x == '1'
 
     # next is number of atoms involved in the bond
-    num_bonded_atoms = map(int, _get_wrapped_separated_vals(lineiter, nbasis))
+    num_bonded_atoms = list(map(int, _get_wrapped_separated_vals(lineiter, nbasis)))
     bond_names = _get_wrapped_separated_vals(lineiter, nbasis)
 
     # Next indicates whether real or virtual
@@ -189,11 +194,11 @@ def read_orbital_set(lineiter, nbasis):
     for s in stars: assert (s == '' or s == '*')
 
     # number of bonds between this pair of atoms
-    bondnums = map(int, _get_wrapped_separated_vals(lineiter, nbasis))
+    bondnums = list(map(int, _get_wrapped_separated_vals(lineiter, nbasis)))
 
     # first atom index (1-based)
-    iatom = map(int, _get_wrapped_separated_vals(lineiter, nbasis))
-    jatom = map(int, _get_wrapped_separated_vals(lineiter, nbasis))
+    iatom = list(map(int, _get_wrapped_separated_vals(lineiter, nbasis)))
+    jatom = list(map(int, _get_wrapped_separated_vals(lineiter, nbasis)))
 
     # The rest appears to be 0 most of the time ...
 
@@ -206,8 +211,8 @@ def read_orbital_set(lineiter, nbasis):
 
 def _parse_wrapped_matrix(lineiter, nbasis):
     mat = []
-    for i in xrange(nbasis):
-        currline = map(float, _get_wrapped_separated_vals(lineiter, nbasis))
+    for i in range(nbasis):
+        currline = list(map(float, _get_wrapped_separated_vals(lineiter, nbasis)))
         assert len(currline) == nbasis
         mat.append(currline)
     return mat
@@ -216,7 +221,7 @@ def _parse_wrapped_matrix(lineiter, nbasis):
 def _get_wrapped_separated_vals(lineiter, nbasis):
     vals = []
     while True:
-        l = lineiter.next()
+        l = next(lineiter)
         vals.extend(l.split())
         if len(vals) == nbasis:
             break
@@ -229,7 +234,7 @@ def _get_wrapped_column_vals(lineiter, nbasis):
     while True:
         l = lineiter.next()[1:]
         lenl = len(l)
-        for i in xrange(20):
+        for i in range(20):
             if lenl <= 3*i + 1: break
             vals.append(l[3*i: 3*i + 3].strip())
         if len(vals) == nbasis:

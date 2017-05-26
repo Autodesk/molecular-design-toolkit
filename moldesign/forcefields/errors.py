@@ -15,16 +15,18 @@
 """
 Class that define displays for common errors in assigning a forcefield
 """
+from __future__ import print_function
 
+from builtins import object
 import cgi
 from .. import utils
 from .. import units as u
 
 
 def show_parameterization_results(errormessages, molin, molout=None):
-    print 'Forcefield assignment: %s' % ('Success' if molout is not None else 'Failure')
+    print('Forcefield assignment: %s' % ('Success' if molout is not None else 'Failure'))
     for err in errormessages:
-        print utils.html_to_text(err.desc)
+        print(utils.html_to_text(err.desc))
 
 
 class ForcefieldAssignmentError(Exception):

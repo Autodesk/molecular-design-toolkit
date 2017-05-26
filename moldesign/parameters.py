@@ -18,6 +18,7 @@ This module stores definitions of common parameters for common techniques.
 These are used to standardize our interfaces to other codes, and automatically generate interactive
 notebook interfaces to configure various techniques.
 """
+from builtins import object
 import operator as op
 
 from moldesign import units as u

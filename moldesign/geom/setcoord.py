@@ -1,3 +1,4 @@
+from __future__ import division
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from past.utils import old_div
 import numpy as np
 
 import moldesign as mdt
@@ -39,7 +41,7 @@ def set_distance(a1, a2, newlength, adjustmol=True):
         assert a1.molecule == a2.molecule
     vec = a1.position - a2.position
     dist = np.sqrt(vec.dot(vec))
-    direction = vec / dist
+    direction = old_div(vec, dist)
     delta = newlength - dist
     if np.abs(delta) < 1.0e-5 * delta.get_units(): return
     if not adjustmol:
@@ -72,8 +74,8 @@ def set_angle(a1, a2, a3, theta, adjustmol=True):
 
     axis = np.cross(a1.position - a2.position, a3.position - a2.position) # do vecs need to be normalized?
     if not adjustmol:
-        rotmat_l = external.transformations.rotation_matrix(rotation / 2.0, axis, a2.position)
-        rotmat_r = external.transformations.rotation_matrix(-rotation / 2.0, axis, a2.position)
+        rotmat_l = external.transformations.rotation_matrix(old_div(rotation, 2.0), axis, a2.position)
+        rotmat_r = external.transformations.rotation_matrix(old_div(-rotation, 2.0), axis, a2.position)
 
         a1.position = apply_4x4_transform(rotmat_l, a1.position)
         a3.position = apply_4x4_transform(rotmat_r, a3.position)
@@ -123,8 +125,8 @@ def set_dihedral(a1, a2=None, a3=None, a4=None, theta=None, adjustmol=True):
 
     axis = a2.position - a3.position
     if not adjustmol:
-        rotmat_l = external.transformations.rotation_matrix(-rotation / 2.0, axis, a3.position)
-        rotmat_r = external.transformations.rotation_matrix(rotation / 2.0, axis, a3.position)
+        rotmat_l = external.transformations.rotation_matrix(old_div(-rotation, 2.0), axis, a3.position)
+        rotmat_r = external.transformations.rotation_matrix(old_div(rotation, 2.0), axis, a3.position)
 
         a1.position = apply_4x4_transform(rotmat_l, a1.position)
         a4.position = apply_4x4_transform(rotmat_r, a4.position)

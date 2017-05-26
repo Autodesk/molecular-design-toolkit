@@ -1,5 +1,6 @@
 """ Tests constraint routines
 """
+from builtins import range
 import pytest
 import numpy as np
 
@@ -30,7 +31,7 @@ def four_particle_45_twist():
                           [0.0, 0.0, 0.5],
                           [0.2, -0.2, 0.5]]
 
-    for iatom in xrange(3):
+    for iatom in range(3):
         mol.atoms[iatom].bond_to(mol.atoms[iatom+1], 1)
 
     return mol

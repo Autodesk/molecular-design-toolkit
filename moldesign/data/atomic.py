@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import zip
+from builtins import range
 from moldesign import units as u
 
 __all__ = 'ATOMIC_MASSES ATOMIC_NUMBERS ELEMENTS SYMBOLS'.split()
@@ -31,13 +33,13 @@ ATOMIC_NUMBERS = {'Ac': 89, 'Ag': 47, 'Al': 13, 'Am': 95, 'Ar': 18, 'As': 33, 'A
                   'Tb': 65, 'Tc': 43, 'Te': 52, 'Th': 90, 'Ti': 22, 'Tl': 81, 'Tm': 69, 'U': 92,
                   'Uuh': 116, 'Uuo': 118, 'Uup': 115, 'Uuq': 114, 'Uus': 117, 'Uut': 113, 'V': 23,
                   'W': 74, 'Xe': 54, 'Y': 39, 'Yb': 70, 'Zn': 30, 'Zr': 40}
-ELEMENTS = {val: key for key, val in ATOMIC_NUMBERS.iteritems()}
+ELEMENTS = {val: key for key, val in ATOMIC_NUMBERS.items()}
 SYMBOLS = ELEMENTS
 
 
 # Isotopic masses for the most abundant species of each element
 # from https://www.ncsu.edu/chemistry/msf/pdf/IsotopicMass_NaturalAbundance.pdf
-ATOMIC_MASSES = {i: m*u.amu for i, m in zip(xrange(1, 55), (
+ATOMIC_MASSES = {i: m*u.amu for i, m in zip(range(1, 55), (
     1.007825, 4.002603, 7.016004, 9.012182, 11.009305, 12.0, 14.003074, 15.994915, 18.998403,
     19.99244, 22.98977,
     23.985042, 26.981538, 27.976927, 30.973762, 31.972071, 34.968853, 39.962383, 38.963707,

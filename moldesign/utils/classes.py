@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import object
 from bisect import bisect_left, bisect_right
 import collections
 
@@ -63,13 +64,13 @@ class ExclusiveList(object):
         return obj
 
     def __iter__(self):
-        return self._keys.itervalues()
+        return iter(self._keys.values())
 
     def __len__(self):
         return len(self._keys)
 
     def __getitem__(self, item):
-        return self._keys.values()[item]
+        return list(self._keys.values())[item]
 
     def remove(self, obj):
         k = self._keyfn(obj)
@@ -87,11 +88,11 @@ class ExclusiveList(object):
         if index is None:
             return self._keys.popitem()[1]
         else:
-            k = self._keys.keys()[index]
+            k = list(self._keys.keys())[index]
             return self._keys.pop(k)
 
     def __repr__(self):
-        return '%s(%s)' % (type(self).__name__, self._keys.values())
+        return '%s(%s)' % (type(self).__name__, list(self._keys.values()))
 
     __str__ = __repr__
 
@@ -121,7 +122,7 @@ class DotDict(object):
         return self.__dict__ == other.__dict__
 
     def copy(self):
-        return self.__class__(self.iteritems())
+        return self.__class__(self.items())
 
 # add dictionary magic method aliases
 for _delegate in ['__getitem__', '__setitem__', '__contains__', '__iter__',
@@ -151,13 +152,7 @@ class OrderedDotDict(DotDict):
             yield k, self[k]
 
     def __repr__(self):
-        return '%s({%s})'%(self.__class__.__name__, self.items())
-
-    def values(self):
-        return list(self.itervalues())
-
-    def items(self):
-        return list(self.iteritems())
+        return '%s({%s})'%(self.__class__.__name__, list(self.items()))
 
     def __setitem__(self, key, value):
         super(OrderedDotDict, self).__setitem__(key, value)
@@ -182,7 +177,7 @@ class OrderedDotDict(DotDict):
         return rv
 
     def update(self, *args, **kwargs):
-        for k,v in collections.OrderedDict(*args, **kwargs).iteritems():
+        for k,v in collections.OrderedDict(*args, **kwargs).items():
             self[k] = v
 
 

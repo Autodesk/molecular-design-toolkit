@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import range
 import moldesign as mdt
 from moldesign import units as u
 from moldesign.molecules import Trajectory
@@ -45,7 +46,7 @@ class VelocityVerlet(IntegratorBase):
         next_trajectory_frame = self.params.frame_interval
 
         # Dynamics loop
-        for istep in xrange(nsteps):
+        for istep in range(nsteps):
             self.step()
             if istep + 1 >= next_trajectory_frame:
                 self.traj.new_frame()

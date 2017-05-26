@@ -11,6 +11,10 @@
     :license: BSD, see sphinxlicense/LICENSE for details.
 """
 
+from builtins import next
+from builtins import range
+from past.builtins import basestring
+from builtins import object
 import collections
 import re
 
@@ -98,7 +102,7 @@ class GoogleDocArgumentInjector(object):
         newlines = list(self.lines_before_args)
         if self.args:
             newlines.append(' '*self.arg_indent + self.arg_section_name + ':')
-            newlines.extend(self._indent(self.args.values(), self.arg_indent+4))
+            newlines.extend(self._indent(list(self.args.values()), self.arg_indent+4))
             newlines.append('')
         newlines.extend(self.lines_after_args)
 

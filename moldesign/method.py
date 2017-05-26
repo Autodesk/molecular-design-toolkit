@@ -15,11 +15,13 @@
 This module contains abstract base classes for potential models, integrators, and various
 associated data types (force fields, orbitals, basis sets, etc.).
 """
+from builtins import object
 import funcsigs
 
 import moldesign as mdt
 from .utils import DotDict
 from .helpers import WidgetMethod
+from future.utils import with_metaclass
 
 
 class _InitKeywordMeta(type):
@@ -40,7 +42,7 @@ class _InitKeywordMeta(type):
         return self.__customsig
 
 
-class Method(object):
+class Method(with_metaclass(_InitKeywordMeta, object)):
     """Abstract Base class for energy models, integrators, and "heavy duty" simulation objects
 
     Args:
@@ -49,8 +51,6 @@ class Method(object):
     Attributes:
        mol (mdt.Molecule): the molecule this method is associated with
     """
-
-    __metaclass__ = _InitKeywordMeta
 
     PARAMETERS = []
     """ list: list of Parameters that can be used to configure this method
