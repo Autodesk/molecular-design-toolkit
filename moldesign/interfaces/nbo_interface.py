@@ -1,3 +1,8 @@
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,18 +16,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import map
-from builtins import range
 import numpy as np
 
 import moldesign as mdt
-import moldesign.molecules.bonds
-from moldesign import units as u
-from moldesign import utils
-from dotmap import DotMap
+from .. import units as u
+from .. import utils
+
 
 
 SIGMA_UTF = u"\u03C3"
@@ -41,7 +40,7 @@ def run_nbo(mol, requests=('nlmo', 'nbo'),
                           command,
                           inputs=inputs,
                           name="nbo, %s" % mol.name)
-    moldesign.helpers.display_log(job.get_display_object(), "nbo, %s"%mol.name)
+    mdt.helpers.display_log(job.get_display_object(), "nbo, %s"%mol.name)
 
     job.wait()
     parsed_data = parse_nbo(job.get_output('FILE.10'),
@@ -81,7 +80,7 @@ def add_orbitals(mol, wfn, orbdata, orbtype):
             utf_name = bname
         else:
             atoms.append(mol.atoms[orbdata.jatom[i] - 1])
-            bond = moldesign.molecules.bonds.Bond(*atoms)
+            bond = mdt.Bond(*atoms)
             if orbdata.bondnums[i] == 1:  # THIS IS NOT CORRECT
                 nbotype = 'sigma'
                 utf_type = SIGMA_UTF
@@ -94,13 +93,13 @@ def add_orbitals(mol, wfn, orbdata, orbtype):
                                            atoms[0].name, atoms[1].name)
         name = '%s %s' % (bname, orbtype)
 
-        orbs.append(moldesign.methods.orbitals.Orbital(orbdata.coeffs[i],
-                                                       wfn=wfn, occupation=orbdata.occupations[i],
-                                                       atoms=atoms, name=name,
-                                                       nbotype=nbotype,
-                                                       bond=bond,
-                                                       unicode_name=utf_name,
-                                                       _data=orbdata))
+        orbs.append(mdt.Orbital(orbdata.coeffs[i],
+                                wfn=wfn, occupation=orbdata.occupations[i],
+                                atoms=atoms, name=name,
+                                nbotype=nbotype,
+                                bond=bond,
+                                unicode_name=utf_name,
+                                _data=orbdata))
     return wfn.add_orbitals(orbs, orbtype=orbtype)
 
 
@@ -168,7 +167,7 @@ def parse_nbo(f, nbasis):
             next(lines)
             if orbname[0] == 'P':  # these are pre-orthogonal orbitals, it only prints the coefficients
                 coeffs = _parse_wrapped_matrix(lines, nbasis)
-                parsed[orbname] = DotMap(coeffs=np.array(coeffs))
+                parsed[orbname] = utils.DotDict(coeffs=np.array(coeffs))
             else:  # there's more complete information available
                 parsed[orbname] = read_orbital_set(lines, nbasis)
     return parsed
@@ -202,11 +201,11 @@ def read_orbital_set(lineiter, nbasis):
 
     # The rest appears to be 0 most of the time ...
 
-    return DotMap(coeffs=np.array(mat),
-                  iatom=iatom, jatom=jatom, bondnums=bondnums,
-                  bond_names=bond_names,
-                  num_bonded_atoms=num_bonded_atoms,
-                  stars=stars, occupations=occupations)
+    return utils.DotDict(coeffs=np.array(mat),
+                         iatom=iatom, jatom=jatom, bondnums=bondnums,
+                         bond_names=bond_names,
+                         num_bonded_atoms=num_bonded_atoms,
+                         stars=stars, occupations=occupations)
 
 
 def _parse_wrapped_matrix(lineiter, nbasis):

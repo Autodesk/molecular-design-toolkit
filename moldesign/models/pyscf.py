@@ -1,3 +1,8 @@
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,27 +16,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import  # prevent clashes between this and the "pyscf" package
-from future import standard_library
+
 from functools import reduce
-standard_library.install_aliases()
-from builtins import map
-from builtins import zip
-from builtins import range
-from builtins import object
 from io import StringIO
+from past.utils import old_div
 
 import numpy as np
 
 import moldesign as mdt
-
 from .. import units as u
-from .. import compute, orbitals
+from .. import compute, orbitals, utils
 from ..interfaces.pyscf_interface import force_remote, mol_to_pyscf,  StatusLogger, SPHERICAL_NAMES
 from .base import QMBase
-from ..utils import exports
 from ..helpers import Logger
-from dotmap import DotMap
 
 
 class LazyClassMap(object):
@@ -77,7 +74,7 @@ FORCE_CALCULATORS = LazyClassMap({'rhf': 'pyscf.grad.RHF', 'hf': 'pyscf.grad.RHF
                                   'rks': 'pyscf.grad.RKS', 'ks': 'pyscf.grad.RKS'})
 
 
-@exports
+@utils.exports
 class PySCFPotential(QMBase):
     DEFAULT_PROPERTIES = ['potential_energy',
                           'wfn',
@@ -230,7 +227,7 @@ class PySCFPotential(QMBase):
         scf_matrices = self._get_scf_matrices(orb_calc, ao_matrices)
         if hasattr(orb_calc, 'mulliken_pop'):
             ao_pop, atom_pop = orb_calc.mulliken_pop(verbose=-1)
-            result['mulliken'] = DotMap({a: p for a, p in zip(self.mol.atoms, atom_pop)})
+            result['mulliken'] = utils.DotDict({a: p for a, p in zip(self.mol.atoms, atom_pop)})
             result['mulliken'].type = 'atomic'
 
         if hasattr(orb_calc, 'dip_moment'):
@@ -472,7 +469,7 @@ class PySCFPotential(QMBase):
     def _get_ao_matrices(mf):
         h1e = mf.get_hcore() * u.hartree
         sao = mf.get_ovlp()
-        return DotMap(h1e=h1e, sao=sao)
+        return utils.DotDict(h1e=h1e, sao=sao)
 
     def _get_scf_matrices(self, mf, ao_mats):
         dm = mf.make_rdm1()
@@ -505,9 +502,9 @@ def _get_multiconf_dipoles(basis, mcstate, nstates):
     References:
         https://github.com/sunqm/pyscf/blob/e4d824853c49b7c19eb35cd6f9fe6ea675de932d/examples/1-advanced/030-transition_dipole.py
     """
-    nuc_charge_center = np.einsum('z,zx->x', nuc_charges, nuc_coords)/sum(nuc_charges)
     nuc_charges = [basis.atom_charge(i) for i in range(basis.natm)]
     nuc_coords = [basis.atom_coord(i) for i in range(basis.natm)]
+    nuc_charge_center = np.einsum('z,zx->x', nuc_charges, nuc_coords)/sum(nuc_charges)
     basis.set_common_orig_(nuc_charge_center)
     nuc_dip = np.einsum('i,ix->x', nuc_charges, nuc_coords-nuc_charge_center) * u.a0 * u.q_e
 

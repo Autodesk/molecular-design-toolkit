@@ -1,3 +1,8 @@
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,14 +16,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import division
-from builtins import str, object
-
 import numpy as np
-from dotmap import DotMap
 
 from . import MolecularOrbitals
-
+from ..utils import DotDict
 
 class ElectronicWfn(object):
     """ Stores the results of a quantum chemistry calculation.

@@ -1,3 +1,8 @@
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,11 +23,10 @@ This module stores definitions of common parameters for common techniques.
 These are used to standardize our interfaces to other codes, and automatically generate interactive
 notebook interfaces to configure various techniques.
 """
-from builtins import object
 import operator as op
 
-from moldesign import units as u
-from moldesign import utils
+from . import units as u
+from . import utils
 
 
 def isin(a, b): return a in b

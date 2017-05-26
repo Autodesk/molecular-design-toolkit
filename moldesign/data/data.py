@@ -20,7 +20,7 @@ import json
 import webcolors
 
 import moldesign as mdt
-import ..units as u
+from .. import units as u
 
 PACKAGEPATH = os.path.abspath(os.path.dirname(mdt.__file__))
 

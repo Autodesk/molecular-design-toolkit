@@ -1,3 +1,8 @@
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,13 +16,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import dotmap
-from builtins import zip
-from builtins import map
-from builtins import hex
-from builtins import str
-from builtins import range
-from builtins import object
 import copy
 import time
 
@@ -59,7 +57,7 @@ class Frame(utils.DotDict):
     def __init__(self, traj, frameidx):
         self.traj = traj
         self.frameidx = frameidx
-        super(Frame, self).__init__()
+        super(Frame, self).__init__(_dynamic=False)
         for key in self.traj.properties:
             self[key] = getattr(traj, key)[self.frameidx]
 
@@ -245,7 +243,7 @@ class Trajectory(TrajectoryAnalysisMixin):
         self.frames = []
         self.mol = mol
         self.unit_system = utils.if_not_none(unit_system, mdt.units.default)
-        self.properties = dotmap.DotMap()
+        self.properties = utils.DotDict()
         self._reset()
         self._tempmol.dynamic_dof = self.mol.dynamic_dof
         self.name = utils.if_not_none(name, 'untitled')

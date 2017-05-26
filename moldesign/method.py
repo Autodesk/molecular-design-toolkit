@@ -1,3 +1,8 @@
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +20,11 @@
 This module contains abstract base classes for potential models, integrators, and various
 associated data types (force fields, orbitals, basis sets, etc.).
 """
-from builtins import object
+from future.utils import with_metaclass
 import funcsigs
 
 import moldesign as mdt
 from .helpers import WidgetMethod
-from future.utils import with_metaclass
 
 
 class _InitKeywordMeta(type):
