@@ -14,8 +14,6 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-from builtins import bytes
-from builtins import str
 from builtins import hex
 from builtins import range
 import os
@@ -34,10 +32,9 @@ else:  # this should be configurable
     force_remote = False  # debugging
 
 import moldesign as mdt
-from moldesign.compute.runsremotely import runsremotely
-import moldesign.molecules.atoms
-from moldesign import units as u
-from moldesign.utils import exports
+from ..compute.runsremotely import runsremotely
+from .. import units as u
+from ..utils import exports
 
 
 def read_file(filename, name=None, format=None):
@@ -64,7 +61,8 @@ def read_file(filename, name=None, format=None):
         return mol
     else:
         pbmol = next(pb.readfile(format=format, filename=filename))
-        if name is None: name = filename
+        if name is None:
+            name = filename
         mol = pybel_to_mol(pbmol, name=os.path.basename(name))
         mol.filename = filename
         return mol
@@ -237,17 +235,17 @@ def mol_to_pybel(mdtmol):
         if atom.residue and atom.residue not in resmap:
             obres = obmol.NewResidue()
             resmap[atom.residue] = obres
-            obres.SetChain(bytes(
-                    mdt.utils.if_not_none(atom.chain.name, 'Z')[0] ))
-            obres.SetName(bytes(
-                    mdt.utils.if_not_none(atom.residue.pdbname, 'UNL') ))
+            obres.SetChain(str(
+                    mdt.utils.if_not_none(atom.chain.name, 'Z')[0]))
+            obres.SetName(str(
+                    mdt.utils.if_not_none(atom.residue.pdbname, 'UNL')))
             obres.SetNum(mdt.utils.if_not_none(atom.residue.pdbindex, '0'))
         else:
             obres = resmap[atom.residue]
 
         obres.AddAtom(obatom)
         obres.SetHetAtom(obatom, not atom.residue.is_standard_residue)
-        obres.SetAtomID(obatom, bytes(atom.name))
+        obres.SetAtomID(obatom, str(atom.name))
         obres.SetSerialNum(obatom,
                            mdt.utils.if_not_none(atom.pdbindex, atom.index+1))
 
@@ -308,9 +306,9 @@ def pybel_to_mol(pbmol,
             atnum = moldesign.data.ATOMIC_NUMBERS[name[0]]
         else:
             atnum = pybatom.atomicnum
-        mdtatom = moldesign.molecules.atoms.Atom(atnum=atnum, name=name,
-                                                 formal_charge=pybatom.formalcharge * u.q_e,
-                                                 pdbname=name, pdbindex=pybatom.OBAtom.GetIdx())
+        mdtatom = mdt.Atom(atnum=atnum, name=name,
+                           formal_charge=pybatom.formalcharge * u.q_e,
+                           pdbname=name, pdbindex=pybatom.OBAtom.GetIdx())
         newatom_map[pybatom.OBAtom.GetIdx()] = mdtatom
         mdtatom.position = pybatom.coords * u.angstrom
 

@@ -20,8 +20,6 @@ from setuptools.command.install import install
 
 import versioneer
 
-assert sys.version_info[:2] == (2, 7), "Sorry, this package requires Python 2.7."
-
 PACKAGE_NAME = 'moldesign'
 
 CLASSIFIERS = """\

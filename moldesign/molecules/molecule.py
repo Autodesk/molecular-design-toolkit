@@ -12,23 +12,24 @@ from __future__ import print_function
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import dotmap
 from builtins import zip
 from builtins import chr
 from past.utils import old_div
 from builtins import object
+
 import itertools
 import string
-
 import collections
 import numpy as np
 
+import dotmap
+
 import moldesign as mdt
-from moldesign import helpers, utils
-from moldesign import units as u
-from moldesign.compute import DummyJob
-from moldesign.exceptions import NotCalculatedError
-from moldesign.min.base import MinimizerBase
+from .. import helpers, utils
+from .. import units as u
+from ..compute import DummyJob
+from ..exceptions import NotCalculatedError
+from ..min.base import MinimizerBase
 
 from .properties import MolecularProperties
 from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond
@@ -609,8 +610,8 @@ class MolTopologyMixin(object):
                 ', '.join(conflicts)))
         self.is_biomolecule = (num_biores >= 2)
 
-    def __eq__(self, other):
-        """ Test whether two molecules are "equivalent"
+    def is_identical(self, other):
+        """ Test whether two molecules are "identical"
 
         We specifically test these quantities for equality:
          - positions
@@ -758,10 +759,8 @@ class MolTopologyMixin(object):
                     return False
         return True
 
-    def __ne__(self, other):
-        return not (self == other)
-
-    __ne__.__doc__ = __eq__.__doc__
+    def not_identical(self, other):
+        return not self.is_identical(other)
 
 
 class MolSimulationMixin(object):

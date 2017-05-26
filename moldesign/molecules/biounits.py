@@ -67,7 +67,10 @@ class ChildList(AtomContainer):
         if isinstance(item, basestring) or item is None:
             return (item in self._childbyname)
         else:
-            return (item in self._childinorder)
+            try:
+                return (item in self._childinorder)
+            except TypeError:  # meaning that the comparison couldn't even be made
+                return False
 
     def __getattr__(self, item):
         if item == '_childbyname':
