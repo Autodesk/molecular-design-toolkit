@@ -25,6 +25,7 @@ import funcsigs
 
 import moldesign as mdt
 from .helpers import WidgetMethod
+from . import utils
 
 
 class _InitKeywordMeta(type):

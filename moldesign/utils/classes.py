@@ -122,7 +122,7 @@ class DotDict(object):
             del self._od[key]
 
     def __reduce__(self):
-        return DotDict, self._od
+        return DotDict, (self._od, )
 
     def copy(self):
         return self.__class__(self._od.copy())
@@ -150,6 +150,11 @@ class DotDict(object):
         else:
             self._od[key] = val
 
-for _v in ('keys values items __iter__ __getitem__  __len__ __contains__ '
-           '__setitem__ pop setdefault get update').split():
+    def __bool__(self):
+        return bool(self._od)
+
+    __nonzero__ = __bool__
+
+for _v in ('keys values items __iter__ __getitem__  __len__ __contains__ clear '
+           ' __setitem__ pop setdefault get update').split():
     setattr(DotDict, _v, Alias('_od.%s' % _v))
