@@ -90,7 +90,7 @@ def gaff_model_gasteiger(small_molecule):
 
 @pytest.mark.parametrize('objkey', registered_types['hasmodel'])
 def test_forces_and_energy_were_calculated(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+    mol = request.getfixturevalue(objkey)
     energy = mol.calculate_potential_energy()
     forces = mol.calculate_forces()
     assert forces.shape == mol.positions.shape
@@ -101,7 +101,7 @@ def test_forces_and_energy_were_calculated(objkey, request):
                            "otherwise this takes too long")
 @pytest.mark.parametrize('objkey', registered_types['hasmodel'])
 def test_analytical_vs_numerical_forces(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+    mol = request.getfixturevalue(objkey)
 
     if mol.num_atoms > 20:
         atoms = random.sample(mol.atoms, 20)
@@ -119,8 +119,8 @@ def test_analytical_vs_numerical_forces(objkey, request):
 
 @pytest.mark.parametrize('objkey', registered_types['hasmodel'])
 def test_minimization_reduces_energy(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+    mol = request.getfixturevalue(objkey)
     e1 = mol.calculate_potential_energy()
-    mol = request.getfuncargvalue(objkey)
+    mol = request.getfixturevalue(objkey)
     traj = mol.minimize()
     assert mol.calculate_potential_energy() < e1

@@ -5,7 +5,7 @@ from .object_fixtures import *
 
 @pytest.mark.parametrize('objkey', 'dotdict ordered_dotdict'.split())
 def test_dotdict(objkey, request):
-    dd = request.getfuncargvalue(objkey)
+    dd = request.getfixturevalue(objkey)
 
     # basic lookups and functions
     assert len(dd) == len(TESTDICT)

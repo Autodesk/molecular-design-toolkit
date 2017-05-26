@@ -29,13 +29,13 @@ def bdna_actg_helix():
 
 @pytest.mark.parametrize('fixture', fixture_types['dna'])
 def test_dna_chain_properties(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
     assert mol.chains['A'].type == 'dna'
 
 
 @pytest.mark.parametrize('fixture', fixture_types['dna'])
 def test_dna_residue_iteration(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
 
     assert mol.chains['A'].type == 'dna'
 
@@ -63,7 +63,7 @@ def test_dna_residue_iteration(fixture, request):
 
 @pytest.mark.parametrize('fixture', fixture_types['dna'])
 def test_dna_chain_terminals(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
 
     assert mol.chains['A'].type == 'dna'
 
@@ -92,7 +92,7 @@ def test_dna_chain_terminals(fixture, request):
 
 @pytest.mark.parametrize('fixture', fixture_types['dna'])
 def test_protein_methods_on_dna_dont_work(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
 
     with pytest.raises(ValueError):
         mol.residues[0].is_n_terminal

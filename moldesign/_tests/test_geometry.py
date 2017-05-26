@@ -191,7 +191,7 @@ def test_distance_array(three_particle_right_angle):
 
 @pytest.mark.parametrize('objkey', registered_types['atomcontainer'])
 def test_atomic_distance_measures_are_consistent(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+    mol = request.getfixturevalue(objkey)
 
     distance_array = mol.calc_distance_array()
 

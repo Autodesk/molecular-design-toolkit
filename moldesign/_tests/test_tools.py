@@ -38,7 +38,7 @@ def ammonium_charged():
 @pytest.mark.parametrize('objkey',
                          ['ammonium_nocharge', 'ammonium_charged'])
 def test_ammonium_formal_charge(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+    mol = request.getfixturevalue(objkey)
     mdt.assign_formal_charges(mol)
     assert mol.charge == 1 * u.q_e
 

@@ -52,7 +52,7 @@ def test_3aid_cif_separate_waters(protease_cif):
 
 @pytest.mark.parametrize('fixture', fixture_types['3AID'])
 def test_3aid_chain_properties(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
     for chainid in 'AB':
         c = mol.chains[chainid]
         assert c.n_terminal == c.residues['PRO1']
@@ -62,7 +62,7 @@ def test_3aid_chain_properties(fixture, request):
 
 @pytest.mark.parametrize('fixture', fixture_types['3AID'])
 def test_3aid_primary_structure_access_methods(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
 
     a1 = mol.chains['A'].residues['GLN2'].atoms['CB']
     assert a1 is mol.atoms[a1.index]
@@ -74,7 +74,7 @@ def test_3aid_primary_structure_access_methods(fixture, request):
 
 @pytest.mark.parametrize('fixture', fixture_types['3AID'])
 def test_3aid_atom_selection(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
 
     a1 = mol.chains['A'].residues['GLN2'].atoms['CB']
     a2 = mol.chains['B'].residues['LYS20'].atoms['O']
@@ -83,7 +83,7 @@ def test_3aid_atom_selection(fixture, request):
 
 @pytest.mark.parametrize('fixture', fixture_types['protein'])
 def test_chain_lookup_by_name_and_index(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
 
     for ic, chain in enumerate(mol.chains):
         assert mol.chains[chain.index] is chain
@@ -94,7 +94,7 @@ def test_chain_lookup_by_name_and_index(fixture, request):
 
 @pytest.mark.parametrize('fixture', fixture_types['protein'])
 def test_residue_lookup_by_name_and_index(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
 
     for chain in mol.chains:
         for ires, residue in enumerate(chain.residues):
@@ -112,7 +112,7 @@ def test_residue_lookup_by_name_and_index(fixture, request):
 
 @pytest.mark.parametrize('fixture', fixture_types['protein'])
 def test_atom_lookup_by_name_and_index(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
 
     for residue in mol.residues:
         for iatom, atom in enumerate(residue.atoms):
@@ -132,7 +132,7 @@ def test_atom_lookup_by_name_and_index(fixture, request):
 
 @pytest.mark.parametrize('fixture', fixture_types['protein'])
 def test_protein_residue_iteration(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
 
     assert mol.chains['A'].type == 'protein'
 
@@ -160,7 +160,7 @@ def test_protein_residue_iteration(fixture, request):
 
 @pytest.mark.parametrize('fixture', fixture_types['protein'])
 def test_protein_residue_terminals(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
 
     assert mol.chains['A'].type == 'protein'
 
@@ -189,7 +189,7 @@ def test_protein_residue_terminals(fixture, request):
 
 @pytest.mark.parametrize('fixture', fixture_types['protein'])
 def test_molecule_links(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
 
     for obj in itertools.chain(mol.atoms, mol.residues, mol.chains):
         assert obj.molecule is mol
@@ -197,13 +197,13 @@ def test_molecule_links(fixture, request):
 
 @pytest.mark.parametrize('fixture', fixture_types['protein'])
 def test_chains_iterate_in_order(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
     _iter_index_order_tester(mol.chains)
 
 
 @pytest.mark.parametrize('fixture', fixture_types['protein'])
 def test_residues_iterate_in_order(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
 
     _iter_index_order_tester(mol.residues)
 
@@ -213,7 +213,7 @@ def test_residues_iterate_in_order(fixture, request):
 
 @pytest.mark.parametrize('fixture', fixture_types['protein'])
 def test_atoms_iterate_in_order(fixture, request):
-    mol = request.getfuncargvalue(fixture)
+    mol = request.getfixturevalue(fixture)
 
     _iter_index_order_tester(mol.atoms)
 

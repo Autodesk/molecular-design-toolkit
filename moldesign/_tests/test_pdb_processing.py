@@ -28,7 +28,7 @@ def test_missing_terminal_atoms_3ac2(request, mol):
     """ Tests that we can still detect terminal residues even if the peptide-bonded atoms
     are missing from the structure
     """
-    mol = request.getfuncargvalue(mol)
+    mol = request.getfixturevalue(mol)
     assert mol.chains['A'].n_terminal is not None
     assert mol.chains['A'].c_terminal is not None
 
@@ -45,7 +45,7 @@ def pdb_1hpk_roundtrip(pdb_1hpk):
 
 @pytest.mark.parametrize('mol', 'pdb_1hpk pdb_1hpk_roundtrip'.split())
 def test_1hpk(request, mol):
-    mol = request.getfuncargvalue(mol)
+    mol = request.getfixturevalue(mol)
     mol = mdt.interfaces.ambertools._prep_for_tleap(mol)
     for residx in (0, 21, 49, 61, 73, 78):
         residue = mol.residues[residx]
@@ -69,7 +69,7 @@ def test_negative_residue_numbers_2jaj(request, mol):
             LooseVersion(getattr(parmed, '__version__', '0.0.0')) <= LooseVersion('2.7.3')):
         pytest.xfail("This test requires ParmEd 2.7.4 (not yet released as of this writing)")
 
-    mol = request.getfuncargvalue(mol)
+    mol = request.getfixturevalue(mol)
     res = mol.chains['B'].residues[0]
     assert res.pdbindex == -4
     assert res.index == 272
@@ -80,7 +80,7 @@ def test_negative_residue_numbers_2jaj(request, mol):
 def test_missing_residues_xtal_2jaj(request, mol):
     if mol == 'pdb_2jaj_roundtrip':
         pytest.xfail('Writing missing residue records is not yet supported.')
-    mol = request.getfuncargvalue(mol)
+    mol = request.getfixturevalue(mol)
     missingres = mol.metadata.missing_residues
     for expected in MISSINGRES_2JAJ:
         assert missingres[expected[0]][expected[2]] == expected[1]
@@ -102,7 +102,7 @@ def test_numeric_residue_name_1PYN(request, mol):
     """
     import parmed
 
-    mol = request.getfuncargvalue(mol)
+    mol = request.getfixturevalue(mol)
     ligand = mdt.Molecule(mol.residues[283])
 
     params = mdt.create_ff_parameters(ligand, charges='gasteiger')

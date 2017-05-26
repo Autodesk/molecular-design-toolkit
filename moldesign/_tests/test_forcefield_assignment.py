@@ -103,7 +103,7 @@ def mol_from_smiles():
 @pytest.mark.parametrize('objkey',
                          'mol_from_smiles mol_from_pdb mol_from_xyz mol_from_sdf'.split())
 def test_parameterization_from_formats(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+    mol = request.getfixturevalue(objkey)
     assert not mol.ff
     params = mdt.create_ff_parameters(mol, charges='gasteiger')
     assert params is not None

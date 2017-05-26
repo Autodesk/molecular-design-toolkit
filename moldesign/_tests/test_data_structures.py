@@ -114,7 +114,7 @@ def test_h2_traj_energies(h2_trajectory):
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_atom_hierarchy(molkey, request):
-    mol = request.getfuncargvalue(molkey)
+    mol = request.getfixturevalue(molkey)
     all_residues = set(mol.residues)
     all_chains = set(mol.chains)
 
@@ -133,7 +133,7 @@ def test_molecule_atom_hierarchy(molkey, request):
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_residue_hierarchy(molkey, request):
-    mol = request.getfuncargvalue(molkey)
+    mol = request.getfixturevalue(molkey)
     all_atoms = set(mol.atoms)
     all_residues = set(mol.residues)
     all_chains = set(mol.chains)
@@ -159,7 +159,7 @@ def test_molecule_residue_hierarchy(molkey, request):
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_chain_hierarchy(molkey, request):
-    mol = request.getfuncargvalue(molkey)
+    mol = request.getfixturevalue(molkey)
     all_residues = set(mol.residues)
     all_chains = set(mol.chains)
 
@@ -180,7 +180,7 @@ def test_molecule_chain_hierarchy(molkey, request):
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_bonds(molkey, request):
-    mol = request.getfuncargvalue(molkey)
+    mol = request.getfixturevalue(molkey)
     all_atoms = set(mol.atoms)
     for atom in all_atoms:
         if atom not in mol.bond_graph:
@@ -194,7 +194,7 @@ def test_molecule_bonds(molkey, request):
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_types(molkey, request):
-    mol = request.getfuncargvalue(molkey)
+    mol = request.getfixturevalue(molkey)
     assert issubclass(type(mol.atoms), moldesign.molecules.atomcollections.AtomList)
     for atom in mol.atoms:
         assert issubclass(type(atom), mdt.Atom)
@@ -204,7 +204,7 @@ def test_molecule_types(molkey, request):
 
 @pytest.mark.parametrize('objkey', all_objects)
 def test_pickling(objkey, request):
-    obj = request.getfuncargvalue(objkey)
+    obj = request.getfixturevalue(objkey)
     for iprotocol in (0,1,2):
         x = pickle.dumps(obj, protocol=iprotocol)
         y = pickle.loads(x)
@@ -213,7 +213,7 @@ def test_pickling(objkey, request):
 
 @pytest.mark.parametrize('objkey', registered_types['equality'])
 def test_pickled_equality(objkey, request):
-    obj = request.getfuncargvalue(objkey)
+    obj = request.getfixturevalue(objkey)
 
     for iprotocol in (0,1,2):
         x = pickle.dumps(obj, protocol=iprotocol)
