@@ -8,6 +8,7 @@ place.
 import collections
 import random
 
+import dotmap
 import numpy as np
 import pytest
 
@@ -42,13 +43,13 @@ TESTDICT = collections.OrderedDict((('a', 'b'),
 
 @typedfixture('object')
 def dotdict():
-    dd = mdt.utils.classes.DotDict(TESTDICT)
+    dd = dotmap.DotMap(TESTDICT)
     return dd
 
 
 @typedfixture('object')
 def ordered_dotdict():
-    dd = mdt.utils.classes.OrderedDotDict(TESTDICT)
+    dd = dotmap.DotMap(TESTDICT)
     return dd
 
 

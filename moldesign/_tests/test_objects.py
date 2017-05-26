@@ -1,5 +1,3 @@
-import itertools
-
 import pytest
 
 from .object_fixtures import *
@@ -35,15 +33,9 @@ def test_dotdict(objkey, request):
 
 
 def test_ordered_dotdict(ordered_dotdict):
-    assert ordered_dotdict.keys() == TESTDICT.keys()
-    assert ordered_dotdict.values() == TESTDICT.values()
-    assert ordered_dotdict.items() == TESTDICT.items()
-
-    for iterator_method in '__iter__ iterkeys itervalues iteritems'.split():
-        odd_iter = getattr(ordered_dotdict, iterator_method)()
-        test_iter = getattr(TESTDICT, iterator_method)()
-        for gotval, testval in itertools.izip_longest(odd_iter, test_iter, fillvalue=None):
-            assert gotval == testval, 'Iterator %s failed' % iterator_method
+    assert list(ordered_dotdict.keys()) == list(TESTDICT.keys())
+    assert list(ordered_dotdict.values()) == list(TESTDICT.values())
+    assert list(ordered_dotdict.items()) == list(TESTDICT.items())
 
 
 def test_h2_positions(h2):

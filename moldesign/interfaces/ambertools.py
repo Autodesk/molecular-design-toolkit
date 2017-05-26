@@ -103,7 +103,7 @@ def _antechamber_calc_charges(mol, ambname, chargename, kwargs):
     def finish_job(job):
         """Callback to complete the job"""
         lines = iter(job.get_output('out.mol2').read().split('\n'))
-        charges = utils.DotDict(type='atomic')
+        charges = dotmap.DotMap(type='atomic')
 
         line = next(lines)
         while line.strip()[:len('@<TRIPOS>ATOM')] != '@<TRIPOS>ATOM':

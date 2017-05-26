@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import dotmap
 from builtins import map
 from builtins import range
 import re
@@ -73,7 +74,7 @@ MATRIXPARSER = re.compile('(\d+)\s+CSM =\s+([\d\.]+)\s+MAX. DIFF. \(Angstrom\)=(
 # this parses '  4 CSM =   0.06     MAX. DIFF. (Angstrom)=0.0545     TYPE C3' -> [4, 0.06, 0.545, C3]
 def parse_output(outfile):
     lines = iter(outfile)
-    data = mdt.utils.classes.DotDict()
+    data = dotmap.DotMap()
     while True:
         l = next(lines)
         fields = l.split()

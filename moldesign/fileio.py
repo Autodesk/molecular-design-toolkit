@@ -62,29 +62,35 @@ def read(f, format=None):
         ValueError: if ``f`` isn't recognized as a string, file path, or file-like object
     """
     filename = None
+    closehandle = False
+    try:
+        # Open a file-like object
+        if isinstance(f, basestring) and _isfile(f):  # it's a path to a file
+            filename = os.path.expanduser(f)
+            format, compression = _get_format(filename, format)
+            fileobj = COMPRESSION[compression](filename, mode='r')
+            closehandle = True
+        elif hasattr(f, 'open'):  # we can get a file-like object
+            fileobj = f.open('r')
+            closehandle = True
+        elif hasattr(f, 'read'):  # it's already file-like
+            fileobj = f
+        elif isinstance(f, basestring):  # assume it's just a string
+            if format is None:
+                raise IOError(('No file named "%s"; ' % f[:50]) +
+                              'please set the `format` argument if you want to parse the string')
+            fileobj = StringIO.StringIO(f)
+        else:
+            raise ValueError('Parameter to moldesign.read (%s) not ' % str(f) +
+                             'recognized as string, file path, or file-like object')
 
-    # Open a file-like object
-    if isinstance(f, basestring) and _isfile(f):  # it's a path to a file
-        filename = os.path.expanduser(f)
-        format, compression = _get_format(filename, format)
-        fileobj = COMPRESSION[compression](filename, mode='r')
-    elif hasattr(f, 'open'):  # we can get a file-like object
-        fileobj = f.open('r')
-    elif hasattr(f, 'read'):  # it's already file-like
-        fileobj = f
-    elif isinstance(f, basestring):  # assume it's just a string
-        if format is None:
-            raise IOError(('No file named "%s"; ' % f[:50]) +
-                          'please set the `format` argument if you want to parse the string')
-        fileobj = StringIO.StringIO(f)
-    else:
-        raise ValueError('Parameter to moldesign.read (%s) not ' % str(f) +
-                         'recognized as string, file path, or file-like object')
-
-    if format in READERS:
-        mol = READERS[format](fileobj)
-    else:  # default to openbabel if there's not an explicit reader for this format
-        mol = openbabel_interface.read_stream(fileobj, format)
+        if format in READERS:
+            mol = READERS[format](fileobj)
+        else:  # default to openbabel if there's not an explicit reader for this format
+            mol = openbabel_interface.read_stream(fileobj, format)
+    finally:
+        if closehandle:
+            fileobj.close()
 
     if filename is not None and mol.name not in (None, 'untitled'):
         mol.name = filename

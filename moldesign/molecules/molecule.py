@@ -12,6 +12,7 @@ from __future__ import print_function
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import dotmap
 from builtins import zip
 from builtins import chr
 from past.utils import old_div
@@ -696,7 +697,7 @@ class MolTopologyMixin(object):
                             charge=charge,
                             name='%s extended with %d atoms' %
                                  (self.name, len(new_atoms) - self.num_atoms),
-                            metadata=utils.DotDict(description=
+                            metadata=dotmap.DotMap(description=
                                                    'Union of %s' % ', '.join(names)))
 
     def same_topology(self, other, verbose=False):
@@ -1039,7 +1040,7 @@ class Molecule(AtomGroup,
         atoms, name = self._get_initializing_atoms(atomcontainer, name, copy_atoms)
 
         if metadata is None:
-            metadata = getattr(atomcontainer, 'metadata', utils.DotDict())
+            metadata = getattr(atomcontainer, 'metadata', dotmap.DotMap())
 
         self.atoms = atoms
         self.time = getattr(atomcontainer, 'time', 0.0 * u.default.time)

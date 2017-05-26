@@ -17,9 +17,8 @@ associated data types (force fields, orbitals, basis sets, etc.).
 """
 from builtins import object
 import funcsigs
-
+import dotmap
 import moldesign as mdt
-from .utils import DotDict
 from .helpers import WidgetMethod
 from future.utils import with_metaclass
 
@@ -76,7 +75,7 @@ class Method(with_metaclass(_InitKeywordMeta, object)):
         self._prepped = False
         self.status = None
         self.mol = None
-        self.params = DotDict(params)
+        self.params = dotmap.DotMap(params)
         # Set default parameter values
         for param in self.PARAMETERS:
             if param.name not in self.params:

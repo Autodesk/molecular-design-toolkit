@@ -13,6 +13,8 @@
 # limitations under the License.
 from builtins import str
 from past.builtins import basestring
+from sortedcontainers import SortedListWithKey
+
 import moldesign as mdt
 from moldesign import utils
 
@@ -39,7 +41,7 @@ class ChildList(AtomContainer):
         super(ChildList, self).__init__()
         self.parent = parent
         self._childbyname = {}
-        self._childinorder = utils.SortedCollection(key=_sortkey)
+        self._childinorder = SortedListWithKey(key=_sortkey)
 
     def __dir__(self):
         return list(self.__dict__.keys()) + list(self.__class__.__dict__.keys()) + list(self._childbyname.keys())
@@ -59,7 +61,7 @@ class ChildList(AtomContainer):
         if key in self._childbyname:
             raise KeyError('%s already exists in %s' % (key, self.parent))
         self._childbyname[key] = val
-        self._childinorder.insert_right(val)
+        self._childinorder.add(val)
 
     def __contains__(self, item):
         if isinstance(item, basestring) or item is None:
@@ -101,7 +103,7 @@ class ChildList(AtomContainer):
 
 
 def _sortkey(x):
-    return x.pdbindex
+    return x.pdbindex, x.index
 
 
 @toplevel

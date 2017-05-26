@@ -1,5 +1,6 @@
 biopython
 docker >= 2.0
+dotmap
 future
 fortranformat
 funcsigs
@@ -13,4 +14,5 @@ pytest
 pyyaml
 requests
 scipy
+sortedcontainers
 webcolors

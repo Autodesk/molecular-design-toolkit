@@ -22,7 +22,7 @@ import moldesign as mdt
 import moldesign.molecules.bonds
 from moldesign import units as u
 from moldesign import utils
-from moldesign.utils import DotDict
+from dotmap import DotMap
 
 
 SIGMA_UTF = u"\u03C3"
@@ -168,7 +168,7 @@ def parse_nbo(f, nbasis):
             next(lines)
             if orbname[0] == 'P':  # these are pre-orthogonal orbitals, it only prints the coefficients
                 coeffs = _parse_wrapped_matrix(lines, nbasis)
-                parsed[orbname] = DotDict(coeffs=np.array(coeffs))
+                parsed[orbname] = DotMap(coeffs=np.array(coeffs))
             else:  # there's more complete information available
                 parsed[orbname] = read_orbital_set(lines, nbasis)
     return parsed
@@ -202,11 +202,11 @@ def read_orbital_set(lineiter, nbasis):
 
     # The rest appears to be 0 most of the time ...
 
-    return DotDict(coeffs=np.array(mat),
-                   iatom=iatom, jatom=jatom, bondnums=bondnums,
-                   bond_names=bond_names,
-                   num_bonded_atoms=num_bonded_atoms,
-                   stars=stars, occupations=occupations)
+    return DotMap(coeffs=np.array(mat),
+                  iatom=iatom, jatom=jatom, bondnums=bondnums,
+                  bond_names=bond_names,
+                  num_bonded_atoms=num_bonded_atoms,
+                  stars=stars, occupations=occupations)
 
 
 def _parse_wrapped_matrix(lineiter, nbasis):

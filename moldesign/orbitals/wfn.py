@@ -17,7 +17,7 @@ from builtins import object
 from past.utils import old_div
 import numpy as np
 
-from moldesign.utils import DotDict
+from dotmap import DotMap
 
 from . import MolecularOrbitals
 
@@ -58,7 +58,7 @@ class ElectronicWfn(object):
             self.nbasis = len(self.aobasis)
         else:
             self.nbasis = None
-        self.orbitals = DotDict()
+        self.orbitals = DotMap()
         self.fock_ao = fock_ao
         self.num_electrons = num_electrons
         self.homo = old_div(self.num_electrons,2) - 1
