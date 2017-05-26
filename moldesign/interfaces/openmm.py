@@ -1,5 +1,4 @@
-from __future__ import print_function
-# Copyright 2016 Autodesk Inc.
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,9 +11,9 @@ from __future__ import print_function
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from builtins import zip
-from builtins import str
-from builtins import object
+from __future__ import print_function
+from builtins import zip, str, object
+
 import itertools
 import imp
 
@@ -22,10 +21,10 @@ import numpy as np
 
 import pyccc
 import moldesign as mdt
-from moldesign.utils import from_filepath
-from moldesign import units as u
-from moldesign import compute
-from moldesign.utils import exports
+from ..utils import from_filepath
+from .. import units as u
+from .. import compute
+from ..utils import exports
 
 
 try:

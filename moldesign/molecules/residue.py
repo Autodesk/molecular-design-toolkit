@@ -1,5 +1,4 @@
-from __future__ import print_function
-# Copyright 2016 Autodesk Inc.
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,12 +11,13 @@ from __future__ import print_function
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import print_function
 from builtins import str
+
 import collections
 
 import moldesign as mdt
-from moldesign import utils, data
-
+from .. import utils, data
 from . import BioContainer, AtomList, toplevel
 
 

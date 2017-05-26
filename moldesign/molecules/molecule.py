@@ -1,5 +1,4 @@
-from __future__ import print_function
-# Copyright 2016 Autodesk Inc.
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,17 +10,15 @@ from __future__ import print_function
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.
-from builtins import zip
-from builtins import chr
-from past.utils import old_div
-from builtins import object
+# limitations under the License.from __future__ import print_function
+from __future__ import print_function, division
+from builtins import zip, chr, object
 
 import itertools
 import string
 import collections
-import numpy as np
 
+import numpy as np
 import dotmap
 
 import moldesign as mdt
@@ -30,7 +27,6 @@ from .. import units as u
 from ..compute import DummyJob
 from ..exceptions import NotCalculatedError
 from ..min.base import MinimizerBase
-
 from .properties import MolecularProperties
 from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond
 from ..helpers import WidgetMethod
@@ -204,7 +200,7 @@ class MolPropertyMixin(object):
 
         Note:
             This assumes a closed shell ground state! """
-        return old_div(self.num_electrons,2)-1
+        return self.num_electrons // 2 - 1
 
     @property
     def lumo(self):
@@ -212,7 +208,7 @@ class MolPropertyMixin(object):
 
         Note:
             This assumes a closed shell ground state! """
-        return old_div(self.num_electrons,2)
+        return self.num_electrons // 2
 
     def get_stoichiometry(self, html=False):
         """ Return this molecule's stoichiometry
@@ -1131,7 +1127,7 @@ class Molecule(AtomGroup,
     @property
     def num_bonds(self):
         """int: number of chemical bonds in this molecule"""
-        return old_div(sum(atom.nbonds for atom in self.atoms),2)
+        return sum(atom.nbonds for atom in self.atoms) // 2
 
     nbonds = num_bonds
 

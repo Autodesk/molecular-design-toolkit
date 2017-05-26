@@ -1,5 +1,4 @@
-from __future__ import print_function
-# Copyright 2016 Autodesk Inc.
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,15 +11,16 @@ from __future__ import print_function
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from builtins import map
-from builtins import str
+from __future__ import print_function
+from builtins import map, str
+
 import os
 import json
 
 import webcolors
 
 import moldesign as mdt
-import moldesign.units as u
+import ..units as u
 
 PACKAGEPATH = os.path.abspath(os.path.dirname(mdt.__file__))
 

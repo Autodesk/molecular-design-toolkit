@@ -1,5 +1,4 @@
-from __future__ import print_function
-# Copyright 2016 Autodesk Inc.
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,10 +11,12 @@ from __future__ import print_function
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import print_function
 from future import standard_library
 standard_library.install_aliases()
 from builtins import str
 from past.builtins import basestring
+
 import bz2
 import pickle as pkl  # TODO: if cpickle fails, retry with regular pickle to get a better traceback
 import io
@@ -24,11 +25,11 @@ import gzip
 import os
 
 import moldesign as mdt
-from moldesign import utils
-from moldesign.interfaces import biopython_interface
-import moldesign.interfaces.openbabel as openbabel_interface
-from moldesign.interfaces.parmed_interface import write_pdb, write_mmcif
-from moldesign.helpers import pdb
+from . import utils
+from .interfaces import biopython_interface
+from .interfaces import openbabel as openbabel_interface
+from .interfaces.parmed_interface import write_pdb, write_mmcif
+from .helpers import pdb
 
 # imported names
 read_amber = mdt.interfaces.openmm.amber_to_mol

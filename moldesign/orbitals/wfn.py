@@ -1,5 +1,4 @@
-from __future__ import division
-# Copyright 2016 Autodesk Inc.
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +11,10 @@ from __future__ import division
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from builtins import str
-from builtins import object
-from past.utils import old_div
-import numpy as np
+from __future__ import division
+from builtins import str, object
 
+import numpy as np
 from dotmap import DotMap
 
 from . import MolecularOrbitals
@@ -61,7 +59,7 @@ class ElectronicWfn(object):
         self.orbitals = DotMap()
         self.fock_ao = fock_ao
         self.num_electrons = num_electrons
-        self.homo = old_div(self.num_electrons,2) - 1
+        self.homo = self.num_electrons//2 - 1
         self.lumo = self.homo + 1
         self._has_canonical = False
         self.density_matrix_ao = density_matrix_ao

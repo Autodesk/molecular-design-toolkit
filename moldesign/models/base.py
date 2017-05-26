@@ -1,5 +1,4 @@
-from __future__ import print_function
-# Copyright 2016 Autodesk Inc.
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,13 +11,15 @@ from __future__ import print_function
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import print_function
 from builtins import range
 import itertools
+
 import numpy as np
 
 import moldesign as mdt
-from moldesign import units as u
-from moldesign.method import Method
+from .. import units as u
+from ..method import Method
 
 
 class EnergyModelBase(Method):
