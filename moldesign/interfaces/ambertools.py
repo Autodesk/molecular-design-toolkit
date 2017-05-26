@@ -1,4 +1,3 @@
-from __future__ import print_function
 # Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +11,8 @@ from __future__ import print_function
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import print_function
+
 from builtins import str
 from builtins import map
 from past.builtins import basestring
@@ -19,6 +20,7 @@ from builtins import object
 import re
 import os
 import tempfile
+import dotmap
 
 import moldesign as mdt
 import pyccc
@@ -58,7 +60,6 @@ class ExtraAmberParameters(object):
         self.lib = lib
         self.frcmod = frcmod
         self.job = job
-
 
 
 @utils.kwargs_from(mdt.compute.run_job)

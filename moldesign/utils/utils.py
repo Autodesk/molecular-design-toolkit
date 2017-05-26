@@ -371,7 +371,7 @@ def from_filepath(func, filelike):
         return func(filelike)
     else:
         with tempfile.NamedTemporaryFile() as outfile:
-            outfile.write(filelike.read())
+            outfile.write(filelike.read().encode())  # hack - prob need to detect bytes
             outfile.flush()
             result = func(outfile.name)
         return result
