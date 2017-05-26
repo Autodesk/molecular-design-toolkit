@@ -18,7 +18,7 @@ from builtins import str
 from past.builtins import basestring
 import bz2
 import pickle as pkl  # TODO: if cpickle fails, retry with regular pickle to get a better traceback
-import io as StringIO
+import io
 import functools
 import gzip
 import os
@@ -63,15 +63,21 @@ def read(f, format=None):
     """
     filename = None
     closehandle = False
+    streamtype = io.StringIO
+    readmode = 'r'
     try:
         # Open a file-like object
         if isinstance(f, basestring) and _isfile(f):  # it's a path to a file
             filename = os.path.expanduser(f)
             format, compression = _get_format(filename, format)
-            fileobj = COMPRESSION[compression](filename, mode='r')
+            if format in PICKLE_EXTENSIONS:
+                readmode = 'rb'
+            fileobj = COMPRESSION[compression](filename, mode=readmode)
             closehandle = True
         elif hasattr(f, 'open'):  # we can get a file-like object
-            fileobj = f.open('r')
+            if format in PICKLE_EXTENSIONS:
+                readmode = 'rb'
+            fileobj = f.open(readmode)
             closehandle = True
         elif hasattr(f, 'read'):  # it's already file-like
             fileobj = f
@@ -79,7 +85,10 @@ def read(f, format=None):
             if format is None:
                 raise IOError(('No file named "%s"; ' % f[:50]) +
                               'please set the `format` argument if you want to parse the string')
-            fileobj = StringIO.StringIO(f)
+            elif format in PICKLE_EXTENSIONS:
+                streamtype = io.BytesIO
+            fileobj = streamtype(f)
+
         else:
             raise ValueError('Parameter to moldesign.read (%s) not ' % str(f) +
                              'recognized as string, file path, or file-like object')
@@ -102,7 +111,7 @@ def read(f, format=None):
 def _isfile(f):
     try:
         return os.path.isfile(f)
-    except TypeError:
+    except (TypeError, ValueError):
         return False
 
 
@@ -135,13 +144,20 @@ def write(obj, filename=None, format=None, mode='w'):
 
     format, compression = _get_format(filename, format)
 
+    if format in PICKLE_EXTENSIONS:
+        streamtype = io.BytesIO
+        mode = 'wb'
+    else:
+        streamtype = io.StringIO
+        mode = 'w'
+
     # First, create an object to write to (either file handle or file-like buffer)
     if filename:
         return_string = False
         fileobj = COMPRESSION[compression](os.path.expanduser(filename), mode=mode)
     else:
         return_string = True
-        fileobj = StringIO.StringIO()
+        fileobj = streamtype()
 
     # Now, write to the object
     if format in WRITERS:
@@ -180,7 +196,7 @@ def write_trajectory(traj, filename=None, format=None, overwrite=True):
         if filename and (not overwrite) and _isfile(filename):
             raise IOError('%s exists' % filename)
         if not filename:
-            fileobj = StringIO.StringIO()
+            fileobj = io.StringIO()
         else:
             fileobj = open(filename, 'w')
 
