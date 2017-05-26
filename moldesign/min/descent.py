@@ -56,7 +56,7 @@ class GradientDescent(MinimizerBase):
                  scaling=0.01*u.angstrom**2/u.eV,
                  gamma=0.4, control=0.25,
                  **kwargs):
-        super(GradientDescent, self).__init__(mol, **kwargs)
+        super().__init__(mol, **kwargs)
         assert 'forces' in self.request_list, 'Gradient descent built-in gradients'
         self.max_atom_move = max_atom_move
         self.scaling = scaling

@@ -57,7 +57,7 @@ class Frame(utils.DotDict):
     def __init__(self, traj, frameidx):
         self.traj = traj
         self.frameidx = frameidx
-        super(Frame, self).__init__(_dynamic=False)
+        super().__init__(_dynamic=False)
         for key in self.traj.properties:
             self[key] = getattr(traj, key)[self.frameidx]
 

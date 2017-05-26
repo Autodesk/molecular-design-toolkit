@@ -70,10 +70,10 @@ class MdtQuantity(ureg.Quantity):
         if item == '__getnewargs__':
             raise AttributeError('__getnewargs__ not accessible in this class')
         else:
-            return super(MdtQuantity, self).__getattr__(item)
+            return super().__getattr__(item)
 
     def __reduce__(self):
-        replacer = list(super(MdtQuantity, self).__reduce__())
+        replacer = list(super().__reduce__())
         replacer[0] = MdtQuantity
         return tuple(replacer)
 
@@ -89,7 +89,7 @@ class MdtQuantity(ureg.Quantity):
     #        return fmtstring.format(m=self.magnitude,
     #                                u=self.units)
     #    except:
-    #        return super(MdtQuantity, self).__format__(fmt)
+    #        return super().__format__(fmt)
 
     def __setitem__(self, key, value):
         # Overrides pint's built-in version of this ... this is apparently way faster

@@ -36,7 +36,7 @@ class MolecularProperties(utils.DotDict):
         """
         # ADD_FEATURE: always return stored properties in the default unit systems
         positions = properties.pop('positions', mol.positions)
-        super(MolecularProperties, self).__init__(positions=positions.copy(), **properties)
+        super().__init__(positions=positions.copy(), **properties)
 
     def copy(self, mol):
         props = self.__dict__.copy()

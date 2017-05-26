@@ -78,4 +78,4 @@ class OpenBabelPotential(EnergyModelBase):
     # if necessary, run the entire minimization remotely for speed
     @mdt.compute.runsremotely(enable=mdt.interfaces.openbabel.force_remote, is_imethod=True)
     def minimize(self, **kwargs):
-        super(OpenBabelPotential, self).minimize(**kwargs)
+        super().minimize(**kwargs)

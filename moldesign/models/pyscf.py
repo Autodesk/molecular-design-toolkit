@@ -90,7 +90,7 @@ class PySCFPotential(QMBase):
 
     @mdt.utils.kwargs_from(QMBase)
     def __init__(self, **kwargs):
-        super(PySCFPotential, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.pyscfmol = None
         self.reference = None
         self.kernel = None

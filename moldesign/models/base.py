@@ -129,7 +129,7 @@ class MMBase(EnergyModelBase):
                   list(mdt.parameters.mm_model_parameters.values()))
 
     def __init__(self, *args, **kwargs):
-        super(MMBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.mdtforcefield = None
 
 

@@ -43,7 +43,7 @@ class SmartMin(MinimizerBase):
         self.gd_threshold = kwargs.pop('gd_threshold', GDTHRESH)
         self.args = args
         self.kwargs = kwargs
-        super(SmartMin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def run(self):
         # If forces are already low, go directly to the quadratic convergence methods and return

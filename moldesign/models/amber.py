@@ -42,12 +42,12 @@ class GaffSmallMolecule(ForceField):
 
     def prep(self, force=False):
         self._parameterize()
-        return super(GaffSmallMolecule, self).prep()
+        return super().prep()
 
     def calculate(self, requests=None):
         if not self._prepped:
             self._parameterize()
-        return super(GaffSmallMolecule, self).calculate(requests=requests)
+        return super().calculate(requests=requests)
 
     def _parameterize(self):
         if not self.mol.ff:

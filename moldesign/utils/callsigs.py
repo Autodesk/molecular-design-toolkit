@@ -225,7 +225,7 @@ class DocInherit(object):
 
     def get_with_inst(self, obj, cls):
 
-        overridden = getattr(super(cls, obj), self.name, None)
+        overridden = getattr(super(), self.name, None)
 
         @wraps(self.mthd, assigned=('__name__','__module__'))
         def f(*args, **kwargs):

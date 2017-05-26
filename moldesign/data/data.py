@@ -27,7 +27,7 @@ PACKAGEPATH = os.path.abspath(os.path.dirname(mdt.__file__))
 
 class CyclicList(list):
     def __getitem__(self, item):
-        return super(CyclicList, self).__getitem__(item % len(self))
+        return super().__getitem__(item % len(self))
 
 
 COLOR_LIST = ['lightgreen', 'lightblue', 'lightgrey',

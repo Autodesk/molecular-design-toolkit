@@ -38,7 +38,7 @@ class ChildList(AtomContainer):
             return '<ChildList @ %x (exception in self.__repr__)>' % id(self)
 
     def __init__(self, parent):
-        super(ChildList, self).__init__()
+        super().__init__()
         self.parent = parent
         self._childbyname = {}
         self._childinorder = SortedListWithKey(key=_sortkey)
@@ -142,7 +142,7 @@ class BioContainer(AtomContainer):
             pdbname (str): PDB-format name of this biocontainer
             pdbindex (str): Index of this biocontainer in PDB format
         """
-        super(BioContainer, self).__init__()
+        super().__init__()
         self.children = ChildList(self)
         self.molecule = molecule
         self.name = name

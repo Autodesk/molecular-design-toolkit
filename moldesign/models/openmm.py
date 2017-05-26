@@ -37,7 +37,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
     _openmm_compatible = True
 
     def __init__(self, **kwargs):
-        super(OpenMMPotential, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.sim = None
         self.mm_system = None
         self._prep_integrator = 'uninitialized'
@@ -109,7 +109,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
 
             return traj
         else:
-            return super(OpenMMPotential, self).minimize(**kwargs)
+            return super().minimize(**kwargs)
 
     def _sync_remote(self, mol):
         # TODO: this is a hack to update the object after a minimization

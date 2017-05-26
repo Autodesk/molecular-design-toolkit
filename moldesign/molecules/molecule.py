@@ -1031,7 +1031,7 @@ class Molecule(AtomGroup,
                  pdbname=None,
                  charge=None,
                  metadata=None):
-        super(Molecule, self).__init__()
+        super().__init__()
 
         atoms, name = self._get_initializing_atoms(atomcontainer, name, copy_atoms)
 

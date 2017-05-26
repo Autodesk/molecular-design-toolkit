@@ -26,7 +26,7 @@ class TLeapLib(TLeapForcefield):
     def __init__(self, *ffnames):
         self.names = ffnames
         sourcelines = ['source %s' % data.AMBER_LEAPRC[ffn] for ffn in ffnames]
-        super(TLeapLib, self).__init__(sourcelines)
+        super().__init__(sourcelines)
 
     def __str__(self):
         return "TLeap data: %s" % ','.join(self.names)
@@ -35,10 +35,10 @@ class TLeapLib(TLeapForcefield):
 @exports
 class DefaultAmber(TLeapLib):
     def __init__(self):
-        super(DefaultAmber, self).__init__(*data.AMBER_DEFAULT)
+        super().__init__(*data.AMBER_DEFAULT)
 
 
 @exports
 class GAFF2ForceField(TLeapLib):
     def __init__(self):
-        super(GAFF2ForceField, self).__init__('gaff2')
+        super().__init__('gaff2')

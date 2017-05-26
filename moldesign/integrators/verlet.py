@@ -24,7 +24,7 @@ from .base import IntegratorBase
 @exports
 class VelocityVerlet(IntegratorBase):
     def __init__(self, *args, **kwargs):
-        super(VelocityVerlet, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     # TODO: raise exception if any constraints are requested ...
 

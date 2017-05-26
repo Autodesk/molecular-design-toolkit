@@ -59,7 +59,7 @@ class StructureOk(ForceFieldMessage):
     MSG = 'No errors or warnings'
 
     def __init__(self):
-        super(StructureOk, self).__init__(self.MSG)
+        super().__init__(self.MSG)
 
 
 class MissingTerms(ForceFieldMessage):

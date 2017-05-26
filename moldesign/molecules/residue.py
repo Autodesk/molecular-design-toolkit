@@ -40,7 +40,7 @@ class Residue(BioContainer):
             Residue: copy of this residue and all its atoms. This copy will NOT
             reference any parent molecule
         """
-        newatoms = super(Residue, self).copy_atoms()
+        newatoms = super().copy_atoms()
         return newatoms[0].residue
 
     @utils.args_from(BioContainer)
@@ -50,7 +50,7 @@ class Residue(BioContainer):
             **kwargs ():
         """
         self.chain = kwargs.get('chain', None)
-        super(Residue, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         if self.index is None and self.molecule is not None:
             self.index = self.molecule.residues.index(self)
         self.chainindex = None
@@ -155,9 +155,9 @@ class Residue(BioContainer):
             assert atom.chain == self.chain, "Atom's chain does not match residue's chain"
 
         if key is not None or atom.name not in self.children:
-            return super(Residue, self).add(atom, key=key)
+            return super().add(atom, key=key)
         else:
-            return super(Residue, self).add(atom, key='%s%s' % (atom.name, len(self)))
+            return super().add(atom, key='%s%s' % (atom.name, len(self)))
     add.__doc__ = BioContainer.add.__doc__
 
     @property

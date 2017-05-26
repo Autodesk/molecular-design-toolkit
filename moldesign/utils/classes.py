@@ -26,7 +26,7 @@ class Categorizer(dict):
     """
 
     def __init__(self, keyfn, iterable):
-        super(Categorizer, self).__init__()
+        super().__init__()
         self.keyfn = keyfn
         for item in iterable:
             self.add(item)
@@ -100,8 +100,11 @@ class ExclusiveList(object):
 
 
 class DotDict(object):
-    """ An attribute-accessible dictionary that preserved insertion order
+    """ An attribute-accessible dictionary that preserves insertion order
     """
+    def __init__(self, *args, **kwargs):
+        self._od = collections.OrderedDict(*args, **kwargs)
+        self._init = True
 
     def __delattr__(self, item):
         if not self.__dict__.get('_init', False):
@@ -114,7 +117,7 @@ class DotDict(object):
 
     def __delitem__(self, key):
         if not self.__dict__.get('_init', False):
-            super().__delitem__(key)
+            raise TypeError()
         else:
             del self._od[key]
 
@@ -123,10 +126,6 @@ class DotDict(object):
 
     def copy(self):
         return self.__class__(self._od.copy())
-
-    def __init__(self, *args, **kwargs):
-        self._od = collections.OrderedDict(*args, **kwargs)
-        self._init = True
 
     def __eq__(self, other):
         try:

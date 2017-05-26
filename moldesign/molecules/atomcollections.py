@@ -42,7 +42,7 @@ class AtomGroup(object):
     def __init__(self, *args, **kwargs):
         """ This should never be called directly - it will be called by the `super` methods
         of its subclasses """
-        super(AtomGroup, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._atom_attrs = None
         self.viz2d = None
         self.viz3d = None
@@ -486,17 +486,17 @@ class AtomList(AtomContainer, list):  # order is important, list will override m
                 atoms.extend(obj.atoms)
             else:
                 atoms.append(obj)
-        super(AtomList, self).__init__(atoms)
+        super().__init__(atoms)
 
     def __getitem__(self, item):
-        result = super(AtomList, self).__getitem__(item)
+        result = super().__getitem__(item)
         if isinstance(item, slice):
             return type(self)(result)
         else:
             return result
 
     def __getslice__(self, i, j):
-        result = super(AtomList, self).__getslice__(i, j)
+        result = super().__getslice__(i, j)
         return type(self)(result)
 
     def __str__(self):

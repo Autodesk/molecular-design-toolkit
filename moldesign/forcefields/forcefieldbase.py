@@ -112,7 +112,7 @@ class TLeapForcefield(Forcefield):
         self.names = None
         self._fflines = fflines
         self._file_list = file_list if file_list is not None else {}
-        super(TLeapForcefield, self).__init__()
+        super().__init__()
 
     def assign(self, mol):
         newmol = self.create_prepped_molecule(mol)

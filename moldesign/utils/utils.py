@@ -258,7 +258,7 @@ class PrintTable(BaseTable):
         for field in string.Formatter().parse(formatstr):
             key = field.split('.')[0]
             categories.append(key)
-        super(PrintTable, self).__init__(categories, fileobj=fileobj)
+        super().__init__(categories, fileobj=fileobj)
 
     def writeline(self, line):
         if not self._wrote_header:
@@ -277,7 +277,7 @@ class PrintTable(BaseTable):
 
 class MarkdownTable(BaseTable):
     def __init__(self, *categories):
-        super(MarkdownTable, self).__init__(categories)
+        super().__init__(categories)
 
     def markdown(self, replace=None):
         if replace is None: replace = {}

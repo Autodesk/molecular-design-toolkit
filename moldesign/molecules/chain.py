@@ -38,7 +38,7 @@ class Chain(BioContainer):
                     raise ValueError('Inconsistent name for chain: %s' % kwargs)
                 name = val
 
-        super(Chain, self).__init__(name=name, **kwargs)
+        super().__init__(name=name, **kwargs)
         self._type = None
 
         self._5p_end = self._3p_end = self._n_terminal = self._c_terminal = None
@@ -150,7 +150,7 @@ class Chain(BioContainer):
             Chain: copy of this chain and all atoms/residues it contains. This copy will NOT
             reference any parent molecule
         """
-        newatoms = super(Chain, self).copy_atoms()
+        newatoms = super().copy_atoms()
         return newatoms[0].chain
 
     @property
@@ -170,7 +170,7 @@ class Chain(BioContainer):
         else:
             assert residue.chain is self, "Residue is not a member of this chain"
 
-        return super(Chain, self).add(residue, **kwargs)
+        return super().add(residue, **kwargs)
 
     def _get_chain_end(self, restype, selfattr, test):
         currval = getattr(self, selfattr)
