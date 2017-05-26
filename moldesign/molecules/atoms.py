@@ -16,7 +16,6 @@ from __future__ import division
 from builtins import map, range, object
 
 import numpy as np
-import dotmap
 
 import moldesign as mdt
 from .. import data, utils
@@ -53,7 +52,7 @@ class AtomPropertyMixin(object):  # TODO: this isn't worth it, just put it back 
 
     @property
     def ff(self):
-        """ dotmap.DotMap: This atom's force field parameters, if available (``None``
+        """ utils.DotDict: This atom's force field parameters, if available (``None``
         otherwise)
         """
         if self.molecule.ff is None:
@@ -77,9 +76,9 @@ class AtomPropertyMixin(object):  # TODO: this isn't worth it, just put it back 
 
     @property
     def properties(self):
-        """ dotmap.DotMap: Returns any calculated properties for this atom
+        """ utils.DotDict: Returns any calculated properties for this atom
         """
-        props = dotmap.DotMap()
+        props = utils.DotDict()
         for name, p in self.molecule.properties.items():
             if hasattr(p, 'type') and p.type == 'atomic':
                 props[name] = p[self]
@@ -185,7 +184,7 @@ class Atom(AtomPropertyMixin):
         self._momentum = np.zeros(3) * (u.default.length*
                                        u.default.mass/u.default.time)
         self._bond_graph = {}
-        self.metadata = dotmap.DotMap()
+        self.metadata = utils.DotDict()
         if metadata:
             self.metadata.update(metadata)
 

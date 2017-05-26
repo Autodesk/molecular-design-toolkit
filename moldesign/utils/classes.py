@@ -14,6 +14,8 @@
 from builtins import object
 import collections
 
+import collections
+from .descriptors import Alias
 
 class Categorizer(dict):
     """
@@ -93,3 +95,59 @@ class ExclusiveList(object):
 
     __str__ = __repr__
 
+
+class DotDict(object):
+    """ An attribute-accessible dictionary that preserved insertion order
+    """
+
+    def __delattr__(self, item):
+        if not self.__dict__.get('_init', False):
+            super().__delattr__(item)
+        else:
+            try:
+                del self._od[item]
+            except KeyError:
+                raise AttributeError()
+
+    def __delitem__(self, key):
+        if not self.__dict__.get('_init', False):
+            super().__delitem__(key)
+        else:
+            del self._od[key]
+
+    def __reduce__(self):
+        return DotDict, self._od
+
+    def copy(self):
+        return self.__class__(self._od.copy())
+
+    def __init__(self, *args, **kwargs):
+        self._od = collections.OrderedDict(*args, **kwargs)
+        self._init = True
+
+    def __eq__(self, other):
+        try:
+            return self._od == other._od
+        except AttributeError:
+            return False
+
+    def __repr__(self):
+        return str(self._od).replace('OrderedDict', self.__class__.__name__)
+
+    def __getattr__(self, key):
+        if not self.__dict__.get('_init', False):
+            return self.__getattribute__(key)
+        if key in self._od:
+            return self._od[key]
+        else:
+            raise AttributeError(key)
+
+    def __setattr__(self, key, val):
+        if not self.__dict__.get('_init', False):
+            super().__setattr__(key, val)
+        else:
+            self._od[key] = val
+
+for _v in ('keys values items __iter__ __getitem__  __len__ __contains__ '
+           '__setitem__ pop setdefault get update').split():
+    setattr(DotDict, _v, Alias('_od.%s' % _v))

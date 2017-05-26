@@ -19,7 +19,7 @@ import sys
 import yaml
 import warnings
 
-import dotmap
+from .. import utils
 from pyccc import engines
 
 from moldesign import utils
@@ -39,7 +39,7 @@ You can fix this either:
      running `moldesign.compute.reset_compute_engine()` to try again."""
 
 
-config = dotmap.DotMap()
+config = utils.DotDict()
 """ dict: dictionary of parameters (read from user's moldesign.yml at startup)
 
 This dictionary configures how MDT interacts with "computational engines" - the systems that run
@@ -86,7 +86,7 @@ DEFAULT_CONFIG_PATH = os.path.join(os.environ['HOME'], '.moldesign/moldesign.yml
 # TODO: we're currently hardcoding this at release - there's got to be a better way
 DEFAULT_VERSION_TAG = '0.7.4a2'
 
-CONFIG_DEFAULTS = dotmap.DotMap(engine_type='docker',
+CONFIG_DEFAULTS = utils.DotDict(engine_type='docker',
                                 default_repository='docker.io/autodesk/moldesign:',
                                 default_python_image=None,
                                 default_docker_host=None,

@@ -1,6 +1,5 @@
 biopython
 docker >= 2.0
-dotmap
 future
 fortranformat
 funcsigs

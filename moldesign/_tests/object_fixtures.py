@@ -8,13 +8,13 @@ place.
 import collections
 import random
 
-import dotmap
 import numpy as np
 import pytest
 
 import moldesign as mdt
-from moldesign import units as u
+from .. import units as u
 from .helpers import get_data_path
+from .. import utils
 
 registered_types = {}
 
@@ -43,13 +43,7 @@ TESTDICT = collections.OrderedDict((('a', 'b'),
 
 @typedfixture('object')
 def dotdict():
-    dd = dotmap.DotMap(TESTDICT)
-    return dd
-
-
-@typedfixture('object')
-def ordered_dotdict():
-    dd = dotmap.DotMap(TESTDICT)
+    dd = utils.DotDict(TESTDICT)
     return dd
 
 

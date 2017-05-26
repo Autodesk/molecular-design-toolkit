@@ -11,14 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import dotmap
 import numpy as np
 
 from . import toplevel
+from .. import utils
 
 
 @toplevel
-class MolecularProperties(dotmap.DotMap):
+class MolecularProperties(utils.DotDict):
     """ Stores property values for a molecule.
     These objects will be generally created and updated by EnergyModels, not by users.
     """

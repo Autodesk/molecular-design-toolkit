@@ -56,7 +56,7 @@ class ElectronicWfn(object):
             self.nbasis = len(self.aobasis)
         else:
             self.nbasis = None
-        self.orbitals = DotMap()
+        self.orbitals = DotDict()
         self.fock_ao = fock_ao
         self.num_electrons = num_electrons
         self.homo = self.num_electrons//2 - 1

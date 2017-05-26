@@ -31,7 +31,7 @@ from .molecule import MolecularProperties
 from . import toplevel
 
 
-class Frame(dotmap.DotMap):
+class Frame(utils.DotDict):
     """ A snapshot of a molecule during its motion. This is really just a dictionary of properties.
     These properties are those accessed as ``molecule.properties``, and can vary
     substantially depending on the origin of the trajectory. They also include relevant dynamical

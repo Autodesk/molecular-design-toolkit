@@ -18,7 +18,6 @@ This module stores definitions of common parameters for common techniques.
 These are used to standardize our interfaces to other codes, and automatically generate interactive
 notebook interfaces to configure various techniques.
 """
-import dotmap
 from builtins import object
 import operator as op
 
@@ -107,7 +106,7 @@ class Parameter(object):
 
 # TODO - make this ordered as well as dotted
 def named_dict(l):
-    return dotmap.DotMap((i.name, i) for i in l)
+    return utils.DotDict((i.name, i) for i in l)
 
 model_parameters = named_dict([
     Parameter('subsystem')

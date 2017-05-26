@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import dotmap
+from .. import utils
 from future import standard_library
 standard_library.install_aliases()
 from builtins import map
@@ -166,7 +166,7 @@ def parmed_to_mdt(pmdmol):
 
 
 def _get_pdb_metadata(pmdmol):
-    metadata = dotmap.DotMap(description=pmdmol.title)
+    metadata = utils.DotDict(description=pmdmol.title)
 
     authors = getattr(pmdmol, 'journal_authors', None)
     if authors:

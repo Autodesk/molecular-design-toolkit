@@ -44,7 +44,7 @@ class EnergyModelBase(Method):
             requests (List[str]): the requested properties to calculate
 
         Returns:
-           dotmap.DotMap: A dict of calculated properties (or a job object that will return them)
+           utils.DotDict: A dict of calculated properties (or a job object that will return them)
         """
         self.prep()
         raise NotImplementedError('EnergyModelBase is an abstract base class')

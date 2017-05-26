@@ -19,7 +19,6 @@ import string
 import collections
 
 import numpy as np
-import dotmap
 
 import moldesign as mdt
 from .. import helpers, utils
@@ -694,7 +693,7 @@ class MolTopologyMixin(object):
                             charge=charge,
                             name='%s extended with %d atoms' %
                                  (self.name, len(new_atoms) - self.num_atoms),
-                            metadata=dotmap.DotMap(description=
+                            metadata=utils.DotDict(description=
                                                    'Union of %s' % ', '.join(names)))
 
     def same_topology(self, other, verbose=False):
@@ -1035,7 +1034,7 @@ class Molecule(AtomGroup,
         atoms, name = self._get_initializing_atoms(atomcontainer, name, copy_atoms)
 
         if metadata is None:
-            metadata = getattr(atomcontainer, 'metadata', dotmap.DotMap())
+            metadata = getattr(atomcontainer, 'metadata', utils.DotDict())
 
         self.atoms = atoms
         self.time = getattr(atomcontainer, 'time', 0.0 * u.default.time)
