@@ -1,3 +1,8 @@
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,10 +16,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Set up physical constants and unit systems
-"""
-from builtins import str
 import operator
 import copy
 from os.path import join, abspath, dirname
@@ -70,10 +71,10 @@ class MdtQuantity(ureg.Quantity):
         if item == '__getnewargs__':
             raise AttributeError('__getnewargs__ not accessible in this class')
         else:
-            return super().__getattr__(item)
+            return super(MdtQuantity, self).__getattr__(item)
 
     def __reduce__(self):
-        replacer = list(super().__reduce__())
+        replacer = list(super(MdtQuantity, self).__reduce__())
         replacer[0] = MdtQuantity
         return tuple(replacer)
 

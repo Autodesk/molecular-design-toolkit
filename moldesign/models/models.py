@@ -1,3 +1,8 @@
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +26,6 @@ Currently, everything here is an alias. However, more complicated logic (includi
 dispatch) may be used to determine the best implementation in a given situation
 """
 from moldesign import utils
-from moldesign.utils import exports
 
 from . import PySCFPotential
 from . import OpenMMPotential
@@ -29,14 +33,14 @@ from . import OpenMMPotential
 
 ##################
 # ForceField
-@exports
+@utils.exports
 class ForceField(OpenMMPotential):
     pass  # currently an alias
 
 
 ##################
 # QM generics
-@exports
+@utils.exports
 class RHF(PySCFPotential):
     @utils.doc_inherit
     def __init__(self, *args, **kwargs):
@@ -44,7 +48,7 @@ class RHF(PySCFPotential):
         super().__init__(*args, **kwargs)
 
 
-@exports
+@utils.exports
 class DFT(PySCFPotential):
     @utils.doc_inherit
     def __init__(self, *args, **kwargs):
@@ -52,7 +56,7 @@ class DFT(PySCFPotential):
         super().__init__(*args, **kwargs)
 
 
-@exports
+@utils.exports
 class B3LYP(PySCFPotential):
     @utils.doc_inherit
     def __init__(self, *args, **kwargs):
@@ -61,14 +65,14 @@ class B3LYP(PySCFPotential):
         super().__init__(*args, **kwargs)
 
 
-@exports
+@utils.exports
 class MP2(PySCFPotential):
     @utils.doc_inherit
     def __init__(self, *args, **kwargs):
         kwargs['theory'] = 'mp2'
         super().__init__(*args, **kwargs)
 
-@exports
+@utils.exports
 class CASSCF(PySCFPotential):
     @utils.doc_inherit
     def __init__(self, *args, **kwargs):

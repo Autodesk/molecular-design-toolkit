@@ -1,15 +1,16 @@
+
 """
 My standard utilities. Intended to be included in all projects
 Obviously everything included here needs to be in the standard library (or numpy)
 """
-from __future__ import print_function
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
 from future import standard_library
-from functools import reduce
 standard_library.install_aliases()
-from builtins import map
-from builtins import str
-from builtins import range
-from builtins import object
+
+from future.utils import native_str
+
+from functools import reduce
 import contextlib
 import fractions
 import operator
@@ -112,7 +113,7 @@ class methodcaller(object):
             raise TypeError(msg)
         self = args[0]
         self._name = args[1]
-        if not isinstance(self._name, str):
+        if not isinstance(self._name, native_str):
             raise TypeError('method name must be a string')
         self._args = args[2:]
         self._kwargs = kwargs

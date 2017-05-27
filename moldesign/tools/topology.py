@@ -1,3 +1,11 @@
+"""
+This module contains various utility functions that are exposed to API users
+"""
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +20,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-This module contains various utility functions that are exposed to API users
-"""
-from __future__ import print_function
-from builtins import str
-from builtins import zip
 import moldesign as mdt
 from moldesign import units as u
 

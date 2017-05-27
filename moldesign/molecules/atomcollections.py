@@ -1,3 +1,8 @@
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from builtins import zip
-from builtins import str
-from builtins import map
 from past.builtins import basestring
-from builtins import object
 import copy
 import collections
 import itertools
@@ -24,8 +25,8 @@ import itertools
 import numpy as np
 
 import moldesign as mdt
-from moldesign import units as u
-from moldesign import utils, external, mathutils, helpers
+from .. import units as u
+from .. import utils, external, mathutils, helpers
 from . import toplevel
 
 

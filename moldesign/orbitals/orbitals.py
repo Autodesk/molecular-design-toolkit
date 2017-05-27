@@ -1,3 +1,20 @@
+""" Class definitions for atomic and molecular orbitals.
+
+Notes:
+    In this documentation, we use the following conventions for labeling orbitals:
+      - atomic orbitals using lower case greek labels and subscripts, e.g.,
+          :math:`\left| \mu \right \rangle, F_{\nu \lambda}, etc.
+      - molecular orbitals use lower case labels and subscripts, e.g.,
+          :math:`\left| i \right \rangle, F_{kl}, etc.
+      - adiabatic electronic states are indexed using capital letters, _N_, _L_, _M_, etc.
+
+"""
+
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,20 +29,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Class definitions for atomic and molecular orbitals.
-
-Notes:
-    In this documentation, we use the following conventions for labeling orbitals:
-      - atomic orbitals using lower case greek labels and subscripts, e.g.,
-          :math:`\left| \mu \right \rangle, F_{\nu \lambda}, etc.
-      - molecular orbitals use lower case labels and subscripts, e.g.,
-          :math:`\left| i \right \rangle, F_{kl}, etc.
-      - adiabatic electronic states are indexed using capital letters, _N_, _L_, _M_, etc.
-
-"""
-from builtins import zip
-from builtins import str
-from builtins import object
 import numpy as np
 
 from moldesign import units as u

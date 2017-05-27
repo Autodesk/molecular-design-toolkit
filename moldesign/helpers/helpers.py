@@ -1,3 +1,11 @@
+"""
+This module contains various helper functions used by MDT internally.
+"""
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,18 +20,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-This module contains various helper functions used by MDT internally.
-"""
-from __future__ import print_function
-
-from builtins import zip
-from builtins import str
-from builtins import object
 import collections
 
 import numpy as np
-import webcolors
 
 from moldesign import units as u
 

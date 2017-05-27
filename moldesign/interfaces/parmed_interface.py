@@ -1,3 +1,8 @@
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,13 +16,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from .. import utils
-from future import standard_library
-standard_library.install_aliases()
-from builtins import map
-from builtins import str
-from builtins import zip
-from builtins import range
+
 from past.builtins import basestring
 import collections
 
@@ -26,9 +25,8 @@ import parmed
 from io import StringIO
 
 import moldesign as mdt
-from moldesign import units as u
-from moldesign import utils
-from moldesign.utils import exports
+from .. import units as u
+from .. import utils
 
 
 def read_mmcif(f, reassign_chains=True):
@@ -120,7 +118,7 @@ def write_mmcif(mol, fileobj):
     mol_to_parmed(mol).write_cif(fileobj)
 
 
-@exports
+@utils.exports
 def parmed_to_mdt(pmdmol):
     """ Convert parmed Structure to MDT Structure
 
@@ -188,7 +186,7 @@ def _get_pdb_metadata(pmdmol):
     return metadata
 
 
-@exports
+@utils.exports
 def mol_to_parmed(mol):
     """ Convert MDT Molecule to parmed Structure
     Args:

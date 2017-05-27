@@ -22,9 +22,8 @@ import time
 import numpy as np
 
 import moldesign as mdt
-from moldesign import helpers, utils
-from moldesign import units as u
-
+from .. import helpers, utils
+from .. import units as u
 from .molecule import MolecularProperties
 from . import toplevel
 

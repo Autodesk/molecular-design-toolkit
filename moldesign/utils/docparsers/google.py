@@ -11,10 +11,12 @@
     :license: BSD, see sphinxlicense/LICENSE for details.
 """
 
-from builtins import next
-from builtins import range
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 from past.builtins import basestring
-from builtins import object
 import collections
 import re
 

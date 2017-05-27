@@ -1,3 +1,8 @@
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +21,7 @@
 We don't yet (and hopefully will never need) an internal PDB parser or writer. For now,
 routines in this module read and write data that's not necessarily parsed by other implementations.
 """
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-from builtins import map
-from builtins import str
-from builtins import range
 from past.builtins import basestring
-from builtins import object
 import collections
 from io import StringIO
 

@@ -4,10 +4,9 @@ future
 fortranformat
 funcsigs
 markdown2
-matplotlib
-numpy
-parmed >= 2.0.0
-pint >= 0.7
+numpy >= 1.12
+parmed >= 2.7.3
+pint >= 0.8
 pyccc >= 0.7.4
 pytest
 pyyaml

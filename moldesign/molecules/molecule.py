@@ -486,7 +486,7 @@ class MolTopologyMixin(object):
         self._positions = np.zeros((self.num_atoms, 3)) * u.default.length
         self._momenta = np.zeros((self.num_atoms, 3)) * u.default.momentum
         self.masses = np.zeros(self.num_atoms) * u.default.mass
-        self.dim_masses = u.broadcast_to(self.masses, (3, self.num_atoms)).T  # TODO: pickling
+        self.dim_masses = u.broadcast_to(self.masses, (3, self.num_atoms)).T
         self._assign_atom_indices()
         self._assign_residue_indices()
         self._dof = None

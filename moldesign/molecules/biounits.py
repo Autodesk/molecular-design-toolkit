@@ -1,3 +1,8 @@
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,13 +16,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from builtins import str
 from past.builtins import basestring
 from sortedcontainers import SortedListWithKey
 
 import moldesign as mdt
-from moldesign import utils
-
+from .. import utils
 from . import toplevel, AtomList, AtomContainer
 
 

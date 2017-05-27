@@ -1,3 +1,8 @@
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +21,6 @@ This module contains python "descriptors" (nothing to do with chemoinformatic "d
 help maintain the links between an atom's coordinates and its molecule's coordinates
 """
 
-from builtins import object
 class ProtectedArray(object):
     """
     Descriptor for arrays that shouldn't be reassigned.
