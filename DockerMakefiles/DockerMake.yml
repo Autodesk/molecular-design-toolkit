@@ -96,7 +96,7 @@ deploybase:
 
 
 python_deploy_base:
-  FROM: continuumio/miniconda:4.3.11
+  FROM: continuumio/miniconda3:4.3.11
   build_directory: buildfiles/deploybase
   build: |
     ADD cleanapt /usr/local/bin

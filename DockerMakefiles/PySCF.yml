@@ -21,12 +21,10 @@ pyscf_build:
     git \
     gfortran \
    && cd /opt \
-     && wget -nv https://github.com/sunqm/pyscf/archive/v1.1.1.tar.gz \
-     && tar xvzf v1.1.1.tar.gz && rm v1.1.1.tar.gz \
-     && mv pyscf-1.1.1 pyscf \
+     && wget -nv https://github.com/sunqm/pyscf/archive/v1.3.1.tar.gz \
+     && tar xvzf v1.3.1.tar.gz && rm v1.3.1.tar.gz \
+     && mv pyscf-1.3.1 pyscf \
    && cd /opt/pyscf/lib \
-     && mv CMakeLists.txt CMakeLists.txt.old \
-     && sed -e "s/libcint\.git/qcint.git/" CMakeLists.txt.old > CMakeLists.txt \
      && mkdir build && cd build \
      && cmake .. \
      && make \
@@ -42,8 +40,11 @@ pyscf:
     - pyscf_dependencies
   build: |
     RUN conda install h5py
+    ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.6/site-packages/pyscf/lib
+    RUN pip install git+https://github.com/sunqm/pyscf@v1.3.1
+    # note that the version here needs to be the same as the build version above
   copy_from:
     pyscf_build:
-      /opt/pyscf: /opt/conda/lib/python2.7/site-packages/  # assumes conda installation, obvs
-      /opt/shared_libs/lib: /usr/
+      /opt/shared_libs/lib: /opt/conda/lib/python3.6/site-packages/pyscf
+
 
