@@ -1,11 +1,84 @@
-from builtins import zip
+import random
 import pytest
+import numpy as np
 
 import moldesign as mdt
+import moldesign.units as u
+from .helpers import get_data_path
 
-from . import helpers
 
-# TODO: test parameterization error detection
+molecule_standards = {}
+
+def typedfixture(*types, **kwargs):
+    """This is a decorator that lets us associate fixtures with one or more arbitrary types.
+    We'll later use this type to determine what tests to run on the result"""
+
+    def fixture_wrapper(func):
+        for t in types:
+            molecule_standards.setdefault(t, []).append(func.__name__)
+        return pytest.fixture(**kwargs)(func)
+
+    return fixture_wrapper
+
+
+######################################
+# Tests around PDB ID 3AID
+@typedfixture('molecule', scope='session')
+def pdb3aid():
+    mol = mdt.read(get_data_path('3aid.pdb'))
+    return mol
+
+
+@typedfixture('submolecule')
+def ligand_residue_3aid(pdb3aid):
+    unknown = pdb3aid.chains['A'](type='unknown')
+    assert len(unknown) == 1
+    return unknown[0]
+
+
+@typedfixture('submolecule')
+def ligand_3aid_atoms(ligand_residue_3aid):
+    return ligand_residue_3aid.atoms
+
+
+@typedfixture('molecule')
+def ligand3aid(ligand_residue_3aid):
+    newmol = mdt.Molecule(ligand_residue_3aid)
+    return newmol
+
+
+@pytest.fixture
+def random_atoms_from_3aid(pdb3aid):
+    atoms = mdt.molecules.atomcollections.AtomList(random.sample(pdb3aid.atoms, 10))
+    return atoms
+
+
+@pytest.fixture(scope='function')
+def small_molecule():
+    mol = mdt.from_smiles('CNCOS(=O)C')
+    mol.positions += 0.001*np.random.random(mol.positions.shape)*u.angstrom  # move out of minimum
+    return mol
+
+
+@typedfixture('molecule')
+def h2():
+    atom1 = mdt.Atom('H')
+    atom1.x = 0.5 * u.angstrom
+    atom2 = mdt.Atom(atnum=1)
+    atom2.position = [-0.5, 0.0, 0.0] * u.angstrom
+    h2 = mdt.Molecule([atom1, atom2], name='h2')
+    atom1.bond_to(atom2, 1)
+    return h2
+
+
+@pytest.fixture
+def ethylene():
+    return mdt.from_smiles('C=C')
+
+@pytest.fixture
+def pdb1yu8():
+    return mdt.read(get_data_path('1yu8.pdb'))
+
 
 @pytest.fixture(scope='function')
 def mol_from_xyz():
@@ -89,96 +162,10 @@ $$$$
 """, format='sdf')
 
 
-@pytest.fixture(scope='function')
-def mol_from_pdb():
-    mol = mdt.from_pdb('3aid')
-    return mdt.Molecule(mol.chains['A'].residues['ARQ401'])
-
-
-@pytest.fixture(scope='function')
-def mol_from_smiles():
-    return mdt.from_smiles('CC')
-
-
-@pytest.mark.parametrize('objkey',
-                         'mol_from_smiles mol_from_pdb mol_from_xyz mol_from_sdf'.split())
-def test_parameterization_from_formats(objkey, request):
-    mol = request.getfixturevalue(objkey)
-    assert not mol.ff
-    params = mdt.create_ff_parameters(mol, charges='gasteiger')
-    assert params is not None
-    _test_succesful_parameterization(mol)
-
-
-def test_parameterize_multiple_identical_small_molecules():
-    m1 = mdt.from_smiles('O')
-    params = mdt.create_ff_parameters(m1, charges='am1-bcc')
-    assert params is not None
-    m2 = m1.copy()
-    m2.translate([4.0, 0.0, 0.0] * mdt.units.angstrom)
-    mol = m1.combine(m2)
-    ff = mdt.forcefields.DefaultAmber()
-    ff.add_ff(params)
-
-    ff.assign(mol)
-    _test_succesful_parameterization(mol)
-
-
-@pytest.mark.parametrize('chargemodel',
-                         'esp gasteiger zero am1-bcc'.split())
-def test_charge_models(mol_from_smiles, chargemodel):
-    mol = mol_from_smiles
-    if chargemodel == 'esp':
-        pytest.xfail("ESP not yet implemented")
-    assert not mol.ff
-    params = mdt.create_ff_parameters(mol, charges=chargemodel)
-    assert params is not None
-    _test_succesful_parameterization(mol)
-
-
-def _test_succesful_parameterization(mol):
-    assert mol.ff
-    mol.set_energy_model(mdt.models.ForceField)
-    mol.calculate()
-    assert 'potential_energy' in mol.properties
-    assert 'forces' in mol.properties
-
-
-def test_1yu8_default_amber_fix_and_assignment():
-    ff = mdt.forcefields.DefaultAmber()
-    mol = mdt.read(helpers.get_data_path('1yu8.pdb'))
-    newmol = ff.create_prepped_molecule(mol)
-    _test_succesful_parameterization(newmol)
-
-
-def test_ff_assignment_doesnt_change_topology():
-    m = mdt.read(helpers.get_data_path('3aid.pdb'))
-    protein = mdt.Molecule(m.get_atoms('protein'))
-    ligand = mdt.Molecule(m.get_atoms('unknown'))
-    ligff = mdt.create_ff_parameters(ligand, charges='gasteiger')
-
-    mdt.guess_histidine_states(protein)
-    mol = protein.combine(ligand)
-
-    ff = mdt.forcefields.DefaultAmber()
-    ff.add_ff(ligff)
-
-    mdready = ff.create_prepped_molecule(mol)
-
-    assert mdready.num_residues == mol.num_residues
-    assert mdready.num_chains == mol.num_chains
-    for c1, c2 in zip(mdready.chains, mol.chains):
-        assert c1.name == c2.name
-        assert c1.num_residues == c2.num_residues
-        assert c1.index == c2.index
-
-    for newr, oldr in zip(mdready.residues, mol.residues):
-        assert newr.index == oldr.index
-        if newr.resname == 'HIS':
-            assert oldr.resname in 'HIS HID HIE HIP'.split()
-        else:
-            assert newr.resname == oldr.resname
-        assert newr.pdbindex == oldr.pdbindex
-        assert newr.chain.index == oldr.chain.index
-        for atom in oldr:
-            assert atom.name in newr
+######################################
+# Tests around a piece of DNA
+@typedfixture('molecule', scope='session')
+def nucleic():
+    # ACTG.pdb contains a molecule generated using mdt.build_dna('ACTG')
+    mol = mdt.read(get_data_path('ACTG.pdb'))
+    return mol
