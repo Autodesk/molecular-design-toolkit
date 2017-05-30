@@ -2,6 +2,8 @@ import pytest
 
 import moldesign as mdt
 
+from .molecule_fixtures import small_molecule
+
 
 registered_types = {}
 
@@ -42,3 +44,26 @@ def openbabel_ghemical(small_molecule):
 def openbabel_uff(small_molecule):
     small_molecule.set_energy_model(mdt.models.OpenBabelPotential, forcefield='uff')
     return small_molecule
+
+
+@pytest.mark.parametrize('fixture', registered_types['hasmodel'])
+def test_ob_energy_models(request, fixture):
+    mol = request.getfixturevalue(fixture)
+    assert mol.energy_model is not None
+    assert isinstance(mol.calculate_potential_energy(), mdt.units.MdtQuantity)
+
+
+def test_ob_smiles_read():
+    mol = mdt.interfaces.openbabel.from_smiles('CC')
+    _assert_its_ethane(mol)
+
+
+def test_ob_inchi_read():
+    mol = mdt.interfaces.openbabel.from_inchi('InChI=1S/C2H6/c1-2/h1-2H3')
+    _assert_its_ethane(mol)
+
+
+def _assert_its_ethane(mol):
+    assert mol.num_atoms == 8
+    assert len(mol.get_atoms(symbol='H')) == 6
+    assert len(mol.get_atoms(symbol='C')) == 2

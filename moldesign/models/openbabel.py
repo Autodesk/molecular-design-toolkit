@@ -28,7 +28,7 @@ from .base import EnergyModelBase
 
 
 # uff disabled because it doesn't pass tests
-FFNAMES = {n: n.capitalize() for n in ['ghemical', 'mmff94', 'mmff94s']}
+FFNAMES = {n: n.capitalize() for n in ['ghemical', 'mmff94', 'mmff94s', 'uff']}
 UNITNAMES = {'kcal/mol': u.kcalpermol, 'kJ/mol': u.kjpermol}
 
 

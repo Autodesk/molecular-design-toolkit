@@ -19,7 +19,7 @@ def typedfixture(*types, **kwargs):
     return fixture_wrapper
 
 
-# TODO: test parameterization error detection
+# TODO: tests for parameterization error detection
 
 
 @pytest.fixture(scope='function')
@@ -143,8 +143,8 @@ def _param_small_mol(small_molecule, chargemodel):
 
 
 @typedfixture('hasmodel')
-def protein_default_amber_forcefield():
-    mol = mdt.read(helpers.get_data_path('1yu8.pdb'))
+def protein_default_amber_forcefield(pdb1yu8):
+    mol = pdb1yu8
     ff = mdt.forcefields.DefaultAmber()
     newmol = ff.create_prepped_molecule(mol)
     newmol.set_energy_model(mdt.models.ForceField)

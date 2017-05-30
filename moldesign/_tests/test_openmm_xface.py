@@ -6,9 +6,12 @@ import moldesign as mdt
 from moldesign import units as u
 
 from . import helpers
-
+from .molecule_fixtures import (pdb1yu8, small_molecule)
 from .test_openbabel_xface import registered_types as obtypes
 from .test_ambertools_xface import registered_types as ambtypes
+from .test_ambertools_xface import (gaff_model_gasteiger, protein_default_amber_forcefield,
+                                    parameterize_am1bcc, parameterize_zeros,
+                                    protein_default_amber_forcefield)
 
 
 registered_types = {}
