@@ -16,17 +16,18 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import sys
+
 import json
 import zlib
+import future.utils
 
 from . import Alias
 
-if sys.version_info.major == 2:
+if future.utils.PY2:
     import dumbdbm
 else:
     import dbm.dumb as dumbdbm
-    assert sys.version_info.major >= 3
+
 
 class CompressedJsonDbm(object):
     """ Quick-and-dirty interface to a DBM file

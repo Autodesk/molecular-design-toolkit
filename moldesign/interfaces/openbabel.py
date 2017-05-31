@@ -125,7 +125,7 @@ def write_string(mol, format):
         outstr = pbmol.write(format=format).strip()
     else:
         outstr = pbmol.write(format=format)
-    return outstr
+    return str(outstr)
 
 
 def write_file(mol, filename=None, mode='w', format=None):

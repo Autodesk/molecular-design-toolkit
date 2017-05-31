@@ -36,8 +36,21 @@ class Alias(object):
         self.methodname = methodname
 
     def __get__(self, instance, owner):
-        proxied = getattr(instance, self.objname)
-        return getattr(proxied,self.methodname)
+        if instance is None:
+            assert owner is not None
+            return _unbound_getter(self.objname, self.methodname)
+        else:
+            proxied = getattr(instance, self.objname)
+            return getattr(proxied,self.methodname)
+
+
+def _unbound_getter(objname, methodname):
+    def _method_getter(s, *args, **kwargs):
+        obj = getattr(s, objname)
+        meth = getattr(obj, methodname)
+        return meth(*args, **kwargs)
+    return _method_getter
+
 
 
 class Synonym(object):

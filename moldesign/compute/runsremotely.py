@@ -16,9 +16,8 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import sys
 import types
-
+import future.utils
 from pyccc import python as bpy
 
 import moldesign as mdt
@@ -103,7 +102,8 @@ class RunsRemotely(object):
                                 image,
                                 python_call,
                                 name=self.jobname,
-                                sendsource=self.sendsource)
+                                sendsource=self.sendsource,
+                                interpreter='python')  # always run in native interpreter
 
             if self.display:
                 display_log(job.get_display_object(), title=f.__name__)
@@ -126,10 +126,9 @@ def _bind_instance_method(f, args):
     # instance methods. Instead, we'll create another bound copy of the instancemethod (probably
     # only need to do this once)
     fn_self = args[0]
-    if sys.version_info.major == 2:
+    if future.utils.PY2 == 2:
         f = types.MethodType(f, fn_self, fn_self.__class__)
     else:
-        assert sys.version_info.major >= 3
         f = types.MethodType(f, fn_self)
     args = args[1:]
     return f, args

@@ -122,6 +122,10 @@ class _SortKey(object):
     def __eq__(self, other):
         return self.obj is other.obj
 
+    def __ne__(self, other):
+        # if not present, this always returns True in python 2. (???)
+        return not self == other
+
     def __lt__(self, other):
         try:
             return self.obj.index < other.obj.index

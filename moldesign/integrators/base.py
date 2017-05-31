@@ -48,7 +48,7 @@ class IntegratorBase(Method):
             dims = time.dimensionality
             assert len(dims) == 1 and dims['[time]'] == 1.0
         except (AttributeError, AssertionError):
-            assert type(time) == int, "argument to integrator.run must have units of time or be an int"
+            assert isinstance(time, int), "argument to integrator.run must have units of time or be an int"
             return time
         else:
             return int(round(time / timestep))

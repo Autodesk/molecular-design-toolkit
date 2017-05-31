@@ -22,12 +22,16 @@ import collections
 
 import itertools
 import parmed
-from io import StringIO
+import future.utils
 
 import moldesign as mdt
 from .. import units as u
 from .. import utils
 
+if future.utils.PY2:
+    from cStringIO import StringIO
+else:
+    from io import StringIO
 
 def read_mmcif(f, reassign_chains=True):
     """Parse an mmCIF file (using the parmEd parser) and return a molecule
@@ -82,7 +86,7 @@ def _insert_conect_records(mol, pmdmol, pdbfile, write_to=None):
         pdbfile (TextIO OR str): pdb file (file-like or string)
 
     Returns:
-        cStringIO.StringIO OR str: copy of the pdb file with added TER records - it will be
+        StringIO OR str: copy of the pdb file with added TER records - it will be
          returned as the same type passed (i.e., as a filelike buffer or as a string)
     """
     conect_bonds = mdt.helpers.get_conect_pairs(mol)
@@ -108,9 +112,10 @@ def _insert_conect_records(mol, pmdmol, pdbfile, write_to=None):
             for a1idx in pairs:
                 for istart in range(0, len(pairs[a1idx]), 4):
                     pairindices = ''.join(("%5d" % idx) for idx in pairs[a1idx][istart:istart+4])
-                    newf.write(CONECT % a1idx + pairindices + '\n')
+                    newf.write(str(CONECT % a1idx + pairindices + '\n'))
 
-        newf.write(line)
+        newf.write(str(line))
+        # strs are added here for py2/py3 compatibility - always casts into native str type
 
 
 

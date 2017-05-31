@@ -8,7 +8,7 @@ from future.builtins import *
 from future import standard_library
 standard_library.install_aliases()
 
-from future.utils import native_str
+import future.utils
 
 from functools import reduce
 import contextlib
@@ -62,7 +62,8 @@ class MLStripper(HTMLParser):
     FROM http://stackoverflow.com/a/925630/1958900
     """
     def __init__(self):
-        super().__init__()
+        if not future.utils.PY2:
+            super().__init__()
         self.reset()
         self.fed = []
         self.strict = False
@@ -116,7 +117,7 @@ class methodcaller(object):
             raise TypeError(msg)
         self = args[0]
         self._name = args[1]
-        if not isinstance(self._name, native_str):
+        if not isinstance(self._name, future.utils.native_str):
             raise TypeError('method name must be a string')
         self._args = args[2:]
         self._kwargs = kwargs
