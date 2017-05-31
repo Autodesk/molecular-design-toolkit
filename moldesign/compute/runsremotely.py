@@ -26,6 +26,7 @@ from moldesign import utils
 from . import configuration
 from ..helpers import display_log
 
+
 class RunsRemotely(object):
     def __init__(self, enable=True,
                  display=True,

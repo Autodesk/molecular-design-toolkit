@@ -64,6 +64,5 @@ def test_analytical_vs_numerical_forces(objkey, request):
 def test_minimization_reduces_energy(objkey, request):
     mol = request.getfixturevalue(objkey)
     e1 = mol.calculate_potential_energy()
-    mol = request.getfixturevalue(objkey)
     traj = mol.minimize()
     assert mol.calculate_potential_energy() < e1

@@ -14,7 +14,7 @@ import moldesign as mdt
 from .. import units as u
 from .. import utils
 
-from .molecule_fixtures import molecule_standards
+from .molecule_fixtures import *
 
 registered_types = {}
 registered_types.update(molecule_standards)

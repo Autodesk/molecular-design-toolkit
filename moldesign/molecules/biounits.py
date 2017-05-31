@@ -1,4 +1,7 @@
 from __future__ import print_function, absolute_import, division
+
+import functools
+
 from future.builtins import *
 from future import standard_library
 standard_library.install_aliases()
@@ -32,7 +35,7 @@ class ChildList(AtomContainer):
     index = utils.Alias('_childinorder.index')
 
     def __str__(self):
-        return str(self._childinorder._items)
+        return str([item.name for item in self])
 
     def __repr__(self):
         try:
@@ -44,10 +47,11 @@ class ChildList(AtomContainer):
         super().__init__()
         self.parent = parent
         self._childbyname = {}
-        self._childinorder = SortedListWithKey(key=_sortkey)
+        self._childinorder = SortedListWithKey(key=_SortKey)
 
     def __dir__(self):
-        return list(self.__dict__.keys()) + list(self.__class__.__dict__.keys()) + list(self._childbyname.keys())
+        return (list(self.__dict__.keys()) + list(self.__class__.__dict__.keys())
+                + list(self._childbyname.keys()))
 
     def __getitem__(self, item):
         if isinstance(item, basestring):
@@ -106,10 +110,28 @@ class ChildList(AtomContainer):
 
     def rebuild(self):
         self._childbyname = {obj.name: obj for obj in self._childinorder}
+        self._childinorder = SortedListWithKey([obj for obj in self._childbyname.values()],
+                                               key=_SortKey)
 
 
-def _sortkey(x):
-    return x.pdbindex, x.index
+@functools.total_ordering
+class _SortKey(object):
+    def __init__(self, obj):
+        self.obj = obj
+
+    def __eq__(self, other):
+        return self.obj is other.obj
+
+    def __lt__(self, other):
+        try:
+            return self.obj.index < other.obj.index
+        except TypeError:
+            pass
+
+        try:
+            return self.obj.pdbindex < other.obj.pdbindex
+        except TypeError:
+            return id(self.obj) < id(other.obj)
 
 
 @toplevel

@@ -323,10 +323,8 @@ def from_pdb(pdbcode, usecif=False):
         raise ValueError('Failed to download %s.%s from rcsb.org: %s %s' % (
             pdbcode, fileext, request.status_code, request.reason))
 
-    if usecif:
-        filestring = request.text
-    else:
-        filestring = request.text.encode('ascii')
+
+    filestring = request.text
 
     mol = read(filestring, format=fileext)
     mol.name = pdbcode

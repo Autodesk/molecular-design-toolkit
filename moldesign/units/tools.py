@@ -70,8 +70,13 @@ def get_units(q):
     """
     x = q
     while True:
-        try: x = next(x.__iter__())
-        except (AttributeError, TypeError): break
+        try:
+            x = next(x.__iter__())
+        except (AttributeError, TypeError):
+            break
+        else:
+            if isinstance(x, str):
+                raise TypeError('Found string data while trying to determine units')
     try:
         y = 1.0 * x
         y._magnitude = 1.0

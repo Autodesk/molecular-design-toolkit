@@ -104,10 +104,8 @@ class UnitSystem(object):
                 q = quantity[0]
             except (TypeError, StopIteration):
                 raise TypeError('This type of object cannot have physical units')
-
-            if q == quantity:
+            if isinstance(q, str):
                 raise TypeError('This type of object cannot have physical units')
-
             try:
                 return self.get_baseunit(q)
             except (IndexError, TypeError):  # Assume dimensionless

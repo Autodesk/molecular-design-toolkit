@@ -5,6 +5,7 @@ import pytest
 import moldesign as mdt
 from moldesign import units as u
 
+from .molecule_fixtures import *
 from .object_fixtures import *
 
 
