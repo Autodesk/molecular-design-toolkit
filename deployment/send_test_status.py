@@ -10,7 +10,7 @@ import github
 
 
 missing_env = []
-for key in 'CI_COMMIT_ID TESTENV GITHUB_REPO_TOKEN CI_PROJECT_ID CI_BUILD_ID'.split():
+for key in 'CI_COMMIT_ID TESTENV GITHUB_REPO_TOKEN CI_PROJECT_ID CI_BUILD_ID PYVERSION'.split():
     if not os.environ.get(key, None):
         missing_env.append(key)
 
@@ -21,12 +21,14 @@ ghtoken = os.environ.get('GITHUB_REPO_TOKEN', '_notoken')
 # projid = os.environ.get('CI_PROJECT_ID', '_no_projid')
 projid = '214515'  # hardcoded for now
 buildid = os.environ.get('CI_BUILD_ID', '_no_buildid')
+pyversion = os.environ.get('PYVERSION', '_no_pyversion')
+
 
 data = dict(state='success' if sys.argv[1] == '0' else 'failure',
             target_url='https://app.codeship.com/projects/%s/builds/%s' %
                        (projid, buildid),
             description=" ".join(sys.argv[2:]).replace("=","").strip(),
-            context='mdt/' + testenv)
+            context='%s/py%s' % (testenv, pyversion))
 
 
 if missing_env:
