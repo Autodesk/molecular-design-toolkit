@@ -17,6 +17,7 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from past.builtins import basestring
+import future.utils
 
 import os
 import sys
@@ -168,10 +169,13 @@ def init_config():
     if 'default_version_tag' not in config:
         config.default_version_tag = DEFAULT_VERSION_TAG
 
-    expcted_docker_python_image = compute.get_image_path('moldesign_complete')
+    if future.utils.PY2:
+        expcted_docker_python_image = compute.get_image_path('moldesign_complete_py2')
+    else:
+        expcted_docker_python_image = compute.get_image_path('moldesign_complete')
+
     if config.get('default_python_image', None) is None:
         config.default_python_image = expcted_docker_python_image
-
 
 
 def _check_override(tagname, expected, path):

@@ -1,7 +1,4 @@
 from __future__ import print_function, absolute_import, division
-
-import functools
-
 from future.builtins import *
 from future import standard_library
 standard_library.install_aliases()
@@ -21,6 +18,7 @@ standard_library.install_aliases()
 # limitations under the License.
 from past.builtins import basestring
 from sortedcontainers import SortedListWithKey
+import functools
 
 import moldesign as mdt
 from .. import utils

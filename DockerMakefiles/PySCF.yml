@@ -36,15 +36,15 @@ pyscf_build:
 
 pyscf:
   requires:
-    - python_deploy_base
+    - deploy_requirements
     - pyscf_dependencies
   build: |
     RUN conda install h5py
-    ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.6/site-packages/pyscf/lib
+    ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.6/site-packages/pyscf/lib:/opt/conda/lib/python2.7/site-packages/pyscf/lib
     RUN pip install git+https://github.com/sunqm/pyscf@v1.3.1
     # note that the version here needs to be the same as the build version above
   copy_from:
     pyscf_build:
       /opt/shared_libs/lib: /opt/conda/lib/python3.6/site-packages/pyscf
-
+      /opt/shared_libs/lib: /opt/conda/lib/python2.7/site-packages/pyscf
 

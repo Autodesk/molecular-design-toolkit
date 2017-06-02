@@ -16,7 +16,7 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from io import StringIO
+import future.utils
 
 import numpy as np
 import imp
@@ -26,6 +26,11 @@ from .. import compute
 from ..utils import if_not_none, redirect_stderr
 from .. import orbitals
 from ..utils import exports
+
+if future.utils.PY2:
+    from cStringIO import StringIO
+else:
+    from io import StringIO
 
 
 try:

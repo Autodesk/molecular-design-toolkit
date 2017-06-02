@@ -1,6 +1,6 @@
 moldesign_requirements:
   requires:
-    - python_deploy_base
+    - deploy_requirements
   build: |
     RUN conda install -qy -c omnia parmed biopython
 
@@ -18,11 +18,19 @@ moldesign_minimal:
   RUN pip install -e /opt/molecular-design-toolkit
 
 
-moldesign_complete:
+moldesign_complete_requirements:
   description: An image with moldesign and all python dependencies
   requires:
    - chem_python
    - moldesign_minimal
+
+moldesign_complete:
+  FROM: continuumio/miniconda3:4.3.11
+  requires: [moldesign_complete_requirements]
+
+moldesign_complete_py2:
+  FROM: continuumio/miniconda:4.3.11
+  requires: [moldesign_complete_requirements]
 
 moldesign_notebook:
  description: A production-ready, fully outfitted jupyter server container

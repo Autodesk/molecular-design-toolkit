@@ -13,6 +13,7 @@ _ALL_:
   - symmol
   - nwchem
   - moldesign_complete
+  - moldesign_complete_py2
   - moldesign_minimal
   - nucleic_acid_builder
   - nwchem_build
@@ -95,10 +96,20 @@ deploybase:
       && cleanapt
 
 
-python_deploy_base:
-  FROM: continuumio/miniconda3:4.3.11
+deploy_requirements:
   build_directory: buildfiles/deploybase
   build: |
     ADD cleanapt /usr/local/bin
     RUN chmod +x /usr/local/bin/cleanapt
     RUN conda install -qy numpy scipy pyyaml
+
+python2_deploy_base:
+  FROM: continuumio/miniconda:4.3.11
+  requires:
+     - deploy_requirements
+
+python_deploy_base:
+  FROM: continuumio/miniconda3:4.3.11
+  requires:
+    - deploy_requirements
+

@@ -87,7 +87,7 @@ def read(f, format=None):
             if format is None:
                 raise IOError(('No file named "%s"; ' % f[:50]) +
                               'please set the `format` argument if you want to parse the string')
-            elif format in PICKLE_EXTENSIONS:
+            elif format in PICKLE_EXTENSIONS or isinstance(f, bytes):
                 streamtype = io.BytesIO
             fileobj = streamtype(f)
 

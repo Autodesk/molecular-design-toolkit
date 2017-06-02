@@ -16,9 +16,8 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import future.utils
 from functools import reduce
-from io import StringIO
 from past.utils import old_div
 
 import numpy as np
@@ -29,6 +28,11 @@ from .. import compute, orbitals, utils
 from ..interfaces.pyscf_interface import force_remote, mol_to_pyscf,  StatusLogger, SPHERICAL_NAMES
 from .base import QMBase
 from ..helpers import Logger
+
+if future.utils.PY2:
+    from cStringIO import StringIO
+else:
+    from io import StringIO
 
 
 class LazyClassMap(object):

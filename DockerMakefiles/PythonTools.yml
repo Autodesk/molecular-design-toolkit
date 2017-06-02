@@ -23,7 +23,7 @@ pyquante2:
 
 chem_python_conda:
  requires:
-  - python_deploy_base
+  - deploy_requirements
  description: All of the external python chemistry libraries in one place
  build: |
    RUN conda install -qy -c openbabel openbabel=2.4.1
