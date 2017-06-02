@@ -29,9 +29,10 @@ pyscf_build:
      && cmake .. \
      && make \
      && rm -rf /opt/pyscf/lib/build
-  RUN mkdir -p /opt/shared_libs/lib \
+  RUN mkdir -p /opt/shared_libs/lib /opt/shared_libs/py3 \
    && cp -v /opt/pyscf/lib/*.so* /opt/pyscf/lib/deps/lib/*.so* \
-         /opt/shared_libs/lib
+         /opt/shared_libs/lib \
+   && cp -r /opt/shared_libs/lib /opt/shared_libs/py3/lib  # this is a hack for silly reasons
 
 
 pyscf:
@@ -44,7 +45,7 @@ pyscf:
     RUN pip install git+https://github.com/sunqm/pyscf@v1.3.1
     # note that the version here needs to be the same as the build version above
   copy_from:
-    pyscf_build:
+    pyscf_build:  # probably better to install in one location, obvs, but this will have to do for now
       /opt/shared_libs/lib: /opt/conda/lib/python3.6/site-packages/pyscf
-      /opt/shared_libs/lib: /opt/conda/lib/python2.7/site-packages/pyscf
+      /opt/shared_libs/py3/lib: /opt/conda/lib/python2.7/site-packages/pyscf
 

@@ -8,6 +8,12 @@ if [ "${TESTENV}" == "complete" ]; then
        PYTESTFLAGS="--cov .. --cov-config=./.coveragerc ${PYTESTFLAGS}"
 fi
 
+
+function send_status_update(){
+     python ../../deployment/send_test_status.py "${1}" "${2}"
+}
+
+
 function check_if_tests_should_run(){
     echo "Should I run the tests in this environment?"
 
@@ -32,13 +38,15 @@ function check_if_tests_should_run(){
      echo "SKIPPING tests in this environment."
      echo "To run these tests, add \"--testall\" to your commit message"
      echo "(or work in the dev or deploy branches)"
-     python ../../deployment/send_test_status.py 0 "Skipped (dev/deploy branches only)"
+     send_status_update 0 "Skipped (dev/deploy branches only)"
      exit 0
    fi
 }
 
 
 function run_tests(){
+    send_status_update "na" "Starting tests for ${VERSION}"
+
     py.test ${PYTESTFLAGS} | tee /opt/reports/pytest.${VERSION}.log
     exitstat=${PIPESTATUS[0]}
 
@@ -47,7 +55,7 @@ function run_tests(){
     echo 'Test status:'
     echo ${statline}
 
-    python ../../deployment/send_test_status.py "${exitstat}" "${statline}"
+    send_status_update "${exitstat}" "${statline}"
 
     if [ "${TESTENV}" == "complete" ]; then
        if [[ ${exitstat} == 0 && "$CI_BRANCH" != "" ]]; then

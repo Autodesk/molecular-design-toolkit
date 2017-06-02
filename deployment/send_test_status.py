@@ -8,6 +8,7 @@ import sys
 
 import github
 
+status = {'0':'success', 'na':'pending'}.get(sys.argv[1], 'failure')
 
 missing_env = []
 for key in 'CI_COMMIT_ID TESTENV GITHUB_REPO_TOKEN CI_PROJECT_ID CI_BUILD_ID PYVERSION'.split():
@@ -24,7 +25,7 @@ buildid = os.environ.get('CI_BUILD_ID', '_no_buildid')
 pyversion = os.environ.get('PYVERSION', '_no_pyversion')
 
 
-data = dict(state='success' if sys.argv[1] == '0' else 'failure',
+data = dict(state=status,
             target_url='https://app.codeship.com/projects/%s/builds/%s' %
                        (projid, buildid),
             description=" ".join(sys.argv[2:]).replace("=","").strip(),
