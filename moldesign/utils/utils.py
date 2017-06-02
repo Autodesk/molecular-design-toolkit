@@ -1,8 +1,3 @@
-
-"""
-My standard utilities. Intended to be included in all projects
-Obviously everything included here needs to be in the standard library (or numpy)
-"""
 from __future__ import print_function, absolute_import, division
 from future.builtins import *
 from future import standard_library
@@ -16,16 +11,13 @@ import fractions
 import operator
 import os
 import re
-import shutil
 import string
 import sys
 import tempfile
-import threading
 from html.parser import HTMLParser
 from io import StringIO
 from uuid import uuid4
 
-import webcolors
 
 
 def make_none(): return None

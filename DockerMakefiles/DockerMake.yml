@@ -15,6 +15,8 @@ _ALL_:
   - moldesign_complete
   - moldesign_complete_py2
   - moldesign_minimal
+  - moldesign_minimal_py2
+  # - moldesign_notebook
   - nucleic_acid_builder
   - nwchem_build
   - openblas
@@ -96,6 +98,13 @@ deploybase:
       && cleanapt
 
 
+miniconda:
+  FROM: continuumio/miniconda:4.3.11
+
+miniconda_py2:
+  FROM: continuumio/miniconda2:4.3.11
+
+
 deploy_requirements:
   build_directory: buildfiles/deploybase
   build: |
@@ -103,13 +112,13 @@ deploy_requirements:
     RUN chmod +x /usr/local/bin/cleanapt
     RUN conda install -qy numpy scipy pyyaml
 
-python2_deploy_base:
-  FROM: continuumio/miniconda:4.3.11
+python_deploy_base_py2:
   requires:
+     - miniconda
      - deploy_requirements
 
 python_deploy_base:
-  FROM: continuumio/miniconda3:4.3.11
   requires:
+    - miniconda_py2
     - deploy_requirements
 

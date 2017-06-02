@@ -3,14 +3,11 @@ docker >= 2.0
 future
 fortranformat
 funcsigs
-markdown2
 numpy >= 1.12
 parmed >= 2.7.3
 pint >= 0.8
 pyccc >= 0.7.5
-pytest
 pyyaml
 requests
 scipy
 sortedcontainers
-webcolors

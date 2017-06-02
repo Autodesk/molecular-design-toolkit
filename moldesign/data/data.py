@@ -19,8 +19,6 @@ standard_library.install_aliases()
 import os
 import json
 
-import webcolors
-
 import moldesign as mdt
 from .. import units as u
 
@@ -35,8 +33,6 @@ class CyclicList(list):
 COLOR_LIST = ['lightgreen', 'lightblue', 'lightgrey',
               'yellow', 'orange', 'purple', 'IndianRed',
               'PaleTurquoise', 'OldLace', 'Thistle', 'pink']
-
-color_rotation = CyclicList(list(map(webcolors.name_to_hex, COLOR_LIST)))
 
 
 DEFAULT_FORCE_TOLERANCE = (0.0001 * u.hartree / u.bohr).defunits()  # taken from GAMESS OPTTOL keyword

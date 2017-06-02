@@ -4,7 +4,9 @@ moldesign_requirements:
   build: |
     RUN conda install -qy -c omnia parmed biopython
 
-moldesign_minimal:
+
+
+moldesign_minimal_requirements:
  description: Base installation of the MDT library. Built from the current directory.
  requires:
   - moldesign_requirements
@@ -17,42 +19,41 @@ moldesign_minimal:
   COPY . /opt/molecular-design-toolkit
   RUN pip install -e /opt/molecular-design-toolkit
 
+moldesign_minimal:
+  requires:
+    - miniconda
+    - moldesign_minimal_requirements
+
+moldesign_minimal_py2:
+  requires:
+    - miniconda_py2
+    - moldesign_minimal_requirements
+
 
 moldesign_complete_requirements:
   description: An image with moldesign and all python dependencies
   requires:
-   - chem_python
-   - moldesign_minimal
+   - chem_python_requirements
+   - moldesign_minimal_requirements
 
 moldesign_complete:
-  FROM: continuumio/miniconda3:4.3.11
-  requires: [moldesign_complete_requirements]
+  requires:
+    - miniconda
+    - moldesign_complete_requirements
 
 moldesign_complete_py2:
-  FROM: continuumio/miniconda:4.3.11
-  requires: [moldesign_complete_requirements]
+  requires:
+    - miniconda_py2
+    - moldesign_complete_requirements
+
 
 moldesign_notebook:
- description: A production-ready, fully outfitted jupyter server container
+ description: OUT OF DATE A production-ready, fully outfitted jupyter server container
  requires:
-  - notebook
   - moldesign_complete
+  - notebook
  build: |
   RUN pip install nbmolviz # == 0.7.0
   RUN python -m moldesign copyexamples
   RUN jupyter nbextension enable --python --sys-prefix widgetsnbextension \
    && jupyter nbextension enable --python --sys-prefix nbmolviz
-
-
-moldesign_standalone:
-  description: |
-       Complete image INCLUDING binary dependencies, which run in container
-       subprocesses (i.e., NOT with CCC)
-  requires:
-     - moldesign_complete
-     - nwchem
-     - ambertools
-     - opsin
-  build: |
-    RUN mkdir -p ~/.moldesign \
-     && echo "engine_type: subprocess" > ~/.moldesign/moldesign.yml

@@ -30,10 +30,20 @@ chem_python_conda:
    RUN conda install -qy -c omnia biopython openmm parmed pdbfixer
 
 
-chem_python:
+chem_python_requirements:
   requires:
     - pyscf
     - chem_python_conda
+
+chem_python:
+ requires:
+  - miniconda
+  - chem_python_requirements
+
+chem_python_py2:
+ requires:
+  - miniconda_py2
+  - chem_python_requirements
 
 
 chem_notebook:

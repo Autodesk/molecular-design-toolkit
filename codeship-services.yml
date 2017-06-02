@@ -26,6 +26,21 @@ test_moldesign_minimal:
   add_docker: true
   environment:
     TESTENV: minimal
+    PYVERSION: 3
+  volumes:
+    - ./tmp/reports:/opt/reports
+
+test_moldesign_minimal_py2:
+  encrypted_env_file: deployment/tokens.crypt
+  build:
+    context: ./deployment
+    dockerfile: moldesign-minimal-py2-cache.dockerfile
+  cached: false  # do not cache this! It gets built before the cache is triggered
+  working_dir: /opt/molecular-design-toolkit/moldesign/_tests
+  add_docker: true
+  environment:
+    TESTENV: minimal
+    PYVERSION: 2
   volumes:
     - ./tmp/reports:/opt/reports
 
@@ -39,6 +54,21 @@ test_moldesign_complete:
   add_docker: true
   environment:
     TESTENV: complete
+    PYVERSION: 3
+  volumes:
+    - ./tmp/reports:/opt/reports
+
+test_moldesign_complete_py2:
+  encrypted_env_file: deployment/tokens.crypt
+  build:
+    context: ./deployment
+    dockerfile: moldesign-complete-py2-cache.dockerfile
+  cached: false  # do not cache this! It gets built before the cache is triggered
+  working_dir: /opt/molecular-design-toolkit/moldesign/_tests
+  add_docker: true
+  environment:
+    TESTENV: complete
+    PYVERSION: 2
   volumes:
     - ./tmp/reports:/opt/reports
 
@@ -48,21 +78,9 @@ cache_nwchem_build:
     context: ./tmp/makefiles
   cached: true
 
-cache_ambertools:
-  build:
-    dockerfile: Dockerfile.ambertools
-    context: ./tmp/makefiles
-  cached: true
-
 cache_pyscf_build:
   build:
     dockerfile: Dockerfile.pyscf_build
-    context: ./tmp/makefiles
-  cached: true
-
-cache_python_deploy_base:
-  build:
-    dockerfile: Dockerfile.python_deploy_base
     context: ./tmp/makefiles
   cached: true
 
@@ -72,8 +90,14 @@ cache_deploybase:
     context: ./tmp/makefiles
   cached: true
 
-cache_chem_python_conda:
+cache_python_deploy_base:
   build:
-    dockerfile: Dockerfile.chem_python_conda
+    dockerfile: Dockerfile.python_deploy_base
+    context: ./tmp/makefiles
+  cached: true
+
+cache_python_deploy_base_py2:
+  build:
+    dockerfile: Dockerfile.python_deploy_base_py2
     context: ./tmp/makefiles
   cached: true

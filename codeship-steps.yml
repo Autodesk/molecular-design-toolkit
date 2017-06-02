@@ -6,10 +6,9 @@
        docker-make -p -n --dockerfile-dir /makefiles
          nwchem_build
          pyscf_build
-         ambertools
          deploybase
          python_deploy_base
-         chem_python_conda
+         python_deploy_base_py2
       name: write_dockerfiles
     - command: cp buildfiles/deploybase/cleanapt buildfiles/notebook/run_notebook.sh /makefiles
       name: copy_contexts
@@ -19,13 +18,12 @@
   type: parallel
   services:
     - cache_nwchem_build
-    - cache_ambertools
     - cache_pyscf_build
     - cache_deploybase
     - cache_python_deploy_base
-    - cache_chem_python_conda
+    - cache_python_deploy_base_py2
   steps:
-   - command: echo checking in
+   - command: echo cache triggered
 
 
 - name: parallel_image_build
@@ -34,8 +32,12 @@
   steps:
   - command: docker-make --tag dev nwchem
     name: nwchem
-  - command: docker-make --tag dev moldesign_minimal
-    name: mdt_minimal
+  - type: serial
+    steps:
+    - command: docker-make --tag dev moldesign_minimal
+      name: mdt_minimal
+    - command: docker-make --tag dev moldesign_minimal_py2
+      name: mdt_minimal_py2
   - type: serial
     steps:
     - command: docker-make --tag dev ambertools
@@ -50,6 +52,8 @@
       name: pyscf
     - command: docker-make --tag dev moldesign_complete
       name: mdt_complete
+    - command: docker-make --tag dev moldesign_complete_py2
+      name: mdt_complete_py2
 
 
 - name: mdt_stack_build
@@ -64,8 +68,14 @@
       service: test_moldesign_complete
       name: complete_env_test
     - command: ../../deployment/codeship_runtests.sh
+      service: test_moldesign_complete_py2
+      name: complete_env_test_py2
+    - command: ../../deployment/codeship_runtests.sh
       service: test_moldesign_minimal
       name: minimal_env_test
+    - command: ../../deployment/codeship_runtests.sh
+      service: test_moldesign_minimal_py2
+      name: minimal_env_test_py2
 
 # TODO: test the merged versions of PRs; test additional environments sometimes
 
@@ -75,7 +85,7 @@
 
 - name: publish
   service: publisher
-  # tests for semantic versions
+  # matches tags that are valid semantic versions
   tag: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$'
   type: serial
   steps:
