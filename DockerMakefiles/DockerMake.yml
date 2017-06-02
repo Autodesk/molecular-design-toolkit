@@ -99,10 +99,10 @@ deploybase:
 
 
 miniconda:
-  FROM: continuumio/miniconda:4.3.11
+  FROM: continuumio/miniconda3:4.3.11
 
 miniconda_py2:
-  FROM: continuumio/miniconda2:4.3.11
+  FROM: continuumio/miniconda:4.3.11
 
 
 deploy_requirements:

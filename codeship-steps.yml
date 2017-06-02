@@ -48,8 +48,8 @@
       name: symmol
   - type: serial
     steps:
-    - command: docker-make --tag dev pyscf
-      name: pyscf
+    - command: docker-make --tag dev pyscf_build
+      name: pyscf_build
     - command: docker-make --tag dev moldesign_complete
       name: mdt_complete
     - command: docker-make --tag dev moldesign_complete_py2
