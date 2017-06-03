@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -70,7 +75,7 @@ except ImportError:
             self.disabled = True  # so user can't overwrite
 
         def _write(self, string):
-            print string.strip()
+            print(string.strip())
 
         # temporary so that we can use this like a logging module later
         error = warning = info = handled = debug = status = _write
@@ -85,4 +90,4 @@ except ImportError:
         :param title: A name for the object (otherwise, str(obj) is used)
         :return:
         """
-        print obj
+        print(obj)

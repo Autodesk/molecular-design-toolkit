@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,23 +16,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from cStringIO import StringIO
+import future.utils
 
 import numpy as np
 import imp
 
 import moldesign.units as u
-from moldesign import compute
-from moldesign.utils import if_not_none, redirect_stderr
-from moldesign import orbitals
-from moldesign.utils import exports
+from .. import compute
+from ..utils import if_not_none, redirect_stderr
+from .. import orbitals
+from ..utils import exports
 
+if future.utils.PY2:
+    from cStringIO import StringIO
+else:
+    from io import StringIO
 
 
 try:
     imp.find_module('pyscf')
 except (ImportError, OSError) as exc:
-    print 'PySCF not installed; using remote docker container'
+    print('PySCF not installed; using remote docker container')
     force_remote = True
 else:
     force_remote = False
@@ -53,7 +62,7 @@ def mol_to_pyscf(mol, basis, symmetry=None, charge=0, positions=None):
         if line.strip() == 'Warn: Ipython shell catchs sys.args':
             continue
         else:
-            print 'PYSCF: ' + line
+            print('PYSCF: ' + line)
     return pyscfmol
 
 

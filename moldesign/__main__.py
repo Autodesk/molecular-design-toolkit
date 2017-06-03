@@ -1,4 +1,4 @@
-# Copyright 2016 Autodesk Inc.
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ The functions here are intended help users set up their environment.
 Note that MDT routines will NOT be importable from this module when it runs as a script -- you
 won't be working with molecules or atoms in this module.
 """
+from __future__ import print_function
+from builtins import range
 import argparse
 import distutils.spawn
 import errno
@@ -43,7 +45,7 @@ EXAMPLE_DIR_TARGET = os.path.join(os.path.curdir, 'moldesign-examples')
 MOLDESIGN_SRC = os.path.abspath(os.path.dirname(__file__))
 EXAMPLE_DIR_SRC = unit_def_file = os.path.join(MOLDESIGN_SRC, '_notebooks')
 MDTVERSION = subprocess.check_output(['python', '-c',
-                                      "import _version; print _version.get_versions()['version']"],
+                                      "import _version; print(_version.get_versions()['version'])"],
                                      cwd=MOLDESIGN_SRC).strip()
 VERFILEPATH = os.path.join(EXAMPLE_DIR_TARGET, '.mdtversion')
 
@@ -60,7 +62,7 @@ CONFIG_PATH = os.path.join(CONFIG_DIR, 'moldesign.yml')
 
 
 def main():
-    print 'Molecular Design Toolkit v%s Launcher' % MDTVERSION
+    print('Molecular Design Toolkit v%s Launcher' % MDTVERSION)
 
 
     global CONFIG_PATH
@@ -107,11 +109,11 @@ def main():
         copy_example_dir(use_existing=False)
 
     elif args.command == 'config':
-        print 'Reading config file from: %s' % CONFIG_PATH
-        print '----------------------------'
+        print('Reading config file from: %s' % CONFIG_PATH)
+        print('----------------------------')
         with open(CONFIG_PATH, 'r') as cfgfile:
-            for key, value in yaml.load(cfgfile).iteritems():
-                print '%s: %s' % (key, value)
+            for key, value in yaml.load(cfgfile).items():
+                print('%s: %s' % (key, value))
 
     else:
         raise ValueError("Unhandled CLI command '%s'" % args.command)
@@ -126,19 +128,19 @@ def pull():
 def _pull_img(img):
     from moldesign import compute
     imgurl = compute.get_image_path(img, _devmode=False)
-    print 'Pulling %s' % imgurl
+    print('Pulling %s' % imgurl)
     subprocess.check_call(['docker', 'pull', imgurl])
 
 
 BUILD_FILES = "nwchem_build pyscf_build".split()
 
 def devbuild():
-    print '-' * 80
-    print "Molecular design toolkit is downloading and building local, up-to-date copies of "
-    print "all docker containers it depends on. To use them, set:"
-    print "   devmode: true"
-    print "in ~/.moldesign/moldesign.yml."
-    print ('-' * 80) + '\n'
+    print('-' * 80)
+    print("Molecular design toolkit is downloading and building local, up-to-date copies of ")
+    print("all docker containers it depends on. To use them, set:")
+    print("   devmode: true")
+    print("in ~/.moldesign/moldesign.yml.")
+    print(('-' * 80) + '\n')
 
     devpull()
 
@@ -151,7 +153,7 @@ def devpull():
         try:
             _pull_img(img)
         except subprocess.CalledProcessError:
-            print '"%s " not found. Will rebuild locally ...'%img
+            print('"%s " not found. Will rebuild locally ...'%img)
 
 
 def launch(cwd=None, path=''):
@@ -161,21 +163,21 @@ def launch(cwd=None, path=''):
     try:
         server.wait()
     except KeyboardInterrupt:
-        print 'Shutting down ...'
+        print('Shutting down ...')
         server.terminate()
         server.wait()
-        print 'Jupyter terminated.'
+        print('Jupyter terminated.')
 
 
 def copy_example_dir(use_existing=False):
-    print 'Copying MDT examples to `%s` ...' % EXAMPLE_DIR_TARGET
+    print('Copying MDT examples to `%s` ...' % EXAMPLE_DIR_TARGET)
     if os.path.exists(EXAMPLE_DIR_TARGET):
         check_existing_examples(use_existing)
     else:
         shutil.copytree(EXAMPLE_DIR_SRC, EXAMPLE_DIR_TARGET)
         with open(VERFILEPATH, 'w') as verfile:
-            print >> verfile, MDTVERSION
-        print 'Done.'
+            print(MDTVERSION, file=verfile)
+        print('Done.')
 
 
 def check_existing_examples(use_existing):
@@ -194,21 +196,21 @@ def check_existing_examples(use_existing):
     if use_existing:
         return
     else:
-        print '\n'.join(
+        print('\n'.join(
                 ['FAILED: directory already exists. Please:'
                  ' 1) Rename or remove the existing directory at %s,'%EXAMPLE_DIR_TARGET,
                  ' 2) Run this command in a different location, or'
-                 ' 3) Run `python -m moldesign intro` to launch the example gallery.'])
+                 ' 3) Run `python -m moldesign intro` to launch the example gallery.']))
         sys.exit(1)
 
 
 def launch_jupyter_server(cwd=None):
-    for i in xrange(8888, 9999):
+    for i in range(8888, 9999):
         if localhost_port_available(i):
             portnum = i
             break
     else:
-        print 'WARNING: no available port found between 8888 and 9999. Will try a random port ... '
+        print('WARNING: no available port found between 8888 and 9999. Will try a random port ... ')
         portnum = random.randint(10001, 65535)
 
     server = subprocess.Popen(('jupyter notebook --no-browser --port %d' % portnum).split(),
@@ -226,7 +228,7 @@ def open_browser(url):
                 continue
             else:
                 return
-    print 'Point your browser to %s to get started.' % url  # fallback
+    print('Point your browser to %s to get started.' % url)  # fallback
 
 
 def localhost_port_available(portnum):
@@ -276,7 +278,7 @@ def wait_net_service(server, port, timeout=None):
             s.connect((server, port))
 
         except socket.timeout as err:
-            print 'x'
+            print('x')
             # this exception occurs only if timeout is set
             if timeout: return False
 
@@ -287,7 +289,7 @@ def wait_net_service(server, port, timeout=None):
             s.close()
             return True
 
-        print '.',
+        print('.', end=' ')
         sys.stdout.flush()
         time.sleep(0.1)
 

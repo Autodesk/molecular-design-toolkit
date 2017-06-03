@@ -7,7 +7,8 @@ opsin:
 
 
 ambertools:
-  FROM: continuumio/miniconda3:4.3.11
+  requires:
+    - miniconda
   build: |
     RUN apt-get update \
      && apt-get install --no-install-recommends -y libgfortran3 \

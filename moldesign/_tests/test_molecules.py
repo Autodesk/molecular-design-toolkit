@@ -24,8 +24,8 @@ def test_h2_protected_atom_arrays(h2):
 def test_h2_hierarchy(h2):
     assert len(h2.residues) == 1
     assert len(h2.chains) == 1
-    chain = h2.chains.__iter__().next()
-    res = h2.residues.__iter__().next()
+    chain = next(h2.chains.__iter__())
+    res = next(h2.residues.__iter__())
     atom1, atom2 = h2.atoms
     assert h2 == atom1.molecule == atom2.molecule == chain.molecule == res.molecule
     assert chain == atom1.chain == atom2.chain
@@ -114,7 +114,7 @@ def test_h2_traj_energies(h2_trajectory):
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_atom_hierarchy(molkey, request):
-    mol = request.getfuncargvalue(molkey)
+    mol = request.getfixturevalue(molkey)
     all_residues = set(mol.residues)
     all_chains = set(mol.chains)
 
@@ -133,7 +133,7 @@ def test_molecule_atom_hierarchy(molkey, request):
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_residue_hierarchy(molkey, request):
-    mol = request.getfuncargvalue(molkey)
+    mol = request.getfixturevalue(molkey)
     all_atoms = set(mol.atoms)
     all_residues = set(mol.residues)
     all_chains = set(mol.chains)
@@ -159,7 +159,7 @@ def test_molecule_residue_hierarchy(molkey, request):
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_chain_hierarchy(molkey, request):
-    mol = request.getfuncargvalue(molkey)
+    mol = request.getfixturevalue(molkey)
     all_residues = set(mol.residues)
     all_chains = set(mol.chains)
 
@@ -180,7 +180,7 @@ def test_molecule_chain_hierarchy(molkey, request):
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_bonds(molkey, request):
-    mol = request.getfuncargvalue(molkey)
+    mol = request.getfixturevalue(molkey)
     all_atoms = set(mol.atoms)
     for atom in all_atoms:
         if atom not in mol.bond_graph:
@@ -194,7 +194,7 @@ def test_molecule_bonds(molkey, request):
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_types(molkey, request):
-    mol = request.getfuncargvalue(molkey)
+    mol = request.getfixturevalue(molkey)
     assert issubclass(type(mol.atoms), moldesign.molecules.atomcollections.AtomList)
     for atom in mol.atoms:
         assert issubclass(type(atom), mdt.Atom)
@@ -204,7 +204,7 @@ def test_molecule_types(molkey, request):
 
 @pytest.mark.parametrize('objkey', all_objects)
 def test_pickling(objkey, request):
-    obj = request.getfuncargvalue(objkey)
+    obj = request.getfixturevalue(objkey)
     for iprotocol in (0,1,2):
         x = pickle.dumps(obj, protocol=iprotocol)
         y = pickle.loads(x)
@@ -213,7 +213,7 @@ def test_pickling(objkey, request):
 
 @pytest.mark.parametrize('objkey', registered_types['equality'])
 def test_pickled_equality(objkey, request):
-    obj = request.getfuncargvalue(objkey)
+    obj = request.getfixturevalue(objkey)
 
     for iprotocol in (0,1,2):
         x = pickle.dumps(obj, protocol=iprotocol)
@@ -225,3 +225,61 @@ def test_pickled_equality(objkey, request):
             assert (y == obj).all()
 
 
+def test_h2_positions(h2):
+    atom1, atom2 = h2.atoms
+    assert (atom1.position == np.array([0.5, 0.0, 0.0]) * u.angstrom).all()
+    assert atom2.x == -0.5 * u.angstrom
+    assert atom1.distance(atom2) == 1.0 * u.angstrom
+
+
+def test_h2(h2):
+    mol = h2
+    assert mol.num_atoms == 2
+    assert mol.atoms[0].symbol == mol.atoms[1].symbol == 'H'
+
+
+def test_3aid(pdb3aid):
+    mol = pdb3aid
+    assert len(mol.chains) == 2
+
+
+def test_3aid_ligand_search(pdb3aid):
+    mol = pdb3aid
+    unknown = mol.chains['A'](type='unknown')
+    proteina = mol.chains['A'](type='protein')
+    proteinb = mol.chains['B'](type='protein')
+    assert len(unknown) == 1
+    assert len(proteina) == len(proteinb) == 99
+
+
+def test_ligand3aid(ligand3aid):
+    mol = ligand3aid
+    assert len(mol.chains) == 1
+    assert len(mol.residues) == 1
+
+
+def test_nucleic_build(nucleic):
+    mol = nucleic
+    assert mol.num_chains == 2
+    assert mol.num_residues == 8
+    assert mol.chains[0] is mol.chains['A']
+    assert mol.chains[1] is mol.chains['B']
+    assert len(mol.chains[0].residues) == len(mol.chains[1].residues) == 4
+
+
+def test_h2_trajectory(h2_trajectory):
+    """
+    Check if the trajectory is the sine wave that we expect
+    """
+    traj = h2_trajectory
+    mol = traj.mol
+    k = mol.energy_model.params.k
+    period = 2*u.pi*np.sqrt(mol.atoms[0].mass/k)
+    for frame in traj.frames:
+        period_progress = (frame.time % period) / period
+        if period_progress < 0.1 or period_progress > 0.9:
+            # check for expected peaks of sine wave
+            assert frame.positions[0, 0] > 0.1 * u.angstrom
+        elif 0.4 < period_progress < 0.6:
+            # check for expected troughs of sine wave
+            assert frame.positions[0, 0] < -0.1 * u.angstrom

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright 2016 Autodesk Inc.
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 Due to its size, we generate a dbm database that can be accessed without loading the whole thing
 into memory.
 """
+from __future__ import print_function
+from builtins import zip
 import collections
 import itertools
 import sys
@@ -84,13 +86,13 @@ RESFIELDS = ['name', 'type', 'atoms', 'bonds']
 
 
 def read_ccd():
-    print 'Reading components.cif ...'
+    print('Reading components.cif ...')
     sys.stdout.flush()
     components = CifFileReader()
     all_residues = components.read('components.cif')
-    print 'Reading aa-variants-v1.cif ...'
+    print('Reading aa-variants-v1.cif ...')
     amino_variants = components.read('aa-variants-v1.cif')
-    return itertools.chain(all_residues.iteritems(), amino_variants.iteritems())
+    return itertools.chain(iter(all_residues.items()), iter(amino_variants.items()))
 
 
 def store_residue(resname, data, db):
@@ -100,22 +102,22 @@ def store_residue(resname, data, db):
                   atom_data(data),
                   bond_data(data)]
     except (KeyError, ValueError) as exc:
-        print '\nFAILED for residue %s: %s'%(resname, exc)
+        print('\nFAILED for residue %s: %s'%(resname, exc))
     else:
         db[resname] = record
-    print resname,
+    print(resname, end=' ')
     sys.stdout.flush()
 
 
 def main():
-    print 'This program regenerates the `%s` database using the "Chemical Component ' % DBNAME
-    print 'Dictionary" and "Protonation Variants Dictionary" from http://www.wwpdb.org/data/ccd'
+    print('This program regenerates the `%s` database using the "Chemical Component ' % DBNAME)
+    print('Dictionary" and "Protonation Variants Dictionary" from http://www.wwpdb.org/data/ccd')
 
     if len(sys.argv) > 1 and sys.argv[1] == '--download':
-        print 'Downloading newest CCD files ...\n'
+        print('Downloading newest CCD files ...\n')
         download_ccd()
     else:
-        print 'Using cached download (run with "--download" to download a new version)'
+        print('Using cached download (run with "--download" to download a new version)')
 
     residues = read_ccd()
 
@@ -126,7 +128,7 @@ def main():
     for resname, data in residues:
         store_residue(resname, data, db)
 
-    print '\nCreated db "%s" (%d records)' % (DBNAME, len(db))
+    print('\nCreated db "%s" (%d records)' % (DBNAME, len(db)))
     db.close()
 
 

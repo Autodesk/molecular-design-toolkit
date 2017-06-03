@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,20 +46,17 @@ class _DatabaseEntry(object):
 
     __contains__ = utils.Alias('hostdb.__contains__')
 
-    def iterkeys(self):
-        for key in self.hostdb.iterkeys():
+    def keys(self):
+        for key in self.hostdb.keys():
             if key == '__FIELDS__':
                 continue
             yield key
 
-    def keys(self):
-        return list(self.iterkeys())
-
-    def iteritems(self):
+    def items(self):
         for key in self:
             yield key, self[key]
 
-    __iter__ = iterkeys
+    __iter__ = keys
 
 
 # This is a very big dict, so we load it as a compressed database

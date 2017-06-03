@@ -44,7 +44,7 @@ def heh_plus():
 
 @pytest.mark.parametrize('objkey', registered_types['molecule'])
 def test_pyscf_rhf_sto3g_properties(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+    mol = request.getfixturevalue(objkey)
     mol.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
 
     mol.calculate()
@@ -59,7 +59,7 @@ def test_pyscf_rhf_sto3g_properties(objkey, request):
 
 @pytest.mark.parametrize('objkey', registered_types['molecule'])
 def test_pyscf_rhf_sto3g_matrices(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+    mol = request.getfixturevalue(objkey)
     mol.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
 
     mol.calculate()
@@ -75,7 +75,7 @@ def test_pyscf_rhf_sto3g_matrices(objkey, request):
 
 @pytest.mark.parametrize('objkey', registered_types['molecule'])
 def test_pyscf_rhf_sto3g_forces(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+    mol = request.getfixturevalue(objkey)
     mol.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
     forces = mol.calc_forces()
 

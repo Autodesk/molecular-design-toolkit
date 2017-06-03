@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,7 +63,7 @@ def build_assembly(mol, assembly_name):
         raise KeyError(('The specified assembly name ("%s") was not found. The following '
                         'assemblies are present: %s') %
                        (assembly_name,
-                        ', '.join(mol.properties.bioassemblies.keys())))
+                        ', '.join(list(mol.properties.bioassemblies.keys()))))
 
     # Make sure each chain gets a unique name - up to all the letters in the alphabet, anyway
     used_chain_names = set()
@@ -72,7 +77,7 @@ def build_assembly(mol, assembly_name):
             chain.transform(t)
 
             while chain.name in used_chain_names:
-                chain.name = alpha.next()
+                chain.name = next(alpha)
             used_chain_names.add(chain.name)
             chain.pdbname = chain.pdbindex = chain.name
             all_atoms.extend(chain.atoms)

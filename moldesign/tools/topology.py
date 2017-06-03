@@ -1,4 +1,12 @@
-# Copyright 2016 Autodesk Inc.
+"""
+This module contains various utility functions that are exposed to API users
+"""
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,9 +20,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-This module contains various utility functions that are exposed to API users
-"""
 import moldesign as mdt
 from moldesign import units as u
 
@@ -169,7 +174,7 @@ def guess_histidine_states(mol):
                 residue.resname = 'HIE'
             else:
                 residue.resname = 'HID'
-            print 'Renaming %s from HIS to %s' % (oldname, residue.resname)
+            print('Renaming %s from HIS to %s' % (oldname, residue.resname))
 
 
 @toplevel

@@ -1,4 +1,4 @@
-# Copyright 2016 Autodesk Inc.
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ from setuptools import find_packages, setup
 from setuptools.command.install import install
 
 import versioneer
-
-assert sys.version_info[:2] == (2, 7), "Sorry, this package requires Python 2.7."
 
 PACKAGE_NAME = 'moldesign'
 

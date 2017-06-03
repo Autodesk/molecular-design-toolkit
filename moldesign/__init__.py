@@ -1,4 +1,4 @@
-# Copyright 2016 Autodesk Inc.
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,13 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import
+from __future__ import print_function, absolute_import, division
 
 import os as _os
 
 _building_docs = bool(_os.environ.get('SPHINX_IS_BUILDING_DOCS', ""))
-
-import moldesign.__main__
 
 from . import data
 PACKAGEPATH = data.PACKAGEPATH
@@ -46,7 +44,6 @@ from . import molecules
 from . import tools
 from . import widgets
 
-
 # Populate the top-level namespace (imports everything from each <submodule>.__all__ variable)
 from .exceptions import *
 from .fileio import *
@@ -60,13 +57,11 @@ from .tools import *
 # Set up cloud computing
 compute.init_config()
 
-
 # package metadata
 from . import _version
 __version__ = _version.get_versions()['version']
-__copyright__ = "Copyright 2016 Autodesk Inc."
+__copyright__ = "Copyright 2017 Autodesk Inc."
 __license__ = "Apache 2.0"
-
 
 # Set warnings appropriately
 # TODO: don't clobber user's settings!!!
@@ -82,6 +77,5 @@ if _building_docs:
               min.__all__ + \
               orbitals.__all__ + \
               molecules.__all__ + \
-              tools.__all__ + \
-              viewer.__all__
+              tools.__all__
 

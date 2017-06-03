@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +16,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 
 class Alias(object):
     """
@@ -32,8 +36,21 @@ class Alias(object):
         self.methodname = methodname
 
     def __get__(self, instance, owner):
-        proxied = getattr(instance, self.objname)
-        return getattr(proxied,self.methodname)
+        if instance is None:
+            assert owner is not None
+            return _unbound_getter(self.objname, self.methodname)
+        else:
+            proxied = getattr(instance, self.objname)
+            return getattr(proxied,self.methodname)
+
+
+def _unbound_getter(objname, methodname):
+    def _method_getter(s, *args, **kwargs):
+        obj = getattr(s, objname)
+        meth = getattr(obj, methodname)
+        return meth(*args, **kwargs)
+    return _method_getter
+
 
 
 class Synonym(object):

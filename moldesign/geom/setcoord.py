@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,7 +44,7 @@ def set_distance(a1, a2, newlength, adjustmol=True):
         assert a1.molecule == a2.molecule
     vec = a1.position - a2.position
     dist = np.sqrt(vec.dot(vec))
-    direction = vec / dist
+    direction = (vec / dist)
     delta = newlength - dist
     if np.abs(delta) < 1.0e-5 * delta.get_units(): return
     if not adjustmol:
@@ -123,8 +128,8 @@ def set_dihedral(a1, a2=None, a3=None, a4=None, theta=None, adjustmol=True):
 
     axis = a2.position - a3.position
     if not adjustmol:
-        rotmat_l = external.transformations.rotation_matrix(-rotation / 2.0, axis, a3.position)
-        rotmat_r = external.transformations.rotation_matrix(rotation / 2.0, axis, a3.position)
+        rotmat_l = external.transformations.rotation_matrix((-rotation / 2.0), axis, a3.position)
+        rotmat_r = external.transformations.rotation_matrix((rotation / 2.0), axis, a3.position)
 
         a1.position = apply_4x4_transform(rotmat_l, a1.position)
         a4.position = apply_4x4_transform(rotmat_r, a4.position)

@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,18 +22,16 @@ import io
 
 import numpy as np
 
-
 import moldesign as mdt
-from moldesign import units as u
-from moldesign import compute
-from moldesign.utils import exports
-
+from .. import units as u
+from .. import compute
+from ..utils import exports
 from . import openmm as opm
 
 try:
     imp.find_module('pdbfixer')
 except (ImportError, OSError) as exc:
-    print 'PDBFixer could not be imported; using remote docker container'
+    print('PDBFixer could not be imported; using remote docker container')
     force_remote = True
 else:
     force_remote = False
@@ -61,10 +64,10 @@ def mutate(mol, mutationmap):
     for res in mutationmap:
         chain_mutations.setdefault(res.chain.pdbname, {})[res] = mutationmap[res]
 
-    for chainid, mutations in chain_mutations.iteritems():
+    for chainid, mutations in chain_mutations.items():
         mutstrings = ['%s-%d-%s' % (res.resname, res.pdbindex, newname)
-                      for res, newname in mutations.iteritems()]
-        print 'Applying mutations to chain %s: %s' % (chainid, ', '.join(mutstrings))
+                      for res, newname in mutations.items()]
+        print('Applying mutations to chain %s: %s' % (chainid, ', '.join(mutstrings)))
         fixer.applyMutations(mutations, chainid)
     return fixer_to_mol(fixer)
 
@@ -76,7 +79,7 @@ def get_missing_residues(mol):
     fixerchains = list(fixer.topology.chains)
 
     missing = list()
-    for (chainidx, insertionpoint), reslist in fixer.missingResidues.iteritems():
+    for (chainidx, insertionpoint), reslist in fixer.missingResidues.items():
         chainid = fixerchains[chainidx].id
         for ires, resname in enumerate(reslist):
             missing.append(mdt.helpers.MissingResidue(chainid, resname, insertionpoint + ires))

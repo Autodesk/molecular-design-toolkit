@@ -11,6 +11,12 @@
     :license: BSD, see sphinxlicense/LICENSE for details.
 """
 
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+from past.builtins import basestring
 import collections
 import re
 
@@ -98,7 +104,7 @@ class GoogleDocArgumentInjector(object):
         newlines = list(self.lines_before_args)
         if self.args:
             newlines.append(' '*self.arg_indent + self.arg_section_name + ':')
-            newlines.extend(self._indent(self.args.values(), self.arg_indent+4))
+            newlines.extend(self._indent(list(self.args.values()), self.arg_indent+4))
             newlines.append('')
         newlines.extend(self.lines_after_args)
 
@@ -594,7 +600,7 @@ class modify_iter(peek_iter):
         if not callable(self.modifier):
             raise TypeError('modify_iter(o, modifier): '
                             'modifier must be callable')
-        super(modify_iter, self).__init__(*args)
+        super().__init__(*args)
 
     def _fillcache(self, n):
         """Cache `n` modified items. If `n` is 0 or None, 1 item is cached.

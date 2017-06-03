@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -99,10 +104,8 @@ class UnitSystem(object):
                 q = quantity[0]
             except (TypeError, StopIteration):
                 raise TypeError('This type of object cannot have physical units')
-
-            if q == quantity:
+            if isinstance(q, str):
                 raise TypeError('This type of object cannot have physical units')
-
             try:
                 return self.get_baseunit(q)
             except (IndexError, TypeError):  # Assume dimensionless

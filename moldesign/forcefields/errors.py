@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,16 +20,15 @@
 """
 Class that define displays for common errors in assigning a forcefield
 """
-
 import cgi
 from .. import utils
 from .. import units as u
 
 
 def show_parameterization_results(errormessages, molin, molout=None):
-    print 'Forcefield assignment: %s' % ('Success' if molout is not None else 'Failure')
+    print('Forcefield assignment: %s' % ('Success' if molout is not None else 'Failure'))
     for err in errormessages:
-        print utils.html_to_text(err.desc)
+        print(utils.html_to_text(err.desc))
 
 
 class ForcefieldAssignmentError(Exception):
@@ -57,7 +61,7 @@ class StructureOk(ForceFieldMessage):
     MSG = 'No errors or warnings'
 
     def __init__(self):
-        super(StructureOk, self).__init__(self.MSG)
+        super().__init__(self.MSG)
 
 
 class MissingTerms(ForceFieldMessage):

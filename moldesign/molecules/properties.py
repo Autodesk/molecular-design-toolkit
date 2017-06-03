@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +18,8 @@
 # limitations under the License.
 import numpy as np
 
-from .. import utils
 from . import toplevel
+from .. import utils
 
 
 @toplevel
@@ -31,7 +36,7 @@ class MolecularProperties(utils.DotDict):
         """
         # ADD_FEATURE: always return stored properties in the default unit systems
         positions = properties.pop('positions', mol.positions)
-        super(MolecularProperties, self).__init__(positions=positions.copy(), **properties)
+        super().__init__(positions=positions.copy(), **properties)
 
     def copy(self, mol):
         props = self.__dict__.copy()

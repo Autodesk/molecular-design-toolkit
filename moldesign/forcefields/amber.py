@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +31,7 @@ class TLeapLib(TLeapForcefield):
     def __init__(self, *ffnames):
         self.names = ffnames
         sourcelines = ['source %s' % data.AMBER_LEAPRC[ffn] for ffn in ffnames]
-        super(TLeapLib, self).__init__(sourcelines)
+        super().__init__(sourcelines)
 
     def __str__(self):
         return "TLeap data: %s" % ','.join(self.names)
@@ -35,10 +40,10 @@ class TLeapLib(TLeapForcefield):
 @exports
 class DefaultAmber(TLeapLib):
     def __init__(self):
-        super(DefaultAmber, self).__init__(*data.AMBER_DEFAULT)
+        super().__init__(*data.AMBER_DEFAULT)
 
 
 @exports
 class GAFF2ForceField(TLeapLib):
     def __init__(self):
-        super(GAFF2ForceField, self).__init__('gaff2')
+        super().__init__('gaff2')

@@ -1,4 +1,12 @@
-# Copyright 2016 Autodesk Inc.
+"""
+This module contains various helper functions used by MDT internally.
+"""
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +20,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-This module contains various helper functions used by MDT internally.
-"""
-
 import collections
 
 import numpy as np
-import webcolors
 
 from moldesign import units as u
 
@@ -80,7 +83,7 @@ def get_all_atoms(*objects):
                 elif hasattr(item, 'atoms'):
                     atoms.update((x, None) for x in item.atoms)
 
-    return molecules.AtomList(atoms.iterkeys())
+    return molecules.AtomList(iter(atoms.keys()))
 
 
 def kinetic_energy(momenta, masses):
@@ -117,7 +120,7 @@ def atom_name_check(mol, force=False):
                     atomnums[atom.symbol] += 1
 
     if badres:
-        print 'WARNING: residues do not have uniquely named atoms: %s' % badres
+        print('WARNING: residues do not have uniquely named atoms: %s' % badres)
 
 
 def restore_topology(mol, topo):

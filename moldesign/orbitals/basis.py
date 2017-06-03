@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +19,7 @@
 
 import numpy as np
 
-from moldesign.utils import Attribute
+from ..utils import Attribute
 from . import toplevel, MolecularOrbitals
 
 
@@ -64,7 +69,7 @@ class BasisSet(MolecularOrbitals):
         self.basisname = name
         self.h1e = h1e
         self.overlaps = overlaps
-        for kw, val in kwargs.iteritems():
+        for kw, val in kwargs.items():
             setattr(self, kw, val)
 
         self.on_atom = {}

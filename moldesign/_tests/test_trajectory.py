@@ -4,7 +4,7 @@ import numpy as np
 import moldesign as mdt
 from moldesign import units as u
 
-from .object_fixtures import h2_harmonic, h2_trajectory
+from .object_fixtures import h2, h2_harmonic, h2_trajectory
 
 def test_frames_synched_with_trajectory(h2_trajectory):
     traj = h2_trajectory
@@ -68,7 +68,7 @@ def test_geometry_analysis_precanned(precanned_trajectory):
     np.testing.assert_allclose(time.value_in(u.fs),
                                desired.value_in(u.fs))
 
-    assert traj.somenumber == [1, 2, 3]
+    assert all(traj.somenumber == np.array([1, 2, 3]))
     assert traj.someletter == list('abc')
 
 

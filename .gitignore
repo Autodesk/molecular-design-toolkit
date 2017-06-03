@@ -18,4 +18,5 @@ tokens
 moldesign/_static_data/components.ci*
 moldesign/_static_data/aa-variants-v1.ci*
 tmp
+*.bak
 

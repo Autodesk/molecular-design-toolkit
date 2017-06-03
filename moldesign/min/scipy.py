@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,11 +16,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from __future__ import absolute_import
 
-from moldesign import units as u
-from moldesign.utils import exports
-
+from .. import units as u
+from ..utils import exports
 from .base import MinimizerBase
 from . import toplevel
 
@@ -37,8 +40,8 @@ class ScipyMinimizer(MinimizerBase):
     def run(self):
         import scipy.optimize
 
-        print 'Starting geometry optimization: SciPy/%s with %s gradients'%(
-            self._METHOD_NAME, self.gradtype)
+        print('Starting geometry optimization: SciPy/%s with %s gradients'%(
+            self._METHOD_NAME, self.gradtype))
         options = {'disp': True}
         if self.nsteps is not None:
             options['maxiter'] = self.nsteps

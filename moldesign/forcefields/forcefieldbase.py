@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -111,7 +116,7 @@ class TLeapForcefield(Forcefield):
         self.names = None
         self._fflines = fflines
         self._file_list = file_list if file_list is not None else {}
-        super(TLeapForcefield, self).__init__()
+        super().__init__()
 
     def assign(self, mol):
         newmol = self.create_prepped_molecule(mol)
@@ -152,7 +157,7 @@ class TLeapForcefield(Forcefield):
 
     def add_ff(self, ff):
         self._fflines.extend(ff._fflines)
-        for fname, fobj in ff._file_list.iteritems():
+        for fname, fobj in ff._file_list.items():
             if fname in self._file_list:
                 raise ValueError("Can't combine forcefields - two files with same name (%s)"
                                  %fname)

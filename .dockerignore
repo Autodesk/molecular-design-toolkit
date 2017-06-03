@@ -16,4 +16,4 @@ moldesign/_static_data/aa-variants-v1.ci*
 docs/_build
 **/tokens
 **/codeship.aes
-
+**/tmp

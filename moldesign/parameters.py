@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,8 +25,8 @@ notebook interfaces to configure various techniques.
 """
 import operator as op
 
-from moldesign import units as u
-from moldesign import utils
+from . import units as u
+from . import utils
 
 
 def isin(a, b): return a in b
@@ -105,7 +110,7 @@ class Parameter(object):
 
 # TODO - make this ordered as well as dotted
 def named_dict(l):
-    return utils.OrderedDotDict((i.name, i) for i in l)
+    return utils.DotDict((i.name, i) for i in l)
 
 model_parameters = named_dict([
     Parameter('subsystem')

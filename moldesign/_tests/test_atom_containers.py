@@ -1,3 +1,4 @@
+from builtins import range
 import itertools
 import random
 
@@ -78,16 +79,16 @@ def test_distance_is_minimum_pairwise(protein):
                          itertools.product(registered_types['container'],
                                            registered_types['container']))
 def test_pairwise_distance_arrays(f1, f2, request):
-    o1 = request.getfuncargvalue(f1)
-    o2 = request.getfuncargvalue(f2)
+    o1 = request.getfixturevalue(f1)
+    o2 = request.getfixturevalue(f2)
 
     array = o1.calc_distance_array(o2)
 
     if o1.num_atoms * o2.num_atoms > 250:  # stochastically test larger matrices
         pairs = ((random.randrange(0, o1.num_atoms), random.randrange(0, o2.num_atoms))
-                 for i in xrange(250))
+                 for i in range(250))
     else:
-        pairs = itertools.product(xrange(o1.num_atoms), xrange(o2.num_atoms))
+        pairs = itertools.product(range(o1.num_atoms), range(o2.num_atoms))
 
     for iatom, jatom in pairs:
         assert o1.atoms[iatom].distance(o2.atoms[jatom]) == array[iatom, jatom]
@@ -95,7 +96,7 @@ def test_pairwise_distance_arrays(f1, f2, request):
 
 @pytest.mark.parametrize('fixturename', registered_types['container'])
 def test_center_of_mass_movement(fixturename, request):
-    obj = request.getfuncargvalue(fixturename)
+    obj = request.getfixturevalue(fixturename)
     origpos = obj.positions.copy()
 
     obj.positions -= obj.center_of_mass
@@ -119,7 +120,7 @@ def test_center_of_mass_movement(fixturename, request):
 
 @pytest.mark.parametrize('fixturename', registered_types['container'])
 def test_container_properties(fixturename, request):
-    obj = request.getfuncargvalue(fixturename)
+    obj = request.getfixturevalue(fixturename)
     assert obj.mass == sum([atom.mass for atom in obj.atoms])
     np.testing.assert_array_equal(obj.positions.defunits(),
                                   u.array([atom.position for atom in obj.atoms]).defunits())
@@ -128,7 +129,7 @@ def test_container_properties(fixturename, request):
 
 @pytest.mark.parametrize('fixturename', registered_types['container'])
 def test_position_links(fixturename, request):
-    obj = request.getfuncargvalue(fixturename)
+    obj = request.getfixturevalue(fixturename)
 
     np.testing.assert_array_equal(obj.positions[0, :],
                                   obj.atoms[0].position)
@@ -148,7 +149,7 @@ def _get_minimum_pairwise(group1, group2):
 
 @pytest.mark.parametrize('fixturename', ['atom', 'residue', 'atomlist', 'small_molecule'])
 def test_atoms_within(fixturename, request):
-    obj = request.getfuncargvalue(fixturename)
+    obj = request.getfixturevalue(fixturename)
 
     if fixturename == 'atom':
         myatoms = {obj}
@@ -176,7 +177,7 @@ def test_atoms_within(fixturename, request):
 
 @pytest.mark.parametrize('fixturename', ['atom', 'residue', 'atomlist'])
 def test_residues_within(fixturename, request):
-    obj = request.getfuncargvalue(fixturename)
+    obj = request.getfixturevalue(fixturename)
 
     if fixturename == 'atom':
         mol = obj.molecule

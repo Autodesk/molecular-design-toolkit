@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,10 +16,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import moldesign as mdt
-from moldesign import units as u
-from moldesign.molecules import Trajectory
-from moldesign.utils import exports
+from .. import units as u
+from ..molecules import Trajectory
+from ..utils import exports
 
 from .base import IntegratorBase
 
@@ -23,7 +27,7 @@ from .base import IntegratorBase
 @exports
 class VelocityVerlet(IntegratorBase):
     def __init__(self, *args, **kwargs):
-        super(VelocityVerlet, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     # TODO: raise exception if any constraints are requested ...
 
@@ -45,7 +49,7 @@ class VelocityVerlet(IntegratorBase):
         next_trajectory_frame = self.params.frame_interval
 
         # Dynamics loop
-        for istep in xrange(nsteps):
+        for istep in range(nsteps):
             self.step()
             if istep + 1 >= next_trajectory_frame:
                 self.traj.new_frame()

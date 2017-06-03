@@ -2,8 +2,8 @@ name: moldesign_env
 channels:
  - omnia
 dependencies:
- - python=2.7
  - biopython
+ - h5py
  - markdown2
  - matplotlib
  - numpy
@@ -18,6 +18,7 @@ dependencies:
  - pip:
    - webcolors
    - funcsigs
+   - git+https://github.com/sunqm/pyscf@v1.3.1
    - docker-py
    - fortranformat
    - pyccc >= 0.7.4

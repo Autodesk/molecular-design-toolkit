@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,7 +47,7 @@ class Bond(object):
         else:
             self.molecule = a1.molecule
 
-        if a1.index > a2.index:
+        if a1.index is not None and a2.index is not None and a1.index > a2.index:
             a1, a2 = a2, a1
         self.a1 = a1
         self.a2 = a2

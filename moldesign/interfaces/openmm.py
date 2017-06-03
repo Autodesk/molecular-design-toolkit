@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +16,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import itertools
 import imp
 
@@ -18,16 +24,16 @@ import numpy as np
 
 import pyccc
 import moldesign as mdt
-from moldesign.utils import from_filepath
-from moldesign import units as u
-from moldesign import compute
-from moldesign.utils import exports
+from ..utils import from_filepath
+from .. import units as u
+from .. import compute
+from ..utils import exports
 
 
 try:
     imp.find_module('simtk')
 except (ImportError, OSError) as exc:
-    print 'OpenMM could not be imported; using remote docker container'
+    print('OpenMM could not be imported; using remote docker container')
     force_remote = True
 else:
     force_remote = False
@@ -83,12 +89,12 @@ def MdtReporter(mol, report_interval):
                                                                    getVelocities=True))
 
         def report(self, simulation, state):
-            """
-            Callback for dynamics after the specified interval
-            :type simulation: simtk.openmm.app.Simulation
-            :type state: simtk.openmm.State
-            """
+            """ Callback for dynamics after the specified interval
 
+            Args:
+               simulation (simtk.openmm.app.Simulation): simulation to report on
+               state (simtk.openmm.State): state of the simulation
+            """
             # TODO: make sure openmm masses are the same as MDT masses
             report = dict(
                 positions=simtk2pint(state.getPositions()),
@@ -104,27 +110,25 @@ def MdtReporter(mol, report_interval):
                 peheader = 'potential / {units}'.format(units=u.default.energy)
                 keheader = 'kinetic / {units}'.format(units=u.default.energy)
                 temperatureheader = 'T / {units}'.format(units=u.default.temperature)
-                print self._row_format.format(timeheader, peheader, keheader, temperatureheader)
+                print(self._row_format.format(timeheader, peheader, keheader, temperatureheader))
                 self._printed_header = True
             ke = mdt.helpers.kinetic_energy(report['momenta'], self.mol.dim_masses)
             t = (2.0 * ke) / (u.k_b * self.mol.dynamic_dof)
-            print self._row_format.format(report['time'].defunits_value(),
+            print(self._row_format.format(report['time'].defunits_value(),
                                           report['potential_energy'].defunits_value(),
                                           ke.defunits_value(),
-                                          t.defunits_value())
+                                          t.defunits_value()))
             self.last_report_time = self.mol.time
 
             self.trajectory.new_frame(properties=report)
 
         def describeNextReport(self, simulation):
             """
-            :type simulation: simtk.openmm.app.Simulation
-            :return: report_description
-                A five element tuple.  The first element is the number of steps
+            Returns:
+                tuple: A five element tuple.  The first element is the number of steps
                 until the next report.  The remaining elements specify whether
                 that report will require positions, velocities, forces, and
                 energies respectively.
-            :return type: tuple
             """
             steps = self.report_interval - simulation.currentStep % self.report_interval
             return (steps, True, True, True, True)
@@ -140,21 +144,24 @@ PINT_NAMES = {'mole': u.avogadro,
 
 @exports
 def simtk2pint(quantity, flat=False):
-    """
-    Converts a quantity from the simtk unit system to a quantity from the pint unit system
-    :param quantity:
-    :param flat: if True, flatten 3xN arrays to 3N
+    """ Converts a quantity from the simtk unit system to the internal unit system
+
+    Args:
+        quantity (simtk.unit.quantity.Quantity): quantity to convert
+        flat (bool): if True, flatten 3xN arrays to 3N
+
+    Returns:
+        mdt.units.MdtQuantity: converted to MDT unit system
     """
     from simtk import unit as stku
 
-    mag = quantity._value
+    mag = np.array(quantity._value)
 
     if quantity.unit == stku.radian:
         return mag * u.radians
     if quantity.unit == stku.degree:
         return mag * u.degrees
 
-    if hasattr(mag, '__getslice__'): mag = np.array(mag[:])
     for dim, exp in itertools.chain(quantity.unit.iter_scaled_units(),
                                     quantity.unit.iter_top_base_units()):
         if dim.name in PINT_NAMES:
@@ -162,14 +169,15 @@ def simtk2pint(quantity, flat=False):
         else:
             pintunit = u.ureg.parse_expression(dim.name)
         mag = mag * (pintunit**exp)
-        if flat: mag = np.reshape(mag, (np.product(mag.shape),))
+        if flat:
+            mag = np.reshape(mag, (np.product(mag.shape),))
     return u.default.convert(mag)
 
 
 @exports
 def pint2simtk(quantity):
     """ Converts a quantity from the pint to simtk unit system.
-    Note SimTK appears limited, esp for energy units. May need to have pint convert
+    Note SimTK has a less extensive collection that pint. May need to have pint convert
     to SI first
     """
     from simtk import unit as stku
@@ -180,7 +188,7 @@ def pint2simtk(quantity):
                    'ps': stku.picosecond}
 
     newvar = quantity._magnitude
-    for dim, exp in quantity._units.iteritems():
+    for dim, exp in quantity._units.items():
         if dim in SIMTK_NAMES:
             stkunit = SIMTK_NAMES[dim]
         else:
@@ -196,11 +204,9 @@ def _amber_to_mol(prmtop_file, inpcrd_file):
     Args:
         prmtop_file (file-like): topology file in amber prmtop format
         inpcrd_file (file-like): coordinate file in amber crd format
-        topo (mdt.Molecule): if passed, use this information to assign chains and residue
-            consistent with this structure
 
     Returns:
-
+        moldesign.Molecule: Molecule parsed from amber output
     """
     from simtk.openmm import app
 
@@ -320,7 +326,6 @@ def mol_to_topology(mol):
 
     Returns:
         simtk.openmm.app.Topology: topology of the molecule
-
     """
     from simtk.openmm import app
 

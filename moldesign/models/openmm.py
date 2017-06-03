@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,7 +40,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
     _openmm_compatible = True
 
     def __init__(self, **kwargs):
-        super(OpenMMPotential, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.sim = None
         self.mm_system = None
         self._prep_integrator = 'uninitialized'
@@ -91,7 +96,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         self._set_constraints()
         self.sim = app.Simulation(self.mol.ff.parmed_obj.topology, self.mm_system, integrator)
         self._prepped = True
-        print 'Created OpenMM kernel (Platform: %s)' % self.sim.context.getPlatform().getName()
+        print('Created OpenMM kernel (Platform: %s)' % self.sim.context.getPlatform().getName())
         self._prep_integrator = self.mol.integrator
 
     def reset_constraints(self):
@@ -107,7 +112,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
 
             return traj
         else:
-            return super(OpenMMPotential, self).minimize(**kwargs)
+            return super().minimize(**kwargs)
 
     def _sync_remote(self, mol):
         # TODO: this is a hack to update the object after a minimization
@@ -275,4 +280,4 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
 def list_openmmplatforms():
     from simtk import openmm
     return [openmm.Platform.getPlatform(ip).getName()
-            for ip in xrange(openmm.Platform.getNumPlatforms())]
+            for ip in range(openmm.Platform.getNumPlatforms())]

@@ -1,5 +1,6 @@
 """ Tests geometry routines
 """
+from builtins import range
 import random
 
 import itertools
@@ -33,7 +34,7 @@ def typedfixture(*types, **kwargs):
 
 
 def _make_mol_with_n_hydrogens(n):
-    return mdt.Molecule([mdt.Atom('H') for i in xrange(n)])
+    return mdt.Molecule([mdt.Atom('H') for i in range(n)])
 
 
 def _apply_random_offsets(mol, idim):
@@ -46,7 +47,7 @@ def three_particle_right_angle():
     mol.atoms[0].x = 1.0 * u.angstrom
     mol.atoms[2].y = 1.0 * u.angstrom
 
-    for idim in xrange(3):
+    for idim in range(3):
         _apply_random_offsets(mol, idim)
 
     return mol
@@ -60,10 +61,10 @@ def four_particle_45_twist():
                           [0.0, 0.0, 0.5],
                           [0.2, -0.2, 0.5]]
 
-    for idim in xrange(3):
+    for idim in range(3):
         _apply_random_offsets(mol, idim)
 
-    for iatom in xrange(3):
+    for iatom in range(3):
         mol.atoms[iatom].bond_to(mol.atoms[iatom+1], 1)
 
     return mol
@@ -190,11 +191,11 @@ def test_distance_array(three_particle_right_angle):
 
 @pytest.mark.parametrize('objkey', registered_types['atomcontainer'])
 def test_atomic_distance_measures_are_consistent(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+    mol = request.getfixturevalue(objkey)
 
     distance_array = mol.calc_distance_array()
 
-    for i, j in itertools.product(xrange(3), xrange(3)):
+    for i, j in itertools.product(range(3), range(3)):
         ai, aj = mol.atoms[i], mol.atoms[j]
         assert ai.distance(aj) == distance_array[i, j]
         assert mdt.distance(ai, aj) == distance_array[i, j]

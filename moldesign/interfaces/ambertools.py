@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +16,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from past.builtins import basestring
 import re
 import os
 import tempfile
@@ -53,7 +59,6 @@ class ExtraAmberParameters(object):
         self.lib = lib
         self.frcmod = frcmod
         self.job = job
-
 
 
 @utils.kwargs_from(mdt.compute.run_job)
@@ -100,17 +105,17 @@ def _antechamber_calc_charges(mol, ambname, chargename, kwargs):
         lines = iter(job.get_output('out.mol2').read().split('\n'))
         charges = utils.DotDict(type='atomic')
 
-        line = lines.next()
+        line = next(lines)
         while line.strip()[:len('@<TRIPOS>ATOM')] != '@<TRIPOS>ATOM':
-            line = lines.next()
+            line = next(lines)
 
-        line = lines.next()
+        line = next(lines)
         while line.strip()[:len('@<TRIPOS>BOND')] != '@<TRIPOS>BOND':
             fields = line.split()
             idx = int(fields[0])-1
             assert mol.atoms[idx].name == fields[1]
             charges[mol.atoms[idx]] = u.q_e*float(fields[-1])
-            line = lines.next()
+            line = next(lines)
 
         mol.properties[chargename] = charges
         return charges
@@ -272,7 +277,7 @@ def _prep_for_tleap(mol):
                         raise ValueError('Unknown bond from cysteine sulfur (%s)' % sulfur)
 
                     # if we're here, this is a cystine with a disulfide bond
-                    print 'INFO: disulfide bond detected. Renaming %s from CYS to CYX' % residue
+                    print('INFO: disulfide bond detected. Renaming %s from CYS to CYX' % residue)
                     sulfur.residue.resname = 'CYX'
 
             clean._rebuild_topology()
@@ -307,7 +312,7 @@ def create_ff_parameters(mol, charges='esp', baseff='gaff2', **kwargs):
     assert mol.num_residues == 1
     if mol.residues[0].resname is None:
         mol.residues[0].resname = 'UNL'
-        print 'Assigned residue name "UNL" to %s' % mol
+        print('Assigned residue name "UNL" to %s' % mol)
     resname = mol.residues[0].resname
 
     # check that atoms have unique names
@@ -352,10 +357,10 @@ def create_ff_parameters(mol, charges='esp', baseff='gaff2', **kwargs):
     def finish_job(j):
         leapcmds = ['source leaprc.gaff2']
         files = {}
-        for fname, f in j.glob_output("*.lib").iteritems():
+        for fname, f in j.glob_output("*.lib").items():
             leapcmds.append('loadoff %s' % fname)
             files[fname] = f
-        for fname, f in j.glob_output("*.frcmod").iteritems():
+        for fname, f in j.glob_output("*.frcmod").items():
             leapcmds.append('loadAmberParams %s' % fname)
             files[fname] = f
 
@@ -416,7 +421,7 @@ def _parse_tleap_errors(job, molin):
             # Matches two lines, EX:
             # "WARNING: There is a bond of 34.397700 angstroms between:"
             # "-------  .R<DG 92>.A<O3' 33> and .R<DG 93>.A<P 1>"
-            nextline = lineiter.next()
+            nextline = next(lineiter)
             return unusual_bond(line+nextline)
 
         elif fields[:5] == 'Created a new atom named:'.split():
@@ -437,7 +442,7 @@ def _parse_tleap_errors(job, molin):
 
     while True:
         try:
-            line = lineiter.next()
+            line = next(lineiter)
         except StopIteration:
             break
 

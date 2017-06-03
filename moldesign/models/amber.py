@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +18,8 @@
 # limitations under the License.
 
 import moldesign as mdt
-from moldesign.parameters import Parameter, WhenParam
-from moldesign.utils import exports
-
+from ..parameters import Parameter, WhenParam
+from ..utils import exports
 from . import ForceField
 
 
@@ -42,12 +46,12 @@ class GaffSmallMolecule(ForceField):
 
     def prep(self, force=False):
         self._parameterize()
-        return super(GaffSmallMolecule, self).prep()
+        return super().prep()
 
     def calculate(self, requests=None):
         if not self._prepped:
             self._parameterize()
-        return super(GaffSmallMolecule, self).calculate(requests=requests)
+        return super().calculate(requests=requests)
 
     def _parameterize(self):
         if not self.mol.ff:

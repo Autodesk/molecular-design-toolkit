@@ -2,6 +2,18 @@
 
 # this script expects to run from the moldesign/_tests directory
 
+VERSION="${TESTENV}.py${PYVERSION}"
+PYTESTFLAGS="-n 4 --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=240"
+if [ "${TESTENV}" == "complete" ]; then
+       PYTESTFLAGS="--cov .. --cov-config=./.coveragerc ${PYTESTFLAGS}"
+fi
+
+
+function send_status_update(){
+     python ../../deployment/send_test_status.py "${1}" "${2}"
+}
+
+
 function check_if_tests_should_run(){
     echo "Should I run the tests in this environment?"
 
@@ -26,26 +38,24 @@ function check_if_tests_should_run(){
      echo "SKIPPING tests in this environment."
      echo "To run these tests, add \"--testall\" to your commit message"
      echo "(or work in the dev or deploy branches)"
-     python ../../deployment/send_test_status.py 0 "Skipped (dev/deploy branches only)"
+     send_status_update 0 "Skipped (dev/deploy branches only)"
      exit 0
    fi
 }
 
 
 function run_tests(){
-    if [ "${TESTENV}" == "complete" ]; then
-           coverageflags="--cov .. --cov-config=./.coveragerc"
-    fi
+    send_status_update "na" "Starting tests for ${VERSION}"
 
-    py.test -n 4 --durations=20 --junit-xml=/opt/reports/junit.${TESTENV}.xml ${coverageflags} | tee /opt/reports/pytest.${TESTENV}.log
+    py.test ${PYTESTFLAGS} | tee /opt/reports/pytest.${VERSION}.log
     exitstat=${PIPESTATUS[0]}
 
-    statline="$(tail -n1 /opt/reports/pytest.${TESTENV}.log)"
+    statline="$(tail -n1 /opt/reports/pytest.${VERSION}.log)"
 
     echo 'Test status:'
     echo ${statline}
 
-    python ../../deployment/send_test_status.py "${exitstat}" "${statline}"
+    send_status_update "${exitstat}" "${statline}"
 
     if [ "${TESTENV}" == "complete" ]; then
        if [[ ${exitstat} == 0 && "$CI_BRANCH" != "" ]]; then

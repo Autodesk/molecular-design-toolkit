@@ -1,5 +1,6 @@
 """ Tests constraint routines
 """
+from builtins import range
 import pytest
 import numpy as np
 
@@ -30,7 +31,7 @@ def four_particle_45_twist():
                           [0.0, 0.0, 0.5],
                           [0.2, -0.2, 0.5]]
 
-    for iatom in xrange(3):
+    for iatom in range(3):
         mol.atoms[iatom].bond_to(mol.atoms[iatom+1], 1)
 
     return mol
@@ -122,7 +123,7 @@ def test_distance_constraint(distance_constraint_satisfied):
 
 @pytest.mark.parametrize('objkey', registered_types['constraint'])
 def test_constraint_gradient(objkey, request):
-    mol, c = request.getfuncargvalue(objkey)
+    mol, c = request.getfixturevalue(objkey)
 
     calc_grad = c.gradient()
     num_grad = helpers.num_grad(mol, c.error)

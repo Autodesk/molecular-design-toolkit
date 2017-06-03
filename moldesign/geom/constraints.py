@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -117,7 +122,7 @@ class DistanceConstraint(GeometryConstraint):
                  tolerance=DIST_TOLERANCE, force_constant=DIST_FORCE_CONSTANT):
         self.a1 = atom1
         self.a2 = atom2
-        super(DistanceConstraint, self).__init__([atom1, atom2], value=value,
+        super().__init__([atom1, atom2], value=value,
                                                  tolerance=tolerance, force_constant=force_constant)
 
     def current(self):
@@ -135,7 +140,7 @@ class AngleConstraint(GeometryConstraint):
         self.a1 = atom1
         self.a2 = atom2
         self.a3 = atom3
-        super(AngleConstraint, self).__init__([atom1, atom2, atom3], value=value,
+        super().__init__([atom1, atom2, atom3], value=value,
                                               tolerance=tolerance, force_constant=force_constant)
 
     def current(self):
@@ -158,7 +163,7 @@ class DihedralConstraint(GeometryConstraint):
         self.a2 = atom2
         self.a3 = atom3
         self.a4 = atom4
-        super(DihedralConstraint, self).__init__([atom1, atom2, atom3, atom4], value=value,
+        super().__init__([atom1, atom2, atom3, atom4], value=value,
                                                  tolerance=tolerance, force_constant=force_constant)
 
     def current(self):
@@ -190,7 +195,7 @@ class FixedPosition(GeometryConstraint):
             self.value = mdt.utils.if_not_none(value, atom.position.copy())
         else:
             self.value = value.copy()
-        super(FixedPosition, self).__init__([atom], value=self.value,
+        super().__init__([atom], value=self.value,
                                             tolerance=tolerance, force_constant=force_constant)
 
     def current(self):
@@ -240,7 +245,7 @@ class FixedCoordinate(GeometryConstraint):
             self.value = mdt.utils.if_not_none(value, self.current())
         else:
             self.value = value.copy()
-        super(FixedCoordinate, self).__init__([atom], value=self.value,
+        super().__init__([atom], value=self.value,
                                               tolerance=tolerance, force_constant=force_constant)
 
     def current(self):
@@ -251,4 +256,4 @@ class FixedCoordinate(GeometryConstraint):
         return [self.vector] * u.ureg.dimensionless  # that was easy
 
     def _constraintsig(self):
-        return super(FixedCoordinate, self)._constraintsig() + (self.vector,)
+        return super()._constraintsig() + (self.vector,)

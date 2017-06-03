@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,10 +18,8 @@
 # limitations under the License.
 import numpy as np
 
-from moldesign.utils import DotDict
-
 from . import MolecularOrbitals
-
+from ..utils import DotDict
 
 class ElectronicWfn(object):
     """ Stores the results of a quantum chemistry calculation.
@@ -57,7 +60,7 @@ class ElectronicWfn(object):
         self.orbitals = DotDict()
         self.fock_ao = fock_ao
         self.num_electrons = num_electrons
-        self.homo = self.num_electrons/2 - 1
+        self.homo = self.num_electrons//2 - 1
         self.lumo = self.homo + 1
         self._has_canonical = False
         self.density_matrix_ao = density_matrix_ao

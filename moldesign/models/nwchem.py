@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -99,7 +104,7 @@ class NWChemQM(QMBase):
     @staticmethod
     def _get_properties(jsonprops):
         props = {}
-        for name, property in jsonprops.iteritems():
+        for name, property in jsonprops.items():
             if isinstance(property, dict) and len(property) == 2 and \
                             'units' in property and 'value' in property:
                 props[name] = property['value'] * u.ureg(property['units'])

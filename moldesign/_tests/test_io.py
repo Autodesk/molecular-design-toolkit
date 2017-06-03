@@ -1,5 +1,6 @@
 """ Tests for molecule creation and file i/o
 """
+from builtins import str
 import collections
 
 import numpy
@@ -49,7 +50,7 @@ ATOMDATA = {  # (symbol, valence, mass)
 
 @pytest.mark.parametrize('key', 'iupac smiles inchi xyz sdf'.split())
 def test_auto_unique_atom_names(key, request):
-    mol = request.getfuncargvalue('bipyridine_'+key)
+    mol = request.getfixturevalue('bipyridine_'+key)
 
     atomnames = set(atom.name for atom in mol.atoms)
     assert len(atomnames) == mol.num_atoms
@@ -63,7 +64,7 @@ def test_atom_names_preserved_from_input_file_mol2(bipyridine_mol2):
 
 @pytest.mark.parametrize('key', 'mol2 xyz sdf iupac smiles inchi'.split())
 def test_read_bipyridine_from_format(key, request):
-    mol = request.getfuncargvalue('bipyridine_'+key)
+    mol = request.getfixturevalue('bipyridine_'+key)
 
     atomcounts = collections.Counter(atom.symbol for atom in mol.atoms)
     assert len(atomcounts) == 3
@@ -116,12 +117,12 @@ def mmcif_1kbu():
 def test_read_dna_from_format(key, request):
     if key == 'mmcif':
         pytest.xfail(reason='Known mmcif parser bug, fix this by 0.7.4')
-    mol = request.getfuncargvalue('dna_'+key)
+    mol = request.getfixturevalue('dna_'+key)
 
 
 @pytest.mark.parametrize('key', 'mmcif pdb'.split())
 def test_1kbu_assembly_data(key, request):
-    mol = request.getfuncargvalue('%s_1kbu' % key)
+    mol = request.getfixturevalue('%s_1kbu' % key)
 
     assert len(mol.properties.bioassemblies) == 1
     assert '1' in mol.properties.bioassemblies
@@ -142,7 +143,7 @@ def test_1kbu_assembly_data(key, request):
 
 @pytest.mark.parametrize('key', 'mmcif pdb'.split())
 def test_1kbu_assembly_build(key, request):
-    asym = request.getfuncargvalue('%s_1kbu' % key)
+    asym = request.getfixturevalue('%s_1kbu' % key)
 
     original = mdt.Molecule(asym)
 
@@ -155,7 +156,7 @@ def test_1kbu_assembly_build(key, request):
     assert mol.num_chains == 2 * asym.num_chains
 
     # test that original is unaffected
-    assert original == asym
+    assert original.is_identical(asym)
 
     testchain = assembly.chains[0]
     new_chain_pos = mol.chains[testchain].positions.T.ldot(rot).T + move[None, :]

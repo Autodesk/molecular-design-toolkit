@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +32,7 @@ with open(os.path.join(PACKAGEPATH, '_static_data', 'amber_ffs.yml'), 'r') as _a
 
 AMBER_LEAPRC = {}
 AMBER_SYSTEM = {}
-for system, ffs in ambff.items():
-    for ff, leaprc in ffs.items():
+for system, ffs in list(ambff.items()):
+    for ff, leaprc in list(ffs.items()):
         AMBER_LEAPRC[ff] = leaprc
         AMBER_SYSTEM[ff] = system
