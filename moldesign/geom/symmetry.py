@@ -41,6 +41,12 @@ class SymmetryElement(object):
         for kw, val in kwargs.items():
             setattr(self, kw, val)
 
+    def __str__(self):
+        return 'SymmetryElement %s' % self.symbol
+
+    def __repr__(self):
+        return '<%s>' % self
+
     def get_axis(self):
         """
         Returns normal of the plane for Cs or axis of rotation for a Cn
@@ -77,7 +83,7 @@ class MolecularSymmetry(object):
         self.mol = mol
         self.symbol = symbol
         self.rms = rms
-        self.orientation = mdt.utils.if_not_none(orientation, mol.atoms.position)
+        self.orientation = mdt.utils.if_not_none(orientation, mol.positions)
         self.elems = mdt.utils.if_not_none(elems, [])
         for kw, val in kwargs.items():
             setattr(self, kw, val)

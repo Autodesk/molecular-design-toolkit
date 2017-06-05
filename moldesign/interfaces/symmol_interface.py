@@ -20,6 +20,7 @@ import re
 
 import fortranformat
 import numpy as np
+import pyccc
 
 import moldesign as mdt
 from .. import units as u
@@ -27,11 +28,10 @@ from .. import utils
 
 line_writer = fortranformat.FortranRecordWriter('(a6,i2,6f9.5)')
 
+IMAGE = 'symmol'
+
 #@doi('10.1107/S0021889898002180')
-def run_symmol(mol,
-               tolerance=0.1 * u.angstrom,
-               image='symmol',
-               engine=None):
+def run_symmol(mol, tolerance=0.1 * u.angstrom):
     infile = ['1.0 1.0 1.0 90.0 90.0 90.0',  # line 1: indicates XYZ coordinates
               # line 2: numbers indicate: mass weighted moment of inertia,
               #         tolerance interpretation, tolerance value,
@@ -47,15 +47,11 @@ def run_symmol(mol,
     command = 'symmol < sym.in'
     inputs = {'sym.in': '\n'.join(infile)}
 
-    # TODO: this boilerplate has to go
-    engine = utils.if_not_none(engine, mdt.compute.get_engine())
-    imagename = mdt.compute.get_image_path(image)
-    job = engine.launch(imagename,
-                          command,
-                          inputs=inputs,
-                          name="symmol, %s" % mol.name)
-    mdt.display.display_log(job.get_display_object(), "symmol, %s"%mol.name)
-    job.wait()
+    job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
+                    command=command,
+                    inputs=inputs,
+                    name="symmol, %s" % mol.name)
+    job = mdt.compute.run_job(job)
 
     data = parse_output(job.get_output('symmol.out'))
     symm = mdt.geom.MolecularSymmetry(
@@ -176,9 +172,10 @@ def _string_to_matrix(string):
         mat.append(row)
     return np.array(mat)
 
+
 def get_aligned_coords(mol, data):
     com = mol.com
-    centerpos = mol.atoms.position - com
+    centerpos = mol.positions - com
     orthcoords = (centerpos.T.ldot(data.orthmat)).T
     return orthcoords
 
