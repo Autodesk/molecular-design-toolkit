@@ -20,9 +20,11 @@ import functools
 import inspect
 import os
 from functools import wraps
-
 import collections
+import warnings
+
 import funcsigs
+
 
 from .utils import if_not_none
 from .docparsers import GoogleDocArgumentInjector
@@ -105,36 +107,42 @@ def args_from(original_function,
 
     def decorator(f):
         """Modify f's call signature (using the `__signature__` attribute)"""
-        if wraps:
-            fname = original_function.__name__
-            f = functools.wraps(original_function)(f)
-            f.__name__ = fname  # revert name change
-        else:
-            fname = f.__name__
-        f.__signature__ = sig
-
-        if update_docstring_args or inject_kwargs:
-            if not update_docstring_args:
-                argument_docstrings = GoogleDocArgumentInjector(f.__doc__).args
-            docs = GoogleDocArgumentInjector(f.__doc__)
-            docs.args = argument_docstrings
-
-            if not hasattr(f, '__orig_docs'):
-                f.__orig_docs = []
-            f.__orig_docs.append(f.__doc__)
-
-            f.__doc__ = docs.new_docstring()
-
-        # Only for building sphinx documentation:
-        if os.environ.get('SPHINX_IS_BUILDING_DOCS', ""):
-            sigstring = '%s%s\n' % (fname, sig)
-            if hasattr(f, '__doc__') and f.__doc__ is not None:
-                f.__doc__ = sigstring + f.__doc__
+        try:
+            if wraps:
+                fname = original_function.__name__
+                f = functools.wraps(original_function)(f)
+                f.__name__ = fname  # revert name change
             else:
-                f.__doc__ = sigstring
+                fname = f.__name__
+            f.__signature__ = sig
+
+            if update_docstring_args or inject_kwargs:
+                if not update_docstring_args:
+                    argument_docstrings = GoogleDocArgumentInjector(f.__doc__).args
+                docs = GoogleDocArgumentInjector(f.__doc__)
+                docs.args = argument_docstrings
+
+                if not hasattr(f, '__orig_docs'):
+                    f.__orig_docs = []
+                f.__orig_docs.append(f.__doc__)
+
+                f.__doc__ = docs.new_docstring()
+
+            # Only for building sphinx documentation:
+            if os.environ.get('SPHINX_IS_BUILDING_DOCS', ""):
+                sigstring = '%s%s\n' % (fname, sig)
+                if hasattr(f, '__doc__') and f.__doc__ is not None:
+                    f.__doc__ = sigstring + f.__doc__
+                else:
+                    f.__doc__ = sigstring
+
+        except Exception as exc:
+            warnings.warn('Failed to create call signature object for %s: %s' % (f, exc))
+
         return f
 
     return decorator
+
 
 
 def kwargs_from(reference_function, mod_docs=True):

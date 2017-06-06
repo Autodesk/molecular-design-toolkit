@@ -15,8 +15,6 @@ notebook:
 
 
 psi4:
-  requires:
-    - python_deploy_base
   build: conda install -c psi4 psi4
 
 pyquante2:
