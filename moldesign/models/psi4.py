@@ -18,6 +18,7 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .. import units as u
 from ..compute import runsremotely
 from ..interfaces import psi4_interface
 from .base import QMBase
@@ -36,7 +37,8 @@ class Psi4Potential(QMBase):
         import psi4
         geom = psi4_interface.mdt_to_psi4(self.mol)
         psi4.set_options({'basis': BASES.get(self.params.basis, self.params.basis)})
-        return {'potential_energy': self._get_runmethod(requests)(self._gettheorystring())}
+        return {'potential_energy':
+                    self._get_runmethod(requests)(self._gettheorystring()) * u.hartree}
 
     @staticmethod
     def _get_runmethod(requests):

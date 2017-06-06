@@ -43,6 +43,21 @@ class MolecularProperties(utils.DotDict):
         props['mol'] = mol
         return self.__class__(**props)
 
+    def __getattr__(self, item):
+        val = super().__getattr__(item)
+        return self._tryconvert(val)
+
+    def __getitem__(self, item):
+        val = super().__getitem__(item)
+        return self._tryconvert(val)
+
+    def _tryconvert(self, val):
+        try:
+            return val.defunits()
+        except (TypeError, ValueError):
+            return val
+
+
     def geometry_matches(self, mol):
         """Returns:
             bool: True if the molecule's ``position`` is the same as these properties' ``position``

@@ -24,8 +24,10 @@ try:
     imp.find_module('nbmolviz')
 except ImportError:
     nbmolviz_installed = False
+    disp_log = print
 else:
     nbmolviz_installed = True
+    from IPython.display import display as disp_log
 
 
 def _get_nbmethod(name):
@@ -90,4 +92,4 @@ except ImportError:
         :param title: A name for the object (otherwise, str(obj) is used)
         :return:
         """
-        print(obj)
+        disp_log(obj)
