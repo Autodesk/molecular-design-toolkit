@@ -175,11 +175,10 @@ def write(obj, filename=None, format=None, mode='w'):
 
 
 def write_xyz(mol, fileobj):
-    print >> fileobj, "   %d" % mol.num_atoms
-    print >> fileobj, mol.name
+    fileobj.write("   %d\n%s\n" % (mol.num_atoms, mol.name))
     for atom in mol.atoms:
         x, y, z = atom.position.value_in(mdt.units.angstrom)
-        print >> fileobj, "%s   %24.14f   %24.14f   %24.14f" % (atom.element, x, y, z)
+        fileobj.write("%s   %24.14f   %24.14f   %24.14f\n" % (atom.element, x, y, z))
 
 
 @utils.exports
