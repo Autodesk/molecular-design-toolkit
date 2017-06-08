@@ -51,12 +51,12 @@ class MolecularProperties(utils.DotDict):
         val = super().__getitem__(item)
         return self._tryconvert(val)
 
-    def _tryconvert(self, val):
-        try:
+    @staticmethod
+    def _tryconvert(val):
+        if hasattr(val, 'defunits'):
             return val.defunits()
-        except (TypeError, ValueError):
+        else:
             return val
-
 
     def geometry_matches(self, mol):
         """Returns:
