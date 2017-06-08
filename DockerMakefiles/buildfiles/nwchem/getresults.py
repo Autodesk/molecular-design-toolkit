@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 """
 This script extracts data from the NWChem DB and outputs it in a standardized
 JSON format. It uses Marat Valiev's simple API from https://github.com/nwchem-python/nwapi
@@ -162,7 +162,7 @@ def get_aobasis_cartesian():
             for fn in shell[1]:
                 primitives.append({'alpha': fn[0],
                                    'coeff': fn[1]})
-            l = SHELLS[shellname].lower()
+            l = SHELLS[shellname.lower()]
             for m in xrange(-l, l+1):
                 basis_fns.append({'n': energylevels[shellname],
                                   'l': l,
@@ -241,7 +241,8 @@ def _get_method_description():
         'basis': get_basisname(),
         'scf': get_scftype(),
         'theory': get_theory(),
-        'aobasis': get_aobasis_cartesian()}
+        #'aobasis': get_aobasis_cartesian()
+    }
 
     if result['theory'] == 'dft':
         result['functional'] = get_functional()

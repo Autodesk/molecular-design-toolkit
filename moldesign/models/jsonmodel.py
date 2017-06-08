@@ -79,7 +79,7 @@ class JsonModelBase(EnergyModelBase):
         assert len(results['states']) == 1
         jsonprops = results['states'][0]['calculated']
         if 'orbitals' in jsonprops:
-            wfn = self._make_wfn(jsonprops)
+            wfn = self._make_wfn(results['states'][0])
         else:
             wfn = None
 
@@ -89,22 +89,25 @@ class JsonModelBase(EnergyModelBase):
             result['wfn'] = wfn
         return result
 
-
     def _make_wfn(self, state):
         from moldesign import orbitals
 
-        bfs = [orbitals.AtomicBasisFunction(**bdata) for bdata in
-               state['calculated']['method']['aobasis']]
-        basis_set = orbitals.BasisSet(self.mol,
-                                      orbitals=bfs,
-                                      name=self.params.basis)
+        try:
+            basis_fns = state['calculated']['method']['aobasis']
+        except KeyError:
+            basis_set = None
+        else:
+            bfs = [orbitals.AtomicBasisFunction(**bdata) for bdata in basis_fns]
+            basis_set = orbitals.BasisSet(self.mol,
+                                          orbitals=bfs,
+                                          name=self.params.basis)
         wfn = orbitals.ElectronicWfn(self.mol,
                                      self.mol.num_electrons,
                                      aobasis=basis_set)
 
-        for setname, orbdata in state['calculated']['orbitals'].iteritems():
+        for setname, orbdata in state['calculated']['orbitals'].items():
             orbs = []
-            for iorb in xrange(len(orbdata['coefficients'])):
+            for iorb in range(len(orbdata['coefficients'])):
                 orbs.append(orbitals.Orbital(orbdata['coefficients'][iorb]))
                 if 'occupations' in orbs:
                     orbs[-1].occupation = orbdata['occupations'][iorb]
@@ -112,11 +115,10 @@ class JsonModelBase(EnergyModelBase):
 
         return wfn
 
-
     @staticmethod
     def _json_to_quantities(jsonprops):
         props = {}
-        for name, property in jsonprops.iteritems():
+        for name, property in jsonprops.items():
             if isinstance(property, dict) and len(property) == 2 and \
                             'units' in property and 'value' in property:
                 props[name] = property['value'] * u.ureg(property['units'])

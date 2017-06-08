@@ -83,12 +83,12 @@ nwchem:
   description: Deployable NWChem image
   build_directory: buildfiles/nwchem/
   requires:
-    - python_deploy_base
+    - python_deploy_base_py2
     - nwchem_requirements
   build: |
     RUN pip install pint cclib
     ENV NWCHEMFILE="From https://svn.pnl.gov/svn/nwchem/trunk/src"
-    ENV PYTHONPATH=$PYTHONPATH:/opt
+    ENV PYTHONPATH=$PYTHONPATH:/opt/nwapi
     COPY run.py runqmmm.py getresults.py /usr/local/bin/
     RUN chmod +x /usr/local/bin/getresults.py \
      /usr/local/bin/run.py \
@@ -98,6 +98,7 @@ nwchem:
       /usr/local/lib/python2.7/dist-packages: /usr/local/lib/python2.7/
       /opt/nwchem: /opt
       /opt/lib: /opt
+      /opt/nwapi: /opt
     openblas:
       /opt/lib: /opt
 

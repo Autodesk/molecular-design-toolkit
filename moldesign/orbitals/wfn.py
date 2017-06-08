@@ -91,8 +91,11 @@ class ElectronicWfn(object):
 
     def align_orbital_phases(self, other, assert_same=True):
         """Align this wavefunction's orbitals to have the same phase as those in `other`.
-        :type other: ElectronicWfn
-        :param assert_same: raise an exception if the two wavefunctions do not have the same kinds of orbitals
+
+        Args:
+            other (ElectronicWfn): wfn to match phases with
+            assert_same (True): raise an exception if the two wavefunctions do not have matching
+                orbital sets (e.g., both having canonical orbs or NBOs, etc.)
         """
         for orbtype in self.orbitals:
             if orbtype not in other.orbitals:
@@ -105,6 +108,9 @@ class ElectronicWfn(object):
         nbo_interface.run_nbo(self.mol, **kwargs)
 
     def add_orbitals(self, orbs, orbtype='canonical', **kwargs):
+        for orb in orbs:
+            if orb.wfn is None:
+                orb.wfn = self
         mo_object = MolecularOrbitals(orbs,
                                       wfn=self,
                                       orbtype=orbtype)
