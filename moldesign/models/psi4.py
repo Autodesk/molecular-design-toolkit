@@ -37,8 +37,10 @@ class Psi4Potential(QMBase):
         import psi4
         geom = psi4_interface.mdt_to_psi4(self.mol)
         psi4.set_options({'basis': BASES.get(self.params.basis, self.params.basis)})
-        return {'potential_energy':
-                    self._get_runmethod(requests)(self._gettheorystring()) * u.hartree}
+        props = {'potential_energy':
+                     self._get_runmethod(requests)(self._gettheorystring()) * u.hartree}
+        psi4.core.clean()
+        psi4.core.clean_options()
 
     @staticmethod
     def _get_runmethod(requests):
@@ -48,6 +50,5 @@ class Psi4Potential(QMBase):
 
     def _gettheorystring(self):
         return THEORIES.get(self.params.theory, self.params.theory)
-
 
 
