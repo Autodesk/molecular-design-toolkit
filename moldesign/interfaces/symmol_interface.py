@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,20 +18,20 @@
 # limitations under the License.
 import re
 
-import fortranformat as ff
+import fortranformat
 import numpy as np
+import pyccc
 
 import moldesign as mdt
-from moldesign import units as u
-from moldesign import utils
+from .. import units as u
+from .. import utils
 
-line_writer = ff.FortranRecordWriter('(a6,i2,6f9.5)')
+line_writer = fortranformat.FortranRecordWriter('(a6,i2,6f9.5)')
+
+IMAGE = 'symmol'
 
 #@doi('10.1107/S0021889898002180')
-def run_symmol(mol,
-               tolerance=0.1 * u.angstrom,
-               image='symmol',
-               engine=None):
+def run_symmol(mol, tolerance=0.1 * u.angstrom):
     infile = ['1.0 1.0 1.0 90.0 90.0 90.0',  # line 1: indicates XYZ coordinates
               # line 2: numbers indicate: mass weighted moment of inertia,
               #         tolerance interpretation, tolerance value,
@@ -42,15 +47,11 @@ def run_symmol(mol,
     command = 'symmol < sym.in'
     inputs = {'sym.in': '\n'.join(infile)}
 
-    # TODO: this boilerplate has to go
-    engine = utils.if_not_none(engine, mdt.compute.get_engine())
-    imagename = mdt.compute.get_image_path(image)
-    job = engine.launch(imagename,
-                          command,
-                          inputs=inputs,
-                          name="symmol, %s" % mol.name)
-    mdt.display.display_log(job.get_display_object(), "symmol, %s"%mol.name)
-    job.wait()
+    job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
+                    command=command,
+                    inputs=inputs,
+                    name="symmol, %s" % mol.name)
+    job = mdt.compute.run_job(job)
 
     data = parse_output(job.get_output('symmol.out'))
     symm = mdt.geom.MolecularSymmetry(
@@ -71,9 +72,9 @@ MATRIXPARSER = re.compile('(\d+)\s+CSM =\s+([\d\.]+)\s+MAX. DIFF. \(Angstrom\)=(
 # this parses '  4 CSM =   0.06     MAX. DIFF. (Angstrom)=0.0545     TYPE C3' -> [4, 0.06, 0.545, C3]
 def parse_output(outfile):
     lines = iter(outfile)
-    data = mdt.utils.classes.DotDict()
+    data = utils.DotDict()
     while True:
-        l = lines.next()
+        l = next(lines)
         fields = l.split()
         if fields == NOSYMM:
             data.symbol = 'C1'
@@ -84,8 +85,8 @@ def parse_output(outfile):
 
         elif fields == MATRIXSTRING:  # get coordinates along principal axes
             data.orthmat = np.zeros((3, 3))
-            for i in xrange(3):
-                data.orthmat[i] = map(float, lines.next().split())
+            for i in range(3):
+                data.orthmat[i] = list(map(float, next(lines).split()))
 
         elif fields[:2] == 'Schoenflies symbol'.split():
             data.symbol = fields[3]
@@ -96,7 +97,7 @@ def parse_output(outfile):
             data.elems = []
             while True:
                 try:
-                    l = lines.next()
+                    l = next(lines)
                 except StopIteration:
                     break
                 if l.strip() == '': break
@@ -114,11 +115,11 @@ def parse_output(outfile):
 
         elif fields == TRANSFORMATIONSTRING:
             data.elems = []
-            l = lines.next()
+            l = next(lines)
 
             while True:
                 while l.strip() == '':
-                    try: l = lines.next()
+                    try: l = next(lines)
                     except StopIteration: return data
                 eleminfo = MATRIXPARSER.findall(l)
 
@@ -128,9 +129,9 @@ def parse_output(outfile):
                 info = eleminfo[0]
 
                 matrix = np.zeros((3, 3))
-                for i in xrange(3):
-                    l = lines.next()
-                    matrix[i, :] = map(float, l.split())
+                for i in range(3):
+                    l = next(lines)
+                    matrix[i, :] = list(map(float, l.split()))
 
                 e = mdt.geom.SymmetryElement(
                         matrix=matrix,
@@ -143,7 +144,7 @@ def parse_output(outfile):
 
                 e.matrix = matrix
                 data.elems.append(e)
-                l = lines.next()
+                l = next(lines)
 
     return data
 
@@ -171,9 +172,10 @@ def _string_to_matrix(string):
         mat.append(row)
     return np.array(mat)
 
+
 def get_aligned_coords(mol, data):
     com = mol.com
-    centerpos = mol.atoms.position - com
+    centerpos = mol.positions - com
     orthcoords = (centerpos.T.ldot(data.orthmat)).T
     return orthcoords
 

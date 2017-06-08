@@ -9,11 +9,13 @@
 **Try it now:** [![Binder](http://mybinder.org/badge.svg)](http://mybinder.org:/repo/avirshup/mdt-gallery-test)
 
 # Molecular Design Toolkit
-Molecular modeling without the pain - a Python 2.7 library offering integrated simulation, visualization, analysis, and cloud computing. 
+Molecular modeling without the pain - a Python library offering integrated simulation, visualization, analysis, and cloud computing. 
 
 The toolkit aims to lower the barriers between you and your science by integrating mature, open source simulation packages with a readable abstract API, Jupyter notebook visualization, and native cloud computing.
 
 ## Get started
+MDT requires [Docker](https://www.docker.com/get-docker) and Python 2.7. (Python 3.5+ is supported in the development version, and will be available in the stable 0.8 release.)
+
 On the command line, run:
 ```shell
 pip install moldesign

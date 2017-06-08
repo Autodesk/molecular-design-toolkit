@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,9 +16,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Set up physical constants and unit systems
-"""
 import operator
 import copy
 from os.path import join, abspath, dirname
@@ -88,7 +90,7 @@ class MdtQuantity(ureg.Quantity):
     #        return fmtstring.format(m=self.magnitude,
     #                                u=self.units)
     #    except:
-    #        return super(MdtQuantity, self).__format__(fmt)
+    #        return super().__format__(fmt)
 
     def __setitem__(self, key, value):
         # Overrides pint's built-in version of this ... this is apparently way faster
@@ -137,7 +139,7 @@ class MdtQuantity(ureg.Quantity):
         """
         x = self
         while True:
-            try: x = x.__iter__().next()
+            try: x = next(x.__iter__())
             except (AttributeError, TypeError): break
         try:
             y = 1.0 * x

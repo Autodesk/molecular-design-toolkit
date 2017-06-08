@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -98,7 +103,7 @@ RESTYPES = dict(
 
 def _make_residue_type_dict():
     rdt = {None: 'placeholder'}
-    for typename, namelist in RESTYPES.iteritems():
+    for typename, namelist in RESTYPES.items():
         for resname in namelist:
             rdt[resname] = typename
     return rdt
@@ -108,12 +113,12 @@ RESIDUE_TYPES = _make_residue_type_dict()
 
 def _make_residue_description_dict():
     rd = dict(AMINO_NAMES)
-    for base, name in AMINO_NAMES.iteritems():
+    for base, name in AMINO_NAMES.items():
         rd['N'+name] = name+' (N-terminal)'
         rd['C'+name] = name+' (C-terminal)'
 
     rd.update(NUCLEIC_NAMES)
-    for base, name in NUCLEIC_NAMES.iteritems():
+    for base, name in NUCLEIC_NAMES.items():
         rd['D'+base] = name+" (DNA)"
         rd['D'+base+'5'] = name+" (DNA, 5'-end)"
         rd['D'+base+'3'] = name+" (DNA, 3'-end)"

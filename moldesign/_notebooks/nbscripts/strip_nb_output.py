@@ -33,7 +33,7 @@ if __name__ == '__main__':
     nb = v4.reads(sys.stdin.read())
     nb = strip_output(nb)
     output = v4.writes(nb)
-    if type(output) == unicode:
+    if type(output) == str:
         output = output.encode('utf-8')
     sys.stdout.write(output)
 

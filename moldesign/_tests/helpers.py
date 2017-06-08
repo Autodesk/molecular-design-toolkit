@@ -1,3 +1,4 @@
+from builtins import range
 import os
 
 import numpy as np
@@ -29,7 +30,7 @@ def num_grad(mol, fn, step=DEFSTEP, atoms=None, fnargs=None, fnkwargs=None):
         atoms = mol.atoms
 
     for iatom, atom in enumerate(atoms):
-        for idim in xrange(3):
+        for idim in range(3):
             atom.position[idim] += step
             vplus = fn(*fnargs, **fnkwargs)
             atom.position[idim] -= 2.0 * step
@@ -65,7 +66,7 @@ def minimization_tester(mol):
 
 
 def _make_mol_with_n_hydrogens(n):
-    return mdt.Molecule([mdt.Atom('H') for i in xrange(n)])
+    return mdt.Molecule([mdt.Atom('H') for i in range(n)])
 
 
 class ZeroEnergy(mdt.models.base.EnergyModelBase):

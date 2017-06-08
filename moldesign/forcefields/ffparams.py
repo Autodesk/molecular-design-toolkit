@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +22,8 @@ import moldesign as mdt
 from moldesign import units as u
 
 
-class ForceField(object):
-    """ Stores a forcefield definition.
+class ForcefieldParams(object):
+    """ Stores the forcefield parameters for a specific molecule.
 
     The current implementation is heavily based on a ParmEd object,
     with fairly thin MDT wrappers providing an interface and handling unit conversions.
@@ -192,12 +197,3 @@ class FFParameters(object):
             self.dihedral_term.setdefault(tuple(term.atoms), []).append(term)
             self.dihedral_term.setdefault(tuple(reversed(term.atoms)), []).append(term)
 
-
-
-ffdefaults = dict(protein='ff14SB',
-                  dna='OL15',
-                  rna='OL3',
-                  carbohydrate='GLYCAM_06j-1',
-                  lipid='lipid14',
-                  water='tip3p',
-                  organic='gaff2')

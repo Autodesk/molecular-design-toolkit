@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,8 +21,9 @@
 We don't yet (and hopefully will never need) an internal PDB parser or writer. For now,
 routines in this module read and write data that's not necessarily parsed by other implementations.
 """
+from past.builtins import basestring
 import collections
-from cStringIO import StringIO
+from io import StringIO
 
 import numpy as np
 
@@ -75,7 +81,7 @@ def insert_ter_records(mol, pdbfile):
             res = (line[21], int(line[22:26].strip()))
             if watchres:
                 if res != watchres:
-                    print >> newf, 'TER'
+                    print('TER', file=newf)
                     watchres = None
             if res in ter_residues:
                 watchres = res
@@ -83,7 +89,7 @@ def insert_ter_records(mol, pdbfile):
         elif watchres is not None:  # line is not an atom record
             watchres = None
             if line.strip() != 'TER':
-                print >> newf, 'TER'
+                print('TER', file=newf)
 
         newf.write(line)
 
@@ -110,7 +116,7 @@ def get_conect_pairs(mol):
                     order = 1
                 else:
                     order = bond.order
-                for i in xrange(order):
+                for i in range(order):
                     conects.setdefault(bond.a1, []).append(bond.a2)
 
         # inter-residue bonds
@@ -130,14 +136,14 @@ def warn_assemblies(mol, assemblies):
     """
 
     # Don't warn if the only assembly is the asymmetric unit
-    if len(assemblies) > 1 or len(assemblies.values()[0].transforms) > 1:
-        print "WARNING: This PDB file contains the following biomolecular assemblies:"
+    if len(assemblies) > 1 or len(list(assemblies.values())[0].transforms) > 1:
+        print("WARNING: This PDB file contains the following biomolecular assemblies:")
 
-        for name, asm in assemblies.iteritems():
-            print 'WARNING: Assembly "%s": %d copies of chains %s'%(
-                name, len(asm.transforms), ', '.join(asm.chains))
-            print 'WARNING: Use ``mdt.build_assembly([molecule],[assembly_name])``' \
-                  ' to build one of the above assemblies'
+        for name, asm in assemblies.items():
+            print('WARNING: Assembly "%s": %d copies of chains %s'%(
+                name, len(asm.transforms), ', '.join(asm.chains)))
+            print('WARNING: Use ``mdt.build_assembly([molecule],[assembly_name])``' \
+                  ' to build one of the above assemblies')
 
 
 def guess_atnum_from_name(s):
@@ -262,7 +268,7 @@ def get_pdb_missing_residues(fileobj):
     lineiter = iter(fileobj)
     while True:
         try:
-            fields = lineiter.next().split()
+            fields = next(lineiter).split()
         except StopIteration:
             missing = {}  # no missing residues found in file
             break
@@ -283,7 +289,7 @@ def get_pdb_missing_residues(fileobj):
 def _parse_missing_xtal(fileobj):
     missing = []
     while True:
-        fields = fileobj.next().split()
+        fields = next(fileobj).split()
         if fields[:2] != ['REMARK', '465']:
             break
 
@@ -301,12 +307,12 @@ def _parse_missing_xtal(fileobj):
 
 
 def _parse_missing_nmr(fileobj):
-    header = fileobj.next().split()
+    header = next(fileobj).split()
     assert header == ['REMARK', '465', 'RES', 'C', 'SSSEQI']
 
     missing = []
     while True:
-        fields = fileobj.next().split()
+        fields = next(fileobj).split()
 
         if fields[:2] != ['REMARK', '465']:
             break
@@ -330,7 +336,7 @@ def get_pdb_assemblies(fileobj):
     assemblies = {}
     lineiter = iter(fileobj)
     while True:  # first, search for assembly transformations
-        line = lineiter.next()
+        line = next(lineiter)
         fields = line.split()
 
         # Conditions that indicate we're past the "REMARK 350" section
@@ -352,11 +358,11 @@ def _read_pdb_assembly(lineiter):
     """
     # First, there's description lines: "REMARK 350 AUTHOR DETERMINED BIOLOGICAL UNIT: OCTAMERIC"
     description_lines = []
-    line = lineiter.next()
+    line = next(lineiter)
     fields = line.split()
     while fields[:7] != 'REMARK 350 APPLY THE FOLLOWING TO CHAINS:'.split():
         description_lines.append(line[len('REMARK 350 '):])
-        line = lineiter.next()
+        line = next(lineiter)
         fields = line.split()
     description = (''.join(description_lines)).strip()
 
@@ -364,7 +370,7 @@ def _read_pdb_assembly(lineiter):
     assert fields[:7] == 'REMARK 350 APPLY THE FOLLOWING TO CHAINS:'.split()
     chain_names = [x.rstrip(',') for x in fields[7:]]
     while fields[-1][-1] == ',':  # deal with multi-line lists of chains
-        line = lineiter.next()
+        line = next(lineiter)
         fields = line.split()
         assert fields[2:4] == ['AND', 'CHAINS:']
         chain_names.extend(x.rstrip(',') for x in fields[4:])
@@ -375,15 +381,15 @@ def _read_pdb_assembly(lineiter):
         t = np.zeros((4, 4))
         t[3, 3] = 1.0
 
-        for idim in xrange(3):
-            line = lineiter.next()
+        for idim in range(3):
+            line = next(lineiter)
             fields = line.split()
             if idim == 0 and len(fields) == 2:
                 return BioAssembly(description, chain_names, transforms)
 
             assert int(fields[3]) == len(transforms)+1
             assert fields[2] == ('BIOMT%d' % (idim+1))
-            t[idim, :] = map(float, fields[4:8])
+            t[idim, :] = list(map(float, fields[4:8]))
 
         transforms.append(t)
 
@@ -400,14 +406,14 @@ def assign_biopolymer_bonds(mol):
         try:
             chain.assign_biopolymer_bonds()
         except KeyError:
-            print('WARNING: failed to assign backbone bonds for %s') % str(chain)
+            print(('WARNING: failed to assign backbone bonds for %s') % str(chain))
     for residue in mol.residues:
         try:
             residue.assign_template_bonds()
         except KeyError:
             if residue.type not in ('ion', 'water'):
-                print('WARNING: failed to assign bonds for %s; use '
-                      '``residue.assign_distance.bonds`` to guess the topology') % str(residue)
+                print(('WARNING: failed to assign bonds for %s; use '
+                      '``residue.assign_distance.bonds`` to guess the topology') % str(residue))
 
 
 def assign_unique_hydrogen_names(mol):

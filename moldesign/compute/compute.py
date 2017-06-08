@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +17,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import moldesign as mdt
-from moldesign import utils
+from .. import utils
+from ..helpers import display_log
 
 
 def get_image_path(image_name, _devmode=None):
@@ -112,7 +118,7 @@ def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True,
     jobname = utils.if_not_none(jobname, job.name)
 
     if display:
-        mdt.display.display_log(job.get_display_object(), jobname)
+        display_log(job.get_display_object(), jobname)
 
     if wait:
         job.wait()

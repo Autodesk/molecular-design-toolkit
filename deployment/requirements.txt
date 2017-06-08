@@ -1,4 +1,6 @@
+# Python dependencies for the build/test environment
 PyGithub
-pytest-xdist
 pytest-cov
-python-coveralls
+pytest-xdist
+pytest-timeout
+coveralls

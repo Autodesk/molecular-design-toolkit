@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +23,7 @@ from moldesign.method import Method
 class IntegratorBase(Method):
     """Base class for all integrators"""
 
-    PARAMETERS = parameters.integrator_parameters.values()
+    PARAMETERS = list(parameters.integrator_parameters.values())
 
     def run(self, run_for):
         """
@@ -43,19 +48,19 @@ class IntegratorBase(Method):
             dims = time.dimensionality
             assert len(dims) == 1 and dims['[time]'] == 1.0
         except (AttributeError, AssertionError):
-            assert type(time) == int, "argument to integrator.run must have units of time or be an int"
+            assert isinstance(time, int), "argument to integrator.run must have units of time or be an int"
             return time
         else:
             return int(round(time / timestep))
 
 
 class MDBase(IntegratorBase):
-    PARAMETERS = IntegratorBase.PARAMETERS + parameters.md_parameters.values()
+    PARAMETERS = IntegratorBase.PARAMETERS + list(parameters.md_parameters.values())
 
 
 class ConstantTemperatureBase(MDBase):
-    PARAMETERS = MDBase.PARAMETERS + parameters.constant_temp_parameters.values()
+    PARAMETERS = MDBase.PARAMETERS + list(parameters.constant_temp_parameters.values())
 
 
 class LangevinBase(ConstantTemperatureBase):
-    PARAMETERS = ConstantTemperatureBase.PARAMETERS + parameters.langevin_parameters.values()
+    PARAMETERS = ConstantTemperatureBase.PARAMETERS + list(parameters.langevin_parameters.values())

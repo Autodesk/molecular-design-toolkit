@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,9 +16,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import moldesign as mdt
-from moldesign import utils
+from past.builtins import basestring
+from sortedcontainers import SortedListWithKey
+import functools
 
+import moldesign as mdt
+from .. import utils
 from . import toplevel, AtomList, AtomContainer
 
 
@@ -25,7 +33,7 @@ class ChildList(AtomContainer):
     index = utils.Alias('_childinorder.index')
 
     def __str__(self):
-        return str(self._childinorder._items)
+        return str([item.name for item in self])
 
     def __repr__(self):
         try:
@@ -34,13 +42,14 @@ class ChildList(AtomContainer):
             return '<ChildList @ %x (exception in self.__repr__)>' % id(self)
 
     def __init__(self, parent):
-        super(ChildList, self).__init__()
+        super().__init__()
         self.parent = parent
         self._childbyname = {}
-        self._childinorder = utils.SortedCollection(key=_sortkey)
+        self._childinorder = SortedListWithKey(key=_SortKey)
 
     def __dir__(self):
-        return self.__dict__.keys() + self.__class__.__dict__.keys() + self._childbyname.keys()
+        return (list(self.__dict__.keys()) + list(self.__class__.__dict__.keys())
+                + list(self._childbyname.keys()))
 
     def __getitem__(self, item):
         if isinstance(item, basestring):
@@ -57,13 +66,16 @@ class ChildList(AtomContainer):
         if key in self._childbyname:
             raise KeyError('%s already exists in %s' % (key, self.parent))
         self._childbyname[key] = val
-        self._childinorder.insert_right(val)
+        self._childinorder.add(val)
 
     def __contains__(self, item):
         if isinstance(item, basestring) or item is None:
             return (item in self._childbyname)
         else:
-            return (item in self._childinorder)
+            try:
+                return (item in self._childinorder)
+            except TypeError:  # meaning that the comparison couldn't even be made
+                return False
 
     def __getattr__(self, item):
         if item == '_childbyname':
@@ -96,10 +108,32 @@ class ChildList(AtomContainer):
 
     def rebuild(self):
         self._childbyname = {obj.name: obj for obj in self._childinorder}
+        self._childinorder = SortedListWithKey([obj for obj in self._childbyname.values()],
+                                               key=_SortKey)
 
 
-def _sortkey(x):
-    return x.pdbindex
+@functools.total_ordering
+class _SortKey(object):
+    def __init__(self, obj):
+        self.obj = obj
+
+    def __eq__(self, other):
+        return self.obj is other.obj
+
+    def __ne__(self, other):
+        # if not present, this always returns True in python 2. (???)
+        return not self == other
+
+    def __lt__(self, other):
+        try:
+            return self.obj.index < other.obj.index
+        except TypeError:
+            pass
+
+        try:
+            return self.obj.pdbindex < other.obj.pdbindex
+        except TypeError:
+            return id(self.obj) < id(other.obj)
 
 
 @toplevel
@@ -135,7 +169,7 @@ class BioContainer(AtomContainer):
             pdbname (str): PDB-format name of this biocontainer
             pdbindex (str): Index of this biocontainer in PDB format
         """
-        super(BioContainer, self).__init__()
+        super().__init__()
         self.children = ChildList(self)
         self.molecule = molecule
         self.name = name
@@ -144,7 +178,7 @@ class BioContainer(AtomContainer):
         self.pdbname = pdbname
         self.pdbindex = pdbindex
 
-        for name, val in kwargs.iteritems():
+        for name, val in kwargs.items():
             setattr(self, name, val)
 
     def add(self, item, key=None):
@@ -164,8 +198,8 @@ class BioContainer(AtomContainer):
     __setitem__ = add
 
     def __dir__(self):
-        return (self.__dict__.keys() +
-                self.__class__.__dict__.keys() +
+        return (list(self.__dict__.keys()) +
+                list(self.__class__.__dict__.keys()) +
                 [x.name for x in self.children])
 
     def __hash__(self):
@@ -196,7 +230,7 @@ class BioContainer(AtomContainer):
         """
         retlist = []
         for child in self:
-            for key, val in kwargs.iteritems():
+            for key, val in kwargs.items():
                 if hasattr(child, key) and getattr(child, key) == val:
                     retlist.append(child)
         return retlist

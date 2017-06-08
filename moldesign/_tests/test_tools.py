@@ -38,7 +38,7 @@ def ammonium_charged():
 @pytest.mark.parametrize('objkey',
                          ['ammonium_nocharge', 'ammonium_charged'])
 def test_ammonium_formal_charge(objkey, request):
-    mol = request.getfuncargvalue(objkey)
+    mol = request.getfixturevalue(objkey)
     mdt.assign_formal_charges(mol)
     assert mol.charge == 1 * u.q_e
 
@@ -80,11 +80,11 @@ def test_add_hydrogen_to_c2(c2_no_hydrogen_from_smiles):
     assert atomcounts['H'] == 6
     assert len(atomcounts) == 2
     assert newmol.num_bonds == 7
-    for atom, bondgraph in newmol.bond_graph.iteritems():
+    for atom, bondgraph in newmol.bond_graph.items():
         if atom.atnum == 1:
             assert len(bondgraph) == 1
-            assert bondgraph.keys()[0].elem == 'C'
-            assert bondgraph.values()[0] == 1
+            assert list(bondgraph.keys())[0].elem == 'C'
+            assert list(bondgraph.values())[0] == 1
         else:
             assert atom.atnum == 6
             assert len(bondgraph) == 4

@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,19 +16,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from past.builtins import basestring
+
 import bz2
-import cPickle as pkl  # TODO: if cpickle fails, retry with regular pickle to get a better traceback
-import cStringIO as StringIO
+import pickle as pkl  # TODO: if cpickle fails, retry with regular pickle to get a better traceback
+import io
 import functools
 import gzip
 import os
 
 import moldesign as mdt
-from moldesign import utils
-from moldesign.interfaces import biopython_interface
-import moldesign.interfaces.openbabel as openbabel_interface
-from moldesign.interfaces.parmed_interface import write_pdb, write_mmcif
-from moldesign.helpers import pdb
+from . import utils
+from .interfaces import biopython_interface
+from .interfaces import openbabel as openbabel_interface
+from .interfaces.parmed_interface import write_pdb, write_mmcif
+from .helpers import pdb
 
 # imported names
 read_amber = mdt.interfaces.openmm.amber_to_mol
@@ -57,29 +64,44 @@ def read(f, format=None):
         ValueError: if ``f`` isn't recognized as a string, file path, or file-like object
     """
     filename = None
+    closehandle = False
+    streamtype = io.StringIO
+    readmode = 'r'
+    try:
+        # Open a file-like object
+        if isinstance(f, basestring) and _isfile(f):  # it's a path to a file
+            filename = os.path.expanduser(f)
+            format, compression = _get_format(filename, format)
+            if format in PICKLE_EXTENSIONS:
+                readmode = 'rb'
+            fileobj = COMPRESSION[compression](filename, mode=readmode)
+            closehandle = True
+        elif hasattr(f, 'open'):  # we can get a file-like object
+            if format in PICKLE_EXTENSIONS:
+                readmode = 'rb'
+            fileobj = f.open(readmode)
+            closehandle = True
+        elif hasattr(f, 'read'):  # it's already file-like
+            fileobj = f
+        elif isinstance(f, basestring):  # assume it's just a string
+            if format is None:
+                raise IOError(('No file named "%s"; ' % f[:50]) +
+                              'please set the `format` argument if you want to parse the string')
+            elif format in PICKLE_EXTENSIONS or isinstance(f, bytes):
+                streamtype = io.BytesIO
+            fileobj = streamtype(f)
 
-    # Open a file-like object
-    if isinstance(f, basestring) and _isfile(f):  # it's a path to a file
-        filename = os.path.expanduser(f)
-        format, compression = _get_format(filename, format)
-        fileobj = COMPRESSION[compression](filename, mode='r')
-    elif hasattr(f, 'open'):  # we can get a file-like object
-        fileobj = f.open('r')
-    elif hasattr(f, 'read'):  # it's already file-like
-        fileobj = f
-    elif isinstance(f, basestring):  # assume it's just a string
-        if format is None:
-            raise IOError(('No file named "%s"; ' % f[:50]) +
-                          'please set the `format` argument if you want to parse the string')
-        fileobj = StringIO.StringIO(f)
-    else:
-        raise ValueError('Parameter to moldesign.read (%s) not ' % str(f) +
-                         'recognized as string, file path, or file-like object')
+        else:
+            raise ValueError('Parameter to moldesign.read (%s) not ' % str(f) +
+                             'recognized as string, file path, or file-like object')
 
-    if format in READERS:
-        mol = READERS[format](fileobj)
-    else:  # default to openbabel if there's not an explicit reader for this format
-        mol = openbabel_interface.read_stream(fileobj, format)
+        if format in READERS:
+            mol = READERS[format](fileobj)
+        else:  # default to openbabel if there's not an explicit reader for this format
+            mol = openbabel_interface.read_stream(fileobj, format)
+    finally:
+        if closehandle:
+            fileobj.close()
 
     if filename is not None and mol.name not in (None, 'untitled'):
         mol.name = filename
@@ -91,7 +113,7 @@ def read(f, format=None):
 def _isfile(f):
     try:
         return os.path.isfile(f)
-    except TypeError:
+    except (TypeError, ValueError):
         return False
 
 
@@ -124,13 +146,20 @@ def write(obj, filename=None, format=None, mode='w'):
 
     format, compression = _get_format(filename, format)
 
+    if format in PICKLE_EXTENSIONS:
+        streamtype = io.BytesIO
+        mode = 'wb'
+    else:
+        streamtype = io.StringIO
+        mode = 'w'
+
     # First, create an object to write to (either file handle or file-like buffer)
     if filename:
         return_string = False
         fileobj = COMPRESSION[compression](os.path.expanduser(filename), mode=mode)
     else:
         return_string = True
-        fileobj = StringIO.StringIO()
+        fileobj = streamtype()
 
     # Now, write to the object
     if format in WRITERS:
@@ -177,7 +206,7 @@ def write_trajectory(traj, filename=None, format=None, overwrite=True):
         if filename and (not overwrite) and _isfile(filename):
             raise IOError('%s exists' % filename)
         if not filename:
-            fileobj = StringIO.StringIO()
+            fileobj = io.StringIO()
         else:
             fileobj = open(filename, 'w')
 
@@ -313,20 +342,18 @@ def from_pdb(pdbcode, usecif=False):
     request = requests.get(url)
 
     if request.status_code == 404 and not usecif:  # if not found, try the cif-format version
-        print 'WARNING: %s.pdb not found in rcsb.org database. Trying %s.cif...' % (
-            pdbcode, pdbcode),
+        print('WARNING: %s.pdb not found in rcsb.org database. Trying %s.cif...' % (
+            pdbcode, pdbcode), end=' ')
         retval = from_pdb(pdbcode, usecif=True)
-        print 'success.'
+        print('success.')
         return retval
 
     elif request.status_code != 200:
         raise ValueError('Failed to download %s.%s from rcsb.org: %s %s' % (
             pdbcode, fileext, request.status_code, request.reason))
 
-    if usecif:
-        filestring = request.text
-    else:
-        filestring = request.text.encode('ascii')
+
+    filestring = request.text
 
     mol = read(filestring, format=fileext)
     mol.name = pdbcode

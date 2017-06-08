@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,10 +19,9 @@
 import numpy as np
 
 import moldesign as mdt
-import moldesign.molecules.bonds
-from moldesign import units as u
-from moldesign import utils
-from moldesign.utils import DotDict
+from .. import units as u
+from .. import utils
+
 
 
 SIGMA_UTF = u"\u03C3"
@@ -36,13 +40,13 @@ def run_nbo(mol, requests=('nlmo', 'nbo'),
                           command,
                           inputs=inputs,
                           name="nbo, %s" % mol.name)
-    moldesign.display.display_log(job.get_display_object(), "nbo, %s"%mol.name)
+    mdt.helpers.display_log(job.get_display_object(), "nbo, %s"%mol.name)
 
     job.wait()
     parsed_data = parse_nbo(job.get_output('FILE.10'),
                             len(mol.wfn.aobasis))
 
-    for orbtype, data in parsed_data.iteritems():
+    for orbtype, data in parsed_data.items():
         if orbtype[0] == 'P':  # copy data from the orthogonal orbitals
             orthdata = parsed_data[orbtype[1:]]
             for key in 'bond_names iatom jatom stars bondnums num_bonded_atoms'.split():
@@ -55,7 +59,7 @@ def run_nbo(mol, requests=('nlmo', 'nbo'),
 
 def add_orbitals(mol, wfn, orbdata, orbtype):
     orbs = []
-    for i in xrange(len(orbdata.coeffs)):
+    for i in range(len(orbdata.coeffs)):
         bond = None
         atoms = [mol.atoms[orbdata.iatom[i] - 1]]
         if orbdata.bond_names[i] == 'RY':
@@ -76,7 +80,7 @@ def add_orbitals(mol, wfn, orbdata, orbtype):
             utf_name = bname
         else:
             atoms.append(mol.atoms[orbdata.jatom[i] - 1])
-            bond = moldesign.molecules.bonds.Bond(*atoms)
+            bond = mdt.Bond(*atoms)
             if orbdata.bondnums[i] == 1:  # THIS IS NOT CORRECT
                 nbotype = 'sigma'
                 utf_type = SIGMA_UTF
@@ -89,13 +93,13 @@ def add_orbitals(mol, wfn, orbdata, orbtype):
                                            atoms[0].name, atoms[1].name)
         name = '%s %s' % (bname, orbtype)
 
-        orbs.append(moldesign.methods.orbitals.Orbital(orbdata.coeffs[i],
-                                                       wfn=wfn, occupation=orbdata.occupations[i],
-                                                       atoms=atoms, name=name,
-                                                       nbotype=nbotype,
-                                                       bond=bond,
-                                                       unicode_name=utf_name,
-                                                       _data=orbdata))
+        orbs.append(mdt.Orbital(orbdata.coeffs[i],
+                                wfn=wfn, occupation=orbdata.occupations[i],
+                                atoms=atoms, name=name,
+                                nbotype=nbotype,
+                                bond=bond,
+                                unicode_name=utf_name,
+                                _data=orbdata))
     return wfn.add_orbitals(orbs, orbtype=orbtype)
 
 
@@ -123,7 +127,7 @@ def make_nbo_input_file(mol, requests):
     nbofile.append("$COORD\n %s" % mol.name)
     for iatom, atom in enumerate(mol.atoms):
         #TODO: deal with pseudopotential electrons
-        x, y, z = map(repr, atom.position.value_in(u.angstrom))
+        x, y, z = list(map(repr, atom.position.value_in(u.angstrom)))
         nbofile.append("%d %d %s %s %s" % (atom.atnum, atom.atnum,
                                                     x, y, z))
     nbofile.append("$END")
@@ -151,7 +155,7 @@ def parse_nbo(f, nbasis):
     parsed = {}
     while True:
         try:
-            l = lines.next()
+            l = next(lines)
         except StopIteration:
             break
 
@@ -160,10 +164,10 @@ def parse_nbo(f, nbasis):
             orbname = fields[0]
             assert orbname[-1] == 's'
             orbname = orbname[:-1]
-            lines.next()
+            next(lines)
             if orbname[0] == 'P':  # these are pre-orthogonal orbitals, it only prints the coefficients
                 coeffs = _parse_wrapped_matrix(lines, nbasis)
-                parsed[orbname] = DotDict(coeffs=np.array(coeffs))
+                parsed[orbname] = utils.DotDict(coeffs=np.array(coeffs))
             else:  # there's more complete information available
                 parsed[orbname] = read_orbital_set(lines, nbasis)
     return parsed
@@ -174,14 +178,14 @@ def read_orbital_set(lineiter, nbasis):
     mat = _parse_wrapped_matrix(lineiter, nbasis)
 
     # First, occupation numbers
-    occupations = map(float,_get_wrapped_separated_vals(lineiter, nbasis))
+    occupations = list(map(float,_get_wrapped_separated_vals(lineiter, nbasis)))
 
     # Next, a line of things that always appear to be ones (for spin orbitals maybe?)
     oneline = _get_wrapped_separated_vals(lineiter, nbasis)
     for x in oneline: assert x == '1'
 
     # next is number of atoms involved in the bond
-    num_bonded_atoms = map(int, _get_wrapped_separated_vals(lineiter, nbasis))
+    num_bonded_atoms = list(map(int, _get_wrapped_separated_vals(lineiter, nbasis)))
     bond_names = _get_wrapped_separated_vals(lineiter, nbasis)
 
     # Next indicates whether real or virtual
@@ -189,25 +193,25 @@ def read_orbital_set(lineiter, nbasis):
     for s in stars: assert (s == '' or s == '*')
 
     # number of bonds between this pair of atoms
-    bondnums = map(int, _get_wrapped_separated_vals(lineiter, nbasis))
+    bondnums = list(map(int, _get_wrapped_separated_vals(lineiter, nbasis)))
 
     # first atom index (1-based)
-    iatom = map(int, _get_wrapped_separated_vals(lineiter, nbasis))
-    jatom = map(int, _get_wrapped_separated_vals(lineiter, nbasis))
+    iatom = list(map(int, _get_wrapped_separated_vals(lineiter, nbasis)))
+    jatom = list(map(int, _get_wrapped_separated_vals(lineiter, nbasis)))
 
     # The rest appears to be 0 most of the time ...
 
-    return DotDict(coeffs=np.array(mat),
-                   iatom=iatom, jatom=jatom, bondnums=bondnums,
-                   bond_names=bond_names,
-                   num_bonded_atoms=num_bonded_atoms,
-                   stars=stars, occupations=occupations)
+    return utils.DotDict(coeffs=np.array(mat),
+                         iatom=iatom, jatom=jatom, bondnums=bondnums,
+                         bond_names=bond_names,
+                         num_bonded_atoms=num_bonded_atoms,
+                         stars=stars, occupations=occupations)
 
 
 def _parse_wrapped_matrix(lineiter, nbasis):
     mat = []
-    for i in xrange(nbasis):
-        currline = map(float, _get_wrapped_separated_vals(lineiter, nbasis))
+    for i in range(nbasis):
+        currline = list(map(float, _get_wrapped_separated_vals(lineiter, nbasis)))
         assert len(currline) == nbasis
         mat.append(currline)
     return mat
@@ -216,7 +220,7 @@ def _parse_wrapped_matrix(lineiter, nbasis):
 def _get_wrapped_separated_vals(lineiter, nbasis):
     vals = []
     while True:
-        l = lineiter.next()
+        l = next(lineiter)
         vals.extend(l.split())
         if len(vals) == nbasis:
             break
@@ -227,9 +231,9 @@ def _get_wrapped_separated_vals(lineiter, nbasis):
 def _get_wrapped_column_vals(lineiter, nbasis):
     vals = []
     while True:
-        l = lineiter.next()[1:]
+        l = next(lineiter.next)[1:]
         lenl = len(l)
-        for i in xrange(20):
+        for i in range(20):
             if lenl <= 3*i + 1: break
             vals.append(l[3*i: 3*i + 3].strip())
         if len(vals) == nbasis:

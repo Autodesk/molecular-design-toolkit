@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,26 +16,47 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from moldesign.utils import exports
 
-from .base import MMBase
-from .jsonmodel import JsonModelBase
-
-IMAGE = 'nwchem'
+import moldesign as mdt
+from ..parameters import Parameter, WhenParam
+from ..utils import exports
+from . import ForceField
 
 
 @exports
-class SanderMM(JsonModelBase, MMBase):
-    """ Interface with NWChem package (QM only)
+class GaffSmallMolecule(ForceField):
+    """ Model the energy using the GAFF forcefield
 
-    Note:
-        This is the first interface based on our new wrapping strategy. This is slightly hacked,
-        but has the potential to become very general; very few things here are NWChem-specific
+    This is implemented as a special case of the ForceField energy model; it automates small
+    parameterization process
     """
-    IMAGE = 'ambertools'
-    MODELNAME = 'sander'
-    DEFAULT_PROPERTIES = ['potential_energy']
-    ALL_PROPERTIES = DEFAULT_PROPERTIES + ['forces']
+    # TODO: mechanism to store partial charges so they don't need to be constantly recomputed
 
-    RUNNER = 'runsander.py'
-    PARSER = 'parsesander.py'
+    PARAMETERS = [Parameter('partial_charges',
+                            'Partial charge model',
+                            type=str,
+                            default='am1-bcc',
+                            choices=['am1-bcc', 'gasteiger', 'esp']),
+                  Parameter('gaff_version',
+                            'GAFF version',
+                            type=str,
+                            choices='gaff gaff2'.split(),
+                            default='gaff2')
+                  ] + ForceField.PARAMETERS
+
+    def prep(self, force=False):
+        self._parameterize()
+        return super().prep()
+
+    def calculate(self, requests=None):
+        if not self._prepped:
+            self._parameterize()
+        return super().calculate(requests=requests)
+
+    def _parameterize(self):
+        if not self.mol.ff:
+            params = mdt.create_ff_parameters(self.mol,
+                                              charges=self.params.partial_charges,
+                                              baseff=self.params.gaff_version)
+            params.assign(self.mol)
+

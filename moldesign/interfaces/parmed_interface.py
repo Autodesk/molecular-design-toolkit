@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,17 +16,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from past.builtins import basestring
 import collections
 
 import itertools
 import parmed
-from StringIO import StringIO
+import future.utils
 
 import moldesign as mdt
-from moldesign import units as u
-from moldesign import utils
-from moldesign.utils import exports
+from .. import units as u
+from .. import utils
 
+if future.utils.PY2:
+    from cStringIO import StringIO
+else:
+    from io import StringIO
 
 def read_mmcif(f, reassign_chains=True):
     """Parse an mmCIF file (using the parmEd parser) and return a molecule
@@ -76,7 +86,7 @@ def _insert_conect_records(mol, pmdmol, pdbfile, write_to=None):
         pdbfile (TextIO OR str): pdb file (file-like or string)
 
     Returns:
-        cStringIO.StringIO OR str: copy of the pdb file with added TER records - it will be
+        StringIO OR str: copy of the pdb file with added TER records - it will be
          returned as the same type passed (i.e., as a filelike buffer or as a string)
     """
     conect_bonds = mdt.helpers.get_conect_pairs(mol)
@@ -85,8 +95,8 @@ def _insert_conect_records(mol, pmdmol, pdbfile, write_to=None):
         return pmdmol.atoms[atom.index].number
 
     pairs = collections.OrderedDict()
-    for atom, nbrs in conect_bonds.iteritems():
-        pairs[get_atomseq(atom)] = map(get_atomseq, nbrs)
+    for atom, nbrs in conect_bonds.items():
+        pairs[get_atomseq(atom)] = list(map(get_atomseq, nbrs))
 
     if isinstance(pdbfile, basestring):
         pdbfile = StringIO(pdbfile)
@@ -100,11 +110,12 @@ def _insert_conect_records(mol, pmdmol, pdbfile, write_to=None):
     for line in pdbfile:
         if line.split() == ['END']:
             for a1idx in pairs:
-                for istart in xrange(0, len(pairs[a1idx]), 4):
+                for istart in range(0, len(pairs[a1idx]), 4):
                     pairindices = ''.join(("%5d" % idx) for idx in pairs[a1idx][istart:istart+4])
-                    newf.write(CONECT % a1idx + pairindices + '\n')
+                    newf.write(str(CONECT % a1idx + pairindices + '\n'))
 
-        newf.write(line)
+        newf.write(str(line))
+        # strs are added here for py2/py3 compatibility - always casts into native str type
 
 
 
@@ -112,7 +123,7 @@ def write_mmcif(mol, fileobj):
     mol_to_parmed(mol).write_cif(fileobj)
 
 
-@exports
+@utils.exports
 def parmed_to_mdt(pmdmol):
     """ Convert parmed Structure to MDT Structure
 
@@ -152,7 +163,7 @@ def parmed_to_mdt(pmdmol):
     for pbnd in pmdmol.bonds:
         atoms[pbnd.atom1].bond_to(atoms[pbnd.atom2], int(pbnd.order))
 
-    mol = mdt.Molecule(atoms.values(),
+    mol = mdt.Molecule(list(atoms.values()),
                        metadata=_get_pdb_metadata(pmdmol))
     return mol
 
@@ -180,7 +191,7 @@ def _get_pdb_metadata(pmdmol):
     return metadata
 
 
-@exports
+@utils.exports
 def mol_to_parmed(mol):
     """ Convert MDT Molecule to parmed Structure
     Args:

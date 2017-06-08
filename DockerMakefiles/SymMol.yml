@@ -20,6 +20,11 @@ symmol_build:
 symmol:
   requires:
     - deploybase
+  build: |
+    RUN apt-get update \
+     && apt-get install -y --no-install-recommends \
+           gfortran libgfortran3\
+     && cleanapt
   copy_from:
     symmol_build:
       /usr/local/bin/symmol: /usr/local/bin

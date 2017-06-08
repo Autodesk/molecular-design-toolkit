@@ -1,4 +1,14 @@
-# Copyright 2016 Autodesk Inc.
+"""
+This module contains abstract base classes for potential models, integrators, and various
+associated data types (force fields, orbitals, basis sets, etc.).
+"""
+
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,15 +21,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-This module contains abstract base classes for potential models, integrators, and various
-associated data types (force fields, orbitals, basis sets, etc.).
-"""
+from future.utils import with_metaclass
 import funcsigs
 
 import moldesign as mdt
-from .utils import DotDict
 from .helpers import WidgetMethod
+from . import utils
 
 
 class _InitKeywordMeta(type):
@@ -40,7 +47,7 @@ class _InitKeywordMeta(type):
         return self.__customsig
 
 
-class Method(object):
+class Method(with_metaclass(_InitKeywordMeta, object)):
     """Abstract Base class for energy models, integrators, and "heavy duty" simulation objects
 
     Args:
@@ -49,8 +56,6 @@ class Method(object):
     Attributes:
        mol (mdt.Molecule): the molecule this method is associated with
     """
-
-    __metaclass__ = _InitKeywordMeta
 
     PARAMETERS = []
     """ list: list of Parameters that can be used to configure this method
@@ -76,7 +81,7 @@ class Method(object):
         self._prepped = False
         self.status = None
         self.mol = None
-        self.params = DotDict(params)
+        self.params = utils.DotDict(params)
         # Set default parameter values
         for param in self.PARAMETERS:
             if param.name not in self.params:

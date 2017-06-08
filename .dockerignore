@@ -12,8 +12,8 @@ build
 moldesign/_static_data/components.ci*
 moldesign/_static_data/aa-variants-v1.ci*
 **/*.bak
-**/.coverage*
+**/.coverage
 docs/_build
 **/tokens
 **/codeship.aes
-
+**/tmp

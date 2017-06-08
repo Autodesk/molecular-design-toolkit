@@ -1,4 +1,21 @@
-# Copyright 2016 Autodesk Inc.
+""" Class definitions for atomic and molecular orbitals.
+
+Notes:
+    In this documentation, we use the following conventions for labeling orbitals:
+      - atomic orbitals using lower case greek labels and subscripts, e.g.,
+          :math:`\left| \mu \right \rangle, F_{\nu \lambda}, etc.
+      - molecular orbitals use lower case labels and subscripts, e.g.,
+          :math:`\left| i \right \rangle, F_{kl}, etc.
+      - adiabatic electronic states are indexed using capital letters, _N_, _L_, _M_, etc.
+
+"""
+
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,24 +29,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Class definitions for atomic and molecular orbitals.
-
-Notes:
-    In this documentation, we use the following conventions for labeling orbitals:
-      - atomic orbitals using lower case greek labels and subscripts, e.g.,
-          :math:`\left| \mu \right \rangle, F_{\nu \lambda}, etc.
-      - molecular orbitals use lower case labels and subscripts, e.g.,
-          :math:`\left| i \right \rangle, F_{kl}, etc.
-      - adiabatic electronic states are indexed using capital letters, _N_, _L_, _M_, etc.
-
-"""
 import numpy as np
 
 from moldesign import units as u
 from moldesign.utils import Alias
 
 SHELLS = {0: 's', 1: 'p', 2: 'd', 3: 'f', 4: 'g', 5: 'h'}
-ANGMOM = {v: k for k, v in SHELLS.iteritems()}
+ANGMOM = {v: k for k, v in SHELLS.items()}
 
 # See https://en.wikipedia.org/wiki/Table_of_spherical_harmonics#Real_spherical_harmonics
 SPHERICALNAMES = {(0, 0): 's', (1, -1): 'p(x)', (1, 0): 'p(z)', (1, 1): 'p(y)',

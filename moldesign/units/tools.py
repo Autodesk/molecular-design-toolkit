@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -65,8 +70,13 @@ def get_units(q):
     """
     x = q
     while True:
-        try: x = x.__iter__().next()
-        except (AttributeError, TypeError): break
+        try:
+            x = next(x.__iter__())
+        except (AttributeError, TypeError):
+            break
+        else:
+            if isinstance(x, str):
+                raise TypeError('Found string data while trying to determine units')
     try:
         y = 1.0 * x
         y._magnitude = 1.0
@@ -109,32 +119,9 @@ def broadcast_to(arr, *args, **kwargs):
     units = arr.units
     newarr = np.zeros(2) * units
     # TODO: replace with np.broadcast_to once numpy 1.10 is available in most package managers
-    tmp = _from_np_broadcast_to(arr, *args, **kwargs)
+    tmp = np.broadcast_to(arr, *args, **kwargs)
     newarr._magnitude = tmp
     return newarr
-
-
-# TODO: remove once numpy 1.10 is available in most package managers
-def _from_np_broadcast_to(array, shape, subok=False, readonly=True):
-    """ Temporary copy of a new NumPy function in 1.10, which isn't available in pkg managers yet
-    """
-    shape = tuple(shape) if np.iterable(shape) else (shape,)
-    array = np.array(array, copy=False, subok=subok)
-    if not shape and array.shape:
-        raise ValueError('cannot broadcast a non-scalar to a scalar array')
-    if any(size < 0 for size in shape):
-        raise ValueError('all elements of broadcast shape must be non-'
-                         'negative')
-    needs_writeable = not readonly and array.flags.writeable
-    extras = ['reduce_ok'] if needs_writeable else []
-    op_flag = 'readwrite' if needs_writeable else 'readonly'
-    broadcast = np.nditer(
-        (array,), flags=['multi_index', 'refs_ok', 'zerosize_ok'] + extras,
-        op_flags=[op_flag], itershape=shape, order='C').itviews[0]
-    result = _maybe_view_as_subclass(array, broadcast)
-    if needs_writeable and not result.flags.writeable:
-        result.flags.writeable = True
-    return result
 
 
 # TODO: remove once numpy 1.10 is available in most package managers

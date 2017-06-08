@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,24 +19,20 @@
 import os
 import json
 
-import webcolors
-
 import moldesign as mdt
-import moldesign.units as u
+from .. import units as u
 
 PACKAGEPATH = os.path.abspath(os.path.dirname(mdt.__file__))
 
 
 class CyclicList(list):
     def __getitem__(self, item):
-        return super(CyclicList, self).__getitem__(item % len(self))
+        return super().__getitem__(item % len(self))
 
 
 COLOR_LIST = ['lightgreen', 'lightblue', 'lightgrey',
               'yellow', 'orange', 'purple', 'IndianRed',
               'PaleTurquoise', 'OldLace', 'Thistle', 'pink']
-
-color_rotation = CyclicList(map(webcolors.name_to_hex, COLOR_LIST))
 
 
 DEFAULT_FORCE_TOLERANCE = (0.0001 * u.hartree / u.bohr).defunits()  # taken from GAMESS OPTTOL keyword
@@ -72,5 +73,5 @@ def print_environment():
     except Exception as e:
         env['platform_exception'] = str(e)
 
-    print json.dumps({'env': env,
-                      'versions': version})
+    print(json.dumps({'env': env,
+                      'versions': version}))

@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,14 +16,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import types
-
+import future.utils
 from pyccc import python as bpy
 
 import moldesign as mdt
-from moldesign import utils, display
+from moldesign import utils
 from . import configuration
+from ..helpers import display_log
+
 
 class RunsRemotely(object):
     def __init__(self, enable=True,
@@ -96,10 +102,11 @@ class RunsRemotely(object):
                                 image,
                                 python_call,
                                 name=self.jobname,
-                                sendsource=self.sendsource)
+                                sendsource=self.sendsource,
+                                interpreter='python')  # always run in native interpreter
 
             if self.display:
-                display.display_log(job.get_display_object(), title=f.__name__)
+                display_log(job.get_display_object(), title=f.__name__)
 
             if wait:
                 job.wait()
@@ -119,7 +126,10 @@ def _bind_instance_method(f, args):
     # instance methods. Instead, we'll create another bound copy of the instancemethod (probably
     # only need to do this once)
     fn_self = args[0]
-    f = types.MethodType(f, fn_self, fn_self.__class__)
+    if future.utils.PY2 == 2:
+        f = types.MethodType(f, fn_self, fn_self.__class__)
+    else:
+        f = types.MethodType(f, fn_self)
     args = args[1:]
     return f, args
 

@@ -1,9 +1,11 @@
+from builtins import zip
 import numpy as np
 import pytest
 
 import moldesign as mdt
 from moldesign import units as u
 
+from .molecule_fixtures import *
 from .object_fixtures import *
 
 
@@ -70,7 +72,7 @@ def test_atoms_copied_from_h2_harmonic(copy_atoms_from_h2_harmonic, h2_harmonic)
 @pytest.mark.parametrize('fixture_key',
                          registered_types['molecule'] + registered_types['submolecule'])
 def test_copy_atoms(fixture_key, request):
-    oldobj = request.getfuncargvalue(fixture_key)
+    oldobj = request.getfixturevalue(fixture_key)
     oldatoms = oldobj.atoms
     atoms = oldatoms.copy_atoms()
     assert isinstance(atoms, mdt.AtomList)
@@ -80,7 +82,7 @@ def test_copy_atoms(fixture_key, request):
 @pytest.mark.parametrize('fixture_key',
                          registered_types['molecule'] + registered_types['submolecule'])
 def test_copy_atoms_in_containers(fixture_key, request):
-    oldobj = request.getfuncargvalue(fixture_key)
+    oldobj = request.getfixturevalue(fixture_key)
     if isinstance(oldobj, mdt.molecules.ChildList):
         pytest.xfail("We haven't defined the behavior for copying ChildLists yet")
 
@@ -109,7 +111,7 @@ def _test_copy_integrity(atoms, oldatoms):
 
 @pytest.mark.parametrize('fixture_key', moldesign_objects)
 def test_copied_types(fixture_key, request):
-    obj = request.getfuncargvalue(fixture_key)
+    obj = request.getfixturevalue(fixture_key)
     if isinstance(obj, mdt.molecules.ChildList):
         pytest.xfail("We haven't defined the behavior for copying ChildLists yet")
     objcopy = obj.copy()
@@ -123,18 +125,29 @@ def test_copied_types(fixture_key, request):
 
 @pytest.mark.parametrize('fixture_key', registered_types['molecule'])
 def test_molecule_copy(fixture_key, request):
-    mol = request.getfuncargvalue(fixture_key)
+    mol = request.getfixturevalue(fixture_key)
     newmol = mol.copy()
     assert mol.name in newmol.name
     assert mol.energy_model == newmol.energy_model
     assert mol.integrator == newmol.integrator
 
 
-def test_molecular_combination(pdb3aid):
-    m2 = pdb3aid.copy()
-    newmol = pdb3aid.combine(m2)
-    assert newmol.num_chains == 2 * pdb3aid.num_chains
+@pytest.mark.parametrize('fixturename', 'pdb3aid h2'.split())
+def test_molecular_combination_chains(request, fixturename):
+    mol = request.getfixturevalue(fixturename)
+    m2 = mol.copy()
+    newmol = mol.combine(m2)
+    assert newmol.num_chains == 2*mol.num_chains
     assert len(set(chain for chain in newmol.chains)) == newmol.num_chains
+    _assert_unique_chainids(newmol)
+
+
+def _assert_unique_chainids(mol):
+    chain_names = set()
+    for chain in mol.chains:
+        assert chain.name == chain.pdbindex
+        assert chain.name not in chain_names
+        chain_names.add(chain.name)
 
 
 def test_chain_rename(pdb3aid):

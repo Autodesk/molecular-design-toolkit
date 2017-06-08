@@ -1,22 +1,23 @@
-"""
-My standard utilities. Intended to be included in all projects
-Obviously everything included here needs to be in the standard library (or numpy)
-"""
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+import future.utils
+
+from functools import reduce
 import contextlib
 import fractions
 import operator
 import os
 import re
-import shutil
 import string
 import sys
 import tempfile
-import threading
-from HTMLParser import HTMLParser
-from cStringIO import StringIO
+from html.parser import HTMLParser
+from io import StringIO
 from uuid import uuid4
 
-import webcolors
 
 
 def make_none(): return None
@@ -53,8 +54,12 @@ class MLStripper(HTMLParser):
     FROM http://stackoverflow.com/a/925630/1958900
     """
     def __init__(self):
+        if not future.utils.PY2:
+            super().__init__()
         self.reset()
         self.fed = []
+        self.strict = False
+        self.convert_charrefs = True
 
     def handle_data(self, d):
         self.fed.append(d)
@@ -75,13 +80,13 @@ def html_to_text(html):
 
 def printflush(s, newline=True):
     if newline:
-        print s
+        print(s)
     else:
-        print s,
+        print(s, end=' ')
     sys.stdout.flush()
 
 
-class methodcaller:
+class methodcaller(object):
     """The pickleable implementation of the standard library operator.methodcaller.
 
     This was copied without modification from:
@@ -104,7 +109,7 @@ class methodcaller:
             raise TypeError(msg)
         self = args[0]
         self._name = args[1]
-        if not isinstance(self._name, str):
+        if not isinstance(self._name, future.utils.native_str):
             raise TypeError('method name must be a string')
         self._args = args[2:]
         self._kwargs = kwargs
@@ -114,8 +119,8 @@ class methodcaller:
 
     def __repr__(self):
         args = [repr(self._name)]
-        args.extend(map(repr, self._args))
-        args.extend('%s=%r' % (k, v) for k, v in self._kwargs.items())
+        args.extend(list(map(repr, self._args)))
+        args.extend('%s=%r' % (k, v) for k, v in list(self._kwargs.items()))
         return '%s.%s(%s)' % (self.__class__.__module__,
                               self.__class__.__name__,
                               ', '.join(args))
@@ -199,40 +204,6 @@ class progressbar(object):
                 self.progress_bar.bar_style = 'success'
 
 
-class PipedFile(object):
-    """
-    Allows us to pass data by filesystem path without ever writing it to disk
-    To prevent deadlock, we spawn a thread to write to the pipe
-    Call it as a context manager:
-    >>> with PipedFile('file contents',filename='contents.txt') as pipepath:
-    >>>     print open(pipepath,'r').read()
-    """
-    def __init__(self, fileobj, filename='pipe'):
-        if type(fileobj) in (unicode,str):
-            self.fileobj = StringIO(fileobj)
-        else:
-            self.fileobj = fileobj
-        self.tempdir = None
-        assert '/' not in filename,"Filename must not include directory"
-        self.filename = filename
-
-    def __enter__(self):
-        self.tempdir = tempfile.mkdtemp()
-        self.pipe_path = os.path.join(self.tempdir, self.filename)
-        os.mkfifo(self.pipe_path)
-        self.pipe_thread = threading.Thread(target=self._write_to_pipe)
-        self.pipe_thread.start()
-        return self.pipe_path
-
-    def _write_to_pipe(self):
-        with open(self.pipe_path,'w') as pipe:
-            pipe.write(self.fileobj.read())
-
-    def __exit__(self, type, value, traceback):
-        if self.tempdir is not None:
-            shutil.rmtree(self.tempdir)
-
-
 def remove_directories(list_of_paths):
     """
     Removes non-leafs from a list of directory paths
@@ -240,7 +211,7 @@ def remove_directories(list_of_paths):
     found_dirs = set('/')
     for path in list_of_paths:
         dirs = path.strip().split('/')
-        for i in xrange(2, len(dirs)):
+        for i in range(2, len(dirs)):
             found_dirs.add('/'.join(dirs[:i]))
 
     paths = [path for path in list_of_paths if
@@ -284,26 +255,26 @@ class PrintTable(BaseTable):
         for field in string.Formatter().parse(formatstr):
             key = field.split('.')[0]
             categories.append(key)
-        super(PrintTable, self).__init__(categories, fileobj=fileobj)
+        super().__init__(categories, fileobj=fileobj)
 
     def writeline(self, line):
         if not self._wrote_header:
-            print >> self._fileobj, self.format.format(self.categories)
+            print(self.format.format(self.categories), file=self._fileobj)
             self._wrote_header = True
 
         if self.fileobj is None: return
-        print >> self.fileobj, self.formatstr.format(**line)
+        print(self.formatstr.format(**line), file=self.fileobj)
 
     def getstring(self):
         s = StringIO()
         for line in self.lines:
-            print >> s, self.format.format(line)
+            print(self.format.format(line), file=s)
         return s.getvalue()
 
 
 class MarkdownTable(BaseTable):
     def __init__(self, *categories):
-        super(MarkdownTable, self).__init__(categories)
+        super().__init__(categories)
 
     def markdown(self, replace=None):
         if replace is None: replace = {}
@@ -390,29 +361,6 @@ class redirect_stderr(_RedirectStream):
 GETFLOAT = re.compile(r'-?\d+(\.\d+)?(e[-+]?\d+)')  # matches numbers, e.g. 1, -2.0, 3.5e50, 0.001e-10
 
 
-def is_color(s):
-    """ Do our best to determine if "s" is a color spec that can be converted to hex
-    :param s:
-    :return:
-    """
-    def in_range(i): return 0 <= i <= int('0xFFFFFF', 0)
-
-    try:
-        if type(s) == int:
-            return in_range(s)
-        elif type(s) not in (str, unicode):
-            return False
-        elif s in webcolors.css3_names_to_hex:
-            return True
-        elif s[0] == '#':
-            return in_range(int('0x' + s[1:], 0))
-        elif s[0:2] == '0x':
-            return in_range(int(s, 0))
-        elif len(s) == 6:
-            return in_range(int('0x' + s, 0))
-    except ValueError:
-        return False
-
 
 def from_filepath(func, filelike):
     """Run func on a temporary *path* assigned to filelike"""
@@ -420,7 +368,7 @@ def from_filepath(func, filelike):
         return func(filelike)
     else:
         with tempfile.NamedTemporaryFile() as outfile:
-            outfile.write(filelike.read())
+            outfile.write(filelike.read().encode())  # hack - prob need to detect bytes
             outfile.flush()
             result = func(outfile.name)
         return result

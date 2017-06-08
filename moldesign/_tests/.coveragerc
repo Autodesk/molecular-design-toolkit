@@ -1,0 +1,18 @@
+[run]
+omit =
+   ../_notebooks/*
+   ../_static_data/*
+   ../_tests/*
+   ../_version.py
+   ../external/*
+   ../../versioneer.py
+   ../../setup.py
+
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    def __str__
+    raise AssertionError
+    raise NotImplementedError

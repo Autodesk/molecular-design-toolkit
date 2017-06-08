@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,11 +16,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import collections
 
 import moldesign as mdt
-from moldesign import utils, data
-
+from .. import utils, data
 from . import BioContainer, AtomList, toplevel
 
 
@@ -38,7 +43,7 @@ class Residue(BioContainer):
             Residue: copy of this residue and all its atoms. This copy will NOT
             reference any parent molecule
         """
-        newatoms = super(Residue, self).copy_atoms()
+        newatoms = super().copy_atoms()
         return newatoms[0].residue
 
     @utils.args_from(BioContainer)
@@ -48,7 +53,7 @@ class Residue(BioContainer):
             **kwargs ():
         """
         self.chain = kwargs.get('chain', None)
-        super(Residue, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         if self.index is None and self.molecule is not None:
             self.index = self.molecule.residues.index(self)
         self.chainindex = None
@@ -140,7 +145,7 @@ class Residue(BioContainer):
         residues = collections.OrderedDict()
         for atom in self.bonded_atoms:
             residues[atom.residue] = None
-        return residues.keys()
+        return list(residues.keys())
 
     def add(self, atom, key=None):
         """Deals with atom name clashes within a residue - common for small molecules"""
@@ -153,9 +158,9 @@ class Residue(BioContainer):
             assert atom.chain == self.chain, "Atom's chain does not match residue's chain"
 
         if key is not None or atom.name not in self.children:
-            return super(Residue, self).add(atom, key=key)
+            return super().add(atom, key=key)
         else:
-            return super(Residue, self).add(atom, key='%s%s' % (atom.name, len(self)))
+            return super().add(atom, key='%s%s' % (atom.name, len(self)))
     add.__doc__ = BioContainer.add.__doc__
 
     @property
@@ -221,8 +226,8 @@ class Residue(BioContainer):
             if self.index == len(self.molecule.residues):
                 return True
             else:
-                print 'WARNING: %s is missing expected atoms. Attempting to infer chain end' % \
-                    self
+                print('WARNING: %s is missing expected atoms. Attempting to infer chain end' % \
+                    self)
                 nextres = self.molecule.residues[self.index + 1]
                 return not self._same_polymer(nextres)
 
@@ -243,8 +248,8 @@ class Residue(BioContainer):
                 assert self.index == 0
                 return True
             else:
-                print 'WARNING: %s is missing expected atoms. Attempting to infer chain start' % \
-                    self
+                print('WARNING: %s is missing expected atoms. Attempting to infer chain start' % \
+                    self)
                 nextres = self.molecule.residues[self.index - 1]
                 return not self._same_polymer(nextres)
         else:
@@ -279,7 +284,7 @@ class Residue(BioContainer):
             self._template_name = resname
         except KeyError:
             if len(self) == 1 and self.type not in ('water', 'ion'):
-                print 'INFO: no bonds assigned to residue %s' % self
+                print('INFO: no bonds assigned to residue %s' % self)
                 return
             else:
                 raise KeyError("No bonding template for residue '%s'" % resname)
@@ -287,7 +292,7 @@ class Residue(BioContainer):
         # intra-residue bonds
         bond_graph = {atom: {} for atom in self}
         for atom in self:
-            for nbrname, order in bonds_by_name.get(atom.name, {}).iteritems():
+            for nbrname, order in bonds_by_name.get(atom.name, {}).items():
                 try:
                     nbr = self[nbrname]
                 except KeyError:  # missing atoms are normal (often hydrogen)

@@ -1,4 +1,12 @@
-# Copyright 2016 Autodesk Inc.
+"""
+This module contains various utility functions that are exposed to API users
+"""
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,9 +20,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-This module contains various utility functions that are exposed to API users
-"""
 import moldesign as mdt
 from moldesign import units as u
 
@@ -22,11 +27,11 @@ from . import toplevel, __all__ as _pkgall
 
 from moldesign.interfaces.openbabel import add_hydrogen, guess_bond_orders, set_protonation
 from moldesign.interfaces.pdbfixer_interface import mutate, add_water
-from moldesign.interfaces.ambertools import assign_forcefield, parameterize
+from moldesign.interfaces.ambertools import create_ff_parameters
 from moldesign.interfaces.ambertools import calc_am1_bcc_charges, calc_gasteiger_charges
 
 _pkgall.extend(('add_hydrogen guess_bond_orders mutate add_water'
-                ' assign_forcefield parameterize calc_am1_bcc_charges calc_gasteiger_charges '
+                ' create_ff_parameters calc_am1_bcc_charges calc_gasteiger_charges '
                 'set_protonation').split())
 
 ATNUM_VALENCE_CHARGE = {6: {3: -1, 4: 0},
@@ -169,7 +174,7 @@ def guess_histidine_states(mol):
                 residue.resname = 'HIE'
             else:
                 residue.resname = 'HID'
-            print 'Renaming %s from HIS to %s' % (oldname, residue.resname)
+            print('Renaming %s from HIS to %s' % (oldname, residue.resname))
 
 
 @toplevel

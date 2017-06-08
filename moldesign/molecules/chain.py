@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +20,7 @@
 import collections
 
 import moldesign as mdt
-from moldesign import utils, data
-
+from .. import utils, data
 from . import BioContainer, toplevel
 
 
@@ -37,7 +41,7 @@ class Chain(BioContainer):
                     raise ValueError('Inconsistent name for chain: %s' % kwargs)
                 name = val
 
-        super(Chain, self).__init__(name=name, **kwargs)
+        super().__init__(name=name, **kwargs)
         self._type = None
 
         self._5p_end = self._3p_end = self._n_terminal = self._c_terminal = None
@@ -71,7 +75,7 @@ class Chain(BioContainer):
         if self._type is None:
 
             counts = collections.Counter(x.type for x in self.residues)
-            unique_types = sum(bool(v) for v in counts.itervalues())
+            unique_types = sum(bool(v) for v in counts.values())
             if unique_types == 1:
                 if self.num_residues == 1:
                     self._type = data.CHAIN_MONOMER_NAMES.get(self.residues[0].type,
@@ -130,12 +134,12 @@ class Chain(BioContainer):
         """
         iterator = self.unclassified_residues
         try:
-            ligand = iterator.next()
+            ligand = next(iterator)
         except StopIteration:
             raise ValueError('This chain does not appear to contain any ligands')
 
         try:
-            nextligand = iterator.next()
+            nextligand = next(iterator)
         except StopIteration:
             return ligand
         else:
@@ -149,7 +153,7 @@ class Chain(BioContainer):
             Chain: copy of this chain and all atoms/residues it contains. This copy will NOT
             reference any parent molecule
         """
-        newatoms = super(Chain, self).copy_atoms()
+        newatoms = super().copy_atoms()
         return newatoms[0].chain
 
     @property
@@ -169,7 +173,7 @@ class Chain(BioContainer):
         else:
             assert residue.chain is self, "Residue is not a member of this chain"
 
-        return super(Chain, self).add(residue, **kwargs)
+        return super().add(residue, **kwargs)
 
     def _get_chain_end(self, restype, selfattr, test):
         currval = getattr(self, selfattr)
@@ -214,7 +218,7 @@ class Chain(BioContainer):
         residues = list(self)
         residues.sort(key=lambda x: int(x.pdbindex))
         bond_graph = {}
-        for ires in xrange(len(residues)-1):
+        for ires in range(len(residues)-1):
             r1 = residues[ires]
             r2 = residues[ires+1]
 
@@ -255,7 +259,7 @@ class Chain(BioContainer):
         missing = self.molecule.metadata.get('missing_residues', {}).get(self.pdbname, {})
         all_residues = list(self.residues)
         all_residues.extend(mdt.helpers.MissingResidue(self.pdbname, resname, resnum)
-                            for resnum, resname  in missing.iteritems())
+                            for resnum, resname  in missing.items())
         all_residues.sort(key=lambda r: r.pdbindex)
 
         bracket_open = False

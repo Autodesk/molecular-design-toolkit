@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +19,8 @@
 import numpy as np
 
 import moldesign as mdt
-from moldesign import units as u
-from moldesign.utils import exports
-
+from .. import units as u
+from ..utils import exports
 from .base import MinimizerBase
 from . import toplevel
 
@@ -54,7 +58,7 @@ class GradientDescent(MinimizerBase):
                  scaling=0.01*u.angstrom**2/u.eV,
                  gamma=0.4, control=0.25,
                  **kwargs):
-        super(GradientDescent, self).__init__(mol, **kwargs)
+        super().__init__(mol, **kwargs)
         assert 'forces' in self.request_list, 'Gradient descent built-in gradients'
         self.max_atom_move = max_atom_move
         self.scaling = scaling
@@ -63,11 +67,11 @@ class GradientDescent(MinimizerBase):
         self._last_energy = None
 
     def run(self):
-        print 'Starting geometry optimization: built-in gradient descent'
+        print('Starting geometry optimization: built-in gradient descent')
         lastenergy = self.objective(self._coords_to_vector(self.mol.positions))
         current = self._coords_to_vector(self.mol.positions)
 
-        for i in xrange(self.nsteps):
+        for i in range(self.nsteps):
             grad = self.grad(current)
             if np.abs(grad.max()) < self.force_tolerance:  # converged
                 return
@@ -75,7 +79,7 @@ class GradientDescent(MinimizerBase):
             move = self.scale_move(grad)
             armijo_goldstein_prefac = self.control * move.norm()
 
-            for icycle in xrange(0, 10):
+            for icycle in range(0, 10):
                 g = self.gamma**icycle
                 newpos = self._make_move(current, g * move)
 

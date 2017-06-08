@@ -1,4 +1,9 @@
-# Copyright 2016 Autodesk Inc.
+from __future__ import print_function, absolute_import, division
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
+# Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,8 +38,14 @@ class SymmetryElement(object):
     def __init__(self, symbol, matrix, **kwargs):
         self.symbol = symbol
         self.matrix = matrix
-        for kw, val in kwargs.iteritems():
+        for kw, val in kwargs.items():
             setattr(self, kw, val)
+
+    def __str__(self):
+        return 'SymmetryElement %s' % self.symbol
+
+    def __repr__(self):
+        return '<%s>' % self
 
     def get_axis(self):
         """
@@ -72,9 +83,9 @@ class MolecularSymmetry(object):
         self.mol = mol
         self.symbol = symbol
         self.rms = rms
-        self.orientation = mdt.utils.if_not_none(orientation, mol.atoms.position)
+        self.orientation = mdt.utils.if_not_none(orientation, mol.positions)
         self.elems = mdt.utils.if_not_none(elems, [])
-        for kw, val in kwargs.iteritems():
+        for kw, val in kwargs.items():
             setattr(self, kw, val)
 
     def get_symmetrized_coords(self, elem):
@@ -92,7 +103,7 @@ class MolecularSymmetry(object):
         align_to_transform = {}  # map between the original positions and their transformed positions
         transform_to_align = {}  # inverse
         byelement = mdt.utils.Categorizer(lambda x: x.element, self.mol.atoms)
-        for elemname, atoms in byelement.iteritems():
+        for elemname, atoms in byelement.items():
             indices = np.array([atom.index for atom in atoms])
             atoms_aligned = oriented_coords[indices].defunits_value()
             atoms_transformed = transformed_coords[indices].defunits_value()
@@ -104,7 +115,7 @@ class MolecularSymmetry(object):
 
         # Make the positions exactly symmetric by averaging them
         pos = np.zeros(transformed_coords.shape) * u.default.length
-        for align_atom, transform_atom in align_to_transform.iteritems():
+        for align_atom, transform_atom in align_to_transform.items():
             assert transform_to_align[transform_atom] == align_atom, \
                 'Molecule is too far from this symmetry to symmetrize'
             pos[transform_atom] = (oriented_coords[transform_atom] +
