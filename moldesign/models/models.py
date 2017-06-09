@@ -45,7 +45,7 @@ class RHF(PySCFPotential):
     @utils.doc_inherit
     def __init__(self, *args, **kwargs):
         kwargs['theory'] = 'rhf'
-        super().__init__(*args, **kwargs)
+        super(RHF, self).__init__(*args, **kwargs)
 
 
 @utils.exports
@@ -53,7 +53,7 @@ class DFT(PySCFPotential):
     @utils.doc_inherit
     def __init__(self, *args, **kwargs):
         kwargs['theory'] = 'rks'
-        super().__init__(*args, **kwargs)
+        super(DFT, self).__init__(*args, **kwargs)
 
 
 @utils.exports
@@ -62,7 +62,7 @@ class B3LYP(PySCFPotential):
     def __init__(self, *args, **kwargs):
         kwargs['theory'] = 'rks'
         kwargs['functional'] = 'b3lyp'
-        super().__init__(*args, **kwargs)
+        super(B3LYP, self).__init__(*args, **kwargs)
 
 
 @utils.exports
@@ -70,11 +70,11 @@ class MP2(PySCFPotential):
     @utils.doc_inherit
     def __init__(self, *args, **kwargs):
         kwargs['theory'] = 'mp2'
-        super().__init__(*args, **kwargs)
+        super(MP2, self).__init__(*args, **kwargs)
 
 @utils.exports
 class CASSCF(PySCFPotential):
     @utils.doc_inherit
     def __init__(self, *args, **kwargs):
         kwargs['theory'] = 'casscf'
-        super().__init__(*args, **kwargs)
+        super(CASSCF, self).__init__(*args, **kwargs)
