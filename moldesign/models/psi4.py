@@ -41,6 +41,7 @@ class Psi4Potential(QMBase):
                      self._get_runmethod(requests)(self._gettheorystring()) * u.hartree}
         psi4.core.clean()
         psi4.core.clean_options()
+        return props
 
     @staticmethod
     def _get_runmethod(requests):
