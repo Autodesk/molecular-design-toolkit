@@ -47,7 +47,7 @@ def heh_plus():
 # Note that this is an incomplete set of models
 models_to_test = list(itertools.product((mdt.models.NWChemQM, mdt.models.PySCFPotential),
                                         'sto-3g 6-31g'.split(),
-                                        'rhf rks'.split()))
+                                        'rhf rks mp2'.split()))
 model_ids = ['/'.join((model.__name__, theory, basis)) for (model, theory, basis) in models_to_test]
 
 

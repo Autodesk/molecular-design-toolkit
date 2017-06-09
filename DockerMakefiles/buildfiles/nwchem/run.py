@@ -71,7 +71,7 @@ class QMRunner(object):
                 self._geom_block(),
                 self._basisblock(),
                 self._chargeblock(),
-                self._theoryblock(),
+                self._scfblock(),
                 self._otherblocks(),
                 self._taskblock()]
 
@@ -91,8 +91,8 @@ class QMRunner(object):
     def _basisblock(self):
         return 'basis\n  * library %s\nend' % self.parameters['basis']  # TODO: translate names
 
-    def _theoryblock(self):
-        lines = [self._taskname(),
+    def _scfblock(self):
+        lines = [self.SCFTYPES[self.parameters['theory']],
                  self._multiplicityline(),
                  self._theorylines(),
                  'end'
@@ -112,20 +112,23 @@ class QMRunner(object):
 
         return '\n'.join(lines)
 
-
-    TASKNAMES = {'rhf': 'scf',
-                 'uhf': 'scf',
-                 'rks': 'dft',
-                 'uks': 'dft'}
-
-    def _taskname(self):
-        return self.TASKNAMES[self.parameters['theory']]
-
+    SCFTYPES = {'rhf': 'scf',
+                'uhf': 'scf',
+                'rks': 'dft',
+                'uks': 'dft',
+                'mp2': 'scf'}  # TODO: Not sure if true!!! How do we use DFT reference?
 
     SCFNAMES = {'rhf': 'rhf',
                 'uhf': 'uhf',
                 'rks': 'rhf',
-                'uks': 'uhf'}
+                'uks': 'uhf',
+                'mp2': 'rhf'}
+
+    TASKNAMES = {'rhf': 'scf',
+                 'uhf': 'scf',
+                 'rks': 'dft',
+                 'uks': 'dft',
+                 'mp2': 'mp2'}
 
     def _scfname(self):
         return self.SCFNAMES[self.parameters['theory']]
@@ -138,8 +141,7 @@ class QMRunner(object):
         else:
             tasktype = 'energy'
 
-        return 'task %s %s' % (self._taskname(), tasktype)
-
+        return 'task %s %s' % (self.TASKNAMES[self.parameters['theory']], tasktype)
 
     STATENAMES = {1: "SINGLET",
                   2: "DOUBLET",
@@ -173,12 +175,12 @@ class QMRunner(object):
           value: {value: <float>, units: <str>}
           atomIdx0: <int>...} ...]
 
-        For example, fixes atom constraints have the form:
+        For example, fixed atom constraints have the form:
         {type: 'atomPosition',
          restraint: False,
          atomIdx: <int>}
 
-        Restraints are described similary, but include a spring constant (of the appropriate units):
+        Restraints are described similarly, but include a spring constant (of the appropriate units):
         {type: 'bond',
          restraint: True,
          atomIdx1: <int>,
@@ -213,9 +215,17 @@ class QMRunner(object):
     def _chargeblock(self):
         return '\ncharge %s\n' % self.parameters.get('charge', 0)
 
+    def _isdft(self):
+        if self.parameters['theory'] in ('rks', 'uks'):
+            return True
+        elif self.parameters.get('reference', None) in ('rks', 'uks'):
+            return True
+        else:
+            return False
+
     def _theorylines(self):
         lines = ['direct']
-        if self._taskname() == 'dft':
+        if self._isdft():
             lines.append('XC %s' % self.parameters['functional'])
         return '\n'.join(lines)
 
