@@ -1,3 +1,20 @@
+"""
+This file collects the various command line tasks accessed via
+``python -m moldesign [command]``
+
+The functions here are intended help users set up their environment.
+
+Note that MDT routines will NOT be importable from this module when it runs as a script -- you
+won't be working with molecules or atoms in this module.
+"""
+
+from __future__ import print_function, absolute_import, division
+
+import atexit
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,17 +28,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-This file collects the various command line tasks accessed via
-``python -m moldesign [command]``
+from future.utils import PY2
 
-The functions here are intended help users set up their environment.
-
-Note that MDT routines will NOT be importable from this module when it runs as a script -- you
-won't be working with molecules or atoms in this module.
-"""
-from __future__ import print_function
-from builtins import range
 import argparse
 import distutils.spawn
 import errno
@@ -63,7 +71,6 @@ CONFIG_PATH = os.path.join(CONFIG_DIR, 'moldesign.yml')
 
 def main():
     print('Molecular Design Toolkit v%s Launcher' % MDTVERSION)
-
 
     global CONFIG_PATH
     parser = argparse.ArgumentParser('python -m moldesign')
@@ -110,15 +117,9 @@ def main():
 
 def launch(cwd=None, path=''):
     server, portnum = launch_jupyter_server(cwd=cwd)
-    wait_net_service('localhost', portnum)
+    wait_net_service('localhost', portnum, server)
     open_browser('http://localhost:%d/%s' % (portnum, path))
-    try:
-        server.wait()
-    except KeyboardInterrupt:
-        print('Shutting down ...')
-        server.terminate()
-        server.wait()
-        print('Jupyter terminated.')
+    server.wait()
 
 
 def copy_example_dir(use_existing=False):
@@ -168,8 +169,15 @@ def launch_jupyter_server(cwd=None):
 
     server = subprocess.Popen(('jupyter notebook --no-browser --port %d' % portnum).split(),
                               cwd=cwd)
-
+    atexit.register(server_shutdown, server)
     return server, portnum
+
+
+def server_shutdown(server):
+    print('Shutting down jupyter server...')
+    server.terminate()
+    server.wait()
+    print('Jupyter terminated.')
 
 
 def open_browser(url):
@@ -202,7 +210,7 @@ def yaml_dumper(*args):
     return yaml.dump(*args, default_flow_style=False)
 
 
-def wait_net_service(server, port, timeout=None):
+def wait_net_service(server, port, process, timeout=None):
     """
     Wait for network service to appear
     FROM http://code.activestate.com/recipes/576655-wait-for-network-service-to-appear/
@@ -219,7 +227,12 @@ def wait_net_service(server, port, timeout=None):
         end = now() + timeout
 
     while True:
+        if process.poll() is not None:
+            print('ERROR: Jupyter process exited prematurely')
+            sys.exit(128)
+
         s = socket.socket()
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         try:
             if timeout:
@@ -236,8 +249,9 @@ def wait_net_service(server, port, timeout=None):
             if timeout: return False
 
         except socket.error as err:
-            if type(err.args) != tuple or err[0] not in (errno.ETIMEDOUT, errno.ECONNREFUSED):
+            if type(err.args) != tuple or err.errno not in (errno.ETIMEDOUT, errno.ECONNREFUSED):
                 raise
+
         else:
             s.close()
             return True
