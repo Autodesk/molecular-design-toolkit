@@ -14,5 +14,6 @@ exclude_lines =
     pragma: no cover
     def __repr__
     def __str__
+    def _repr_markdown
     raise AssertionError
     raise NotImplementedError

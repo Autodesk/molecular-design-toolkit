@@ -368,10 +368,7 @@ class MolPropertyMixin(object):
     calc_potential_energy = calculate_potential_energy
     calc_forces = calculate_forces
 
-    def _repr_markdown_(self):
-        return self.markdown_summary()
-
-    def biomol_summary_markdown(self):
+    def _biomol_summary_markdown(self):
         """A markdown description of biomolecular structure.
 
         Returns:
@@ -1100,6 +1097,40 @@ class Molecule(AtomGroup,
 
     def __str__(self):
         return 'Molecule: %s' % self.name
+
+    def _repr_markdown_(self):
+        """A markdown description of this molecule.
+
+        Returns:
+            str: Markdown
+        """
+        # TODO: remove leading underscores for descriptor-protected attributes
+        lines = ['### Molecule: "%s" (%d atoms)'%(self.name, self.natoms)]
+
+        description = self.metadata.get('description', None)
+        if description is not None:
+            description = self.metadata.description[:5000]
+            url = self.metadata.get('url', None)
+            if url is not None:
+                description = '<a href="%s" target="_blank">%s</a>'% \
+                              (url, description)
+            lines.append(description)
+
+        lines.extend([
+            '**Mass**: {:.2f}'.format(self.mass),
+            '**Formula**: %s'%self.get_stoichiometry(html=True),
+            '**Charge**: %s'%self.charge])
+
+        if self.energy_model:
+            lines.append('**Potential model**: %s'%str(self.energy_model))
+
+        if self.integrator:
+            lines.append('**Integrator**: %s'%str(self.integrator))
+
+        if self.is_biomolecule:
+            lines.extend(self.biomol_summary_markdown())
+
+        return '\n\n'.join(lines)
 
     def newbond(self, a1, a2, order):
         """ Create a new bond
