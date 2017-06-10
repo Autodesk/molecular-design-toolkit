@@ -85,11 +85,9 @@
   tag: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$'
   type: serial
   steps:
-    - command: exit 1 # test that the code has the right version (and test that it's a good semver?)
+    - command: ./deployment/check_pyversion.sh
       name: verify_version
-    - command: build any additional images for deployment (moldesign_notebook, at least?)
-      tag: build_notebook
-    - command: tag and push docker images
-      name: docker_deploy
-    - command: upload package to pypi
-      name: pypi_deploy
+    - command: docker-make --all --tag $CI_BRANCH --repo docker.io/autodesk/moldesign
+      tag: docker_push
+    - command: python setup.py check sdist && twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/*
+      name: pypi_push

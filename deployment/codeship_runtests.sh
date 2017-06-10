@@ -17,6 +17,12 @@ function send_status_update(){
 function check_if_tests_should_run(){
     echo "Should I run the tests in this environment?"
 
+   if [[ "${CI_COMMIT_MESSAGE}" == *"--fast-ci-tests"* && "${VERSION}" != "complete.py3" ]];  then
+       echo "NO: found \"--fast-ci-tests\" flag in commit message; run complete.py3 only"
+       send_status_update 0 "Skipped (--fast-ci-tests flag in commit msg)"
+       exit 0
+   fi
+
    if [ "${TESTENV}" == "complete" ]; then
        runthem=true
        echo "YES: always run in 'complete' environment"
