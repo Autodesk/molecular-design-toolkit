@@ -4,7 +4,7 @@
 
 VERSION="${TESTENV}.py${PYVERSION}"
 PYTESTFLAGS="-n 6 --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=1800"
-if [ "${TESTENV}" == "complete" ]; then
+if [ "${VERSION}" == "complete.py3" ]; then
        PYTESTFLAGS="--cov .. --cov-config=./.coveragerc ${PYTESTFLAGS}"
 fi
 
@@ -63,7 +63,7 @@ function run_tests(){
 
     send_status_update "${exitstat}" "${statline}"
 
-    if [ "${TESTENV}" == "complete" ]; then
+    if [ "${VERSION}" == "complete.py3" ]; then
        if [[ ${exitstat} == 0 && "$CI_BRANCH" != "" ]]; then
           coveralls || echo "Failed to upload code coverage stats"
        else
