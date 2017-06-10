@@ -46,7 +46,7 @@ MOLDESIGN_SRC = os.path.abspath(os.path.dirname(__file__))
 EXAMPLE_DIR_SRC = unit_def_file = os.path.join(MOLDESIGN_SRC, '_notebooks')
 MDTVERSION = subprocess.check_output(['python', '-c',
                                       "import _version; print(_version.get_versions()['version'])"],
-                                     cwd=MOLDESIGN_SRC).strip()
+                                     cwd=MOLDESIGN_SRC).strip().decode('utf-8')
 VERFILEPATH = os.path.join(EXAMPLE_DIR_TARGET, '.mdtversion')
 
 
@@ -77,8 +77,6 @@ def main():
                                        'only when a docker client is configured)')
     subparsers.add_parser('config', help='print configuration and exit')
     subparsers.add_parser('copyexamples', help='Copy example notebooks')
-    subparsers.add_parser('devbuild', help='rebuild required docker containers locally')
-    subparsers.add_parser('devpull', help='Pull development images for latest release')
 
     parser.add_argument('-f', '--config-file', type=str,
                         help='Path to config file')
@@ -93,17 +91,8 @@ def main():
         launch(cwd=EXAMPLE_DIR_TARGET,
                path='notebooks/Getting%20Started.ipynb')
 
-    elif args.command == 'pull':
-        pull()
-
     elif args.command == 'launch':
         launch()
-
-    elif args.command == 'devbuild':
-        devbuild()
-
-    elif args.command == 'devpull':
-        devpull()
 
     elif args.command == 'copyexamples':
         copy_example_dir(use_existing=False)
@@ -117,43 +106,6 @@ def main():
 
     else:
         raise ValueError("Unhandled CLI command '%s'" % args.command)
-
-DOCKER_IMAGES = 'ambertools moldesign_complete opsin symmol nwchem'.split()
-
-def pull():
-    for img in DOCKER_IMAGES:
-        _pull_img(img)
-
-
-def _pull_img(img):
-    from moldesign import compute
-    imgurl = compute.get_image_path(img, _devmode=False)
-    print('Pulling %s' % imgurl)
-    subprocess.check_call(['docker', 'pull', imgurl])
-
-
-BUILD_FILES = "nwchem_build pyscf_build".split()
-
-def devbuild():
-    print('-' * 80)
-    print("Molecular design toolkit is downloading and building local, up-to-date copies of ")
-    print("all docker containers it depends on. To use them, set:")
-    print("   devmode: true")
-    print("in ~/.moldesign/moldesign.yml.")
-    print(('-' * 80) + '\n')
-
-    devpull()
-
-    subprocess.check_call('docker-make --all --tag dev'.split(),
-                          cwd=os.path.join(MOLDESIGN_SRC, '..', 'DockerMakefiles'))
-
-
-def devpull():
-    for img in DOCKER_IMAGES+BUILD_FILES:
-        try:
-            _pull_img(img)
-        except subprocess.CalledProcessError:
-            print('"%s " not found. Will rebuild locally ...'%img)
 
 
 def launch(cwd=None, path=''):
@@ -188,10 +140,11 @@ def check_existing_examples(use_existing):
         version = 'pre-0.7.4'
 
     if version != MDTVERSION:
-        print ('WARNING - your example directory is out of date! It corresponds to MDT version '
-               '%s, but you are using version %s'%(version, MDTVERSION))
-        print ('If you want to update your examples, please rename or remove "%s"'
-               % EXAMPLE_DIR_TARGET)
+        print('WARNING - your example directory is out of date! It corresponds to MDT version '
+              '%s, but you are using version %s'%(version, MDTVERSION))
+        print('If you want to update your examples, please rename or remove "%s"'
+              % EXAMPLE_DIR_TARGET)
+        sys.exit(201)
 
     if use_existing:
         return
@@ -201,7 +154,7 @@ def check_existing_examples(use_existing):
                  ' 1) Rename or remove the existing directory at %s,'%EXAMPLE_DIR_TARGET,
                  ' 2) Run this command in a different location, or'
                  ' 3) Run `python -m moldesign intro` to launch the example gallery.']))
-        sys.exit(1)
+        sys.exit(200)
 
 
 def launch_jupyter_server(cwd=None):
