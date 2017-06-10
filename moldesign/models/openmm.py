@@ -78,6 +78,8 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         This will rebuild this OpenMM simulation if: A) it's not built yet, or B)
         there's a new integrator
         """
+        if opm.force_remote:
+            return True
         from simtk.openmm import app
 
         # TODO: automatically set _prepped to false if the model or integration parameters change

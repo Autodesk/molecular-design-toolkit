@@ -28,11 +28,13 @@ Intended Audience :: Science/Research
 Intended Audience :: Developers
 Intended Audience :: Education
 License :: OSI Approved :: Apache Software License
+Programming Language :: Python :: 2
 Programming Language :: Python :: 2.7
-Programming Language :: Python :: 2 :: Only
+Programming Language :: Python :: 3
+Programming Language :: Python :: 3.5
+Programming Language :: Python :: 3.6
 Topic :: Scientific/Engineering :: Chemistry
 Topic :: Scientific/Engineering :: Physics
-Topic :: Scientific/Engineering :: Visualization
 Operating System :: POSIX
 Operating System :: Unix
 Operating System :: MacOS
@@ -86,8 +88,6 @@ setup(
     url='http://moldesign.bionano.autodesk.com',
     cmdclass=cmdclass,
     license='Apache 2.0',
-    author='Aaron Virshup, BioNano Research at Autodesk',
+    author='Aaron Virshup, Autodesk Life Sciences',
     author_email='moleculardesigntoolkit@autodesk.com',
-    description='The Molecular Design Toolkit: Dead-simple chemical simulation, visualization, '
-                'and cloud computing in a notebook'
-)
+    description='A single, intuitive interface to a huge range of molecular modeling software')

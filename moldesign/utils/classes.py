@@ -121,8 +121,12 @@ class DotDict(object):
         else:
             del self._od[key]
 
-    def __reduce__(self):
-        return DotDict, (self._od, )
+    def __getstate__(self):
+        return {'od': self._od}
+
+    def __setstate__(self, state):
+        self._od = state['od']
+        self._init = True
 
     def copy(self):
         return self.__class__(self._od.copy())

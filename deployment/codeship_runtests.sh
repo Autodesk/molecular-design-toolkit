@@ -3,7 +3,7 @@
 # this script expects to run from the moldesign/_tests directory
 
 VERSION="${TESTENV}.py${PYVERSION}"
-PYTESTFLAGS="-n 4 --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=240"
+PYTESTFLAGS="-n 6 --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=1800"
 if [ "${TESTENV}" == "complete" ]; then
        PYTESTFLAGS="--cov .. --cov-config=./.coveragerc ${PYTESTFLAGS}"
 fi

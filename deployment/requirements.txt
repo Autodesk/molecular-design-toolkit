@@ -1,6 +1,6 @@
 # Python dependencies for the build/test environment
 PyGithub
 pytest-cov
-pytest-xdist
+pytest-xdist != 1.17.0
 pytest-timeout
 coveralls
