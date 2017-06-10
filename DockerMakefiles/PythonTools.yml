@@ -14,6 +14,9 @@ notebook:
      && pip install backports.ssl_match_hostname backports.shutil_get_terminal_size
 
 
+psi4:
+  build: conda install -c psi4 psi4
+
 pyquante2:
  requires:
   - python_deploy_base
@@ -34,6 +37,7 @@ chem_python_requirements:
   requires:
     - pyscf
     - chem_python_conda
+    - psi4
 
 chem_python:
  requires:

@@ -138,7 +138,7 @@ mm_model_parameters = named_dict([
 ])
 
 
-QMTHEORIES = ['rhf', 'rks', 'mp2', 'casscf', 'casci', 'fci']
+QMTHEORIES = ['rhf', 'rks', 'uhf', 'uks', 'mp2', 'casscf', 'casci', 'fci']
 BASISSETS = ['3-21g', '4-31g', '6-31g', '6-31g*', '6-31g**',
              '6-311g', '6-311g*', '6-311g+', '6-311g*+',
              'sto-3g', 'sto-6g', 'minao', 'weigend',
