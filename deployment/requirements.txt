@@ -1,6 +1,8 @@
 # Python dependencies for the build/test environment
+coveralls
+pathlib ; python_version < '3.5'
 PyGithub
 pytest-cov
 pytest-xdist != 1.17.0
 pytest-timeout
-coveralls
+twine

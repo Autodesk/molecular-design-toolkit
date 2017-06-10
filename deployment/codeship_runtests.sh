@@ -4,7 +4,7 @@
 
 VERSION="${TESTENV}.py${PYVERSION}"
 PYTESTFLAGS="-n 6 --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=1800"
-if [ "${TESTENV}" == "complete" ]; then
+if [ "${VERSION}" == "complete.py3" ]; then
        PYTESTFLAGS="--cov .. --cov-config=./.coveragerc ${PYTESTFLAGS}"
 fi
 
@@ -16,6 +16,12 @@ function send_status_update(){
 
 function check_if_tests_should_run(){
     echo "Should I run the tests in this environment?"
+
+   if [[ "${CI_COMMIT_MESSAGE}" == *"--fast-ci-tests"* && "${VERSION}" != "complete.py3" ]];  then
+       echo "NO: found \"--fast-ci-tests\" flag in commit message; run complete.py3 only"
+       send_status_update 0 "Skipped (--fast-ci-tests flag in commit msg)"
+       exit 0
+   fi
 
    if [ "${TESTENV}" == "complete" ]; then
        runthem=true
@@ -57,7 +63,7 @@ function run_tests(){
 
     send_status_update "${exitstat}" "${statline}"
 
-    if [ "${TESTENV}" == "complete" ]; then
+    if [ "${VERSION}" == "complete.py3" ]; then
        if [[ ${exitstat} == 0 && "$CI_BRANCH" != "" ]]; then
           coveralls || echo "Failed to upload code coverage stats"
        else

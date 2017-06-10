@@ -9,10 +9,12 @@ docker_make:
 
 publisher:
   encrypted_env_file: deployment/tokens.crypt
+  encryped_dockercfg: deployment/docker.crypt
   build:
     context: .
     dockerfile: ./deployment/build-env.dockerfile
   add_docker: true
+  working_dir: /opt/molecular-design-toolkit
   volumes:
   - ./tmp/reports:/opt/reports
 
