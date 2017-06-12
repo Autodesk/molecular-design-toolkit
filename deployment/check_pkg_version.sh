@@ -2,7 +2,7 @@
 
 # Exit 0 if python package version is same as branch name, else exit 1
 
-pyversion=$(python -c "import moldesign; print(moldesign.__version__)")
+pyversion=$(python -c "import pkg_resources; print(pkg_resources.get_distribution('moldesign').version)")
 
 if [ "${pyversion}" == "${CI_BRANCH}" ]; then
   echo "Deploying version ${CI_BRANCH}"
