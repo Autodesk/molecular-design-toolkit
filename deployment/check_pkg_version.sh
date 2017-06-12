@@ -4,11 +4,10 @@
 
 pyversion=$(python -c "import moldesign; print(moldesign.__version__)")
 
-if [ "${pyversion}" == "${CI_BRANCH}" ]
-  then
-    echo "Deploying version ${CI_BRANCH}"
-    exit 0
-  else
-    echo "Can't deploy - moldesign package version '${pyversion}' differs from CI version ${CI_BRANCH}"
-    exit 1
+if [ "${pyversion}" == "${CI_BRANCH}" ]; then
+  echo "Deploying version ${CI_BRANCH}"
+  exit 0
+else
+  echo "Can't deploy - moldesign package version '${pyversion}' differs from its Git tag '${CI_BRANCH}'"
+  exit 1
 fi

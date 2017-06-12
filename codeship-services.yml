@@ -11,8 +11,8 @@ publisher:
   encrypted_env_file: deployment/tokens.crypt
   encryped_dockercfg: deployment/docker.crypt
   build:
-    context: .
-    dockerfile: ./deployment/build-env.dockerfile
+    context: ./deployment
+    dockerfile: ./moldesign-complete-cache.dockerfile
   add_docker: true
   working_dir: /opt/molecular-design-toolkit
   volumes:

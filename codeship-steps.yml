@@ -1,3 +1,7 @@
+- name: stop_ci_if_necessary
+  service: docker_make
+  command: ../deployment/stop_ci_fast.sh
+
 - name: generate_dockerfiles
   service: docker_make
   type: serial
@@ -89,5 +93,5 @@
       name: verify_version
     - command: cd DockerMakefiles && docker-make --all --tag $CI_BRANCH --repo docker.io/autodesk/moldesign
       tag: docker_push
-    - command: python setup.py check sdist && twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/*
+    - command: twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/moldesign-${CI_BRANCH}.tar.gz
       name: pypi_push

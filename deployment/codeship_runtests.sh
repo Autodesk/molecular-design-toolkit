@@ -15,11 +15,11 @@ function send_status_update(){
 
 
 function check_if_tests_should_run(){
-    echo "Should I run the tests in this environment?"
+   echo "Should I run the tests in this environment?"
+   runthem=false
 
    if [[ "${CI_COMMIT_MESSAGE}" == *"--fast-ci-tests"* && "${VERSION}" != "complete.py3" ]];  then
        echo "NO: found \"--fast-ci-tests\" flag in commit message; run complete.py3 only"
-       send_status_update 0 "Skipped (--fast-ci-tests flag in commit msg)"
        exit 0
    fi
 
@@ -44,7 +44,6 @@ function check_if_tests_should_run(){
      echo "SKIPPING tests in this environment."
      echo "To run these tests, add \"--testall\" to your commit message"
      echo "(or work in the dev or deploy branches)"
-     send_status_update 0 "Skipped (dev/deploy branches only)"
      exit 0
    fi
 }
