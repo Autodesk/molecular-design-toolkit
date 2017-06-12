@@ -46,7 +46,7 @@ MOLDESIGN_SRC = os.path.abspath(os.path.dirname(__file__))
 EXAMPLE_DIR_SRC = unit_def_file = os.path.join(MOLDESIGN_SRC, '_notebooks')
 MDTVERSION = subprocess.check_output(['python', '-c',
                                       "import _version; print(_version.get_versions()['version'])"],
-                                     cwd=MOLDESIGN_SRC).splitlines()[-1]
+                                     cwd=MOLDESIGN_SRC).splitlines()[-1].decode('ascii')
 VERFILEPATH = os.path.join(EXAMPLE_DIR_TARGET, '.mdtversion')
 
 
