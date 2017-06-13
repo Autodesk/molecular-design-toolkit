@@ -50,4 +50,7 @@ def test_example_version_warning(tmpdir):
         assert False, "Expected CalledProcessError"
 
 
+def test_version_command():
+    ver = subprocess.check_output('python -m moldesign version'.split()).splitlines()[-1]
+    assert ver.decode('ascii') == mdt.__version__
 
