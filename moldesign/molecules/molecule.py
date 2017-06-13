@@ -1128,7 +1128,7 @@ class Molecule(AtomGroup,
             lines.append('**Integrator**: %s'%str(self.integrator))
 
         if self.is_biomolecule:
-            lines.extend(self.biomol_summary_markdown())
+            lines.extend(self._biomol_summary_markdown())
 
         return '\n\n'.join(lines)
 
