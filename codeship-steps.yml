@@ -87,7 +87,7 @@
   steps:
     - command: ./deployment/check_pkg_version.sh
       name: verify_version
-    - command: cd DockerMakefiles && docker-make --all --tag $CI_BRANCH --repo docker.io/autodesk/moldesign
+    - command: docker-make -f DockerMakefiles/DockerMake.yml --push --all --tag $CI_BRANCH --repo docker.io/autodesk/moldesign:
       name: docker_push
     - command: twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/moldesign-${CI_BRANCH}.tar.gz
       name: pypi_push
