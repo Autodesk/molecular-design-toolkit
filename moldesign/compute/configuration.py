@@ -28,6 +28,7 @@ from pyccc import engines
 
 from .. import utils
 from . import compute
+from .. import _version
 
 default_engine = None
 
@@ -88,13 +89,13 @@ DEFAULT_CONFIG_PATH = os.path.join(os.environ['HOME'], '.moldesign/moldesign.yml
 """ str: default search path for moldesign.yml."""
 
 # TODO: we're currently hardcoding this at release - there's got to be a better way
-DEFAULT_VERSION_TAG = '0.7.4a2'
+DEFAULT_VERSION_TAG = _version.get_versions()['version']
 
 CONFIG_DEFAULTS = utils.DotDict(engine_type='docker',
                                 default_repository='docker.io/autodesk/moldesign:',
                                 default_python_image=None,
-                                default_docker_host=None,
-                                default_version_tag='0.7.4a2',
+                                default_docker_host='',
+                                default_version_tag=DEFAULT_VERSION_TAG,
                                 devmode=False)
 
 DEF_CONFIG = CONFIG_DEFAULTS.copy()
