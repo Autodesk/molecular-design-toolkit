@@ -32,6 +32,9 @@ IMAGE = 'symmol'
 
 #@doi('10.1107/S0021889898002180')
 def run_symmol(mol, tolerance=0.1 * u.angstrom):
+    if mol.num_atoms == 2:
+        return _get_twoatom_symmetry(mol)
+
     infile = ['1.0 1.0 1.0 90.0 90.0 90.0',  # line 1: indicates XYZ coordinates
               # line 2: numbers indicate: mass weighted moment of inertia,
               #         tolerance interpretation, tolerance value,
@@ -53,13 +56,67 @@ def run_symmol(mol, tolerance=0.1 * u.angstrom):
                     name="symmol, %s" % mol.name)
     job = mdt.compute.run_job(job)
 
-    data = parse_output(job.get_output('symmol.out'))
+    data = parse_output(mol, job.get_output('symmol.out'))
     symm = mdt.geom.MolecularSymmetry(
             mol, data.symbol, data.rms,
             orientation=get_aligned_coords(mol, data),
             elems=data.elems,
-            job=job)
+            _job=job)
     return symm
+
+
+def _get_twoatom_symmetry(mol):
+    """ Symmol doesn't deal with continuous symmetries, so this is hardcoded
+    """
+    com_pos = mol.positions-mol.com
+
+    ident = mdt.geom.SymmetryElement(mol,
+                                     idx=0,
+                                     symbol='C1',
+                                     matrix=np.identity(3),
+                                     csm=0.0*u.angstrom,
+                                     max_diff=0.0*u.angstrom)
+
+    # Note: for a continuous symmetry, so the 'matrix' should really be an infinitesimal transform.
+    # This doesn't come up a lot practically, so we just put a small generator here instead.
+    # The rotation is through an irrational angle so that it does in fact generate the full
+    # symmetry group
+    transmat = mdt.external.transformations.rotation_matrix(1/np.sqrt(20), com_pos[0])
+    axis_rot = mdt.geom.SymmetryElement(mol,
+                                        idx=1,
+                                        symbol='Cinf_v',
+                                        matrix=transmat[:3,:3],
+                                        csm=0.0*u.angstrom,
+                                        max_diff=0.0*u.angstrom)
+
+    elems = [ident, axis_rot]
+
+    # This is for the mirror plane / inversion center between the two atoms
+    if mol.atoms[0].atnum == mol.atoms[1].atnum and mol.atoms[0].mass == mol.atoms[1].mass:
+        reflmat = mdt.external.transformations.reflection_matrix([0,0,0], com_pos[0])
+        elems.append(mdt.geom.SymmetryElement(mol,
+                                              idx=2,
+                                              symbol='Cs',
+                                              matrix=reflmat[:3,:3],
+                                              csm=0.0*u.default.length,
+                                              max_diff=0.0*u.default.length))
+
+        elems.append(mdt.geom.SymmetryElement(mol,
+                                              idx=2,
+                                              symbol='Ci',
+                                              matrix=-1 * np.identity(3),
+                                              csm=0.0*u.default.length,
+                                              max_diff=0.0*u.default.length))
+
+        term_symbol = 'Dinf_h'
+    else:
+        term_symbol = axis_rot.symbol
+
+    symm = mdt.geom.MolecularSymmetry(mol, term_symbol, 0.0 * u.default.length,
+                                      orientation=com_pos,
+                                      elems=elems)
+    return symm
+
 
 
 MATRIXSTRING = 'ORTHOGONALIZATION MATRIX'.split()
@@ -70,7 +127,7 @@ ELEMPARSER = re.compile('(\d+)\) \[(...)\]\s+(\S+)\s+([\-0-9\.]+)\s+([\-0-9\.]+)
 # this regex parses '1) [E  ]  x,y,z       0.0000  0.0000' -> [1, 'E  ', 'x,y,z','0.0000','0.0000']
 MATRIXPARSER = re.compile('(\d+)\s+CSM =\s+([\d\.]+)\s+MAX. DIFF. \(Angstrom\)=([\d\.]+)\s+TYPE (\S+)')
 # this parses '  4 CSM =   0.06     MAX. DIFF. (Angstrom)=0.0545     TYPE C3' -> [4, 0.06, 0.545, C3]
-def parse_output(outfile):
+def parse_output(mol, outfile):
     lines = iter(outfile)
     data = utils.DotDict()
     while True:
@@ -103,12 +160,12 @@ def parse_output(outfile):
                 if l.strip() == '': break
                 parsed = ELEMPARSER.findall(l)
                 for p in parsed:
-                    elem = mdt.geom.SymmetryElement(
-                            idx=int(p[0])-1,
-                            symbol=p[1].strip(),
-                            matrix=_string_to_matrix(p[2]),
-                            csm=float(p[3]),
-                            max_diff=float(p[4]) * u.angstrom)
+                    elem = mdt.geom.SymmetryElement(mol,
+                                                    idx=int(p[0])-1,
+                                                    symbol=p[1].strip(),
+                                                    matrix=_string_to_matrix(p[2]),
+                                                    csm=float(p[3]),
+                                                    max_diff=float(p[4]) * u.angstrom)
                     if elem.symbol == 'E': elem.symbol = 'C1'
                     data.elems.append(elem)
             break
@@ -139,8 +196,8 @@ def parse_output(outfile):
                         csm=float(info[1]) * u.angstrom,
                         max_diff=float(info[2]) * u.angstrom,
                         symbol=info[3])
-                if e.symbol == 'E': e.symbol = 'C1'
-
+                if e.symbol == 'E':
+                    e.symbol = 'C1'
 
                 e.matrix = matrix
                 data.elems.append(e)
