@@ -46,7 +46,7 @@ MOLDESIGN_SRC = os.path.abspath(os.path.dirname(__file__))
 EXAMPLE_DIR_SRC = unit_def_file = os.path.join(MOLDESIGN_SRC, '_notebooks')
 MDTVERSION = subprocess.check_output(['python', '-c',
                                       "import _version; print(_version.get_versions()['version'])"],
-                                     cwd=MOLDESIGN_SRC).strip()
+                                     cwd=MOLDESIGN_SRC).splitlines()[-1].decode('ascii')
 VERFILEPATH = os.path.join(EXAMPLE_DIR_TARGET, '.mdtversion')
 
 
@@ -64,7 +64,6 @@ CONFIG_PATH = os.path.join(CONFIG_DIR, 'moldesign.yml')
 def main():
     print('Molecular Design Toolkit v%s Launcher' % MDTVERSION)
 
-
     global CONFIG_PATH
     parser = argparse.ArgumentParser('python -m moldesign')
 
@@ -79,6 +78,7 @@ def main():
     subparsers.add_parser('copyexamples', help='Copy example notebooks')
     subparsers.add_parser('devbuild', help='rebuild required docker containers locally')
     subparsers.add_parser('devpull', help='Pull development images for latest release')
+    subparsers.add_parser('version', help='Write version string and exit')
 
     parser.add_argument('-f', '--config-file', type=str,
                         help='Path to config file')
@@ -107,6 +107,9 @@ def main():
 
     elif args.command == 'copyexamples':
         copy_example_dir(use_existing=False)
+
+    elif args.command == 'version':
+        print(MDTVERSION)
 
     elif args.command == 'config':
         print('Reading config file from: %s' % CONFIG_PATH)
