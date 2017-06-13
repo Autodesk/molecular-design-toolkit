@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-
 # this script expects to run from the moldesign/_tests directory
+
+# fail immediately if any command fails:
+set -e
 
 VERSION="${TESTENV}.py${PYVERSION}"
 PYTESTFLAGS="-n 6 --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=1800"

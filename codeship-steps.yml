@@ -82,12 +82,6 @@
 - name: publish
   service: publisher
   # matches tags that are valid PEP440 versions
-  tag: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)([a,rc,b](0|[1-9]\d*))?'
-  type: serial
-  steps:
-    - command: ./deployment/check_pkg_version.sh
-      name: verify_version
-    - command: "docker-make -f DockerMakefiles/DockerMake.yml --push --all --tag $CI_BRANCH --repo docker.io/autodesk/moldesign:"
-      name: docker_push
-    - command: twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/moldesign-${CI_BRANCH}.tar.gz
-      name: pypi_push
+  tag: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)((a|rc|b)(0|[1-9]\d*))?$'
+  command: ./deployment/publish.sh
+

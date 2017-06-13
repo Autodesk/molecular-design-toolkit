@@ -98,7 +98,7 @@ For now, we're using a subset [PEP 440](https://www.python.org/dev/peps/pep-0440
 1. Every release should be of the form MAJOR.MINOR.PATCH, e.g. `0.1.2`
 2. Pre-releases should be numbered consecutively, and may be alpha, beta, or "release candidate", e.g. `1.0.1rc3` or `0.5.3a1`
 3. Our deployment infrastructure uses this regular expression to accept version strings:
-`^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)([a,rc,b](0|[1-9]\d*))?`
+`^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)((a|rc|b)(0|[1-9]\d*))?$`
 
 ### Maintainers: updating the documentation
 
