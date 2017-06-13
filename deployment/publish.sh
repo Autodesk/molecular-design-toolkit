@@ -22,4 +22,4 @@ docker-make -f DockerMakefiles/DockerMake.yml \
             --all \
             --push
 
-echo twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/moldesign-${pyversion}.tar.gz
+twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/moldesign-${pyversion}.tar.gz
