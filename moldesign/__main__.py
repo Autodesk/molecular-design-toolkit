@@ -54,7 +54,7 @@ MOLDESIGN_SRC = os.path.abspath(os.path.dirname(__file__))
 EXAMPLE_DIR_SRC = unit_def_file = os.path.join(MOLDESIGN_SRC, '_notebooks')
 MDTVERSION = subprocess.check_output(['python', '-c',
                                       "import _version; print(_version.get_versions()['version'])"],
-                                     cwd=MOLDESIGN_SRC).strip().decode('utf-8')
+                                     cwd=MOLDESIGN_SRC).splitlines()[-1].decode('ascii')
 VERFILEPATH = os.path.join(EXAMPLE_DIR_TARGET, '.mdtversion')
 
 
@@ -84,6 +84,7 @@ def main():
                                        'only when a docker client is configured)')
     subparsers.add_parser('config', help='print configuration and exit')
     subparsers.add_parser('copyexamples', help='Copy example notebooks')
+    subparsers.add_parser('version', help='Write version string and exit')
 
     parser.add_argument('-f', '--config-file', type=str,
                         help='Path to config file')
@@ -103,6 +104,9 @@ def main():
 
     elif args.command == 'copyexamples':
         copy_example_dir(use_existing=False)
+
+    elif args.command == 'version':
+        print(MDTVERSION)
 
     elif args.command == 'config':
         print('Reading config file from: %s' % CONFIG_PATH)

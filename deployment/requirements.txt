@@ -5,4 +5,3 @@ PyGithub
 pytest-cov
 pytest-xdist != 1.17.0
 pytest-timeout
-twine

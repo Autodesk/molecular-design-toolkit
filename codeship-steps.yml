@@ -73,21 +73,9 @@
   service: test_moldesign_minimal_py2
   name: minimal_test_py2
 
-# TODO: test the merged versions of PRs; test additional environments sometimes
-
-#- name: code_coverage
-#  service: test_moldesign_complete
-#  command: cd /opt/molecular-design-toolkit/ && coveralls
-
 - name: publish
   service: publisher
-  # matches tags that are valid semantic versions
-  tag: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$'
-  type: serial
-  steps:
-    - command: ./deployment/check_pkg_version.sh
-      name: verify_version
-    - command: cd DockerMakefiles && docker-make --all --tag $CI_BRANCH --repo docker.io/autodesk/moldesign
-      tag: docker_push
-    - command: python setup.py check sdist && twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/*
-      name: pypi_push
+  # matches tags that are valid PEP440 versions
+  tag: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)((a|rc|b)(0|[1-9]\d*))?$'
+  command: ./deployment/publish.sh
+
