@@ -57,6 +57,7 @@ def run_symmol(mol, tolerance=0.1 * u.angstrom):
     job = mdt.compute.run_job(job)
 
     data = parse_output(mol, job.get_output('symmol.out'))
+    _prune_symmetries(data)
     symm = mdt.geom.MolecularSymmetry(
             mol, data.symbol, data.rms,
             orientation=get_aligned_coords(mol, data),
@@ -117,6 +118,24 @@ def _get_twoatom_symmetry(mol):
                                       elems=elems)
     return symm
 
+
+def _prune_symmetries(data):
+    """ Remove identical symmetries
+    """
+    found = {}
+    for elem in data.elems:
+        found.setdefault(elem.symbol, [])
+        for otherelem in found[elem.symbol]:
+            if (np.abs(elem.matrix.T - otherelem.matrix) < 1e-11).all():
+                break
+        else:
+            found[elem.symbol].append(elem)
+
+    newelems = []
+    for val in found.values():
+        newelems.extend(val)
+
+    data.elems = newelems
 
 
 MATRIXSTRING = 'ORTHOGONALIZATION MATRIX'.split()
@@ -190,12 +209,12 @@ def parse_output(mol, outfile):
                     l = next(lines)
                     matrix[i, :] = list(map(float, l.split()))
 
-                e = mdt.geom.SymmetryElement(
-                        matrix=matrix,
-                        idx=int(info[0])-1,
-                        csm=float(info[1]) * u.angstrom,
-                        max_diff=float(info[2]) * u.angstrom,
-                        symbol=info[3])
+                e = mdt.geom.SymmetryElement(mol,
+                                             matrix=matrix,
+                                             idx=int(info[0])-1,
+                                             csm=float(info[1]) * u.angstrom,
+                                             max_diff=float(info[2]) * u.angstrom,
+                                             symbol=info[3])
                 if e.symbol == 'E':
                     e.symbol = 'C1'
 

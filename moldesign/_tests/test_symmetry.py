@@ -5,6 +5,8 @@ import moldesign as mdt
 from moldesign import units as u
 from moldesign.external import transformations
 
+from .molecule_fixtures import benzene
+
 
 @pytest.fixture
 def linear():
@@ -25,7 +27,8 @@ def linear_inversion(linear):
 
     expected = {'C1': 1,
                 'Cinf_v': 1,
-                'C2': 1}
+                'Cs': 1,
+                'Ci': 1}
     mol.atoms[0].atnum = mol.atoms[1].atnum
     mol.atoms[0].mass = mol.atoms[1].mass
 
@@ -46,8 +49,22 @@ def planar():
 
     return mdt.Molecule([a1, a2, a3], name='planar_h3'), expected, True
 
+@pytest.fixture
+def benz(benzene):
+    # Note: we're counting on the geometry generation algorithm to give proper symmetries
+    expected = {'C1': 1,
+                'C6': 1,
+                'C2': 7,
+                'C3': 1,
+                'Ci': 1,
+                'Cs': 7,
+                'S6': 1,
+                'S3': 1}
+    return benzene, expected, False
 
-@pytest.mark.parametrize('fixturename', 'linear linear_inversion planar'.split())
+
+
+@pytest.mark.parametrize('fixturename', 'linear linear_inversion planar benz'.split())
 def test_expected_symmetries(fixturename, request):
     mol, expected, allexact = request.getfixturevalue(fixturename)
     symmetries = mdt.get_symmetry(mol)
@@ -67,7 +84,7 @@ def test_expected_symmetries(fixturename, request):
 
         positions = symmetries.orientation.copy()
         transformed = positions.dot(elem.matrix)
-        assert_isomorphic(mol, positions, transformed, tolerance=elem.csm)
+        assert_isomorphic(mol, positions, transformed, elem.max_diff)
 
         # check that transformation matrix is unitary
         assert_identity_matrix(elem.matrix.dot(elem.matrix.T))
@@ -108,13 +125,15 @@ def assert_rotation_matrix(mat, angle=None):
         assert (point[:3] == 0).all()  # would be WEIRD if this fails
 
         if angle is not None:
-            assert abs(angle.value_in(u.radian) - theta) <= 1e-6
+            assert abs(angle.value_in(u.radian) - abs(theta)) <= 1e-6
 
-def assert_isomorphic(mol, transformed, positions, tolerance):
-    if tolerance == 0.0:
-        tolerance = 1.0e-8 * u.angstrom
+def assert_isomorphic(mol, transformed, positions, maxdiff):
+    if maxdiff == 0.0:
+        tolerance = 1.0e-4 * u.angstrom
+    else:
+        tolerance = maxdiff * 4
 
-    tol2 = (tolerance * 1.1) ** 2
+    tol2 = tolerance ** 2
 
     available = {atom: pos for atom, pos in zip(mol.atoms, positions)}
 
