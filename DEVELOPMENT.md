@@ -87,9 +87,18 @@ are considered "stable".
 
 ### Releases
 
-1. Decide on the new version number (using [semantic versioning](http://semver.org/)). For our purposes here, we'll pretend it's `0.9.3`.
+1. Decide on the new version number (see below). For our purposes here, we'll pretend it's `0.9.3`.
 1. Tag the relevant commit (the build must be passing) with a release candidate version number, e.g., `0.9.3rc1`.
-1. Codeship will automatically deploy the updated release to PyPI and DockerHub (still WIP 5/17)
+1. Codeship will automatically deploy the updated release to PyPI and DockerHub
+1. Manually test the example notebooks against this pre-release version.
+1. If succesful, tag the relevant commit with the official release version `0.9.3`
+
+### Versioning
+For now, we're using a subset [PEP 440](https://www.python.org/dev/peps/pep-0440/):
+1. Every release should be of the form MAJOR.MINOR.PATCH, e.g. `0.1.2`
+2. Pre-releases should be numbered consecutively, and may be alpha, beta, or "release candidate", e.g. `1.0.1rc3` or `0.5.3a1`
+3. Our deployment infrastructure uses this regular expression to accept version strings:
+`^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)([a,rc,b](0|[1-9]\d*))?`
 
 ### Maintainers: updating the documentation
 
