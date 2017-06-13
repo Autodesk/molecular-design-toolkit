@@ -1,12 +1,13 @@
 0.8 - WIP
 =========
 Changes:
+  - Simultaneous Python 2/3 compatibility
   - To make installation easier, we've removed all Jupyter-specific functionality to the
-     ``Autodesk/mdtwidgets`` project (formerly known as ``nbolviz``), which vastly simplifies
-     MDT's dependencies. To use the notebook visualization utilities, run `pip install mdtwidgets`
+     which vastly simplifies
+     MDT's dependencies. To use the notebook visualization utilities, run `pip install nbmolviz`
 
 NEW MODELING FEATURES
-  - QM/MM
+  - NWChem QM
 
 
 0.7.3 - October 17, 2016

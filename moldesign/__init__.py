@@ -43,6 +43,7 @@ from . import orbitals
 from . import molecules
 from . import tools
 from . import widgets
+from .widgets import configure, about
 
 # Populate the top-level namespace (imports everything from each <submodule>.__all__ variable)
 from .exceptions import *

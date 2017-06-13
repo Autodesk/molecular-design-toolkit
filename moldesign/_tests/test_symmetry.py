@@ -49,6 +49,7 @@ def planar():
 
     return mdt.Molecule([a1, a2, a3], name='planar_h3'), expected, True
 
+
 @pytest.fixture
 def benz(benzene):
     # Note: we're counting on the geometry generation algorithm to give proper symmetries
@@ -61,7 +62,6 @@ def benz(benzene):
                 'S6': 1,
                 'S3': 1}
     return benzene, expected, False
-
 
 
 @pytest.mark.parametrize('fixturename', 'linear linear_inversion planar benz'.split())

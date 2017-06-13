@@ -54,3 +54,12 @@ def test_version_command():
     ver = subprocess.check_output('python -m moldesign version'.split()).splitlines()[-1]
     assert ver.decode('ascii') == mdt.__version__
 
+
+def test_dumpenv_command():
+    # just test that it doesn't error
+    subprocess.check_call('python -m moldesign dumpenv'.split())
+
+
+def test_print_environment():
+    # just test that it still works
+    mdt.data.print_environment()

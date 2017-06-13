@@ -85,6 +85,7 @@ def main():
     subparsers.add_parser('config', help='print configuration and exit')
     subparsers.add_parser('copyexamples', help='Copy example notebooks')
     subparsers.add_parser('version', help='Write version string and exit')
+    subparsers.add_parser('dumpenv', help="Dump environment for bug reports")
 
     parser.add_argument('-f', '--config-file', type=str,
                         help='Path to config file')
@@ -107,6 +108,10 @@ def main():
 
     elif args.command == 'version':
         print(MDTVERSION)
+
+    elif args.command == 'dumpenv':
+        import moldesign as mdt
+        mdt.data.print_environment()
 
     elif args.command == 'config':
         print('Reading config file from: %s' % CONFIG_PATH)
