@@ -11,7 +11,6 @@ pyversion=$(python -m moldesign version | tail -n 1)
 
 if [ "${pyversion}" == "${CI_BRANCH}" ]; then
   echo "Deploying version ${CI_BRANCH}"
-  exit 0
 else
   echo "Can't publish - moldesign package version '${pyversion}' differs from its Git tag '${CI_BRANCH}'"
   exit 1
