@@ -20,6 +20,6 @@ docker-make -f DockerMakefiles/DockerMake.yml \
             --repo docker.io/autodesk/moldesign: \
             --tag ${pyversion} \
             --all \
-            --push
+            --push --user ${DOCKERHUB_USER} --token ${DOCKERHUB_PASSWORD}
 
 twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/moldesign-${pyversion}.tar.gz

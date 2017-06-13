@@ -9,7 +9,6 @@ docker_make:
 
 publisher:
   encrypted_env_file: deployment/tokens.crypt
-  encrypted_dockercfg_path: deployment/docker.crypt
   build:
     context: ./deployment
     dockerfile: ./moldesign-complete-cache.dockerfile
