@@ -73,6 +73,24 @@ def test_pyscf_rhf_sto3g_matrices(objkey, request):
     np.testing.assert_allclose(canonical.from_ao(basis.overlaps), canonical.overlaps, atol=1.e-9)
 
 
+def test_pyscf_casscf(h2):
+    h2.set_energy_model(mdt.models.PySCFPotential,
+                        theory='casscf',
+                        active_electrons=2, active_orbitals=2,
+                        state_average=3, basis='sto-3g')
+    h2.calculate()
+    # TODO: actually test results
+
+
+def test_pyscf_casci(h2):
+    pytest.xfail("CASCI interface doesn't yet work")
+    h2.set_energy_model(mdt.models.PySCFPotential,
+                        theory='casci',
+                        active_electrons=2, active_orbitals=2, basis='6-31g')
+    h2.calculate()
+    # TODO: actually test results
+
+
 @pytest.mark.parametrize('objkey', registered_types['molecule'])
 def test_pyscf_rhf_sto3g_forces(objkey, request):
     mol = request.getfixturevalue(objkey)

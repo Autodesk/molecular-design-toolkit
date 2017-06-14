@@ -66,3 +66,12 @@ def test_minimization_reduces_energy(objkey, request):
     e1 = mol.calculate_potential_energy()
     traj = mol.minimize()
     assert mol.calculate_potential_energy() < e1
+
+
+@pytest.mark.parametrize('objkey', registered_types['hasmodel'])
+def test_langevin_integrator(objkey, request):
+    mol = request.getfixturevalue(objkey)
+    mol.set_integrator(mdt.integrators.OpenMMLangevin, temperature=300.0*u.kelvin)
+    traj = mol.run(5.0 * u.ps)
+    assert mol.time >= 5.0 * u.ps
+    assert 150 * u.kelvin <= traj.temperature[-1] <= 450 * u.kelvin
