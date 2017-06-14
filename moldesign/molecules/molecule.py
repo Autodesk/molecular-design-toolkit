@@ -392,7 +392,7 @@ class MolPropertyMixin(object):
 
         return lines
 
-    def get_residue_table(self):
+    def get_residue_table(self):  # pragma: no cover
         """Creates a data table summarizing this molecule's primary structure.
 
         Returns:
@@ -1045,6 +1045,7 @@ class Molecule(AtomGroup,
         self.energy_model = None
         self.integrator = None
         self.metadata = metadata
+        self.electronic_state_index = 0
 
         if charge is not None:
             self.charge = charge
@@ -1117,9 +1118,9 @@ class Molecule(AtomGroup,
             lines.append(description)
 
         lines.extend([
-            '**Mass**: {:.2f}'.format(self.mass),
-            '**Formula**: %s'%self.get_stoichiometry(html=True),
-            '**Charge**: %s'%self.charge])
+            '**Mass**: %s' % self.mass,
+            '**Formula**: %s' % self.get_stoichiometry(html=True),
+            '**Charge**: %s' % self.charge])
 
         if self.energy_model:
             lines.append('**Potential model**: %s'%str(self.energy_model))

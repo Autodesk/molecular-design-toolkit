@@ -15,6 +15,7 @@ omit =
    moldesign/external/*
    moldesign/widgets.py
    moldesign/interfaces/nbo_interface.py
+   moldesign/utils/_deadfunctions.py
 
 [report]
 exclude_lines =
