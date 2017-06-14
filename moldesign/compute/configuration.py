@@ -207,8 +207,14 @@ def reset_compute_engine():
     compute.default_engine = None
 
     if config.engine_type == 'docker':
-        with utils.textnotify('Connecting to docker host at %s' % config.default_docker_host):
-            compute.default_engine = engines.Docker(config.default_docker_host)
+        if config.default_docker_host:
+            notice = 'Connecting to docker host at %s' % config.default_docker_host
+            hosturl = config.default_docker_host
+        else:
+            notice = "Connecting to your docker engine"
+            hosturl = None
+        with utils.textnotify(notice):
+            compute.default_engine = engines.Docker(hosturl)
         _connect_docker_registry()
 
     elif config.engine_type == 'subprocess':
