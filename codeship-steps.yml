@@ -60,16 +60,16 @@
   service: docker_make
   command: docker-make --all --tag dev
 
-- command: ../../deployment/codeship_runtests.sh
+- command: deployment/codeship_runtests.sh
   service: test_moldesign_complete
   name: complete_test_py3
-- command: ../../deployment/codeship_runtests.sh
+- command: deployment/codeship_runtests.sh
   service: test_moldesign_minimal
   name: minimal_test_py3
-- command: ../../deployment/codeship_runtests.sh
+- command: deployment/codeship_runtests.sh
   service: test_moldesign_complete_py2
   name: complete_test_py2
-- command: ../../deployment/codeship_runtests.sh
+- command: deployment/codeship_runtests.sh
   service: test_moldesign_minimal_py2
   name: minimal_test_py2
 
@@ -77,5 +77,5 @@
   service: publisher
   # matches tags that are valid PEP440 versions
   tag: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)((a|rc|b)(0|[1-9]\d*))?$'
-  command: ./deployment/publish.sh
+  command: deployment/publish.sh
 
