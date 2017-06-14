@@ -1052,7 +1052,7 @@ class Molecule(AtomGroup,
                 self.charge *= u.q_e
         else:
             self.charge = getattr(atomcontainer, 'charge',
-                                  sum(atom.formal_charge for atom in self.atoms))
+                                  u.unitsum(atom.formal_charge for atom in self.atoms))
 
         # Builds the internal memory structures
         self.chains = Instance(molecule=self)

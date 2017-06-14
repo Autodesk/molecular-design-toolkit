@@ -63,7 +63,7 @@ class AtomGroup(object):
     def mass(self):
         """ u.Scalar[mass]: total mass of this object
         """
-        return sum(a.mass for a in self.atoms)
+        return u.unitsum(a.mass for a in self.atoms)
 
     @property
     def momentum(self):

@@ -20,6 +20,25 @@ standard_library.install_aliases()
 from .quantity import *
 
 
+def unitsum(iterable):
+    """
+    Faster method to compute sums of iterables if they're all in the right units
+
+    Args:
+        iterable (Iter[MdtQuantity]): iterable to sum over
+
+    Returns:
+        MdtQuantity: the sum
+    """
+    g0 = next(iterable).copy()
+    for item in iterable:
+        if item.units == g0.units:
+            g0._magnitude += item._magnitude
+        else:
+            g0 += item
+    return g0
+
+
 def from_json(j):
     """
     Convert a JSON description to a quantity.

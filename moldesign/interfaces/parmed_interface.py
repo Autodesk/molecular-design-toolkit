@@ -136,7 +136,11 @@ def parmed_to_mdt(pmdmol):
     atoms = collections.OrderedDict()
     residues = {}
     chains = {}
-    for patm in pmdmol.atoms:
+
+    masses = [pa.mass for pa in pmdmol.atoms] * u.dalton
+    positions = [[pa.xx, pa.xy, pa.xz] for pa in pmdmol.atoms] * u.angstrom
+
+    for iatom, patm in enumerate(pmdmol.atoms):
         if patm.residue.chain not in chains:
             chains[patm.residue.chain] = mdt.Chain(pdbname=patm.residue.chain)
         chain = chains[patm.residue.chain]
@@ -151,8 +155,8 @@ def parmed_to_mdt(pmdmol):
         atom = mdt.Atom(name=patm.name,
                         atnum=patm.atomic_number,
                         pdbindex=patm.number,
-                        mass=patm.mass * u.dalton)
-        atom.position = [patm.xx, patm.xy, patm.xz]*u.angstrom
+                        mass=masses[iatom])
+        atom.position = positions[iatom]
 
         atom.residue = residue
         residue.add(atom)
