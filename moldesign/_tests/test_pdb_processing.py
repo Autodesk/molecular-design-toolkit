@@ -55,7 +55,7 @@ def test_1hpk(request, mol):
 
 @pytest.fixture
 def pdb_2jaj():
-    return mdt.read(get_data_path('2jaj.pdb'))
+    return mdt.read(get_data_path('2jaj.pdb.gz'))
 
 
 @pytest.fixture
@@ -87,7 +87,7 @@ def test_missing_residues_xtal_2jaj(request, mol):
 
 
 def test_missing_residues_nmr_5b7a():
-    mol = mdt.read(get_data_path('5b7a.pdb'))
+    mol = mdt.read(get_data_path('5b7a.pdb.bz2'))
     missingres = mol.metadata.missing_residues
     for expected in MISSINGRES_5B7A:
         assert missingres[expected[0]][expected[2]] == expected[1]

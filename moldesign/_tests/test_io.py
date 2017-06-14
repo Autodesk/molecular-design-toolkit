@@ -105,12 +105,12 @@ def dna_sequence():
 
 @pytest.fixture
 def pdb_1kbu():
-    return mdt.read(get_data_path('1KBU.pdb'))
+    return mdt.read(get_data_path('1KBU.pdb.bz2'))
 
 
 @pytest.fixture
 def mmcif_1kbu():
-    return mdt.read(get_data_path('1KBU.cif'))
+    return mdt.read(get_data_path('1KBU.cif.bz2'))
 
 
 @pytest.mark.parametrize('key', 'pdb mmcif sequence'.split())

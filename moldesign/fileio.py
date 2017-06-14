@@ -17,6 +17,7 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from past.builtins import basestring
+from future.utils import PY2
 
 import bz2
 import pickle as pkl  # TODO: if cpickle fails, retry with regular pickle to get a better traceback
@@ -74,6 +75,8 @@ def read(f, format=None):
             format, compression = _get_format(filename, format)
             if format in PICKLE_EXTENSIONS:
                 readmode = 'rb'
+            elif compression == 'bz2' and not PY2:
+                readmode = 'rt'
             fileobj = COMPRESSION[compression](filename, mode=readmode)
             closehandle = True
         elif hasattr(f, 'open'):  # we can get a file-like object
@@ -398,11 +401,16 @@ READERS = {'pdb': read_pdb,
 WRITERS = {'pdb': write_pdb,
            'mmcif': write_mmcif}
 
+if PY2:
+    bzopener = bz2.BZ2File
+else:
+    bzopener = bz2.open
+
 PICKLE_EXTENSIONS = set("p pkl pickle mdt".split())
 COMPRESSION = {'gz': gzip.open,
                'gzip': gzip.open,
-               'bz2': bz2.BZ2File,
-               'bzip2': bz2.BZ2File,
+               'bz2': bzopener,
+               'bzip2': bzopener,
                None: open}
 
 for ext in PICKLE_EXTENSIONS:
