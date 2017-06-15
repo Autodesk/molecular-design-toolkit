@@ -80,6 +80,7 @@ def h2():
 def ethylene():
     return mdt.from_smiles('C=C')
 
+
 @pytest.fixture
 def pdb1yu8():
     return mdt.read(get_data_path('1yu8.pdb'))

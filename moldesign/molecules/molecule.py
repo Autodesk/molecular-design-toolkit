@@ -604,7 +604,7 @@ class MolTopologyMixin(object):
                 ', '.join(conflicts)))
         self.is_biomolecule = (num_biores >= 2)
 
-    def is_identical(self, other):
+    def is_identical(self, other, verbose=False):
         """ Test whether two molecules are "identical"
 
         We specifically test these quantities for equality:
@@ -621,18 +621,29 @@ class MolTopologyMixin(object):
 
         Args:
             other (moldesign.Molecule): molecule to test against
+            verbose (bool): when returning False, print the reasons why
+
 
         Returns:
             bool: true if all tested quantities are equal
         """
-        if (self.num_atoms != other.num_atoms
-            or self.num_residues != other.num_residues
-            or self.num_chains != other.num_chains
-            or (self.positions != other.positions).any()
-            or (self.momenta != other.momenta).any()):
+        if not self.same_topology(other, verbose=verbose):
             return False
 
-        return self.same_topology(other)
+        if (self.positions != other.positions).any():
+            if verbose:
+                mismatch = (self.positions != other.positions).any(axis=1).sum()
+                print("%d atoms have different positions." % mismatch)
+            return False
+
+        if (self.momenta != other.momenta).any():
+            if verbose:
+                mismatch = (self.momenta != other.momenta).any(axis=1).sum()
+                print("%d atoms have different momenta."%mismatch)
+            return False
+
+        return True
+
 
     @property
     def num_residues(self):
@@ -710,10 +721,23 @@ class MolTopologyMixin(object):
 
         Args:
             other (moldesign.Molecule): molecule to test against
+            verbose (bool): when returning False, print the reasons why
 
         Returns:
             bool: true if all tested quantities are equal
         """
+        if self.num_atoms != other.num_atoms:
+            if verbose: print('INFO: Different numbers of atoms')
+            return False
+
+        if self.num_chains != other.num_chains:
+            if verbose: print('INFO: Different numbers of chains')
+            return False
+
+        if self.num_residues != other.num_residues:
+            if verbose: print('INFO: Different numbers of residues')
+            return False
+
         for a1, a2 in itertools.zip_longest(
                 itertools.chain(self.atoms, self.residues, self.chains),
                 itertools.chain(other.atoms, other.residues, other.chains)):
@@ -1021,7 +1045,7 @@ class Molecule(AtomGroup,
     momenta = ProtectedArray('_momenta')
 
     draw_orbitals = WidgetMethod('molecules.draw_orbitals')
-    _PERSIST_REFERENCES = True  # relevant for `pyccc` helper library
+    _PERSIST_REFERENCES = True  # relevant for `pyccc` RPC calls
 
     def __init__(self, atomcontainer,
                  name=None, bond_graph=None,

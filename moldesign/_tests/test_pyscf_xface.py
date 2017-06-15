@@ -116,3 +116,19 @@ def test_calc_eri_tensor(h2):
     assert eris.nbasis == 2
     with pytest.raises(IndexError):
         eris[0,1,2,1]
+
+
+def test_aobasis(h2_rhfwfn):
+    # it's sto-3g, so structure is simple
+    aobasis = h2_rhfwfn.wfn.aobasis
+    assert aobasis.basisname == 'sto-3g'
+    assert (aobasis.coeffs == np.identity(2)).all()
+    np.testing.assert_allclose(aobasis.fock, aobasis.fock.T)
+    assert (aobasis.energies == aobasis.fock.diagonal()).all()
+
+    assert aobasis.fock.dimensionality == u.eV.dimensionality
+
+    for orb in h2_rhfwfn.wfn.aobasis:
+        assert orb.orbtype == 's'
+        assert len(orb.primitives) == 3
+        assert (orb.n, orb.m, orb.l) == (1, 0, 0)

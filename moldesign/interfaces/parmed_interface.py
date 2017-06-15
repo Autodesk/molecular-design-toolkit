@@ -1,4 +1,7 @@
 from __future__ import print_function, absolute_import, division
+
+import io
+
 from future.builtins import *
 from future import standard_library
 standard_library.install_aliases()
@@ -67,12 +70,29 @@ def read_pdb(f):
 
 
 def write_pdb(mol, fileobj):
+    """ Write a PDB file to a buffer
+
+    Args:
+        mol (moldesign.Molecule): molecule to write as pdb
+        fileobj (io.IOBase): buffer to write to - bytes and text interfaces are acceptable
+    """
     pmedmol = mol_to_parmed(mol)
 
     tempfile = StringIO()
     pmedmol.write_pdb(tempfile, renumber=False)
+
+    if not isinstance(fileobj, io.TextIOBase) or 'b' in getattr(fileobj, 'mode', ''):
+        binaryobj = fileobj
+        fileobj = io.TextIOWrapper(binaryobj)
+        wrapped = True
+    else:
+        wrapped = False
+
     _insert_conect_records(mol, pmedmol, tempfile, write_to=fileobj)
 
+    if wrapped:
+        fileobj.flush()
+        fileobj.detach()
 
 CONECT = 'CONECT %4d'
 
@@ -86,7 +106,7 @@ def _insert_conect_records(mol, pmdmol, pdbfile, write_to=None):
         pdbfile (TextIO OR str): pdb file (file-like or string)
 
     Returns:
-        StringIO OR str: copy of the pdb file with added TER records - it will be
+        TextIO OR str: copy of the pdb file with added TER records - it will be
          returned as the same type passed (i.e., as a filelike buffer or as a string)
     """
     conect_bonds = mdt.helpers.get_conect_pairs(mol)
@@ -115,7 +135,6 @@ def _insert_conect_records(mol, pmdmol, pdbfile, write_to=None):
                     newf.write(str(CONECT % a1idx + pairindices + '\n'))
 
         newf.write(str(line))
-        # strs are added here for py2/py3 compatibility - always casts into native str type
 
 
 

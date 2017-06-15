@@ -1,11 +1,16 @@
 """ Tests for molecule creation and file i/o
 """
+import io
+import os
+
+import subprocess
 from future.utils import PY2, native_str
 from builtins import str
 import collections
 import pathlib
 import gzip
 import bz2
+import pickle
 
 import numpy
 import pytest
@@ -14,7 +19,8 @@ import moldesign as mdt
 mdt.compute.config.engine_type = 'docker'
 from moldesign import units as u
 
-from .helpers import get_data_path
+from .helpers import get_data_path, INTERNET_ON, native_str_buffer
+from .object_fixtures import h2_trajectory, h2_harmonic, h2
 
 
 @pytest.fixture
@@ -146,11 +152,54 @@ def mmcif_1kbu():
     return mdt.read(get_data_path('1KBU.cif.bz2'))
 
 
+@pytest.mark.skipif(not INTERNET_ON, reason='This test requires an internet connection')
+def test_from_pdb_pdb_format():
+    mol = mdt.from_pdb('3aid')
+    assert mol.metadata.pdbid == '3aid'
+    assert mol.metadata.sourceformat == 'pdb'
+    assert mol.num_atoms == 1912
+
+
+@pytest.mark.skipif(not INTERNET_ON, reason='This test requires an internet connection')
+def test_from_pdb_mmcif_format():
+    mol = mdt.from_pdb('3aid', usecif=True)
+    assert mol.metadata.pdbid == '3aid'
+    assert mol.metadata.sourceformat == 'mmcif'
+    assert mol.metadata.sourceurl.split('.')[-1] == 'cif'
+    assert mol.num_atoms == 1912
+
+
 @pytest.mark.parametrize('key', 'pdb mmcif sequence'.split())
 def test_read_dna_from_format(key, request):
     if key == 'mmcif':
         pytest.xfail(reason='Known mmcif parser bug, fix this by 0.7.4')
     mol = request.getfixturevalue('dna_'+key)
+
+
+def test_write_file_to_buffer(bipyridine_smiles):
+    mol = bipyridine_smiles
+    buffer = native_str_buffer()
+    mol.write(buffer, format='pdb')
+
+    buffer.seek(0)
+    newmol = mdt.read(buffer.getvalue(), format='pdb')
+    assert mol.num_atoms == newmol.num_atoms
+
+
+def test_write_pickle_to_buffer(bipyridine_smiles):
+    mol = bipyridine_smiles
+    buffer = io.BytesIO()
+    mol.write(buffer, format='pkl')
+
+    newmol = pickle.loads(buffer.getvalue())
+    assert newmol.is_identical(mol, verbose=True)
+
+
+def test_read_from_buffer():
+    s = native_str("2\nmy xyz file\n H  1.0 1.0 1.0\n H 1.0 2.0 1.0\n")
+    buffer = native_str_buffer(s)
+    h2 = mdt.read(buffer, format='xyz')
+    assert h2.num_atoms == 2
 
 
 @pytest.mark.parametrize('key', 'mmcif pdb'.split())
@@ -211,3 +260,12 @@ def test_topology_preserved_in_serialization(bipyridine_smiles, fmt):
 
     newmol = mdt.read(mol.write(format=fmt), format=fmt)
     assert mol.same_bonds(newmol, verbose=True)
+
+
+def test_write_traj(h2_trajectory, tmpdir):
+    path = os.path.join(str(tmpdir), 'traj.xyz')
+
+    h2_trajectory.write(path)
+
+    assert int(subprocess.check_output(['wc', '-l', path]).split()[0]) == (
+        (h2_trajectory.mol.num_atoms+2) * h2_trajectory.num_frames)

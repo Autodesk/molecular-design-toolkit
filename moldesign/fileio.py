@@ -141,7 +141,7 @@ def _isfile(f):
 
 
 @utils.exports
-def write(obj, filename=None, format=None, mode='w'):
+def write(obj, filename=None, format=None):
     """ Write a molecule to a file or string.
     Will also pickle arbitrary python objects.
 
@@ -160,6 +160,8 @@ def write(obj, filename=None, format=None, mode='w'):
     Returns:
         str: if filename is none, return the output file as a string (otherwise returns ``None``)
     """
+    close_handle = False
+
     if hasattr(filename, 'write'):  # it's a stream
         fileobj = filename
         return_string = False
@@ -198,6 +200,7 @@ def write(obj, filename=None, format=None, mode='w'):
         if path:
             return_string = False
             fileobj = COMPRESSION[compression](str(path), mode=writemode + mode)
+            close_handle = True
         else:
             return_string = True
             fileobj = streamtype()
@@ -211,7 +214,7 @@ def write(obj, filename=None, format=None, mode='w'):
     # Return a string if necessary
     if return_string:
         return fileobj.getvalue()
-    else:
+    elif close_handle:
         fileobj.close()
 
 
@@ -321,15 +324,6 @@ def read_xyz(f):
     return mdt.Molecule(tempmol.atoms)
 
 
-
-@utils.exports
-def mol_to_openmm_sim(mol):
-    try:
-        return mol.energy_model.get_openmm_simulation()
-    except AttributeError:
-        raise AttributeError("Can't create an OpenMM object - no OpenMM energy_model present")
-
-
 @utils.exports
 def from_pdb(pdbcode, usecif=False):
     """ Import the given molecular geometry from PDB.org
@@ -350,7 +344,7 @@ def from_pdb(pdbcode, usecif=False):
 
     fileext = 'cif' if usecif else 'pdb'
 
-    url = 'http://www.rcsb.org/pdb/files/%s.%s' % (pdbcode, fileext)
+    url = 'https://www.rcsb.org/pdb/files/%s.%s' % (pdbcode, fileext)
     request = requests.get(url)
 
     if request.status_code == 404 and not usecif:  # if not found, try the cif-format version
@@ -364,12 +358,17 @@ def from_pdb(pdbcode, usecif=False):
         raise ValueError('Failed to download %s.%s from rcsb.org: %s %s' % (
             pdbcode, fileext, request.status_code, request.reason))
 
-
     filestring = request.text
 
     mol = read(filestring, format=fileext)
     mol.name = pdbcode
-    mol.metadata.url = 'http://www.rcsb.org/pdb/explore.do?structureId=%s' % pdbcode
+    mol.metadata.sourceurl = url
+    mol.metadata.structureurl = 'https://www.rcsb.org/pdb/explore.do?structureId=%s' % pdbcode
+    mol.metadata.pdbid = pdbcode
+    if usecif:
+        mol.metadata.sourceformat = 'mmcif'
+    else:
+        mol.metadata.sourceformat = 'pdb'
     return mol
 
 

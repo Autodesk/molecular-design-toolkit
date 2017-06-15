@@ -1,6 +1,7 @@
 """ Test various functionalities around data structure consistency
 """
 import pickle
+from past.builtins import basestring
 
 import moldesign.exceptions
 import moldesign.molecules.atomcollections
@@ -289,9 +290,9 @@ def test_h2_trajectory(h2_trajectory):
 
 def test_markdown_reprs_work(nucleic):
     # Not bothering to test the content, just want to make sure there's no error
-    assert isinstance(nucleic._repr_markdown_(), str)
-    assert isinstance(nucleic.atoms[0]._repr_markdown_(), str)
-    assert isinstance(nucleic.residues[0]._repr_markdown_(), str)
+    assert isinstance(nucleic._repr_markdown_(), basestring)
+    assert isinstance(nucleic.atoms[0]._repr_markdown_(), basestring)
+    assert isinstance(nucleic.residues[0]._repr_markdown_(), basestring)
 
 
 def test_molecule_comparisons(nucleic, h2):
