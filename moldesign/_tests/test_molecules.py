@@ -26,8 +26,8 @@ def test_h2_protected_atom_arrays(h2):
 def test_h2_hierarchy(h2):
     assert len(h2.residues) == 1
     assert len(h2.chains) == 1
-    chain = next(h2.chains.__iter__())
-    res = next(h2.residues.__iter__())
+    chain = next(iter(h2.chains))
+    res = next(iter(h2.residues))
     atom1, atom2 = h2.atoms
     assert h2 == atom1.molecule == atom2.molecule == chain.molecule == res.molecule
     assert chain == atom1.chain == atom2.chain

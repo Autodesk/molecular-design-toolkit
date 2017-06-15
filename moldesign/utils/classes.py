@@ -121,6 +121,9 @@ class DotDict(object):
         else:
             del self._od[key]
 
+    def __dir__(self):
+        return list(self.keys()) + super().__dir__()
+
     def __getstate__(self):
         return {'od': self._od}
 
