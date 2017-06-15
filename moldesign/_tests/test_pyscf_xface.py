@@ -106,3 +106,13 @@ def test_pyscf_rhf_sto3g_forces(objkey, request):
 
     assert forces.shape == (mol.num_atoms, 3)
 
+
+def test_calc_eri_tensor(h2):
+    h2.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
+    h2.calculate()
+    eris = h2.wfn.aobasis.calc_eris()
+    assert eris[0,0, 1,1] == eris[1,1, 0,0]
+    assert eris[1,0, 0,1] == eris[0,1, 0,1]
+    assert eris.nbasis == 2
+    with pytest.raises(IndexError):
+        eris[0,1,2,1]

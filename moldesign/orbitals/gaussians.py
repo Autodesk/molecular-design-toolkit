@@ -441,21 +441,3 @@ def cart_to_powers(s):
 
 
 DIMLABELS = {'x': 0, 'y': 1, 'z': 2}
-
-
-class ERI4FoldTensor(object):
-    def __init__(self, mat, basis_orbitals):
-        self.mat = mat
-        self.basis_orbitals = basis_orbitals
-        nbasis = len(self.basis_orbitals)
-        mapping = np.zeros((nbasis, nbasis), dtype='int')
-        ij = 0
-        for i in range(nbasis):
-            for j in range(i + 1):
-                mapping[i, j] = mapping[j, i] = ij
-                ij += 1
-        self.mapping = mapping
-
-    def __getitem__(self, item):
-        i, j, k, l = item
-        return self.mat[self.mapping[i, j], self.mapping[k, l]]

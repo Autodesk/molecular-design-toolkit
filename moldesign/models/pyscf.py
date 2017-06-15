@@ -83,8 +83,7 @@ class PySCFPotential(QMBase):
     DEFAULT_PROPERTIES = ['potential_energy',
                           'wfn',
                           'mulliken']
-    ALL_PROPERTIES = DEFAULT_PROPERTIES + ['eri_tensor',
-                                           'forces',
+    ALL_PROPERTIES = DEFAULT_PROPERTIES + ['forces',
                                            'nuclear_forces',
                                            'electronic_forces']
     PARAM_SUPPORT = {'theory': ['rhf', 'rks', 'mp2'],

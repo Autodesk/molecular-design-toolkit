@@ -213,6 +213,19 @@ class MolecularOrbitals(object):
                 thisorb.coeffs *= -1.0
                 # TODO: print a warning if overlap is small?
 
+    def calc_eris(self):
+        """ Calculate electron repulsion integrals in this basis
+
+        Returns:
+            ERI4FoldTensor: table of electron repulsion integrals
+
+        Note:
+            Currently uses PySCF/libint to calculate the integrals, regardless of the program
+            that generated the wavefunction
+        """
+        from moldesign.interfaces.pyscf_interface import get_eris_in_basis
+        return get_eris_in_basis(self.wfn.aobasis, self.coeffs)
+
     def overlap(self, other):
         """ Calculate overlaps between this and another set of orbitals
 
@@ -360,3 +373,19 @@ class MolecularOrbitals(object):
                     orb.name = 'virt cmo %d' % i
 
 
+class ERI4FoldTensor(object):
+    def __init__(self, mat, basis_orbitals):
+        self.mat = mat
+        self.basis_orbitals = basis_orbitals
+        self.nbasis = len(self.basis_orbitals)
+        mapping = np.zeros((self.nbasis, self.nbasis), dtype='int')
+        ij = 0
+        for i in range(self.nbasis):
+            for j in range(i + 1):
+                mapping[i, j] = mapping[j, i] = ij
+                ij += 1
+        self.mapping = mapping
+
+    def __getitem__(self, item):
+        i, j, k, l = item
+        return self.mat[self.mapping[i, j], self.mapping[k, l]]
