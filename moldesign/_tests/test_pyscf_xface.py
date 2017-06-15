@@ -42,6 +42,13 @@ def heh_plus():
     return mol
 
 
+@pytest.fixture
+def h2_rhfwfn(h2):
+    h2.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
+    h2.calculate()
+    return h2
+
+
 @pytest.mark.parametrize('objkey', registered_types['molecule'])
 def test_pyscf_rhf_sto3g_properties(objkey, request):
     mol = request.getfixturevalue(objkey)

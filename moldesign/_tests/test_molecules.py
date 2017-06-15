@@ -7,6 +7,8 @@ import moldesign.molecules.atomcollections
 import moldesign.utils.classes
 
 from .object_fixtures import *
+from .test_ambertools_xface import protein_default_amber_forcefield
+from .test_pyscf_xface import h2_rhfwfn
 
 
 def test_h2_protected_atom_arrays(h2):
@@ -283,3 +285,71 @@ def test_h2_trajectory(h2_trajectory):
         elif 0.4 < period_progress < 0.6:
             # check for expected troughs of sine wave
             assert frame.positions[0, 0] < -0.1 * u.angstrom
+
+
+def test_markdown_reprs_work(nucleic):
+    # Not bothering to test the content, just want to make sure there's no error
+    assert isinstance(nucleic._repr_markdown_(), str)
+    assert isinstance(nucleic.atoms[0]._repr_markdown_(), str)
+    assert isinstance(nucleic.residues[0]._repr_markdown_(), str)
+
+
+def test_molecule_comparisons(nucleic, h2):
+    n = nucleic.copy()
+    assert nucleic.same_topology(n)
+    assert nucleic.is_identical(n)
+
+    n.positions[3] += 0.1 * u.angstrom
+    assert nucleic.same_topology(n)
+    assert not nucleic.is_identical(n)
+
+    assert not nucleic.same_topology(h2)
+
+
+def test_forcefield_atom_term_access(protein_default_amber_forcefield):
+    mol = protein_default_amber_forcefield
+    for atom in mol.atoms:
+        assert atom.ff.ljepsilon.dimensionality == u.kcalpermol.dimensionality
+        assert atom.ff.ljsigma.dimensionality == u.angstrom.dimensionality
+        assert atom.ff.partial_charge.dimensionality == u.q_e.dimensionality
+
+
+def test_forcefield_bond_term_access(protein_default_amber_forcefield):
+    mol = protein_default_amber_forcefield
+    for bond in mol.bonds:
+        assert bond.ff.equilibrium_length.dimensionality == u.angstrom.dimensionality
+        assert bond.ff.force_constant.dimensionality == (u.kcalpermol/u.angstrom).dimensionality
+
+
+def test_atom_basis_function_returns_none_if_no_wfn(h2):
+    for atom in h2.atoms:
+        assert atom.basis_functions is None
+
+
+def test_atom_ffterms_returns_none_if_no_ff(h2):
+    for atom in h2.atoms:
+        assert atom.ff is None
+
+
+def test_bond_ffterms_returns_none_if_no_ff(h2):
+    for bond in h2.bonds:
+        assert bond.ff is None
+
+
+def test_basis_function_atom_access(h2_rhfwfn):
+    mol = h2_rhfwfn
+    for atom in mol.atoms:
+        assert len(atom.basis_functions) == 1  # good ol' sto-3g
+        assert len(atom.basis_functions[0].primitives) == 3
+
+
+def test_atom_property_access_to_mulliken_charges(h2_rhfwfn):
+    mol = h2_rhfwfn
+    for atom in mol.atoms:
+        assert abs(atom.properties.mulliken) <= 1e-5 * u.q_e
+
+
+def test_atom_properties_are_empty_dict_if_nothings_computed(h2):
+    empty = mdt.utils.DotDict()
+    for atom in h2.atoms:
+        assert atom.properties == empty

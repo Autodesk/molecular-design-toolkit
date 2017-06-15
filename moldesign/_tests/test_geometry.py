@@ -41,7 +41,7 @@ def _apply_random_offsets(mol, idim):
     mol.positions[:, idim] += (random.random()-0.5)*100.0*u.angstrom
 
 
-@typedfixture('atomcontainer')
+@typedfixture('atomcontainer', scope='function')
 def three_particle_right_angle():
     mol = _make_mol_with_n_hydrogens(3)
     mol.atoms[0].x = 1.0 * u.angstrom
@@ -53,7 +53,7 @@ def three_particle_right_angle():
     return mol
 
 
-@typedfixture('atomcontainer')
+@typedfixture('atomcontainer', scope='function')
 def four_particle_45_twist():
     mol = _make_mol_with_n_hydrogens(4)
     mol.positions = u.nm*[[0.1, 0.0, -0.5],
@@ -117,6 +117,15 @@ def test_set_dihedral_two_atom_selection(four_particle_45_twist):
         mdt.set_dihedral(mol.atoms[0], mol.atoms[1], 5.0 * u.degrees)
 
 
+def test_set_dihedral_bond_no_adjust(four_particle_45_twist):
+    mol = four_particle_45_twist
+    bond = mdt.Bond(mol.atoms[1], mol.atoms[2])
+    mdt.set_dihedral(bond, 10.0 * u.degrees, adjustmol=False)
+    np.testing.assert_almost_equal(mdt.dihedral(*mol.atoms).value_in(u.degrees),
+                                   10.0,
+                                   decimal=8)
+
+
 def test_dihedral_sign_convention(four_particle_45_twist):
     mol = four_particle_45_twist
     mol.atoms[-1].y += 0.4 * u.nm
@@ -173,6 +182,26 @@ def test_angle_gradient(three_particle_right_angle):
                                atol=5.0*helpers.DEFSTEP.defunits_value())
 
 
+def test_set_angle_with_monitor(three_particle_right_angle):
+    mol = three_particle_right_angle
+    ang = mdt.AngleMonitor(*mol.atoms)
+
+    ang.value = 45 * u.degrees
+    assert abs(mdt.angle(*mol.atoms) - (45 * u.degrees)) < 0.1 * u.degrees
+
+
+def test_set_angle_noadjust(four_particle_45_twist):
+    mol = four_particle_45_twist
+    assert mdt.angle(*mol.atoms[:3]) == 90.0 * u.degrees
+    final = 45 * u.degrees
+    origpos = mol.positions.copy()
+    mdt.set_angle(mol.atoms[0], mol.atoms[1], mol.atoms[2], final, adjustmol=False)
+
+    assert abs(mdt.angle(*mol.atoms[:3]) - final) < 0.1 * u.degrees
+    assert (mol.positions[-1] == origpos[-1]).all()
+
+
+
 ########################
 # Distances            #
 ########################
@@ -187,6 +216,29 @@ def test_distance_array(three_particle_right_angle):
     np.testing.assert_allclose(distance_array,
                                desired_distance_array,
                                atol=1e-8)
+
+
+def test_set_distance_and_adjust(four_particle_45_twist):
+    mol = four_particle_45_twist
+    origpos = mol.positions.copy()
+    distance = mdt.DistanceMonitor(mol.atoms[1], mol.atoms[2])
+    olddist = distance.value
+    distance.value *= 2.0
+
+    displacement = np.sqrt(((origpos[0] - mol.positions[0])**2).sum()) + \
+                   np.sqrt(((origpos[-1] - mol.positions[-1])**2).sum())
+    assert abs(mdt.distance(mol.atoms[1], mol.atoms[2]) - 2.0*olddist) <= 1e-9 * u.angstrom
+    assert abs(displacement - olddist) < 1.0e-9 * u.angstrom
+
+
+def test_set_distance_noadjust(four_particle_45_twist):
+    mol = four_particle_45_twist
+    origpos = mol.positions.copy()
+    olddist = mdt.distance(mol.atoms[1], mol.atoms[2])
+    mdt.set_distance(mol.atoms[1], mol.atoms[2], 2.0 * olddist, adjustmol=False)
+
+    assert abs(mdt.distance(mol.atoms[1], mol.atoms[2]) - 2.0*olddist) <= 1e-9 * u.angstrom
+    assert (origpos[0] == mol.positions[0]).all() and (origpos[-1] == mol.positions[-1]).all()
 
 
 @pytest.mark.parametrize('objkey', registered_types['atomcontainer'])
