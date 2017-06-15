@@ -1,8 +1,8 @@
-import pathlib
 import subprocess
 import pytest
 
 import moldesign as mdt
+from moldesign.external import pathlib
 
 
 @pytest.fixture

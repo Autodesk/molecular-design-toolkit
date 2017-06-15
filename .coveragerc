@@ -25,3 +25,5 @@ exclude_lines =
     def _repr_markdown_
     raise AssertionError
     raise NotImplementedError
+    if PY2
+    if future.utils.PY2

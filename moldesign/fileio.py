@@ -25,7 +25,6 @@ import io
 import functools
 import gzip
 import os
-import pathlib
 
 import moldesign as mdt
 from . import utils
@@ -33,6 +32,7 @@ from .interfaces import biopython_interface
 from .interfaces import openbabel as openbabel_interface
 from .interfaces.parmed_interface import write_pdb, write_mmcif
 from .helpers import pdb
+from .external import pathlib
 
 # imported names
 read_amber = mdt.interfaces.openmm.amber_to_mol
@@ -69,10 +69,13 @@ def read(f, format=None):
     closehandle = False
     streamtype = io.StringIO
     readmode = 'r'
+    if PY2:
+        f = pathlib._backport_pathlib_fixup(f)
+
     try:  # Gets a file-like object, depending on exactly what was passed:
 
         # it's a path to a file
-        if isinstance(f, pathlib.Path) or (isinstance(f, basestring) and _isfile(f)):
+        if _ispath(f):
             path = pathlib.Path(f).expanduser()
             format, compression, modesuffix = _get_format(path.name, format)
             fileobj = COMPRESSION[compression](str(path), mode='r' + modesuffix)
@@ -115,6 +118,19 @@ def read(f, format=None):
 
     mdt.helpers.atom_name_check(mol)
     return mol
+
+
+def _ispath(f):
+    if not f:
+        return False
+    elif isinstance(f, basestring) and _isfile(f):
+        return True
+    elif isinstance(f, pathlib.Path):
+        return True
+    elif PY2 and pathlib._backportpathlib and isinstance(f, pathlib._backportpathlib.Path):
+        return True
+    else:
+        return False
 
 
 def _isfile(f):

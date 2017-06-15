@@ -1,6 +1,6 @@
 """ Tests for molecule creation and file i/o
 """
-from future.utils import PY2
+from future.utils import PY2, native_str
 from builtins import str
 import collections
 import pathlib
@@ -95,7 +95,7 @@ def test_read_bipyridine_from_format(key, request):
 @pytest.mark.parametrize('suffix', ['gz','bz2'])
 def test_compressed_write(bipyridine_xyz, tmpdir, suffix):
     # Note: compressed read is tested elsewhere when reading test data files
-    path = pathlib.Path(str(tmpdir))
+    path = pathlib.Path(native_str(tmpdir))
     dest = path / ('bipyr.xyz.' + suffix)
     bipyridine_xyz.write(dest)
 

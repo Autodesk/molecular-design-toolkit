@@ -4,7 +4,7 @@ future
 fortranformat
 funcsigs
 numpy >= 1.12
-pathlib ; python_version < '3.3'
+pathlib2 ; python_version < '3.3'
 parmed >= 2.7.3
 pint >= 0.8
 pyccc >= 0.7.6
