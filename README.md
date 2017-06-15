@@ -1,10 +1,11 @@
 <img src="moldesign/_notebooks/img/Header.png">
 
-[![PyPI version](https://badge.fury.io/py/moldesign.svg)](https://badge.fury.io/py/moldesign)
-[![GitHub version](https://badge.fury.io/gh/autodesk%2Fmolecular-design-toolkit.svg)](https://badge.fury.io/gh/autodesk%2Fmolecular-design-toolkit)
-<a href="https://github.com/autodesk/molecular-design-toolkit/blob/master/LICENSE" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: rgb(70, 61, 84);"><img src="https://img.shields.io/badge/license-Apache%202-blue.svg"> </a>
-[ ![Codeship Status for Autodesk/molecular-design-toolkit](https://app.codeship.com/projects/5ed079f0-08f6-0135-3493-3696d72919a3/status?branch=master)](https://app.codeship.com/projects/214515)
-[![Coverage Status](https://coveralls.io/repos/github/Autodesk/molecular-design-toolkit/badge.svg?branch=master)](https://coveralls.io/github/Autodesk/molecular-design-toolkit?branch=master)
+[![PyPI version](https://img.shields.io/pypi/v/moldesign.svg?label=dev)](https://pypi.python.org/pypi/moldesign)
+[![github release tag](https://img.shields.io/github/release/autodesk/molecular-design-toolkit.svg?label=stable)](https://pypi.python.org/pypi/moldesign)
+![Python versions](https://img.shields.io/pypi/pyversions/moldesign.svg)
+[![License](https://img.shields.io/pypi/l/moldesign.svg)](LICENSE.md)
+[ ![Codeship Status for Autodesk/molecular-design-toolkit](https://img.shields.io/codeship/5ed079f0-08f6-0135-3493-3696d72919a3/master.svg)](https://app.codeship.com/projects/214515)
+[![Coverage Status](https://img.shields.io/coveralls/Autodesk/molecular-design-toolkit/master.svg)](https://coveralls.io/github/Autodesk/molecular-design-toolkit?branch=master)
                                 
 **Try it now:** [![Binder](http://mybinder.org/badge.svg)](http://mybinder.org:/repo/avirshup/mdt-gallery-test)
 
