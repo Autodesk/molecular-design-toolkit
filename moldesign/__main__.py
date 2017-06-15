@@ -167,7 +167,7 @@ def check_existing_examples(use_existing):
         sys.exit(200)
 
 
-def launch_jupyter_server(cwd=None):
+def launch_jupyter_server(cwd=None):  # pragma: no cover
     for i in range(8888, 9999):
         if localhost_port_available(i):
             portnum = i
@@ -182,14 +182,14 @@ def launch_jupyter_server(cwd=None):
     return server, portnum
 
 
-def server_shutdown(server):
+def server_shutdown(server):  # pragma: no cover
     print('Shutting down jupyter server...')
     server.terminate()
     server.wait()
     print('Jupyter terminated.')
 
 
-def open_browser(url):
+def open_browser(url):  # pragma: no cover
     for exe in URL_OPENERS:
         if distutils.spawn.find_executable(exe) is not None:
             try:
@@ -201,7 +201,7 @@ def open_browser(url):
     print('Point your browser to %s to get started.' % url)  # fallback
 
 
-def localhost_port_available(portnum):
+def localhost_port_available(portnum):  # pragma: no cover
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(0.2)
     try:
@@ -219,7 +219,7 @@ def yaml_dumper(*args):
     return yaml.dump(*args, default_flow_style=False)
 
 
-def wait_net_service(server, port, process, timeout=None):
+def wait_net_service(server, port, process, timeout=None):  # pragma: no cover
     """
     Wait for network service to appear
     FROM http://code.activestate.com/recipes/576655-wait-for-network-service-to-appear/

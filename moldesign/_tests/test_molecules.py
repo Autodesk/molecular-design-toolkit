@@ -295,62 +295,57 @@ def test_markdown_reprs_work(nucleic):
     assert isinstance(nucleic.residues[0]._repr_markdown_(), basestring)
 
 
-def test_molecule_comparisons(nucleic, h2):
+def test_dna_and_hydrogen_are_different(nucleic, h2):
+    assert not nucleic.same_topology(h2)
+    assert not nucleic.is_identical(h2)
+
+
+def test_changing_momenta_and_positions_makes_mols_different(nucleic):
     n = nucleic.copy()
     assert nucleic.same_topology(n)
     assert nucleic.is_identical(n)
 
     n.positions[3] += 0.1 * u.angstrom
     assert nucleic.same_topology(n)
-    assert not nucleic.is_identical(n)
+    assert not nucleic.is_identical(n, verbose=True)
 
-    assert not nucleic.same_topology(h2)
+    n.positions = nucleic.positions
+    assert nucleic.is_identical(n)
 
+    n.momenta[3] += 5.0 * u.default.momentum
+    assert not nucleic.is_identical(n, verbose=True)
+    assert nucleic.same_topology(n, verbose=True)
 
-def test_forcefield_atom_term_access(protein_default_amber_forcefield):
-    mol = protein_default_amber_forcefield
-    for atom in mol.atoms:
-        assert atom.ff.ljepsilon.dimensionality == u.kcalpermol.dimensionality
-        assert atom.ff.ljsigma.dimensionality == u.angstrom.dimensionality
-        assert atom.ff.partial_charge.dimensionality == u.q_e.dimensionality
-
-
-def test_forcefield_bond_term_access(protein_default_amber_forcefield):
-    mol = protein_default_amber_forcefield
-    for bond in mol.bonds:
-        assert bond.ff.equilibrium_length.dimensionality == u.angstrom.dimensionality
-        assert bond.ff.force_constant.dimensionality == (u.kcalpermol/u.angstrom).dimensionality
+    n.momenta = nucleic.momenta
+    assert nucleic.is_identical(n, verbose=True)
+    assert nucleic.same_topology(n, verbose=True)
 
 
-def test_atom_basis_function_returns_none_if_no_wfn(h2):
-    for atom in h2.atoms:
-        assert atom.basis_functions is None
+def test_changing_residue_name_makes_mols_different(nucleic):
+    n = nucleic.copy()
+
+    assert nucleic.is_identical(n, verbose=True)
+    n.residues[0].resname = 'abc'
+    n.residues[0].name = 'abc1'
+    assert not nucleic.is_identical(n, verbose=True)
 
 
-def test_atom_ffterms_returns_none_if_no_ff(h2):
-    for atom in h2.atoms:
-        assert atom.ff is None
+def test_changing_residue_name_makes_mols_different(nucleic):
+    n = nucleic.copy()
+
+    assert nucleic.is_identical(n, verbose=True)
+    n.atoms[3].atnum = 5
+    assert not nucleic.is_identical(n, verbose=True)
+    assert not nucleic.same_topology(n, verbose=True)
 
 
-def test_bond_ffterms_returns_none_if_no_ff(h2):
-    for bond in h2.bonds:
-        assert bond.ff is None
+def test_changing_bonds_makes_mols_different(nucleic):
+    n = nucleic.copy()
 
+    assert nucleic.is_identical(n, verbose=True)
 
-def test_basis_function_atom_access(h2_rhfwfn):
-    mol = h2_rhfwfn
-    for atom in mol.atoms:
-        assert len(atom.basis_functions) == 1  # good ol' sto-3g
-        assert len(atom.basis_functions[0].primitives) == 3
-
-
-def test_atom_property_access_to_mulliken_charges(h2_rhfwfn):
-    mol = h2_rhfwfn
-    for atom in mol.atoms:
-        assert abs(atom.properties.mulliken) <= 1e-5 * u.q_e
-
-
-def test_atom_properties_are_empty_dict_if_nothings_computed(h2):
-    empty = mdt.utils.DotDict()
-    for atom in h2.atoms:
-        assert atom.properties == empty
+    atom1 = n.atoms[3]
+    atom2 = n.atoms[134]
+    n.bond_graph[atom1][atom2] = n.bond_graph[atom2][atom1] = 1
+    assert not nucleic.is_identical(n, verbose=True)
+    assert not nucleic.same_topology(n, verbose=True)

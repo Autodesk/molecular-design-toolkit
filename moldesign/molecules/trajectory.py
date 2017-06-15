@@ -425,7 +425,7 @@ class Trajectory(TrajectoryAnalysisMixin):
         if reference_frame is None:
             iframe = 0
             relative_alignment = True
-        elif type(reference_frame) == int:
+        elif isinstance(reference_frame, int):
             iframe = reference_frame
             relative_alignment = True
         else:

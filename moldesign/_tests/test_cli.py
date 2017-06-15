@@ -63,3 +63,7 @@ def test_dumpenv_command():
 def test_print_environment():
     # just test that it still works
     mdt.data.print_environment()
+
+def test_config_command():
+    # just test that it doesn't error
+    subprocess.check_call('python -m moldesign config'.split())

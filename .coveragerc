@@ -16,6 +16,7 @@ omit =
    moldesign/widgets.py
    moldesign/interfaces/nbo_interface.py
    moldesign/utils/_deadfunctions.py
+   moldesign/utils/docparsers/google.py
 
 [report]
 exclude_lines =

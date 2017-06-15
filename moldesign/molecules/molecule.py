@@ -301,21 +301,6 @@ class MolPropertyMixin(object):
         """
         return self.calc_property('wfn')
 
-    def update_properties(self, properties):
-        """
-        This is intended mainly as a callback for long-running property calculations.
-        When they are finished, they can call this method to update the molecule's properties.
-
-        Args:
-            properties (dict): properties-like object. MUST contain a 'positions' attribute.
-        """
-        if self.properties is None:
-            self.properties = properties
-        else:
-            assert (self.positions == properties.positions).all(), \
-                'The molecular geometry does not correspond to these properties'
-            self.properties.update()
-
     @property
     def potential_energy(self):
         """ units.Scalar[energy]: return the molecule's current potential energy, if calculated.

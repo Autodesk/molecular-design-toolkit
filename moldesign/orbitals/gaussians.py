@@ -113,10 +113,11 @@ class CartesianGaussian(AbstractFunction):
         self._cartesian = (self.powers != 0).any()
 
     def __repr__(self):
-        return ("<Gaussian (coeff: {coeff:4.2f}, "
+        return ("<{ndim}-D Gaussian (cart) (coeff: {coeff:4.2f}, "
                 "cartesian powers: {powers}, "
                 "exponent: {exp:4.2f}, "
                 "center: {center}>").format(
+                ndim=self.ndim,
                 center=self.center, exp=self.exp,
                 powers=tuple(self.powers), coeff=self.coeff)
 
@@ -256,6 +257,8 @@ class SphericalGaussian(AbstractFunction):
             Int J Quantum Chem 54, 83-87 (1995). doi:10.1002/qua.560540202
     """
 
+    ndims = 3
+
     def __init__(self, center, exp, n, l, m, coeff=None):
         self.center = center
         assert len(self.center) == 3
@@ -271,7 +274,7 @@ class SphericalGaussian(AbstractFunction):
             self.coeff = coeff
 
     def __repr__(self):
-        return ("<Gaussian (coeff: {coeff:4.2f}, "
+        return ("<3D Gaussian (Spherical) (coeff: {coeff:4.2f}, "
                 "exponent: {exp:4.2f}, "
                 "(n,l,m) = {qnums}").format(
                 center=self.center, exp=self.exp, coeff=self.coeff,

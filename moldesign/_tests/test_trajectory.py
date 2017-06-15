@@ -109,3 +109,38 @@ def test_property_backfill(precanned_trajectory):
     traj.new_frame(somenewthing=5)
 
     assert traj.somenewthing == [None] * oldnumframes + [5]
+
+
+def test_add_traj(precanned_trajectory):
+    newtraj = precanned_trajectory + precanned_trajectory
+
+    assert newtraj.num_frames == 2 * precanned_trajectory.num_frames
+
+
+@pytest.fixture
+def h2_wfn_traj(h2):
+    mol = h2.copy()
+    mol.set_energy_model(mdt.models.RHF, basis='sto-3g')
+
+    traj = mdt.Trajectory(mol)
+    for i in range(3):
+        mol.calculate()
+        traj.new_frame()
+        mol.atoms[0].x += 0.2 * u.angstrom
+
+    return traj
+
+
+def test_align_phases(h2_wfn_traj):
+    # TODO: actually check results
+    h2_wfn_traj.align_orbital_phases()
+
+    h2_wfn_traj.align_orbital_phases(reference_frame=1)
+
+    h2_wfn_traj.align_orbital_phases(reference_frame=h2_wfn_traj.frames[0])
+
+
+def test_mulliken_charge_trajectory(h2_wfn_traj):
+    traj = h2_wfn_traj
+    atom = traj.atoms[0]
+    assert len(atom.mulliken) == traj.num_frames

@@ -13,6 +13,8 @@ from moldesign import units as u
 registered_types = {}
 
 
+# TODO: implement and test spherical gaussians (not yet implemented)
+
 def typedfixture(*types, **kwargs):
     """This is a decorator that lets us associate fixtures with one or more arbitrary types.
     We'll later use this type to determine what tests to run on the result"""
@@ -132,3 +134,10 @@ def _assert_almost_equal(a, b, *args, **kwargs):
         return np.testing.assert_almost_equal(a.value_in(units),
                                               b.value_in(units),
                                               *args, **kwargs)
+
+
+def test_cart_to_powers():
+    from moldesign.orbitals.gaussians import cart_to_powers
+    assert cart_to_powers('y') == [0, 1, 0]
+    assert cart_to_powers('xxyz') == [2, 1, 1]
+    assert cart_to_powers('zx^3') == [3,0,1]
