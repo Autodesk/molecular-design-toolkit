@@ -74,4 +74,4 @@ def test_langevin_integrator(objkey, request):
     mol.set_integrator(mdt.integrators.OpenMMLangevin, temperature=300.0*u.kelvin)
     traj = mol.run(5.0 * u.ps)
     assert mol.time >= 4.99 * u.ps
-    assert 150 * u.kelvin <= traj.temperature[-1] <= 450 * u.kelvin
+    assert 150 * u.kelvin <= traj.kinetic_temperature[-1] <= 450 * u.kelvin

@@ -25,6 +25,7 @@ import io
 import functools
 import gzip
 import os
+import pathlib
 
 import moldesign as mdt
 from . import utils
@@ -52,7 +53,7 @@ def read(f, format=None):
         Currently does not support files with more than one record - only returns the first record
 
     Args:
-        f (str or file-like): Either a path to a file, OR a string with the
+        f (str or file-like or pathlib.Path): Either a path to a file, OR a string with the
             file's contents, OR a file-like object
         format (str): molecule format (pdb, xyz, sdf, etc.) or pickle format
             (recognizes p, pkl, or pickle); guessed from filename if not passed
@@ -68,25 +69,28 @@ def read(f, format=None):
     closehandle = False
     streamtype = io.StringIO
     readmode = 'r'
-    try:
-        # Open a file-like object
-        if isinstance(f, basestring) and _isfile(f):  # it's a path to a file
-            filename = os.path.expanduser(f)
-            format, compression = _get_format(filename, format)
-            if format in PICKLE_EXTENSIONS:
-                readmode = 'rb'
-            elif compression == 'bz2' and not PY2:
-                readmode = 'rt'
-            fileobj = COMPRESSION[compression](filename, mode=readmode)
+    try:  # Gets a file-like object, depending on exactly what was passed:
+
+        # it's a path to a file
+        if isinstance(f, pathlib.Path) or (isinstance(f, basestring) and _isfile(f)):
+            path = pathlib.Path(f).expanduser()
+            format, compression, modesuffix = _get_format(path.name, format)
+            fileobj = COMPRESSION[compression](str(path), mode='r' + modesuffix)
             closehandle = True
-        elif hasattr(f, 'open'):  # we can get a file-like object
+
+        # it can create a file-like object
+        elif hasattr(f, 'open'):
             if format in PICKLE_EXTENSIONS:
                 readmode = 'rb'
             fileobj = f.open(readmode)
             closehandle = True
-        elif hasattr(f, 'read'):  # it's already file-like
+
+        # it's already file-like
+        elif hasattr(f, 'read'):
             fileobj = f
-        elif isinstance(f, basestring):  # assume it's just a string
+
+        # It's a string with a file's content
+        elif isinstance(f, basestring):
             if format is None:
                 raise IOError(('No file named "%s"; ' % f[:50]) +
                               'please set the `format` argument if you want to parse the string')
@@ -125,44 +129,62 @@ def write(obj, filename=None, format=None, mode='w'):
     """ Write a molecule to a file or string.
     Will also pickle arbitrary python objects.
 
-    Note:
+    Notes:
         Files with ``.bz2`` or ``.gz`` suffixes will be automatically compressed.
+        Users will usually call this by way of ``Molecule.write``.
 
     Args:
         obj (moldesign.Molecule or object): the molecule to be written
             (or python object to be pickled)
-        filename (str): filename (if not passed, then a string is returned)
+        filename (str or pathlib.Path or file-like): path or buffer to write to (if not passed),
+            string is returned
         format (str): molecule format (pdb, xyz, sdf, etc.) or a pickle file extension
             ('pkl' and 'mdt' are both accepted)
 
     Returns:
         str: if filename is none, return the output file as a string (otherwise returns ``None``)
     """
-    # TODO: handle writing and returning file-like objects instead of strings
-
-    # lets users call mdt.write(obj, 'pdb') and get a string (without needing the "format" keyword
-    if (format is None and
-                filename is not None and
-                len(filename) < 5 and
-                '.' not in filename):
-        filename, format = None, filename
-
-    format, compression = _get_format(filename, format)
-
-    if format in PICKLE_EXTENSIONS:
-        streamtype = io.BytesIO
-        mode = 'wb'
-    else:
-        streamtype = io.StringIO
-        mode = 'w'
-
-    # First, create an object to write to (either file handle or file-like buffer)
-    if filename:
+    if hasattr(filename, 'write'):  # it's a stream
+        fileobj = filename
         return_string = False
-        fileobj = COMPRESSION[compression](os.path.expanduser(filename), mode=mode)
+
+        if format is None and getattr(fileobj, 'name', None):
+            format, compression, mode = _get_format(fileobj.name, format)
+
+        if format is None:
+            raise ValueError("Could not determine format to write - please the 'format' argument")
+
     else:
-        return_string = True
-        fileobj = streamtype()
+        if ( format is None
+             and filename is not None
+             and not isinstance(filename, pathlib.Path)
+             and len(str(filename)) < 5
+             and '.' not in filename):
+            # lets users call mdt.write(obj, 'pdb') and get a string (without needing the "format" keyword
+            path, format = None, filename
+        elif filename is None:
+            path = None
+        elif isinstance(filename, str):
+            path = pathlib.Path(filename).expanduser()
+        else:
+            path = filename
+            filename = str(path)
+
+        writemode = 'w'
+        format, compression, mode = _get_format(filename, format)
+
+        if mode == 'b':
+            streamtype = io.BytesIO
+        else:
+            streamtype = io.StringIO
+
+        # First, create an object to write to (either file handle or file-like buffer)
+        if path:
+            return_string = False
+            fileobj = COMPRESSION[compression](str(path), mode=writemode + mode)
+        else:
+            return_string = True
+            fileobj = streamtype()
 
     # Now, write to the object
     if format in WRITERS:
@@ -190,7 +212,7 @@ def write_trajectory(traj, filename=None, format=None, overwrite=True):
     Returns:
         StringIO: file-like object (only if filename not passed)
     """
-    format, compression = _get_format(filename, format)
+    format, compression, modesuffix = _get_format(filename, format)
 
     # If user is requesting a pickle, just dump the whole thing now and return
     if format.lower() in PICKLE_EXTENSIONS:
@@ -203,7 +225,7 @@ def write_trajectory(traj, filename=None, format=None, overwrite=True):
         if not filename:
             fileobj = io.StringIO()
         else:
-            fileobj = open(filename, 'w')
+            fileobj = open(filename, 'w' + modesuffix)
 
         for frame in traj.frames:
             fileobj.write(frame.write(format=format))
@@ -361,7 +383,7 @@ def _get_format(filename, format):
         format (str or None): requested format, if present
 
     Returns:
-        (str, str): (file format, compression format or ``None`` for no compression)
+        (str, str, str): (file format, compression format or ``None`` for no compression)
 
     Examples:
         >>> _get_format('mymol.pdb', None)
@@ -371,22 +393,28 @@ def _get_format(filename, format):
         >>> _get_format('mymol.t.gz', 'sdf')
         ('sdf','gz')
     """
+    compressor = None
     if filename is None and format is None:
         raise ValueError('No filename or file format specified')
-    elif filename is None:
-        return format, None
+    elif filename is not None:
+        fname, extn = os.path.splitext(filename)
+        suffix = extn[1:].lower()
+        compressor = None
+        if suffix in COMPRESSION:
+            compressor = suffix
+            suffix = os.path.splitext(fname)[1][1:].lower()
 
-    fname, extn = os.path.splitext(filename)
-    suffix = extn[1:].lower()
-    compressor = None
-    if suffix in COMPRESSION:
-        compressor = suffix
-        suffix = os.path.splitext(fname)[1][1:].lower()
+        if format is None:
+            format = suffix
 
-    if format is None:
-        format = suffix
+    if format in PICKLE_EXTENSIONS:
+        mode = 'b'
+    elif (compressor == 'bz2' and not PY2) or compressor == 'gz':
+        mode = 't'
+    else:
+        mode = ''
 
-    return format, compressor
+    return format, compressor, mode
 
 ####################################
 #   FILE EXTENSION HANDLERS        #

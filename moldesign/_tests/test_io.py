@@ -1,7 +1,11 @@
 """ Tests for molecule creation and file i/o
 """
+from future.utils import PY2
 from builtins import str
 import collections
+import pathlib
+import gzip
+import bz2
 
 import numpy
 import pytest
@@ -88,9 +92,38 @@ def test_read_bipyridine_from_format(key, request):
     assert len(bondorders) == 2
 
 
+@pytest.mark.parametrize('suffix', ['gz','bz2'])
+def test_compressed_write(bipyridine_xyz, tmpdir, suffix):
+    # Note: compressed read is tested elsewhere when reading test data files
+    path = pathlib.Path(str(tmpdir))
+    dest = path / ('bipyr.xyz.' + suffix)
+    bipyridine_xyz.write(dest)
+
+    # don't use MDT's reader here! Need to make sure it's really gzip'd
+    if suffix == 'gz':
+        opener = gzip.open
+    elif suffix == 'bz2':
+        opener = bz2.BZ2File
+    else:
+        raise ValueError('Unrecognized suffix "%s"' % suffix)
+
+    if PY2:
+        mode = 'r'
+    else:
+        mode = 'rt'
+        if suffix == 'bz2':
+            opener = bz2.open
+
+    with opener(str(dest), mode) as infile:
+        content = infile.read()
+
+    mol = mdt.read(content, format='xyz')
+    assert mol.num_atoms == bipyridine_xyz.num_atoms
+
+
 @pytest.fixture
 def dna_pdb():
-    return mdt.read(get_data_path('ACTG.pdb'))
+    return mdt.read(pathlib.Path(get_data_path('ACTG.pdb')))
 
 
 @pytest.fixture
@@ -105,7 +138,7 @@ def dna_sequence():
 
 @pytest.fixture
 def pdb_1kbu():
-    return mdt.read(get_data_path('1KBU.pdb.bz2'))
+    return mdt.read(pathlib.Path(get_data_path('1KBU.pdb.bz2')))
 
 
 @pytest.fixture

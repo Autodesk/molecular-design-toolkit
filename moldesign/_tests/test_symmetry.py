@@ -127,6 +127,7 @@ def assert_rotation_matrix(mat, angle=None):
         if angle is not None:
             assert abs(angle.value_in(u.radian) - abs(theta)) <= 1e-6
 
+
 def assert_isomorphic(mol, transformed, positions, maxdiff):
     if maxdiff == 0.0:
         tolerance = 1.0e-4 * u.angstrom
