@@ -27,29 +27,30 @@ def typedfixture(*types, **kwargs):
 
 @typedfixture('gaussian')
 def std_1d_gaussian():
-    g = moldesign.methods.gaussians.Gaussian([0.0]*u.angstrom,
-                                             1.0/u.angstrom ** 2)
+    g = moldesign.orbitals.gaussians.Gaussian([0.0]*u.angstrom,
+                                              1.0/u.angstrom ** 2)
     return g
 
 
 @typedfixture('gaussian')
 def std_3d_gaussian():
-    g = moldesign.methods.gaussians.Gaussian([0.0, 0.0, 0.0]*u.angstrom,
-                                             1.0/u.angstrom ** 2)
+    g = moldesign.orbitals.gaussians.Gaussian([0.0, 0.0, 0.0]*u.angstrom,
+                                              1.0/u.angstrom ** 2)
     return g
 
 
 @typedfixture('gaussian')
 def std_10d_gaussian():
-    g = moldesign.methods.gaussians.Gaussian([0.0 for i in xrange(10)]*u.angstrom,
-                                             1.0/u.angstrom ** 2)
+    g = moldesign.orbitals.gaussians.Gaussian([0.0 for i in range(10)]*u.angstrom,
+                                              1.0/u.angstrom ** 2)
     return g
 
 @typedfixture('cartesiangaussian')
 def cart_10d_gaussian():
-    g = moldesign.methods.gaussians.CartesianGaussian(center=[random.random() for i in xrange(10)]*u.angstrom,
-                                                      powers=[random.choice([0, 1, 2, 3]) for i in xrange(10)],
-                                                      exp=1.1/u.angstrom ** 2)
+    g = moldesign.orbitals.gaussians.CartesianGaussian(
+            center=[random.random() for i in range(10)]*u.angstrom,
+            powers=[random.choice([0, 1, 2, 3]) for i in range(10)],
+            exp=1.1/u.angstrom ** 2)
     return g
 
 
@@ -71,7 +72,7 @@ def test_gaussian_integral_and_dimensionality(objkey, request):
 def test_gaussian_function_values(objkey, request):
     g = request.getfuncargvalue(objkey)
 
-    for idim in xrange(g.ndims):
+    for idim in range(g.ndims):
         coord = g.center.copy()
         randoffset = 4.0 * (random.random() - 0.5) * g.exp**-0.5
         coord[idim] += randoffset
@@ -86,7 +87,7 @@ def test_vectorized_gaussian_function_evaluations(objkey, request):
     g = request.getfuncargvalue(objkey)
 
     coords = np.zeros((5, g.ndims)) * g.center.units
-    for i in xrange(5):
+    for i in range(5):
         coords[i] = g.center
         randoffset = 4.0 * (random.random() - 0.5) * g.exp**-0.5
         idim = random.randrange(g.ndims)
@@ -94,15 +95,17 @@ def test_vectorized_gaussian_function_evaluations(objkey, request):
 
     vector_results = g(coords)
     expected = u.array([g(c) for c in coords])
+    if vector_results.dimensionless:
+        vector_results = vector_results._magnitude
 
     _assert_almost_equal(vector_results, expected, decimal=8)
 
 
 def test_gaussian_self_overlap_is_unity():
-    g1 = moldesign.methods.gaussians.Gaussian([0.0, 0.0, 0.0]*u.angstrom,
+    g1 = moldesign.orbitals.gaussians.Gaussian([0.0, 0.0, 0.0]*u.angstrom,
                                               1.0/u.angstrom ** 2,
                                               coeff=-1.0)
-    g2 = moldesign.methods.gaussians.Gaussian([0.0, 0.0, 0.0]*u.angstrom,
+    g2 = moldesign.orbitals.gaussians.Gaussian([0.0, 0.0, 0.0]*u.angstrom,
                                               1.0/u.angstrom ** 2,
                                               coeff=123.456)
     npt.assert_almost_equal(-1.0,
