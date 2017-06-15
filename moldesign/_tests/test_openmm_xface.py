@@ -87,6 +87,6 @@ def test_openmm_verlet_integrator(objkey, request):
 
     # very rough energy conservation test
     energy = traj.potential_energy + traj.kinetic_energy
-    assert abs(energy[0] - energy[-1]) <= 0.1 * u.kcalpermol
+    assert abs(energy[0] - energy[-1]) <= 0.01 * mol.num_atoms * u.kcalpermol
 
 
