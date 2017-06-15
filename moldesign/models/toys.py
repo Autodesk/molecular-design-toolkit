@@ -63,7 +63,13 @@ class HarmonicOscillator(EnergyModelBase):
             'k', 'Spring constant',
             type=u.eV/u.angstrom**2)]
 
+    def prep(self):
+        if self.params.k.dimensionality != (u.eV/u.angstrom**2).dimensionality:
+            raise u.DimensionalityError("Spring constant must have dimensions of energy/length^2")
+        return True
+
     def calculate(self, requests):
+        self.prep()
         energy = 0.5 * self.params.k * np.sum(self.mol.positions[:, 0]**2)
         forces = np.zeros((self.mol.num_atoms, 3)) * u.default.force
         forces[:, 0] = - self.params.k * self.mol.positions[:, 0]

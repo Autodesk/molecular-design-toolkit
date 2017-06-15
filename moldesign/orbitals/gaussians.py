@@ -113,10 +113,11 @@ class CartesianGaussian(AbstractFunction):
         self._cartesian = (self.powers != 0).any()
 
     def __repr__(self):
-        return ("<Gaussian (coeff: {coeff:4.2f}, "
+        return ("<{ndim}-D Gaussian (cart) (coeff: {coeff:4.2f}, "
                 "cartesian powers: {powers}, "
                 "exponent: {exp:4.2f}, "
                 "center: {center}>").format(
+                ndim=self.ndim,
                 center=self.center, exp=self.exp,
                 powers=tuple(self.powers), coeff=self.coeff)
 
@@ -256,6 +257,8 @@ class SphericalGaussian(AbstractFunction):
             Int J Quantum Chem 54, 83-87 (1995). doi:10.1002/qua.560540202
     """
 
+    ndims = 3
+
     def __init__(self, center, exp, n, l, m, coeff=None):
         self.center = center
         assert len(self.center) == 3
@@ -271,7 +274,7 @@ class SphericalGaussian(AbstractFunction):
             self.coeff = coeff
 
     def __repr__(self):
-        return ("<Gaussian (coeff: {coeff:4.2f}, "
+        return ("<3D Gaussian (Spherical) (coeff: {coeff:4.2f}, "
                 "exponent: {exp:4.2f}, "
                 "(n,l,m) = {qnums}").format(
                 center=self.center, exp=self.exp, coeff=self.coeff,
@@ -441,21 +444,3 @@ def cart_to_powers(s):
 
 
 DIMLABELS = {'x': 0, 'y': 1, 'z': 2}
-
-
-class ERI4FoldTensor(object):
-    def __init__(self, mat, basis_orbitals):
-        self.mat = mat
-        self.basis_orbitals = basis_orbitals
-        nbasis = len(self.basis_orbitals)
-        mapping = np.zeros((nbasis, nbasis), dtype='int')
-        ij = 0
-        for i in range(nbasis):
-            for j in range(i + 1):
-                mapping[i, j] = mapping[j, i] = ij
-                ij += 1
-        self.mapping = mapping
-
-    def __getitem__(self, item):
-        i, j, k, l = item
-        return self.mat[self.mapping[i, j], self.mapping[k, l]]

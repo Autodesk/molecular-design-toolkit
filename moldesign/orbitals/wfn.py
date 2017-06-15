@@ -41,7 +41,6 @@ class ElectronicWfn(object):
         description (str): text describing the wfn (e.g. 'RHF/STO-3G', 'CAS(2,2)/SA3/6-31G**')
         density_matrix_ao (np.ndarray): density matrix in the ao basis
     """
-
     def __init__(self, mol, num_electrons,
                  model=None,
                  aobasis=None, fock_ao=None,
@@ -91,8 +90,11 @@ class ElectronicWfn(object):
 
     def align_orbital_phases(self, other, assert_same=True):
         """Align this wavefunction's orbitals to have the same phase as those in `other`.
-        :type other: ElectronicWfn
-        :param assert_same: raise an exception if the two wavefunctions do not have the same kinds of orbitals
+
+        Args:
+            other (ElectronicWfn): reference wfn to align phases with
+            assert_same (bool): raise an exception if the two wavefunctions do not have the same
+                 kinds of orbitals
         """
         for orbtype in self.orbitals:
             if orbtype not in other.orbitals:

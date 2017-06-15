@@ -23,8 +23,10 @@ import moldesign as mdt
 from moldesign import units as u
 from moldesign.external import transformations as trns
 from moldesign.interfaces import symmol_interface as smi
+from . import __all__ as __toplevel__
 
 get_symmetry = smi.run_symmol
+__toplevel__.append('get_symmetry')
 
 
 class SymmetryElement(object):
@@ -33,16 +35,28 @@ class SymmetryElement(object):
     inversion center (Ci),
     mirror plane (Cs), rotation axis (C2,C3,...), or
     improper rotation (S4, S6, ...)
+
+    Attributes:
+        mol (moldesign.Molecule): molecule this symmetry describes
+        idx (int): symmetry index
+        symbol (str): Schoenflies symbol
+        matrix (np.array): symmetry transformation
+        csm (mdt.units.MdtQuantity): mean-squared-distance to this symmetry group (i.e.,
+           0 if this symmetry is exact)
+        max_diff (mdt.unitsMdtQuantity): maximum distance of any one atom to this symmetry group
     """
 
-    def __init__(self, symbol, matrix, **kwargs):
+    def __init__(self, mol, idx, symbol, matrix, csm, max_diff):
+        self.mol = mol
         self.symbol = symbol
         self.matrix = matrix
-        for kw, val in kwargs.items():
-            setattr(self, kw, val)
+        self.mol = mol
+        self.csm = csm
+        self.max_diff = max_diff
+        self.idx = idx
 
     def __str__(self):
-        return 'SymmetryElement %s' % self.symbol
+        return 'SymmetryElement %s, error=%s' % (self.symbol, self.csm)
 
     def __repr__(self):
         return '<%s>' % self
@@ -79,14 +93,19 @@ class MolecularSymmetry(object):
     def __init__(self, mol, symbol, rms,
                  orientation=None,
                  elems=None,
-                 **kwargs):
+                 _job=None):
         self.mol = mol
         self.symbol = symbol
         self.rms = rms
         self.orientation = mdt.utils.if_not_none(orientation, mol.positions)
         self.elems = mdt.utils.if_not_none(elems, [])
-        for kw, val in kwargs.items():
-            setattr(self, kw, val)
+        self._job = _job
+
+    def __str__(self):
+        return '%d symmetry element%s' % (len(self.elems), 's' if len(self.elems) != 1 else '')
+
+    def __repr__(self):
+        return '%s of molecule %s' % (self, self.mol.name)
 
     def get_symmetrized_coords(self, elem):
         """

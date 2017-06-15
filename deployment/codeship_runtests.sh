@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# this script expects to run from the moldesign/_tests directory
+# this script expects to run from the root of the repository
 
 # fail immediately if any command fails:
 set -e
@@ -7,12 +7,12 @@ set -e
 VERSION="${TESTENV}.py${PYVERSION}"
 PYTESTFLAGS="-n 6 --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=1800"
 if [ "${VERSION}" == "complete.py3" ]; then
-       PYTESTFLAGS="--cov .. --cov-config=./.coveragerc ${PYTESTFLAGS}"
+       PYTESTFLAGS="--cov moldesign ${PYTESTFLAGS}"
 fi
 
 
 function send_status_update(){
-     python ../../deployment/send_test_status.py "${1}" "${2}"
+     python deployment/send_test_status.py "${1}" "${2}"
 }
 
 
@@ -53,6 +53,11 @@ function check_if_tests_should_run(){
 
 function run_tests(){
     send_status_update "na" "Starting tests for ${VERSION}"
+
+    echo
+    echo "Test command running in working dir '$(pwd)':"
+    echo "py.test ${PYTESTFLAGS}"
+    echo
 
     py.test ${PYTESTFLAGS} | tee /opt/reports/pytest.${VERSION}.log
     exitstat=${PIPESTATUS[0]}

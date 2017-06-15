@@ -33,7 +33,8 @@ class RunsRemotely(object):
                  sendsource=False,
                  engine=None,
                  image=None,
-                 is_imethod=False):
+                 is_imethod=False,
+                 persist_refs=False):
         """Function decorator to run a python function remotely.
 
         Note:
@@ -51,6 +52,7 @@ class RunsRemotely(object):
                 moldesign.compute.get_engine())
             image (str): name of the docker image (including registry, repository, and tags)
                 (default: moldesign.config.default_python_image)
+            persist_refs (bool): Persist python object references across the RPC roundtrip
             is_imethod (bool): This is an instancemethod
                Note: we can't determine this at import-time without going to great lengths ...
                     - see, e.g., http://stackoverflow.com/questions/2366713/ )
@@ -62,6 +64,7 @@ class RunsRemotely(object):
         self.engine = engine
         self.jobname = jobname
         self.is_imethod = is_imethod
+        self.persist_refs = persist_refs
 
     def __call__(self, func):
         """
@@ -103,7 +106,8 @@ class RunsRemotely(object):
                                 python_call,
                                 name=self.jobname,
                                 sendsource=self.sendsource,
-                                interpreter='python')  # always run in native interpreter
+                                interpreter='python',  # always run in native interpreter
+                                persist_references=self.persist_refs)
 
             if self.display:
                 display_log(job.get_display_object(), title=f.__name__)

@@ -60,6 +60,11 @@ def small_molecule():
     return mol
 
 
+@pytest.fixture
+def benzene():
+    return mdt.from_smiles('c1ccccc1')
+
+
 @typedfixture('molecule')
 def h2():
     atom1 = mdt.Atom('H')
@@ -74,6 +79,7 @@ def h2():
 @pytest.fixture
 def ethylene():
     return mdt.from_smiles('C=C')
+
 
 @pytest.fixture
 def pdb1yu8():

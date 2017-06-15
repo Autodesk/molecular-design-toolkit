@@ -301,21 +301,6 @@ class MolPropertyMixin(object):
         """
         return self.calc_property('wfn')
 
-    def update_properties(self, properties):
-        """
-        This is intended mainly as a callback for long-running property calculations.
-        When they are finished, they can call this method to update the molecule's properties.
-
-        Args:
-            properties (dict): properties-like object. MUST contain a 'positions' attribute.
-        """
-        if self.properties is None:
-            self.properties = properties
-        else:
-            assert (self.positions == properties.positions).all(), \
-                'The molecular geometry does not correspond to these properties'
-            self.properties.update()
-
     @property
     def potential_energy(self):
         """ units.Scalar[energy]: return the molecule's current potential energy, if calculated.
@@ -368,10 +353,7 @@ class MolPropertyMixin(object):
     calc_potential_energy = calculate_potential_energy
     calc_forces = calculate_forces
 
-    def _repr_markdown_(self):
-        return self.markdown_summary()
-
-    def biomol_summary_markdown(self):
+    def _biomol_summary_markdown(self):
         """A markdown description of biomolecular structure.
 
         Returns:
@@ -395,7 +377,7 @@ class MolPropertyMixin(object):
 
         return lines
 
-    def get_residue_table(self):
+    def get_residue_table(self):  # pragma: no cover
         """Creates a data table summarizing this molecule's primary structure.
 
         Returns:
@@ -607,7 +589,7 @@ class MolTopologyMixin(object):
                 ', '.join(conflicts)))
         self.is_biomolecule = (num_biores >= 2)
 
-    def is_identical(self, other):
+    def is_identical(self, other, verbose=False):
         """ Test whether two molecules are "identical"
 
         We specifically test these quantities for equality:
@@ -624,18 +606,29 @@ class MolTopologyMixin(object):
 
         Args:
             other (moldesign.Molecule): molecule to test against
+            verbose (bool): when returning False, print the reasons why
+
 
         Returns:
             bool: true if all tested quantities are equal
         """
-        if (self.num_atoms != other.num_atoms
-            or self.num_residues != other.num_residues
-            or self.num_chains != other.num_chains
-            or (self.positions != other.positions).any()
-            or (self.momenta != other.momenta).any()):
+        if not self.same_topology(other, verbose=verbose):
             return False
 
-        return self.same_topology(other)
+        if (self.positions != other.positions).any():
+            if verbose:
+                mismatch = (self.positions != other.positions).any(axis=1).sum()
+                print("%d atoms have different positions." % mismatch)
+            return False
+
+        if (self.momenta != other.momenta).any():
+            if verbose:
+                mismatch = (self.momenta != other.momenta).any(axis=1).sum()
+                print("%d atoms have different momenta."%mismatch)
+            return False
+
+        return True
+
 
     @property
     def num_residues(self):
@@ -713,10 +706,23 @@ class MolTopologyMixin(object):
 
         Args:
             other (moldesign.Molecule): molecule to test against
+            verbose (bool): when returning False, print the reasons why
 
         Returns:
             bool: true if all tested quantities are equal
         """
+        if self.num_atoms != other.num_atoms:
+            if verbose: print('INFO: Different numbers of atoms')
+            return False
+
+        if self.num_chains != other.num_chains:
+            if verbose: print('INFO: Different numbers of chains')
+            return False
+
+        if self.num_residues != other.num_residues:
+            if verbose: print('INFO: Different numbers of residues')
+            return False
+
         for a1, a2 in itertools.zip_longest(
                 itertools.chain(self.atoms, self.residues, self.chains),
                 itertools.chain(other.atoms, other.residues, other.chains)):
@@ -1024,6 +1030,7 @@ class Molecule(AtomGroup,
     momenta = ProtectedArray('_momenta')
 
     draw_orbitals = WidgetMethod('molecules.draw_orbitals')
+    _PERSIST_REFERENCES = True  # relevant for `pyccc` RPC calls
 
     def __init__(self, atomcontainer,
                  name=None, bond_graph=None,
@@ -1048,6 +1055,7 @@ class Molecule(AtomGroup,
         self.energy_model = None
         self.integrator = None
         self.metadata = metadata
+        self.electronic_state_index = 0
 
         if charge is not None:
             self.charge = charge
@@ -1055,7 +1063,7 @@ class Molecule(AtomGroup,
                 self.charge *= u.q_e
         else:
             self.charge = getattr(atomcontainer, 'charge',
-                                  sum(atom.formal_charge for atom in self.atoms))
+                                  u.unitsum(atom.formal_charge for atom in self.atoms))
 
         # Builds the internal memory structures
         self.chains = Instance(molecule=self)
@@ -1100,6 +1108,40 @@ class Molecule(AtomGroup,
 
     def __str__(self):
         return 'Molecule: %s' % self.name
+
+    def _repr_markdown_(self):
+        """A markdown description of this molecule.
+
+        Returns:
+            str: Markdown
+        """
+        # TODO: remove leading underscores for descriptor-protected attributes
+        lines = ['### Molecule: "%s" (%d atoms)'%(self.name, self.natoms)]
+
+        description = self.metadata.get('description', None)
+        if description is not None:
+            description = self.metadata.description[:5000]
+            url = self.metadata.get('url', None)
+            if url is not None:
+                description = '<a href="%s" target="_blank">%s</a>'% \
+                              (url, description)
+            lines.append(description)
+
+        lines.extend([
+            '**Mass**: %s' % self.mass,
+            '**Formula**: %s' % self.get_stoichiometry(html=True),
+            '**Charge**: %s' % self.charge])
+
+        if self.energy_model:
+            lines.append('**Potential model**: %s'%str(self.energy_model))
+
+        if self.integrator:
+            lines.append('**Integrator**: %s'%str(self.integrator))
+
+        if self.is_biomolecule:
+            lines.extend(self._biomol_summary_markdown())
+
+        return '\n\n'.join(lines)
 
     def newbond(self, a1, a2, order):
         """ Create a new bond

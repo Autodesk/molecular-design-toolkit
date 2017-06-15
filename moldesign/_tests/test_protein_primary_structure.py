@@ -33,6 +33,27 @@ def protease_cif():
     return mdt.read(get_data_path('3aid.cif'))
 
 
+def test_chain_types(protease_pdb):
+    assert protease_pdb.chains['A'].type == 'protein'
+    assert protease_pdb.chains['B'].type == 'protein'
+
+
+def test_chain_iterators(protease_pdb):
+    waters = list(protease_pdb.chains['A'].solvent_residues)
+    waternames = [water.name for water in waters]
+    assert waternames == ['HOH402', 'HOH403', 'HOH405', 'HOH406', 'HOH410']
+
+    ligands = list(protease_pdb.chains['A'].unclassified_residues)
+    assert len(ligands) == 1
+    assert ligands[0].name == 'ARQ401'
+
+    assert protease_pdb.chains['A'].get_ligand() == ligands[0]
+
+    water_chainb = list(protease_pdb.chains['B'].solvent_residues)
+    waternames_b = [water.name for water in water_chainb]
+    assert waternames_b == ['HOH407', 'HOH408', 'HOH409']
+
+
 def test_3aid_cif_chains(protease_cif):
     mol = protease_cif
     assert len(mol.chains) == 5

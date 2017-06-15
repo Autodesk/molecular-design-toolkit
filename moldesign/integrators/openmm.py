@@ -27,7 +27,6 @@ from moldesign.utils import exports
 from .base import IntegratorBase, LangevinBase
 
 
-
 class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
     _openmm_compatible = True
 
@@ -64,7 +63,7 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
         self.model._set_openmm_state()
 
         self.reporter = self._attach_reporters()
-        self.reporter.annotation = 'Langevin dynamics @ %s' % self.params.temperature
+        self.reporter.annotation = self._describe_dynamics()
         self.reporter.report_from_mol()
 
         self.sim.step(nsteps)  # this is the actual dynamics loop
@@ -86,6 +85,9 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
         self.sim.reporters = [reporter]
         return reporter
 
+    def _describe_dynamics(self):
+        raise NotImplementedError()
+
 
 @exports
 class OpenMMVerlet(OpenMMBaseIntegrator):
@@ -93,6 +95,9 @@ class OpenMMVerlet(OpenMMBaseIntegrator):
         from simtk import openmm
         integrator = openmm.VerletIntegrator(pint2simtk(self.params.timestep))
         return integrator
+
+    def _describe_dynamics(self):
+        return 'Constant energy dynamics'
 
 
 @exports
@@ -105,5 +110,9 @@ class OpenMMLangevin(LangevinBase, OpenMMBaseIntegrator):
             pint2simtk(self.params.collision_rate),
             pint2simtk(self.params.timestep))
         return integrator
+
+    def _describe_dynamics(self):
+        return 'Langevin dynamics @ %s' % self.params.temperature
+
 
 

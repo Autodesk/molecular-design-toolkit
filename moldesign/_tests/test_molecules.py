@@ -1,12 +1,15 @@
 """ Test various functionalities around data structure consistency
 """
 import pickle
+from past.builtins import basestring
 
 import moldesign.exceptions
 import moldesign.molecules.atomcollections
 import moldesign.utils.classes
 
 from .object_fixtures import *
+from .test_ambertools_xface import protein_default_amber_forcefield
+from .test_pyscf_xface import h2_rhfwfn
 
 
 def test_h2_protected_atom_arrays(h2):
@@ -24,8 +27,8 @@ def test_h2_protected_atom_arrays(h2):
 def test_h2_hierarchy(h2):
     assert len(h2.residues) == 1
     assert len(h2.chains) == 1
-    chain = next(h2.chains.__iter__())
-    res = next(h2.residues.__iter__())
+    chain = next(iter(h2.chains))
+    res = next(iter(h2.residues))
     atom1, atom2 = h2.atoms
     assert h2 == atom1.molecule == atom2.molecule == chain.molecule == res.molecule
     assert chain == atom1.chain == atom2.chain
@@ -283,3 +286,66 @@ def test_h2_trajectory(h2_trajectory):
         elif 0.4 < period_progress < 0.6:
             # check for expected troughs of sine wave
             assert frame.positions[0, 0] < -0.1 * u.angstrom
+
+
+def test_markdown_reprs_work(nucleic):
+    # Not bothering to test the content, just want to make sure there's no error
+    assert isinstance(nucleic._repr_markdown_(), basestring)
+    assert isinstance(nucleic.atoms[0]._repr_markdown_(), basestring)
+    assert isinstance(nucleic.residues[0]._repr_markdown_(), basestring)
+
+
+def test_dna_and_hydrogen_are_different(nucleic, h2):
+    assert not nucleic.same_topology(h2)
+    assert not nucleic.is_identical(h2)
+
+
+def test_changing_momenta_and_positions_makes_mols_different(nucleic):
+    n = nucleic.copy()
+    assert nucleic.same_topology(n)
+    assert nucleic.is_identical(n)
+
+    n.positions[3] += 0.1 * u.angstrom
+    assert nucleic.same_topology(n)
+    assert not nucleic.is_identical(n, verbose=True)
+
+    n.positions = nucleic.positions
+    assert nucleic.is_identical(n)
+
+    n.momenta[3] += 5.0 * u.default.momentum
+    assert not nucleic.is_identical(n, verbose=True)
+    assert nucleic.same_topology(n, verbose=True)
+
+    n.momenta = nucleic.momenta
+    assert nucleic.is_identical(n, verbose=True)
+    assert nucleic.same_topology(n, verbose=True)
+
+
+def test_changing_residue_name_makes_mols_different(nucleic):
+    n = nucleic.copy()
+
+    assert nucleic.is_identical(n, verbose=True)
+    n.residues[0].resname = 'abc'
+    n.residues[0].name = 'abc1'
+    assert not nucleic.is_identical(n, verbose=True)
+
+
+def test_changing_residue_name_makes_mols_different(nucleic):
+    n = nucleic.copy()
+
+    assert nucleic.is_identical(n, verbose=True)
+    n.atoms[3].atnum = 5
+    assert not nucleic.is_identical(n, verbose=True)
+    assert not nucleic.same_topology(n, verbose=True)
+
+
+def test_changing_bonds_makes_mols_different(nucleic):
+    n = nucleic.copy()
+
+    assert nucleic.is_identical(n, verbose=True)
+
+    atom1 = n.atoms[3]
+    atom2 = n.atoms[134]
+    n.bond_graph[atom1][atom2] = n.bond_graph[atom2][atom1] = 1
+    assert not nucleic.is_identical(n, verbose=True)
+    assert not nucleic.same_topology(n, verbose=True)

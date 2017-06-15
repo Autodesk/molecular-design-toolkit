@@ -1,32 +1,33 @@
 # DEVELOPING MDT
 
 ### Setting up a dev environment
-(WIP)
+(still under construction)
 
-### Install prerequisites (first time only)
-To make these instructions reasonably cross-platform, we'll use pyenv as the python environment manager. 
+### Install prequisites (first time only)
+You need to install docker, and an environment manager for Python 3 (Miniconda 3). Here's one way to do that:
 1. Install docker: [link]
 2. Install pyenv and pyenv-venv: [link]
-3. Install miniconda2 by running: `pyenv install miniconda2-latest`
-4. Switch to miniconda environment by running: `pyenv shell miniconda2-latest`
+3. Install miniconda3 by running: `pyenv install miniconda3-latest`
+4. Switch to miniconda environment by running: `pyenv shell miniconda3-latest`
 
 ### Set up your environment (first time only)
-1. Change directory to the base of the `molecular-design-toolkit` repository
+1. Get MDT: `git clone http://github.com/Autodesk/molecular-design-toolkit`
+1. `cd molecular-design-toolkit`
 1. Create conda environment (optional but recommended) by running: [command to create conda env]
-2. Activate the environment: `pyenv shell [environment name???]`
-1. Install dev dependencies: `pip install -r requirements.txt DockerMakefiles/requirements.txt moldesign/_tests/requirements.txt`
+2. Activate the environment: `pyenv activate [environment name???]`
+1. Install dev dependencies: `pip install -r requirements.txt DockerMakefiles/requirements.txt deployment/requirements.txt`
 2. Set up for local dev mode (this tells MDT to use your local docker containers):
 ```bash
 mkdir ~/.moldesign
 echo "devmode: true" > ~/.moldesign/moldesign.yml
 ```
-8. Link your installation within your environment
+8. Install MDT in "development mode": 
 ```
 pip install -e molecular-design-toolkit
 ```
 
 ### To activate environment (in any new shell)
-1. Run `pyenv shell [environment name???]`
+1. Run `pyenv activate [environment name???]`
 
 ### To rebuild docker images (first time and after changes that affect dockerized code)
 5. Build development versions of all docker images:

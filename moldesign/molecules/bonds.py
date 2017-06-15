@@ -98,4 +98,7 @@ class Bond(object):
         """mdt.forcefield.BondTerm: the force-field term for this bond (or ``None`` if no
             forcefield is present)
         """
-        return self.molecule.ff.get_bond_term(self)
+        if self.molecule.ff is not None:
+            return self.molecule.ff.get_bond_term(self)
+        else:
+            return None

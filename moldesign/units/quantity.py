@@ -95,7 +95,10 @@ class MdtQuantity(ureg.Quantity):
     def __setitem__(self, key, value):
         # Overrides pint's built-in version of this ... this is apparently way faster
         try:
-            self.magnitude[key] = value.value_in(self.units)
+            if self.units == value.units:
+                self.magnitude[key] = value._magnitude
+            else:
+                self.magnitude[key] = value.value_in(self.units)
         except AttributeError:
             if not hasattr(value, 'value_in'):  # deal with missing `value_in` method
                 if self.dimensionless:  # case 1: this is OK if self is dimensionless
