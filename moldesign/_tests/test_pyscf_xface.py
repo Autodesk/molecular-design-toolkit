@@ -129,10 +129,10 @@ def test_aobasis(h2_rhfwfn):
     assert aobasis.fock.dimensionality == u.eV.dimensionality
 
     for orb in h2_rhfwfn.wfn.aobasis:
-        assert orb.aotype == 's'
+        assert orb.aotype == '1s'
+        assert orb.orbtype == 's'
         assert len(orb.primitives) == 3
         assert (orb.n, orb.m, orb.l) == (1, 0, 0)
         assert isinstance(orb.name, str)
-        assert isinstance(orb.orbtype, str)
 
 # todo: deal with other shells, cartesian vs. spherical
