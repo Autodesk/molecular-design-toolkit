@@ -157,6 +157,8 @@ class Atom(AtomPropertyMixin):
     draw3d = WidgetMethod('atoms.draw3d')
     draw = WidgetMethod('atoms.draw')
 
+    _PERSIST_REFERENCES = True  # relevant for `pyccc` helper library
+
     #################################################################
     # Methods for BUILDING the atom and indexing it in a molecule
     def __init__(self, name=None, atnum=None, mass=None, chain=None, residue=None,

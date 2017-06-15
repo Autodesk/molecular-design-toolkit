@@ -1021,6 +1021,7 @@ class Molecule(AtomGroup,
     momenta = ProtectedArray('_momenta')
 
     draw_orbitals = WidgetMethod('molecules.draw_orbitals')
+    _PERSIST_REFERENCES = True  # relevant for `pyccc` helper library
 
     def __init__(self, atomcontainer,
                  name=None, bond_graph=None,
