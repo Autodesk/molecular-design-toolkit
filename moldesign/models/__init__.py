@@ -6,3 +6,4 @@ from .amber import *
 from .openbabel import *
 from .nwchem import *
 from .qmmm import *
+from .psi4 import *

@@ -2,6 +2,7 @@ name: moldesign_env
 channels:
  - omnia
 dependencies:
+ - python >=3.5
  - biopython
  - h5py
  - markdown2

@@ -41,6 +41,10 @@ def mdt_to_psi4(mol):
 
     geom = psi4.geometry('\n'.join(lines))
     return geom
+#name JSPB June 15
+@exports
+def mol_name(mol):
+    return mol.name
 
 @exports
 def psi4_to_mdt(geom):
