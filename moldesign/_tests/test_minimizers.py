@@ -28,6 +28,20 @@ def test_basic_minimization(harmonic_atom, MinClass):
     _check_basic_minimization_has_occured(p0, e0, traj)
 
 
+@pytest.mark.parametrize('MinClass', (mdt.min.GradientDescent,
+                                      mdt.min.BFGS,
+                                      mdt.min.SmartMin))
+def test_basic_minimization_remotely(harmonic_atom, MinClass):
+    mol = harmonic_atom
+    e0 = mol.calculate_potential_energy()
+    p0 = mol.positions.copy()
+
+    minimizer = MinClass(mol)
+    traj = minimizer.runremotely()
+
+    _check_basic_minimization_has_occured(p0, e0, traj)
+
+
 MINIMIZERS = collections.OrderedDict([('gradient_descent', mdt.min.gradient_descent),
                                      ('leastsqr', mdt.min.sequential_least_squares),
                                      ('smart', mdt.min.minimize)])

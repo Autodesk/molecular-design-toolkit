@@ -50,12 +50,12 @@ class SmartMin(MinimizerBase):
         self.kwargs = kwargs
         super().__init__(*args, **kwargs)
 
-    def run(self):
+    def _run(self):
         # If forces are already low, go directly to the quadratic convergence methods and return
         forces = self.mol.calculate_forces()
         if abs(forces).max() <= self.gd_threshold:
             spmin = self._make_quadratic_method()
-            spmin.run()
+            spmin._run()
             self.traj = spmin.traj
             self.current_step = spmin.current_step
             return
@@ -64,7 +64,7 @@ class SmartMin(MinimizerBase):
         descent_kwargs = self.kwargs.copy()
         descent_kwargs['force_tolerance'] = self.gd_threshold
         descender = GradientDescent(*self.args, **descent_kwargs)
-        descender.run()
+        descender._run()
         if descender.current_step >= self.nsteps:
             self.traj = descender.traj
             return
@@ -76,7 +76,7 @@ class SmartMin(MinimizerBase):
                                                    descender.frame_interval)
         spmin = self._make_quadratic_method(kwargs)
         spmin.current_step = descender.current_step
-        spmin.run()
+        spmin._run()
         self.traj = descender.traj + spmin.traj
         self.current_step = spmin.current_step
 

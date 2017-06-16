@@ -37,7 +37,7 @@ class ScipyMinimizer(MinimizerBase):
     _TAKES_FTOL = False
     _TAKES_GTOL = False
 
-    def run(self):
+    def _run(self):
         import scipy.optimize
 
         print('Starting geometry optimization: SciPy/%s with %s gradients'%(

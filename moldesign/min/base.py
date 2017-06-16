@@ -123,7 +123,24 @@ class MinimizerBase(object):
                                            (self.current_step, self.mol.potential_energy))
         return self.traj
 
-    def run(self):
+    def runremotely(self, wait=True):
+        """ Execute this minimization in a remote process
+
+        Args:
+            wait (bool): if True, block until the minimization is complete.
+                Otherwise, return a ``pyccc.PythonJob`` object
+        """
+        return mdt.compute.runremotely(self.__call__, wait=wait,
+                                       jobname='%s: %s' % (self.__class__.__name__, self.mol.name),
+                                       when_finished=self._finishremoterun)
+
+    def _finishremoterun(self, job):
+        traj = job.function_result
+        self.mol.positions = traj.positions[-1]
+        self.mol.properties.update(traj.frames[-1])
+        return traj
+
+    def _run(self):
         raise NotImplementedError('This is an abstract base class')
 
     def callback(self, *args):
@@ -177,7 +194,3 @@ class MinimizerBase(object):
         asfn.__doc__ = cls.__doc__
 
         return asfn
-
-
-
-
