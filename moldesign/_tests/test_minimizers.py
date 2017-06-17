@@ -1,8 +1,10 @@
 import collections
+
+import numpy as np
 import pytest
 
-
 import moldesign as mdt
+from .helpers import assert_something_resembling_minimization_happened
 from moldesign import units as u
 
 
@@ -24,8 +26,7 @@ def test_basic_minimization(harmonic_atom, MinClass):
 
     minimizer = MinClass(mol)
     traj = minimizer()
-
-    _check_basic_minimization_has_occured(p0, e0, traj)
+    assert_something_resembling_minimization_happened(p0, e0, traj, mol)
 
 
 @pytest.mark.parametrize('MinClass', (mdt.min.GradientDescent,
@@ -39,11 +40,12 @@ def test_basic_minimization_remotely(harmonic_atom, MinClass):
     minimizer = MinClass(mol)
     traj = minimizer.runremotely()
 
-    _check_basic_minimization_has_occured(p0, e0, traj)
+    assert_something_resembling_minimization_happened(p0, e0, traj, mol)
 
 
 MINIMIZERS = collections.OrderedDict([('gradient_descent', mdt.min.gradient_descent),
                                      ('leastsqr', mdt.min.sequential_least_squares),
+                                     ('bfgs', mdt.min.bfgs),
                                      ('smart', mdt.min.minimize)])
 # (ordered because pytest+xdist needs a definite ordering of parameters)
 
@@ -62,10 +64,18 @@ def test_constrained_distance_minimization(minkey):
     p0 = mol.positions.copy()
 
     constraint = mol.constrain_distance(mol.atoms[0], mol.atoms[1])
+
+    if minkey == 'bfgs':  # BFGS expected to fail here
+        with pytest.raises(mdt.exceptions.NotSupportedError):
+            minimizer(mol)
+        return
+
     traj = minimizer(mol)
 
-    _check_basic_minimization_has_occured(p0, e0, traj)
+    assert_something_resembling_minimization_happened(p0, e0, traj, mol)
     assert abs(constraint.error()) < 1e-4 * u.angstrom
+
+    # for scipy-based minimizers
 
 
 @pytest.mark.parametrize('minkey',(MINIMIZERS.keys()))
@@ -81,21 +91,31 @@ def test_constrained_dihedral_minimization(minkey):
     constraint = dihedral.constrain()
 
     mol.set_energy_model(mdt.models.OpenBabelPotential, forcefield='mmff94s')
+    e0_1 = mol.calculate_potential_energy()
+    p0_1 = mol.positions.copy()
+
+    if minkey == 'bfgs':  # BFGS expected to fail here
+        with pytest.raises(mdt.exceptions.NotSupportedError):
+            minimizer(mol)
+        return
+
     traj = minimizer(mol, nsteps=100)
-    _check_basic_minimization_has_occured(traj.positions[0], traj.potential_energy[0], traj)
+    assert_something_resembling_minimization_happened(p0_1, e0_1, traj, mol)
 
     assert constraint.error() <= 1.0 * u.degree
     traj_twists = traj.dihedral(mol.atoms[0], mol.atoms[1])
     assert (abs(traj_twists - 45 * u.degrees) <= 1.0 * u.degree).all()
 
+    e0_2 = mol.potential_energy
+    p0_2 = mol.positions.copy()
     mol.clear_constraints()
     traj2 = minimizer(mol, nsteps=100)
-    _check_basic_minimization_has_occured(traj2.positions[0], traj2.potential_energy[0], traj2)
+
+    assert_something_resembling_minimization_happened(p0_2, e0_2, traj2, mol)
     assert dihedral.value <= 5.0 * u.degrees
 
 
-def _check_basic_minimization_has_occured(p0, e0, traj):
-    assert traj.potential_energy[0] == e0
-    assert traj.potential_energy[-1] < e0
-    assert (traj.positions[0] == p0).all()
-    assert (traj.positions[-1] != p0).any()
+def _apply_noise(mol):
+    noise = np.random.normal(size=(mol.num_atoms, 3), scale=0.05) * u.angstrom
+    mol.positions += noise
+

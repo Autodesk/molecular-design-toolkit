@@ -40,6 +40,8 @@ class MinimizerBase(object):
         self.frame_interval = mdt.utils.if_not_none(frame_interval,
                                                     max(nsteps/10, 1))
         self._restart_from = _restart_from
+        self._foundmin = None
+        self._calc_cache = {}
 
         # Set up the trajectory to track the minimization
         self.traj = mdt.Trajectory(mol)
@@ -89,6 +91,8 @@ class MinimizerBase(object):
         except mdt.QMConvergenceError:  # returning infinity can help rescue some line searches
             return np.inf
 
+        self._cachemin()
+        self._calc_cache[tuple(vector)] = self.mol.properties
         pot = self.mol.potential_energy
 
         if self._initial_energy is None: self._initial_energy = pot
@@ -101,6 +105,8 @@ class MinimizerBase(object):
         """
         self._sync_positions(vector)
         self.mol.calculate(requests=self.request_list)
+        self._cachemin()
+        self._calc_cache[tuple(vector)] = self.mol.properties
         grad = -self.mol.forces
 
         grad = grad.reshape(self.mol.num_atoms * 3)
@@ -110,14 +116,26 @@ class MinimizerBase(object):
         else:
             return grad.defunits()
 
+    def _cachemin(self):
+        """ Caches the minimum potential energy properties so we can return them
+        when the calculation is done.
+
+        Underlying implementations can use this or not - it may not be valid if constraints
+        are present
+        """
+        if self._foundmin is None or self.mol.potential_energy < self._foundmin.potential_energy:
+            self._foundmin = self.mol.properties
+
     def __call__(self):
         """ Run the minimization
 
         Returns:
             moldesign.Trajectory: the minimization trajectory
         """
-        self.run()
-        if self.traj.num_frames == 0 or self.traj.frames[-1].minimization_step != self.current_step:
+        self._run()
+        # Write the last step to the trajectory, if needed
+        if self.traj.potential_energy[-1] != self.mol.potential_energy:
+            assert self.traj.potential_energy[-1] > self.mol.potential_energy
             self.traj.new_frame(minimization_step=self.current_step,
                                 annotation='minimization result (%d steps) (energy=%s)'%
                                            (self.current_step, self.mol.potential_energy))

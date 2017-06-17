@@ -13,7 +13,6 @@ from .test_ambertools_xface import (gaff_model_gasteiger, protein_default_amber_
                                     parameterize_am1bcc, parameterize_zeros,
                                     protein_default_amber_forcefield)
 
-
 registered_types = {}
 registered_types.update(obtypes)
 registered_types.update(ambtypes)
@@ -63,9 +62,10 @@ def test_analytical_vs_numerical_forces(objkey, request):
 @pytest.mark.parametrize('objkey', registered_types['hasmodel'])
 def test_minimization_reduces_energy(objkey, request):
     mol = request.getfixturevalue(objkey)
-    e1 = mol.calculate_potential_energy()
+    p0 = mol.positions.copy()
+    e0 = mol.calculate_potential_energy()
     traj = mol.minimize()
-    assert mol.calculate_potential_energy() < e1
+    helpers.assert_something_resembling_minimization_happened(p0, e0, traj, mol)
 
 
 @pytest.mark.parametrize('objkey', registered_types['hasmodel'])

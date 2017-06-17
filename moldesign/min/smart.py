@@ -48,37 +48,68 @@ class SmartMin(MinimizerBase):
         self.gd_threshold = kwargs.pop('gd_threshold', GDTHRESH)
         self.args = args
         self.kwargs = kwargs
+        self._spmin = None
+        self._descent = None
+        self._traj = None
+        self._currentstep = None
+        self.__foundmin = None
         super().__init__(*args, **kwargs)
 
     def _run(self):
         # If forces are already low, go directly to the quadratic convergence methods and return
         forces = self.mol.calculate_forces()
         if abs(forces).max() <= self.gd_threshold:
-            spmin = self._make_quadratic_method()
-            spmin._run()
-            self.traj = spmin.traj
-            self.current_step = spmin.current_step
+            self._spmin = self._make_quadratic_method()
+            self._spmin._run()
+            self.traj = self._spmin.traj
             return
 
         # Otherwise, remove large forces with gradient descent; exit if we pass the cycle limit
         descent_kwargs = self.kwargs.copy()
         descent_kwargs['force_tolerance'] = self.gd_threshold
-        descender = GradientDescent(*self.args, **descent_kwargs)
-        descender._run()
-        if descender.current_step >= self.nsteps:
-            self.traj = descender.traj
+        self._descender = GradientDescent(*self.args, **descent_kwargs)
+        self._descender._run()
+        if self._descender.current_step >= self.nsteps:
+            self.traj = self._descender.traj
             return
 
         # Finally, use a quadratic method to converge the optimization
-        kwargs = dict(_restart_from=descender.current_step,
-                      _restart_energy=descender._initial_energy)
+        kwargs = dict(_restart_from=self._descender.current_step,
+                      _restart_energy=self._descender._initial_energy)
         kwargs['frame_interval'] = self.kwargs.get('frame_interval',
-                                                   descender.frame_interval)
-        spmin = self._make_quadratic_method(kwargs)
-        spmin.current_step = descender.current_step
-        spmin._run()
-        self.traj = descender.traj + spmin.traj
-        self.current_step = spmin.current_step
+                                                   self._descender.frame_interval)
+        self._spmin = self._make_quadratic_method(kwargs)
+        self._spmin.current_step = self.current_step
+        self._spmin._foundmin = self._foundmin
+        self._spmin._run()
+        self.traj = self._descender.traj + self._spmin.traj
+        self.traj.info = getattr(self._spmin, 'info', None)
+
+    @property
+    def _foundmin(self):
+        if self._descent:
+            return self._descent._foundmin
+        elif self._spmin:
+            return self._spmin._foundmin
+        else:
+            return self.__foundmin
+
+    @_foundmin.setter
+    def _foundmin(self, val):
+        self.__foundmin = val
+
+    @property
+    def currentstep(self):
+        if self._descent:
+            return self._descent.currentstep
+        elif self._spmin:
+            return self._spmin.currentstep
+        else:
+            return self._currentstep
+
+    @currentstep.setter
+    def currentstep(self, val):
+        self._currentstep = val
 
     def _make_quadratic_method(self, kwargs=None):
         if kwargs is None: kwargs = {}
