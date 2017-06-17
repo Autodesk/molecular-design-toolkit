@@ -360,11 +360,6 @@ class MolPropertyMixin(object):
             str: Markdown string"""
         lines = []
         if len(self.residues) > 1:
-            table = self.get_residue_table()
-            lines.append('### Residues')
-            # extra '|' here may be workaround for a bug in ipy.markdown?
-            lines.append(table.markdown(replace={0: ' '})+'|')
-
             lines.append('### Biopolymer chains')
             seqs = []
             for chain in self.chains:
@@ -377,13 +372,13 @@ class MolPropertyMixin(object):
 
         return lines
 
-    def get_residue_table(self):  # pragma: no cover
+    def get_residue_table(self):
         """Creates a data table summarizing this molecule's primary structure.
 
         Returns:
             moldesign.utils.MarkdownTable"""
         table = utils.MarkdownTable(*(['chain']+
-                                      'protein dna rna unknown water solvent'.split()))
+                                      'protein dna rna unknown water solvent ion'.split()))
         for chain in self.chains:
             counts = {}
             unk = []
@@ -1146,6 +1141,11 @@ class Molecule(AtomGroup,
 
         if self.integrator:
             lines.append('**Integrator**: %s'%str(self.integrator))
+
+        if self.num_residues > 1:
+            table = self.get_residue_table()
+            lines.append('### Residues')
+            lines.append(table.markdown(replace={0: ' '})+'|')  # extra '|' is bug workaround (?)
 
         if self.is_biomolecule:
             lines.extend(self._biomol_summary_markdown())

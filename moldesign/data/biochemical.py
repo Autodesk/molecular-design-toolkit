@@ -89,8 +89,8 @@ IONS = {'NA': 'Na+',
         'MG': 'Mg+2',
         'CA': 'Ca+2',
         'F': 'F-',
-        'Cl': 'Cl-',
-        'Br': 'Br-',
+        'CL': 'Cl-',
+        'BR': 'Br-',
         'I': 'I-'}
 
 RESTYPES = dict(
