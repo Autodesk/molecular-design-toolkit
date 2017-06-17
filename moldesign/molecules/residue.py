@@ -16,6 +16,7 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from past.builtins import basestring
 
 import collections
 
@@ -423,3 +424,41 @@ class Residue(BioContainer):
 
     def __str__(self):
         return 'Residue %s (index %s, chain %s)' % (self.name, self.index, self.chain.name)
+
+
+class HasResidues(object):
+    """ Mixin for classes that *contain* residues (i.e. Molecules and Chains)
+    """
+
+    def get_residues(self, *keywords, **queries):
+        """Allows keyword-based residue queries. Returns residues that match ALL queries.
+
+        Args:
+            *keywords (list): pre-set keywords (currently, just selects by residue type)
+            **queries (dict): attributes (or residue attributes) to match
+
+        Examples:
+            >>> mol.get_residues(type='protein')  # returns all amino acid residues in molecule
+            >>> mol.chains['A'].get_residues(resname='ALA')  # returns all alanines
+
+        Returns:
+            List[Residues]: residues matching the query
+        """
+        if not (queries or keywords):
+            return list(self.residues)
+
+        result = []
+        for res in self.residues:
+            for field, val in queries.items():
+                if field == 'chain' and isinstance(val, basestring):
+                    if res.chain.name != val:
+                        break
+                    else:
+                        continue
+
+                elif getattr(res, field, None) != val:
+                    break
+            else:
+                result.append(res)
+
+        return result

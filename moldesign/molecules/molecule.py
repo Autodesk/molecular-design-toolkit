@@ -29,7 +29,7 @@ from ..compute import DummyJob
 from ..exceptions import NotCalculatedError
 from ..min.base import MinimizerBase
 from .properties import MolecularProperties
-from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond
+from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond, HasResidues
 from ..helpers import WidgetMethod
 from .coord_arrays import *
 
@@ -938,7 +938,9 @@ class MolSimulationMixin(object):
 class Molecule(AtomGroup,
                MolConstraintMixin,
                MolPropertyMixin,
-               MolTopologyMixin, MolSimulationMixin):
+               MolTopologyMixin,
+               MolSimulationMixin,
+               HasResidues):
     """
     ``Molecule`` objects store a molecular system, including atoms, 3D coordinates, molecular
     properties, biomolecular entities, and other model-specific information. Interfaces with

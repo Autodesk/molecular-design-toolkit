@@ -9,6 +9,7 @@ import moldesign as mdt
 from moldesign import units as u
 
 from . import helpers
+from .molecule_fixtures import pdb3aid
 
 
 registered_types = {}
@@ -234,3 +235,23 @@ def test_get_atoms(protein):
         assert (atom.name == 'CA' and atom.residue.resname == 'GLY') == (
             atom in gly_alpha_carbons)
 
+
+def test_get_residues_in_molecule(pdb3aid):
+    mol = pdb3aid
+    waters = mol.get_residues(type='water')
+    assert set(waters) == set(res for res in mol.residues if res.resname == 'HOH')
+
+
+def test_get_residues_in_chain(pdb3aid):
+    mol = pdb3aid
+    chain = mol.chains['A']
+    waters = chain.get_residues(type='water')
+    assert set(waters) == set(res for res in mol.chains['A'].residues if res.resname == 'HOH')
+
+
+def test_get_residues_two_parameters(pdb3aid):
+    mol = pdb3aid
+    alas = mol.chains['B'].get_residues(resname='ALA')
+    assert set(alas) == set(res for res in mol.chains['B'].residues if res.resname == 'ALA')
+    ala2 = mol.get_residues(resname='ALA', chain='B')
+    assert set(ala2) == set(alas)
