@@ -51,6 +51,33 @@ def planar():
 
 
 @pytest.fixture
+def almost_planar(planar):
+    atoms = planar[0].atoms
+    atoms.append(mdt.Atom(4))
+    atoms[-1].position = [0, 0, 0.005] * u.angstrom
+    return mdt.Molecule(atoms, name='almost_planar')
+
+
+def test_approximate_symmetry(almost_planar):
+    mol = almost_planar.copy()
+
+    symmetries = mdt.get_symmetry(almost_planar)
+
+    assert symmetries.rms > 0
+    assert len(symmetries.exact) == 1
+    assert symmetries.exact[0].symbol == 'C1'
+
+    assert len(symmetries.approximate) == 1
+    assert symmetries.approximate[0].symbol == 'Cs'
+    cs = symmetries.groups['Cs'][0]
+
+    mol.positions = symmetries.get_symmetrized_coords(cs)
+    newsymm = mdt.get_symmetry(mol)
+    assert len(newsymm.exact) == 2
+    assert len(newsymm.approximate) == 0
+
+
+@pytest.fixture
 def benz(benzene):
     # Note: we're counting on the geometry generation algorithm to give proper symmetries
     expected = {'C1': 1,

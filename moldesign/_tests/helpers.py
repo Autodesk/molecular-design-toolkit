@@ -62,7 +62,6 @@ def native_str_buffer(*args, **kwargs):
         return io.StringIO(*args, **kwargs)
 
 
-
 class ZeroEnergy(mdt.models.base.EnergyModelBase):
     """ All 0, all the time
     """
@@ -126,6 +125,4 @@ def assert_something_resembling_minimization_happened(p0, e0, traj, mol):
                                    mol.positions.defunits_value().flat)
         np.testing.assert_almost_equal(scipyresult.fun,
                                        mol.potential_energy.defunits_value())
-        if not mol.constraints:  # scipy modifies forces with penalty functions, they'll be wrong
-            np.testing.assert_allclose(scipyresult.jac,
-                                       (-mol.forces.defunits_value()).flat)
+
