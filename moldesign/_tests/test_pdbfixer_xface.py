@@ -98,3 +98,39 @@ def test_multiple_mutations(pdb3aid):
     assert [r.resname for r in mut.chains['A'].get_residues(pdbindex=2)] == ['SER']
     assert [r.resname for r in mut.chains['B'].get_residues(pdbindex=3)] == ['SER']
 
+
+def test_solvate_small_molecule_boxsize(benzene):
+    newmol = mdt.add_water(benzene, min_box_size=15.0*u.angstrom)
+    assert newmol.num_atoms > 50  # who knows how many? more than benzene though
+
+
+def test_seawater_solvation_small_molecule(benzene):
+    newmol = mdt.add_water(benzene,
+                           min_box_size=20.0*u.angstrom,
+                           ion_concentration=0.6*u.molar)
+    assert newmol.num_atoms > 50  # who knows how many? more than benzene though
+    assert len(newmol.get_atoms(name='Cl')) == 3  # TODO: check that this is correct molarity
+    assert len(newmol.get_atoms(name='Na')) == 3  # TODO: check that this is correct molarity
+
+
+def test_solvation_alternative_ions(benzene):
+    newmol = mdt.add_water(benzene,
+                           min_box_size=20.0*u.angstrom,
+                           ion_concentration=0.6*u.molar,
+                           positive_ion='Rb',
+                           negative_ion='I')
+    assert newmol.num_atoms > 50  # who knows how many? more than benzene though
+    assert len(newmol.get_atoms(name='Rb')) == 3  # TODO: check that this is correct molarity
+    assert len(newmol.get_atoms(name='I')) == 3  # TODO: check that this is correct molarity
+
+
+def test_solvate_protein_padding(pdb1yu8):
+    newmol = mdt.add_water(pdb1yu8, padding=5.0*u.angstrom)
+    assert newmol.num_atoms > pdb1yu8.num_atoms
+
+    oldmol = mdt.Molecule(newmol.residues[:pdb1yu8.num_residues])
+    assert oldmol.same_topology(pdb1yu8, verbose=True)
+
+    np.testing.assert_allclose(pdb1yu8.positions.value_in(u.angstrom),
+                               oldmol.positions.value_in(u.angstrom),
+                               atol=1e-3)

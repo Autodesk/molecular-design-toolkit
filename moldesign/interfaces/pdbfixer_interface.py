@@ -114,7 +114,7 @@ def mutate_residues(mol, residue_map):
         else:
             residues_to_copy.append(oldres)
 
-    metadata = {'mutant_of': mol.metadata.copy(),
+    metadata = {'origin': mol.metadata.copy(),
                 'mutations': mutation_strs}
 
     return mdt.Molecule(residues_to_copy,
@@ -195,7 +195,7 @@ def _mut_strs_to_map(mol, strs):
 
 @compute.runsremotely(enable=force_remote)
 def add_water(mol, min_box_size=None, padding=None,
-              ion_concentration=None, neutralize=True,
+              ion_concentration=0.0, neutralize=True,
               positive_ion='Na+', negative_ion='Cl-'):
     """ Solvate a molecule in a water box with optional ions
 
@@ -231,10 +231,10 @@ def add_water(mol, min_box_size=None, padding=None,
         assert negative_ion[-1] != '+'
         negative_ion += '-'
 
-    if ion_concentration is not None:
-        ion_concentration = u.MdtQuantity(ion_concentration)
-        if ion_concentration.dimensionless:
-            ion_concentration *= u.molar
+    ion_concentration = u.MdtQuantity(ion_concentration)
+    if ion_concentration.dimensionless:
+        ion_concentration *= u.molar
+    ion_concentration = opm.pint2simtk(ion_concentration)
 
     # calculate box size - in each dimension, use the largest of min_box_size or
     #    the calculated padding
@@ -249,20 +249,33 @@ def add_water(mol, min_box_size=None, padding=None,
 
     modeller = opm.mol_to_modeller(mol)
 
-    # TODO: this is like 10 bad things at once. Should probably submit a
-    #       PR to PDBFixer to make this a public staticmethod instead of a private instancemethod
-    #       Alternatively, PR to create Fixers directly from Topology objs
+    # Creating my fixers directly from Topology objs
     ff = pdbfixer.PDBFixer.__dict__['_createForceField'](None, modeller.getTopology(), True)
 
     modeller.addSolvent(ff,
                         boxSize=opm.pint2simtk(boxsize),
                         positiveIon=positive_ion,
                         negativeIon=negative_ion,
-                        ionicStrength=opm.pint2simtk(ion_concentration),
+                        ionicStrength=ion_concentration,
                         neutralize=neutralize)
 
-    return opm.topology_to_mol(modeller.getTopology(),
-                               positions=modeller.getPositions(),
-                               name='%s with water box' % mol.name)
+    solv_tempmol = opm.topology_to_mol(modeller.getTopology(),
+                                  positions=modeller.getPositions(),
+                                  name='%s with water box' % mol.name)
+
+    # PDBFixer reorders atoms, so to keep things consistent, we'll graft the mutated residues
+    # into an MDT structure
+    newmol_atoms = [mol]
+    for residue in solv_tempmol.residues[mol.num_residues:]:
+        newmol_atoms.append(residue)
+
+    newmol = mdt.Molecule(newmol_atoms,
+                          name="Solvated %s" % mol,
+                          metadata={'origin':mol.metadata})
+
+    assert newmol.num_atoms == solv_tempmol.num_atoms
+    assert newmol.num_residues == solv_tempmol.num_residues
+    return newmol
+
 
 
