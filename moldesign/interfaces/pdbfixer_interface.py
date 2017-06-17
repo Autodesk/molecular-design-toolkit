@@ -16,9 +16,12 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from past.builtins import basestring
 
 import imp
 import io
+import re
+
 
 import numpy as np
 
@@ -51,43 +54,143 @@ def fixer_to_mol(f):
 
 
 @compute.runsremotely(enable=force_remote)
-def mutate(mol, mutationmap):
+def mutate_residues(mol, residue_map):
     """ Create a mutant with point mutations (returns a copy - leaves the original unchanged)
+
+    Mutations may be specified in one of two ways:
+      1) As a dictionary mapping residue objects to the 3-letter name of the amino acid they
+        will be mutated into: ``{mol.residues[3]: 'ALA'}``
+      2) As a list of mutation strings: ``['A43M', '332S', 'B.53N']`` (see below)
+
+    Mutation strings have the form:
+       ``[chain name .][initial amino acid code](residue index)(mutant amino acid code)``
+       If the chain name is omited, the mutation will be applied to all chains (if possible).
+       The initial amino acid code may also be omitted.
+
+    Examples:
+        >>> mutate_residues(mol, {mol.residues[5]: 'ALA'})  # mutate residue 5 to ALA
+        >>> mutate_residues(mol, 'A43M')  # In chain A, mutate ALA43 to MET43
+        >>> mutate_residues(mol, ['A.332S', 'B.120S'])  # Mutate Chain A res 332 and B 120 to SER
+        >>> mutate_residues(mol, ['B.C53N']) # Mutate Cysteine 53 in chain B to Asparagine
 
     Args:
         mol (moldesign.Molecule): molecule to create mutant from
-        mutationmap (Dict[moldesign.Residue:str]): mapping from residue objects to the mutant
-           3-letter residue
+        residue_map (Dict[moldesign.Residue:str] OR List[str]): list of mutations (see above for
+           allowed formats)
 
     Returns:
-        moldesign.Molecule: mutant
+        moldesign.Molecule: the mutant
     """
     fixer = mol_to_fixer(mol)
     chain_mutations = {}
-    for res in mutationmap:
-        chain_mutations.setdefault(res.chain.pdbname, {})[res] = mutationmap[res]
+    mutation_strs = []
+    if not hasattr(residue_map, 'items'):
+        residue_map = _mut_strs_to_map(mol, residue_map)
+
+    if not residue_map:
+        raise ValueError("No mutations specified!")
+
+    for res, newres in residue_map.items():
+        chain_mutations.setdefault(res.chain.pdbname, {})[res] = residue_map[res]
+        mutation_strs.append(_mutation_as_str(res, newres))
 
     for chainid, mutations in chain_mutations.items():
         mutstrings = ['%s-%d-%s' % (res.resname, res.pdbindex, newname)
                       for res, newname in mutations.items()]
-        print('Applying mutations to chain %s: %s' % (chainid, ', '.join(mutstrings)))
         fixer.applyMutations(mutstrings, chainid)
-    return fixer_to_mol(fixer)
+    temp_mutant = fixer_to_mol(fixer)
+
+    # PDBFixer reorders atoms, so to keep things consistent, we'll graft the mutated residues
+    # into an MDT structure
+    assert temp_mutant.num_residues == mol.num_residues  # shouldn't change number of residues
+    residues_to_copy = []
+    for oldres, mutant_res in zip(mol.residues, temp_mutant.residues):
+        if oldres in residue_map:
+            residues_to_copy.append(mutant_res)
+            mutant_res.mol = None
+            mutant_res.chain = oldres.chain
+            for atom in mutant_res.atoms:
+                atom.chain = oldres.chain
+        else:
+            residues_to_copy.append(oldres)
+
+    metadata = {'mutant_of': mol.metadata.copy(),
+                'mutations': mutation_strs}
+
+    return mdt.Molecule(residues_to_copy,
+                        name='Mutant of "%s"' % mol,
+                        metadata=metadata)
 
 
-@compute.runsremotely(enable=force_remote)
-def get_missing_residues(mol):
-    fixer = mol_to_fixer(mol)
-    fixer.findMissingResidues()
-    fixerchains = list(fixer.topology.chains)
+def _mutation_as_str(res, newres):
+    """ Create mutation string for storage as metadata.
 
-    missing = list()
-    for (chainidx, insertionpoint), reslist in fixer.missingResidues.items():
-        chainid = fixerchains[chainidx].id
-        for ires, resname in enumerate(reslist):
-            missing.append(mdt.helpers.MissingResidue(chainid, resname, insertionpoint + ires))
+    Note that this will include the name of the chain, if available, as a prefix:
 
-    return missing
+    Examples:
+        >>> res = mdt.Residue(resname='ALA', pdbindex='23', chain=mdt.Chain(name=None))
+        >>> _mutation_as_str(res, 'TRP')
+        'A23W'
+        >>> res = mdt.Residue(resname='ALA', pdbindex='23', chain=mdt.Chain(name='C'))
+        >>> _mutation_as_str(res, 'TRP')
+        'C.A23W'
+
+    Args:
+        res (moldesign.Residue): residue to be mutated
+        newres (str): 3-letter residue code for new amino acid
+
+    Returns:
+        str: mutation string
+
+    References:
+        Nomenclature for the description of sequence variations
+            J.T. den Dunnen, S.E. Antonarakis: Hum Genet 109(1): 121-124, 2001
+            Online at http://www.hgmd.cf.ac.uk/docs/mut_nom.html#protein
+    """
+    try:  # tries to describe mutation using standard
+        mutstr = '%s%s%s' % (res.code, res.pdbindex,
+                             mdt.data.RESIDUE_ONE_LETTER.get(newres, '?'))
+        if res.chain.pdbname:
+            mutstr = '%s.%s' % (res.chain.pdbname, mutstr)
+        return mutstr
+    except (TypeError, ValueError) as e:
+        print('WARNING: failed to construct mutation code: %s' % e)
+        return '%s -> %s' % (str(res), newres)
+
+
+MUT_RE = re.compile(r'(.*\.)?([^\d]*)(\d+)([^\d]+)')  # parses mutation strings
+
+
+def _mut_strs_to_map(mol, strs):
+    if isinstance(strs, basestring):
+        strs = [strs]
+    mutmap = {}
+    for s in strs:
+        match = MUT_RE.match(s)
+        if match is None:
+            raise ValueError("Failed to parse mutation string '%s'" % s)
+        chainid, initialcode, residx, finalcode = match.groups()
+        if chainid is not None:
+            parent = mol.chains[chainid[:-1]]
+        else:
+            parent = mol  # queries the whole molecule
+
+        newresname = mdt.data.RESIDUE_CODE_TO_NAME[finalcode]
+
+        query = {'pdbindex': int(residx)}
+        if initialcode:
+            query['code'] = initialcode
+
+        residues = parent.get_residues(**query)
+
+        if len(residues) == 0:
+            raise ValueError("Mutation '%s' did not match any residues" % s)
+
+        for res in residues:
+            assert res not in mutmap, "Multiple mutations for %s" % res
+            mutmap[res] = newresname
+
+    return mutmap
 
 
 @compute.runsremotely(enable=force_remote)

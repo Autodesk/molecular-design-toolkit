@@ -540,12 +540,19 @@ class MolTopologyMixin(object):
         num_biores = 0
         conflicts = set()
 
-        last_pdb_idx = None
+        pdbatoms = [atom for atom in self.atoms if atom.pdbindex is not None]
+        if pdbatoms:
+            min_pdb_atom = min(pdbatoms, key=lambda x:x.pdbindex)
+            last_pdb_idx = min_pdb_atom.pdbindex - min_pdb_atom.index - 1
+        else:
+            last_pdb_idx = 0
 
         for atom in self.atoms:
+            if atom.pdbindex is None:
+                atom.pdbindex = last_pdb_idx + 1
             if last_pdb_idx is not None and atom.pdbindex <= last_pdb_idx:
                 atom.pdbindex = last_pdb_idx + 1
-                conflicts.add('atom numbers')
+                conflicts.add('atom indices')
             last_pdb_idx = atom.pdbindex
 
             # if atom has no chain/residue, assign defaults
@@ -569,7 +576,7 @@ class MolTopologyMixin(object):
                     atom.chain.name = chr(ord(atom.chain.name)+1)
 
                 if oldname != atom.chain.name:
-                    conflicts.add('chain')
+                    conflicts.add('chain ids')
                 self.chains.add(atom.chain)
             else:
                 assert atom.chain.molecule is self
@@ -585,7 +592,7 @@ class MolTopologyMixin(object):
                 assert atom.chain.molecule is self
 
         if conflicts:
-            print('WARNING: %s indices modified due to name clashes' % (
+            print('WARNING: %s modified due to name clashes' % (
                 ', '.join(conflicts)))
         self.is_biomolecule = (num_biores >= 2)
 

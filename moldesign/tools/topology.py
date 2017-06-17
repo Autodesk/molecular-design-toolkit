@@ -26,11 +26,11 @@ from moldesign import units as u
 from . import toplevel, __all__ as _pkgall
 
 from moldesign.interfaces.openbabel import add_hydrogen, guess_bond_orders, set_protonation
-from moldesign.interfaces.pdbfixer_interface import mutate, add_water
+from moldesign.interfaces.pdbfixer_interface import mutate_residues, add_water
 from moldesign.interfaces.ambertools import create_ff_parameters
 from moldesign.interfaces.ambertools import calc_am1_bcc_charges, calc_gasteiger_charges
 
-_pkgall.extend(('add_hydrogen guess_bond_orders mutate add_water'
+_pkgall.extend(('add_hydrogen guess_bond_orders mutate_residues add_water'
                 ' create_ff_parameters calc_am1_bcc_charges calc_gasteiger_charges '
                 'set_protonation').split())
 

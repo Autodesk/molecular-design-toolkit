@@ -18,8 +18,12 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import numpy as np
+
 import moldesign as mdt
-from .molecule_fixtures import pdb3aid
+from moldesign import units as u
+
+from .molecule_fixtures import pdb3aid, benzene, pdb1yu8
 
 
 def test_inchain_residue_mutation_in_protein(pdb3aid):
@@ -41,13 +45,15 @@ def test_cterm_residue_mutate_protein(pdb3aid):
 
 
 def _mutate_and_check(mol, residx, resname, allatoms):
-    newmol = mdt.mutate(mol, {mol.residues[residx]: resname})
+    newmol = mdt.mutate_residues(mol, {mol.residues[residx]: resname})
 
     assert newmol.num_chains == mol.num_chains
     assert mol.num_residues == newmol.num_residues
+    foundnew = False
 
     for i, (res, newres) in enumerate(zip(mol.residues, newmol.residues)):
         if i == residx:
+            foundnew = True
             assert newres.resname == resname
             assert newres.name == resname+str(newres.pdbindex)
             atomnames = set(atom.name for atom in newres)
@@ -57,3 +63,8 @@ def _mutate_and_check(mol, residx, resname, allatoms):
             assert res.name == newres.name
             assert res.num_atoms == newres.num_atoms
 
+            for oldatom, newatom in zip(res, newres):
+                assert oldatom.name == newatom.name
+                assert oldatom.atnum == newatom.atnum
+                if not foundnew:
+                    assert oldatom.pdbindex == newatom.pdbindex

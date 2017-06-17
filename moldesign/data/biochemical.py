@@ -35,6 +35,8 @@ RESIDUE_ONE_LETTER = dict(ALA="A", ASX="B", CYS="C", ASP="D",
                           GLN="Q", ARG="R", SER="S", THR="T", VAL="V",
                           TRP="W", XAA="X", TYR="Y", GLX="Z")
 
+RESIDUE_CODE_TO_NAME = {v:k for k,v in RESIDUE_ONE_LETTER.items()}
+
 BIOPOLYMER_TYPES = set('dna rna protein'.split())
 
 CHAIN_MONOMER_NAMES = {'dna': 'dna base',

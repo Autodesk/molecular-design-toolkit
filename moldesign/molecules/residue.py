@@ -430,21 +430,22 @@ class HasResidues(object):
     """ Mixin for classes that *contain* residues (i.e. Molecules and Chains)
     """
 
-    def get_residues(self, *keywords, **queries):
+    def get_residues(self, **queries):
         """Allows keyword-based residue queries. Returns residues that match ALL queries.
 
         Args:
-            *keywords (list): pre-set keywords (currently, just selects by residue type)
             **queries (dict): attributes (or residue attributes) to match
 
         Examples:
             >>> mol.get_residues(type='protein')  # returns all amino acid residues in molecule
-            >>> mol.chains['A'].get_residues(resname='ALA')  # returns all alanines
+            >>> mol.chains['A'].get_residues(resname='ALA')  # returns all alanines in chain A
+            >>> mol.get_residues(chain='A')  # all residues in chain A
+
 
         Returns:
             List[Residues]: residues matching the query
         """
-        if not (queries or keywords):
+        if not queries:
             return list(self.residues)
 
         result = []
