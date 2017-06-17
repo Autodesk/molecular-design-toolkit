@@ -41,7 +41,7 @@ else:
 def mol_to_fixer(mol):
     import pdbfixer
     fixer = pdbfixer.PDBFixer(
-            pdbfile=io.BytesIO(mol.write(format='pdb')))
+            pdbfile=io.StringIO(mol.write(format='pdb')))
     return fixer
 
 
@@ -51,14 +51,17 @@ def fixer_to_mol(f):
 
 
 @compute.runsremotely(enable=force_remote)
-def add_hydrogen(mol, pH=7.4):
-    fixer = mol_to_fixer(mol)
-    fixer.addMissingHydrogens(pH)
-    return fixer_to_mol(fixer)
-
-
-@compute.runsremotely(enable=force_remote)
 def mutate(mol, mutationmap):
+    """ Create a mutant with point mutations (returns a copy - leaves the original unchanged)
+
+    Args:
+        mol (moldesign.Molecule): molecule to create mutant from
+        mutationmap (Dict[moldesign.Residue:str]): mapping from residue objects to the mutant
+           3-letter residue
+
+    Returns:
+        moldesign.Molecule: mutant
+    """
     fixer = mol_to_fixer(mol)
     chain_mutations = {}
     for res in mutationmap:
@@ -68,7 +71,7 @@ def mutate(mol, mutationmap):
         mutstrings = ['%s-%d-%s' % (res.resname, res.pdbindex, newname)
                       for res, newname in mutations.items()]
         print('Applying mutations to chain %s: %s' % (chainid, ', '.join(mutstrings)))
-        fixer.applyMutations(mutations, chainid)
+        fixer.applyMutations(mutstrings, chainid)
     return fixer_to_mol(fixer)
 
 
