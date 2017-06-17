@@ -23,6 +23,8 @@ import numpy as np
 import moldesign as mdt
 from moldesign import units as u
 
+import pytest
+
 from .molecule_fixtures import pdb3aid, benzene, pdb1yu8
 
 
@@ -68,3 +70,31 @@ def _mutate_and_check(mol, residx, resname, allatoms):
                 assert oldatom.atnum == newatom.atnum
                 if not foundnew:
                     assert oldatom.pdbindex == newatom.pdbindex
+
+
+def test_mutate_docstring_dict_example(pdb3aid):
+    mol = pdb3aid
+    assert mol.residues[5].resname != 'ALA'
+    mut = mdt.mutate_residues(mol, {mol.residues[5]: 'ALA'})  # mutate residue 5 to ALA
+    assert mut.residues[5].resname == 'ALA'
+
+
+def test_mutation_nomenclature_string_only(pdb3aid):
+    mol = pdb3aid
+    res25 = mol.get_residues(pdbindex=25)
+    assert len(res25) == 2
+    assert [r.resname for r in res25] == ['ASP', 'ASP']
+
+    mut = mdt.mutate_residues(mol, 'D25M')  # Mutate ALA43 to MET43
+    assert mut.get_residues()
+    mut25 = mut.get_residues(pdbindex=25)
+    assert len(mut25) == 2
+    assert [r.resname for r in mut25] == ['MET', 'MET']
+
+
+def test_multiple_mutations(pdb3aid):
+    mol = pdb3aid
+    mut = mdt.mutate_residues(mol, ['A.2S', 'B.3S'])  # Mutate Chain A res 2 and B 3 to SER
+    assert [r.resname for r in mut.chains['A'].get_residues(pdbindex=2)] == ['SER']
+    assert [r.resname for r in mut.chains['B'].get_residues(pdbindex=3)] == ['SER']
+

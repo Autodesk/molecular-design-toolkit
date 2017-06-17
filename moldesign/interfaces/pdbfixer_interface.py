@@ -69,7 +69,7 @@ def mutate_residues(mol, residue_map):
 
     Examples:
         >>> mutate_residues(mol, {mol.residues[5]: 'ALA'})  # mutate residue 5 to ALA
-        >>> mutate_residues(mol, 'A43M')  # In chain A, mutate ALA43 to MET43
+        >>> mutate_residues(mol, 'A43M')  # In all chains with ALA43 mutate it to MET43
         >>> mutate_residues(mol, ['A.332S', 'B.120S'])  # Mutate Chain A res 332 and B 120 to SER
         >>> mutate_residues(mol, ['B.C53N']) # Mutate Cysteine 53 in chain B to Asparagine
 
