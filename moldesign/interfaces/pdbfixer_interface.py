@@ -1,4 +1,7 @@
 from __future__ import print_function, absolute_import, division
+
+import string
+
 from future.builtins import *
 from future import standard_library
 standard_library.install_aliases()
@@ -99,6 +102,7 @@ def mutate_residues(mol, residue_map):
                       for res, newname in mutations.items()]
         fixer.applyMutations(mutstrings, chainid)
     temp_mutant = fixer_to_mol(fixer)
+    _pdbfixer_chainnames_to_letter(temp_mutant)
 
     # PDBFixer reorders atoms, so to keep things consistent, we'll graft the mutated residues
     # into an MDT structure
@@ -120,6 +124,15 @@ def mutate_residues(mol, residue_map):
     return mdt.Molecule(residues_to_copy,
                         name='Mutant of "%s"' % mol,
                         metadata=metadata)
+
+
+def _pdbfixer_chainnames_to_letter(pdbfixermol):
+    for chain in pdbfixermol.chains:
+        try:
+            if chain.name.isdigit():
+                chain.name = string.ascii_uppercase[int(chain.name)-1]
+        except (ValueError, TypeError, IndexError):
+            continue  # not worth crashing over
 
 
 def _mutation_as_str(res, newres):
@@ -262,6 +275,9 @@ def add_water(mol, min_box_size=None, padding=None,
     solv_tempmol = opm.topology_to_mol(modeller.getTopology(),
                                   positions=modeller.getPositions(),
                                   name='%s with water box' % mol.name)
+
+    _pdbfixer_chainnames_to_letter(solv_tempmol)
+
 
     # PDBFixer reorders atoms, so to keep things consistent, we'll graft the mutated residues
     # into an MDT structure
