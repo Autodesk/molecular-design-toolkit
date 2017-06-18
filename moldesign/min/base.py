@@ -126,13 +126,22 @@ class MinimizerBase(object):
         if self._foundmin is None or self.mol.potential_energy < self._foundmin.potential_energy:
             self._foundmin = self.mol.properties
 
-    def __call__(self):
+    def __call__(self, remote=False, wait=True):
         """ Run the minimization
+
+        Args:
+            remote (bool): launch the minimization in a remote job
+            wait (bool): if remote, wait until the minimization completes before returning.
+               (if remote=True and wait=False, will return a reference to the job)
 
         Returns:
             moldesign.Trajectory: the minimization trajectory
         """
+        if remote or getattr(self.mol.energy_model, '_CALLS_MDT_IN_DOCKER', False):
+            return self.runremotely(wait=wait)
+
         self._run()
+
         # Write the last step to the trajectory, if needed
         if self.traj.potential_energy[-1] != self.mol.potential_energy:
             assert self.traj.potential_energy[-1] > self.mol.potential_energy
@@ -206,8 +215,10 @@ class MinimizerBase(object):
         """
         @mdt.utils.args_from(cls, allexcept=['self'])
         def asfn(*args, **kwargs):
+            remote = kwargs.pop('remote', False)
+            wait = kwargs.pop('wait', True)
             obj = cls(*args, **kwargs)
-            return obj()
+            return obj(remote=remote, wait=wait)
         asfn.__name__ = newname
         asfn.__doc__ = cls.__doc__
 

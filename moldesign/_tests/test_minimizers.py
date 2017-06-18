@@ -16,6 +16,17 @@ def harmonic_atom():
     return mol
 
 
+@pytest.fixture(scope='function')
+def scrambled():
+    mol = mdt.from_smiles('C=C')
+    mol.set_energy_model(mdt.models.OpenBabelPotential, forcefield='mmff94s')
+    mol.com = [0, 0, 0] * u.angstrom
+    _apply_noise(mol, scale=5.0)
+    e0 = mol.calculate_potential_energy()
+    p0 = mol.positions.copy()
+    return mol, e0, p0
+
+
 @pytest.mark.parametrize('MinClass', (mdt.min.GradientDescent,
                                       mdt.min.BFGS,
                                       mdt.min.SmartMin))
@@ -50,6 +61,54 @@ MINIMIZERS = collections.OrderedDict([('gradient_descent', mdt.min.gradient_desc
 # (ordered because pytest+xdist needs a definite ordering of parameters)
 
 
+def test_extreme_forces_with_smart_minimizer(scrambled):
+    mol, e0, p0 = scrambled
+
+    traj = mdt.minimize(mol, nsteps=500)
+    assert_something_resembling_minimization_happened(p0, e0, traj, mol)
+
+
+@pytest.mark.skipif(mdt.models.OpenBabelPotential._CALLS_MDT_IN_DOCKER,
+                    reason='Redundant with regular test')
+def test_remote_with_smart_minimizer(scrambled):
+    mol, e0, p0 = scrambled
+
+    minimizer = mdt.min.SmartMin(mol, nsteps=500)
+    traj = minimizer.runremotely()
+    assert traj.mol is mol
+    assert_something_resembling_minimization_happened(p0, e0, traj, mol)
+
+
+@pytest.mark.skipif(mdt.models.OpenBabelPotential._CALLS_MDT_IN_DOCKER,
+                    reason='Redundant with regular test')
+def test_remote_with_smart_minimizer_async(scrambled):
+    mol, e0, p0 = scrambled
+    job = mdt.min.minimize(mol, nsteps=500, remote=True, wait=False)
+    assert (mol.positions == p0).all()  # shouldn't have changed yet
+
+    job.wait()
+    assert (mol.positions != p0).any()  # NOW it should have changed yet
+    traj = job.result
+    assert traj.mol is mol
+    assert_something_resembling_minimization_happened(p0, e0, traj, mol)
+
+
+@pytest.mark.skipif(mdt.models.OpenBabelPotential._CALLS_MDT_IN_DOCKER,
+                    reason='Redundant with regular test')
+def test_remote_minimization_automatic_if_openbabel_not_installed(scrambled):
+    mol, e0, p0 = scrambled
+
+    # a bit of an API hack - remote overridden if the model isn't installed locally
+    mol.energy_model._CALLS_MDT_IN_DOCKER = True  # monkey-patch should only affect this instance
+    job = mdt.min.minimize(mol, nsteps=500, remote=False, wait=False)
+    assert (mol.positions == p0).all()  # shouldn't have changed yet
+    job.wait()
+    assert (mol.positions != p0).any()  # NOW it should have changed yet
+    traj = job.result
+    assert traj.mol is mol
+    assert_something_resembling_minimization_happened(p0, e0, traj, mol)
+
+
 @pytest.mark.parametrize('minkey',(MINIMIZERS.keys()))
 def test_constrained_distance_minimization(minkey):
     minimizer = MINIMIZERS[minkey]
@@ -75,7 +134,6 @@ def test_constrained_distance_minimization(minkey):
     assert_something_resembling_minimization_happened(p0, e0, traj, mol)
     assert abs(constraint.error()) < 1e-4 * u.angstrom
 
-    # for scipy-based minimizers
 
 
 @pytest.mark.parametrize('minkey',(MINIMIZERS.keys()))
@@ -115,7 +173,7 @@ def test_constrained_dihedral_minimization(minkey):
     assert dihedral.value <= 5.0 * u.degrees
 
 
-def _apply_noise(mol):
-    noise = np.random.normal(size=(mol.num_atoms, 3), scale=0.05) * u.angstrom
+def _apply_noise(mol, scale=0.05):
+    noise = np.random.normal(size=(mol.num_atoms, 3), scale=scale) * u.angstrom
     mol.positions += noise
 

@@ -40,6 +40,8 @@ class EnergyModelBase(Method):
 
     PARAMETERS = []
 
+    _CALLS_MDT_IN_DOCKER = False  # gets set to true if a python-interfaced dependency is missing
+
     def calculate(self, requests):
         """Calculate the the default properties and any additiona requests
 
