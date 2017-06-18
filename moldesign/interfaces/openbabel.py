@@ -37,37 +37,6 @@ from .. import units as u
 from ..utils import exports
 
 
-def read_file(filename, name=None, format=None):
-    """ Read a molecule from a file
-
-    Note:
-        Currently only reads the first conformation in a file
-
-    Args:
-        filename (str): path to file
-        name (str): name to assign to molecule
-        format (str): File format: pdb, sdf, mol2, bbll, etc.
-
-    Returns:
-        moldesign.Molecule: parsed result
-    """
-    # TODO: check for openbabel molecule name?
-    if format is None:
-        format = filename.split('.')[-1]
-
-    if force_remote:
-        with open(filename, 'r') as infile:
-            mol = read_string(infile.read(), format, name=name)
-        return mol
-    else:
-        pbmol = next(pb.readfile(format=format, filename=filename))
-        if name is None:
-            name = filename
-        mol = pybel_to_mol(pbmol, name=os.path.basename(name))
-        mol.filename = filename
-        return mol
-
-
 def read_stream(filelike, format, name=None):
     """ Read a molecule from a file-like object
 
@@ -128,25 +97,6 @@ def write_string(mol, format):
     return str(outstr)
 
 
-def write_file(mol, filename=None, mode='w', format=None):
-    """ Write molecule to a file
-
-    Args:
-        mol (moldesign.Molecule): molecule to write
-        filename (str): File to write to
-        mode (str): Writing mode (e.g. 'w' to overwrite, the default, or 'a' to append)
-        format (str): File format: pdb, sdf, mol2, bbll, etc.
-    """
-    if format is None:
-        format = filename.split('.')[-1]
-    outstr = write_string(mol, format)
-    if filename is None:
-        return outstr
-    else:
-        with open(filename, mode) as wrf:
-            print(outstr, file=wrf)
-
-
 @runsremotely(enable=force_remote)
 def guess_bond_orders(mol):
     """Use OpenBabel to guess bond orders using geometry and functional group templates.
@@ -178,32 +128,6 @@ def add_hydrogen(mol):
     pbmol.OBMol.AddHydrogens()
     newmol = pybel_to_mol(pbmol, reorder_atoms_by_residue=True)
     mdt.helpers.assign_unique_hydrogen_names(newmol)
-    return newmol
-
-
-@runsremotely(enable=force_remote)
-def set_protonation(mol, ph=7.4):
-    """ Adjust protonation according to the OpenBabel pka model.
-
-    This routine will return a copy of the molecule with the new protonation state and adjusted
-    formal charges
-
-    Args:
-        mol (moldesign.Molecule): Molecule to adjust
-        ph (float): assign protonation state for this pH value
-
-    Returns:
-        moldesign.Molecule: New molecule with adjusted protonation
-    """
-    # TODO: this doesn't appear to do anything for most molecules!!!
-    # TODO: this renames hydrogens!!!
-
-    pbmol = mol_to_pybel(mol)
-    pbmol.OBMol.AddHydrogens(False, True, ph)
-
-    newmol = pybel_to_mol(pbmol, reorder_atoms_by_residue=True)
-    mdt.helpers.assign_unique_hydrogen_names(newmol)
-    mdt.assign_formal_charges(newmol, ignore_nonzero=False)
     return newmol
 
 

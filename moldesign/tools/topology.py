@@ -25,14 +25,13 @@ from moldesign import units as u
 
 from . import toplevel, __all__ as _pkgall
 
-from moldesign.interfaces.openbabel import add_hydrogen, guess_bond_orders, set_protonation
+from moldesign.interfaces.openbabel import add_hydrogen, guess_bond_orders
 from moldesign.interfaces.pdbfixer_interface import mutate_residues, add_water
 from moldesign.interfaces.ambertools import create_ff_parameters
 from moldesign.interfaces.ambertools import calc_am1_bcc_charges, calc_gasteiger_charges
 
 _pkgall.extend(('add_hydrogen guess_bond_orders mutate_residues add_water'
-                ' create_ff_parameters calc_am1_bcc_charges calc_gasteiger_charges '
-                'set_protonation').split())
+                ' create_ff_parameters calc_am1_bcc_charges calc_gasteiger_charges ').split())
 
 ATNUM_VALENCE_CHARGE = {6: {3: -1, 4: 0},
                         7: {2: -1, 3: 0, 4: 1},
@@ -99,30 +98,6 @@ def assign_formal_charges(mol, ignore_nonzero=True):
         if newcharge is not None:
             mol.charge += newcharge * u.q_e - atom.formal_charge
             atom.formal_charge = newcharge * u.q_e
-
-
-@toplevel
-def set_hybridization_and_ph(mol, ph=7.4):
-    """ Add missing hydrogens, bond orders, and formal charges
-
-    Specifically, this is a convenience function that runs:
-    ``mdt.guess_bond_orders``, ``mdt.add_hydrogen``, and ``mdt.assign_formal_charges``
-
-    Note:
-        This does NOT add missing residues to biochemical structures. This functionality will be
-        available as :meth:`moldesign.add_missing_residues`
-
-    Args:
-        mol (moldesign.Molecule): molecule to clean
-        ph (float): assigned pH. Assign protonation states using the default OpenBabel pKa model
-
-    Returns:
-        moldesign.Molecule: cleaned version of the molecule
-    """
-    m1 = mdt.guess_bond_orders(mol)
-    m2 = mdt.add_hydrogen(m1)
-    m3 = mdt.set_protonation(m2, ph)
-    return m3
 
 
 @toplevel

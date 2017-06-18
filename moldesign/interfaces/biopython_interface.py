@@ -30,62 +30,8 @@ from moldesign.helpers.pdb import BioAssembly
 from moldesign.utils import exports
 
 
-def parse_mmcif(f):
-    """Parse an mmCIF file (using the Biopython parser) and return a molecule
-
-    Note:
-        This routine is not currently called by any part of the user-facing API! The
-        OpenBabel parser appears to give more accurate results for the time being. The
-        molecules created using this routine will NOT have any bond topology!
-
-    Args:
-        f (file): file-like object containing the mmCIF file
-
-    Returns:
-        moldesign.Molecule: parsed molecule
-    """
-    return _parse_file(f, Bio.PDB.MMCIFParser)
-
-
-def parse_pdb(f):
-    """Parse a PDB file (using the Biopython parser) and return the basic structure
-
-    Note:
-        This structure will be missing some key data - most notably bonds, but also
-        any biomolecular assembly information. Therefore, our default parser combines
-        this routine with a few other methods to create the final Molecule object
-
-    See also:
-        moldesign.fileio.read_pdb
-
-    Args:
-        f (file): file-like object containing the PDB file
-
-    Returns:
-        moldesign.Molecule: parsed molecule
-    """
-    # TODO: this needs to handle strings and streams
-    # TODO: deal with alternate locations
-
-    return _parse_file(f, Bio.PDB.PDBParser)
-
-
-def _parse_file(f, parser_type):
-    parser = parser_type()
-    struc = parser.get_structure('no name', f)
-    mol = biopy_to_mol(struc)
-    return mol
-
-
-def get_pdb_seqres(f):
-    from Bio import SeqIO
-    chainseqs = list(SeqIO.parse(f, "pdb-seqres"))
-    seqs = {cs.annotations['chain']: str(cs.seq) for cs in chainseqs}
-    return seqs
-
-
 @exports
-def biopy_to_mol(struc):
+def biopython_to_mol(struc):
     """Convert a biopython PDB structure to an MDT molecule.
 
     Note:
@@ -127,8 +73,7 @@ def biopy_to_mol(struc):
 
                 newatoms.append(newatom)
 
-    return mdt.Molecule(newatoms,
-                        name=struc.get_full_id()[0])
+    return mdt.Molecule(newatoms, name=struc.get_full_id()[0])
 
 
 def get_mmcif_assemblies(fileobj=None, mmcdata=None):
