@@ -1,21 +1,29 @@
 #!/usr/bin/env bash
+# this script expects to run from the root of the repository
 
-# this script expects to run from the moldesign/_tests directory
+# fail immediately if any command fails:
+set -e
 
 VERSION="${TESTENV}.py${PYVERSION}"
-PYTESTFLAGS="-n 6 --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=1800"
-if [ "${TESTENV}" == "complete" ]; then
-       PYTESTFLAGS="--cov .. --cov-config=./.coveragerc ${PYTESTFLAGS}"
+PYTESTFLAGS="-n 5 --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=1800 --tb=short"
+if [ "${VERSION}" == "complete.py3" ]; then
+       PYTESTFLAGS="--cov moldesign ${PYTESTFLAGS}"
 fi
 
 
 function send_status_update(){
-     python ../../deployment/send_test_status.py "${1}" "${2}"
+     python deployment/send_test_status.py "${1}" "${2}"
 }
 
 
 function check_if_tests_should_run(){
-    echo "Should I run the tests in this environment?"
+   echo "Should I run the tests in this environment?"
+   runthem=false
+
+   if [[ "${CI_COMMIT_MESSAGE}" == *"--fast-ci-tests"* && "${VERSION}" != "complete.py3" ]];  then
+       echo "NO: found \"--fast-ci-tests\" flag in commit message; run complete.py3 only"
+       exit 0
+   fi
 
    if [ "${TESTENV}" == "complete" ]; then
        runthem=true
@@ -38,7 +46,6 @@ function check_if_tests_should_run(){
      echo "SKIPPING tests in this environment."
      echo "To run these tests, add \"--testall\" to your commit message"
      echo "(or work in the dev or deploy branches)"
-     send_status_update 0 "Skipped (dev/deploy branches only)"
      exit 0
    fi
 }
@@ -46,6 +53,11 @@ function check_if_tests_should_run(){
 
 function run_tests(){
     send_status_update "na" "Starting tests for ${VERSION}"
+
+    echo
+    echo "Test command running in working dir '$(pwd)':"
+    echo "py.test ${PYTESTFLAGS}"
+    echo
 
     py.test ${PYTESTFLAGS} | tee /opt/reports/pytest.${VERSION}.log
     exitstat=${PIPESTATUS[0]}
@@ -57,7 +69,7 @@ function run_tests(){
 
     send_status_update "${exitstat}" "${statline}"
 
-    if [ "${TESTENV}" == "complete" ]; then
+    if [ "${VERSION}" == "complete.py3" ]; then
        if [[ ${exitstat} == 0 && "$CI_BRANCH" != "" ]]; then
           coveralls || echo "Failed to upload code coverage stats"
        else

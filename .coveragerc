@@ -1,0 +1,33 @@
+[paths]
+source =
+  moldesign
+  */site-packages/moldesign
+  */dist-packages/moldesign
+
+
+[run]
+source = moldesign
+omit =
+   moldesign/_notebooks/*
+   moldesign/_tests/*
+   moldesign/_static_data/*
+   moldesign/_version.py
+   moldesign/external/*
+   moldesign/widgets.py
+   moldesign/interfaces/nbo_interface.py
+   moldesign/utils/_deadfunctions.py
+   moldesign/utils/docparsers/google.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    def __str__
+    def _repr_markdown_
+    raise AssertionError
+    raise NotImplementedError
+    if PY2
+    if future.utils.PY2
+    def show
+    def unshow
+

@@ -55,7 +55,7 @@ def test_1hpk(request, mol):
 
 @pytest.fixture
 def pdb_2jaj():
-    return mdt.read(get_data_path('2jaj.pdb'))
+    return mdt.read(get_data_path('2jaj.pdb.gz'))
 
 
 @pytest.fixture
@@ -84,6 +84,14 @@ def test_missing_residues_xtal_2jaj(request, mol):
     missingres = mol.metadata.missing_residues
     for expected in MISSINGRES_2JAJ:
         assert missingres[expected[0]][expected[2]] == expected[1]
+
+
+def test_missing_residues_nmr_5b7a():
+    mol = mdt.read(get_data_path('5b7a.pdb.bz2'))
+    missingres = mol.metadata.missing_residues
+    for expected in MISSINGRES_5B7A:
+        assert missingres[expected[0]][expected[2]] == expected[1]
+    assert mol.metadata.description == 'STRUCTURES OF HUMAN SUMO'
 
 
 @pytest.fixture
@@ -119,3 +127,18 @@ MISSINGRES_2JAJ = [('A', 'GLY', -4), ('A', 'PRO', -3), ('A', 'LEU', -2), ('A', '
                    ('A', 'SER', 284), ('B', 'GLY', 34), ('B', 'GLU', 35), ('B', 'ALA', 168),
                    ('B', 'ASP', 169), ('B', 'GLY', 170), ('B', 'VAL', 282), ('B', 'ASP', 283),
                    ('B', 'SER', 284)]
+
+MISSINGRES_5B7A = [('A', 'PRO', 0),
+                   ('A', 'ASP', -1),
+                   ('A', 'MET', -13),
+                   ('A', 'GLY', -12),
+                   ('A', 'SER', -11),
+                   ('A', 'SER', -10),
+                   ('A', 'HIS', -9),
+                   ('A', 'HIS', -8),
+                   ('A', 'HIS', -7),
+                   ('A', 'HIS', -6),
+                   ('A', 'HIS', -5),
+                   ('A', 'HIS', -4),
+                   ('A', 'SER', -3),
+                   ('A', 'GLN', -2)]

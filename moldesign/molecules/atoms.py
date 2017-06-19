@@ -86,6 +86,10 @@ class AtomPropertyMixin(object):  # TODO: this isn't worth it, just put it back 
         return props
 
 
+# TODO: units need to stay up to date if defaults change
+_position0 = np.zeros(3) * u.default.length
+_momentum0 = np.zeros(3) * (u.default.length * u.default.mass/u.default.time)
+
 @toplevel
 class Atom(AtomPropertyMixin):
     """ A data structure representing an atom.
@@ -153,11 +157,13 @@ class Atom(AtomPropertyMixin):
     draw3d = WidgetMethod('atoms.draw3d')
     draw = WidgetMethod('atoms.draw')
 
+    _PERSIST_REFERENCES = True  # relevant for `pyccc` helper library
+
     #################################################################
     # Methods for BUILDING the atom and indexing it in a molecule
     def __init__(self, name=None, atnum=None, mass=None, chain=None, residue=None,
                  formal_charge=None, pdbname=None, pdbindex=None, element=None,
-                 metadata=None):
+                 metadata=None, position=None, momentum=None):
 
         # Allow user to instantiate an atom as Atom(6) or Atom('C')
         if atnum is None and element is None:
@@ -181,9 +187,16 @@ class Atom(AtomPropertyMixin):
         self.chain = chain
         self.molecule = None
         self.index = None
-        self._position = np.zeros(3) * u.default.length
-        self._momentum = np.zeros(3) * (u.default.length*
-                                       u.default.mass/u.default.time)
+        if position is None:
+            self._position = _position0.copy()
+        else:
+            self._position = position
+
+        if momentum is None:
+            self._momentum = _momentum0.copy()
+        else:
+            self._momentum = momentum
+
         self._bond_graph = {}
         self.metadata = utils.DotDict()
         if metadata:

@@ -101,7 +101,7 @@ def get_eris_in_basis(basis, orbs):
     """
     from pyscf import ao2mo
 
-    pmol = mol_to_pyscf(basis.wfn.molecule, basis=basis.basisname)
+    pmol = mol_to_pyscf(basis.wfn.mol, basis=basis.basisname)
     eri = ao2mo.full(pmol, orbs.T, compact=True) * u.hartree
     eri.defunits_inplace()
     return orbitals.ERI4FoldTensor(eri, orbs)

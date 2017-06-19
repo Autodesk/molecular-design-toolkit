@@ -80,11 +80,11 @@ FORCE_CALCULATORS = LazyClassMap({'rhf': 'pyscf.grad.RHF', 'hf': 'pyscf.grad.RHF
 
 @utils.exports
 class PySCFPotential(QMBase):
+    _CALLS_MDT_IN_DOCKER = force_remote
     DEFAULT_PROPERTIES = ['potential_energy',
                           'wfn',
                           'mulliken']
-    ALL_PROPERTIES = DEFAULT_PROPERTIES + ['eri_tensor',
-                                           'forces',
+    ALL_PROPERTIES = DEFAULT_PROPERTIES + ['forces',
                                            'nuclear_forces',
                                            'electronic_forces']
     PARAM_SUPPORT = {'theory': ['rhf', 'rks', 'mp2'],
@@ -101,7 +101,7 @@ class PySCFPotential(QMBase):
         self.logs = StringIO()
         self.logger = Logger('PySCF interface')
 
-    @compute.runsremotely(enable=force_remote, is_imethod=True)
+    @compute.runsremotely(enable=force_remote, is_imethod=True, persist_refs=True)
     def calculate(self, requests=None):
         self.logger = Logger('PySCF calc')
         do_forces = 'forces' in requests
@@ -231,7 +231,7 @@ class PySCFPotential(QMBase):
         scf_matrices = self._get_scf_matrices(orb_calc, ao_matrices)
         if hasattr(orb_calc, 'mulliken_pop'):
             ao_pop, atom_pop = orb_calc.mulliken_pop(verbose=-1)
-            result['mulliken'] = utils.DotDict({a: p for a, p in zip(self.mol.atoms, atom_pop)})
+            result['mulliken'] = utils.DotDict({a: p * u.q_e for a, p in zip(self.mol.atoms, atom_pop)})
             result['mulliken'].type = 'atomic'
 
         if hasattr(orb_calc, 'dip_moment'):

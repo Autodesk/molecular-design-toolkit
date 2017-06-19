@@ -9,6 +9,7 @@ import moldesign as mdt
 from moldesign import units as u
 
 from . import helpers
+from .molecule_fixtures import pdb3aid, ethylene_waterbox_2na_2cl
 
 
 registered_types = {}
@@ -234,3 +235,46 @@ def test_get_atoms(protein):
         assert (atom.name == 'CA' and atom.residue.resname == 'GLY') == (
             atom in gly_alpha_carbons)
 
+
+def test_get_atoms_keywords(ethylene_waterbox_2na_2cl):
+    mol = ethylene_waterbox_2na_2cl
+    with pytest.raises(ValueError):
+        mol.get_atoms('arglebargle')
+
+    with pytest.raises(ValueError):
+        mol.get_atoms('ions')  # it's "ion" only (for now)
+
+    ions = mol.get_atoms('ion')
+    assert ions.num_atoms == 4
+    for ion in ions:
+        assert ion.residue.resname in ('NA','CL') and ion.name in ('Na','Cl')
+
+    waters = mol.get_atoms('water')
+    for w in waters:
+        assert w.residue.resname == 'HOH'
+
+    solute = mol.get_atoms('unknown')
+    assert len(solute) == 6
+
+    assert len(waters) + len(ions) + len(solute) == mol.num_atoms
+
+
+def test_get_residues_in_molecule(pdb3aid):
+    mol = pdb3aid
+    waters = mol.get_residues(type='water')
+    assert set(waters) == set(res for res in mol.residues if res.resname == 'HOH')
+
+
+def test_get_residues_in_chain(pdb3aid):
+    mol = pdb3aid
+    chain = mol.chains['A']
+    waters = chain.get_residues(type='water')
+    assert set(waters) == set(res for res in mol.chains['A'].residues if res.resname == 'HOH')
+
+
+def test_get_residues_two_parameters(pdb3aid):
+    mol = pdb3aid
+    alas = mol.chains['B'].get_residues(resname='ALA')
+    assert set(alas) == set(res for res in mol.chains['B'].residues if res.resname == 'ALA')
+    ala2 = mol.get_residues(resname='ALA', chain='B')
+    assert set(ala2) == set(alas)

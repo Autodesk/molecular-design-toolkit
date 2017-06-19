@@ -13,7 +13,6 @@ from .test_ambertools_xface import (gaff_model_gasteiger, protein_default_amber_
                                     parameterize_am1bcc, parameterize_zeros,
                                     protein_default_amber_forcefield)
 
-
 registered_types = {}
 registered_types.update(obtypes)
 registered_types.update(ambtypes)
@@ -63,6 +62,31 @@ def test_analytical_vs_numerical_forces(objkey, request):
 @pytest.mark.parametrize('objkey', registered_types['hasmodel'])
 def test_minimization_reduces_energy(objkey, request):
     mol = request.getfixturevalue(objkey)
-    e1 = mol.calculate_potential_energy()
+    p0 = mol.positions.copy()
+    e0 = mol.calculate_potential_energy()
     traj = mol.minimize()
-    assert mol.calculate_potential_energy() < e1
+    helpers.assert_something_resembling_minimization_happened(p0, e0, traj, mol)
+
+
+@pytest.mark.parametrize('objkey', registered_types['hasmodel'])
+def test_openmm_langevin_integrator(objkey, request):
+    mol = request.getfixturevalue(objkey)
+    mol.set_integrator(mdt.integrators.OpenMMLangevin, temperature=300.0*u.kelvin)
+    traj = mol.run(10.0 * u.ps)
+    assert mol.time >= 4.99 * u.ps
+    # small molecules have a big range
+    assert 100 * u.kelvin <= traj.kinetic_temperature[-1] <= 500 * u.kelvin
+
+
+@pytest.mark.parametrize('objkey', registered_types['hasmodel'])
+def test_openmm_verlet_integrator(objkey, request):
+    mol = request.getfixturevalue(objkey)
+    mol.set_integrator(mdt.integrators.OpenMMVerlet, timestep=1.0*u.fs)
+    mol.minimize()
+    traj = mol.run(5.0 * u.ps)
+
+    # very rough energy conservation test
+    energy = traj.potential_energy + traj.kinetic_energy
+    assert abs(energy[0] - energy[-1]) <= 0.01 * mol.num_atoms * u.kcalpermol
+
+

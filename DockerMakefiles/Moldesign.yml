@@ -17,7 +17,8 @@ moldesign_minimal_requirements:
    && apt-get install -y gcc \
    && pip install -r /tmp/mdtreqs.txt
   COPY . /opt/molecular-design-toolkit
-  RUN pip install -e /opt/molecular-design-toolkit
+  WORKDIR /opt/molecular-design-toolkit
+  RUN python setup.py sdist && pip install `ls -t dist/*.tar.gz | head -n1`
 
 moldesign_minimal:
   requires:

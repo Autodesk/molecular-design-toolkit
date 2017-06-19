@@ -47,6 +47,13 @@ def ligand3aid(ligand_residue_3aid):
     return newmol
 
 
+@typedfixture('molecule')
+def ethylene_waterbox_2na_2cl():
+    mol = mdt.from_smiles('C=C')
+    solvated = mdt.add_water(mol, padding=15.0*u.angstrom, ion_concentration=0.6*u.molar)
+    return solvated
+
+
 @pytest.fixture
 def random_atoms_from_3aid(pdb3aid):
     atoms = mdt.molecules.atomcollections.AtomList(random.sample(pdb3aid.atoms, 10))
@@ -58,6 +65,11 @@ def small_molecule():
     mol = mdt.from_smiles('CNCOS(=O)C')
     mol.positions += 0.001*np.random.random(mol.positions.shape)*u.angstrom  # move out of minimum
     return mol
+
+
+@pytest.fixture
+def benzene():
+    return mdt.from_smiles('c1ccccc1')
 
 
 @typedfixture('molecule')
@@ -74,6 +86,7 @@ def h2():
 @pytest.fixture
 def ethylene():
     return mdt.from_smiles('C=C')
+
 
 @pytest.fixture
 def pdb1yu8():

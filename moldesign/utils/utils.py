@@ -20,26 +20,6 @@ from uuid import uuid4
 
 
 
-def make_none(): return None
-
-
-@contextlib.contextmanager
-def recursionlimit_atleast(n=1000):
-    """Context manager for temporarily raising the context manager's
-    the interpreter's maximum call stack size (misleading called the ``recursion limit``)
-
-    Notes:
-        This will explicitly reset the the recursion limit when we exit the context;
-            any intermediate recursion limit changes will be lost
-        This will not lower the limit ``n`` is less than the current recursion limit.
-    """
-    current_limit = sys.getrecursionlimit()
-    if n >= current_limit:
-        sys.setrecursionlimit(n)
-    yield
-    sys.setrecursionlimit(current_limit)
-
-
 def if_not_none(item, default):
     """ Equivalent to `item if item is not None else default` """
     if item is None:
@@ -164,66 +144,6 @@ class textnotify(object):
             printflush('ERROR')
 
 
-class progressbar(object):
-    """ Create a progress bar for a calculation
-
-    The context manager provides a callback which needs to be called as
-    set_progress(percent), where percent is a number between 0 and 100
-
-    Examples:
-        >>> import time
-        >>> with progressbar('count to 100') as set_progress:
-        >>>     for i in xrange(100):
-        >>>         time.sleep(0.5)
-        >>>         set_progress(i+1)
-    """
-    def __init__(self, description):
-        import ipywidgets as ipy
-        import traitlets
-        try:
-            self.progress_bar = ipy.FloatProgress(0, min=0, max=100, description=description)
-        except traitlets.TraitError:
-            self.progress_bar = None
-
-    def __enter__(self):
-        from IPython.display import display
-        if self.progress_bar is not None:
-            display(self.progress_bar)
-        return self.set_progress
-
-    def set_progress(self, percent):
-        if self.progress_bar is not None:
-            self.progress_bar.value = percent
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.progress_bar is not None:
-            self.value = 100.0
-            if exc_type is not None:
-                self.progress_bar.bar_style = 'danger'
-            else:
-                self.progress_bar.bar_style = 'success'
-
-
-def remove_directories(list_of_paths):
-    """
-    Removes non-leafs from a list of directory paths
-    """
-    found_dirs = set('/')
-    for path in list_of_paths:
-        dirs = path.strip().split('/')
-        for i in range(2, len(dirs)):
-            found_dirs.add('/'.join(dirs[:i]))
-
-    paths = [path for path in list_of_paths if
-             (path.strip() not in found_dirs) and path.strip()[-1] != '/']
-    return paths
-
-
-def make_local_temp_dir():
-    tempdir = '/tmp/%s' % uuid4()
-    os.mkdir(tempdir)
-    return tempdir
-
 
 class BaseTable(object):
     def __init__(self, categories, fileobj=None):
@@ -245,31 +165,6 @@ class BaseTable(object):
 
     def getstring(self):
         raise NotImplementedError()
-
-
-class PrintTable(BaseTable):
-    def __init__(self, formatstr, fileobj=sys.stdout):
-        self.format = formatstr
-        categories = []
-        self._wrote_header = False
-        for field in string.Formatter().parse(formatstr):
-            key = field.split('.')[0]
-            categories.append(key)
-        super().__init__(categories, fileobj=fileobj)
-
-    def writeline(self, line):
-        if not self._wrote_header:
-            print(self.format.format(self.categories), file=self._fileobj)
-            self._wrote_header = True
-
-        if self.fileobj is None: return
-        print(self.formatstr.format(**line), file=self.fileobj)
-
-    def getstring(self):
-        s = StringIO()
-        for line in self.lines:
-            print(self.format.format(line), file=s)
-        return s.getvalue()
 
 
 class MarkdownTable(BaseTable):
@@ -348,18 +243,12 @@ class _RedirectStream(object):
         setattr(sys, self._stream, self._old_targets.pop())
 
 
-class redirect_stdout(_RedirectStream):
-    """From python3.4 stdlib"""
-    _stream = "stdout"
-
-
 class redirect_stderr(_RedirectStream):
     """From python3.4 stdlib"""
     _stream = "stderr"
 
 
 GETFLOAT = re.compile(r'-?\d+(\.\d+)?(e[-+]?\d+)')  # matches numbers, e.g. 1, -2.0, 3.5e50, 0.001e-10
-
 
 
 def from_filepath(func, filelike):

@@ -37,6 +37,8 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
     """
     # NEWFEATURE: need to set/get platform (and properties, e.g. number of threads)
     DEFAULT_PROPERTIES = ['potential_energy', 'forces']
+    _CALLS_MDT_IN_DOCKER = opm.force_remote
+
     _openmm_compatible = True
 
     def __init__(self, **kwargs):
@@ -78,6 +80,8 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         This will rebuild this OpenMM simulation if: A) it's not built yet, or B)
         there's a new integrator
         """
+        if opm.force_remote:
+            return True
         from simtk.openmm import app
 
         # TODO: automatically set _prepped to false if the model or integration parameters change

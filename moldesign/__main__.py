@@ -1,3 +1,20 @@
+"""
+This file collects the various command line tasks accessed via
+``python -m moldesign [command]``
+
+The functions here are intended help users set up their environment.
+
+Note that MDT routines will NOT be importable from this module when it runs as a script -- you
+won't be working with molecules or atoms in this module.
+"""
+
+from __future__ import print_function, absolute_import, division
+
+import atexit
+from future.builtins import *
+from future import standard_library
+standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,17 +28,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-This file collects the various command line tasks accessed via
-``python -m moldesign [command]``
+from future.utils import PY2
 
-The functions here are intended help users set up their environment.
-
-Note that MDT routines will NOT be importable from this module when it runs as a script -- you
-won't be working with molecules or atoms in this module.
-"""
-from __future__ import print_function
-from builtins import range
 import argparse
 import distutils.spawn
 import errno
@@ -46,7 +54,7 @@ MOLDESIGN_SRC = os.path.abspath(os.path.dirname(__file__))
 EXAMPLE_DIR_SRC = unit_def_file = os.path.join(MOLDESIGN_SRC, '_notebooks')
 MDTVERSION = subprocess.check_output(['python', '-c',
                                       "import _version; print(_version.get_versions()['version'])"],
-                                     cwd=MOLDESIGN_SRC).strip()
+                                     cwd=MOLDESIGN_SRC).splitlines()[-1].decode('ascii')
 VERFILEPATH = os.path.join(EXAMPLE_DIR_TARGET, '.mdtversion')
 
 
@@ -64,7 +72,6 @@ CONFIG_PATH = os.path.join(CONFIG_DIR, 'moldesign.yml')
 def main():
     print('Molecular Design Toolkit v%s Launcher' % MDTVERSION)
 
-
     global CONFIG_PATH
     parser = argparse.ArgumentParser('python -m moldesign')
 
@@ -77,8 +84,8 @@ def main():
                                        'only when a docker client is configured)')
     subparsers.add_parser('config', help='print configuration and exit')
     subparsers.add_parser('copyexamples', help='Copy example notebooks')
-    subparsers.add_parser('devbuild', help='rebuild required docker containers locally')
-    subparsers.add_parser('devpull', help='Pull development images for latest release')
+    subparsers.add_parser('version', help='Write version string and exit')
+    subparsers.add_parser('dumpenv', help="Dump environment for bug reports")
 
     parser.add_argument('-f', '--config-file', type=str,
                         help='Path to config file')
@@ -93,20 +100,18 @@ def main():
         launch(cwd=EXAMPLE_DIR_TARGET,
                path='notebooks/Getting%20Started.ipynb')
 
-    elif args.command == 'pull':
-        pull()
-
     elif args.command == 'launch':
         launch()
 
-    elif args.command == 'devbuild':
-        devbuild()
-
-    elif args.command == 'devpull':
-        devpull()
-
     elif args.command == 'copyexamples':
         copy_example_dir(use_existing=False)
+
+    elif args.command == 'version':
+        print(MDTVERSION)
+
+    elif args.command == 'dumpenv':
+        import moldesign as mdt
+        mdt.data.print_environment()
 
     elif args.command == 'config':
         print('Reading config file from: %s' % CONFIG_PATH)
@@ -118,55 +123,12 @@ def main():
     else:
         raise ValueError("Unhandled CLI command '%s'" % args.command)
 
-DOCKER_IMAGES = 'ambertools moldesign_complete opsin symmol nwchem'.split()
-
-def pull():
-    for img in DOCKER_IMAGES:
-        _pull_img(img)
-
-
-def _pull_img(img):
-    from moldesign import compute
-    imgurl = compute.get_image_path(img, _devmode=False)
-    print('Pulling %s' % imgurl)
-    subprocess.check_call(['docker', 'pull', imgurl])
-
-
-BUILD_FILES = "nwchem_build pyscf_build".split()
-
-def devbuild():
-    print('-' * 80)
-    print("Molecular design toolkit is downloading and building local, up-to-date copies of ")
-    print("all docker containers it depends on. To use them, set:")
-    print("   devmode: true")
-    print("in ~/.moldesign/moldesign.yml.")
-    print(('-' * 80) + '\n')
-
-    devpull()
-
-    subprocess.check_call('docker-make --all --tag dev'.split(),
-                          cwd=os.path.join(MOLDESIGN_SRC, '..', 'DockerMakefiles'))
-
-
-def devpull():
-    for img in DOCKER_IMAGES+BUILD_FILES:
-        try:
-            _pull_img(img)
-        except subprocess.CalledProcessError:
-            print('"%s " not found. Will rebuild locally ...'%img)
-
 
 def launch(cwd=None, path=''):
     server, portnum = launch_jupyter_server(cwd=cwd)
-    wait_net_service('localhost', portnum)
+    wait_net_service('localhost', portnum, server)
     open_browser('http://localhost:%d/%s' % (portnum, path))
-    try:
-        server.wait()
-    except KeyboardInterrupt:
-        print('Shutting down ...')
-        server.terminate()
-        server.wait()
-        print('Jupyter terminated.')
+    server.wait()
 
 
 def copy_example_dir(use_existing=False):
@@ -188,10 +150,11 @@ def check_existing_examples(use_existing):
         version = 'pre-0.7.4'
 
     if version != MDTVERSION:
-        print ('WARNING - your example directory is out of date! It corresponds to MDT version '
-               '%s, but you are using version %s'%(version, MDTVERSION))
-        print ('If you want to update your examples, please rename or remove "%s"'
-               % EXAMPLE_DIR_TARGET)
+        print('WARNING - your example directory is out of date! It corresponds to MDT version '
+              '%s, but you are using version %s'%(version, MDTVERSION))
+        print('If you want to update your examples, please rename or remove "%s"'
+              % EXAMPLE_DIR_TARGET)
+        sys.exit(201)
 
     if use_existing:
         return
@@ -201,10 +164,10 @@ def check_existing_examples(use_existing):
                  ' 1) Rename or remove the existing directory at %s,'%EXAMPLE_DIR_TARGET,
                  ' 2) Run this command in a different location, or'
                  ' 3) Run `python -m moldesign intro` to launch the example gallery.']))
-        sys.exit(1)
+        sys.exit(200)
 
 
-def launch_jupyter_server(cwd=None):
+def launch_jupyter_server(cwd=None):  # pragma: no cover
     for i in range(8888, 9999):
         if localhost_port_available(i):
             portnum = i
@@ -215,11 +178,18 @@ def launch_jupyter_server(cwd=None):
 
     server = subprocess.Popen(('jupyter notebook --no-browser --port %d' % portnum).split(),
                               cwd=cwd)
-
+    atexit.register(server_shutdown, server)
     return server, portnum
 
 
-def open_browser(url):
+def server_shutdown(server):  # pragma: no cover
+    print('Shutting down jupyter server...')
+    server.terminate()
+    server.wait()
+    print('Jupyter terminated.')
+
+
+def open_browser(url):  # pragma: no cover
     for exe in URL_OPENERS:
         if distutils.spawn.find_executable(exe) is not None:
             try:
@@ -231,7 +201,7 @@ def open_browser(url):
     print('Point your browser to %s to get started.' % url)  # fallback
 
 
-def localhost_port_available(portnum):
+def localhost_port_available(portnum):  # pragma: no cover
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(0.2)
     try:
@@ -249,7 +219,7 @@ def yaml_dumper(*args):
     return yaml.dump(*args, default_flow_style=False)
 
 
-def wait_net_service(server, port, timeout=None):
+def wait_net_service(server, port, process, timeout=None):  # pragma: no cover
     """
     Wait for network service to appear
     FROM http://code.activestate.com/recipes/576655-wait-for-network-service-to-appear/
@@ -266,7 +236,12 @@ def wait_net_service(server, port, timeout=None):
         end = now() + timeout
 
     while True:
+        if process.poll() is not None:
+            print('ERROR: Jupyter process exited prematurely')
+            sys.exit(128)
+
         s = socket.socket()
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         try:
             if timeout:
@@ -283,8 +258,9 @@ def wait_net_service(server, port, timeout=None):
             if timeout: return False
 
         except socket.error as err:
-            if type(err.args) != tuple or err[0] not in (errno.ETIMEDOUT, errno.ECONNREFUSED):
+            if type(err.args) != tuple or err.errno not in (errno.ETIMEDOUT, errno.ECONNREFUSED):
                 raise
+
         else:
             s.close()
             return True

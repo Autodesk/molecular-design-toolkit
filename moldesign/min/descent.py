@@ -66,7 +66,7 @@ class GradientDescent(MinimizerBase):
         self.control = control
         self._last_energy = None
 
-    def run(self):
+    def _run(self):
         print('Starting geometry optimization: built-in gradient descent')
         lastenergy = self.objective(self._coords_to_vector(self.mol.positions))
         current = self._coords_to_vector(self.mol.positions)

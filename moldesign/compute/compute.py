@@ -88,7 +88,7 @@ class DummyJob(object):
             self.updated_object = updated_object
 
 
-def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True,
+def run_job(job, engine=None, wait=True, jobname=None, display=True,
             _return_result=False):
     """ Helper for running jobs.
 
@@ -105,7 +105,7 @@ def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True,
         pyccc job object OR function's return value
     """
 
-    mdt._lastjobs.append(job)
+    mdt._lastjobs.append(job)  # TODO: this could potentially be a memory leak
 
     engine = utils.if_not_none(engine, mdt.compute.get_engine())
 
@@ -114,7 +114,6 @@ def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True,
                          'moldesign.compute.config')
 
     engine.submit(job)
-
     jobname = utils.if_not_none(jobname, job.name)
 
     if display:
@@ -127,7 +126,42 @@ def run_job(job, engine=None, image=None, wait=True, jobname=None, display=True,
     return job
 
 
+@utils.args_from(run_job, only='engine wait jobname display'.split())
+def runremotely(func, args=None, kwargs=None,
+                jobname=None, engine=None, image=None, wait=True, display=True,
+                persist_refs=True, when_finished=None):
+    """ Runs a python command remotely.
 
+    Args:
+        job (pyccc.Job): The job to run
 
+    Returns:
+        pyccc.PythonJob OR object: reference to the job if wait=False, or the function's
+           return value, if wait=True
+    """
+    import pyccc
+
+    if args is None:
+        args = []
+    if kwargs is None:
+        kwargs = {}
+
+    if image is None:
+        image = mdt.compute.config.default_python_image
+
+    if jobname is None:
+        jobname = func.__name__
+        if args:
+            jobname += str(args[0])
+
+    call = pyccc.PythonCall(func, *args, **kwargs)
+    job = pyccc.PythonJob(command=call, image=image, engine=engine, name=jobname,
+                          submit=False, persist_references=persist_refs,
+                          sendsource=False, when_finished=when_finished)
+    job = run_job(job, wait=wait, display=display)
+    if wait:
+        return job.result
+    else:
+        return job
 
 

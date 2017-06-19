@@ -2,6 +2,7 @@ import pytest
 import sys
 
 
+@pytest.mark.tryfirst
 def test_lazy_imports():
     import moldesign
 

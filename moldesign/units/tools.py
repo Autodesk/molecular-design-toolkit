@@ -20,6 +20,25 @@ standard_library.install_aliases()
 from .quantity import *
 
 
+def unitsum(iterable):
+    """
+    Faster method to compute sums of iterables if they're all in the right units
+
+    Args:
+        iterable (Iter[MdtQuantity]): iterable to sum over
+
+    Returns:
+        MdtQuantity: the sum
+    """
+    g0 = next(iterable).copy()
+    for item in iterable:
+        if item.units == g0.units:
+            g0._magnitude += item._magnitude
+        else:
+            g0 += item
+    return g0
+
+
 def from_json(j):
     """
     Convert a JSON description to a quantity.
@@ -32,36 +51,6 @@ def from_json(j):
         moldesign.units.quantity.MDTQuantity
     """
     return j['value'] * ureg(j['units'])
-
-
-def units_transfer(from_var, to_var, force=False):
-    """ Give the "to_var" object the same units as "from_var"
-
-    Args:
-        from_var (MdtQuantity): use this quantities units
-        to_var (MdtQuantity): apply units to this quantity
-        force (bool):  Transfer the units even if from_var and to_var have incompatible units
-
-    Returns:
-        MdtQuantity: to_var with from_var's units
-    """
-
-    # If from_var is not a Quantity-like object, return a normal python scalar
-    if not hasattr(from_var, '_units'):
-        try:
-            if to_var.dimensionless or force: return to_var._magnitude
-            else: raise DimensionalityError(from_var, to_var)
-        except AttributeError:
-            return to_var
-
-    # If to_var is a quantity-like object, just perform in-place conversion
-    try:
-        return to_var.to(from_var.units)
-    except AttributeError:
-        pass
-
-    # If to_var has no units, return a Quantity object
-    return to_var * from_var.units
 
 
 def get_units(q):
@@ -118,23 +107,6 @@ def array(qlist, baseunit=None):
 def broadcast_to(arr, *args, **kwargs):
     units = arr.units
     newarr = np.zeros(2) * units
-    # TODO: replace with np.broadcast_to once numpy 1.10 is available in most package managers
     tmp = np.broadcast_to(arr, *args, **kwargs)
     newarr._magnitude = tmp
     return newarr
-
-
-# TODO: remove once numpy 1.10 is available in most package managers
-def _maybe_view_as_subclass(original_array, new_array):
-    """ Temporary copy of a new NumPy function in 1.10, which isn't available in pkg managers yet
-    """
-    if type(original_array) is not type(new_array):
-        # if input was an ndarray subclass and subclasses were OK,
-        # then view the result as that subclass.
-        new_array = new_array.view(type=type(original_array))
-        # Since we have done something akin to a view from original_array, we
-        # should let the subclass finalize (if it has it implemented, i.e., is
-        # not None).
-        if new_array.__array_finalize__:
-            new_array.__array_finalize__(original_array)
-    return new_array
