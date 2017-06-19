@@ -62,7 +62,6 @@ def native_str_buffer(*args, **kwargs):
         return io.StringIO(*args, **kwargs)
 
 
-
 class ZeroEnergy(mdt.models.base.EnergyModelBase):
     """ All 0, all the time
     """
@@ -84,10 +83,46 @@ def _internet(host="8.8.8.8", port=53, timeout=3):
     """
     try:
         socket.setdefaulttimeout(timeout)
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+        try:
+            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+        except OSError:
+            return False
         return True
     except Exception as ex:
         print(ex.message)
         return False
 
 INTERNET_ON = _internet()
+
+
+def assert_something_resembling_minimization_happened(p0, e0, traj, mol):
+    """ Raises assertion error if results do not correspond to a successful optimization
+
+    Args:
+        p0 (Array[length]): initial position array
+        e0 (Scalar[energy]): initial energy
+        traj (moldesign.Trajectory): trajectory created from minimization
+        mol (moldesign.Molecule): state of molecule AFTER minimization
+
+    Returns:
+
+    """
+    import scipy.optimize.optimize
+
+    assert traj.num_frames > 1
+
+    assert traj.potential_energy[0] == e0
+    assert traj.potential_energy[-1] < e0
+    assert traj.potential_energy[-1] == mol.potential_energy
+
+    assert (traj.positions[0] == p0).all()
+    assert (traj.positions[-1] != p0).any()
+    assert (traj.positions[-1] == mol.positions).all()
+
+    scipyresult = getattr(traj, 'info', None)
+    if isinstance(scipyresult, scipy.optimize.optimize.OptimizeResult):
+        np.testing.assert_allclose(scipyresult.x,
+                                   mol.positions.defunits_value().flat)
+        np.testing.assert_almost_equal(scipyresult.fun,
+                                       mol.potential_energy.defunits_value())
+

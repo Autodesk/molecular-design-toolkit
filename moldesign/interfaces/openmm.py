@@ -347,5 +347,12 @@ def mol_to_topology(mol):
 @exports
 def mol_to_modeller(mol):
     from simtk.openmm import app
+    if mol.is_small_molecule:
+        if not mol.residues[0].resname:
+            mol.residues[0].resname = 'UNL'
+            mol.residues[0].pdbindex = 1
+        if not mol.chains[0].pdbname:
+            mol.chains[0].pdbname = 'A'
+
     return app.Modeller(mol_to_topology(mol), pint2simtk(mol.positions))
 

@@ -259,15 +259,16 @@ def write_trajectory(traj, filename=None, format=None, overwrite=True):
 def read_pdb(f, assign_ccd_bonds=True):
     """ Read a PDB file and return a molecule.
 
-    This uses the biopython parser to get the molecular structure, but uses internal parsers
-    to create bonds and biomolecular assembly data.
+    This uses ParmEd's parser to get the molecular structure, with additional functionality
+    to assign Chemical Component Dictionary bonds, detect missing residues, and find
+    biomolecular assembly information.
 
     Note:
         Users won't typically use this routine; instead, they'll use ``moldesign.read``, which will
         delegate to this routine when appropriate.
 
     Args:
-        f (filelike): filelike object giving access to the PDB file (must implement seek)
+        f (filelike): filelike object giving access to the PDB file (must implement readline+seek)
         assign_ccd_bonds (bool): Use the PDB Chemical Component Dictionary (CCD) to create bond
             topology (note that bonds from CONECT records will always be created as well)
 
@@ -322,6 +323,13 @@ def read_xyz(f):
         atom.residue = None
         atom.chain = None
     return mdt.Molecule(tempmol.atoms)
+
+
+def write_xyz(mol, fileobj):
+    fileobj.write(u"   %d\n%s\n" % (mol.num_atoms, mol.name))
+    for atom in mol.atoms:
+        x, y, z = atom.position.value_in(mdt.units.angstrom)
+        fileobj.write(u"%s   %24.14f   %24.14f   %24.14f\n" % (atom.element, x, y, z))
 
 
 @utils.exports
@@ -442,7 +450,8 @@ READERS = {'pdb': read_pdb,
            'xyz': read_xyz}
 
 WRITERS = {'pdb': write_pdb,
-           'mmcif': write_mmcif}
+           'mmcif': write_mmcif,
+           'xyz': write_xyz}
 
 if PY2:
     bzopener = bz2.BZ2File

@@ -83,6 +83,9 @@ class MdtQuantity(ureg.Quantity):
         memo[id(self)] = result
         return result
 
+    def __hash__(self):
+        return hash((self._magnitude, str(self.units)))
+
     # This doesn't deal with length specs correctly (pint's doesn't either though)
     #def __format__(self, fmt):
     #    fmtstring = '{m:%s} {u}' % fmt

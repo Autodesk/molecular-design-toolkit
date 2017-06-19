@@ -103,10 +103,14 @@ class AtomGroup(object):
 
         atoms = self.atoms
 
+        KEYS = 'protein dna rna water unknown ion'.split()
+
         for key in keywords:
-            if key in 'protein dna rna water unknown':
+            if key in KEYS:
                 atoms = mdt.AtomList(atom for atom in atoms
                                      if atom.residue.type == key)
+            else:
+                raise ValueError("Invalid keyword '%s': valid values are %s" % (key, KEYS))
 
         result = mdt.AtomList()
         for atom in atoms:

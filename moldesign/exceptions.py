@@ -17,6 +17,10 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+class NotSupportedError(Exception):
+    """ Raised when a given method can't support the requested calculation
+    """
+
 
 class ConvergenceFailure(Exception):
     """ Raised when an iterative calculation fails to converge """

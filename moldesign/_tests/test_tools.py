@@ -50,6 +50,20 @@ def test_ammonium_formal_charge(objkey, request):
             assert atom.formal_charge == 0 * u.q_e
 
 
+def test_set_hybridization_and_saturate():
+    # Creates just the carbons of ethylene, expects the routine to figure out the rest
+    atom1 = mdt.Atom(6)
+    atom2 = mdt.Atom(6)
+    atom2.x = 1.35 * u.angstrom
+    atom1.bond_to(atom2, 1)
+    mol = mdt.Molecule([atom1, atom2])
+    newmol = mdt.set_hybridization_and_saturate(mol)
+    pytest.xfail('This is apparently broken')
+    assert newmol.num_atoms == 6
+    assert newmol.atoms[0].bond_graph[atom1] == 2
+    assert len(newmol.get_atoms(atnum=1)) == 4
+
+
 @pytest.fixture
 def c2_no_hydrogen_from_smiles():
     mymol = mdt.from_smiles('[CH0][CH0]')

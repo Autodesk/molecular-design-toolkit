@@ -8,7 +8,15 @@ import sys
 
 import github
 
-status = {'0':'success', 'na':'pending'}.get(sys.argv[1], 'failure')
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('exitcode', type=str)
+parser.add_argument('msg', type=str)
+parser.add_argument('--deployed', action='store_true')
+args = parser.parse_args()
+
+status = {'0':'success', 'na':'pending'}.get(args.exitcode, 'failure')
 
 missing_env = []
 for key in 'CI_COMMIT_ID TESTENV GITHUB_REPO_TOKEN CI_PROJECT_ID CI_BUILD_ID PYVERSION'.split():
@@ -28,15 +36,22 @@ pyversion = os.environ.get('PYVERSION', '_no_pyversion')
 data = dict(state=status,
             target_url='https://app.codeship.com/projects/%s/builds/%s' %
                        (projid, buildid),
-            description=" ".join(sys.argv[2:]).replace("=","").strip(),
+            description=args.msg.replace("=","").strip(),
             context='%s/py%s' % (testenv, pyversion))
 
 
 if missing_env:
     print("Not sending status update b/c of missing env vars: %s" % ','.join(missing_env))
     print(data)
+    sys.exit(0)
+
+
+g = github.Github(ghtoken)
+repo = g.get_repo('autodesk/molecular-design-toolkit')
+commit = repo.get_commit(sha)
+
+if args.deployed:
+    raise NotImplementedError
 else:
-    g = github.Github(ghtoken)
-    repo = g.get_repo('autodesk/molecular-design-toolkit')
-    commit = repo.get_commit(sha)
     commit.create_status(**data)
+

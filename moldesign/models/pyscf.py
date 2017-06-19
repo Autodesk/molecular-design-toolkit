@@ -80,6 +80,7 @@ FORCE_CALCULATORS = LazyClassMap({'rhf': 'pyscf.grad.RHF', 'hf': 'pyscf.grad.RHF
 
 @utils.exports
 class PySCFPotential(QMBase):
+    _CALLS_MDT_IN_DOCKER = force_remote
     DEFAULT_PROPERTIES = ['potential_energy',
                           'wfn',
                           'mulliken']

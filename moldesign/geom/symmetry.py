@@ -91,15 +91,27 @@ class SymmetryElement(object):
 
 class MolecularSymmetry(object):
     def __init__(self, mol, symbol, rms,
-                 orientation=None,
-                 elems=None,
+                 orientation, elems,
                  _job=None):
         self.mol = mol
         self.symbol = symbol
         self.rms = rms
         self.orientation = mdt.utils.if_not_none(orientation, mol.positions)
         self.elems = mdt.utils.if_not_none(elems, [])
+        self.groups = mdt.utils.Categorizer(lambda x:x.symbol, self.elems)
         self._job = _job
+
+    @property
+    def exact(self):
+        """ List[SymmetryElement]: Exact symmetry elements
+        """
+        return [elem for elem in self.elems if elem.max_diff == 0.0]
+
+    @property
+    def approximate(self):
+        """ List[SymmetryElement]: Approximate symmetry elements
+        """
+        return [elem for elem in self.elems if elem.max_diff != 0.0]
 
     def __str__(self):
         return '%d symmetry element%s' % (len(self.elems), 's' if len(self.elems) != 1 else '')

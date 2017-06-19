@@ -1,5 +1,29 @@
-# Graveyard for functions that are currently unused, but that may be useful in the future (so
-# we don't want to lose them in the depths of the repository)
+# Graveyard for functions that are currently unused and untested, but that may be useful in the
+# future.
+#
+# They're here simply so that they don't get lost in the depths of the repository
+
+
+@compute.runsremotely(enable=force_remote)
+def pdbfixer_interface.get_missing_residues(mol):
+    fixer = mol_to_fixer(mol)
+    fixer.findMissingResidues()
+    fixerchains = list(fixer.topology.chains)
+
+    missing = list()
+    for (chainidx, insertionpoint), reslist in fixer.missingResidues.items():
+        chainid = fixerchains[chainidx].id
+        for ires, resname in enumerate(reslist):
+            missing.append(mdt.helpers.MissingResidue(chainid, resname, insertionpoint + ires))
+
+    return missing
+
+
+@compute.runsremotely(enable=force_remote)
+def pdbfixer_interface.add_hydrogen(mol, pH=7.4):
+    fixer = mol_to_fixer(mol)
+    fixer.addMissingHydrogens(pH)
+    return fixer_to_mol(fixer)
 
 
 def guess_atnum_from_name(s):

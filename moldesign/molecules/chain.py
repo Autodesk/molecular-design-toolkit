@@ -21,11 +21,11 @@ import collections
 
 import moldesign as mdt
 from .. import utils, data
-from . import BioContainer, toplevel
+from . import BioContainer, toplevel, HasResidues
 
 
 @toplevel
-class Chain(BioContainer):
+class Chain(BioContainer, HasResidues):
     """ Biomolecular chain class - its children are almost always residues.
 
     Attributes:

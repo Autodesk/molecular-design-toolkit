@@ -40,6 +40,8 @@ class MinimizerBase(object):
         self.frame_interval = mdt.utils.if_not_none(frame_interval,
                                                     max(nsteps/10, 1))
         self._restart_from = _restart_from
+        self._foundmin = None
+        self._calc_cache = {}
 
         # Set up the trajectory to track the minimization
         self.traj = mdt.Trajectory(mol)
@@ -89,6 +91,8 @@ class MinimizerBase(object):
         except mdt.QMConvergenceError:  # returning infinity can help rescue some line searches
             return np.inf
 
+        self._cachemin()
+        self._calc_cache[tuple(vector)] = self.mol.properties
         pot = self.mol.potential_energy
 
         if self._initial_energy is None: self._initial_energy = pot
@@ -101,6 +105,8 @@ class MinimizerBase(object):
         """
         self._sync_positions(vector)
         self.mol.calculate(requests=self.request_list)
+        self._cachemin()
+        self._calc_cache[tuple(vector)] = self.mol.properties
         grad = -self.mol.forces
 
         grad = grad.reshape(self.mol.num_atoms * 3)
@@ -110,20 +116,58 @@ class MinimizerBase(object):
         else:
             return grad.defunits()
 
-    def __call__(self):
+    def _cachemin(self):
+        """ Caches the minimum potential energy properties so we can return them
+        when the calculation is done.
+
+        Underlying implementations can use this or not - it may not be valid if constraints
+        are present
+        """
+        if self._foundmin is None or self.mol.potential_energy < self._foundmin.potential_energy:
+            self._foundmin = self.mol.properties
+
+    def __call__(self, remote=False, wait=True):
         """ Run the minimization
+
+        Args:
+            remote (bool): launch the minimization in a remote job
+            wait (bool): if remote, wait until the minimization completes before returning.
+               (if remote=True and wait=False, will return a reference to the job)
 
         Returns:
             moldesign.Trajectory: the minimization trajectory
         """
-        self.run()
-        if self.traj.num_frames == 0 or self.traj.frames[-1].minimization_step != self.current_step:
+        if remote or getattr(self.mol.energy_model, '_CALLS_MDT_IN_DOCKER', False):
+            return self.runremotely(wait=wait)
+
+        self._run()
+
+        # Write the last step to the trajectory, if needed
+        if self.traj.potential_energy[-1] != self.mol.potential_energy:
+            assert self.traj.potential_energy[-1] > self.mol.potential_energy
             self.traj.new_frame(minimization_step=self.current_step,
                                 annotation='minimization result (%d steps) (energy=%s)'%
                                            (self.current_step, self.mol.potential_energy))
         return self.traj
 
-    def run(self):
+    def runremotely(self, wait=True):
+        """ Execute this minimization in a remote process
+
+        Args:
+            wait (bool): if True, block until the minimization is complete.
+                Otherwise, return a ``pyccc.PythonJob`` object
+        """
+        return mdt.compute.runremotely(self.__call__, wait=wait,
+                                       jobname='%s: %s' % (self.__class__.__name__, self.mol.name),
+                                       when_finished=self._finishremoterun)
+
+    def _finishremoterun(self, job):
+        traj = job.function_result
+        self.mol.positions = traj.positions[-1]
+        self.mol.properties.update(traj.frames[-1])
+        return traj
+
+    def _run(self):
         raise NotImplementedError('This is an abstract base class')
 
     def callback(self, *args):
@@ -171,13 +215,11 @@ class MinimizerBase(object):
         """
         @mdt.utils.args_from(cls, allexcept=['self'])
         def asfn(*args, **kwargs):
+            remote = kwargs.pop('remote', False)
+            wait = kwargs.pop('wait', True)
             obj = cls(*args, **kwargs)
-            return obj()
+            return obj(remote=remote, wait=wait)
         asfn.__name__ = newname
         asfn.__doc__ = cls.__doc__
 
         return asfn
-
-
-
-

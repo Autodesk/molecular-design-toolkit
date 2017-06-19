@@ -20,6 +20,7 @@ standard_library.install_aliases()
 from .. import units as u
 from ..utils import exports
 from .base import MinimizerBase
+from .. import exceptions
 from . import toplevel
 
 
@@ -37,8 +38,12 @@ class ScipyMinimizer(MinimizerBase):
     _TAKES_FTOL = False
     _TAKES_GTOL = False
 
-    def run(self):
+    def _run(self):
         import scipy.optimize
+
+        if self.mol.constraints and self._METHOD_NAME == 'bfgs':
+            raise exceptions.NotSupportedError('BFGS minimization does not '
+                                               'support constrained minimization')
 
         print('Starting geometry optimization: SciPy/%s with %s gradients'%(
             self._METHOD_NAME, self.gradtype))
@@ -46,18 +51,19 @@ class ScipyMinimizer(MinimizerBase):
         if self.nsteps is not None:
             options['maxiter'] = self.nsteps
 
-        if self.gradtype == 'analytical': grad = self.grad
+        if self.gradtype == 'analytical':
+            grad = self.grad
         else: grad = None
 
         if self.force_tolerance is not None:
             if self._TAKES_GTOL:
                 options['gtol'] = self.force_tolerance.defunits().magnitude
             elif self._TAKES_FTOL:
-                print ('WARNING: this method does not use force to measure convergence; '
-                       'approximating force_tolerance keyword')
+                print('WARNING: this method does not use force to measure convergence; '
+                      'approximating force_tolerance keyword')
                 options['ftol'] = (self.force_tolerance * u.angstrom / 50.0).defunits_value()
             else:
-                print ('WARNING: no convergence criteria for this method; using defaults')
+                print('WARNING: no convergence criteria for this method; using defaults')
 
         result = scipy.optimize.minimize(self.objective,
                                          self._coords_to_vector(self.mol.positions),
@@ -68,6 +74,10 @@ class ScipyMinimizer(MinimizerBase):
                                          constraints=self._make_constraints())
 
         self.traj.info = result
+
+        finalprops = self._calc_cache[tuple(result.x)]
+        self.mol.positions = finalprops.positions
+        self.mol.properties = finalprops
 
     def _make_constraints(self):
         constraints = []

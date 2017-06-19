@@ -37,6 +37,8 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
     """
     # NEWFEATURE: need to set/get platform (and properties, e.g. number of threads)
     DEFAULT_PROPERTIES = ['potential_energy', 'forces']
+    _CALLS_MDT_IN_DOCKER = opm.force_remote
+
     _openmm_compatible = True
 
     def __init__(self, **kwargs):

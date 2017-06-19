@@ -29,7 +29,7 @@ from ..compute import DummyJob
 from ..exceptions import NotCalculatedError
 from ..min.base import MinimizerBase
 from .properties import MolecularProperties
-from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond
+from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond, HasResidues
 from ..helpers import WidgetMethod
 from .coord_arrays import *
 
@@ -360,11 +360,6 @@ class MolPropertyMixin(object):
             str: Markdown string"""
         lines = []
         if len(self.residues) > 1:
-            table = self.get_residue_table()
-            lines.append('### Residues')
-            # extra '|' here may be workaround for a bug in ipy.markdown?
-            lines.append(table.markdown(replace={0: ' '})+'|')
-
             lines.append('### Biopolymer chains')
             seqs = []
             for chain in self.chains:
@@ -377,13 +372,13 @@ class MolPropertyMixin(object):
 
         return lines
 
-    def get_residue_table(self):  # pragma: no cover
+    def get_residue_table(self):
         """Creates a data table summarizing this molecule's primary structure.
 
         Returns:
             moldesign.utils.MarkdownTable"""
         table = utils.MarkdownTable(*(['chain']+
-                                      'protein dna rna unknown water solvent'.split()))
+                                      'protein dna rna unknown water solvent ion'.split()))
         for chain in self.chains:
             counts = {}
             unk = []
@@ -540,12 +535,19 @@ class MolTopologyMixin(object):
         num_biores = 0
         conflicts = set()
 
-        last_pdb_idx = None
+        pdbatoms = [atom for atom in self.atoms if atom.pdbindex is not None]
+        if pdbatoms:
+            min_pdb_atom = min(pdbatoms, key=lambda x:x.pdbindex)
+            last_pdb_idx = min_pdb_atom.pdbindex - min_pdb_atom.index - 1
+        else:
+            last_pdb_idx = 0
 
         for atom in self.atoms:
+            if atom.pdbindex is None:
+                atom.pdbindex = last_pdb_idx + 1
             if last_pdb_idx is not None and atom.pdbindex <= last_pdb_idx:
                 atom.pdbindex = last_pdb_idx + 1
-                conflicts.add('atom numbers')
+                conflicts.add('atom indices')
             last_pdb_idx = atom.pdbindex
 
             # if atom has no chain/residue, assign defaults
@@ -569,7 +571,7 @@ class MolTopologyMixin(object):
                     atom.chain.name = chr(ord(atom.chain.name)+1)
 
                 if oldname != atom.chain.name:
-                    conflicts.add('chain')
+                    conflicts.add('chain ids')
                 self.chains.add(atom.chain)
             else:
                 assert atom.chain.molecule is self
@@ -585,7 +587,7 @@ class MolTopologyMixin(object):
                 assert atom.chain.molecule is self
 
         if conflicts:
-            print('WARNING: %s indices modified due to name clashes' % (
+            print('WARNING: %s modified due to name clashes' % (
                 ', '.join(conflicts)))
         self.is_biomolecule = (num_biores >= 2)
 
@@ -938,7 +940,9 @@ class MolSimulationMixin(object):
 class Molecule(AtomGroup,
                MolConstraintMixin,
                MolPropertyMixin,
-               MolTopologyMixin, MolSimulationMixin):
+               MolTopologyMixin,
+               MolSimulationMixin,
+               HasResidues):
     """
     ``Molecule`` objects store a molecular system, including atoms, 3D coordinates, molecular
     properties, biomolecular entities, and other model-specific information. Interfaces with
@@ -1137,6 +1141,11 @@ class Molecule(AtomGroup,
 
         if self.integrator:
             lines.append('**Integrator**: %s'%str(self.integrator))
+
+        if self.num_residues > 1:
+            table = self.get_residue_table()
+            lines.append('### Residues')
+            lines.append(table.markdown(replace={0: ' '})+'|')  # extra '|' is bug workaround (?)
 
         if self.is_biomolecule:
             lines.extend(self._biomol_summary_markdown())

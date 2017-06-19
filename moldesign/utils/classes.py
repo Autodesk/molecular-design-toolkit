@@ -20,6 +20,7 @@ standard_library.install_aliases()
 import collections
 from .descriptors import Alias
 
+
 class Categorizer(dict):
     """
     Create a dict of lists from an iterable, with dict keys given by keyfn
@@ -39,7 +40,7 @@ class Categorizer(dict):
 
 
 class ExclusiveList(object):
-    """ Behaves like a list, but won't allow duplicate items with duplicate keys to be added.
+    """ Behaves like a list, but won't allow items with duplicate keys to be added.
     """
     def __init__(self, iterable=None, key=None):
         self._keys = collections.OrderedDict()
