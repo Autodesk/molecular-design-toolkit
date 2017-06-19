@@ -324,6 +324,13 @@ def read_xyz(f):
     return mdt.Molecule(tempmol.atoms)
 
 
+def write_xyz(mol, fileobj):
+    fileobj.write("   %d\n%s\n" % (mol.num_atoms, mol.name))
+    for atom in mol.atoms:
+        x, y, z = atom.position.value_in(mdt.units.angstrom)
+        fileobj.write("%s   %24.14f   %24.14f   %24.14f\n" % (atom.element, x, y, z))
+
+
 @utils.exports
 def from_pdb(pdbcode, usecif=False):
     """ Import the given molecular geometry from PDB.org
@@ -442,7 +449,8 @@ READERS = {'pdb': read_pdb,
            'xyz': read_xyz}
 
 WRITERS = {'pdb': write_pdb,
-           'mmcif': write_mmcif}
+           'mmcif': write_mmcif,
+           'xyz': write_xyz}
 
 if PY2:
     bzopener = bz2.BZ2File

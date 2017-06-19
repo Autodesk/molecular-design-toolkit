@@ -5,7 +5,7 @@
 set -e
 
 VERSION="${TESTENV}.py${PYVERSION}"
-PYTESTFLAGS="-n 6 --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=1800"
+PYTESTFLAGS="-n 5 --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=1800 --tb=short"
 if [ "${VERSION}" == "complete.py3" ]; then
        PYTESTFLAGS="--cov moldesign ${PYTESTFLAGS}"
 fi
