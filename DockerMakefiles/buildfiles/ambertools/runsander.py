@@ -81,9 +81,7 @@ def convert(q, units):
         10.0
     """
     quantity = q['value'] * ureg(q['units'])
-    return quantity.m_as(units)
-
-
+    return quantity.value_in(units)
 
 
 ##### helper routines below ######

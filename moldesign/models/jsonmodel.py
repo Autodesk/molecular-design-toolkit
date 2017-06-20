@@ -116,7 +116,7 @@ class JsonModelBase(EnergyModelBase):
         return wfn
 
     @staticmethod
-    def _json_to_quantities(jsonprops):
+    def _json_to_quantities(jsonprops):  # TODO: handle this within JSON decoder
         props = {}
         for name, property in jsonprops.items():
             if isinstance(property, dict) and len(property) == 2 and \
@@ -142,7 +142,7 @@ class JsonModelBase(EnergyModelBase):
         params['runType'] = 'minimization'
         if nsteps is not None:
             params['minimization_steps'] = 100
-        inputfiles['params.json'] = json.dumps(dict(params))
+        inputfiles['params.json'] = mdt.utils.json_dumps(dict(params))
 
         job = pyccc.Job(image=mdt.compute.get_image_path(self.IMAGE),
                         command='%s && %s' % (self.RUNNER, self.PARSER),

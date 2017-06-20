@@ -9,7 +9,7 @@ import moldesign.utils.classes
 
 from .object_fixtures import *
 from .test_ambertools_xface import protein_default_amber_forcefield
-from .test_pyscf_xface import h2_rhfwfn
+from .test_qm_xfaces import h2_rhfwfn
 
 
 def test_h2_protected_atom_arrays(h2):

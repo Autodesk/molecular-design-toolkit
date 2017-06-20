@@ -17,11 +17,18 @@ import json
 from . import args_from
 
 
+# TODO: defined JSON types that we can serialize directly into MDT objects OR
+#       use a JSON "pickling" library (only if there's more complexity than covered here already)
+
 class JsonEncoder(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj, 'to_json'):
-            obj = obj.to_json()
-        return obj
+            return obj.to_json()
+        elif hasattr(obj, 'tolist'):
+            return obj.tolist()
+        else:
+            raise TypeError('No seralizer for object "%s" (class: %s)'
+                            % (obj,obj.__class__.__name__))
 
 
 @args_from(json.dump)
