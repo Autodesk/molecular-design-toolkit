@@ -138,13 +138,11 @@ def assert_something_resembling_minimization_happened(p0, e0, traj, mol):
                             mol.potential_energy.defunits_value())
 
 
-
 def assert_almost_equal(actual, desired, **kwargs):
     units = mdt.units.get_units(actual)
-    desired = units.value_of(desired)
 
-    np.testing.assert_almost_equal(actual.value_in(units),
-                                   desired,
+    np.testing.assert_almost_equal(units.value_of(actual),
+                                   units.value_of(desired),
                                    **kwargs)
 
 

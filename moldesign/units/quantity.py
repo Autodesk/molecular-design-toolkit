@@ -41,14 +41,36 @@ class MdtUnit(ureg.Unit):
         return _get_unit, (str(self),)
 
     def convert(self, value):
+        """ Returns quantity converted to these units
+
+        Args:
+            value (MdtQuantity or Numeric): value to convert
+
+        Returns:
+            MdtQuantity: converted value
+
+        Raises:
+            DimensionalityError: if the quantity does not have these units' dimensionality
+        """
         if hasattr(value, 'to'):
             return value.to(self)
         elif self.dimensionless:
-            return value
+            return value * self
         else:
             raise DimensionalityError('Cannot convert "%s" to units of "%s"' % (value, self))
 
     def value_of(self, value):
+        """ Returns numeric value of the quantity in these units
+
+        Args:
+            value (MdtQuantity or Numeric): value to convert
+
+        Returns:
+            Numeric: value in this object's units
+
+        Raises:
+            DimensionalityError: if the quantity does not have these units' dimensionality
+        """
         v = self.convert(value)
         return v.magnitude
 
