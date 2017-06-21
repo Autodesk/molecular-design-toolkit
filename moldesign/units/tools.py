@@ -54,8 +54,27 @@ def from_json(j):
 
 
 def get_units(q):
-    """
-    Return the base unit system of an quantity
+    """ Return the base unit system of an quantity or arbitrarily-nested iterables of quantities
+
+    Note: This routine will dive on the first element of iterables until a quantity with units
+      until the units can be determined. It will not check the remaining elements of the iterable
+      for consistency
+
+    Examples:
+        >>> from moldesign import units
+        >>> units.get_units(1.0 * units.angstrom)
+        <Unit('ang')>
+        >>> units.get_units(np.array([1.0, 2, 3.0]))
+        <Unit('dimensionless')>
+        >>> # We dive on the first element of each iterable until we can determine a unit system:
+        >>> units.get_units([[1.0 * u.dalton, 3.0 * u.eV], ['a'], 'gorilla'])
+        <Unit('amu')>
+
+    Args:
+        q (MdtQuantity or numeric): quantity to test
+
+    Returns:
+        MdtUnit: the quantity's units
     """
     x = q
     while True:
@@ -66,12 +85,7 @@ def get_units(q):
         else:
             if isinstance(x, str):
                 raise TypeError('Found string data while trying to determine units')
-    try:
-        y = 1.0 * x
-        y._magnitude = 1.0
-        return y
-    except AttributeError:
-        return 1.0 * ureg.dimensionless
+    return MdtQuantity(x).units
 
 
 def array(qlist, baseunit=None):

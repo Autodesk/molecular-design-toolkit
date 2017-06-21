@@ -40,6 +40,18 @@ class MdtUnit(ureg.Unit):
     def __reduce__(self):
         return _get_unit, (str(self),)
 
+    def convert(self, value):
+        if hasattr(value, 'to'):
+            return value.to(self)
+        elif self.dimensionless:
+            return value
+        else:
+            raise DimensionalityError('Cannot convert "%s" to units of "%s"' % (value, self))
+
+    def value_of(self, value):
+        v = self.convert(value)
+        return v.magnitude
+
 
 def _get_unit(unitname):
     """pickle helper for deserializing MdtUnit objects"""
