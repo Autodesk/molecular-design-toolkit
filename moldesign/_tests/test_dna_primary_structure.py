@@ -7,6 +7,9 @@ import moldesign as mdt
 from moldesign import units as u
 
 
+__PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
+
+
 fixture_types = {}
 
 

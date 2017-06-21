@@ -5,6 +5,9 @@ import moldesign as mdt
 from moldesign.external import pathlib
 
 
+__PYTEST_MARK__ = 'io'
+
+
 @pytest.fixture
 def example_path(tmpdir):
     path = pathlib.Path(str(tmpdir))

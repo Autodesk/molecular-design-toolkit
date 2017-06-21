@@ -4,6 +4,9 @@ from moldesign.utils import Alias
 from .object_fixtures import *
 
 
+__PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
+
+
 class ComposedClass(object):
     delegated = Alias('s.lower')
 

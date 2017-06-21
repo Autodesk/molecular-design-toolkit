@@ -12,6 +12,9 @@ from .test_ambertools_xface import protein_default_amber_forcefield
 from .test_qm_xfaces import h2_rhfwfn
 
 
+__PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
+
+
 def test_h2_protected_atom_arrays(h2):
     atom1, atom2 = h2.atoms
     with pytest.raises(TypeError):

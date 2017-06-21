@@ -23,6 +23,9 @@ from .helpers import get_data_path, INTERNET_ON, native_str_buffer
 from .object_fixtures import h2_trajectory, h2_harmonic, h2
 
 
+__PYTEST_MARK__ = 'io'
+
+
 @pytest.fixture
 def bipyridine_sdf():
     return mdt.read(get_data_path('bipyridine.sdf'))

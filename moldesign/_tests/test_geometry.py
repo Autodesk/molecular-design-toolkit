@@ -14,6 +14,10 @@ from . import helpers
 
 registered_types = {}
 
+
+__PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
+
+
 # TODO: automated method testing based on its metadata - i.e. test to make sure parameters are
 #       honored, test that it calcultes what it says it does, test that properties have the right
 #       units and array shapes, etc.

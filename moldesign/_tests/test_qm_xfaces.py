@@ -15,6 +15,7 @@ registered_types = {}
 #       honored, test that it calcultes what it says it does, test that properties have the right
 #       units and array shapes, etc.
 
+
 def typedfixture(*types, **kwargs):
     """This is a decorator that lets us associate fixtures with one or more arbitrary types.
     We'll later use this type to determine what tests to run on the result"""
@@ -54,12 +55,26 @@ model_ids = ['/'.join((model.__name__, theory, basis)) for (model, theory, basis
 @pytest.fixture(params=models_to_test, ids=model_ids, scope='function')
 def h2_with_model(request, h2):
     model, basis, theory = request.param
+
+    if model is mdt.models.NWChemQM and theory == 'mp2':
+        pytest.xfail('Not implemented')
+
     h2.set_energy_model(model, basis=basis, theory=theory)
     return h2
 
 
 def test_minimization_trajectory(h2_with_model):
-    helpers.minimization_tester(h2_with_model)
+    mol = h2_with_model
+    if mol.energy_model.params.theory == 'mp2':
+        pytest.skip('Not testing mp2 minimizations at this time')
+
+    assert 'potential_energy' not in mol.properties
+
+    e1 = mol.calculate_potential_energy()
+    p1 = mol.positions.copy()
+
+    traj = mol.minimize()
+    helpers.assert_something_resembling_minimization_happened(p1, e1, traj, mol)
 
 
 @typedfixture('model')

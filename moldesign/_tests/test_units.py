@@ -6,6 +6,9 @@ import numpy as np
 from moldesign import units
 
 
+__PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
+
+
 def test_scalar_comparison_dimensionality_errors():
     with pytest.raises(units.DimensionalityError):
         x = 1.0 * units.angstrom == 1.0*units.ureg.kilograms
@@ -123,9 +126,17 @@ def test_array_unit_checks():
     np.testing.assert_allclose(arr.magnitude,
                                np.arange(10, 15))
 
+
 def test_default_unit_conversions():
     assert abs(10.0 - (1.0*units.nm).defunits_value()) < 1e-10
     assert abs(1000.0 - (1.0*units.ps).defunits_value()) < 1e-10
     assert abs(1.0 - 6.022140857e23/((1.0*units.ureg.grams).defunits_value())) < 1e-6
     assert abs(103.642685491 - (1.0*units.angstrom**2*units.dalton/units.fs**2).defunits_value()
                ) < 1e-7
+
+
+def test_getunits_doctests():
+    assert units.get_units(1.0*units.angstrom) == units.MdtUnit('ang')
+    assert units.get_units(np.array([1.0, 2, 3.0])) == units.MdtUnit('dimensionless')
+    assert units.get_units([[1.0*units.dalton, 3.0*units.eV],
+                            ['a'], 'gorilla']) == units.MdtUnit('amu')

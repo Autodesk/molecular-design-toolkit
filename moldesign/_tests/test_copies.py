@@ -9,6 +9,9 @@ from .molecule_fixtures import *
 from .object_fixtures import *
 
 
+__PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
+
+
 def test_carbon_copy(carbon_copy, carbon_atom):
     atom = carbon_copy
     assert atom.symbol == carbon_atom.symbol
