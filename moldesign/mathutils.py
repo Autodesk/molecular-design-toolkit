@@ -19,6 +19,7 @@ standard_library.install_aliases()
 import numpy as np
 
 from moldesign import units as u
+from moldesign.utils import exports
 
 
 def perpendicular(vec):
@@ -32,26 +33,29 @@ def perpendicular(vec):
     return perp
 
 
-def normalized(vec):
+def normalized(vec, zero_as_zero=True):
     """ Return a vector normalized in L2.
-    If vector is 0, return 0
 
     Args:
         vec (u.Vector): vector to be normalized
+        zero_as_zero (bool): if True, return a 0-vector if a 0-vector is passed; otherwise, will
+           follow default system behavior (depending on numpy's configuration)
 
     Returns:
         u.Vector: normalized vector
     """
     if len(vec.shape) == 1:  # it's just a single column vector
         mag = vec.dot(vec)
-        if mag == 0.0:
+        if mag == 0.0 and zero_as_zero:
             return vec*0.0
         else:
             return vec/np.sqrt(mag)
     else:  # treat as list of vectors
         mag = (vec*vec).sum(axis=1)
-        mag[mag == 0.0] = 1.0  # prevent div by 0
+        if zero_as_zero:
+            mag[mag == 0.0] = 1.0  # prevent div by 0
         return vec / np.sqrt(mag)[:, None]
+
 
 def safe_arccos(costheta):
     """ Version of arccos that can handle numerical noise greater than 1.0

@@ -1,8 +1,10 @@
 """ Tests topology manipulation tools
 """
 import collections
+import random
 
 import pytest
+import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
@@ -23,6 +25,51 @@ def typedfixture(*types, **kwargs):
         return pytest.fixture(**kwargs)(func)
 
     return fixture_wrapper
+
+
+@pytest.fixture(scope='function')
+def linear_mol_and_pmi():
+    mol = mdt.from_smiles('C#CC#CC#C')
+    pmi = mdt.tools.PrincipalMomentsOfInertia(mol)
+    return mol, pmi
+
+
+def test_linear_mol_pmi(linear_mol_and_pmi):
+    mol, pmi = linear_mol_and_pmi
+    _assert_linear_mol_along_x_axis(mol)
+
+
+def _assert_linear_mol_along_x_axis(mol):
+    mol, pmi = linear_mol_and_pmi
+    pmi.reorient(mol)
+    _assert_linear_mol_along_x_axis(mol)
+
+
+def test_principal_moment_of_inertia_reorientation(linear_mol_and_pmi):
+    # note that this will fail if the generated polymer is not perfectly linear
+    mol, pmi = linear_mol_and_pmi
+
+    original_distmat = mol.calc_distance_array().defunits_value()
+
+    for deg in np.linspace(10, 120, 6) * u.degree:
+        axis = [random.uniform(-1.0, 1.0),
+                random.uniform(-1.0, 1.0),
+                random.uniform(0.4, 1.0)]  # make sure to rotate off of x-axis
+
+        translation = 10.0 * (np.random.rand(3)-0.5) * u.angstrom
+
+        mol.translate(translation)
+        mol.rotate(axis=axis, angle=deg)
+        pmi = mdt.tools.PrincipalMomentsOfInertia(mol)
+        pmi.reorient(mol)
+
+        # Check that everything lies along the x-axis
+        np.testing.assert_allclose(mol.positions[:,1:], 0.0)
+
+        # Check that distance matrix was unchanged under the transformation
+        newdistmat = mol.calc_distance_array()
+        np.testing.assert_allclose(newdistmat.defunits_value,
+                                   original_distmat)
 
 
 @pytest.fixture

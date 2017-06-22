@@ -5,3 +5,4 @@ __all__ = []
 
 from .topology import *
 from .build import *
+from .eigen import *

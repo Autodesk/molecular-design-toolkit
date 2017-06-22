@@ -48,6 +48,14 @@ def test_h2_array_link(h2):
     assert h2.atoms[1].py == 3.0*u.default.momentum
 
 
+def test_h2_set_coord_slices(h2):
+    mol = h2.copy()
+    mol.positions[:] = np.zeros((2,3)) * u.angstrom
+    assert (mol.positions == np.zeros((2,3)) * u.angstrom).all()
+    mol.momenta[0:2,1:3] = np.ones((2,2)) * u.default.momentum
+    assert (mol.momenta[0:2, 1:3] == np.ones((2,2)) * u.default.momentum).all()
+
+
 def test_h2_harmonic_oscillator(h2_harmonic):
     mol = h2_harmonic
     atoms = h2_harmonic.atoms
