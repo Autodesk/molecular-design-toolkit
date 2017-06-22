@@ -4,7 +4,7 @@ import pytest
 import numpy as np
 
 from moldesign import units
-
+from moldesign import units as u
 
 __PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
 
@@ -140,3 +140,74 @@ def test_getunits_doctests():
     assert units.get_units(np.array([1.0, 2, 3.0])) == units.MdtUnit('dimensionless')
     assert units.get_units([[1.0*units.dalton, 3.0*units.eV],
                             ['a'], 'gorilla']) == units.MdtUnit('amu')
+
+
+def test_setitem_from_quantity():
+    myarray = np.arange(100) * u.angstrom
+    with pytest.raises(u.DimensionalityError):
+        myarray[:10] = np.arange(10)
+
+    myarray[11] = 5.0 * u.ureg.meters
+
+    myarray[:10] = np.arange(10) * u.nm
+    for i in range(10):
+        assert myarray[i].units == u.angstrom
+        assert abs(myarray[i].magnitude - i*10) < 1e-14
+
+    assert myarray[11].units == u.angstrom
+    assert abs(myarray[11].magnitude - (5.0*u.ureg.meters).value_in(u.angstrom)) < 1e-14
+
+    assert myarray.units == u.angstrom
+
+
+def test_setitem_from_list_of_quantities():
+    myarray = np.arange(100) * u.angstrom
+    myarray[:10] = list(np.arange(10) * u.nm)
+    for i in range(10):
+        assert myarray[i].units == u.angstrom
+        assert abs(myarray[i].magnitude - i*10) < 1e-14 * u.angstrom
+
+
+def test_setitem_slice_dimensionless():
+    myarray = np.arange(100) * u.ureg.dimensionless
+    assert isinstance(myarray, u.MdtQuantity)
+
+    myarray[:10] = np.arange(10)
+    assert myarray.units == u.ureg.dimensionless
+    assert (myarray[:10] == np.arange(10)).all()
+
+
+
+
+@pytest.fixture
+def make_test_matrices():
+    randommatrix = np.random.rand(10,7)
+    randomvector = np.random.rand(10)
+    unitmatrix = randommatrix * u.kcalpermol
+    unitvector = randomvector * u.angstrom
+    expected_matvec_product = randomvector.dot(randommatrix)
+    return unitvector, unitmatrix, expected_matvec_product
+
+
+def self_dot(a, b):
+    return a.dot(b)
+
+
+def self_ldot(a,b):
+    return b.ldot(a)
+
+
+def unit_dot(a,b):
+    return u.dot(a, b)
+
+
+@pytest.mark.parametrize('testfun', [self_dot, self_ldot, unit_dot])
+def test_matrix_math_with_units(make_test_matrices, testfun):
+    unitvector, unitmatrix, expected_matvec_product = make_test_matrices
+
+    result = testfun(unitvector, unitmatrix)
+
+    assert result.units == u.kcalpermol * u.angstrom
+    np.testing.assert_array_almost_equal(expected_matvec_product,
+                                         result.magnitude, decimal=12)
+
