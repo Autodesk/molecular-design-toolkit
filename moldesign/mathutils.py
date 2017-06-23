@@ -101,7 +101,10 @@ def alignment_rotation(v1, v2):
 
     normal = np.cross(e1, e2)
     s = norm(normal)
-    c = np.dot(e1, e2)
+    if len(e1.shape) == 1:
+        c = np.dot(e1, e2)
+    else:
+        c = (e1*e2).sum(axis=1)
     angle = np.arctan2(s, c)
     return angle*u.radian, normalized(normal)
 

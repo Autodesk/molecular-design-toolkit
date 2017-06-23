@@ -55,10 +55,7 @@ def angle(a1, a2, a3):
     """
     r21 = (a1.position - a2.position).defunits_value()  # remove units immediately to improve speed
     r23 = (a3.position - a2.position).defunits_value()
-    e12 = mathutils.normalized(r21)
-    e23 = mathutils.normalized(r23)
-
-    return mathutils.alignment_rotation(e12, e23)[0]
+    return mathutils.alignment_rotation(r21, r23)[0]
 
 
 def _join_bonds(b1, b2):
