@@ -16,23 +16,15 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#from singledispatch import singledispatch
 import numpy as np
 
-from moldesign import units as u
-#from moldesign.molecules import Bond
-from moldesign.mathutils import normalized, safe_arccos
+from .. import units as u
+from .. import mathutils
 
 from . import toplevel
 
 
-# NEWFEATURE: preliminary profiling indicates that, for interactive work, the UNITS LIBRARY is
-#       actually the biggest bottleneck
-
-# NEWFEATURE: pyramidalization aka out-of-plane bending
-
 @toplevel
-#@singledispatch
 def distance(a1, a2):
     """ Return distance between two atoms
 
@@ -51,13 +43,7 @@ def distance(a1, a2):
         return np.sqrt((diffvec*diffvec).sum(axis=1))
 
 
-# @distance.register(Bond)
-# def distance(bond):
-#     return distance(bond.a1, bond.a2)
-
-
 @toplevel
-#@singledispatch
 def angle(a1, a2, a3):
     """ The angle between bonds a2-a1 and a2-a3
 
@@ -69,23 +55,10 @@ def angle(a1, a2, a3):
     """
     r21 = (a1.position - a2.position).defunits_value()  # remove units immediately to improve speed
     r23 = (a3.position - a2.position).defunits_value()
-    e12 = normalized(r21)
-    e23 = normalized(r23)
+    e12 = mathutils.normalized(r21)
+    e23 = mathutils.normalized(r23)
 
-    dim = len(e12.shape)
-    if dim == 2:
-        costheta = (e12*e23).sum(axis=1)
-    else:
-        assert dim == 1
-        costheta = np.dot(e12, e23)
-    theta = safe_arccos(costheta)
-    return theta * u.radians
-
-#
-# @angle.register(Bond)
-# def angle(b1, b2):
-#     a1, a2, a3 = _join_bonds(b1, b2)
-#     return angle(a1, a2, a3)
+    return mathutils.alignment_rotation(e12, e23)[0]
 
 
 def _join_bonds(b1, b2):
@@ -100,7 +73,6 @@ def _join_bonds(b1, b2):
 
 
 @toplevel
-#@singledispatch
 def dihedral(a1, a2=None, a3=None, a4=None):
     """Twist angle of bonds a1-a2 and a4-a3 around around the central bond a2-a3
 
@@ -125,7 +97,7 @@ def dihedral(a1, a2=None, a3=None, a4=None):
 
     dim = len(r21.shape)
     center_bond = (a2.position - a3.position).defunits_value()
-    plane_normal = normalized(center_bond)
+    plane_normal = mathutils.normalized(center_bond)
 
     if dim == 1:
         r21_proj = r21 - plane_normal * r21.dot(plane_normal)
@@ -135,8 +107,8 @@ def dihedral(a1, a2=None, a3=None, a4=None):
         r21_proj = r21 - plane_normal * (r21*plane_normal).sum(axis=1)[:, None]
         r34_proj = r34 - plane_normal * (r34*plane_normal).sum(axis=1)[:, None]
 
-    va = normalized(r21_proj)
-    vb = normalized(r34_proj)
+    va = mathutils.normalized(r21_proj)
+    vb = mathutils.normalized(r34_proj)
 
     if dim == 1:
         costheta = np.dot(va, vb)
@@ -147,7 +119,7 @@ def dihedral(a1, a2=None, a3=None, a4=None):
     else:
         costheta = (va*vb).sum(axis=1)
 
-    abstheta = safe_arccos(costheta)
+    abstheta = mathutils.safe_arccos(costheta)
     cross = np.cross(va, vb)
 
     if dim == 1:
@@ -155,6 +127,31 @@ def dihedral(a1, a2=None, a3=None, a4=None):
     else:
         theta = abstheta * np.sign((cross*plane_normal).sum(axis=1))
     return (theta * u.radians) % (2.0 * u.pi * u.radians)
+
+
+@toplevel
+def nonplanar_bend_angle(a1, a2=None, a3=None, a4=None):
+    """ Calculates the pyramidalization of a 4-atom system
+
+    "Pyramidalization" is the out of plane bending around a trivalent center (usually an
+    sp2 carbon). This routine calculates it as the angle between two planes. The two planes
+    are defined by:
+       1) the three substituents of a tri-valent central atom
+       2) the central atom and its two single-bonded constituents
+
+
+    Can be called as ``pyramidalization(central_atom)`` in an sp2 system
+              OR     ``pyramidalization(double_bond, single_bond1, single_bond2)``
+              OR     ``pyramidalization(a1, a2, a3, a4)`` where the atoms, in order are
+       1. a1 - the central atom
+       2. a2 - the doubly bonded neighbors
+       3. a3 - one of the singly-bonded neighbors
+       4. a4 - the other singly-bonded neighbor
+
+    Returns:
+        (units.Scalar[angle]): angle -  [0, 2 pi) radians
+    """
+    raise NotImplementedError()
 
 
 def _infer_dihedral(a2, a3=None):
@@ -205,23 +202,3 @@ def _pick_atom(atom, nbr):
         newat = traj.atoms[newat.index]
 
     return newat
-
-
-
-
-#
-# @dihedral.register(Bond)
-# def dihedral(b1, b2=None, b3=None):
-#     if b2 is b3 is None:
-#         return dihedral(b1.a1, b1.a2)
-#
-#     else:
-#         a1, a2, a3 = _join_bonds(b1, b2)
-#         a22, a33, a4 = _join_bonds(b2, b3)
-#
-#         assert a22 == a2
-#         assert a33 == a3
-#
-#         return dihedral(a1, a2, a3, a4)
-#
-#

@@ -23,6 +23,17 @@ from moldesign.utils import exports
 
 
 def perpendicular(vec):
+    """ Return an arbitrary unit vector perpendicular to vec.
+
+    This obviously doesn't have a unique solution, but is useful for various computations.
+
+    Args:
+        vec (Vector): 3-D vector
+
+    Returns:
+        vec (np.ndarray): normalized unit vector in a perpendicular direction
+    """
+
     assert vec.shape == (3,)
     direction = normalized(vec)
     if abs(direction[2]) < 0.9:
@@ -33,28 +44,66 @@ def perpendicular(vec):
     return perp
 
 
-def normalized(vec, zero_as_zero=True):
-    """ Return a vector normalized in L2.
+def norm(vec):
+    """ Calculate norm of a vector
 
     Args:
-        vec (u.Vector): vector to be normalized
+        vec (Vector or List[Vector]): vector(s) to compute norm of
+
+    Returns:
+        Scalar or List[Scalar]: norms
+    """
+    if len(vec.shape) == 1:  # it's just a single column vector
+        return np.sqrt(vec.dot(vec))
+    else:  # treat as list of vectors
+        return np.sqrt((vec*vec).sum(axis=1))
+
+
+def normalized(vec, zero_as_zero=True):
+    """ Create normalized versions of a vector or lists of vectors.
+
+    Args:
+        vec (Vector or List[Vector]): vector(s) to be normalized
         zero_as_zero (bool): if True, return a 0-vector if a 0-vector is passed; otherwise, will
            follow default system behavior (depending on numpy's configuration)
 
     Returns:
-        u.Vector: normalized vector
+        Vector or List[Vector]: normalized vector(s)
     """
+    mag = norm(vec)
     if len(vec.shape) == 1:  # it's just a single column vector
-        mag = vec.dot(vec)
         if mag == 0.0 and zero_as_zero:
             return vec*0.0
         else:
-            return vec/np.sqrt(mag)
+            return vec/mag
     else:  # treat as list of vectors
-        mag = (vec*vec).sum(axis=1)
         if zero_as_zero:
             mag[mag == 0.0] = 1.0  # prevent div by 0
-        return vec / np.sqrt(mag)[:, None]
+        return vec / mag[:, None]
+
+
+def alignment_rotation(v1, v2):
+    """ Calculate rotation angle and axis to make v1 parallel with v2
+
+    Args:
+        v1 (Vector): 3-dimensional vector to create rotation for
+        v2 (Vector): 3-dimensional vector to make v1 parallel to
+
+    Returns:
+        MdtQuantity[angle]: angle between the two
+        np.ndarray[len=3]: rotation axis (unit vector)
+
+    References:
+        https://stackoverflow.com/a/10145056/1958900
+    """
+    e1 = normalized(v1)
+    e2 = normalized(v2)
+
+    normal = np.cross(e1, e2)
+    s = norm(normal)
+    c = np.dot(e1, e2)
+    angle = np.arctan2(s, c)
+    return angle*u.radian, normalized(normal)
 
 
 def safe_arccos(costheta):
