@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import moldesign as mdt
-from moldesign.molecules import MolecularProperties
+from ..molecules import MolecularProperties
+from ..utils import exports
 
 from .base import QMMMBase
 
@@ -92,8 +93,8 @@ class QMMMEmbeddingBase(QMMMBase):
     def _exclude_internal_qm_ljterms(self, pmdobj):
         # Turn off QM/QM LJ interactions (must be done AFTER _remove_internal_qm_bonds)
         numqm = len(self.params.qm_atom_indices)
-        for i in xrange(numqm):
-            for j in xrange(i+1, numqm):
+        for i in range(numqm):
+            for j in range(i+1, numqm):
                 pmdobj.atoms[i].exclude(pmdobj.atoms[j])
 
     def _remove_internal_qm_bonds(self, pmdobj):
@@ -129,7 +130,7 @@ class QMMMEmbeddingBase(QMMMBase):
 
     def _term_in_qm_system(self, t, numatoms):
         """ Check if an FF term is entirely within the QM subsystem """
-        for iatom in xrange(numatoms):
+        for iatom in range(numatoms):
             attrname = 'atom%i' % (iatom + 1)
             if not getattr(t, attrname).idx in self._qm_index_set:
                 return True
@@ -137,6 +138,7 @@ class QMMMEmbeddingBase(QMMMBase):
             return False
 
 
+@exports
 class MechanicalEmbeddingQMMM(QMMMEmbeddingBase):
     """
     Handles _non-covalent_ QM/MM with mechanical embedding.
@@ -168,6 +170,7 @@ class MechanicalEmbeddingQMMM(QMMMEmbeddingBase):
         return qmmol
 
 
+@exports
 class ElectrostaticEmbeddingQMMM(QMMMEmbeddingBase):
     """ Handles _non-covalent_ QM/MM with electrostaic embedding.
     No bonds allowed across the QM/MM boundaries.
