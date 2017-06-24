@@ -22,6 +22,7 @@ import numpy as np
 
 from . import toplevel
 from .. import units as u
+from .. import mathutils
 
 
 @toplevel
@@ -112,18 +113,16 @@ class Bond(object):
         return (self.a1.position + self.a2.position) / 2.0
 
     def align(self, other, centered=True):
-        """ Rotates the entire molecule so that this bond points in the specified direction.
+        """ Rotates the entire molecule to align this bond with another object.
 
         Args:
             other (str or Vector[len=3] or Bond): Object to align this bond with, which may be:
                - a string: 'x', 'y', or 'z',
                - a len-3 vector, or
                - another :class:`Bond` object
-            centered (bool): if True (default), center this bond at the origin OR, if another bond
-                is passed, its midpoint
+            centered (bool): if True (default), center this bond at the origin OR the midpoint of
+             the other bond
         """
-        from ..mathutils import normalized, alignment_rotation
-
         mol = self.molecule
 
         centering = -self.midpoint
@@ -141,15 +140,16 @@ class Bond(object):
         else:
             direction = other
 
-        target = normalized(u.array(direction))
+        target = mathutils.normalized(u.array(direction))
         vec = (self.a2.position - self.a1.position).normalized()
 
-        angle, normal = alignment_rotation(vec, target)
+        angle, normal = mathutils.alignment_rotation(vec, target)
 
         if centered:
             mol.positions += centering
-        mol.rotate(angle, normal, center=self.midpoint)
 
+        if abs(mathutils.normalize_angle(angle)) > 1e-3 * u.degrees:
+            mol.rotate(angle, normal, center=self.midpoint)
 
     @property
     def ff(self):

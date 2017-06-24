@@ -45,7 +45,7 @@ def perpendicular(vec):
 
 
 def norm(vec):
-    """ Calculate norm of a vector
+    """ Calculate norm of a vector or list thereof
 
     Args:
         vec (Vector or List[Vector]): vector(s) to compute norm of
@@ -82,12 +82,14 @@ def normalized(vec, zero_as_zero=True):
         return vec / mag[:, None]
 
 
-def alignment_rotation(v1, v2):
+def alignment_rotation(v1, v2, handle_linear=True):
     """ Calculate rotation angle and axis to make v1 parallel with v2
 
     Args:
         v1 (Vector): 3-dimensional vector to create rotation for
         v2 (Vector): 3-dimensional vector to make v1 parallel to
+        handle_linear (bool): if v1 is parallel or anti-parallel to v2, return an arbitrary
+           vector perpendicular to both as the axis (otherwise, returns a 0-vector)
 
     Returns:
         MdtQuantity[angle]: angle between the two
@@ -106,7 +108,12 @@ def alignment_rotation(v1, v2):
     else:
         c = (e1*e2).sum(axis=1)
     angle = np.arctan2(s, c)
-    return angle*u.radian, normalized(normal)
+
+    normalnorm = norm(normal)
+    if handle_linear and normalnorm == 0.0:
+        normal = perpendicular(v1)
+        normalnorm = 1.0
+    return angle*u.radian, normal / normalnorm
 
 
 def safe_arccos(costheta):
@@ -129,7 +136,12 @@ def safe_arccos(costheta):
 def sub_angles(a, b):
     """ Subtract two angles, keeping the result within [-180,180)
     """
-    c = a - b
+    return normalize_angle(a - b)
+
+
+def normalize_angle(c):
+    """ Normalize an angle to the interval [-180,180)
+    """
     return (c + 180.0 * u.degrees) % (360.0 * u.degrees) - (180.0 * u.degrees)
 
 
