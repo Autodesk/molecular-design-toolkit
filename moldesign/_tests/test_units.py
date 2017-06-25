@@ -177,8 +177,6 @@ def test_setitem_slice_dimensionless():
     assert (myarray[:10] == np.arange(10)).all()
 
 
-
-
 @pytest.fixture
 def make_test_matrices():
     randommatrix = np.random.rand(10,7)
@@ -200,8 +198,10 @@ def self_ldot(a,b):
 def unit_dot(a,b):
     return u.dot(a, b)
 
+MATRIX_MATHS = [self_dot, self_ldot, unit_dot]
 
-@pytest.mark.parametrize('testfun', [self_dot, self_ldot, unit_dot])
+
+@pytest.mark.parametrize('testfun', MATRIX_MATHS, ids=[x.__name__ for x in MATRIX_MATHS])
 def test_matrix_math_with_units(make_test_matrices, testfun):
     unitvector, unitmatrix, expected_matvec_product = make_test_matrices
 

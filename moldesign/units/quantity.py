@@ -16,13 +16,14 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from past.builtins import basestring
+
 import operator
 import copy
 from os.path import join, abspath, dirname
-import numbers
 
 import numpy as np
-from pint import UnitRegistry, set_application_registry, DimensionalityError
+from pint import UnitRegistry, set_application_registry, DimensionalityError, UndefinedUnitError
 
 from ..utils import ResizableArray
 from ..mathutils import normalized
@@ -130,15 +131,14 @@ class MdtQuantity(ureg.Quantity):
             else:
                 self.magnitude[key] = value.value_in(self.units)
         except AttributeError:
-            pass
+            try:  # fallback to pint's implementation
+                super().__setitem__(key, value)
+            except (TypeError, ValueError):
+                if isinstance(value, basestring):
+                    raise TypeError("Cannot assign units to a string ('%s')" % value)
 
-        try:  # fallback to pint's implementation
-            super().__setitem__(key, value)
-        except (TypeError, ValueError):
-            pass
-
-        # one last ditch effort to create a more well-behaved object
-        super().__setitem__(key, quantityarray(value))
+                # one last ditch effort to create a more well-behaved object
+                super().__setitem__(key, quantityarray(value))
 
 
     def __eq__(self, other):

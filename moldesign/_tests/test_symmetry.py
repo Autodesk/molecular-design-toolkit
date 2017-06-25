@@ -59,8 +59,6 @@ def almost_planar(planar):
 
 
 def test_approximate_symmetry(almost_planar):
-    mol = almost_planar.copy()
-
     symmetries = mdt.get_symmetry(almost_planar)
 
     assert symmetries.rms > 0
@@ -69,6 +67,11 @@ def test_approximate_symmetry(almost_planar):
 
     assert len(symmetries.approximate) == 1
     assert symmetries.approximate[0].symbol == 'Cs'
+
+
+def test_symmetrizer(almost_planar):
+    mol = almost_planar.copy()
+    symmetries = mdt.get_symmetry(almost_planar)
     cs = symmetries.groups['Cs'][0]
 
     mol.positions = symmetries.get_symmetrized_coords(cs)
