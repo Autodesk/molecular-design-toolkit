@@ -26,7 +26,7 @@ import numpy as np
 from pint import UnitRegistry, set_application_registry, DimensionalityError, UndefinedUnitError
 
 from ..utils import ResizableArray
-from ..mathutils import normalized
+
 
 # Set up pint's unit definitions
 ureg = UnitRegistry()
@@ -131,15 +131,14 @@ class MdtQuantity(ureg.Quantity):
             else:
                 self.magnitude[key] = value.value_in(self.units)
         except AttributeError:
+            if isinstance(value, basestring):
+                raise TypeError("Cannot assign units to a string ('%s')"%value)
+
             try:  # fallback to pint's implementation
                 super().__setitem__(key, value)
             except (TypeError, ValueError):
-                if isinstance(value, basestring):
-                    raise TypeError("Cannot assign units to a string ('%s')" % value)
-
                 # one last ditch effort to create a more well-behaved object
                 super().__setitem__(key, quantityarray(value))
-
 
     def __eq__(self, other):
         return self.compare(other, operator.eq)
@@ -197,6 +196,7 @@ class MdtQuantity(ureg.Quantity):
         Returns:
             np.ndarray: L2-normalized copy of this array (no units)
         """
+        from ..mathutils import normalized
         return normalized(self.magnitude)
 
     def dot(self, other):

@@ -358,8 +358,8 @@ class Trajectory(TrajectoryAnalysisMixin):
           2) resizeable MdtQuantity array
           3) list
 
-        The list of properties will be backfilled with ``None`` if this property wasn't already
-        present
+        If this property wasn't already present, we will add it to all previous frames with a
+        value of ``None``
         """
         assert key not in self.properties
 
@@ -369,7 +369,7 @@ class Trajectory(TrajectoryAnalysisMixin):
         else:
             try:
                 proplist = self.unit_system.convert(u.array([value]))
-            except TypeError:
+            except (TypeError, u.UndefinedUnitError):
                 proplist = [value]
             else:
                 proplist.make_resizable()
