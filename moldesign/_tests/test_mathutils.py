@@ -4,46 +4,106 @@ import numpy as np
 
 from moldesign import mathutils
 from moldesign import units as u
+from . import helpers
 
 
-def y_numpy_unit_vector():
+__PYTEST_MARK__ = 'internal'
+
+CONSTRUCTORS = []
+IDS = []
+
+
+# Couldn't figure out a way to do this with fixtures ...
+def constructor(f):
+    def wrapper():
+        arr, norm = f()
+        return arr * 3.0 * u.nm, norm * 3.0 * u.nm
+    wrapper.__name__ = f.__name__ + '_quantity'
+    CONSTRUCTORS.append(f)
+    IDS.append(f.__name__)
+    CONSTRUCTORS.append(wrapper)
+    IDS.append(wrapper.__name__)
+    return wrapper
+
+
+@constructor
+def zeros():
+    return np.zeros(3), 0.0
+
+
+@constructor
+def ones():
+    return np.ones(3), np.sqrt(3)
+
+
+@constructor
+def y_unit_vector():
     v = np.zeros(3)
     v[1] = 1.0
-    return v
+    return v, 1.0
 
 
-def y_length_vector():
-    v = y_numpy_unit_vector() * 3.0 * u.nm
-    return v
+@constructor
+def list_of_vectors():
+    return np.array(TESTARRAY), np.array(TESTARRAY_NORMS)
 
 
-@pytest.mark.parametrize('y_unit_vector', [y_numpy_unit_vector, y_length_vector])
-def test_perpendicular_to_y(y_unit_vector):
-    arr = y_unit_vector()
-
-    outvec = mathutils.perpendicular(arr)
-    assert isinstance(outvec, np.ndarray)
-
-    assert outvec[1] == 0.0
-    assert abs(mathutils.norm(outvec) - 1.0) < 1e-12
+@pytest.mark.parametrize('setupfn', CONSTRUCTORS, ids=IDS)
+def test_norm(setupfn):
+    arr, expected_norm = setupfn()
+    n = mathutils.norm(arr)
+    helpers.assert_almost_equal(n, expected_norm)
 
 
-def test_norm_numpy_y_unit_vector():
-    arr = y_numpy_unit_vector()
-    assert mathutils.norm(arr) == 1.0
-    assert (mathutils.normalized(arr) == arr).all()
+@pytest.mark.parametrize('setupfn', CONSTRUCTORS, ids=IDS)
+def test_normalized(setupfn):
+    arr, expected_norm = setupfn()
+    vectorized = len(arr.shape) > 1
+    normed = mathutils.normalized(arr)
+    if not vectorized:
+        arr, expected_norm, normed = [arr], [expected_norm], [normed]
+    for v, n, unitvec in zip(arr, expected_norm, normed):
+        if n != 0:
+            helpers.assert_almost_equal(unitvec, v/n)
 
 
-def test_normalization_with_units():
-    arr = y_length_vector()
-    norm = mathutils.norm(arr)
-    assert arr.units == norm.units
-    assert (arr/norm).dimensionless
+@pytest.mark.parametrize('setupfn', CONSTRUCTORS, ids=IDS)
+def test_perpendicular(setupfn):
+    arr, expected_norm = setupfn()
+    vectorized = len(arr.shape) > 1
 
-    normalized = mathutils.normalized(arr)
-    assert isinstance(normalized, np.ndarray) or normalized.units.dimensionless
-    np.testing.assert_allclose(normalized,
-                               arr/norm)
-    assert abs(mathutils.norm(normalized) - 1.0) < 1e-12
+    normvecs = mathutils.normalized(arr)
+    perpvecs = mathutils.perpendicular(arr)
+    assert isinstance(perpvecs, np.ndarray)
+    assert not hasattr(perpvecs, 'units')
+
+    # test that vectors are indeed perpendicular
+    if vectorized:
+        assert (np.abs((normvecs * perpvecs).sum(axis=1)) < 1e-12).all()
+    else:
+        assert abs(perpvecs.dot(normvecs)) < 1e-12
+
+    # test that they are unit vectors (or 0 if the input vector is zero)
+    if not vectorized:
+        arr = [arr]
+        perpvecs = [perpvecs]
+        expected_norm = [expected_norm]
+
+    for i, (vec, perpvec) in enumerate(zip(arr, perpvecs)):
+        if expected_norm[i] == 0.0:
+            assert mathutils.norm(perpvec) < 1e-12
+        else:
+            assert np.abs(1.0 - mathutils.norm(perpvec)) < 1e-12
 
 
+TESTARRAY = [[1.0,  0.0,  0.0],
+             [0.0,  1.0,  0.0],
+             [0.0,  0.0,  1.0],
+             [0.0,  0.0,  0.0],
+             [1.0,  -1.0,  1.0],
+             [2.0,  2.0,  2.0],
+             [0.57735027,  0.57735027,  -0.57735027],
+             [0.70710678,  0.70710678,  0.],
+             [0.0,  -1.0,  1.0]]
+
+TESTARRAY_NORMS = [1.0, 1.0, 1.0, 0.0, np.sqrt(3), np.sqrt(12.0), 1.0, 1.0, np.sqrt(2)]

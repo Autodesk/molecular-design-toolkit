@@ -23,23 +23,26 @@ from moldesign.utils import exports
 
 
 def perpendicular(vec):
-    """ Return an arbitrary unit vector perpendicular to vec.
+    """ Return arbitrary unit vector(s) perpendicular to one or more vectors.
 
     This obviously doesn't have a unique solution, but is useful for various computations.
 
     Args:
-        vec (Vector): 3-D vector
+        vec (Vector or List[Vector]): 3-D vector or list thereof
 
     Returns:
         vec (np.ndarray): normalized unit vector in a perpendicular direction
     """
-
-    assert vec.shape == (3,)
+    vectorized = len(vec.shape) > 1
     direction = normalized(vec)
-    if abs(direction[2]) < 0.9:
-        cross_axis = np.array([0.0, 0.0, 1.0])
+    if vectorized:
+        cross_axis = np.array([[0.0, 0.0, 1.0] if d[2] < 0.9 else [0.0, 1.0, 0.0]
+                              for d in direction])
     else:
-        cross_axis = np.array([0.0, 1.0, 0.0])
+        if abs(direction[2]) < 0.9:
+            cross_axis = np.array([0.0, 0.0, 1.0])
+        else:
+            cross_axis = np.array([0.0, 1.0, 0.0])
     perp = normalized(np.cross(direction, cross_axis))
     return perp
 
@@ -59,17 +62,18 @@ def norm(vec):
         return np.sqrt((vec*vec).sum(axis=1))
 
 
-def normalized(vec, zero_as_zero=True):
+def normalized(vector, zero_as_zero=True):
     """ Create normalized versions of a vector or lists of vectors.
 
     Args:
-        vec (Vector or List[Vector]): vector(s) to be normalized
+        vector (Vector or List[Vector]): vector(s) to be normalized
         zero_as_zero (bool): if True, return a 0-vector if a 0-vector is passed; otherwise, will
            follow default system behavior (depending on numpy's configuration)
 
     Returns:
         Vector or List[Vector]: normalized vector(s)
     """
+    vec = getattr(vector, 'magnitude', vector)  # strip units right away if necessary
     mag = norm(vec)
     if len(vec.shape) == 1:  # it's just a single column vector
         if mag == 0.0 and zero_as_zero:
@@ -83,11 +87,11 @@ def normalized(vec, zero_as_zero=True):
 
 
 def alignment_rotation(v1, v2, handle_linear=True):
-    """ Calculate rotation angle and axis to make v1 parallel with v2
+    """ Calculate rotation angle(s) and axi(e)s to make v1 parallel with v2
 
     Args:
-        v1 (Vector): 3-dimensional vector to create rotation for
-        v2 (Vector): 3-dimensional vector to make v1 parallel to
+        v1 (vector or List[Vector]): 3-dimensional vector(s) to create rotation for
+        v2 (vector or List[Vector]): 3-dimensional vector(s) to make v1 parallel to
         handle_linear (bool): if v1 is parallel or anti-parallel to v2, return an arbitrary
            vector perpendicular to both as the axis (otherwise, returns a 0-vector)
 
@@ -101,19 +105,25 @@ def alignment_rotation(v1, v2, handle_linear=True):
     e1 = normalized(v1)
     e2 = normalized(v2)
 
+    vectorize = len(e1.shape) > 1
+
     normal = np.cross(e1, e2)
     s = norm(normal)
-    if len(e1.shape) == 1:
-        c = np.dot(e1, e2)
-    else:
+    if vectorize:
         c = (e1*e2).sum(axis=1)
-    angle = np.arctan2(s, c)
+        if handle_linear:
+            linear_indices = s == 0.0
+            if linear_indices.any():
+                normal[linear_indices] = perpendicular(v1[linear_indices])
+                s[linear_indices] = 1.0
+    else:
+        c = np.dot(e1, e2)
+        if handle_linear and s == 0.0:
+            normal = perpendicular(v1)
+            s = 1.0
 
-    normalnorm = norm(normal)
-    if handle_linear and normalnorm == 0.0:
-        normal = perpendicular(v1)
-        normalnorm = 1.0
-    return angle*u.radian, normal / normalnorm
+    angle = np.arctan2(s, c)
+    return angle*u.radian, normal / s
 
 
 def safe_arccos(costheta):

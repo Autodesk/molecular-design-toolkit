@@ -34,15 +34,12 @@ def linear_mol_and_pmi():
     return mol, pmi
 
 
-def test_linear_mol_pmi(linear_mol_and_pmi):
-    mol, pmi = linear_mol_and_pmi
-    _assert_linear_mol_along_x_axis(mol)
-
-
-def _assert_linear_mol_along_x_axis(mol):
-    mol, pmi = linear_mol_and_pmi
-    pmi.reorient(mol)
-    _assert_linear_mol_along_x_axis(mol)
+def test_pmi_orthonormal(linear_mol_and_pmi):
+    pmi, mol = linear_mol_and_pmi
+    for ivec in range(3):
+        assert abs(1.0 - mdt.mathutils.norm(pmi.evecs[ivec])) < 1e-12
+        for jvec in range(ivec, 3):
+            assert abs(pmi.evecs[ivec].dot(pmi.evecs[jvec])) < 1e-12
 
 
 def test_principal_moment_of_inertia_reorientation(linear_mol_and_pmi):
@@ -52,14 +49,15 @@ def test_principal_moment_of_inertia_reorientation(linear_mol_and_pmi):
     original_distmat = mol.calc_distance_array().defunits_value()
 
     for deg in np.linspace(10, 120, 6) * u.degree:
+        # Set up a new random reorientation every time
         axis = [random.uniform(-1.0, 1.0),
                 random.uniform(-1.0, 1.0),
                 random.uniform(0.4, 1.0)]  # make sure to rotate off of x-axis
-
         translation = 10.0 * (np.random.rand(3)-0.5) * u.angstrom
-
         mol.translate(translation)
         mol.rotate(axis=axis, angle=deg)
+
+        # calculate PMI and reorient
         pmi = mdt.tools.PrincipalMomentsOfInertia(mol)
         pmi.reorient(mol)
 
