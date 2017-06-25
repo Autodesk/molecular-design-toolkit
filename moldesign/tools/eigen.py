@@ -1,7 +1,6 @@
 from __future__ import print_function, absolute_import, division
 from future.builtins import *
 from future import standard_library
-
 standard_library.install_aliases()
 
 # Copyright 2017 Autodesk Inc.
@@ -41,7 +40,7 @@ class Eigenspace(object):
         It's generally assumed that Eigen space objects will be subclassed to wrap various bits of
         eignproblem-related functionality.
     """
-    def __init__(self, evals, evecs):
+    def __init__(self, evals, evecs, real=True):
         if len(evals) != len(evecs):
             raise ValueError('Eigenvalues and eigenvectors have different lengths!')
 
@@ -77,7 +76,8 @@ class Eigenspace(object):
             def keyfn(t):
                 return key(t[0], t[1])
 
-        evals, evecs = zip(*sorted(zip(self.evals, self.evecs), key=keyfn, reverse=largest_first))
+        evals, evecs = zip(*sorted(zip(self.evals.copy(), self.evecs.copy()),
+                                   key=keyfn, reverse=largest_first))
         self.evals[:] = evals
         self.evecs[:] = evecs
 
@@ -104,8 +104,8 @@ class Eigenspace(object):
 class PrincipalMomentsOfInertia(Eigenspace):
     """ Calculates the moments of inertia of a molecule at a given position
 
-    Note:
-        this object is NOT updated if the initializing molecule's positions change.
+    Notes:
+        This object is NOT updated if the initializing molecule's positions change.
         This allows it to be used to reorient other molecules into the same coordinate system
 
     Args:
@@ -113,8 +113,8 @@ class PrincipalMomentsOfInertia(Eigenspace):
         mass_centered (bool): calculate PMIs relative to molecule's center of mass (default: True)
 
     Attributes:
-        evals (Vector[length**2 * mass]): eigenvalues of the principal moments
-        evecs (List[Vector]]): normalized principal moment vectors
+        axes (List[Vector[len=3]]]): principal rotation axes
+        moments (Vector[length**2 * mass, len=3]): rotational inertias for the three axes
     """
     def __init__(self, mol, mass_centered=True):
         from scipy.linalg import eig
@@ -123,9 +123,20 @@ class PrincipalMomentsOfInertia(Eigenspace):
         evals, evecs = eig(inertia_tensor.defunits_value())  # strip units before going to scipy
         evals = evals*u.default.mass*u.default.length ** 2  # reapply units to evals
 
-        super().__init__(evals, evecs.T)
+        assert (abs(evecs.imag) < 1e-12).all()  # hopefully everything is real?
+        assert (abs(evals.imag) < 1e-12 * evals.units).all()
+
+        super().__init__(evals.real, evecs.T)
         self._com = com
         self.sort()
+
+    @property
+    def moments(self):
+        return self.evals
+
+    @property
+    def axes(self):
+        return self.evecs
 
     def reorient(self, mol):
         """ Rotates molecular coordinates into the PMI coordinate system
@@ -134,29 +145,36 @@ class PrincipalMomentsOfInertia(Eigenspace):
         y along PMI 2, and z along PMI 3.
 
         Args:
-            mol (moldesign.Molecule): molecule to re-orient - its current positinos will be changed.
+            mol (moldesign.Molecule): molecule to re-orient - its current positinos will be changed
         """
         if self._com is not None:
             mol.com -= self._com
         mol.positions = self.transform(mol.positions)
 
 
-
 @exports
 def get_inertia_tensor(mol, mass_centered=True):
+    """ Calculates the moment of inertia for a molecule
+
+    Args:
+        mol (moldesign.Molecule): calculate the inertia tensor of this  molecule
+        mass_centered (bool): if True, calcualte tensor relative to molecule's center of mass. If
+           False, calculate it relative to the current origin.
+
+    Returns:
+        Matrix[mass*length*length]: moment of inertia tensor
+    """
     inertia_tensor = np.zeros((3,3)) * u.default.mass * u.default.length**2
     com = mol.com if mass_centered else None
-    for atom in mol.atoms:
-        pos = atom.position.copy()
-        if mass_centered:
-            pos -= mol.com
 
-        for i in range(3):
-            inertia_tensor[i,i] += atom.mass * (pos[i-1]**2 + pos[i-2]**2)
-            for j in range(i+1,3):
-                di = atom.mass * (pos[i] * pos[j])
-                inertia_tensor[i,j] += di
-                inertia_tensor[j,i] += di
+    pos = mol.positions
+    if mass_centered:
+        pos = pos - mol.com
+
+    for i in range(3):
+        inertia_tensor[i,i] = (mol.masses * (pos[:,i-1]**2 + pos[:,i-2]**2)).sum()
+        for j in range(i+1,3):
+            di = (mol.masses * pos[:,i] * pos[:,j]).sum()
+            inertia_tensor[i,j] = -di
+            inertia_tensor[j,i] = -di
     return inertia_tensor, com
-
-
