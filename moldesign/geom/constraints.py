@@ -65,6 +65,8 @@ class GeometryConstraint(object):
         Return the gradient of the constrained quantity
         Requires that self.atomgrad be implemented (or otherwise provided)
 
+        Must return an MdtQuantity object, even if dimensionless
+
         .. math::
             \nabla G(\mathbf r)
         """
@@ -196,7 +198,7 @@ class FixedPosition(GeometryConstraint):
         else:
             self.value = value.copy()
         super().__init__([atom], value=self.value,
-                                            tolerance=tolerance, force_constant=force_constant)
+                         tolerance=tolerance, force_constant=force_constant)
 
     def current(self):
         return self.atom.position
@@ -220,9 +222,9 @@ class FixedPosition(GeometryConstraint):
         if atom: assert atom is self.atom
         diff = self.atom.position - self.value
         grad = normalized(diff)
-        if (grad.magnitude == np.zeros(3)).all():
-            grad.magnitude[:] = np.ones(3) / np.sqrt(3)
-        return [grad]
+        if (grad == np.zeros(3)).all():
+            grad[:] = np.ones(3) / np.sqrt(3)
+        return [grad] * u.dimensionless
 
 
 class FixedCoordinate(GeometryConstraint):
