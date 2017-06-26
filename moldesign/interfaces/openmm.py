@@ -356,3 +356,8 @@ def mol_to_modeller(mol):
 
     return app.Modeller(mol_to_topology(mol), pint2simtk(mol.positions))
 
+
+def list_openmmplatforms():
+    from simtk import openmm
+    return [openmm.Platform.getPlatform(ip).getName()
+            for ip in range(openmm.Platform.getNumPlatforms())]

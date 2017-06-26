@@ -11,6 +11,7 @@ from moldesign import units as u
 from . import helpers
 from .molecule_fixtures import pdb3aid, ethylene_waterbox_2na_2cl
 
+__PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
 
 registered_types = {}
 

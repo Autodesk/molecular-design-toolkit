@@ -20,18 +20,18 @@ import numpy as np
 import moldesign as mdt
 from moldesign import units as u
 
-from .constraints import FixedCoordinate, FixedPosition
-
 # TODO: create dynamics wrapper that uses timestep to explicitly calculate constraint forces
 
 
-def shake_positions(mol, prev_positions, max_cycles=100, use_masses=True):
+def shake_positions(mol, prev_positions, max_cycles=100, use_masses=True, constraints=None):
     """ Satisfy all molecular constraints using the SHAKE algorithm
 
     Args:
         mol (moldesign.Molecule): molecule with unsatisfied constraints
         prev_positions (mdt.units.Array[length]): positions prior to move
         max_cycles (int): halt and raise an exception after this many cycles
+        constraints (List[moldesign.geom.GeometryConstraint]): list of constraints (optional;
+            uses mol.constraints if not provided)
 
     Note:
         This algorithm does badly if constraint function gradients go to 0.
@@ -41,15 +41,8 @@ def shake_positions(mol, prev_positions, max_cycles=100, use_masses=True):
             Eur Phys J Spec Top. 2011 Nov 1; 200(1): 211.
             doi:10.1140/epjst/e2011-01525-9
     """
-    constraints = []
-    for c in mol.constraints:  # Replace FixedPosition with 3 FixedCoordinates - it's better behaved
-        if isinstance(c, FixedPosition):
-            for i in range(3):
-                vec = np.zeros(3)
-                vec[i] = 1.0
-                constraints.append(FixedCoordinate(c.atom,  vec, value=c.value[i]))
-        else:
-            constraints.append(c)
+    if constraints is None:
+        constraints = mdt.geom.get_base_constraints(mol.constraints)
 
     # ---array shapes---
     # prevgrad, currgrad: (num_constr, 3N)

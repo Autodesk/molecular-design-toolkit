@@ -16,8 +16,13 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from past.builtins import basestring
+
+import numpy as np
 
 from . import toplevel
+from .. import units as u
+from .. import mathutils
 
 
 @toplevel
@@ -44,8 +49,6 @@ class Bond(object):
     def __init__(self, a1, a2, order=None):
         if a1.molecule is not a2.molecule:
             raise ValueError('Cannot create bond for atoms in different molecules.')
-        else:
-            self.molecule = a1.molecule
 
         if a1.index is not None and a2.index is not None and a1.index > a2.index:
             a1, a2 = a2, a1
@@ -94,6 +97,61 @@ class Bond(object):
                         a1=self.a1, a2=self.a2, order=self.order)
 
     @property
+    def molecule(self):
+        """moldesign.Molecule: molecule this bond belongs to (or None if not assigned
+
+        Raises:
+            ValueError: if the atoms are assigned to different molecules
+        """
+        if self.a1.molecule is not self.a2.molecule:
+            raise ValueError("Atoms in %s belong to different molecules" % self)
+        else:
+            return self.a1.molecule
+
+    @property
+    def midpoint(self):
+        return (self.a1.position + self.a2.position) / 2.0
+
+    def align(self, other, centered=True):
+        """ Rotates the entire molecule to align this bond with another object.
+
+        Args:
+            other (str or Vector[len=3] or Bond): Object to align this bond with, which may be:
+               - a string: 'x', 'y', or 'z',
+               - a len-3 vector, or
+               - another :class:`Bond` object
+            centered (bool): if True (default), center this bond at the origin OR the midpoint of
+             the other bond
+        """
+        mol = self.molecule
+
+        centering = -self.midpoint
+
+        if isinstance(other, Bond):
+            direction = (other.a2.position - other.a1.position).normalized()
+            if centered:
+                centering += other.midpoint
+
+        elif isinstance(other, basestring):
+            arr = np.zeros(3)
+            arr[DIMLABELS[other]] = 1.0
+            direction = arr
+
+        else:
+            direction = other
+
+        target = mathutils.normalized(u.array(direction))
+        vec = (self.a2.position - self.a1.position).normalized()
+
+        angle, normal = mathutils.alignment_rotation(vec, target)
+
+        if centered:
+            mol.positions += centering
+
+        if abs(mathutils.normalize_angle(angle)) > 1e-3 * u.degrees:
+            mol.rotate(angle, normal, center=self.midpoint)
+
+    @property
     def ff(self):
         """mdt.forcefield.BondTerm: the force-field term for this bond (or ``None`` if no
             forcefield is present)
@@ -102,3 +160,5 @@ class Bond(object):
             return self.molecule.ff.get_bond_term(self)
         else:
             return None
+
+DIMLABELS = {'x': 0, 'y': 1, 'z':2}

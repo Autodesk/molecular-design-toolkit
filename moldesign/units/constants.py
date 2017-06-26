@@ -19,6 +19,8 @@ standard_library.install_aliases()
 
 from .quantity import *
 
+dimensionless = ureg.dimensionless
+
 # Constants
 unity = ureg.angstrom / ureg.angstrom
 imi = 1.0j

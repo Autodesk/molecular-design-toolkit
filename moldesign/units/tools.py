@@ -39,6 +39,22 @@ def unitsum(iterable):
     return g0
 
 
+def dot(a1, a2):
+    """ Dot product that respects units
+
+    Args:
+        a1 (MdtQuantity or np.ndarray): First term in dot product
+        a2 (MdtQuantity or np.ndarray): Second term in dot product
+
+    Returns:
+        MdtQuantity or np.ndarray: dot product (MdtQuantity if either input has units, ndarray else)
+    """
+    if isinstance(a2, MdtQuantity):
+        return a2.ldot(a1)
+    else:  # this will work whether or not a1 has units
+        return a1.dot(a2)
+
+
 def from_json(j):
     """
     Convert a JSON description to a quantity.
@@ -54,8 +70,27 @@ def from_json(j):
 
 
 def get_units(q):
-    """
-    Return the base unit system of an quantity
+    """ Return the base unit system of an quantity or arbitrarily-nested iterables of quantities
+
+    Note: This routine will dive on the first element of iterables until a quantity with units
+      until the units can be determined. It will not check the remaining elements of the iterable
+      for consistency
+
+    Examples:
+        >>> from moldesign import units
+        >>> units.get_units(1.0 * units.angstrom)
+        <Unit('ang')>
+        >>> units.get_units(np.array([1.0, 2, 3.0]))
+        <Unit('dimensionless')>
+        >>> # We dive on the first element of each iterable until we can determine a unit system:
+        >>> units.get_units([[1.0 * u.dalton, 3.0 * u.eV], ['a'], 'gorilla'])
+        <Unit('amu')>
+
+    Args:
+        q (MdtQuantity or numeric): quantity to test
+
+    Returns:
+        MdtUnit: the quantity's units
     """
     x = q
     while True:
@@ -66,12 +101,7 @@ def get_units(q):
         else:
             if isinstance(x, str):
                 raise TypeError('Found string data while trying to determine units')
-    try:
-        y = 1.0 * x
-        y._magnitude = 1.0
-        return y
-    except AttributeError:
-        return 1.0 * ureg.dimensionless
+    return MdtQuantity(x).units
 
 
 def array(qlist, baseunit=None):

@@ -54,10 +54,12 @@ class Frame(utils.DotDict):
         >>> assert starting_frame.minimization_step == 0
     """
     def __init__(self, traj, frameidx):
+        super().__init__()
         self.traj = traj
         self.frameidx = frameidx
-        super().__init__(_dynamic=False)
         for key in self.traj.properties:
+            if key == 'frameidx':
+                continue
             self[key] = getattr(traj, key)[self.frameidx]
 
     def __str__(self):
@@ -101,7 +103,7 @@ class _TrajAtom(object):
     def _arrayslice(self, attr):
         return getattr(self.traj, attr)[:, self.index, :]
 
-    def __getattr__(self, item):  # TODO: remove and replace all __getattr__
+    def __getattr__(self, item):
         if item in ('traj', 'index', 'real_atom'):
             raise AttributeError('_TrajAtom.%s not assigned (pickle issue?)' % item)
 
@@ -356,8 +358,8 @@ class Trajectory(TrajectoryAnalysisMixin):
           2) resizeable MdtQuantity array
           3) list
 
-        The list of properties will be backfilled with ``None`` if this property wasn't already
-        present
+        If this property wasn't already present, we will add it to all previous frames with a
+        value of ``None``
         """
         assert key not in self.properties
 
@@ -367,7 +369,7 @@ class Trajectory(TrajectoryAnalysisMixin):
         else:
             try:
                 proplist = self.unit_system.convert(u.array([value]))
-            except TypeError:
+            except (TypeError, u.UndefinedUnitError):
                 proplist = [value]
             else:
                 proplist.make_resizable()

@@ -46,6 +46,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         self.sim = None
         self.mm_system = None
         self._prep_integrator = 'uninitialized'
+        self.mm_integrator = None
 
     def get_openmm_simulation(self):
         if opm.force_remote:
@@ -93,12 +94,12 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         self.mm_system = self.mol.ff.parmed_obj.createSystem(**system_params)
 
         if self.mol.integrator is None:
-            integrator = self._make_dummy_integrator()
+            self.mm_integrator = self._make_dummy_integrator()
         else:
-            integrator = self.mol.integrator.get_openmm_integrator()
+            self.mm_integrator = self.mol.integrator.get_openmm_integrator()
 
         self._set_constraints()
-        self.sim = app.Simulation(self.mol.ff.parmed_obj.topology, self.mm_system, integrator)
+        self.sim = app.Simulation(self.mol.ff.parmed_obj.topology, self.mm_system, self.mm_integrator)
         self._prepped = True
         print('Created OpenMM kernel (Platform: %s)' % self.sim.context.getPlatform().getName())
         self._prep_integrator = self.mol.integrator
@@ -142,7 +143,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                [energy/length]
         """
 
-        # NEWFEATURE: write/find an openmm "integrator" to do this minimization
+        # NEWFEATURE: write/find an openmm "integrator" to do this minimization.
         # openmm doesn't work with small step numbers, and doesn't support
         # callbacks during minimization, so frame_interval is disabled.
         if frame_interval is not None:
@@ -177,6 +178,10 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         system = self.mm_system
         fixed_atoms = set()
 
+        # openmm uses a global tolerance, calculated as ``constraint_violation/constraint_dist``
+        # (since only distance constraints are supported). Here we calculate the necessary value
+        required_tolerance = 1e-5
+
         # Constrain atom positions
         for constraint in self.mol.constraints:
             if constraint.desc == 'position':
@@ -191,6 +196,14 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                 system.addConstraint(constraint.a1.index,
                                      constraint.a2.index,
                                      opm.pint2simtk(constraint.value))
+                required_tolerance = min(required_tolerance, constraint.tolerance/constraint.value)
+
+            elif constraint.desc == 'hbonds':
+                continue  # already dealt with at system creation time
+
+            else:
+                raise moldesign.NotSupportedError("OpenMM does not support '%s' constraints" %
+                                                  constraint.desc)
 
         # Workaround for OpenMM issue: can't have an atom that's both
         # fixed *and* has a distance constraint. If both atoms in the distance constraint are
@@ -210,6 +223,10 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                                      'bond (%s)' % moldesign.molecules.bonds.Bond(ai, aj))
                 else:
                     ic += 1
+
+        if self.mm_integrator is not None:
+            self.mm_integrator.setConstraintTolerance(float(required_tolerance))
+
 
     @staticmethod
     def _make_dummy_integrator():
@@ -261,7 +278,9 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         nonbonded_names = {'nocutoff': app.NoCutoff,
                            'ewald': app.Ewald,
                            'pme': app.PME,
-                           'cutoff': app.CutoffPeriodic if self.params.periodic else app.CutoffNonPeriodic}
+                           'cutoff': (app.CutoffPeriodicif
+                                      if self.params.periodic
+                                      else app.CutoffNonPeriodic)}
         implicit_solvent_names = {'obc': app.OBC2,
                                   'obc1': app.OBC1,
                                   None: None}
@@ -270,7 +289,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                              nonbondedCutoff=opm.pint2simtk(self.params.cutoff),
                              implicitSolvent=implicit_solvent_names[self.params.implicit_solvent])
 
-        system_params['rigidWater'] = False
+        system_params['rigidWater'] = False  # not currently supported (because I'm lazy)
         system_params['constraints'] = None
         if self.mol.integrator is not None:
             if self.mol.integrator.params.get('constrain_water', False):
@@ -278,10 +297,10 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
             if self.mol.integrator.params.get('constrain_hbonds', False):
                 system_params['constraints'] = app.HBonds
 
+        # Deal with h-bonds listed in molecular constraints
+        for constraint in self.mol.constraints:
+            if constraint.desc == 'hbonds':
+                system_params['constraints'] = app.HBonds
+                break
+
         return system_params
-
-
-def list_openmmplatforms():
-    from simtk import openmm
-    return [openmm.Platform.getPlatform(ip).getName()
-            for ip in range(openmm.Platform.getNumPlatforms())]

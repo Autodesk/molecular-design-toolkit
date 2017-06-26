@@ -29,7 +29,7 @@ nwchem_build:
  build: |
     RUN         apt-get install -y patch curl perl
     WORKDIR      /opt
-    ENV          NWCHEM_MODULES="nwdft driver stepper" \
+    ENV          NWCHEM_MODULES="nwdft driver stepper mm qmmm nwmd esp " \
                    PYTHONVERSION=2.7 \
                    PYTHONHOME="/usr" \
                    USE_PYTHONCONFIG=Y \
@@ -45,25 +45,32 @@ nwchem_build:
                    && cd nwchem \
                    && svn co --depth empty https://svn.pnl.gov/svn/nwchem/trunk/src \
                    && cd src \
-                   && svn update GNUmakefile nwchem.F config \
-                        tools include basis geom inp input  \
+                   && svn update GNUmakefile nwchem.F config mm qmmm nwmd \
+                        tools include basis geom inp input qhop fft cafe \
                         pstat rtdb task symmetry util peigs perfm bq cons blas lapack \
-                        NWints atomscf cphf ddscf driver gradients hessian nwdft optim property stepper symmetry vib \
+                        NWints atomscf cphf ddscf driver gradients hessian nwdft \
+                        optim property stepper symmetry vib space esp \
                    && rm -rf /opt/nwchem/.svn \
                    && cd tools \
                    && svn export --non-interactive --username nwchem --password nwchem \
                           https://svn.pnl.gov/svn/hpctools/branches/ga-5-5  \
                    && cd .. \
-                   #strip native compiler options as Fedora does
                    && sed -i 's|-march=native||' config/makefile.h \
                    && sed -i 's|-mtune=native|-mtune=generic|' config/makefile.h \
                    && sed -i 's|-mfpmath=sse||' config/makefile.h \
-                   && sed -i 's|-msse3||' config/makefile.h  \
-                   && make nwchem_config && make -j3  \
-                   #clean unnecessary source to reduce docker size
-                   && rm -rf tce tools nwdft NWints geom symmetry util nwxc ddscf lapack blas rism \
-                          argos peigs rmdft gradients symmetry property smd lucia dplot propery \
-                          hessian ccsd mp2_grad moints cafe analyz dimqm /opt/nwchem/lib
+                   && sed -i 's|-msse3||' config/makefile.h
+
+    RUN  cd /opt/nwchem/src \
+         && make nwchem_config \
+         && make -j 8
+
+    RUN mkdir nwchem/contrib \
+       && cd nwchem/contrib \
+       && svn co https://svn.pnl.gov/svn/nwchem/trunk/contrib/mov2asc \
+       && cd mov2asc \
+       && FC=gfortran make \
+       && mv mov2asc asc2mov /opt/nwchem/bin/LINUX64
+
     RUN git clone https://github.com/NWChem-Python/nwapi \
        && cd nwapi \
        && make -f makefile.linux \
@@ -76,19 +83,62 @@ nwchem:
   description: Deployable NWChem image
   build_directory: buildfiles/nwchem/
   requires:
-    - python_deploy_base
+    - python_deploy_base_py2
     - nwchem_requirements
   build: |
-    COPY run.sh run.py getresults.py /usr/bin/
-    RUN chmod +x /usr/bin/getresults.py /usr/bin/run.py /usr/bin/run.sh
-    RUN pip install pint
+    RUN pip install pint cclib
     ENV NWCHEMFILE="From https://svn.pnl.gov/svn/nwchem/trunk/src"
-    ENV PYTHONPATH=$PYTHONPATH:/opt
+    ENV PYTHONPATH=$PYTHONPATH:/opt/nwapi
+    COPY run.py runqmmm.py getresults.py /usr/local/bin/
+    RUN chmod +x /usr/local/bin/getresults.py \
+     /usr/local/bin/run.py \
+     /usr/local/bin/runqmmm.py
   copy_from:
     nwchem_build:
       /usr/local/lib/python2.7/dist-packages: /usr/local/lib/python2.7/
       /opt/nwchem: /opt
       /opt/lib: /opt
-  copy_from:
+      /opt/nwapi: /opt
     openblas:
       /opt/lib: /opt
+
+#################################
+# Experimental QM/MM images below
+nwchem_amber_qmmmm:
+  description: Image with Amber and NWChem for QM/MM
+  requires:
+     - nwchem
+  build: |
+    RUN apt-get update \
+     && apt-get install -y --no-install-recommends \
+         gcc \
+         gfortran \
+     && cleanapt
+  copy_from:
+    amber_dev_branch_build:
+      /opt/amber16: /opt
+      /root/.bash_profile: /root
+
+
+amber_dev_branch_build:
+  build_directory: buildfiles/nwchem
+  requires:
+    - buildbase
+    - ambertools_requirements
+  build: |
+    ADD amber-dev.tgz /opt
+    RUN apt-get install -y \
+         flex \
+         bison \
+         csh \
+         gfortran \
+         g++ \
+         make \
+         patch \
+         python-dev
+    WORKDIR /opt/amber16
+    RUN echo N | ./configure -noX11 --with-python /usr/bin/python --with-netcdf /usr/ gnu \
+     && make -j6 install \
+     && rm -rf test AmberTools doc  # reduce image size for copying to deployment image
+    RUN echo "test -f /opt/amber16/amber.sh && source /opt/amber16/amber.sh" >> /root/.bash_profile
+

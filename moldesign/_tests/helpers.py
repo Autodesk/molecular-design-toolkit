@@ -51,6 +51,9 @@ def num_grad(mol, fn, step=DEFSTEP, atoms=None, fnargs=None, fnkwargs=None):
     return grad
 
 
+ENERGY_TOLERANCE = 1e-8 * u.hartree
+
+
 def _make_mol_with_n_hydrogens(n):
     return mdt.Molecule([mdt.Atom('H') for i in range(n)])
 
@@ -107,22 +110,40 @@ def assert_something_resembling_minimization_happened(p0, e0, traj, mol):
     Returns:
 
     """
+    # Use assert_almost_equal to account for small numerical differences in
+    # convergence noise, serialization methods, etc.
+
     import scipy.optimize.optimize
 
     assert traj.num_frames > 1
 
-    assert traj.potential_energy[0] == e0
+    assert_almost_equal(traj.potential_energy[0],
+                        e0, decimal=9)
+    assert_almost_equal(traj.potential_energy[-1],
+                        mol.potential_energy, decimal=9)
     assert traj.potential_energy[-1] < e0
-    assert traj.potential_energy[-1] == mol.potential_energy
 
     assert (traj.positions[0] == p0).all()
     assert (traj.positions[-1] != p0).any()
     assert (traj.positions[-1] == mol.positions).all()
 
+    recalc = mol.calculate_potential_energy(usecache=False)
+    assert (recalc - traj.potential_energy[-1]) < 1.0e-8 * u.hartree
+
     scipyresult = getattr(traj, 'info', None)
     if isinstance(scipyresult, scipy.optimize.optimize.OptimizeResult):
         np.testing.assert_allclose(scipyresult.x,
                                    mol.positions.defunits_value().flat)
-        np.testing.assert_almost_equal(scipyresult.fun,
-                                       mol.potential_energy.defunits_value())
+        assert_almost_equal(scipyresult.fun,
+                            mol.potential_energy.defunits_value())
+
+
+def assert_almost_equal(actual, desired, **kwargs):
+    units = mdt.units.get_units(actual)
+
+    np.testing.assert_almost_equal(units.value_of(actual),
+                                   units.value_of(desired),
+                                   **kwargs)
+
+
 

@@ -1,17 +1,20 @@
 """ Tests basic QM functionality and data structures
 """
-
+import itertools
 import pytest
 import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
 
+from . import helpers
+
 registered_types = {}
 
 # TODO: automated method testing based on its metadata - i.e. test to make sure parameters are
 #       honored, test that it calcultes what it says it does, test that properties have the right
 #       units and array shapes, etc.
+
 
 def typedfixture(*types, **kwargs):
     """This is a decorator that lets us associate fixtures with one or more arbitrary types.
@@ -25,7 +28,7 @@ def typedfixture(*types, **kwargs):
     return fixture_wrapper
 
 
-@typedfixture('molecule')
+@typedfixture('molecule', scope='function')
 def h2():
     mol = mdt.Molecule([mdt.Atom('H'),
                         mdt.Atom('H')])
@@ -33,13 +36,65 @@ def h2():
     return mol
 
 
-@typedfixture('molecule')
+@typedfixture('molecule', scope='function')
 def heh_plus():
     mol = mdt.Molecule([mdt.Atom('H'),
                         mdt.Atom('He')])
     mol.atoms[1].z = 1.0 * u.angstrom
     mol.charge = 1 * u.q_e
     return mol
+
+
+# Note that this is an incomplete set of models
+models_to_test = list(itertools.product((mdt.models.NWChemQM, mdt.models.PySCFPotential),
+                                        'sto-3g 6-31g'.split(),
+                                        'rhf rks mp2'.split()))
+model_ids = ['/'.join((model.__name__, theory, basis)) for (model, theory, basis) in models_to_test]
+
+
+@pytest.fixture(params=models_to_test, ids=model_ids, scope='function')
+def h2_with_model(request, h2):
+    model, basis, theory = request.param
+
+    if model is mdt.models.NWChemQM and theory == 'mp2':
+        pytest.xfail('Not implemented')
+
+    h2.set_energy_model(model, basis=basis, theory=theory)
+    return h2
+
+
+def test_minimization_trajectory(h2_with_model):
+    mol = h2_with_model
+    if mol.energy_model.params.theory == 'mp2':
+        pytest.skip('Not testing mp2 minimizations at this time')
+
+    assert 'potential_energy' not in mol.properties
+
+    e1 = mol.calculate_potential_energy()
+    p1 = mol.positions.copy()
+
+    traj = mol.minimize()
+    helpers.assert_something_resembling_minimization_happened(p1, e1, traj, mol)
+
+
+@typedfixture('model')
+def pyscf_rhf():
+    return mdt.models.PySCFPotential(basis='sto-3g', theory='rhf')
+
+
+@typedfixture('model')
+def pyscf_dft():
+    return mdt.models.PySCFPotential(basis='sto-3g', theory='rks', functional='b3lyp')
+
+
+@typedfixture('model')
+def nwchem_rhf():
+    return mdt.models.NWChemQM(basis='sto-3g', theory='rhf', functional='b3lyp')
+
+
+@typedfixture('model')
+def nwchem_dft():
+    return mdt.models.NWChemQM(basis='sto-3g', theory='rks', functional='b3lyp')
 
 
 @pytest.fixture

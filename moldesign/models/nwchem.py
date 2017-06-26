@@ -1,9 +1,4 @@
-from __future__ import print_function, absolute_import, division
-from future.builtins import *
-from future import standard_library
-standard_library.install_aliases()
-
-# Copyright 2017 Autodesk Inc.
+# Copyright 2016 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,62 +11,36 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import itertools
 import json
+import numpy as np
 
 import pyccc
 
 import moldesign as mdt
-from moldesign import units as u
+
 from moldesign.utils import exports
+from moldesign import units as u
 
-from .base import QMBase
-
-IMAGE = 'nwchem'
+from .base import QMBase, QMMMBase
+from .jsonmodel import JsonModelBase
 
 
 @exports
-class NWChemQM(QMBase):
+class NWChemQM(JsonModelBase, QMBase):
     """ Interface with NWChem package (QM only)
 
     Note:
         This is the first interface based on our new wrapping strategy. This is slightly hacked,
         but has the potential to become very general; very few things here are NWChem-specific
     """
-
+    IMAGE = 'nwchem'
+    MODELNAME = 'nwchem'
     DEFAULT_PROPERTIES = ['potential_energy']
+    ALL_PROPERTIES = DEFAULT_PROPERTIES + 'forces dipole esp'.split()
 
-    def prep(self):
-        parameters = self.params.copy()
-
-        parameters['constraints'] = []
-        for constraint in self.mol.constraints:
-            raise NotImplementedError()
-
-        parameters['charge'] = self.mol.charge.value_in(u.q_e)
-        self._jobparams = parameters
-        self._prepped = True
-
-    def calculate(self, requests=None):
-        if requests is None: requests = self.DEFAULT_PROPERTIES
-        job = self._make_calculation_job(requests)
-
-        return mdt.compute.run_job(job, _return_result=True)
-
-    def _make_calculation_job(self, requests=None):
-        self.prep()
-        parameters = self._jobparams.copy()
-        parameters['runType'] = 'singlePoint'
-        parameters['properties'] = list(requests)
-        if self.mol.constraints:
-            self.write_constraints(parameters)
-        job = pyccc.Job(  # image=mdt.compute.get_image_path(IMAGE),
-                image=IMAGE,
-                command='run.py && getresults.py',
-                inputs={'input.xyz': self.mol.write(format='xyz'),
-                        'params.json': json.dumps(parameters)},
-                when_finished=self.finish,
-                name='nwchem/%s'%self.mol.name)
-        return job
+    def _get_inputfiles(self):
+        return {'input.xyz': self.mol.write(format='xyz')}
 
     def write_constraints(self, parameters):
         parameters['constraints'] = []
@@ -79,7 +48,7 @@ class NWChemQM(QMBase):
 
             if not constraint.satisfied():  # TODO: factor this out into NWChem subclass
                 raise ValueError('Constraints must be satisfied before passing to NWChem %s'
-                                 %constraint)
+                                 % constraint)
 
             cjson = {'type': constraint['desc'],
                      'value': constraint['value'].to_json()}
@@ -90,57 +59,116 @@ class NWChemQM(QMBase):
                 cjson['atomIdx2'] = constraint.a2.index
 
 
-    def finish(self, job):
-        results = json.loads(job.get_output('results.json').read())
-        return self._process_results(results)
+@exports
+class NWChemQMMM(NWChemQM):
+    """ Interface with NWChem package for QM/MM only. Note that this is currently only set up for
+    optimizations, and only of the QM geometry - the MM region cannot move.
+    """
+    IMAGE = 'nwchem'
+    MODELNAME = 'nwchem_qmmmm'
+    DEFAULT_PROPERTIES = ['potential_energy', 'forces', 'esp']
+    ALL_PROPERTIES = DEFAULT_PROPERTIES
+    RUNNER = 'runqmmm.py'
+    PARSER = 'getresults.py'
+    PARAMETERS = NWChemQM.PARAMETERS + [mdt.parameters.Parameter('qm_atom_indices')]
 
-    def _process_results(self, results):
-        assert len(results['states']) == 1
-        jsonprops = results['states'][0]['calculated']
-        result = mdt.MolecularProperties(self.mol,
-                                         **self._get_properties(jsonprops))
-        return result
+    def _get_inputfiles(self):
+        crdparamfile = self._makecrdparamfile()
+        return {'nwchem.crdparams': crdparamfile}
 
-    @staticmethod
-    def _get_properties(jsonprops):
-        props = {}
-        for name, property in jsonprops.items():
-            if isinstance(property, dict) and len(property) == 2 and \
-                            'units' in property and 'value' in property:
-                props[name] = property['value'] * u.ureg(property['units'])
-            else:
-                props[name] = property
+    def _makecrdparamfile(self, include_mmterms=True):
+        pmdparms = self.mol.ff.parmed_obj
 
-        return props
+        lines = ['qm']
+        qmatom_idxes = set(self.params.qm_atom_indices)
 
-    def minimize(self, nsteps=None):
-        job = self._make_minimization_job(nsteps)
+        def crosses_boundary(*atoms):
+            total = 0
+            inqm = 0
+            for atom in atoms:
+                total += 1
+                if atom.idx in qmatom_idxes:
+                    inqm += 1
+            return inqm != 0 and inqm < total
 
-        return mdt.compute.run_job(job, _return_result=True)
+        # write QM atoms
+        for atomidx in sorted(self.params.qm_atom_indices):
+            atom = self.mol.atoms[atomidx]
+            x, y, z = atom.position.value_in(u.angstrom)
+            lines.append('  %d %s   %24.14f  %24.14f  %24.14f' %
+                         (atom.index+1, atom.element, x, y, z))
+            qmatom_idxes.add(atom.index)
 
-    def _make_minimization_job(self, nsteps):
-        self.prep()
-        parameters = self._jobparams.copy()
-        parameters['runType'] = 'minimization'
-        if nsteps is not None:
-            parameters['minimization_steps'] = 100
-        job = pyccc.Job(  # image=mdt.compute.get_image_path(IMAGE),
-                image=IMAGE,
-                command='run.py && getresults.py',
-                inputs={'input.xyz': self.mol.write(format='xyz'),
-                        'params.json': json.dumps(parameters)},
-                when_finished=self.finish_min,
-                name='nwchem/%s' % self.mol.name)
-        return job
+        # write MM atoms
+        lines.append('end\n\nmm')
+        for atom, patm in zip(self.mol.atoms, pmdparms.atoms):
+            assert atom.index == patm.idx
+            assert atom.atnum == patm.element
+            x, y, z = atom.position.value_in(u.angstrom)
+            if atom.index not in qmatom_idxes:
+                lines.append('  %d %s   %24.14f  %24.14f  %24.14f  %24.14f'
+                             %(atom.index+1, atom.element, x, y, z, patm.charge))
+
+        lines.append('end\n\nbond\n#      i       j       k_ij             r0')
+        if include_mmterms:
+            for term in pmdparms.bonds:
+                if crosses_boundary(term.atom1, term.atom2):
+                    lines.append('  %d    %d   %20.10f    %20.10f' %
+                                 (term.atom1.idx+1, term.atom2.idx+1, term.type.k, term.type.req))
+
+        lines.append('end\n\nangle\n#      i       j       k      k_ijk           theta0')
+        if include_mmterms:
+            for term in pmdparms.angles:
+                if crosses_boundary(term.atom1, term.atom2, term.atom3):
+                    lines.append('  %d    %d   %d   %20.10f    %20.10f' %
+                                 (term.atom1.idx+1, term.atom2.idx+1, term.atom3.idx+1,
+                                  term.type.k, term.type.theteq))
+
+        lines.append('end\n\ndihedral\n'
+                     '#      i       j       k       l      k_ijkl       periodicity        phase')
+        if include_mmterms:
+            for term in pmdparms.dihedrals:
+                if crosses_boundary(term.atom1, term.atom2, term.atom3, term.atom4):
+                    lines.append('  %d    %d   %d   %d   %20.10f   %d    %20.10f' %
+                                 (term.atom1.idx+1, term.atom2.idx+1, term.atom3.idx+1, term.atom4.idx+1,
+                                  term.type.phi_k, term.type.per, term.type.phase))
+
+        lines.append('end\n\nvdw\n'
+                     '#      i       j    A_coeff         B_coeff')
+        if include_mmterms:
+            for atom1idx, atom2 in itertools.product(qmatom_idxes, pmdparms.atoms):
+                if atom2.idx in qmatom_idxes: continue
+                atom1 = pmdparms.atoms[atom1idx]
+                epsilon = np.sqrt(atom1.epsilon * atom2.epsilon)
+                if epsilon == 0: continue
+                sigma = (atom1.sigma + atom2.sigma) / 2.0
+                lj_a = 4.0 * epsilon * sigma**12
+                lj_b = 4.0 * epsilon * sigma**6
+                lines.append('  %d    %d  %20.10e   %20.10e' %
+                             (atom1.idx+1, atom2.idx+1, lj_a, lj_b))
+
+        lines.append('end\n\nscaled_vdw\n'
+                     '#      i       j    A_coeff         B_coeff          one_scnb')
+        # TODO: this part
+        lines.append('end')
+
+        return pyccc.files.StringContainer('\n'.join(lines))
+
 
     def finish_min(self, job):
-        # TODO: parse more data than just the final minimization state
-        properties = self.finish(job)
         traj = mdt.Trajectory(self.mol)
         traj.new_frame()
-        self.mol.positions = properties.positions
+
+        results = json.loads(job.get_output('results.json').read())
+        new_state = self._json_to_quantities(results['states'][0])
+
+        for iatom in sorted(self.params.qm_indices):
+            for position in new_state['positions']:
+                self.mol.atoms[iatom].position = position
+
+        properties = self._process_results(results)
+        properties.positions = self.mol.positions
         self.mol.properties = properties
         traj.new_frame()
         return traj
-
 

@@ -56,6 +56,7 @@ from .molecules import *
 from .tools import *
 
 # Set up cloud computing
+_lastjobs = []
 compute.init_config()
 
 # package metadata

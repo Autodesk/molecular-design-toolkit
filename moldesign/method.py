@@ -87,6 +87,13 @@ class Method(with_metaclass(_InitKeywordMeta, object)):
             if param.name not in self.params:
                 self.params[param.name] = param.default
 
+    @classmethod
+    def supports_parameter(cls, paramname):
+        for parameter in cls.PARAMETERS:
+            if parameter.name == paramname:
+                return True
+        else:
+            return False
     def __eq__(self, other):
         return self.__class__ is other.__class__ and self.params == other.params
 

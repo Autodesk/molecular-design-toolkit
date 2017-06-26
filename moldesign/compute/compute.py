@@ -88,7 +88,6 @@ class DummyJob(object):
             self.updated_object = updated_object
 
 
-
 def run_job(job, engine=None, wait=True, jobname=None, display=True,
             _return_result=False):
     """ Helper for running jobs.
@@ -105,6 +104,9 @@ def run_job(job, engine=None, wait=True, jobname=None, display=True,
     Returns:
         pyccc job object OR function's return value
     """
+
+    mdt._lastjobs.append(job)  # TODO: this could potentially be a memory leak
+
     engine = utils.if_not_none(engine, mdt.compute.get_engine())
 
     if engine is None:
