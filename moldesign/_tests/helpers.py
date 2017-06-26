@@ -137,6 +137,43 @@ def assert_something_resembling_minimization_happened(p0, e0, traj, mol):
         assert_almost_equal(scipyresult.fun,
                             mol.potential_energy.defunits_value())
 
+    if mol.constraints or mol.energy_model.params.get('constrain_hbonds', False):
+        assert_constraints_satisfied(traj, p0, mol)
+
+
+def assert_something_resembling_dynamics_happened(traj, mol, p0, t0, duration):
+    """ Checks that dynamics routines have fulfilled their obligations.
+    """
+    assert mol is traj.mol
+    assert traj.time[0] == t0
+    assert mol.time == traj.time[-1]
+
+    assert traj.potential_energy[-1] == mol.calculate_potential_energy()
+    assert_almost_equal(traj.positions[-1], mol.positions)
+
+    # lower precision for first step due to noise from single-precision positions (i.e. OpenMM CPU)
+    assert_almost_equal(traj.positions[0], p0, decimal=5)
+
+    lasttime = -np.inf * u.fs
+    for step in traj:
+        assert step.time > lasttime
+
+    # currently we permit the integrator to be a little off in how long it integrates for
+    assert mol.time - traj.time[0] > (duration - mol.integrator.params.frame_interval)
+
+    if mol.constraints or mol.energy_model.params.get('constrain_hbonds', False):
+        assert_constraints_satisfied(traj, p0, mol)
+
+
+def assert_constraints_satisfied(traj, p0, mol):
+    """ Checks that constraints were satisfied during molecular motion
+    """
+    for constraint in mol.constraints:
+        assert constraint.satisfied()
+
+    # TODO: check whole trajectory (not necessarily conserved during minimization however)
+    # TODO: check hbonds, if energy model calls for it
+
 
 def assert_almost_equal(actual, desired, **kwargs):
     units = mdt.units.get_units(actual)
@@ -144,6 +181,4 @@ def assert_almost_equal(actual, desired, **kwargs):
     np.testing.assert_almost_equal(units.value_of(actual),
                                    units.value_of(desired),
                                    **kwargs)
-
-
 

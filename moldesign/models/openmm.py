@@ -167,7 +167,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         """ Check whether this molecule's constraints can be enforced in OpenMM
         """
         for constraint in self.mol.constraints:
-            if constraint.desc not in ('position', 'distance'):
+            if constraint.desc not in ('position', 'distance', 'hbonds'):
                 return False
         else:
             return True

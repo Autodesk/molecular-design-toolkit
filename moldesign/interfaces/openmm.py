@@ -115,7 +115,7 @@ def MdtReporter(mol, report_interval):
                 temperatureheader = 'T / {units}'.format(units=u.default.temperature)
                 print(self._header_format.format(timeheader, peheader, keheader, temperatureheader))
                 self._printed_header = True
-            ke = mdt.helpers.kinetic_energy(report['momenta'], self.mol.dim_masses)
+            ke = mdt.helpers.kinetic_energy(report['momenta'], self.mol.masses)
             t = (2.0 * ke) / (u.k_b * self.mol.dynamic_dof)
             print(self._row_format.format(report['time'].defunits_value(),
                                           report['potential_energy'].defunits_value(),

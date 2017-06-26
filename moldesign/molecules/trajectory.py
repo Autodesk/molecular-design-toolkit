@@ -136,7 +136,7 @@ class TrajectoryAnalysisMixin(object):
         for frame in self.frames:
             if 'momenta' in frame:
                 energies.append(
-                    helpers.kinetic_energy(frame.momenta, self.mol.dim_masses))
+                    helpers.kinetic_energy(frame.momenta, self.mol.masses))
             else:
                 convert_units = False
                 energies.append(None)
