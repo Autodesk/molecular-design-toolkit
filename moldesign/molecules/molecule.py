@@ -121,6 +121,17 @@ class MolConstraintMixin(object):
         self._reset_methods()
         return self.constraints[-1]
 
+    def constrain_hbonds(self):
+        """ Constrain all bonds that involve at least one hydrogen atom in this molecule
+
+        Returns:
+            moldesign.geom.HBondConstraint: constraint object
+        """
+        from moldesign import geom
+        self.constraints.append(geom.constraints.HBondsConstraint(self))
+        self._reset_methods()
+        return self.constraints[-1]
+
 
 class MolPropertyMixin(object):
     """ Functions for calculating and accessing molecular properties.
