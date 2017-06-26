@@ -66,13 +66,17 @@ class ScipyMinimizer(MinimizerBase):
             else:
                 print('WARNING: no convergence criteria for this method; using defaults')
 
-        result = scipy.optimize.minimize(self.objective,
-                                         self._coords_to_vector(self.mol.positions),
-                                         method=self._METHOD_NAME,
-                                         jac=grad,
-                                         callback=self.callback,
-                                         options=options,
-                                         constraints=self._make_constraints())
+        self._optimize_kwargs = dict(method=self._METHOD_NAME,
+                                     jac=grad,
+                                     callback=self.callback,
+                                     options=options,
+                                     constraints=self._make_constraints())
+
+        result = scipy.optimize.minimize(self.objective, self._coords_to_vector(self.mol.positions),
+                                         **self._optimize_kwargs)
+
+        if self.mol.constraints:
+            result = self._force_constraint_convergence(result)
 
         self.traj.info = result
 
@@ -82,6 +86,7 @@ class ScipyMinimizer(MinimizerBase):
 
     def _make_constraints(self):
         constraints = []
+        self._constraint_multiplier = 1.0
         for constraint in geom.get_base_constraints(self.mol.constraints):
             fun, jac = self._make_constraint_funs(constraint)
             constraints.append(dict(type='eq',
@@ -89,14 +94,36 @@ class ScipyMinimizer(MinimizerBase):
                                     jac=jac))
         return constraints
 
+    def _force_constraint_convergence(self, result):
+        """ Make sure that all constraints are satisfied, ramp up the constraint functions if not
+
+        Note - if additional iterations are necessary, this will destroy the scipy optimize results
+        object stored at self.traj.info. Not sure what to do about that
+        """
+        import scipy.optimize
+
+        for i in range(5):
+            for constraint in self.mol.constraints:
+                if not constraint.satisfied():
+                    break
+            else:
+                return result
+
+            self._constraint_multiplier *= 10.0
+            result = scipy.optimize.minimize(self.objective,
+                                             self._coords_to_vector(self.mol.positions),
+                                             **self._optimize_kwargs)
+        return result
+
     def _make_constraint_funs(self, const):
         def fun(v):
             self._sync_positions(v)
-            return const.error().defunits_value()
+            return const.error().defunits_value() * self._constraint_multiplier
 
         def jac(v):
             self._sync_positions(v)
-            return const.gradient().defunits_value().reshape(self.mol.num_atoms*3)
+            return (const.gradient().defunits_value().reshape(self.mol.num_atoms*3)
+                    * self._constraint_multiplier)
 
         return fun, jac
 

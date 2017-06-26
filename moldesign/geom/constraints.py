@@ -348,3 +348,4 @@ def get_base_constraints(constraintlist):
             constraints.extend(c.decompose())
         else:
             constraints.append(c)
+    return constraints
