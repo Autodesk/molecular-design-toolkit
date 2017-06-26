@@ -122,7 +122,14 @@ class MolConstraintMixin(object):
         return self.constraints[-1]
 
     def constrain_hbonds(self):
-        """ Constrain all bonds that involve at least one hydrogen atom in this molecule
+        """ Constrain h-bonds in this molecule to their equilibrium forcefield values.
+
+        For molecules with an associated forcefield, this method adds a constraint to the molecule
+        that fixes all the lengths of all bonds that involve at least one hydrogen atom. The bond
+        lengths are constrained to their equilibrium forcefield values.
+
+        Note:
+            This can only be applied if the molecule is associated with a forcefield.
 
         Returns:
             moldesign.geom.HBondConstraint: constraint object

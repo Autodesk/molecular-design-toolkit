@@ -239,9 +239,13 @@ class FixedPosition(GeometryConstraint):
 
 
 class HBondsConstraint(GeometryConstraint):
-    """ Constraints the lengths of all bonds involving hydrogen.
+    """ Constraints the lengths of all bonds involving hydrogen to their equilibrium forcefield
+    values.
 
     Generally, this is used to signal to a molecular dynamics program to apply H-bond constraints.
+
+    Note:
+        This constraint can only be applied to molecules with an assigned forcefield.
 
     Args:
         mol (moldesign.Molecule): Constrain all h-bonds in this molecule
@@ -251,13 +255,16 @@ class HBondsConstraint(GeometryConstraint):
     desc = 'hbonds'
 
     def __init__(self, mol):
+        from ..interfaces.openmm import simtk2pint
+
         self.mol = mol
         self.bonds = []
         self.subconstraints = []
         for bond in self.mol.bonds:
             if bond.a1.atnum == 1 or bond.a2.atnum == 1:
                 self.bonds.append(bond)
-                self.subconstraints.append(DistanceConstraint(bond.a1, bond.a2))
+                self.subconstraints.append(DistanceConstraint(bond.a1, bond.a2,
+                                                              value=bond.ff.equilibrium_length))
         self.values = [c.current() for c in self.subconstraints]
 
     @property

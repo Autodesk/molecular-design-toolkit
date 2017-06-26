@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from __future__ import print_function, absolute_import, division
 from future.builtins import *
 from future import standard_library
@@ -46,6 +48,8 @@ class Bond(object):
         a2 (Atom): Second atom in the bond; assigned so that ``self.a2.index > self.a1.index``
         order (int): bond order (can be ``None``); not used in comparisons
     """
+    SYMBOLS = {1: u'-', 2: u'=', 3: u'≡'}
+
     def __init__(self, a1, a2, order=None):
         if a1.molecule is not a2.molecule:
             raise ValueError('Cannot create bond for atoms in different molecules.')
@@ -59,6 +63,18 @@ class Bond(object):
             except KeyError: self.order = None
         else:
             self.order = order
+
+    def __str__(self):
+        return "%s bond between %s and %s (order: %s)" % (self.type,
+                                                          self.a1._shortstr(), self.a2._shortstr(),
+                                                          self.order)
+
+    def __repr__(self):
+        return "<%s>" % self
+
+    @property
+    def type(self):
+        return self.a1.symbol + self.SYMBOLS.get(self.order, u'?̶') + self.a2.symbol
 
     def __eq__(self, other):
         return (self.a1 is other.a1) and (self.a2 is other.a2)
