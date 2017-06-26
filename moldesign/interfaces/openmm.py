@@ -68,13 +68,13 @@ def MdtReporter(mol, report_interval):
         It's pretty basic - the assumption is that there will be more processing on the client side
         """
 
-        LEN = 30
         def __init__(self, mol, report_interval):
             self.mol = mol
             self.report_interval = report_interval
             self.trajectory = mdt.Trajectory(mol)
             self.annotation = None
-            self._row_format = ("{:<%d}" % 10) + 3*("{:>%d}" % self.LEN)
+            self._row_format = ("{:<10.2f}") + 3*(" {:>15.4f}")
+            self._header_format = self._row_format.replace('.4f','s').replace('.2f','s')
             self._printed_header = False
             self.last_report_time = None
 
@@ -86,9 +86,10 @@ def MdtReporter(mol, report_interval):
                         self.mol.energy_model.sim.context.getState(getEnergy=True,
                                                                    getForces=True,
                                                                    getPositions=True,
-                                                                   getVelocities=True))
+                                                                   getVelocities=True),
+                        settime=self.mol.time)
 
-        def report(self, simulation, state):
+        def report(self, simulation, state, settime=None):
             """ Callback for dynamics after the specified interval
 
             Args:
@@ -96,11 +97,13 @@ def MdtReporter(mol, report_interval):
                state (simtk.openmm.State): state of the simulation
             """
             # TODO: make sure openmm masses are the same as MDT masses
+            settime = settime if settime is not None else simtk2pint(state.getTime())
+
             report = dict(
                 positions=simtk2pint(state.getPositions()),
                 momenta=simtk2pint(state.getVelocities())*self.mol.dim_masses,
                 forces=simtk2pint(state.getForces()),
-                time=simtk2pint(state.getTime()),
+                time=settime,
                 vectors=simtk2pint(state.getPeriodicBoxVectors()),
                 potential_energy=simtk2pint(state.getPotentialEnergy()))
             if self.annotation is not None: report['annotation'] = self.annotation
@@ -110,7 +113,7 @@ def MdtReporter(mol, report_interval):
                 peheader = 'potential / {units}'.format(units=u.default.energy)
                 keheader = 'kinetic / {units}'.format(units=u.default.energy)
                 temperatureheader = 'T / {units}'.format(units=u.default.temperature)
-                print(self._row_format.format(timeheader, peheader, keheader, temperatureheader))
+                print(self._header_format.format(timeheader, peheader, keheader, temperatureheader))
                 self._printed_header = True
             ke = mdt.helpers.kinetic_energy(report['momenta'], self.mol.dim_masses)
             t = (2.0 * ke) / (u.k_b * self.mol.dynamic_dof)
@@ -118,8 +121,9 @@ def MdtReporter(mol, report_interval):
                                           report['potential_energy'].defunits_value(),
                                           ke.defunits_value(),
                                           t.defunits_value()))
-            self.last_report_time = self.mol.time
 
+            if settime:
+                self.last_report_time = report['time']
             self.trajectory.new_frame(properties=report)
 
         def describeNextReport(self, simulation):

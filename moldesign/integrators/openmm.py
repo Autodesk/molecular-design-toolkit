@@ -71,7 +71,6 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
         self.model._sync_to_openmm()
         if self.reporter.last_report_time != self.mol.time:
             self.reporter.report_from_mol()
-        self.reporter.report_from_mol()
         return self.reporter.trajectory
 
     def _attach_reporters(self):
