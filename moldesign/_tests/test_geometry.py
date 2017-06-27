@@ -9,10 +9,8 @@ import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
-from moldesign.mathutils import normalized
 
 from . import helpers
-from .molecule_fixtures import benzene, h2
 
 registered_types = {}
 
@@ -75,62 +73,6 @@ def four_particle_45_twist():
         mol.atoms[iatom].bond_to(mol.atoms[iatom+1], 1)
 
     return mol
-
-
-def test_bond_alignment_on_axis(benzene):
-    directions = ['x', 'y', 'z',
-                  [1,2,3.0],
-                  [0,1,0],
-                  [0.1, 0.1, 0.1] * u.angstrom]
-
-    for i, dir in enumerate(directions):
-        bond = mdt.Bond(*random.sample(benzene.atoms, 2))
-        center = (i % 2) == 0.0
-        bond.align(dir, centered=center)
-
-        if center:
-            np.testing.assert_allclose(bond.midpoint, np.zeros(3),
-                                       atol=1.e-12)
-            np.testing.assert_allclose(bond.a1.position.defunits_value(),
-                                       -bond.a2.position.defunits_value(),
-                                       atol=1e-10)
-        if isinstance(dir, str):
-            if dir == 'x':
-                d = np.array([1.0, 0, 0])
-            elif dir == 'y':
-                d = np.array([0.0, 1.0, 0.0])
-            elif dir == 'z':
-                d = np.array([0.0, 0.0, 1.0])
-            else:
-                raise WtfError()
-        else:
-            d = normalized(u.array(dir))
-
-        newvec = (bond.a2.position - bond.a1.position).normalized()
-        assert abs(1.0 - d.dot(newvec)) < 1e-10
-
-
-def test_align_two_bonds(benzene, h2):
-    h2 = h2.copy()
-    alignbond = list(h2.bonds)[0]
-    one_was_different = False
-
-    for targetbond in benzene.bonds:
-
-        # sanity checks before we start:
-        assert not np.allclose(alignbond.midpoint.defunits_value(),
-                               targetbond.midpoint.defunits_value())
-        vec1, vec2 = (normalized(b.a2.position - b.a1.position)
-                      for b in (alignbond, targetbond))
-        one_was_different = (one_was_different or vec1.dot(vec2) < 0.8)
-
-        alignbond.align(targetbond)
-
-        np.testing.assert_allclose(alignbond.midpoint, targetbond.midpoint)
-        vec1, vec2 = (normalized(b.a2.position - b.a1.position)
-                      for b in (alignbond, targetbond))
-        assert (1.0 - vec1.dot(vec2)) < 1e-8
-
 
 ########################
 # Dihedrals            #

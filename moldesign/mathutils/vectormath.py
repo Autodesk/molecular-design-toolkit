@@ -18,10 +18,11 @@ standard_library.install_aliases()
 # limitations under the License.
 import numpy as np
 
-from moldesign import units as u
-from moldesign.utils import exports
+from .. import units as u
+from ..utils import exports
 
 
+@exports
 def perpendicular(vec):
     """ Return arbitrary unit vector(s) perpendicular to one or more vectors.
 
@@ -47,6 +48,7 @@ def perpendicular(vec):
     return perp
 
 
+@exports
 def norm(vec):
     """ Calculate norm of a vector or list thereof
 
@@ -62,6 +64,7 @@ def norm(vec):
         return np.sqrt((vec*vec).sum(axis=1))
 
 
+@exports
 def normalized(vector, zero_as_zero=True):
     """ Create normalized versions of a vector or lists of vectors.
 
@@ -86,6 +89,7 @@ def normalized(vector, zero_as_zero=True):
         return vec / mag[:, None]
 
 
+@exports
 def alignment_rotation(v1, v2, handle_linear=True):
     """ Calculate rotation angle(s) and axi(e)s to make v1 parallel with v2
 
@@ -126,6 +130,7 @@ def alignment_rotation(v1, v2, handle_linear=True):
     return angle*u.radian, normal / s
 
 
+@exports
 def safe_arccos(costheta):
     """ Version of arccos that can handle numerical noise greater than 1.0
     """
@@ -143,18 +148,21 @@ def safe_arccos(costheta):
             return np.arccos(costheta)
 
 
+@exports
 def sub_angles(a, b):
     """ Subtract two angles, keeping the result within [-180,180)
     """
     return normalize_angle(a - b)
 
 
+@exports
 def normalize_angle(c):
     """ Normalize an angle to the interval [-180,180)
     """
     return (c + 180.0 * u.degrees) % (360.0 * u.degrees) - (180.0 * u.degrees)
 
 
+@exports
 def apply_4x4_transform(trans, vecs):
     """
     Applies a 4x4 transformation vector so one or more 3-D position vector

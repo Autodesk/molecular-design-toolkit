@@ -1,10 +1,8 @@
 """ Tests topology manipulation tools
 """
 import collections
-import random
 
 import pytest
-import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
@@ -26,83 +24,6 @@ def typedfixture(*types, **kwargs):
         return pytest.fixture(**kwargs)(func)
 
     return fixture_wrapper
-
-
-
-@pytest.mark.parametrize('fixturename', 'ligand3aid pdb3aid benzene small_molecule pdb1yu8'.split())
-def test_pmi_is_orthonormal(request, fixturename):
-    # test a bunch of molecules
-    mol = request.getfixturevalue(fixturename)
-    pmi = mdt.tools.PrincipalMomentsOfInertia(mol)
-    for ivec in range(3):
-        assert abs(1.0 - mdt.mathutils.norm(pmi.evecs[ivec])) < 1e-12
-        for jvec in range(ivec+1, 3):
-            assert abs(pmi.evecs[ivec].dot(pmi.evecs[jvec])) < 1e-12
-
-
-@pytest.mark.parametrize('fixturename', 'ligand3aid pdb3aid benzene small_molecule pdb1yu8'.split())
-def test_pmi_translational_rotational_invariance(request, fixturename):
-    # currently only test the eigenvalues
-    mol = request.getfixturevalue(fixturename)
-    pmi = mdt.tools.PrincipalMomentsOfInertia(mol)
-
-    _randomize_orientation(mol)
-    pmi2 = mdt.tools.PrincipalMomentsOfInertia(mol)
-    assert_almost_equal(pmi.moments, pmi2.moments)
-
-
-def _randomize_orientation(mol):
-    translation = 10.0*(np.random.rand(3)-0.5)*u.angstrom
-    mol.translate(translation)
-
-    axis = [random.uniform(-1.0, 1.0),
-            random.uniform(-1.0, 1.0),
-            random.uniform(0.4, 1.0)]  # make sure to rotate off of x-axis
-    mol.rotate(axis=axis, angle=random.randrange(15.0, 170.0) * u.degrees)
-
-
-def test_pmi_reorientation_on_linear_molecule():
-    # note that this will fail if the generated polymer is not perfectly linear
-    mol = mdt.from_smiles('C#CC#CC#C')
-    original_distmat = mol.calc_distance_array().defunits_value()
-
-    for i in range(5):
-        _randomize_orientation(mol)
-
-        # calculate PMI and reorient
-        pmi = mdt.tools.PrincipalMomentsOfInertia(mol)
-        pmi.reorient(mol)
-
-        # Check that everything lies along the z-axis
-        np.testing.assert_allclose(mol.positions[:,:2], 0.0, atol=1e-12)
-
-        # Check that distance matrix was unchanged under the transformation
-        newdistmat = mol.calc_distance_array()
-        np.testing.assert_allclose(newdistmat.defunits_value(),
-                                   original_distmat)
-
-
-def test_pmi_reorientation_on_benzene(benzene):
-    # note that this will fail if the generated polymer is not perfectly linear
-    mol = benzene
-    original_distmat = mol.calc_distance_array().defunits_value()
-
-    for i in range(5):
-        _randomize_orientation(mol)
-
-        # calculate PMI and reorient
-        pmi = mdt.tools.PrincipalMomentsOfInertia(mol)
-        pmi.reorient(mol)
-
-        # Check that molecule is _roughly_ in x-y plane
-        np.testing.assert_allclose(mol.positions[:,0].value_in(u.angstrom), 0.0,
-                                   atol=0.1)
-
-        # Check that distance matrix was unchanged under the transformation
-        newdistmat = mol.calc_distance_array()
-        np.testing.assert_allclose(newdistmat.defunits_value(),
-                                   original_distmat)
-
 
 @pytest.fixture
 def ammonium_nocharge():

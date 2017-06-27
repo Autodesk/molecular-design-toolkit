@@ -18,9 +18,8 @@ standard_library.install_aliases()
 # limitations under the License.
 
 import moldesign as mdt
-import moldesign.molecules.atomcollections
-from moldesign import units as u
-from moldesign.mathutils import *
+from .. import units as u
+from ..mathutils import *
 from .coords import *
 from .grads import *
 from .grads import _atom_grad_to_mol_grad
@@ -46,7 +45,7 @@ class GeometryConstraint(object):
     dof = 1  # number of degrees of freedom constrained (so that we can properly calculate temperature)
 
     def __init__(self, atoms, value=None, tolerance=None, force_constant=None):
-        self.atoms = moldesign.molecules.atomcollections.AtomList(atoms)
+        self.atoms = mdt.AtomList(atoms)
         self.mol = self.atoms[0].molecule
         self.tolerance = tolerance
         self.force_constant = force_constant

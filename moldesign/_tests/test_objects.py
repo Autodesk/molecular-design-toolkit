@@ -110,7 +110,7 @@ def test_dotdict_preserves_ordering(dotdict):
 
 
 def test_eigenspace_with_ndarray_identity_permutation():
-    from moldesign.tools.eigen import Eigenspace
+    from moldesign.mathutils import Eigenspace
 
     evals = np.arange(3)
     evecs = np.array([[0,1,0],
