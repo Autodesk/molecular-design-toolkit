@@ -947,7 +947,6 @@ class MolSimulationMixin(object):
         need to know about
         """
         # TODO: what should this do with the property object?
-        # TODO: handle duplicate constraints (this happens a lot, and is bad)
         if self.energy_model is not None:
             self.energy_model._prepped = False
         if self.integrator is not None:

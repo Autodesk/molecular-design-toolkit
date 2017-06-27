@@ -43,10 +43,14 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self._reset()
+
+    def _reset(self):
         self.sim = None
         self.mm_system = None
-        self._prep_integrator = 'uninitialized'
         self.mm_integrator = None
+        self._prepped_integrator = 'uninitialized'
+        self._constraints_set = False
 
     def get_openmm_simulation(self):
         if opm.force_remote:
@@ -75,52 +79,65 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                                     forces=opm.simtk2pint(state.getForces(), flat=False))
         return props
 
-    def prep(self, force=False):
-        """
-        Drive the construction of the openmm simulation
-        This will rebuild this OpenMM simulation if: A) it's not built yet, or B)
-        there's a new integrator
+    def prep(self):
+        """ Construct the OpenMM simulation objects
+
+        Note:
+            An OpenMM simulation object consists of both the system AND the integrator. This routine
+            therefore constructs both. If self.mol does not use an OpenMM integrator, we create
+            an OpenMM simulation with a "Dummy" integrator that doesn't ever get used.
         """
         if opm.force_remote:
             return True
+
         from simtk.openmm import app
 
-        # TODO: automatically set _prepped to false if the model or integration parameters change
-        if not force:
-            if self._prepped and self._prep_integrator == self.mol.integrator:
-                return
+        if getattr(self.mol.integrator, '_openmm_compatible', False):
+            _prepped = (self._prepped and self.mol.integrator._prepped and
+                        self.mol.integrator is self._prepped_integrator)
+            setup_integrator = True
+        else:
+            _prepped = self._prepped
+            setup_integrator = False
 
+        if _prepped:
+            return
+
+        self._reset()
         system_params = self._get_system_params()
         self.mm_system = self.mol.ff.parmed_obj.createSystem(**system_params)
 
-        if self.mol.integrator is None:
-            self.mm_integrator = self._make_dummy_integrator()
-        else:
+        if setup_integrator:
             self.mm_integrator = self.mol.integrator.get_openmm_integrator()
+        else:
+            self.mm_integrator = self._make_dummy_integrator()
 
-        self._set_constraints()
-        self.sim = app.Simulation(self.mol.ff.parmed_obj.topology, self.mm_system, self.mm_integrator)
+        self.sim = app.Simulation(self.mol.ff.parmed_obj.topology,
+                                  self.mm_system,
+                                  self.mm_integrator)
+
+        if setup_integrator:
+            self.mol.integrator.energy_model = self
+            self.mol.integrator.sim = self.sim
+            self.mol.integrator._prepped = True
+
         self._prepped = True
+        self._prepped_integrator = self.mol.integrator
         print('Created OpenMM kernel (Platform: %s)' % self.sim.context.getPlatform().getName())
-        self._prep_integrator = self.mol.integrator
 
-    def reset_constraints(self):
-        self._set_constraints()
 
     def minimize(self, **kwargs):
         if self.constraints_supported():
             traj = self._minimize(**kwargs)
-
             if opm.force_remote or (not kwargs.get('wait', False)):
                 self._sync_remote(traj.mol)
                 traj.mol = self.mol
-
             return traj
         else:
             return super().minimize(**kwargs)
 
     def _sync_remote(self, mol):
-        # TODO: this is a hack to update the object after a minimization
+        # TODO: this is a hack to update the molecule object after a minimization
         #        We need a better pattern for this, ideally one that doesn't
         #        require an explicit wrapper like this - we shouldn't have to copy
         #        the properties over manually
@@ -165,6 +182,8 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
 
     def constraints_supported(self):
         """ Check whether this molecule's constraints can be enforced in OpenMM
+
+        This sort of overlaps with _set_constraints, but doesn't have dependencies on OpenMM
         """
         for constraint in self.mol.constraints:
             if constraint.desc not in ('position', 'distance', 'hbonds'):
@@ -172,9 +191,9 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         else:
             return True
 
-    #################################################
-    # "Private" methods for managing OpenMM are below
     def _set_constraints(self):
+        if self._constraints_set:
+            return
         system = self.mm_system
         fixed_atoms = set()
 
@@ -227,6 +246,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         if self.mm_integrator is not None:
             self.mm_integrator.setConstraintTolerance(float(required_tolerance))
 
+        self._constraints_set = True
 
     @staticmethod
     def _make_dummy_integrator():
