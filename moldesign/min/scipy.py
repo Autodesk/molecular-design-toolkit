@@ -20,7 +20,6 @@ standard_library.install_aliases()
 from .. import units as u
 from ..utils import exports
 from .base import MinimizerBase
-from .. import geom
 from .. import exceptions
 from . import toplevel
 
@@ -85,6 +84,8 @@ class ScipyMinimizer(MinimizerBase):
         self.mol.properties = finalprops
 
     def _make_constraints(self):
+        from .. import geom
+
         constraints = []
         self._constraint_multiplier = 1.0
         for constraint in geom.get_base_constraints(self.mol.constraints):
