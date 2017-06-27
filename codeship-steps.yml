@@ -60,18 +60,31 @@
   service: docker_make
   command: docker-make --all --tag dev
 
-- command: deployment/codeship_runtests.sh
-  service: test_moldesign_complete
-  name: complete_test_py3
-- command: deployment/codeship_runtests.sh
-  service: test_moldesign_minimal
-  name: minimal_test_py3
-- command: deployment/codeship_runtests.sh
-  service: test_moldesign_complete_py2
-  name: complete_test_py2
-- command: deployment/codeship_runtests.sh
-  service: test_moldesign_minimal_py2
-  name: minimal_test_py2
+- type: parallel
+  name: environments
+  services:
+   - test_moldesign_complete
+   - test_moldesign_complete_py2
+   - test_moldesign_minimal
+   - test_moldesign_minimal_py2
+  steps:
+   - command: deployment/print_environment.sh
+
+- type: parallel
+  name: complete_tests
+  services:
+   - test_moldesign_complete
+   - test_moldesign_complete_py2
+  steps:
+   - command: deployment/codeship_runtests.sh
+
+- type: parallel
+  name: minimal_tests
+  services:
+   - test_moldesign_minimal
+   - test_moldesign_minimal_py2
+  steps:
+   - command: deployment/codeship_runtests.sh
 
 - name: publish
   service: publisher
