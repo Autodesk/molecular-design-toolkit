@@ -108,6 +108,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         self.mm_system = self.mol.ff.parmed_obj.createSystem(**system_params)
 
         if setup_integrator:
+            self._set_constraints()
             self.mm_integrator = self.mol.integrator.get_openmm_integrator()
         else:
             self.mm_integrator = self._make_dummy_integrator()
