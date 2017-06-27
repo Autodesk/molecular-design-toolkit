@@ -2,6 +2,7 @@ import random
 from itertools import product
 
 import pytest
+import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
@@ -94,6 +95,7 @@ def test_analytical_vs_numerical_forces(objkey, request):
 @pytest.mark.parametrize('objkey', TESTSYTEMS)
 def test_minimization_reduces_energy(objkey, request):
     mol = request.getfixturevalue(objkey)
+    mol.positions += 0.01 * u.angstrom * np.random.rand(mol.num_atoms, 3)
     p0 = mol.positions.copy()
     e0 = mol.calculate_potential_energy()
     traj = mol.minimize()
@@ -109,8 +111,8 @@ def test_openmm_dynamics(systemkey, integratorkey, request):
 
     mol.integrator.prep()
     assert mol.integrator.sim.system is mol.energy_model.sim.system
-    assert mol.integrator.sim.system.getNumConstraints() == len(
-            [c for c in mol.constraints if c.desc == 'position'])
+
+    initially_satisfied_constraints = all(c.satisfied() for c in mol.constraints)
 
     p0 = mol.positions.copy()
     t0 = mol.time
@@ -128,7 +130,12 @@ def test_openmm_dynamics(systemkey, integratorkey, request):
 
     else:  # Assume constant energy dynamics (may need to check explicitly in future)
         energy = traj.potential_energy+traj.kinetic_energy
-        assert abs(energy[0]-energy[-1]) <= 0.01*mol.num_atoms*u.kcalpermol
+
+        if initially_satisfied_constraints:
+            compareframe = 0
+        else:
+            compareframe = 1
+        assert abs(energy[compareframe]-energy[-1]) <= 0.01*mol.num_atoms*u.kcalpermol
 
 
 def test_cleared_constraints_are_no_longer_applied(protein_custom_constraints, langevin):
@@ -188,6 +195,8 @@ def test_unsupported_constraint_types(protein, integkey, request):
 @pytest.mark.parametrize('integkey', INTEGRATORS)
 def test_fallback_to_builtin_minimizer_for_arbitrary_constraints(small_mol, integkey, request):
     mol = small_mol
+    mol.positions += 0.01 * u.angstrom * np.random.rand(mol.num_atoms, 3)
+
     assert len(mol.constraints) == 0
     mol.set_integrator(request.getfixturevalue(integkey))
 

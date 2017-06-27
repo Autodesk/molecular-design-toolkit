@@ -108,7 +108,10 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         self.mm_system = self.mol.ff.parmed_obj.createSystem(**system_params)
 
         if setup_integrator:
-            self._set_constraints()
+            try:
+                self._set_constraints()
+            except moldesign.NotSupportedError as exc:
+                print("Warning: dynamics not supported: %s" % exc.args[0])
             self.mm_integrator = self.mol.integrator.get_openmm_integrator()
         else:
             self.mm_integrator = self._make_dummy_integrator()

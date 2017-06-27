@@ -57,6 +57,7 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
     @compute.runsremotely(enable=force_remote, is_imethod=True)
     def _run(self, run_for):
         self.prep()
+        self.energy_model._set_constraints()  # calling this just to raise an exception if necessary
         nsteps = self.time_to_steps(run_for, self.params.timestep)
         self.energy_model._set_openmm_state()
 
