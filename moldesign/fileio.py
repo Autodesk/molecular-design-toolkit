@@ -357,6 +357,9 @@ def write_xyz(mol, fileobj):
 @utils.exports
 def from_pdb(pdbcode, usecif=False):
     """ Import the given molecular geometry from PDB.org
+
+    By default, this will use the structure from the PDB-formatted data; however, it will fall back
+    to using the mmCIF data for this pdbcode if the PDB file is not present.
         
     See Also:
         http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/introduction

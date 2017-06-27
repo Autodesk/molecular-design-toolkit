@@ -5,6 +5,8 @@ install_aliases()
 from builtins import range
 from future.utils import PY2
 
+import pytest
+
 import os
 import socket
 
@@ -182,4 +184,8 @@ def assert_almost_equal(actual, desired, **kwargs):
     np.testing.assert_almost_equal(units.value_of(actual),
                                    units.value_of(desired),
                                    **kwargs)
+
+requires_internet_connection = pytest.mark.skipif(not INTERNET_ON,
+                                                  reason='Network connection timed out')
+""" Decorator to disable tests that need internet if we can't connect to the network """
 

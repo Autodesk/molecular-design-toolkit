@@ -34,7 +34,7 @@ from ..utils import exports
 try:
     imp.find_module('simtk')
 except (ImportError, OSError) as exc:
-    sys.stderr.write('Info: OpenMM not installed; using remote docker container\n')
+    sys.stderr.write('Info: OpenMM not installed; will run in docker container\n')
     force_remote = True
 else:
     force_remote = False

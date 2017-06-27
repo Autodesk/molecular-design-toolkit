@@ -19,7 +19,7 @@ import moldesign as mdt
 mdt.compute.config.engine_type = 'docker'
 from moldesign import units as u
 
-from .helpers import get_data_path, INTERNET_ON, native_str_buffer
+from .helpers import get_data_path, native_str_buffer, requires_internet_connection
 from .object_fixtures import h2_trajectory, h2_harmonic, h2
 
 
@@ -174,7 +174,7 @@ def mmcif_1kbu():
     return mdt.read(get_data_path('1KBU.cif.bz2'))
 
 
-@pytest.mark.skipif(not INTERNET_ON, reason='This test requires an internet connection')
+@requires_internet_connection
 def test_from_pdb_pdb_format():
     mol = mdt.from_pdb('3aid')
     assert mol.metadata.pdbid == '3aid'
@@ -182,13 +182,22 @@ def test_from_pdb_pdb_format():
     assert mol.num_atoms == 1912
 
 
-@pytest.mark.skipif(not INTERNET_ON, reason='This test requires an internet connection')
+@requires_internet_connection
 def test_from_pdb_mmcif_format():
     mol = mdt.from_pdb('3aid', usecif=True)
     assert mol.metadata.pdbid == '3aid'
     assert mol.metadata.sourceformat == 'mmcif'
     assert mol.metadata.sourceurl.split('.')[-1] == 'cif'
     assert mol.num_atoms == 1912
+
+
+@requires_internet_connection
+@pytest.mark.skip("Takes over 10 minutes right now ...")
+def test_mmcif_fallback_if_no_pdb_file():
+    mol = mdt.from_pdb('4V5X')
+    assert mol.metadata.pdbid.lower() == '4v5x'
+    assert mol.metadata.sourceformat == 'mmcif'
+    assert mol.metadata.sourceurl.split('.')[-1] == 'cif'
 
 
 @pytest.mark.parametrize('key', 'pdb mmcif sequence'.split())
