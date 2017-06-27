@@ -20,6 +20,8 @@ INTEGRATORS = ['verlet', 'langevin']
 @pytest.fixture
 def protein(protein_default_amber_forcefield):
     mol = protein_default_amber_forcefield
+    mol.energy_model.params.compute_platform = 'cpu'
+    mol.energy_model.params.num_cpus = 1
     mol.minimize(force_tolerance=0.5*u.eV/u.angstrom)  # perform a very partial minimization
     return mol
 
@@ -27,6 +29,8 @@ def protein(protein_default_amber_forcefield):
 @pytest.fixture
 def small_mol(gaff_model_gasteiger):
     mol = gaff_model_gasteiger
+    mol.energy_model.params.compute_platform = 'cpu'
+    mol.energy_model.params.num_cpus = 1
     mol.minimize(force_tolerance=0.5*u.eV/u.angstrom)  # perform a very partial minimization
     return mol
 

@@ -19,11 +19,24 @@ standard_library.install_aliases()
 
 import moldesign.molecules
 from moldesign import compute
-from moldesign.molecules import Trajectory, MolecularProperties
-from moldesign.utils import exports
-
-import moldesign.interfaces.openmm as opm
+from ..molecules import Trajectory, MolecularProperties
+from ..utils import exports
+from ..interfaces import openmm as opm
 from .base import MMBase
+from .. import parameters
+
+openmm_platform_selector = parameters.Parameter(
+        'compute_platform', 'OpenMM computing platform',
+        type=str, default='cpu', choices=['opencl', 'cuda', 'cpu', 'reference', 'auto'],
+        help_url='http://docs.openmm.org/7.1.0/userguide/library.html#platforms')
+
+numcpus = parameters.num_cpus.copy()
+numcpus.relevance = parameters.WhenParam('compute_platform', parameters.op.eq, 'cpu')
+numcpus.help = ('Sets number of threads for OpenMM CPU platform. '
+                'If 0, uses OpenMM defaults (which can be controlled '
+                'via the OPENMM_NUM_THREADS environment variable). ')
+numcpus.help_url = \
+    'http://docs.openmm.org/7.1.0/userguide/library.html#platform-specific-properties'
 
 
 @exports
@@ -37,6 +50,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
     """
     # NEWFEATURE: need to set/get platform (and properties, e.g. number of threads)
     DEFAULT_PROPERTIES = ['potential_energy', 'forces']
+    PARAMETERS = MMBase.PARAMETERS + [openmm_platform_selector, numcpus]
     _CALLS_MDT_IN_DOCKER = opm.force_remote
 
     _openmm_compatible = True
@@ -116,9 +130,13 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         else:
             self.mm_integrator = self._make_dummy_integrator()
 
+        platform, platform_properties = self._get_platform()
+
         self.sim = app.Simulation(self.mol.ff.parmed_obj.topology,
                                   self.mm_system,
-                                  self.mm_integrator)
+                                  self.mm_integrator,
+                                  platform=platform,
+                                  platformProperties=platform_properties)
 
         if setup_integrator:
             self.mol.integrator.energy_model = self
@@ -128,7 +146,6 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         self._prepped = True
         self._prepped_integrator = self.mol.integrator
         print('Created OpenMM kernel (Platform: %s)' % self.sim.context.getPlatform().getName())
-
 
     def minimize(self, **kwargs):
         if self.constraints_supported():
@@ -328,3 +345,30 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                 break
 
         return system_params
+
+    def _get_platform(self):
+        from simtk import openmm
+
+        preference = ['CUDA', 'OpenCL', 'CPU', 'Reference']
+        from_lower = {x.lower(): x for x in preference}
+
+        properties = None
+
+        if self.params.compute_platform.lower() == 'auto':
+            for platname in preference:
+                try:
+                    platform = openmm.Platform.getPlatformByName(platname)
+                    self.params.compute_platform = platname.lower()
+                except Exception:  # it just throws "Exception" unfortunately
+                    continue
+            else:
+                raise moldesign.NotSupportedError("Likely OpenMM installation error. "
+                                                  "none of the expected platforms were found: "
+                                                  + ', '.join(preference))
+        else:
+            platform = openmm.Platform.getPlatformByName(from_lower[self.params.compute_platform])
+
+        if self.params.compute_platform == 'cpu' and self.params.num_cpus > 0:
+            properties['numThreads'] = self.params.num_cpus
+
+        return platform, properties

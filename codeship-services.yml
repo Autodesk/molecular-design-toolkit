@@ -28,6 +28,7 @@ test_moldesign_minimal:
   environment:
     TESTENV: minimal
     PYVERSION: 3
+    OPENMM_CPU_THREADS: 1
   volumes:
     - ./tmp/reports:/opt/reports
 
@@ -42,6 +43,7 @@ test_moldesign_minimal_py2:
   environment:
     TESTENV: minimal
     PYVERSION: 2
+    OPENMM_CPU_THREADS: 1
   volumes:
     - ./tmp/reports:/opt/reports
 
@@ -56,6 +58,7 @@ test_moldesign_complete:
   environment:
     TESTENV: complete
     PYVERSION: 3
+    OPENMM_CPU_THREADS: 1
   volumes:
     - ./tmp/reports:/opt/reports
 
@@ -70,6 +73,7 @@ test_moldesign_complete_py2:
   environment:
     TESTENV: complete
     PYVERSION: 2
+    OPENMM_CPU_THREADS: 1
   volumes:
     - ./tmp/reports:/opt/reports
 

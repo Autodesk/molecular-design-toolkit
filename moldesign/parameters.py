@@ -24,9 +24,11 @@ These are used to standardize our interfaces to other codes, and automatically g
 notebook interfaces to configure various techniques.
 """
 import operator as op
+import copy
 
 from . import units as u
 from . import utils
+from .utils import named_dict
 
 
 def isin(a, b): return a in b
@@ -77,7 +79,8 @@ class Parameter(object):
                  default=None,
                  choices=None,
                  help_url=None,
-                 relevance=None):
+                 relevance=None,
+                 help=None):
         self.name = name
         self.displayname = utils.if_not_none(short_description, name)
         self.value = None
@@ -85,6 +88,7 @@ class Parameter(object):
         self.choices = utils.if_not_none(choices, [])
         self.type = type
         self.help_url = help_url
+        self.help = help
         if isinstance(type, u.MdtQuantity):
             type = type.units
         if isinstance(type, u.MdtUnit):
@@ -106,18 +110,13 @@ class Parameter(object):
         except (KeyError, AttributeError):
             return '<%s at %x - exception in __repr__>' % (type(self), id(self))
 
+    def copy(self):
+        """ Make a copy of this parameter (usually to modify it for a given method)
 
-
-# TODO - make this ordered as well as dotted
-def named_dict(l):
-    return utils.DotDict((i.name, i) for i in l)
-
-model_parameters = named_dict([
-    Parameter('subsystem')
-])
-
-FORCEFIELDS = []
-PERIODICITIES = [False, 'box']
+        Returns:
+            Parameter: a copy of this parameter type
+        """
+        return copy.deepcopy(self)
 
 
 mm_model_parameters = named_dict([
@@ -134,7 +133,7 @@ mm_model_parameters = named_dict([
     Parameter('solvent_dielectric', 'Solvent dielectric constant',
               default=78.5, type=float),
     Parameter('ewald_error', 'Ewald error tolerance', default=0.0005, type=float),
-    Parameter('periodic', 'Periodicity', default=False, choices=PERIODICITIES)
+    Parameter('periodic', 'Periodicity', default=False, choices=[False, 'box'])
 ])
 
 
@@ -195,6 +194,8 @@ constant_temp_parameters = named_dict([
 langevin_parameters = named_dict([
     Parameter('collision_rate', 'Thermal collision rate', default=1.0/u.ps, type=1/u.ps)
 ])
+
+num_cpus = Parameter('num_cpus', 'Number of CPUs (0=unlimited)', default=0, type=int)
 
 ground_state_properties = ['potential_energy',
                            'forces',

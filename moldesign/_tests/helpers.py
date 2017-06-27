@@ -148,7 +148,8 @@ def assert_something_resembling_dynamics_happened(traj, mol, p0, t0, duration):
     assert traj.time[0] == t0
     assert mol.time == traj.time[-1]
 
-    assert traj.potential_energy[-1] == mol.calculate_potential_energy()
+    # Energy test is not exact due to some non-deterministic kernels (e.g., OpenMM CPU model)
+    assert abs(traj.potential_energy[-1] - mol.calculate_potential_energy()) < 1e-10 * u.eV
     assert_almost_equal(traj.positions[-1], mol.positions)
 
     # lower precision for first step due to noise from single-precision positions (i.e. OpenMM CPU)

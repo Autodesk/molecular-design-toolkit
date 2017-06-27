@@ -17,6 +17,7 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import itertools
 import imp
 
@@ -33,7 +34,7 @@ from ..utils import exports
 try:
     imp.find_module('simtk')
 except (ImportError, OSError) as exc:
-    print('OpenMM could not be imported; using remote docker container')
+    sys.stderr.write('Info: OpenMM not installed; using remote docker container\n')
     force_remote = True
 else:
     force_remote = False
