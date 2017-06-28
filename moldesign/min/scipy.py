@@ -66,12 +66,13 @@ class ScipyMinimizer(MinimizerBase):
                 print('WARNING: no convergence criteria for this method; using defaults')
 
         self._optimize_kwargs = dict(method=self._METHOD_NAME,
-                                     jac=grad,
-                                     callback=self.callback,
                                      options=options,
                                      constraints=self._make_constraints())
 
-        result = scipy.optimize.minimize(self.objective, self._coords_to_vector(self.mol.positions),
+        result = scipy.optimize.minimize(self.objective,
+                                         self._coords_to_vector(self.mol.positions),
+                                         jac=grad,
+                                         callback=self.callback,
                                          **self._optimize_kwargs)
 
         if self.mol.constraints:
@@ -113,6 +114,8 @@ class ScipyMinimizer(MinimizerBase):
             self._constraint_multiplier *= 10.0
             result = scipy.optimize.minimize(self.objective,
                                              self._coords_to_vector(self.mol.positions),
+                                             jac=self.grad if self.gradtype=='analytical' else None,
+                                             callback=self.callback,
                                              **self._optimize_kwargs)
         return result
 
