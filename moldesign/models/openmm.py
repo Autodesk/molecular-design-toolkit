@@ -66,6 +66,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         self.mm_integrator = None
         self._prepped_integrator = 'uninitialized'
         self._constraints_set = False
+        self._required_tolerance = None
 
     def get_openmm_simulation(self):
         if opm.force_remote:
@@ -133,6 +134,8 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
 
         platform, platform_properties = self._get_platform()
 
+        if self._required_tolerance:
+            self.mm_integrator.setConstraintTolerance(float(self._required_tolerance))
         self.sim = app.Simulation(self.mol.ff.parmed_obj.topology,
                                   self.mm_system,
                                   self.mm_integrator,
@@ -221,7 +224,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
 
         # openmm uses a global tolerance, calculated as ``constraint_violation/constraint_dist``
         # (since only distance constraints are supported). Here we calculate the necessary value
-        required_tolerance = 1e-5
+        required_tolerance = None
 
         # Constrain atom positions
         for constraint in self.mol.constraints:
@@ -237,6 +240,9 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                 system.addConstraint(constraint.a1.index,
                                      constraint.a2.index,
                                      opm.pint2simtk(constraint.value))
+
+                if required_tolerance is None:
+                    required_tolerance = 1e-5
                 required_tolerance = min(required_tolerance, constraint.tolerance/constraint.value)
 
             elif constraint.desc == 'hbonds':
@@ -265,10 +271,8 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                 else:
                     ic += 1
 
-        if self.mm_integrator is not None:
-            self.mm_integrator.setConstraintTolerance(float(required_tolerance))
-
         self._constraints_set = True
+        self._required_tolerance = required_tolerance
 
     @staticmethod
     def _make_dummy_integrator():

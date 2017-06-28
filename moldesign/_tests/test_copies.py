@@ -35,7 +35,7 @@ def test_copy_breaks_link(h2):
     assert h2.atoms[1].px == 0.0 * u.default.momentum
 
 
-def test_h2_harmonic_copy_loses_simulation(h2_harmonic_copy, h2_harmonic):
+def test_h2_harmonic_copy(h2_harmonic_copy, h2_harmonic):
     mol = h2_harmonic_copy
     assert mol.energy_model is mol.integrator is None
     for name in 'num_atoms num_residues positions momenta'.split():
@@ -166,3 +166,45 @@ def test_chain_rename(pdb3aid):
     assert newmol.chains[0].name == 'A'
     assert newmol.chains[1].name == 'B'
 
+
+@pytest.mark.parametrize('molkey', ["create_parameterize_am1bcc",
+                                    "create_protein_default_amber_forcefield"])
+def test_forcefield_copied_with_molecule(molkey, request):
+    mol = request.getfixturevalue(molkey)
+    m2 = mol.copy()
+
+    assert isinstance(m2.ff, mol.ff.__class__)
+    assert isinstance(m2.ff.parmed_obj, mol.ff.parmed_obj.__class__)
+    assert m2.ff.parmed_obj is not mol.ff.parmed_obj
+
+    p1 = m2.ff.parmed_obj
+    p2 = m2.ff.parmed_obj
+    assert m2.ff.parmed_obj.LJ_depth == mol.ff.parmed_obj.LJ_depth
+    assert p1.bond_types == p2.bond_types
+    assert p1.angle_types == p2.angle_types
+    assert p1.dihedral_types == p2.dihedral_types
+    assert p1.improper_types == p2.improper_types
+
+
+def test_constraints_copied_with_molecule(parameterize_zeros):
+    mol = parameterize_zeros
+
+    mol.constrain_distance(*mol.atoms[:2])
+    mol.constrain_angle(*mol.atoms[:3])
+    mol.constrain_dihedral(*mol.atoms[:4])
+    mol.constrain_atom(mol.atoms[0])
+    mol.constrain_hbonds()
+
+    mcpy = mol.copy()
+    assert isinstance(mcpy.constraints, mol.constraints.__class__)
+    assert mcpy.constraints[0].desc == 'distance'
+    assert mcpy.constraints[1].desc == 'angle'
+    assert mcpy.constraints[2].desc == 'dihedral'
+    assert mcpy.constraints[3].desc == 'position'
+    assert mcpy.constraints[4].desc == 'hbonds'
+
+    for constraint in mcpy.constraints:
+        assert constraint.mol is mcpy
+        if constraint.desc != 'hbonds':
+            for atom in constraint.atoms:
+                assert atom.molecule is mcpy

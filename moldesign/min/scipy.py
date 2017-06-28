@@ -66,12 +66,14 @@ class ScipyMinimizer(MinimizerBase):
                 print('WARNING: no convergence criteria for this method; using defaults')
 
         self._optimize_kwargs = dict(method=self._METHOD_NAME,
-                                     jac=grad,
-                                     callback=self.callback,
-                                     options=options,
-                                     constraints=self._make_constraints())
+                                     options=options)
+        self._constraint_multiplier = 1.0
 
-        result = scipy.optimize.minimize(self.objective, self._coords_to_vector(self.mol.positions),
+        result = scipy.optimize.minimize(self.objective,
+                                         self._coords_to_vector(self.mol.positions),
+                                         jac=grad,
+                                         callback=self.callback,
+                                         constraints=self._make_constraints(),
                                          **self._optimize_kwargs)
 
         if self.mol.constraints:
@@ -82,18 +84,6 @@ class ScipyMinimizer(MinimizerBase):
         finalprops = self._calc_cache[tuple(result.x)]
         self.mol.positions = finalprops.positions
         self.mol.properties = finalprops
-
-    def _make_constraints(self):
-        from .. import geom
-
-        constraints = []
-        self._constraint_multiplier = 1.0
-        for constraint in geom.get_base_constraints(self.mol.constraints):
-            fun, jac = self._make_constraint_funs(constraint)
-            constraints.append(dict(type='eq',
-                                    fun=fun,
-                                    jac=jac))
-        return constraints
 
     def _force_constraint_convergence(self, result):
         """ Make sure that all constraints are satisfied, ramp up the constraint functions if not
@@ -110,11 +100,28 @@ class ScipyMinimizer(MinimizerBase):
             else:
                 return result
 
+            print('Constraints not satisfied; raising penalties ...')
+
             self._constraint_multiplier *= 10.0
             result = scipy.optimize.minimize(self.objective,
                                              self._coords_to_vector(self.mol.positions),
+                                             jac=self.grad if self.gradtype=='analytical' else None,
+                                             callback=self.callback,
+                                             constraints=self._make_constraints(),
                                              **self._optimize_kwargs)
         return result
+
+    def _make_constraints(self):
+        from .. import geom
+
+        constraints = []
+        for constraint in geom.get_base_constraints(self.mol.constraints):
+            fun, jac = self._make_constraint_funs(constraint)
+            constraints.append(dict(type='eq',
+                                    fun=fun,
+                                    jac=jac))
+        return constraints
+
 
     def _make_constraint_funs(self, const):
         def fun(v):

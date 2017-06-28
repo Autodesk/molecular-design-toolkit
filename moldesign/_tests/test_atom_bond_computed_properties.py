@@ -4,7 +4,7 @@ import moldesign as mdt
 from moldesign import units as u
 
 from .test_ambertools_xface import protein_default_amber_forcefield, pdb1yu8
-from .molecule_fixtures import h2
+from .molecule_fixtures import *
 from .test_qm_xfaces import h2_rhfwfn
 
 
