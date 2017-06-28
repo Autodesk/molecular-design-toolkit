@@ -87,8 +87,9 @@ def test_pdb_with_missing_chains(propane_pdb):
     """
     mol = propane_pdb
 
-    pbmol = mdt.interfaces.mol_to_pybel(mol)
-    assert len(pbmol.atoms) == mol.num_atoms
+    if not mdt.interfaces.openbabel.force_remote:
+        pbmol = mdt.interfaces.mol_to_pybel(mol)
+        assert len(pbmol.atoms) == mol.num_atoms
 
     pmedmol = mdt.interfaces.mol_to_parmed(mol)
     assert len(pmedmol.atoms) == mol.num_atoms

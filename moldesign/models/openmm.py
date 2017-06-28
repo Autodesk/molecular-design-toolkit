@@ -45,8 +45,8 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
     Note that, while a dummy integrator is assigned, a different context will
     be created for any MD calculations.
 
-    :ivar sim: openmm simulation object
-    :type sim: simtk.openmm.app.Simulation
+    Attributes:
+       sim (simtk.openmm.app.Simulation): OpenMM simulation object (once created)
     """
     # NEWFEATURE: need to set/get platform (and properties, e.g. number of threads)
     DEFAULT_PROPERTIES = ['potential_energy', 'forces']
@@ -352,23 +352,25 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         preference = ['CUDA', 'OpenCL', 'CPU', 'Reference']
         from_lower = {x.lower(): x for x in preference}
 
-        properties = None
+        properties = {}
 
         if self.params.compute_platform.lower() == 'auto':
             for platname in preference:
                 try:
                     platform = openmm.Platform.getPlatformByName(platname)
-                    self.params.compute_platform = platname.lower()
                 except Exception:  # it just throws "Exception" unfortunately
                     continue
-            else:
-                raise moldesign.NotSupportedError("Likely OpenMM installation error. "
-                                                  "none of the expected platforms were found: "
-                                                  + ', '.join(preference))
+                else:
+                    self.params.compute_platform = platname.lower()
+                    break
+
+            raise moldesign.NotSupportedError("Likely OpenMM installation error. "
+                                              "none of the expected platforms were found: "
+                                              + ', '.join(preference))
         else:
             platform = openmm.Platform.getPlatformByName(from_lower[self.params.compute_platform])
 
         if self.params.compute_platform == 'cpu' and self.params.num_cpus > 0:
-            properties['numThreads'] = self.params.num_cpus
+            properties['Threads'] = str(self.params.num_cpus)
 
         return platform, properties
