@@ -41,6 +41,7 @@ class ElectronicWfn(object):
         civectors (np.ndarray): CI vectors (if applicable)
         description (str): text describing the wfn (e.g. 'RHF/STO-3G', 'CAS(2,2)/SA3/6-31G**')
         density_matrix_ao (np.ndarray): density matrix in the ao basis
+        gradient (np.array): N x 3 array storing the potential energy surface's gradient
     """
     def __init__(self, mol, num_electrons,
                  model=None,
@@ -48,7 +49,8 @@ class ElectronicWfn(object):
                  positions=None,
                  civectors=None,
                  description=None,
-                 density_matrix_ao=None):
+                 density_matrix_ao=None,
+                 gradient=None):
         self.mol = mol
         self.model = model
         self.civectors = civectors
@@ -65,6 +67,7 @@ class ElectronicWfn(object):
         self._has_canonical = False
         self.density_matrix_ao = density_matrix_ao
         self.description = description
+        self.gradient = gradient
 
         if positions is None:
             self.positions = mol.positions.copy()
@@ -128,3 +131,4 @@ class ElectronicWfn(object):
     def molecular_orbitals(self, val):
         """A synonym for self.orbitals['canonical'], since this is usually what's wanted"""
         self.orbitals['canonical'] = val
+

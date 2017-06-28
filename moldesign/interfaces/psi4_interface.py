@@ -17,6 +17,7 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import imp
+from ..models import psi4 as psi4_mdt
 
 from moldesign import units as u
 from ..utils import exports
@@ -45,6 +46,15 @@ def mdt_to_psi4(mol):
 @exports
 def mol_name(mol):
     return mol.name
+
+@exports
+def Opt_Trajectory(mol, psi4_history):
+    import psi4
+    my_trajectory=psi4_mdt.capture_history(name_string=mol.name,
+                                           molecule=mol,
+                                           psi4_history=psi4_history,
+                                           model=mol.energy_model)
+    return my_trajectory
 
 @exports
 def psi4_to_mdt(geom):
