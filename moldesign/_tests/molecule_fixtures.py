@@ -23,7 +23,7 @@ def typedfixture(*types, **kwargs):
 
 ######################################
 # Tests around PDB ID 3AID
-@typedfixture('molecule', scope='session')
+@typedfixture('molecule')
 def pdb3aid():
     mol = mdt.read(get_data_path('3aid.pdb'))
     return mol
@@ -60,7 +60,7 @@ def random_atoms_from_3aid(pdb3aid):
     return atoms
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 def small_molecule():
     mol = mdt.from_smiles('CNCOS(=O)C')
     mol.positions += 0.001*np.random.random(mol.positions.shape)*u.angstrom  # move out of minimum
@@ -88,12 +88,12 @@ def ethylene():
     return mdt.from_smiles('C=C')
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def pdb1yu8():
     return mdt.read(get_data_path('1yu8.pdb'))
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture()
 def mol_from_xyz():
     return mdt.read("""43
     c1.pdb
@@ -143,7 +143,7 @@ def mol_from_xyz():
     """, format='xyz')
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture()
 def mol_from_sdf():
     return mdt.read("""
  OpenBabel02271712493D
@@ -175,10 +175,73 @@ $$$$
 """, format='sdf')
 
 
-######################################
-# Tests around a piece of DNA
-@typedfixture('molecule', scope='session')
+@typedfixture('molecule')
 def nucleic():
     # ACTG.pdb contains a molecule generated using mdt.build_dna('ACTG')
     mol = mdt.read(get_data_path('ACTG.pdb'))
     return mol
+
+
+########################################################################################
+# Molecules with forcefields assigned - these use a session-scoped constructor w/ a copy factory
+
+@pytest.fixture(scope='session')
+def create_parameterize_zeros(small_molecule):
+    return _param_small_mol(small_molecule, 'zero')
+
+
+@typedfixture('hasmodel')
+def parameterize_zeros(create_parameterize_zeros):
+    return create_parameterize_zeros.copy()
+
+
+@pytest.fixture(scope='session')
+def create_parameterize_am1bcc(small_molecule):
+    """ We don't use this fixture directly, rather use another fixture that copies these results
+    so that we don't have to repeatedly call tleap/antechamber
+    """
+    return _param_small_mol(small_molecule, 'am1-bcc')
+
+
+@typedfixture('hasmodel')
+def parameterize_am1bcc(create_parameterize_am1bcc):
+    return create_parameterize_am1bcc.copy()
+
+
+@pytest.fixture(scope='session')
+def create_gaff_model_gasteiger(small_molecule):
+    """ We don't use this fixture directly, rather use another fixture that copies these results
+    so that we don't have to repeatedly call tleap/antechamber
+    """
+    small_molecule.set_energy_model(mdt.models.GaffSmallMolecule, partial_charges='gasteiger')
+    small_molecule.energy_model.prep()
+    return small_molecule
+
+
+@typedfixture('hasmodel')
+def gaff_model_gasteiger(create_gaff_model_gasteiger):
+    return create_gaff_model_gasteiger.copy()
+
+
+def _param_small_mol(small_molecule, chargemodel):
+    params = mdt.create_ff_parameters(small_molecule, charges=chargemodel, baseff='gaff2')
+    params.assign(small_molecule)
+    small_molecule.set_energy_model(mdt.models.ForceField)
+    return small_molecule
+
+
+@pytest.fixture(scope='session')
+def create_protein_default_amber_forcefield(pdb1yu8):
+    """ We don't use this fixture directly, rather use another fixture that copies these results
+    so that we don't have to repeatedly call tleap/antechamber
+    """
+    mol = pdb1yu8
+    ff = mdt.forcefields.DefaultAmber()
+    newmol = ff.create_prepped_molecule(mol)
+    newmol.set_energy_model(mdt.models.ForceField)
+    return newmol
+
+
+@typedfixture('hasmodel')
+def protein_default_amber_forcefield(create_protein_default_amber_forcefield):
+    return create_protein_default_amber_forcefield.copy()

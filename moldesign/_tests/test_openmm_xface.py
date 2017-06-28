@@ -8,8 +8,7 @@ import moldesign as mdt
 from moldesign import units as u
 
 from . import helpers
-from .molecule_fixtures import (pdb1yu8, small_molecule)
-from .test_ambertools_xface import gaff_model_gasteiger, protein_default_amber_forcefield
+from .molecule_fixtures import *
 
 # TODO: remove constraints from dynamics parameters - they should only live in the constraints array
 
