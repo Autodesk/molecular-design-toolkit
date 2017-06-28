@@ -61,8 +61,8 @@ class Y(object):
         if self.m == 0:
             return (sph_harm(self.m, self.l, phi, theta)).real
         else:
-            vplus = sph_harm(self.m, self.l, phi, theta)
-            vminus = sph_harm(-self.m, self.l, phi, theta)
+            vplus = sph_harm(abs(self.m), self.l, phi, theta)
+            vminus = sph_harm(-abs(self.m), self.l, phi, theta)
 
             if self.m < 0:
                 return -(SQ2INV * (self._posneg * vplus + vminus)).imag
@@ -136,15 +136,16 @@ def sqrt_x_over_pi(num, denom):
     return np.sqrt(num / (denom*np.pi))
 
 
+                  ############   s     ############
 SPHERE_TO_CART = {(0, 0): Cart(0, 0, 0, sqrt_x_over_pi(1, 4)),
 
-                  ############ l=1     ############
+                  ############   p     ############
                   (1, -1): Cart(0, 1, 0, sqrt_x_over_pi(3, 4)),
                   (1, 0): Cart(0, 0, 1, sqrt_x_over_pi(3, 4)),
                   (1, 1): Cart(1, 0, 0, sqrt_x_over_pi(3, 4)),
 
-                  ############ l=2     ############
-                  (2, -2): Cart(1, 1, 0, -sqrt_x_over_pi(15, 4)),
+                  ############   d     ############
+                  (2, -2): Cart(1, 1, 0, sqrt_x_over_pi(15, 4)),
                   (2, -1): Cart(0, 1, 1, sqrt_x_over_pi(15, 4)),
                   (2, 0): CartSum(sqrt_x_over_pi(5, 16),
                                   [(2, 0, 0, -1.0),
@@ -155,12 +156,12 @@ SPHERE_TO_CART = {(0, 0): Cart(0, 0, 0, sqrt_x_over_pi(1, 4)),
                                   [(2, 0, 0, 1.0),
                                    (0, 2, 0, -1.0)]),
 
-                  ############ l=3      ############
+                  ############   f     ############
                   (3, -3): CartSum(sqrt_x_over_pi(35, 32),
                                    [(2, 1, 0, 3.0),
                                     (0, 3, 0, -1.0)]),
 
-                  (3, -2): Cart(1, 1, 1, -sqrt_x_over_pi(105, 4)),
+                  (3, -2): Cart(1, 1, 1, sqrt_x_over_pi(105, 4)),
 
                   (3, -1): CartSum(sqrt_x_over_pi(21, 32),
                                    [(0, 1, 2, 4.0),

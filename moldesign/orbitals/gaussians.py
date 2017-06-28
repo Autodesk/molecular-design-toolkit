@@ -18,7 +18,7 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from past.utils import old_div
+import collections
 import numpy as np
 
 from .orbitals import Orbital, SHELLS, SPHERICALNAMES
@@ -184,7 +184,7 @@ class CartesianGaussian(AbstractFunction):
         a = self.exp
         b = other.exp
         exp = a + b
-        center = old_div((a*self.center + b*other.center),(a+b))
+        center = (a*self.center + b*other.center)/(a+b)
         powers = self.powers + other.powers
         return CartesianGaussian(center=center, exp=exp,
                                  powers=powers, coeff=self.coeff*other.coeff)
@@ -208,7 +208,7 @@ class CartesianGaussian(AbstractFunction):
             Dwight, Herbert B. Tables of Integrals and other Mathematical Data, 3rd ed.
                 Macmillan 1957. 201.
         """
-        integ = (old_div(np.pi,self.exp))**(old_div(self.ndim,2.0))
+        integ = (np.pi/self.exp)**(self.ndim/2.0)
         for p in self.powers:
             if p == 0:  # no contribution
                 continue
@@ -217,7 +217,7 @@ class CartesianGaussian(AbstractFunction):
             elif p < 0:
                 raise ValueError('Powers must be positive or 0')
             else:
-                integ *= old_div(_ODD_FACTORIAL[p-1],(2 ** (p+1)))
+                integ *= _ODD_FACTORIAL[p-1]/(2 ** (p+1))
         return self.coeff * integ
 
 
@@ -239,27 +239,27 @@ def Gaussian(center, exp, coeff=1.0):
 
 
 class SphericalGaussian(AbstractFunction):
-    r""" Stores a 3-dimensional spherical gaussian function:
+    r""" Stores a 3-dimensional real spherical gaussian function:
 
     .. math::
         G_{nlm}(\mathbf r) = C Y^l_m(\mathbf r - \mathbf r_0) r^l e^{-a\left| \mathbf r - \mathbf r_0 \right|^2}
 
     where *C* is ``self.coeff``, *a* is ``self.exp``, and :math:`\mathbf r_0` is ``self.center``,
-    *(l,m)* are given by ``(self.l, self.m)``, and :math:`Y^l_m(\mathbf{r})` is a
-    spherical harmonic.
-
-    Note:
-        self.SPHERE_TO_CART stores expansion coefficients for spherical gaussians in terms of
-        cartesian gaussians. They are taken from the reference below.
+    *(l,m)* are given by ``(self.l, self.m)``, and :math:`Y^l_m(\mathbf{r})` are the _real_
+    spherical harmonics.
 
     References:
         Schlegel and Frisch. Transformation between cartesian and pure spherical harmonic gaussians.
             Int J Quantum Chem 54, 83-87 (1995). doi:10.1002/qua.560540202
+
+        https://en.wikipedia.org/wiki/Table_of_spherical_harmonics#Real_spherical_harmonics
     """
 
     ndims = 3
 
     def __init__(self, center, exp, l, m, coeff=None):
+        from moldesign.mathutils import spherical_harmonics
+
         self.center = center
         assert len(self.center) == 3
         self.exp = exp
@@ -271,6 +271,8 @@ class SphericalGaussian(AbstractFunction):
             self.normalize()
         else:
             self.coeff = coeff
+
+        self._spherical_harmonic = spherical_harmonics.Y(l, m)
 
     def __repr__(self):
         return ("<3D Gaussian (Spherical) (coeff: {coeff:4.2f}, "
@@ -295,7 +297,19 @@ class SphericalGaussian(AbstractFunction):
         Returns:
             Scalar: function value(s) at the passed coordinates
         """
-        raise NotImplementedError
+        if len(coords.shape) > 1:
+            axis = 1
+        else:
+            axis = None
+
+        disp = coords - self.center
+        prd = disp*disp
+        r2 = prd.sum(axis=axis)
+
+        result = self.coeff * np.exp(-self.exp * r2)
+        if _include_spherical:
+            result *= r2**(self.l/2.0) * self._spherical_harmonic(coords)
+        return result
 
 
 class AtomicBasisFunction(Orbital):
@@ -390,8 +404,10 @@ class AtomicBasisFunction(Orbital):
             '3d(z^2)'
         """
         t = self.orbtype
-        if self.n: return '%s%s' % (self.n, t)
-        else: return t
+        if self.n:
+            return '%s%s' % (self.n, t)
+        else:
+            return t
 
     def __str__(self):
         return 'AO ' + self.name
