@@ -99,7 +99,7 @@ class StatusLogger(object):
 
 @compute.runsremotely(enable=force_remote)
 def get_eris_in_basis(basis, orbs):
-    """ Get electron repulsion integrals transformed in (in form eri[i,j,k,l] = (ij|kl))
+    """ Get electron repulsion integrals transformed into this basis (in form eri[i,j,k,l] = (ij|kl))
     """
     from pyscf import ao2mo
 

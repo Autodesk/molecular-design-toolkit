@@ -242,10 +242,10 @@ class SphericalGaussian(AbstractFunction):
     r""" Stores a 3-dimensional spherical gaussian function:
 
     .. math::
-        G_{nlm}(\mathbf r) = C Y^l_m(\mathbf r - \mathbf r_0) r^n e^{-a\left| \mathbf r - \mathbf r_0 \right|^2}
+        G_{nlm}(\mathbf r) = C Y^l_m(\mathbf r - \mathbf r_0) r^l e^{-a\left| \mathbf r - \mathbf r_0 \right|^2}
 
     where *C* is ``self.coeff``, *a* is ``self.exp``, and :math:`\mathbf r_0` is ``self.center``,
-    *(n,l,m)* are given by ``(self.n, self.l, self.m)``, and :math:`Y^l_m(\mathbf{r})` is a
+    *(l,m)* are given by ``(self.l, self.m)``, and :math:`Y^l_m(\mathbf{r})` is a
     spherical harmonic.
 
     Note:
@@ -259,11 +259,10 @@ class SphericalGaussian(AbstractFunction):
 
     ndims = 3
 
-    def __init__(self, center, exp, n, l, m, coeff=None):
+    def __init__(self, center, exp, l, m, coeff=None):
         self.center = center
         assert len(self.center) == 3
         self.exp = exp
-        self.n = n
         self.l = l
         self.m = m
 
@@ -276,9 +275,9 @@ class SphericalGaussian(AbstractFunction):
     def __repr__(self):
         return ("<3D Gaussian (Spherical) (coeff: {coeff:4.2f}, "
                 "exponent: {exp:4.2f}, "
-                "(n,l,m) = {qnums}").format(
+                "(l,m) = {qnums}").format(
                 center=self.center, exp=self.exp, coeff=self.coeff,
-                qnums=(self.n, self.l, self.m))
+                qnums=(self.l, self.m))
 
     def __call__(self, coords, _include_spherical=True):
         """ Evaluate this function at the given coordinates.
@@ -300,20 +299,23 @@ class SphericalGaussian(AbstractFunction):
 
 
 class AtomicBasisFunction(Orbital):
-    def __init__(self, atom, n=None, l=None, m=None, cart=None, primitives=None):
-        """ Initialization:
+    """ Stores an atomic basis function.
 
-        Args:
-            atom (moldesign.Atom): The atom this basis function belongs to
-            index (int): the index of this basis function (it is stored as
-                ``wfn.basis[self.index]``)
-            n (int): principal quantum number (``n>=1``)
-            l (int): total angular momentum quantum number (``l<=n-1``)
-            m (int): z-angular momentum quantum number (optional -
-                 for spherical sets only; ``|m|<=l``)
-            cart (str): cartesian component (optional; for cartesian sets only)
-            primitives (List[PrimitiveBase]): List of primitives, if available
-        """
+    Note:
+        Either l and m should be passed, or cart, but not both.
+
+    Args:
+        atom (moldesign.Atom): The atom this basis function belongs to
+        index (int): the index of this basis function (it is stored as
+            ``wfn.basis[self.index]``)
+        n (int): principal quantum number (``n>=1``) - this is useful only as a metadata object
+        l (int): total angular momentum quantum number (``l<=n-1``)
+        m (int): z-angular momentum quantum number (optional -
+             for spherical sets only; ``|m|<=l``)
+        cart (str): cartesian component (optional; for cartesian sets only)
+        primitives (List[PrimitiveBase]): List of primitives, if available
+    """
+    def __init__(self, atom, n=None, l=None, m=None, cart=None, primitives=None):
         self.atom = atom
         self.n = n
         self.l = l
@@ -343,18 +345,18 @@ class AtomicBasisFunction(Orbital):
         """ Calculate this orbital's norm
 
         Returns:
-            float: norm :math:`<i|i>`
+            float: norm :math:`\sqrt{<i|i>}`
         """
         norm = 0.0
         for p1 in self.primitives:
             for p2 in self.primitives:
                 norm += p1.overlap(p2)
-        return norm
+        return np.sqrt(norm)
 
     def normalize(self):
         """ Scale primitive coefficients to normalize this basis function
         """
-        prefactor = old_div(1.0,np.sqrt(self.norm))
+        prefactor = 1.0 / self.norm
         for primitive in self.primitives:
             primitive *= prefactor
 
