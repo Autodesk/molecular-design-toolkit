@@ -24,7 +24,7 @@ from past.builtins import basestring
 import imp
 import io
 import re
-
+import sys
 
 import numpy as np
 
@@ -37,7 +37,7 @@ from . import openmm as opm
 try:
     imp.find_module('pdbfixer')
 except (ImportError, OSError) as exc:
-    print('PDBFixer could not be imported; using remote docker container')
+    sys.stderr.write('Info: PDBFixer not installed; will run in docker container\n')
     force_remote = True
 else:
     force_remote = False

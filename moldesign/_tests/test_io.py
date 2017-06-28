@@ -19,8 +19,11 @@ import moldesign as mdt
 mdt.compute.config.engine_type = 'docker'
 from moldesign import units as u
 
-from .helpers import get_data_path, INTERNET_ON, native_str_buffer
+from .helpers import get_data_path, native_str_buffer, requires_internet_connection
 from .object_fixtures import h2_trajectory, h2_harmonic, h2
+
+
+__PYTEST_MARK__ = 'io'
 
 
 @pytest.fixture
@@ -42,6 +45,7 @@ def bipyridine_mol2():
 def bipyridine_iupac():
     return mdt.from_name('bipyridine')
 
+
 @pytest.fixture
 def bipyridine_inchi():
     return mdt.from_inchi('InChI=1S/C10H8N2/c1-3-7-11-9(5-1)10-6-2-4-8-12-10/h1-8H')
@@ -59,6 +63,7 @@ ATOMDATA = {  # (symbol, valence, mass)
 
 
 @pytest.mark.parametrize('key', 'iupac smiles inchi xyz sdf'.split())
+@pytest.mark.screening
 def test_auto_unique_atom_names(key, request):
     mol = request.getfixturevalue('bipyridine_'+key)
 
@@ -72,7 +77,27 @@ def test_atom_names_preserved_from_input_file_mol2(bipyridine_mol2):
         assert atom.name == atom.symbol + str(atom.index)
 
 
+@pytest.fixture
+def propane_pdb():
+    return mdt.read(get_data_path('propane.pdb'))
+
+
+def test_pdb_with_missing_chains(propane_pdb):
+    """ In response to an observed bug where various conversions would fail with a PDB file
+    that's missing chain data
+    """
+    mol = propane_pdb
+
+    if not mdt.interfaces.openbabel.force_remote:
+        pbmol = mdt.interfaces.mol_to_pybel(mol)
+        assert len(pbmol.atoms) == mol.num_atoms
+
+    pmedmol = mdt.interfaces.mol_to_parmed(mol)
+    assert len(pmedmol.atoms) == mol.num_atoms
+
+
 @pytest.mark.parametrize('key', 'mol2 xyz sdf iupac smiles inchi'.split())
+@pytest.mark.screening
 def test_read_bipyridine_from_format(key, request):
     mol = request.getfixturevalue('bipyridine_'+key)
 
@@ -152,7 +177,7 @@ def mmcif_1kbu():
     return mdt.read(get_data_path('1KBU.cif.bz2'))
 
 
-@pytest.mark.skipif(not INTERNET_ON, reason='This test requires an internet connection')
+@requires_internet_connection
 def test_from_pdb_pdb_format():
     mol = mdt.from_pdb('3aid')
     assert mol.metadata.pdbid == '3aid'
@@ -160,13 +185,22 @@ def test_from_pdb_pdb_format():
     assert mol.num_atoms == 1912
 
 
-@pytest.mark.skipif(not INTERNET_ON, reason='This test requires an internet connection')
+@requires_internet_connection
 def test_from_pdb_mmcif_format():
     mol = mdt.from_pdb('3aid', usecif=True)
     assert mol.metadata.pdbid == '3aid'
     assert mol.metadata.sourceformat == 'mmcif'
     assert mol.metadata.sourceurl.split('.')[-1] == 'cif'
     assert mol.num_atoms == 1912
+
+
+@requires_internet_connection
+@pytest.mark.skip("Takes over 10 minutes right now ...")
+def test_mmcif_fallback_if_no_pdb_file():
+    mol = mdt.from_pdb('4V5X')
+    assert mol.metadata.pdbid.lower() == '4v5x'
+    assert mol.metadata.sourceformat == 'mmcif'
+    assert mol.metadata.sourceurl.split('.')[-1] == 'cif'
 
 
 @pytest.mark.parametrize('key', 'pdb mmcif sequence'.split())
@@ -203,6 +237,7 @@ def test_read_from_buffer():
 
 
 @pytest.mark.parametrize('key', 'mmcif pdb'.split())
+@pytest.mark.screening
 def test_1kbu_assembly_data(key, request):
     mol = request.getfixturevalue('%s_1kbu' % key)
 

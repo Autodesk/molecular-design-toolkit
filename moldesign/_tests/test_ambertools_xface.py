@@ -4,33 +4,11 @@ import moldesign as mdt
 from . import helpers
 from .molecule_fixtures import *
 
-registered_types = {}
 
-
-def typedfixture(*types, **kwargs):
-    """This is a decorator that lets us associate fixtures with one or more arbitrary types.
-    We'll later use this type to determine what tests to run on the result"""
-
-    def fixture_wrapper(func):
-        for t in types:
-            registered_types.setdefault(t, []).append(func.__name__)
-        return pytest.fixture(**kwargs)(func)
-
-    return fixture_wrapper
-
-
-# TODO: tests for parameterization error detection
-
-
-@pytest.fixture(scope='function')
-def mol_from_pdb():
-    mol = mdt.from_pdb('3aid')
-    return mdt.Molecule(mol.chains['A'].residues['ARQ401'])
-
-
-@pytest.fixture(scope='function')
-def mol_from_smiles():
-    return mdt.from_smiles('CC')
+@pytest.mark.parametrize('fixturename', molecule_standards['hasmodel'])
+def test_model_assigned(fixturename, request):
+    mol = request.getfixturevalue(fixturename)
+    assert mol.ff is not None
 
 
 @pytest.mark.parametrize('objkey',
@@ -43,6 +21,7 @@ def test_parameterization_from_formats(objkey, request):
     _test_succesful_parameterization(mol)
 
 
+@pytest.mark.screening
 def test_parameterize_multiple_identical_small_molecules():
     m1 = mdt.from_smiles('O')
     params = mdt.create_ff_parameters(m1, charges='am1-bcc')
@@ -59,8 +38,8 @@ def test_parameterize_multiple_identical_small_molecules():
 
 @pytest.mark.parametrize('chargemodel',
                          'esp gasteiger zero am1-bcc'.split())
-def test_charge_models(mol_from_smiles, chargemodel):
-    mol = mol_from_smiles
+def test_charge_models(ethylene, chargemodel):
+    mol = ethylene
     if chargemodel == 'esp':
         pytest.xfail("ESP not yet implemented")
     assert not mol.ff
@@ -77,11 +56,8 @@ def _test_succesful_parameterization(mol):
     assert 'forces' in mol.properties
 
 
-def test_1yu8_default_amber_fix_and_assignment(pdb1yu8):
-    mol = pdb1yu8
-    ff = mdt.forcefields.DefaultAmber()
-    newmol = ff.create_prepped_molecule(mol)
-    _test_succesful_parameterization(newmol)
+def test_1yu8_default_amber_fix_and_assignment(protein_default_amber_forcefield):
+    _test_succesful_parameterization(protein_default_amber_forcefield)
 
 
 def test_ff_assignment_doesnt_change_topology(pdb3aid):
@@ -115,43 +91,3 @@ def test_ff_assignment_doesnt_change_topology(pdb3aid):
         assert newr.chain.index == oldr.chain.index
         for atom in oldr:
             assert atom.name in newr
-
-
-
-@typedfixture('hasmodel')
-def parameterize_zeros(small_molecule):
-    return _param_small_mol(small_molecule, 'zero')
-
-
-@typedfixture('hasmodel')
-def parameterize_am1bcc(small_molecule):
-    return _param_small_mol(small_molecule, 'am1-bcc')
-
-
-@typedfixture('hasmodel')
-def gaff_model_gasteiger(small_molecule):
-    small_molecule.set_energy_model(mdt.models.GaffSmallMolecule, partial_charges='gasteiger')
-    small_molecule.energy_model.prep()
-    return small_molecule
-
-
-def _param_small_mol(small_molecule, chargemodel):
-    params = mdt.create_ff_parameters(small_molecule, charges=chargemodel, baseff='gaff2')
-    params.assign(small_molecule)
-    small_molecule.set_energy_model(mdt.models.ForceField)
-    return small_molecule
-
-
-@typedfixture('hasmodel')
-def protein_default_amber_forcefield(pdb1yu8):
-    mol = pdb1yu8
-    ff = mdt.forcefields.DefaultAmber()
-    newmol = ff.create_prepped_molecule(mol)
-    newmol.set_energy_model(mdt.models.ForceField)
-    return newmol
-
-
-@pytest.mark.parametrize('fixturename', registered_types['hasmodel'])
-def test_model_assigned(fixturename, request):
-    mol = request.getfixturevalue(fixturename)
-    assert mol.ff is not None

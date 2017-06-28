@@ -2,7 +2,7 @@ import pytest
 
 import moldesign as mdt
 
-from .molecule_fixtures import small_molecule
+from .molecule_fixtures import *
 
 
 registered_types = {}
@@ -47,6 +47,7 @@ def openbabel_uff(small_molecule):
 
 
 @pytest.mark.parametrize('fixture', registered_types['hasmodel'])
+@pytest.mark.screening
 def test_ob_energy_models(request, fixture):
     mol = request.getfixturevalue(fixture)
     assert mol.energy_model is not None

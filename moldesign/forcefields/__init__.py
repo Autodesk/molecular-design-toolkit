@@ -5,7 +5,6 @@ __all__ = []
 
 from . import errors
 
-from .terms import *
 from .ffparams import *
 from .forcefieldbase import *
 from .amber import *

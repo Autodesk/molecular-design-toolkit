@@ -5,6 +5,9 @@ import moldesign as mdt
 from moldesign.external import pathlib
 
 
+__PYTEST_MARK__ = 'io'
+
+
 @pytest.fixture
 def example_path(tmpdir):
     path = pathlib.Path(str(tmpdir))
@@ -14,6 +17,7 @@ def example_path(tmpdir):
     return path
 
 
+@pytest.mark.screening
 def test_exampled_copied(example_path):
     path = example_path
     assert (path / 'moldesign-examples').is_dir()

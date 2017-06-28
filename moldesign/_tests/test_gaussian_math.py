@@ -58,6 +58,7 @@ def cart_10d_gaussian():
 
 
 @pytest.mark.parametrize('objkey', registered_types['gaussian'])
+@pytest.mark.screening
 def test_gaussian_integral_and_dimensionality(objkey, request):
     g = request.getfuncargvalue(objkey)
     assert g.ndims == len(g.center)
@@ -85,6 +86,7 @@ def test_gaussian_function_values(objkey, request):
 
 @pytest.mark.parametrize('objkey',
                          registered_types['gaussian'] + registered_types['cartesiangaussian'])
+@pytest.mark.screening
 def test_vectorized_gaussian_function_evaluations(objkey, request):
     g = request.getfuncargvalue(objkey)
 

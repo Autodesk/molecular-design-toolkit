@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # this script expects to run from the root of the repository
 
-# fail immediately if any command fails:
-set -e
+set -e  # fail immediately if any command fails
+
 
 VERSION="${TESTENV}.py${PYVERSION}"
-PYTESTFLAGS="-n 5 --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=1800 --tb=short"
+PYTESTFLAGS="-n 2 --spec --disable-warnings --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=1800 --tb=short"
 if [ "${VERSION}" == "complete.py3" ]; then
        PYTESTFLAGS="--cov moldesign ${PYTESTFLAGS}"
 fi

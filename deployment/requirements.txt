@@ -1,9 +1,11 @@
 # Python dependencies for the build/test environment
 coveralls
 nbformat
-pathlib ; python_version < '3.5'
+pathlib ; python_version < '3.3'
 PyGithub
+pyccc >= 0.7.10
 pytest-cov
 pytest-xdist != 1.17.0
 pytest-timeout
+pytest-spec
 

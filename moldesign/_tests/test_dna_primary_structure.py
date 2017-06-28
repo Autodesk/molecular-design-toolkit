@@ -7,6 +7,9 @@ import moldesign as mdt
 from moldesign import units as u
 
 
+__PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
+
+
 fixture_types = {}
 
 
@@ -34,6 +37,7 @@ def test_dna_chain_properties(fixture, request):
 
 
 @pytest.mark.parametrize('fixture', fixture_types['dna'])
+@pytest.mark.screening
 def test_dna_residue_iteration(fixture, request):
     mol = request.getfixturevalue(fixture)
 

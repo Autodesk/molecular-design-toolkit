@@ -14,6 +14,10 @@ from . import helpers
 
 registered_types = {}
 
+
+__PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
+
+
 # TODO: automated method testing based on its metadata - i.e. test to make sure parameters are
 #       honored, test that it calcultes what it says it does, test that properties have the right
 #       units and array shapes, etc.
@@ -39,6 +43,7 @@ def _make_mol_with_n_hydrogens(n):
 
 def _apply_random_offsets(mol, idim):
     mol.positions[:, idim] += (random.random()-0.5)*100.0*u.angstrom
+
 
 
 @typedfixture('atomcontainer', scope='function')
@@ -69,7 +74,6 @@ def four_particle_45_twist():
 
     return mol
 
-
 ########################
 # Dihedrals            #
 ########################
@@ -98,6 +102,7 @@ def test_set_dihedral(four_particle_45_twist):
                                    decimal=8)
 
 
+@pytest.mark.screening
 def test_set_dihedral_sign_convention(four_particle_45_twist):
     mol = four_particle_45_twist
     mdt.set_dihedral(mol.atoms[0], mol.atoms[1], mol.atoms[2], mol.atoms[3], -23.0 * u.degrees)
@@ -135,6 +140,7 @@ def test_dihedral_sign_convention(four_particle_45_twist):
 
 # TODO: test behavior at discontinuities (180, -180)
 
+@pytest.mark.screening
 def test_dihedral_gradient(four_particle_45_twist):
     mol = four_particle_45_twist
 
@@ -169,6 +175,7 @@ def test_angle_measure(three_particle_right_angle):
                                    decimal=8)
 
 
+@pytest.mark.screening
 def test_angle_gradient(three_particle_right_angle):
     mol = three_particle_right_angle
 

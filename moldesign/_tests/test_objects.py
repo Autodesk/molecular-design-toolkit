@@ -1,7 +1,8 @@
-import pytest
-
 from moldesign.utils import Alias
 from .object_fixtures import *
+
+
+__PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
 
 
 class ComposedClass(object):
@@ -50,6 +51,7 @@ def test_dotdict_copy(dotdict):
     assert 'a' in dotdict
 
 
+@pytest.mark.screening
 def test_dotdict_removals(dotdict):
     dd = dotdict.copy()
     assert dd.pop('_a-a-a', None) is None
@@ -106,3 +108,18 @@ def test_dotdict_preserves_ordering(dotdict):
     assert list(dotdict.keys()) == list(TESTDICT.keys())
     assert list(dotdict.values()) == list(TESTDICT.values())
     assert list(dotdict.items()) == list(TESTDICT.items())
+
+
+@pytest.mark.screening
+def test_eigenspace_with_ndarray_identity_permutation():
+    from moldesign.mathutils import Eigenspace
+
+    evals = np.arange(3)
+    evecs = np.array([[0,1,0],
+                      [1,0,0],
+                      [0,0,1]],
+                     dtype='float')
+    espace = Eigenspace(evals, evecs)
+
+    assert (espace.transform([1,0,0]) == [0,1.0, 0.0]).all()
+    assert (espace.transform(np.identity(3)) == espace.evecs).all()

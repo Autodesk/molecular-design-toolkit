@@ -19,7 +19,7 @@ standard_library.install_aliases()
 import pyccc
 import pyccc.exceptions
 
-from moldesign import compute
+from moldesign import compute, exceptions
 from moldesign.interfaces.openmm import force_remote, MdtReporter, pint2simtk, OpenMMPickleMixin
 from moldesign.utils import exports
 
@@ -31,19 +31,17 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
     _openmm_compatible = True
 
     def prep(self):
-        assert self.mol.energy_model._openmm_compatible
-        if self._prepped and self.model is self.mol.energy_model and self.model._prepped: return
-        self.model = self.mol.energy_model
-        self.model.prep()
-        self.sim = self.model.sim
-        self._prepped = True
+        if not self.mol.energy_model._openmm_compatible:
+            raise exceptions.NotSupportedError(
+                    ("%s requires an OpenMM-based energy model (current "
+                     "energy model '%s' is not supported with this integrator") %
+                    (self.mol.energy_model.__class__.__name__, self.__class__.__name__))
+
+        # For OpenMM integrators, all system setup is delegated to the energy model
+        # this will create values for self.energy_model, self.sim, and and self._prepped
+        self.mol.energy_model.prep()
 
     def run(self, run_for, wait=False):
-        assert self.mol.energy_model._openmm_compatible
-
-        if not self.mol.energy_model.constraints_supported():
-            raise NotImplementedError('OpenMM only supports position and bond constraints')
-
         try:
             traj = self._run(run_for)
         except pyccc.exceptions.ProgramFailure:
@@ -59,8 +57,9 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
     @compute.runsremotely(enable=force_remote, is_imethod=True)
     def _run(self, run_for):
         self.prep()
+        self.energy_model._set_constraints()  # calling this just to raise an exception if necessary
         nsteps = self.time_to_steps(run_for, self.params.timestep)
-        self.model._set_openmm_state()
+        self.energy_model._set_openmm_state()
 
         self.reporter = self._attach_reporters()
         self.reporter.annotation = self._describe_dynamics()
@@ -68,10 +67,9 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
 
         self.sim.step(nsteps)  # this is the actual dynamics loop
 
-        self.model._sync_to_openmm()
+        self.energy_model._sync_to_openmm()
         if self.reporter.last_report_time != self.mol.time:
             self.reporter.report_from_mol()
-        self.reporter.report_from_mol()
         return self.reporter.trajectory
 
     def _attach_reporters(self):

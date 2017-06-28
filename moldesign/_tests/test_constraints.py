@@ -6,7 +6,7 @@ import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
-
+from .molecule_fixtures import *
 from . import helpers
 
 registered_types = {}
@@ -106,6 +106,7 @@ def angle_constraint_unsatisfied(atom_coordinate_constraint_satisfied):
     return mol, c
 
 
+@pytest.mark.screening
 def test_distance_constraint(distance_constraint_satisfied):
     mol, c = distance_constraint_satisfied
 
@@ -132,7 +133,7 @@ def test_constraint_gradient(objkey, request):
                                atol=5.0*helpers.DEFSTEP.defunits_value())
 
 
-
+@pytest.mark.screening
 def test_dihedral_constraint_errors(four_particle_45_twist):
     mol = four_particle_45_twist
     constraint = mol.constrain_dihedral(*mol.atoms)
@@ -150,7 +151,6 @@ def test_dihedral_constraint_errors(four_particle_45_twist):
     assert not constraint.satisfied()
 
 
-
 def test_dihedral_constraint_errors_at_0(four_particle_45_twist):
     mol = four_particle_45_twist
     mol.atoms[3].position = [0.1, 0.0, 0.5] * u.angstrom
@@ -163,3 +163,29 @@ def test_dihedral_constraint_errors_at_0(four_particle_45_twist):
         constraint.value = angle
         np.testing.assert_allclose(constraint.error().value_in(u.degrees), -angle.magnitude)
 
+
+def test_cannot_add_duplicate_constraints(parameterize_zeros):
+    mol = parameterize_zeros
+    mol.constrain_distance(*mol.atoms[:2])
+    mol.constrain_angle(*mol.atoms[:3])
+    mol.constrain_dihedral(*mol.atoms[:4])
+    mol.constrain_atom(mol.atoms[0])
+    mol.constrain_hbonds()
+
+    # Failure on adding duplicates
+    with pytest.raises(KeyError):
+        mol.constrain_distance(*mol.atoms[:2])
+    with pytest.raises(KeyError):
+        mol.constrain_angle(*mol.atoms[:3])
+    with pytest.raises(KeyError):
+        mol.constrain_dihedral(*mol.atoms[:4])
+    with pytest.raises(KeyError):
+        mol.constrain_atom(mol.atoms[0])
+    with pytest.raises(KeyError):
+        mol.constrain_hbonds()
+
+    # These should be ok
+    mol.constrain_distance(*mol.atoms[1:3])
+    mol.constrain_angle(*mol.atoms[1:4])
+    mol.constrain_dihedral(*mol.atoms[1:5])
+    mol.constrain_atom(mol.atoms[1])

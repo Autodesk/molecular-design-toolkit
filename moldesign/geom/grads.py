@@ -40,7 +40,7 @@ def distance_gradient(a1, a2):
         Tuple[u.Vector[length], u.Vector[length]]: (gradient w.r.t. first atom, gradient w.r.t.
         second atom)
     """
-    d = normalized(a1.position-a2.position)
+    d = normalized(a1.position-a2.position) * u.ureg.dimensionless
     return d, -d
 
 

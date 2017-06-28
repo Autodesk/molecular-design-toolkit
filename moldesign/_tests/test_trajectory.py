@@ -6,6 +6,8 @@ from moldesign import units as u
 
 from .object_fixtures import h2, h2_harmonic, h2_trajectory
 
+
+@pytest.mark.internal
 def test_frames_synched_with_trajectory(h2_trajectory):
     traj = h2_trajectory
 
@@ -44,6 +46,8 @@ def precanned_trajectory():
     return traj
 
 
+@pytest.mark.internal
+@pytest.mark.screening
 def test_geometry_analysis_precanned(precanned_trajectory):
     traj = precanned_trajectory
     a1, a2, a3 = traj.mol.atoms
@@ -72,6 +76,8 @@ def test_geometry_analysis_precanned(precanned_trajectory):
     assert traj.someletter == list('abc')
 
 
+@pytest.mark.internal
+@pytest.mark.screening
 def test_frame_to_molecule_conversion(precanned_trajectory):
     traj = precanned_trajectory
 
@@ -101,6 +107,8 @@ def test_frame_to_molecule_conversion(precanned_trajectory):
     assert m2.time == 2.0 * u.fs
 
 
+@pytest.mark.internal
+@pytest.mark.screening
 def test_property_backfill(precanned_trajectory):
     traj = precanned_trajectory
     oldnumframes = len(traj)
@@ -111,6 +119,7 @@ def test_property_backfill(precanned_trajectory):
     assert traj.somenewthing == [None] * oldnumframes + [5]
 
 
+@pytest.mark.internal
 def test_add_traj(precanned_trajectory):
     newtraj = precanned_trajectory + precanned_trajectory
 

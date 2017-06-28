@@ -18,8 +18,10 @@ standard_library.install_aliases()
 # limitations under the License.
 import future.utils
 
-import numpy as np
+import sys
 import imp
+
+import numpy as np
 
 import moldesign.units as u
 from .. import compute
@@ -36,7 +38,7 @@ else:
 try:
     imp.find_module('pyscf')
 except (ImportError, OSError) as exc:
-    print('PySCF not installed; using remote docker container')
+    sys.stderr.write('Info: PySCF not installed; will run in docker container\n')
     force_remote = True
 else:
     force_remote = False

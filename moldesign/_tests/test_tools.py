@@ -7,7 +7,8 @@ import pytest
 import moldesign as mdt
 from moldesign import units as u
 
-from .helpers import get_data_path
+from .helpers import get_data_path, assert_almost_equal
+from .molecule_fixtures import ligand3aid,pdb3aid,benzene,small_molecule,pdb1yu8, ligand_residue_3aid
 
 
 registered_types = {}
@@ -23,7 +24,6 @@ def typedfixture(*types, **kwargs):
         return pytest.fixture(**kwargs)(func)
 
     return fixture_wrapper
-
 
 @pytest.fixture
 def ammonium_nocharge():
@@ -86,6 +86,7 @@ def test_c2_no_hydrogen_from_smiles(c2_no_hydrogen_from_smiles):
     assert b.a2.index == 1
 
 
+@pytest.mark.screening
 def test_add_hydrogen_to_c2(c2_no_hydrogen_from_smiles):
     newmol = mdt.add_hydrogen(c2_no_hydrogen_from_smiles)
     atomcounts = collections.Counter(atom.element for atom in newmol.atoms)

@@ -21,6 +21,7 @@ import numpy as np
 from . import MolecularOrbitals
 from ..utils import DotDict
 
+
 class ElectronicWfn(object):
     """ Stores the results of a quantum chemistry calculation.
 
@@ -107,6 +108,9 @@ class ElectronicWfn(object):
         nbo_interface.run_nbo(self.mol, **kwargs)
 
     def add_orbitals(self, orbs, orbtype='canonical', **kwargs):
+        for orb in orbs:
+            if orb.wfn is None:
+                orb.wfn = self
         mo_object = MolecularOrbitals(orbs,
                                       wfn=self,
                                       orbtype=orbtype)

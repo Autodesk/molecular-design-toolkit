@@ -16,14 +16,28 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from future.utils import native_str
 
 import moldesign.molecules
 from moldesign import compute
-from moldesign.molecules import Trajectory, MolecularProperties
-from moldesign.utils import exports
-
-import moldesign.interfaces.openmm as opm
+from ..molecules import Trajectory, MolecularProperties
+from ..utils import exports
+from ..interfaces import openmm as opm
 from .base import MMBase
+from .. import parameters
+
+openmm_platform_selector = parameters.Parameter(
+        'compute_platform', 'OpenMM computing platform',
+        type=str, default='cpu', choices=['opencl', 'cuda', 'cpu', 'reference', 'auto'],
+        help_url='http://docs.openmm.org/7.1.0/userguide/library.html#platforms')
+
+numcpus = parameters.num_cpus.copy()
+numcpus.relevance = parameters.WhenParam('compute_platform', parameters.op.eq, 'cpu')
+numcpus.help = ('Sets number of threads for OpenMM CPU platform. '
+                'If 0, uses OpenMM defaults (which can be controlled '
+                'via the OPENMM_NUM_THREADS environment variable). ')
+numcpus.help_url = \
+    'http://docs.openmm.org/7.1.0/userguide/library.html#platform-specific-properties'
 
 
 @exports
@@ -32,20 +46,27 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
     Note that, while a dummy integrator is assigned, a different context will
     be created for any MD calculations.
 
-    :ivar sim: openmm simulation object
-    :type sim: simtk.openmm.app.Simulation
+    Attributes:
+       sim (simtk.openmm.app.Simulation): OpenMM simulation object (once created)
     """
     # NEWFEATURE: need to set/get platform (and properties, e.g. number of threads)
     DEFAULT_PROPERTIES = ['potential_energy', 'forces']
+    PARAMETERS = MMBase.PARAMETERS + [openmm_platform_selector, numcpus]
     _CALLS_MDT_IN_DOCKER = opm.force_remote
 
     _openmm_compatible = True
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self._reset()
+
+    def _reset(self):
         self.sim = None
         self.mm_system = None
-        self._prep_integrator = 'uninitialized'
+        self.mm_integrator = None
+        self._prepped_integrator = 'uninitialized'
+        self._constraints_set = False
+        self._required_tolerance = None
 
     def get_openmm_simulation(self):
         if opm.force_remote:
@@ -74,52 +95,74 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                                     forces=opm.simtk2pint(state.getForces(), flat=False))
         return props
 
-    def prep(self, force=False):
-        """
-        Drive the construction of the openmm simulation
-        This will rebuild this OpenMM simulation if: A) it's not built yet, or B)
-        there's a new integrator
+    def prep(self):
+        """ Construct the OpenMM simulation objects
+
+        Note:
+            An OpenMM simulation object consists of both the system AND the integrator. This routine
+            therefore constructs both. If self.mol does not use an OpenMM integrator, we create
+            an OpenMM simulation with a "Dummy" integrator that doesn't ever get used.
         """
         if opm.force_remote:
             return True
+
         from simtk.openmm import app
 
-        # TODO: automatically set _prepped to false if the model or integration parameters change
-        if not force:
-            if self._prepped and self._prep_integrator == self.mol.integrator:
-                return
+        if getattr(self.mol.integrator, '_openmm_compatible', False):
+            _prepped = (self._prepped and self.mol.integrator._prepped and
+                        self.mol.integrator is self._prepped_integrator)
+            setup_integrator = True
+        else:
+            _prepped = self._prepped
+            setup_integrator = False
 
+        if _prepped:
+            return
+
+        self._reset()
         system_params = self._get_system_params()
         self.mm_system = self.mol.ff.parmed_obj.createSystem(**system_params)
 
-        if self.mol.integrator is None:
-            integrator = self._make_dummy_integrator()
+        if setup_integrator:
+            try:
+                self._set_constraints()
+            except moldesign.NotSupportedError as exc:
+                print("Warning: dynamics not supported: %s" % exc.args[0])
+            self.mm_integrator = self.mol.integrator.get_openmm_integrator()
         else:
-            integrator = self.mol.integrator.get_openmm_integrator()
+            self.mm_integrator = self._make_dummy_integrator()
 
-        self._set_constraints()
-        self.sim = app.Simulation(self.mol.ff.parmed_obj.topology, self.mm_system, integrator)
+        platform, platform_properties = self._get_platform()
+
+        if self._required_tolerance:
+            self.mm_integrator.setConstraintTolerance(float(self._required_tolerance))
+        self.sim = app.Simulation(self.mol.ff.parmed_obj.topology,
+                                  self.mm_system,
+                                  self.mm_integrator,
+                                  platform=platform,
+                                  platformProperties=platform_properties)
+
+        if setup_integrator:
+            self.mol.integrator.energy_model = self
+            self.mol.integrator.sim = self.sim
+            self.mol.integrator._prepped = True
+
         self._prepped = True
+        self._prepped_integrator = self.mol.integrator
         print('Created OpenMM kernel (Platform: %s)' % self.sim.context.getPlatform().getName())
-        self._prep_integrator = self.mol.integrator
-
-    def reset_constraints(self):
-        self._set_constraints()
 
     def minimize(self, **kwargs):
         if self.constraints_supported():
             traj = self._minimize(**kwargs)
-
             if opm.force_remote or (not kwargs.get('wait', False)):
                 self._sync_remote(traj.mol)
                 traj.mol = self.mol
-
             return traj
         else:
             return super().minimize(**kwargs)
 
     def _sync_remote(self, mol):
-        # TODO: this is a hack to update the object after a minimization
+        # TODO: this is a hack to update the molecule object after a minimization
         #        We need a better pattern for this, ideally one that doesn't
         #        require an explicit wrapper like this - we shouldn't have to copy
         #        the properties over manually
@@ -142,7 +185,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                [energy/length]
         """
 
-        # NEWFEATURE: write/find an openmm "integrator" to do this minimization
+        # NEWFEATURE: write/find an openmm "integrator" to do this minimization.
         # openmm doesn't work with small step numbers, and doesn't support
         # callbacks during minimization, so frame_interval is disabled.
         if frame_interval is not None:
@@ -164,18 +207,24 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
 
     def constraints_supported(self):
         """ Check whether this molecule's constraints can be enforced in OpenMM
+
+        This sort of overlaps with _set_constraints, but doesn't have dependencies on OpenMM
         """
         for constraint in self.mol.constraints:
-            if constraint.desc not in ('position', 'distance'):
+            if constraint.desc not in ('position', 'distance', 'hbonds'):
                 return False
         else:
             return True
 
-    #################################################
-    # "Private" methods for managing OpenMM are below
     def _set_constraints(self):
+        if self._constraints_set:
+            return
         system = self.mm_system
         fixed_atoms = set()
+
+        # openmm uses a global tolerance, calculated as ``constraint_violation/constraint_dist``
+        # (since only distance constraints are supported). Here we calculate the necessary value
+        required_tolerance = None
 
         # Constrain atom positions
         for constraint in self.mol.constraints:
@@ -191,6 +240,17 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                 system.addConstraint(constraint.a1.index,
                                      constraint.a2.index,
                                      opm.pint2simtk(constraint.value))
+
+                if required_tolerance is None:
+                    required_tolerance = 1e-5
+                required_tolerance = min(required_tolerance, constraint.tolerance/constraint.value)
+
+            elif constraint.desc == 'hbonds':
+                continue  # already dealt with at system creation time
+
+            else:
+                raise moldesign.NotSupportedError("OpenMM does not support '%s' constraints" %
+                                                  constraint.desc)
 
         # Workaround for OpenMM issue: can't have an atom that's both
         # fixed *and* has a distance constraint. If both atoms in the distance constraint are
@@ -210,6 +270,9 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                                      'bond (%s)' % moldesign.molecules.bonds.Bond(ai, aj))
                 else:
                     ic += 1
+
+        self._constraints_set = True
+        self._required_tolerance = required_tolerance
 
     @staticmethod
     def _make_dummy_integrator():
@@ -261,7 +324,9 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         nonbonded_names = {'nocutoff': app.NoCutoff,
                            'ewald': app.Ewald,
                            'pme': app.PME,
-                           'cutoff': app.CutoffPeriodic if self.params.periodic else app.CutoffNonPeriodic}
+                           'cutoff': (app.CutoffPeriodicif
+                                      if self.params.periodic
+                                      else app.CutoffNonPeriodic)}
         implicit_solvent_names = {'obc': app.OBC2,
                                   'obc1': app.OBC1,
                                   None: None}
@@ -270,7 +335,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                              nonbondedCutoff=opm.pint2simtk(self.params.cutoff),
                              implicitSolvent=implicit_solvent_names[self.params.implicit_solvent])
 
-        system_params['rigidWater'] = False
+        system_params['rigidWater'] = False  # not currently supported (because I'm lazy)
         system_params['constraints'] = None
         if self.mol.integrator is not None:
             if self.mol.integrator.params.get('constrain_water', False):
@@ -278,10 +343,40 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
             if self.mol.integrator.params.get('constrain_hbonds', False):
                 system_params['constraints'] = app.HBonds
 
+        # Deal with h-bonds listed in molecular constraints
+        for constraint in self.mol.constraints:
+            if constraint.desc == 'hbonds':
+                system_params['constraints'] = app.HBonds
+                break
+
         return system_params
 
+    def _get_platform(self):
+        from simtk import openmm
 
-def list_openmmplatforms():
-    from simtk import openmm
-    return [openmm.Platform.getPlatform(ip).getName()
-            for ip in range(openmm.Platform.getNumPlatforms())]
+        preference = ['CUDA', 'OpenCL', 'CPU', 'Reference']
+        from_lower = {x.lower(): x for x in preference}
+
+        properties = {}
+
+        if self.params.compute_platform.lower() == 'auto':
+            for platname in preference:
+                try:
+                    platform = openmm.Platform.getPlatformByName(platname)
+                except Exception:  # it just throws "Exception" unfortunately
+                    continue
+                else:
+                    self.params.compute_platform = platname.lower()
+                    break
+
+            raise moldesign.NotSupportedError("Likely OpenMM installation error. "
+                                              "none of the expected platforms were found: "
+                                              + ', '.join(preference))
+        else:
+            platform = openmm.Platform.getPlatformByName(from_lower[self.params.compute_platform])
+
+        if self.params.compute_platform == 'cpu' and self.params.num_cpus > 0:
+            # need to use native_strs here or the swig interface gets confused
+            properties[native_str('Threads')] = native_str(self.params.num_cpus)
+
+        return platform, properties

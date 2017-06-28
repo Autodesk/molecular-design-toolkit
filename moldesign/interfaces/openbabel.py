@@ -16,7 +16,7 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
+import sys
 import string
 
 import moldesign.molecules.atomcollections
@@ -26,10 +26,12 @@ try:
     import openbabel as ob
     # WARNING: this is the real library, not our interface - this works because of absolute
     # imports. We should probably rename this interface
+
 except ImportError:
     force_remote = True
-else:  # this should be configurable
-    force_remote = False  # debugging
+    sys.stderr.write('Info: OpenBabel not installed; will run in docker container\n')
+else:
+    force_remote = False
 
 import moldesign as mdt
 from ..compute.runsremotely import runsremotely
@@ -159,11 +161,9 @@ def mol_to_pybel(mdtmol):
         if atom.residue and atom.residue not in resmap:
             obres = obmol.NewResidue()
             resmap[atom.residue] = obres
-            obres.SetChain(str(
-                    mdt.utils.if_not_none(atom.chain.name, 'Z')[0]))
-            obres.SetName(str(
-                    mdt.utils.if_not_none(atom.residue.pdbname, 'UNL')))
-            obres.SetNum(mdt.utils.if_not_none(atom.residue.pdbindex, '0'))
+            obres.SetChain(str(atom.chain.pdbname)[0] if atom.chain.pdbname else 'Z')
+            obres.SetName(str(atom.residue.pdbname) if atom.residue.pdbname else 'UNL')
+            obres.SetNum(str(atom.residue.pdbindex) if atom.residue.pdbindex else 0)
         else:
             obres = resmap[atom.residue]
 

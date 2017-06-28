@@ -325,6 +325,28 @@ def read_xyz(f):
     return mdt.Molecule(tempmol.atoms)
 
 
+def read_smiles_file(f):
+    return _get_mol_from_identifier_file(f, from_smiles)
+
+
+def read_inchi_file(f):
+    return _get_mol_from_identifier_file(f, from_inchi)
+
+
+def read_iupac_file(f):
+    return _get_mol_from_identifier_file(f, from_name)
+
+
+def _get_mol_from_identifier_file(fileobj, mol_constructor):
+    for line in fileobj:
+        if line.strip()[0] == '#':
+            continue
+        else:
+            return mol_constructor(line.strip())
+    else:
+        raise IOError("Didn't find any chemical identifiers in the passed file.")
+
+
 def write_xyz(mol, fileobj):
     fileobj.write(u"   %d\n%s\n" % (mol.num_atoms, mol.name))
     for atom in mol.atoms:
@@ -335,6 +357,9 @@ def write_xyz(mol, fileobj):
 @utils.exports
 def from_pdb(pdbcode, usecif=False):
     """ Import the given molecular geometry from PDB.org
+
+    By default, this will use the structure from the PDB-formatted data; however, it will fall back
+    to using the mmCIF data for this pdbcode if the PDB file is not present.
         
     See Also:
         http://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/introduction
@@ -447,11 +472,16 @@ def _get_format(filename, format):
 READERS = {'pdb': read_pdb,
            'cif': read_mmcif,
            'mmcif': read_mmcif,
+           'smi': read_smiles_file,
+           'smiles': read_smiles_file,
+           'inchi': read_inchi_file,
+           'iupac': read_iupac_file,
            'xyz': read_xyz}
 
 WRITERS = {'pdb': write_pdb,
            'mmcif': write_mmcif,
            'xyz': write_xyz}
+
 
 if PY2:
     bzopener = bz2.BZ2File

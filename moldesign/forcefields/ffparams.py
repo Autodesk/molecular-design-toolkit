@@ -1,8 +1,8 @@
-
 from __future__ import print_function, absolute_import, division
 from future.builtins import *
 from future import standard_library
 standard_library.install_aliases()
+
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,8 +25,7 @@ from moldesign import units as u
 class ForcefieldParams(object):
     """ Stores the forcefield parameters for a specific molecule.
 
-    The current implementation is heavily based on a ParmEd object,
-    with fairly thin MDT wrappers providing an interface and handling unit conversions.
+    This is a shim around a parmed object.
 
     Args:
         mol (mdt.Molecule): Molecule this force field is for
@@ -68,15 +67,18 @@ class ForcefieldParams(object):
         if atom2 is None:
             bond = bond_or_atom1
         else:
-            bond = mdt.Bond(bond_or_atom1,
-                            atom2)
+            bond = mdt.Bond(bond_or_atom1, atom2)
 
         pmdatom = self.parmed_obj.atoms[bond.a1.index]
+        indices = [bond.a1.index, bond.a2.index]
 
-        for pmdbond, pmdpartner in zip(pmdatom.bonds, pmdatom.bond_partners):
-            if pmdpartner.idx == bond.a2.index:
-                return BondTerm(bond,
-                                pmdbond)
+        for pmdbond in pmdatom.bonds:
+            pmdindices = sorted((pmdbond.atom1.idx, pmdbond.atom2.idx))
+            if pmdindices == indices:
+                assert self.parmed_obj.atoms[pmdindices[0]].element == bond.a1.atnum
+                assert self.parmed_obj.atoms[pmdindices[1]].element == bond.a2.atnum
+
+                return BondTerm(bond, pmdbond)
         else:
             raise ValueError("No ForceField term found for bond: %s" % bond)
 

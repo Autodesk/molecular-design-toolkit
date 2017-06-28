@@ -69,7 +69,8 @@ def test_extreme_forces_with_smart_minimizer(scrambled):
 
 
 @pytest.mark.skipif(mdt.models.OpenBabelPotential._CALLS_MDT_IN_DOCKER,
-                    reason='Redundant with regular test')
+                    reason='Redundant with regular test in this environment')
+@pytest.mark.screening
 def test_remote_with_smart_minimizer(scrambled):
     mol, e0, p0 = scrambled
 
@@ -80,7 +81,7 @@ def test_remote_with_smart_minimizer(scrambled):
 
 
 @pytest.mark.skipif(mdt.models.OpenBabelPotential._CALLS_MDT_IN_DOCKER,
-                    reason='Redundant with regular test')
+                    reason='Redundant with regular test in this environment')
 def test_remote_with_smart_minimizer_async(scrambled):
     mol, e0, p0 = scrambled
     job = mdt.min.minimize(mol, nsteps=500, remote=True, wait=False)
@@ -94,7 +95,7 @@ def test_remote_with_smart_minimizer_async(scrambled):
 
 
 @pytest.mark.skipif(mdt.models.OpenBabelPotential._CALLS_MDT_IN_DOCKER,
-                    reason='Redundant with regular test')
+                    reason='Redundant with regular test in this environment')
 def test_remote_minimization_automatic_if_openbabel_not_installed(scrambled):
     mol, e0, p0 = scrambled
 
@@ -122,7 +123,7 @@ def test_constrained_distance_minimization(minkey):
     e0 = mol.calculate_potential_energy()
     p0 = mol.positions.copy()
 
-    constraint = mol.constrain_distance(mol.atoms[0], mol.atoms[1])
+    mol.constrain_distance(mol.atoms[0], mol.atoms[1])
 
     if minkey == 'bfgs':  # BFGS expected to fail here
         with pytest.raises(mdt.exceptions.NotSupportedError):
@@ -132,11 +133,10 @@ def test_constrained_distance_minimization(minkey):
     traj = minimizer(mol)
 
     assert_something_resembling_minimization_happened(p0, e0, traj, mol)
-    assert abs(constraint.error()) < 1e-4 * u.angstrom
-
 
 
 @pytest.mark.parametrize('minkey',(MINIMIZERS.keys()))
+@pytest.mark.screening
 def test_constrained_dihedral_minimization(minkey):
     minimizer = MINIMIZERS[minkey]
     mol = mdt.from_smiles('C=C')

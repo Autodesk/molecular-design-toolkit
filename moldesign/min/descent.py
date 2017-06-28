@@ -59,17 +59,21 @@ class GradientDescent(MinimizerBase):
                  gamma=0.4, control=0.25,
                  **kwargs):
         super().__init__(mol, **kwargs)
-        assert 'forces' in self.request_list, 'Gradient descent built-in gradients'
+        assert 'forces' in self.request_list, 'Gradient descent requires built-in gradients'
         self.max_atom_move = max_atom_move
         self.scaling = scaling
         self.gamma = gamma
         self.control = control
         self._last_energy = None
+        self._constraintlist = None
 
     def _run(self):
         print('Starting geometry optimization: built-in gradient descent')
         lastenergy = self.objective(self._coords_to_vector(self.mol.positions))
         current = self._coords_to_vector(self.mol.positions)
+
+        if self.mol.constraints:
+            self._constraintlist = mdt.geom.get_base_constraints(self.mol.constraints)
 
         for i in range(self.nsteps):
             grad = self.grad(current)
@@ -126,7 +130,7 @@ class GradientDescent(MinimizerBase):
             prev = self.mol.positions.copy()
             self._sync_positions(current+move)
 
-            mdt.geom.shake_positions(self.mol, prev)
+            mdt.geom.shake_positions(self.mol, prev, constraints=self._constraintlist)
             return self._coords_to_vector(self.mol.positions)
         else:
             return current + move

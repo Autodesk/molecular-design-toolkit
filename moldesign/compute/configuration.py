@@ -155,7 +155,7 @@ def init_config():
     if os.path.exists(path):
         try:
             with open(path, 'r') as infile:
-                print('Reading configuration from %s' % path)
+                sys.stderr.write('Reading configuration from %s\n' % path)
                 newconf = yaml.load(infile)
                 if not isinstance(newconf, dict):
                     raise TypeError('Cannot read configuration "%s" from %s.' % (newconf, path))

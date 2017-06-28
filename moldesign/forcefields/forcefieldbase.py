@@ -23,10 +23,11 @@ from ..utils import exports
 
 
 class Forcefield(object):
-    """ Abstract base class representing a biomolecular forcefield definition,
-    such as amber14sb or charm22.
+    """ Abstract class for biomolecular forcefield definitions such as amber14sb or charm22.
 
-    These contain both atom type templates AND forcefield parameters.
+    These contain both atom typing templates AND forcefield parameters. Most of this data
+    is not exposed through the python API (currently); internally, these are collections
+    of references to definition files (such as amber leaprc and lib files)
     """
 
     def assign(self, mol, display=True):

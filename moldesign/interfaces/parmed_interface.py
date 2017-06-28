@@ -246,39 +246,6 @@ def mol_to_parmed(mol):
     return struc
 
 
-def _parmed_to_ff(topo, atom_map):
-    """ Create an MDT FFParameters object from a ParmEd topology
-
-    Args:
-        topo (parmed.Structure): ParmEd structure (with FF terms)
-        atom_map (Mapping[parmed.Atom, moldesign.Atom]): mapping between MDT and ParmEd atoms
-
-    Returns:
-        moldesign.forcefields.FFParameters: parameters in MDT format
-    """
-    bonds = [mdt.forcefields.HarmonicBondTerm(atom_map[bond.a1],
-                                              atom_map[bond.a2],
-                                              bond.type.k*u.kcalpermol/u.angstrom ** 2,
-                                              bond.type.req*u.angstrom)
-             for bond in topo.bonds]
-
-    angles = [mdt.forcefields.HarmonicAngleTerm(atom_map[angle.a1],
-                                                atom_map[angle.a2],
-                                                atom_map[angle.a3],
-                                                angle.type.k*u.kcalpermol/u.radian ** 2,
-                                                angle.type.theta_eq*u.degrees)
-              for angle in topo.angles]
-
-    dihedrals = [mdt.forcefields.PeriodicTorsionTerm(atom_map[dihedral.a1],
-                                                     atom_map[dihedral.a2],
-                                                     atom_map[dihedral.a3],
-                                                     atom_map[dihedral.a4],
-                                                     dihedral.type.per,
-                                                     dihedral.type.phi_k*u.kcalpermol,
-                                                     dihedral.type.phase*u.degrees)
-                 for dihedral in topo.dihedrals]
-
-
 def _reassign_chains(f, mol):
     """ Change chain ID assignments to the mmCIF standard (parmed uses author assignments)
 

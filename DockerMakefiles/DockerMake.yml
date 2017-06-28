@@ -114,11 +114,11 @@ deploy_requirements:
 
 python_deploy_base_py2:
   requires:
-     - miniconda
+     - miniconda_py2
      - deploy_requirements
 
 python_deploy_base:
   requires:
-    - miniconda_py2
+    - miniconda
     - deploy_requirements
 

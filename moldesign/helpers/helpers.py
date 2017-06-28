@@ -87,7 +87,19 @@ def get_all_atoms(*objects):
 
 
 def kinetic_energy(momenta, masses):
-    return 0.5 * (momenta*momenta/masses).sum()
+    """ Returns kinetic energy
+
+    This is just a helper for the KE formula, because the formula is used frequently but not
+    particularly recognizable or easy to read
+
+    Args:
+        momenta (Matrix[momentum, shape=(*,3)]): atomic momenta
+        dim_masses (Vector[mass]): atomic masses
+
+    Returns:
+        Scalar[energy]: kinetic energy of these atoms
+    """
+    return 0.5 * (momenta*momenta/masses[:,None]).sum()
 
 
 def kinetic_temperature(ke, dof):

@@ -121,6 +121,24 @@ class MolConstraintMixin(object):
         self._reset_methods()
         return self.constraints[-1]
 
+    def constrain_hbonds(self):
+        """ Constrain h-bonds in this molecule to their equilibrium forcefield values.
+
+        For molecules with an associated forcefield, this method adds a constraint to the molecule
+        that fixes all the lengths of all bonds that involve at least one hydrogen atom. The bond
+        lengths are constrained to their equilibrium forcefield values.
+
+        Note:
+            This can only be applied if the molecule is associated with a forcefield.
+
+        Returns:
+            moldesign.geom.HBondConstraint: constraint object
+        """
+        from moldesign import geom
+        self.constraints.append(geom.constraints.HBondsConstraint(self))
+        self._reset_methods()
+        return self.constraints[-1]
+
 
 class MolPropertyMixin(object):
     """ Functions for calculating and accessing molecular properties.
@@ -399,7 +417,7 @@ class MolTopologyMixin(object):
 
     Note:
         This is a mixin class designed only to be mixed into the :class:`Molecule` class. Routines
-        are separated are here for code organization only - they could be included in the main
+        are here for code organization only - they could be included in the main
         Atom class without changing any functionality
     """
     def copy(self, name=None):
@@ -422,6 +440,9 @@ class MolTopologyMixin(object):
         newintegrator = self._copy_method(newmol, 'integrator')
         if newintegrator is not None:
             newmol.set_integrator(newintegrator)
+        if self.ff is not None:
+            self.ff.copy_to(newmol)
+        newmol.constraints = [c.copy(newmol) for c in self.constraints]
         return newmol
 
     def _copy_method(self, newmol, methodname):
@@ -929,7 +950,6 @@ class MolSimulationMixin(object):
         need to know about
         """
         # TODO: what should this do with the property object?
-        # TODO: handle duplicate constraints (this happens a lot, and is bad)
         if self.energy_model is not None:
             self.energy_model._prepped = False
         if self.integrator is not None:
@@ -1054,8 +1074,9 @@ class Molecule(AtomGroup,
         self.name = 'uninitialized molecule'
         self._defres = None
         self._defchain = None
+        self._constraints = None
         self.pdbname = pdbname
-        self.constraints = utils.ExclusiveList(key=utils.methodcaller('_constraintsig'))
+        self.constraints = []
         self.energy_model = None
         self.integrator = None
         self.metadata = metadata
@@ -1112,6 +1133,14 @@ class Molecule(AtomGroup,
 
     def __str__(self):
         return 'Molecule: %s' % self.name
+
+    @property
+    def constraints(self):
+        return self._constraints
+
+    @constraints.setter
+    def constraints(self, val):
+        self._constraints = utils.ExclusiveList(val, key=utils.methodcaller('_constraintsig'))
 
     def _repr_markdown_(self):
         """A markdown description of this molecule.
