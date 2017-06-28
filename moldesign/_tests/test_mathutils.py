@@ -4,6 +4,8 @@ import numpy as np
 
 from moldesign import mathutils
 from moldesign import units as u
+from moldesign.mathutils import spherical_harmonics as sh
+
 from . import helpers
 
 
@@ -95,6 +97,53 @@ def test_perpendicular(setupfn):
             assert mathutils.norm(perpvec) < 1e-12
         else:
             assert np.abs(1.0 - mathutils.norm(perpvec)) < 1e-12
+
+
+def test_spherical_angles():
+    assert sh.cart_to_polar_angles(np.zeros(3)) == (0.0, 0.0)
+
+    oneangles = sh.cart_to_polar_angles(np.array([1.0, 0.0, 1.0]))
+    np.testing.assert_allclose(np.array(oneangles),
+                               np.array([np.pi/4, 0.0]))
+
+    oneangles = sh.cart_to_polar_angles(np.array([0.0, 1.0, 1.0]))
+    np.testing.assert_allclose(np.array(oneangles),
+                               np.array([np.pi/4, np.pi/2.0]))
+
+    np.testing.assert_allclose(np.array(sh.cart_to_polar_angles(RANDARRAY)),
+                               np.array(RAND_ARRAY_ANGLES).T)
+
+
+@pytest.mark.parametrize('shell', range(4))
+def test_cart_and_spherical_equivalence(shell):
+    l = shell
+
+    testpoints = (np.random.rand(10, 3)-0.5)*10.0
+
+    for m in range(-l,l+1):
+        real_y = sh.Y(l, m)
+        cart_y = sh.SPHERE_TO_CART[l,m]
+
+        # single point
+        np.testing.assert_allclose(real_y(testpoints[0]),
+                                   cart_y(testpoints[0]),
+                                   err_msg="Failed at %s" % ((l,m),))
+
+        # vectorized
+        np.testing.assert_allclose(real_y(testpoints),
+                                   cart_y(testpoints),
+                                   err_msg="Failed at %s" % ((l,m),))
+
+
+RANDARRAY = np.array([[ 0.03047527, -4.49249374,  5.83154878],
+                      [-7.38885486,  8.30076569, -7.97671261],
+                      [ 6.79409582, -4.07664079,  8.45983794],
+                      [-4.25045695,  0.03411114,  9.02986275]])
+
+RAND_ARRAY_ANGLES = [(0.656426762, -1.564012833),
+                     (2.1933588598416, 2.2981378887583),
+                     (0.75266068344496, -0.54043933754409),
+                     (0.43995560467481, 3.1335675381452)]
 
 
 TESTARRAY = [[1.0,  0.0,  0.0],
