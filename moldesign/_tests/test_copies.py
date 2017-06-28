@@ -19,6 +19,7 @@ def test_carbon_copy(carbon_copy, carbon_atom):
     assert atom.bond_graph == {}
 
 
+@pytest.mark.screening
 def test_copy_breaks_link(h2):
     h2copy = mdt.Molecule(h2)
     h2.atoms[0].y = 4.0 * u.bohr
@@ -47,6 +48,7 @@ def test_h2_harmonic_copy_loses_simulation(h2_harmonic_copy, h2_harmonic):
     assert mol.atoms[1].bond_graph[mol.atoms[0]] == 1
 
 
+@pytest.mark.screening
 def test_copying_doesnt_corrupt_original_h2_harmonic(h2_harmonic):
     mol = h2_harmonic
     integ = mol.integrator

@@ -178,6 +178,7 @@ def test_atoms_within(fixturename, request):
 
 
 @pytest.mark.parametrize('fixturename', ['atom', 'residue', 'atomlist'])
+@pytest.mark.screening
 def test_residues_within(fixturename, request):
     obj = request.getfixturevalue(fixturename)
 
@@ -224,6 +225,7 @@ def test_setlike_atomlist_methods(protein):
     assert (l1 + l2).unique() == protein.atoms[:15]
 
 
+@pytest.mark.screening
 def test_get_atoms(protein):
     protein_atoms = set(protein.get_atoms('protein'))
     water_atoms = set(protein.get_atoms('water'))

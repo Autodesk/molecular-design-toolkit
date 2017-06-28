@@ -152,6 +152,7 @@ def test_atom_lookup_by_name_and_index(fixture, request):
 
 
 @pytest.mark.parametrize('fixture', fixture_types['protein'])
+@pytest.mark.screening
 def test_protein_residue_iteration(fixture, request):
     mol = request.getfixturevalue(fixture)
 
@@ -233,6 +234,7 @@ def test_residues_iterate_in_order(fixture, request):
 
 
 @pytest.mark.parametrize('fixture', fixture_types['protein'])
+@pytest.mark.screening
 def test_atoms_iterate_in_order(fixture, request):
     mol = request.getfixturevalue(fixture)
 

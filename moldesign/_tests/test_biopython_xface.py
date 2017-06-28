@@ -14,6 +14,7 @@ def biopy_3aid():
     return structure
 
 
+@pytest.mark.screening
 def test_biopy_to_mdt(biopy_3aid, pdb3aid):
     mol = mdt.interfaces.biopython_to_mol(biopy_3aid)
     assert mol.num_atoms == pdb3aid.num_atoms

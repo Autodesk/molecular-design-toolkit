@@ -17,6 +17,7 @@ def example_path(tmpdir):
     return path
 
 
+@pytest.mark.screening
 def test_exampled_copied(example_path):
     path = example_path
     assert (path / 'moldesign-examples').is_dir()

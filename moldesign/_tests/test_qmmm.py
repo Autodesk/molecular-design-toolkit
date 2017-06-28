@@ -22,6 +22,7 @@ def h2params():
     params = mdt.create_ff_parameters(mol, charges='gasteiger')
     return mol, params
 
+
 @pytest.fixture(scope='function')
 def h2_h2_with_ff(h2params):
     ma, params = h2params

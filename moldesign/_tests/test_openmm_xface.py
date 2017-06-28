@@ -172,6 +172,7 @@ def test_cleared_constraints_are_no_longer_applied(protein_custom_constraints, l
 
 
 @pytest.mark.parametrize('integkey', INTEGRATORS)
+@pytest.mark.screening
 def test_unsupported_constraint_types(protein, integkey, request):
     integrator = request.getfixturevalue(integkey)
     protein.set_integrator(integrator)

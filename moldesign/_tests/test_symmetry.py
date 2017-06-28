@@ -69,6 +69,7 @@ def test_approximate_symmetry(almost_planar):
     assert symmetries.approximate[0].symbol == 'Cs'
 
 
+@pytest.mark.screening
 def test_symmetrizer(almost_planar):
     mol = almost_planar.copy()
     symmetries = mdt.get_symmetry(almost_planar)

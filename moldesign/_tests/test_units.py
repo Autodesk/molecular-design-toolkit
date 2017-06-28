@@ -9,6 +9,7 @@ from moldesign import units as u
 __PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
 
 
+@pytest.mark.screening
 def test_scalar_comparison_dimensionality_errors():
     with pytest.raises(units.DimensionalityError):
         x = 1.0 * units.angstrom == 1.0*units.ureg.kilograms
@@ -20,6 +21,7 @@ def test_scalar_comparison_dimensionality_errors():
         z = 1.0 * units.ureg.hectare >= 1.0 * units.ureg.astronomical_unit
 
 
+@pytest.mark.screening
 def test_array_comparison_dimensionality_errors():
     mylist = [0.0, -1.0, 1.0]
 
@@ -33,6 +35,7 @@ def test_array_comparison_dimensionality_errors():
         z = mylist * units.ureg.hectare >= mylist * units.ureg.astronomical_unit
 
 
+@pytest.mark.screening
 def test_addition_dimensionality_errors():
     with pytest.raises(units.DimensionalityError):
         x = 1.0 * units.angstrom + 1.0*units.ureg.kilograms
@@ -41,6 +44,7 @@ def test_addition_dimensionality_errors():
         y = 1.0 * units.fs - 1.0 * units.ureg.meter
 
 
+@pytest.mark.screening
 def test_compatible_units_comparison():
     num = 1.0*units.angstrom
     assert abs(num-0.1*units.nm) < 1.0e-15 * units.angstrom
@@ -53,6 +57,7 @@ def test_default_units():
     assert units.default.energy == units.eV
 
 
+@pytest.mark.screening
 def test_default_unit_conversions():
     my_list = [1.0*units.angstrom, 1.0*units.nm, 1.0*units.a0]
     my_array = units.array(my_list).defunits()
@@ -106,6 +111,7 @@ def test_dimensionless_array_unit_checks():
     assert (arr == np.arange(10, 15)).all()
 
 
+@pytest.mark.screening
 def test_array_unit_checks():
     arr = np.arange(5) * units.ureg.nm / units.ureg.fs
 
@@ -127,6 +133,7 @@ def test_array_unit_checks():
                                np.arange(10, 15))
 
 
+@pytest.mark.screening
 def test_default_unit_conversions():
     assert abs(10.0 - (1.0*units.nm).defunits_value()) < 1e-10
     assert abs(1000.0 - (1.0*units.ps).defunits_value()) < 1e-10
@@ -142,6 +149,7 @@ def test_getunits_doctests():
                             ['a'], 'gorilla']) == units.MdtUnit('amu')
 
 
+@pytest.mark.screening
 def test_setitem_from_quantity():
     myarray = np.arange(100) * u.angstrom
     with pytest.raises(u.DimensionalityError):
@@ -160,6 +168,7 @@ def test_setitem_from_quantity():
     assert myarray.units == u.angstrom
 
 
+@pytest.mark.screening
 def test_setitem_from_list_of_quantities():
     myarray = np.arange(100) * u.angstrom
     myarray[:10] = list(np.arange(10) * u.nm)
@@ -202,6 +211,7 @@ MATRIX_MATHS = [self_dot, self_ldot, unit_dot]
 
 
 @pytest.mark.parametrize('testfun', MATRIX_MATHS, ids=[x.__name__ for x in MATRIX_MATHS])
+@pytest.mark.screening
 def test_matrix_math_with_units(make_test_matrices, testfun):
     unitvector, unitmatrix, expected_matvec_product = make_test_matrices
 

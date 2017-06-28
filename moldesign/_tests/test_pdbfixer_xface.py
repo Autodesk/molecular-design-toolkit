@@ -92,6 +92,7 @@ def test_mutation_nomenclature_string_only(pdb3aid):
     assert [r.resname for r in mut25] == ['MET', 'MET']
 
 
+@pytest.mark.screening
 def test_multiple_mutations(pdb3aid):
     mol = pdb3aid
     mut = mdt.mutate_residues(mol, ['A.2S', 'B.3S'])  # Mutate Chain A res 2 and B 3 to SER
@@ -113,6 +114,7 @@ def test_seawater_solvation_small_molecule(benzene):
     assert len(newmol.get_atoms(name='Na')) == 3  # TODO: check that this is correct molarity
 
 
+@pytest.mark.screening
 def test_solvation_alternative_ions(benzene):
     newmol = mdt.add_water(benzene,
                            min_box_size=20.0*u.angstrom,

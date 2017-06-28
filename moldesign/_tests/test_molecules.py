@@ -56,6 +56,7 @@ def test_h2_set_coord_slices(h2):
     assert (mol.momenta[0:2, 1:3] == np.ones((2,2)) * u.default.momentum).all()
 
 
+@pytest.mark.screening
 def test_h2_harmonic_oscillator(h2_harmonic):
     mol = h2_harmonic
     atoms = h2_harmonic.atoms
@@ -103,6 +104,7 @@ def h2_properties_raises_not_calculated_yet(h2_harmonic):
         h2_harmonic.properties.potential_energy
 
 
+@pytest.mark.screening
 def test_h2_calculation_caching(h2_harmonic):
     h2 = h2_harmonic
     h2.properties = mdt.MolecularProperties(h2)
@@ -127,6 +129,7 @@ def test_h2_traj_energies(h2_trajectory):
 
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
+@pytest.mark.screening
 def test_molecule_atom_hierarchy(molkey, request):
     mol = request.getfixturevalue(molkey)
     all_residues = set(mol.residues)

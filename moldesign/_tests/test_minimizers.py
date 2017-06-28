@@ -70,6 +70,7 @@ def test_extreme_forces_with_smart_minimizer(scrambled):
 
 @pytest.mark.skipif(mdt.models.OpenBabelPotential._CALLS_MDT_IN_DOCKER,
                     reason='Redundant with regular test in this environment')
+@pytest.mark.screening
 def test_remote_with_smart_minimizer(scrambled):
     mol, e0, p0 = scrambled
 
@@ -134,8 +135,8 @@ def test_constrained_distance_minimization(minkey):
     assert_something_resembling_minimization_happened(p0, e0, traj, mol)
 
 
-
 @pytest.mark.parametrize('minkey',(MINIMIZERS.keys()))
+@pytest.mark.screening
 def test_constrained_dihedral_minimization(minkey):
     minimizer = MINIMIZERS[minkey]
     mol = mdt.from_smiles('C=C')

@@ -64,6 +64,7 @@ def pdb_2jaj_roundtrip(pdb_2jaj):
 
 
 @pytest.mark.parametrize('mol', 'pdb_2jaj pdb_2jaj_roundtrip'.split())
+@pytest.mark.screening
 def test_negative_residue_numbers_2jaj(request, mol):
     if (mol == 'pdb_2jaj_roundtrip' and
             LooseVersion(getattr(parmed, '__version__', '0.0.0')) <= LooseVersion('2.7.3')):
@@ -105,6 +106,7 @@ def pdb_1pyn_roundtrip(pdb_1pyn):
 
 
 @pytest.mark.parametrize('mol', 'pdb_1pyn pdb_1pyn_roundtrip'.split())
+@pytest.mark.screening
 def test_numeric_residue_name_1PYN(request, mol):
     """ The ligand in this residue is named "941", which causes a little trickiness
     """

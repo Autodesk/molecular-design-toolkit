@@ -47,6 +47,7 @@ def precanned_trajectory():
 
 
 @pytest.mark.internal
+@pytest.mark.screening
 def test_geometry_analysis_precanned(precanned_trajectory):
     traj = precanned_trajectory
     a1, a2, a3 = traj.mol.atoms
@@ -76,6 +77,7 @@ def test_geometry_analysis_precanned(precanned_trajectory):
 
 
 @pytest.mark.internal
+@pytest.mark.screening
 def test_frame_to_molecule_conversion(precanned_trajectory):
     traj = precanned_trajectory
 
@@ -106,6 +108,7 @@ def test_frame_to_molecule_conversion(precanned_trajectory):
 
 
 @pytest.mark.internal
+@pytest.mark.screening
 def test_property_backfill(precanned_trajectory):
     traj = precanned_trajectory
     oldnumframes = len(traj)

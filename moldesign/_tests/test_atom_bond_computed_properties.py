@@ -19,6 +19,7 @@ def test_forcefield_atom_term_access(protein_default_amber_forcefield):
         assert atom.ff.pmdobj.element == atom.atnum
 
 
+@pytest.mark.screening
 def test_forcefield_bond_term_access(protein_default_amber_forcefield):
     mol = protein_default_amber_forcefield
     for bond in mol.bonds:
@@ -53,6 +54,7 @@ def test_basis_function_atom_access(h2_rhfwfn):
         assert len(atom.basis_functions[0].primitives) == 3
 
 
+@pytest.mark.screening
 def test_atom_property_access_to_mulliken_charges(h2_rhfwfn):
     mol = h2_rhfwfn
     for atom in mol.atoms:

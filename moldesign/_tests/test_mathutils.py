@@ -68,6 +68,7 @@ def test_normalized(setupfn):
 
 
 @pytest.mark.parametrize('setupfn', CONSTRUCTORS, ids=IDS)
+@pytest.mark.screening
 def test_perpendicular(setupfn):
     arr, expected_norm = setupfn()
     vectorized = len(arr.shape) > 1

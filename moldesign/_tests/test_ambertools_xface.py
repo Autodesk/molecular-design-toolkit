@@ -43,6 +43,7 @@ def test_parameterization_from_formats(objkey, request):
     _test_succesful_parameterization(mol)
 
 
+@pytest.mark.screening
 def test_parameterize_multiple_identical_small_molecules():
     m1 = mdt.from_smiles('O')
     params = mdt.create_ff_parameters(m1, charges='am1-bcc')

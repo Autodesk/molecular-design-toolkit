@@ -53,6 +53,7 @@ model_ids = ['/'.join((model.__name__, theory, basis)) for (model, theory, basis
 
 
 @pytest.fixture(params=models_to_test, ids=model_ids, scope='function')
+@pytest.mark.screening
 def h2_with_model(request, h2):
     model, basis, theory = request.param
 

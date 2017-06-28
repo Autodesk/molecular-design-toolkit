@@ -51,6 +51,7 @@ def test_dotdict_copy(dotdict):
     assert 'a' in dotdict
 
 
+@pytest.mark.screening
 def test_dotdict_removals(dotdict):
     dd = dotdict.copy()
     assert dd.pop('_a-a-a', None) is None
@@ -109,6 +110,7 @@ def test_dotdict_preserves_ordering(dotdict):
     assert list(dotdict.items()) == list(TESTDICT.items())
 
 
+@pytest.mark.screening
 def test_eigenspace_with_ndarray_identity_permutation():
     from moldesign.mathutils import Eigenspace
 

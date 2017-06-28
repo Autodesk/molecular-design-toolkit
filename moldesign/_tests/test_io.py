@@ -63,6 +63,7 @@ ATOMDATA = {  # (symbol, valence, mass)
 
 
 @pytest.mark.parametrize('key', 'iupac smiles inchi xyz sdf'.split())
+@pytest.mark.screening
 def test_auto_unique_atom_names(key, request):
     mol = request.getfixturevalue('bipyridine_'+key)
 
@@ -96,6 +97,7 @@ def test_pdb_with_missing_chains(propane_pdb):
 
 
 @pytest.mark.parametrize('key', 'mol2 xyz sdf iupac smiles inchi'.split())
+@pytest.mark.screening
 def test_read_bipyridine_from_format(key, request):
     mol = request.getfixturevalue('bipyridine_'+key)
 
@@ -235,6 +237,7 @@ def test_read_from_buffer():
 
 
 @pytest.mark.parametrize('key', 'mmcif pdb'.split())
+@pytest.mark.screening
 def test_1kbu_assembly_data(key, request):
     mol = request.getfixturevalue('%s_1kbu' % key)
 

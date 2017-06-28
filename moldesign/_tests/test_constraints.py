@@ -106,6 +106,7 @@ def angle_constraint_unsatisfied(atom_coordinate_constraint_satisfied):
     return mol, c
 
 
+@pytest.mark.screening
 def test_distance_constraint(distance_constraint_satisfied):
     mol, c = distance_constraint_satisfied
 
@@ -132,7 +133,7 @@ def test_constraint_gradient(objkey, request):
                                atol=5.0*helpers.DEFSTEP.defunits_value())
 
 
-
+@pytest.mark.screening
 def test_dihedral_constraint_errors(four_particle_45_twist):
     mol = four_particle_45_twist
     constraint = mol.constrain_dihedral(*mol.atoms)
@@ -148,7 +149,6 @@ def test_dihedral_constraint_errors(four_particle_45_twist):
     constraint.value = 60.0 * u.degrees
     np.testing.assert_allclose(constraint.error().value_in(u.degrees), -15.0)
     assert not constraint.satisfied()
-
 
 
 def test_dihedral_constraint_errors_at_0(four_particle_45_twist):

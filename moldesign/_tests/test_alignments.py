@@ -103,6 +103,7 @@ def _randomize_orientation(mol):
     mol.rotate(axis=axis, angle=random.randrange(15.0, 170.0) * u.degrees)
 
 
+@pytest.mark.screening
 def test_pmi_reorientation_on_linear_molecule():
     # note that this will fail if the generated polymer is not perfectly linear
     mol = mdt.from_smiles('C#CC#CC#C')

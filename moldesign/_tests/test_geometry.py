@@ -102,6 +102,7 @@ def test_set_dihedral(four_particle_45_twist):
                                    decimal=8)
 
 
+@pytest.mark.screening
 def test_set_dihedral_sign_convention(four_particle_45_twist):
     mol = four_particle_45_twist
     mdt.set_dihedral(mol.atoms[0], mol.atoms[1], mol.atoms[2], mol.atoms[3], -23.0 * u.degrees)
@@ -139,6 +140,7 @@ def test_dihedral_sign_convention(four_particle_45_twist):
 
 # TODO: test behavior at discontinuities (180, -180)
 
+@pytest.mark.screening
 def test_dihedral_gradient(four_particle_45_twist):
     mol = four_particle_45_twist
 
@@ -173,6 +175,7 @@ def test_angle_measure(three_particle_right_angle):
                                    decimal=8)
 
 
+@pytest.mark.screening
 def test_angle_gradient(three_particle_right_angle):
     mol = three_particle_right_angle
 
