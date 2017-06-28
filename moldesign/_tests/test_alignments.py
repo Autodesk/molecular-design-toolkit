@@ -8,8 +8,7 @@ from moldesign import geom
 from moldesign.mathutils import normalized
 from moldesign import units as u
 
-from .molecule_fixtures import (benzene, h2, ligand3aid,
-                                pdb3aid, small_molecule, pdb1yu8, ligand_residue_3aid)
+from .molecule_fixtures import *
 from .helpers import assert_almost_equal
 
 

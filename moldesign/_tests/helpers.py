@@ -146,9 +146,11 @@ def assert_something_resembling_minimization_happened(p0, e0, traj, mol):
 def assert_something_resembling_dynamics_happened(traj, mol, p0, t0, duration):
     """ Checks that dynamics routines have produced a consistent trajectory
     """
-    frame_interval = mol.integrator.frame_interval
+    frame_interval = mol.integrator.params.frame_interval
+    timestep = mol.integrator.params.timestep
+    epsilon_t = 1e-5 * timestep  # numerical noise in time
     if isinstance(frame_interval, int):
-        frame_interval *= mol.integrator.timestep
+        frame_interval *= mol.integrator.params.timestep
 
     assert mol is traj.mol
     assert traj.time[0] == t0
@@ -170,28 +172,44 @@ def assert_something_resembling_dynamics_happened(traj, mol, p0, t0, duration):
 
         if istep == len(traj) - 1:
             # last frame - it just needs
-            assert step.time >= expected_end - 1e-5 * u.timestep
+            assert step.time >= expected_end - epsilon_t
             break
 
         elif istep != 0:
-            assert (step.time - lasttime - frame_interval) < 1e-5 * mol.integrator.timestep
+            assert (step.time - lasttime - frame_interval) < epsilon_t
         lasttime = step.time
 
     # If frame_interval doesn't divide duration exactly, it's permitted to go beyond duration
-    assert duration <= mol.time - traj.time[0] < duration + frame_interval
+    assert duration <= mol.time - traj.time[0] + epsilon_t
+    assert mol.time - traj.time[0] < duration + frame_interval + epsilon_t
 
     if mol.constraints or mol.energy_model.params.get('constrain_hbonds', False):
-        assert_constraints_satisfied(traj, p0, mol)
+        assert_constraints_satisfied(traj, p0, mol, rigorous_constraints=True)
 
 
-def assert_constraints_satisfied(traj, p0, mol):
+def assert_constraints_satisfied(traj, p0, mol, rigorous_constraints=False):
     """ Checks that constraints were satisfied during molecular motion
     """
+    # TODO: check water rigidity, if called for
+    if mol.integrator is not None and mol.integrator.params.get('constrain_hbonds', False):
+        check_hbonds = True
+        assert mdt.geom.HBondsConstraint(mol).satisfied()  # not sure what tolerance should be here
+    else:
+        check_hbonds = False
+
     for constraint in mol.constraints:
         assert constraint.satisfied()
 
-    # TODO: check whole trajectory (not necessarily conserved during minimization however)
-    # TODO: check hbonds, if energy model calls for it
+    if rigorous_constraints:
+        testmol = mol.copy()
+        if check_hbonds:
+            hbonds = mdt.HBondsConstraint(testmol)
+        for frame in traj.frames[1:]:  # ok if starting positions don't obey constraints
+            testmol.positions = frame.positions
+            for constraint in testmol.constraints:
+                assert constraint.satisfied()
+            if check_hbonds:
+                assert hbonds.satisfied()
 
 
 def assert_almost_equal(actual, desired, **kwargs):
