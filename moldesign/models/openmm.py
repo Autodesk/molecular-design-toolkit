@@ -16,6 +16,7 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from future.utils import native_str
 
 import moldesign.molecules
 from moldesign import compute
@@ -371,6 +372,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
             platform = openmm.Platform.getPlatformByName(from_lower[self.params.compute_platform])
 
         if self.params.compute_platform == 'cpu' and self.params.num_cpus > 0:
-            properties['Threads'] = str(self.params.num_cpus)
+            # need to use native_strs here or the swig interface gets confused
+            properties[native_str('Threads')] = native_str(self.params.num_cpus)
 
         return platform, properties
