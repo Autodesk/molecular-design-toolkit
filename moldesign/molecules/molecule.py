@@ -1074,8 +1074,9 @@ class Molecule(AtomGroup,
         self.name = 'uninitialized molecule'
         self._defres = None
         self._defchain = None
+        self._constraints = None
         self.pdbname = pdbname
-        self.constraints = utils.ExclusiveList(key=utils.methodcaller('_constraintsig'))
+        self.constraints = []
         self.energy_model = None
         self.integrator = None
         self.metadata = metadata
@@ -1132,6 +1133,14 @@ class Molecule(AtomGroup,
 
     def __str__(self):
         return 'Molecule: %s' % self.name
+
+    @property
+    def constraints(self):
+        return self._constraints
+
+    @constraints.setter
+    def constraints(self, val):
+        self._constraints = utils.ExclusiveList(val, key=utils.methodcaller('_constraintsig'))
 
     def _repr_markdown_(self):
         """A markdown description of this molecule.

@@ -35,7 +35,7 @@ def test_copy_breaks_link(h2):
     assert h2.atoms[1].px == 0.0 * u.default.momentum
 
 
-def test_h2_harmonic_copy_loses_simulation(h2_harmonic_copy, h2_harmonic):
+def test_h2_harmonic_copy(h2_harmonic_copy, h2_harmonic):
     mol = h2_harmonic_copy
     assert mol.energy_model is mol.integrator is None
     for name in 'num_atoms num_residues positions momenta'.split():
@@ -196,6 +196,7 @@ def test_constraints_copied_with_molecule(parameterize_zeros):
     mol.constrain_hbonds()
 
     mcpy = mol.copy()
+    assert isinstance(mcpy.constraints, mol.constraints.__class__)
     assert mcpy.constraints[0].desc == 'distance'
     assert mcpy.constraints[1].desc == 'angle'
     assert mcpy.constraints[2].desc == 'dihedral'
