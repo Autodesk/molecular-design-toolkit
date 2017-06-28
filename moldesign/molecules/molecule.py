@@ -992,6 +992,7 @@ class Molecule(AtomGroup,
         charge (units.Scalar[charge]): molecule's formal charge
         electronic_state_index (int): index of the molecule's electronic state
         metadata (dict): Arbitrary metadata dictionary
+        multiplicity (int) : multiplicity of molecule's electronic state
 
 
     Examples:
@@ -1058,7 +1059,8 @@ class Molecule(AtomGroup,
                  copy_atoms=False,
                  pdbname=None,
                  charge=None,
-                 metadata=None):
+                 metadata=None,
+                 multiplicity = None):
         super().__init__()
 
         atoms, name = self._get_initializing_atoms(atomcontainer, name, copy_atoms)

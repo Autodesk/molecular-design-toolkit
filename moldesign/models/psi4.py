@@ -56,8 +56,7 @@ def capture_history(name_string, molecule, psi4_history, model):
             this_atom.y = coords[atom_count][1]
             this_atom.z = coords[atom_count][2]
             step_molecule.atoms.append(this_atom)
-            #            step_wavefunction=_build_mdt_wavefunction(psi4_history['wavefunctions'])
-            #to be uncommented once issues with psi4 wavefunction deepcopies are handled
+
     my_traj.frames.append(step_molecule.props)
         
     return my_traj
@@ -73,18 +72,20 @@ class Psi4Potential(QMBase):
         
         request_options = {'vibrational_frequencies' : psi4.freq, 'freq' : psi4.freq, 'frequency' : psi4.freq,'frequencies' : psi4.freq,'optimized_geometry' : psi4.opt,'opt' : psi4.opt,'optimize' : psi4.opt,'potential_energy' : psi4.energy,'energy' : psi4.energy,'electronic_gradient' : psi4.gradient,'hessian' : psi4.hessian }
 
+
+        
+        psi4_molecule = psi4_interface.mdt_to_psi4(self.mol)
+        self.name = psi4_interface.mol_name(self.mol)
+        
         self._psi4_set_up()
         
-        geom = psi4_interface.mdt_to_psi4(self.mol)
-        self.name = psi4_interface.mol_name(self.mol)
-
         if 'memory' in self.params:
             self._set_memory()
 
         his=False
-        psi4_results=self._run_psi4_calc(requests, geom, his)
+        psi4_results =self._run_psi4_calc(requests, psi4_molecule, his)
         
-        props=self._get_properties(requests, geom, psi4_results)
+        props=self._get_properties(requests, psi4_results)
 
         psi4.core.clean()
         psi4.core.clean_options()
@@ -94,16 +95,20 @@ class Psi4Potential(QMBase):
     def minimize(self, requests):
         self._psi4_set_up()
         
+        
         if 'memory' in self.params:
             self._set_memory()
         
-        geom = psi4_interface.mdt_to_psi4(self.mol)
+        psi4_molecule = psi4_interface.mdt_to_psi4(self.mol)
         self.name = psi4_interface.mol_name(self.mol)
+        
+        self._psi4_set_up()
+        
         his=True
-        psi4_results=self._run_psi4_calc(requests, geom, his)
+        psi4_results = self._run_psi4_calc(requests, psi4_molecule, his)
         
         prop_output=[psi4_results[0],psi4_results[1]]
-        self.mol.props = self._get_properties(requests, geom, prop_output )
+        self.mol.props = self._get_properties(requests, prop_output )
         
         trajectory=capture_history(self.name, self.mol, psi4_results[2], self)
         
@@ -145,7 +150,6 @@ class Psi4Potential(QMBase):
         request_options = {'vibrational_frequencies' : psi4.freq, 'freq' : psi4.freq, 'frequency' : psi4.freq,'frequencies' : psi4.freq,'optimized_geometry' : psi4.opt,'opt' : psi4.opt,'optimize' : psi4.opt,'potential_energy' : psi4.energy,'energy' : psi4.energy,'electronic_gradient' : psi4.gradient,'hessian' : psi4.hessian }
         
         for quantity in requests:
-            print(quantity)
             if quantity == 'potential_energy':
                 continue
             if quantity in request_options.keys():
@@ -182,13 +186,16 @@ class Psi4Potential(QMBase):
                 del self.params.options[mdt_opt]
         return self.params.options
     
-    def _run_psi4_calc(self, requests, geom, his):
+    def _run_psi4_calc(self, requests, psi4_molecule, his):
         import psi4
-        psi4_output = self._get_runmethod(requests)(self.params.theory, molecule=geom,return_wfn=True, return_history=his)
+        psi4_output = self._get_runmethod(requests)(self.params.theory, molecule=psi4_molecule,return_wfn=True, return_history=his)
+        psi4_molecule.update_geometry()
+        self.mol.charge=psi4_molecule.molecular_charge()
+        self.mol.multiplicity=psi4_molecule.multiplicity()
         return psi4_output
     
     #psi4_output should be a two membered list: [psi4_energy, psi4_wavefunction]
-    def _get_properties(self,requests,geom,psi4_output):
+    def _get_properties(self,requests,psi4_output):
         import psi4
         props={}
         
@@ -241,34 +248,10 @@ class Psi4Potential(QMBase):
     def _get_ao_basis_functions(self, psi4_wavefunction):
         import psi4
         from psi4 import qcdb
-        mymol = qcdb.Molecule("""
-            C    0.0  0.0 0.0
-            O    1.4  0.0 0.0
-            H_r -0.5 -0.7 0.0
-            H_l -0.5  0.7 0.0
-            """)
-        
-        atom0 = mdt.Atom('O')
-        atom0.x = 1.4* u.angstrom
-        atom0.y = 0.0* u.angstrom
-        atom0.z = 0.0* u.angstrom
 
-        atom1 = mdt.Atom('C')
-        atom1.x = 0.0* u.angstrom
-        atom1.y = 0.0* u.angstrom
-        atom1.z = 0.0* u.angstrom
+        psi4_molecule = psi4_interface.mdt_to_psi4(self.mol)
 
-        atom2 = mdt.Atom('H')
-        atom2.x = -0.5* u.angstrom
-        atom2.y = -0.7* u.angstrom
-        atom2.z = 0.0* u.angstrom
-
-        atom3 = mdt.Atom('H')
-        atom3.x = -0.5* u.angstrom
-        atom3.y = 0.7* u.angstrom
-        atom3.z = 0.0* u.angstrom
-        
-        my_mol=Molecule([atom0,atom1,atom2,atom3], name='My_mol', charge=0)
+        mymol = qcdb.Molecule(psi4_molecule.create_psi4_string_from_molecule())
         
         print('[1]    <<<  uniform cc-pVDZ  >>>')
         wert = qcdb.BasisSet.pyconstruct(mymol, 'BASIS', 'cc-pvdz')[0]
