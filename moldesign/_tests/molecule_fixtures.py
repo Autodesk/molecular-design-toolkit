@@ -6,6 +6,8 @@ import moldesign as mdt
 import moldesign.units as u
 from .helpers import get_data_path
 
+from moldesign.interfaces.openbabel import force_remote as openbabel_missing
+
 
 molecule_standards = {}
 
@@ -61,13 +63,18 @@ def random_atoms_from_3aid(pdb3aid):
 
 
 @pytest.fixture(scope='session')
-def small_molecule():
+def create_small_molecule():
     mol = mdt.from_smiles('CNCOS(=O)C')
     mol.positions += 0.001*np.random.random(mol.positions.shape)*u.angstrom  # move out of minimum
     return mol
 
 
 @pytest.fixture
+def small_molecule(create_small_molecule):
+    return create_small_molecule.copy()
+
+
+@pytest.fixture()
 def benzene():
     return mdt.from_smiles('c1ccccc1')
 
@@ -186,8 +193,8 @@ def nucleic():
 # Molecules with forcefields assigned - these use a session-scoped constructor w/ a copy factory
 
 @pytest.fixture(scope='session')
-def create_parameterize_zeros(small_molecule):
-    return _param_small_mol(small_molecule, 'zero')
+def create_parameterize_zeros(create_small_molecule):
+    return _param_small_mol(create_small_molecule.copy(), 'zero')
 
 
 @typedfixture('hasmodel')
@@ -196,11 +203,11 @@ def parameterize_zeros(create_parameterize_zeros):
 
 
 @pytest.fixture(scope='session')
-def create_parameterize_am1bcc(small_molecule):
+def create_parameterize_am1bcc(create_small_molecule):
     """ We don't use this fixture directly, rather use another fixture that copies these results
     so that we don't have to repeatedly call tleap/antechamber
     """
-    return _param_small_mol(small_molecule, 'am1-bcc')
+    return _param_small_mol(create_small_molecule.copy(), 'am1-bcc')
 
 
 @typedfixture('hasmodel')
@@ -209,13 +216,14 @@ def parameterize_am1bcc(create_parameterize_am1bcc):
 
 
 @pytest.fixture(scope='session')
-def create_gaff_model_gasteiger(small_molecule):
+def create_gaff_model_gasteiger(create_small_molecule):
     """ We don't use this fixture directly, rather use another fixture that copies these results
     so that we don't have to repeatedly call tleap/antechamber
     """
-    small_molecule.set_energy_model(mdt.models.GaffSmallMolecule, partial_charges='gasteiger')
-    small_molecule.energy_model.prep()
-    return small_molecule
+    mol = create_small_molecule.copy()
+    mol.set_energy_model(mdt.models.GaffSmallMolecule, partial_charges='gasteiger')
+    mol.energy_model.prep()
+    return mol
 
 
 @typedfixture('hasmodel')
@@ -223,11 +231,12 @@ def gaff_model_gasteiger(create_gaff_model_gasteiger):
     return create_gaff_model_gasteiger.copy()
 
 
-def _param_small_mol(small_molecule, chargemodel):
-    params = mdt.create_ff_parameters(small_molecule, charges=chargemodel, baseff='gaff2')
-    params.assign(small_molecule)
-    small_molecule.set_energy_model(mdt.models.ForceField)
-    return small_molecule
+def _param_small_mol(create_small_molecule, chargemodel):
+    mol = create_small_molecule.copy()
+    params = mdt.create_ff_parameters(mol, charges=chargemodel, baseff='gaff2')
+    params.assign(mol)
+    mol.set_energy_model(mdt.models.ForceField)
+    return mol
 
 
 @pytest.fixture(scope='session')

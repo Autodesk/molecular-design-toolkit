@@ -6,6 +6,7 @@ import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
+from moldesign.interfaces.openmm import force_remote as missing_openmm
 
 from . import helpers
 from .molecule_fixtures import *
@@ -52,18 +53,21 @@ def protein_freeze_hbonds(protein):
     return mol
 
 
+INTEGRATOR_PARAMS = dict(timestep=1.0 * u.fs,
+                         constrain_hbonds=False,
+                         constrain_water=False)
+
+
 @pytest.fixture
 def langevin():
-    return mdt.integrators.OpenMMLangevin(temperature=300.0*u.kelvin,
-                                          constrain_hbonds=False,
-                                          constrain_water=False)
+    return mdt.integrators.OpenMMLangevin(frame_interval=500,
+                                          **INTEGRATOR_PARAMS)
 
 
 @pytest.fixture
 def verlet():
-    return mdt.integrators.OpenMMVerlet(timestep=1.0 * u.fs,
-                                        constrain_hbonds=False,
-                                        constrain_water=False)
+    return mdt.integrators.OpenMMVerlet(frame_interval=250*u.fs,
+                                        **INTEGRATOR_PARAMS)
 
 
 @pytest.mark.parametrize('objkey', TESTSYTEMS)
@@ -113,16 +117,17 @@ def test_openmm_dynamics(systemkey, integratorkey, request):
     mol.set_integrator(request.getfixturevalue(integratorkey))
 
     mol.integrator.prep()
-    assert mol.integrator.sim.system is mol.energy_model.sim.system
+    if not missing_openmm:
+        assert mol.integrator.sim.system is mol.energy_model.sim.system
 
     initially_satisfied_constraints = all(c.satisfied() for c in mol.constraints)
 
     p0 = mol.positions.copy()
     t0 = mol.time
-    traj = mol.run(10.0 * u.ps)
+    traj = mol.run(2.0 * u.ps)
 
     # Basic dynamics and constraint sanity checks:
-    helpers.assert_something_resembling_dynamics_happened(traj, mol, p0, t0, 10.0*u.ps)
+    helpers.assert_something_resembling_dynamics_happened(traj, mol, p0, t0, 2.0*u.ps)
 
     if 'temperature' in mol.integrator.params:
         temp = mol.integrator.params.temperature
@@ -144,6 +149,8 @@ def test_openmm_dynamics(systemkey, integratorkey, request):
 def test_cleared_constraints_are_no_longer_applied(protein_custom_constraints, langevin):
     mol = protein_custom_constraints
 
+    langevin.frame_interval = 500
+
     t0 = mol.time
     p0 = mol.positions.copy()
     mol.set_integrator(langevin)
@@ -162,12 +169,12 @@ def test_cleared_constraints_are_no_longer_applied(protein_custom_constraints, l
 
     t1 = mol.time
     p1 = mol.positions.copy()
-    traj = mol.run(10.0 * u.ps)
+    traj = mol.run(2.0 * u.ps)
 
     for constraint in oldconstraints:
         assert not constraint.satisfied()  # it would be very very unlikely, I think
 
-    helpers.assert_something_resembling_dynamics_happened(traj, mol, p1, t1, 5*u.ps)
+    helpers.assert_something_resembling_dynamics_happened(traj, mol, p1, t1, 2*u.ps)
 
 
 @pytest.mark.parametrize('integkey', INTEGRATORS)
@@ -176,24 +183,28 @@ def test_unsupported_constraint_types(protein, integkey, request):
     integrator = request.getfixturevalue(integkey)
     protein.set_integrator(integrator)
 
-    assert protein.energy_model._prepped
+    if not missing_openmm:
+        assert protein.energy_model._prepped
+
     protein.constrain_dihedral(*protein.atoms[:4])
-    assert not protein.energy_model._prepped
+
+    if not missing_openmm:
+        assert not protein.energy_model._prepped
 
     protein.calculate(use_cache=False)  # this should work, because there's no motion invovled
 
     with pytest.raises(mdt.exceptions.NotSupportedError):
-        traj = protein.run(1*u.ps)
+        traj = protein.run(1.0*u.ps)
 
     t0 = protein.time
     p0 = protein.positions.copy()
     protein.clear_constraints()
-    traj = protein.run(1*u.ps)  # should NOT raise a fuss now
-    helpers.assert_something_resembling_dynamics_happened(traj, protein, p0, t0, 1*u.ps)
+    traj = protein.run(1.0*u.ps)  # should NOT raise a fuss now
+    helpers.assert_something_resembling_dynamics_happened(traj, protein, p0, t0, 1.0*u.ps)
 
     protein.constrain_angle(*protein.atoms[:3])
     with pytest.raises(mdt.exceptions.NotSupportedError):
-        protein.run(1*u.ps)
+        protein.run(1.0*u.ps)
 
 
 @pytest.mark.parametrize('integkey', INTEGRATORS)
@@ -214,6 +225,7 @@ def test_fallback_to_builtin_minimizer_for_arbitrary_constraints(small_mol, inte
     helpers.assert_something_resembling_minimization_happened(p0, e0, traj, mol)
 
 
+@pytest.mark.skipif(missing_openmm, reason='OpenMM not installed')
 def test_list_platforms():  # doesn't do much right now
     platforms = mdt.interfaces.openmm.list_openmmplatforms()
     print('Found platforms %d: ', (len(platforms), platforms))
