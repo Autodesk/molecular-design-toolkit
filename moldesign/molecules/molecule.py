@@ -417,7 +417,7 @@ class MolTopologyMixin(object):
 
     Note:
         This is a mixin class designed only to be mixed into the :class:`Molecule` class. Routines
-        are separated are here for code organization only - they could be included in the main
+        are here for code organization only - they could be included in the main
         Atom class without changing any functionality
     """
     def copy(self, name=None):
@@ -440,6 +440,9 @@ class MolTopologyMixin(object):
         newintegrator = self._copy_method(newmol, 'integrator')
         if newintegrator is not None:
             newmol.set_integrator(newintegrator)
+        if self.ff is not None:
+            self.ff.copy_to(newmol)
+        newmol.constraints = [c.copy(newmol) for c in self.constraints]
         return newmol
 
     def _copy_method(self, newmol, methodname):

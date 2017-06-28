@@ -16,6 +16,7 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import copy
 
 import moldesign as mdt
 from .. import units as u
@@ -52,6 +53,24 @@ class GeometryConstraint(object):
         for atom in self.atoms:
             assert atom.molecule is self.mol
         self.value = mdt.utils.if_not_none(value, self.current())
+
+    def copy(self, mol=None):
+        """ Copy this constraint, optionally relinking to a new molecule
+
+        Args:
+            mol (moldesign.Molecule): optional new molecule to track.
+
+        Returns:
+            GeometryConstraint: new constraint instance
+        """
+        if mol is None:
+            mol = self.mol
+        newatoms = [mol.atoms[atom.index] for atom in self.atoms]
+
+        # Note: this is the call signature for most subclasses, different than this base class's
+        return self.__class__(*newatoms,
+                              value=self.value, tolerance=self.tolerance,
+                              force_constant=self.force_constant)
 
     def current(self):
         """
@@ -254,8 +273,6 @@ class HBondsConstraint(GeometryConstraint):
     desc = 'hbonds'
 
     def __init__(self, mol):
-        from ..interfaces.openmm import simtk2pint
-
         self.mol = mol
         self.bonds = []
         self.subconstraints = []
@@ -265,6 +282,12 @@ class HBondsConstraint(GeometryConstraint):
                 self.subconstraints.append(DistanceConstraint(bond.a1, bond.a2,
                                                               value=bond.ff.equilibrium_length))
         self.values = [c.current() for c in self.subconstraints]
+
+    def copy(self, mol=None):
+        if mol is None:
+            return super().copy()
+        else:
+            return self.__class__(mol)
 
     @property
     def tolerance(self):
@@ -335,6 +358,22 @@ class FixedCoordinate(GeometryConstraint):
             self.value = value.copy()
         super().__init__([atom], value=self.value,
                          tolerance=tolerance, force_constant=force_constant)
+
+    def copy(self, mol=None):
+        """ Copy this constraint, optionally relinking to a new molecule
+
+        Args:
+            mol (moldesign.Molecule): optional new molecule to track.
+
+        Returns:
+            GeometryConstraint: new constraint instance
+        """
+        if mol is None:
+            mol = self.mol
+        newatom = mol.atoms[self.atom.index]
+        return self.__class__(newatom, self.vector.copy(),
+                              value=self.value, tolerance=self.tolerance,
+                              force_constant=self.force_constant)
 
     def current(self):
         return self.atom.position.dot(self.vector)
