@@ -4,6 +4,8 @@ import moldesign as mdt
 from .molecule_fixtures import *
 from . import helpers
 
+__PYTEST_MARK__ = 'internal'
+
 
 def test_create_atom_with_element_as_name():
     he_plus = mdt.Atom("He", position=np.ones(3) * u.nm, formal_charge=1*u.q_e)
@@ -80,6 +82,7 @@ def test_add_already_owned_atoms(h2):
                                 h2cpy.positions)
 
 
+@pytest.mark.xfail("You can't add an atom to a residue right now - needs different semantics")
 def test_add_atom_to_residues(pdb3aid):
     res = pdb3aid.residues[5]
     newatom = mdt.Atom('Ta', residue=res)

@@ -234,6 +234,10 @@ def test_pickling(objkey, request):
         assert type(y) == type(obj)
 
 
+def test_degrees_of_freedom(benzene):
+    assert benzene.dynamic_dof == 36
+
+
 @pytest.mark.parametrize('objkey', registered_types['equality'])
 def test_pickled_equality(objkey, request):
     obj = request.getfixturevalue(objkey)
@@ -320,6 +324,15 @@ def test_markdown_reprs_work(molkey, request):
 def test_dna_and_hydrogen_are_different(nucleic, h2):
     assert not nucleic.same_topology(h2)
     assert not nucleic.is_identical(h2)
+
+
+def test_attribute_error_without_simulation_setup(h2):
+    with pytest.raises(AttributeError):
+        h2.calculate()
+    with pytest.raises(AttributeError):
+        h2.minimize()
+    with pytest.raises(AttributeError):
+        h2.run(500)
 
 
 def test_changing_momenta_and_positions_makes_mols_different(nucleic):

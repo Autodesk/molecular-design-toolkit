@@ -246,7 +246,6 @@ class Trajectory(TrajectoryAnalysisMixin):
         self.unit_system = utils.if_not_none(unit_system, mdt.units.default)
         self.properties = utils.DotDict()
         self._reset()
-        self._tempmol.dynamic_dof = self.mol.dynamic_dof
         self.name = utils.if_not_none(name, 'untitled')
         if first_frame: self.new_frame()
 

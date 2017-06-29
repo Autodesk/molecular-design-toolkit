@@ -62,8 +62,7 @@ class MolConstraintMixin(object):
         Returns:
             moldesign.geometry.FixedPosition: constraint object
         """
-        from moldesign import geom
-        self.constraints.append(geom.FixedPosition(atom, value=pos))
+        self.constraints.append(mdt.geom.FixedPosition(atom, value=pos))
         self._reset_methods()
         return self.constraints[-1]
 
@@ -78,9 +77,8 @@ class MolConstraintMixin(object):
         Returns:
             moldesign.geometry.DistanceConstraint: constraint object
         """
-        from moldesign import geom
         self.constraints.append(
-            geom.constraints.DistanceConstraint(atom1, atom2, value=dist))
+            mdt.geom.DistanceConstraint(atom1, atom2, value=dist))
         self._reset_methods()
         return self.constraints[-1]
 
@@ -96,9 +94,8 @@ class MolConstraintMixin(object):
         Returns:
             moldesign.geometry.AngleConstraint: constraint object
         """
-        from moldesign import geom
         self.constraints.append(
-            geom.constraints.AngleConstraint(atom1, atom2, atom3, value=angle))
+            mdt.geom.AngleConstraint(atom1, atom2, atom3, value=angle))
         self._reset_methods()
         return self.constraints[-1]
 
@@ -115,27 +112,27 @@ class MolConstraintMixin(object):
         Returns:
             moldesign.geom.AngleConstraint: constraint object
         """
-        from moldesign import geom
         self.constraints.append(
-            geom.constraints.DihedralConstraint(atom1, atom2, atom3, atom4, value=angle))
+            mdt.geom.DihedralConstraint(atom1, atom2, atom3, atom4, value=angle))
         self._reset_methods()
         return self.constraints[-1]
 
-    def constrain_hbonds(self):
-        """ Constrain h-bonds in this molecule to their equilibrium forcefield values.
+    def constrain_hbonds(self, usecurrent=False):
+        """ Constrains the lengths of all bonds involving hydrogen.
 
-        For molecules with an associated forcefield, this method adds a constraint to the molecule
-        that fixes all the lengths of all bonds that involve at least one hydrogen atom. The bond
-        lengths are constrained to their equilibrium forcefield values.
+        By default, the lengths will be constrained to their forcefield equilibrium values.
+        They can also be constrained to their current values by setting ``usecurrent=True``
 
-        Note:
-            This can only be applied if the molecule is associated with a forcefield.
+        Args:
+            mol (moldesign.Molecule): Constrain all h-bonds in this molecule
+            usecurrent (bool): if False (default), set the constraint values to their forcefield
+               equilibrium values (this will fail if no forcefield is assigned). If True, constrain
+               the hydrogen bonds at the current values.
 
-        Returns:
-            moldesign.geom.HBondConstraint: constraint object
+        Raises:
+            AttributeError: if usecurrent=False but no forcefield is assigned
         """
-        from moldesign import geom
-        self.constraints.append(geom.constraints.HBondsConstraint(self))
+        self.constraints.append(mdt.geom.HBondsConstraint(self, usecurrent))
         self._reset_methods()
         return self.constraints[-1]
 
@@ -164,20 +161,14 @@ class MolPropertyMixin(object):
     def dynamic_dof(self):
         """ int: Count the number of spatial degrees of freedom of the system,
         taking into account any constraints
-
-        Note:
-            If there are other DOFs not taken into account here, this quantity can be
-            set explicitly
         """
-        if self._dof is not None:
-            return self._dof
         df = self.ndims
         if self.integrator is not None:
             if self.integrator.params.get('remove_translation', False):
                 df -= 3
             if self.integrator.params.get('remove_rotation', False):
                 if self.num_atoms > 2:
-                    df -= 2
+                    df -= 3
 
         const_hbonds = const_water = False
         if self.integrator is not None:
@@ -186,7 +177,8 @@ class MolPropertyMixin(object):
 
         if const_hbonds:  # TODO: deal with molecular hydrogen
             for atom in self.atoms:
-                if atom.atnum == 1: df -= 1
+                if atom.atnum == 1:
+                    df -= 1
 
         if const_water:
             for residue in self.residues:
@@ -196,11 +188,11 @@ class MolPropertyMixin(object):
                     else:
                         df -= 3
 
-        for constraint in self.constraints:  # TODO: deal with more double-counting cases
-            if const_hbonds:
-                if isinstance(constraint, mdt.geom.DistanceConstraint):
-                    # don't double-count constrained hbonds
-                    if constraint.a1.atnum == 1 or constraint.a2.atnum == 1: continue
+        for constraint in self.constraints:  # TODO: deal better with overlaps!
+            if (const_hbonds
+                    and isinstance(constraint, mdt.geom.DistanceConstraint)
+                    and (constraint.a1.atnum == 1 or constraint.a2.atnum == 1)):
+                continue
             df -= constraint.dof
         return df
 
@@ -1049,6 +1041,14 @@ class Molecule(AtomGroup,
                  metadata=None):
         super().__init__()
 
+        # initial property init
+        self.name = 'uninitialized molecule'
+        self._defres = None
+        self._defchain = None
+        self._constraints = None
+        self._charge = None
+        self._properties = None
+
         atoms, name = self._get_initializing_atoms(atomcontainer, name, copy_atoms)
 
         if metadata is None:
@@ -1056,10 +1056,6 @@ class Molecule(AtomGroup,
 
         self.atoms = atoms
         self.time = getattr(atomcontainer, 'time', 0.0 * u.default.time)
-        self.name = 'uninitialized molecule'
-        self._defres = None
-        self._defchain = None
-        self._constraints = None
         self.pdbname = pdbname
         self.constraints = []
         self.energy_model = None

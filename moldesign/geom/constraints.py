@@ -257,30 +257,34 @@ class FixedPosition(GeometryConstraint):
 
 
 class HBondsConstraint(GeometryConstraint):
-    """ Constraints the lengths of all bonds involving hydrogen to their equilibrium forcefield
-    values.
+    """ Constrains the lengths of all bonds involving hydrogen.
 
-    Generally, this is used to signal to a molecular dynamics program to apply H-bond constraints.
-
-    Note:
-        This constraint can only be applied to molecules with an assigned forcefield.
+    By default, the lengths will be constrained to their forcefield equilibrium values.
+    They can also be constrained to their current values by setting ``usecurrent=True``
 
     Args:
         mol (moldesign.Molecule): Constrain all h-bonds in this molecule
-        values (Vector[length]): constrained bond distances for all atoms (if not given, then
-            these are automatically set to their current values)
+        usecurrent (bool): if False (default), set the constraint values to their forcefield
+           equilibrium values (this will fail if no forcefield is assigned). If True, constrain
+           the hydrogen bonds at the current values.
+
+    Raises:
+        AttributeError: if usecurrent=False but no forcefield is assigned
     """
     desc = 'hbonds'
 
-    def __init__(self, mol):
+    def __init__(self, mol, usecurrent=False):
         self.mol = mol
         self.bonds = []
         self.subconstraints = []
         for bond in self.mol.bonds:
             if bond.a1.atnum == 1 or bond.a2.atnum == 1:
                 self.bonds.append(bond)
-                self.subconstraints.append(DistanceConstraint(bond.a1, bond.a2,
-                                                              value=bond.ff.equilibrium_length))
+                if usecurrent:
+                    l = bond.length
+                else:
+                    l = bond.ff.equilibrium_length
+                self.subconstraints.append(DistanceConstraint(bond.a1, bond.a2, value=l))
         self.values = [c.current() for c in self.subconstraints]
 
     def copy(self, mol=None):
@@ -383,7 +387,7 @@ class FixedCoordinate(GeometryConstraint):
         return [self.vector] * u.ureg.dimensionless
 
     def _constraintsig(self):
-        return super()._constraintsig() + (self.vector,)
+        return super()._constraintsig() + tuple(self.vector)
 
 
 def get_base_constraints(constraintlist):
