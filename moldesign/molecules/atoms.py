@@ -223,7 +223,8 @@ class Atom(AtomPropertyMixin):
         This is a shallow copy, and is intended to be deepcopied to avoid corrupting the original
         atom's data.
 
-        See :method:`moldesign.AtomContainer.copy_atoms` for the public interface that uses this.
+        Generally, the public interface for this is the ``copy`` methods of objects like
+        Molecules, AtomLists, Residues etc. ...
         """
         import copy
         if memo is None:

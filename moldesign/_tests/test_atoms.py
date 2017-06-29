@@ -82,6 +82,57 @@ def test_add_already_owned_atoms(h2):
                                 h2cpy.positions)
 
 
+def test_atom_shortstr_3aid(pdb3aid):
+    assert pdb3aid.atoms[10]._shortstr() == 'CA #10 in A.GLN2'
+
+
+def test_atom_shortstr_benzene(benzene):
+    for atom in benzene.atoms:
+        assert atom._shortstr() == '%s #%s' % (atom.name, atom.index)
+
+
+def test_atom_bond_iterators(benzene):
+    atom = benzene.atoms[0]
+    assert atom.atnum == 6  # sanity check
+    atombonds = benzene.bond_graph[atom]
+
+    assert set(atom.bonded_atoms) == set(atombonds.keys())
+    assert atom.bond_graph == atombonds
+
+    assert len(atom.heavy_bonds) == 2
+    heavybonds = sorted(atom.heavy_bonds, key=lambda x:x.order)
+    assert len(heavybonds) == 2
+    assert heavybonds[0].order == 1 and heavybonds[1].order == 2
+
+    assert len(atom.bonds) == 3
+    hbond, csingle, cdouble = False, False, False
+    for bond in atom.bonds:
+        assert bond.a1 is atom  # since "atom" has the lowest index, it's always a1
+        assert bond.partner(atom) is bond.a2
+
+        if bond.a2.atnum == 1:
+            assert hbond is False
+            hbond = True
+            assert bond.order == 1
+            assert len(bond.a2.heavy_bonds) == 0
+        else:
+            assert bond.a2.atnum == 6
+            if bond.order == 1:
+                assert csingle is False
+                csingle = True
+                assert bond == heavybonds[0]
+            else:
+                assert cdouble is False
+                cdouble = True
+                assert bond.order == 2
+                assert bond == heavybonds[1]
+
+    assert hbond and csingle and cdouble
+
+
+
+
+
 #def test_add_atom_to_residues(pdb3aid):
 #    res = pdb3aid.residues[5]
 #    newatom = mdt.Atom('Ta', residue=res)

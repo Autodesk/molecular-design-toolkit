@@ -463,6 +463,8 @@ class MolTopologyMixin(object):
         else:
             self.bond_graph = bond_graph
 
+        self._topology_changed()
+
         self.is_biomolecule = False
         self.ndims = 3 * self.num_atoms
         self._positions = np.zeros((self.num_atoms, 3)) * u.default.length
@@ -472,7 +474,6 @@ class MolTopologyMixin(object):
         self._assign_atom_indices()
         self._assign_residue_indices()
         self._dof = None
-        self._topology_changed()
 
     @staticmethod
     def _build_bonds(atoms):
@@ -532,7 +533,6 @@ class MolTopologyMixin(object):
             self._defchain.add(self._defres)
 
         default_residue = self._defres
-        default_chain = self._defchain
         num_biores = 0
         conflicts = set()
 

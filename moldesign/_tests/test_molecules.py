@@ -312,7 +312,8 @@ def test_h2_trajectory(h2_trajectory):
             assert frame.positions[0, 0] < -0.1 * u.angstrom
 
 
-@pytest.mark.parametrize('molkey', ['nucleic', 'pdb3aid', 'h2'])
+@pytest.mark.parametrize('molkey', ['nucleic', 'pdb3aid', 'h2', 'mol_with_zerocharge_params'])
+@pytest.mark.screening
 def test_markdown_reprs_work(molkey, request):
     # Not bothering to test the content, just want to make sure there's no error
     mol = request.getfixturevalue(molkey)

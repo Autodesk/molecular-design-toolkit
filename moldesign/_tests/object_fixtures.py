@@ -16,8 +16,7 @@ from .. import utils
 
 from .molecule_fixtures import *
 
-registered_types = {}
-registered_types.update(molecule_standards)
+registered_types = {key:val[:] for key,val in molecule_standards.items()}
 
 def typedfixture(*types, **kwargs):
     """This is a decorator that lets us associate fixtures with one or more arbitrary types.

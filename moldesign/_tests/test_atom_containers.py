@@ -84,7 +84,10 @@ def test_pairwise_distance_arrays(f1, f2, request):
     o1 = request.getfixturevalue(f1)
     o2 = request.getfixturevalue(f2)
 
-    array = o1.calc_distance_array(o2)
+    if isinstance(o1, mdt.Atom):
+        array = np.array([o1.calc_distance(o2)])
+    else:
+        array = o1.calc_distance_array(o2)
 
     if o1.num_atoms * o2.num_atoms > 250:  # stochastically test larger matrices
         pairs = ((random.randrange(0, o1.num_atoms), random.randrange(0, o2.num_atoms))

@@ -118,7 +118,7 @@ class Residue(BioContainer):
         if self.molecule is None:
             lines = ["<h3>Residue %s</h3>"%self.name]
         else:
-            lines = ["<h3>Residue %s (index %d)</h3>"%(self.name, self.index)]
+            lines = ["<h3>Residue %s (index %s)</h3>"%(self.name, self.index)]
 
         if self.type == 'protein':
             lines.append('**Residue codes**: %s / %s'%(self.resname, self.code))
@@ -130,7 +130,7 @@ class Residue(BioContainer):
 
         lines.append('**<p>Chain:** %s'%self.chain.name)
 
-        lines.append('**PDB sequence #**: %d'%self.pdbindex)
+        lines.append('**PDB sequence #**: %s'%self.pdbindex)
 
         terminus = None
         if self.type == 'dna':
