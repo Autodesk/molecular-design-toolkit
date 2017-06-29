@@ -250,7 +250,7 @@ class Atom(AtomPropertyMixin):
         if self.residue is not None:
             if self.residue not in memo:
                 self.residue._subcopy(memo)
-            newatom.residue = memo[self.residue]
+            memo[self.residue].add(newatom)
 
     @property
     def chain(self):

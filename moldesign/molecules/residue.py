@@ -72,7 +72,7 @@ class Residue(BioContainer):
         import copy
 
         if memo is None:
-            memo = {}
+            memo = {'bondgraph':{}}
         if self in memo:
             return
 
@@ -82,13 +82,13 @@ class Residue(BioContainer):
         newresidue.children = ChildList(newresidue)
 
         memo[self] = newresidue
-        if self.chain is not None and self.chain not in memo:
-            newchain = copy.copy(self.chain)
-            newchain.molecule = None
-            newchain.children = ChildList(newchain)
-            memo[self.chain] = newchain
-
-        newresidue.chain = memo[self.chain]
+        if self.chain is not None:
+            if self.chain not in memo:
+                newchain = copy.copy(self.chain)
+                newchain.molecule = None
+                newchain.children = ChildList(newchain)
+                memo[self.chain] = newchain
+            memo[self.chain].add(newresidue)
 
     @property
     def name(self):
