@@ -82,14 +82,13 @@ def test_add_already_owned_atoms(h2):
                                 h2cpy.positions)
 
 
-@pytest.mark.xfail("You can't add an atom to a residue right now - needs different semantics")
-def test_add_atom_to_residues(pdb3aid):
-    res = pdb3aid.residues[5]
-    newatom = mdt.Atom('Ta', residue=res)
-    pdb3aid.add_atom(newatom)
+#def test_add_atom_to_residues(pdb3aid):
+#    res = pdb3aid.residues[5]
+#    newatom = mdt.Atom('Ta', residue=res)
+#    pdb3aid.add_atom(newatom)
 
-    assert newatom.molecule is pdb3aid
-    assert newatom.chain is res.chain
-    assert newatom.residue is res
+#    assert newatom.molecule is pdb3aid
+#    assert newatom.chain is res.chain
+#    assert newatom.residue is res
 
-    assert newatom in res
+#    assert newatom in res
