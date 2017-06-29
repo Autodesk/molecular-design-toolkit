@@ -86,21 +86,39 @@ def benzene(cached_benzene):
 
 @typedfixture('molecule')
 def h2():
-    atom1 = mdt.Atom('H')
-    atom1.x = 0.5 * u.angstrom
-    atom2 = mdt.Atom(atnum=1)
-    atom2.position = [-0.5, 0.0, 0.0] * u.angstrom
-    h2 = mdt.Molecule([atom1, atom2], name='h2')
-    atom1.bond_to(atom2, 1)
-    return h2
+    mol = mdt.Molecule([mdt.Atom('H1'),
+                        mdt.Atom('H2')])
+    mol.atoms[0].x = 0.5 * u.angstrom
+    mol.atoms[1].x = -0.25 * u.angstrom
+    mol.atoms[0].bond_to(mol.atoms[1], 1)
+    return mol
 
 
-@pytest.fixture
-def ethylene():
-    return mdt.from_smiles('C=C')
+@typedfixture('molecule')
+def heh_plus():
+    mol = mdt.Molecule([mdt.Atom('H'),
+                        mdt.Atom('He')])
+    mol.atoms[1].z = 1.0 * u.angstrom
+    mol.charge = 1 * u.q_e
+    mol.atoms[0].bond_to(mol.atoms[1], 1)
+    return mol
 
 
 @pytest.fixture(scope='session')
+def cached_ethylene():
+    return mdt.from_smiles('C=C')
+
+
+@pytest.fixture
+def ethylene(cached_ethylene):
+    return cached_ethylene.copy()
+
+
+@pytest.fixture(scope='session')
+def cached_pdb1yu8():
+    return mdt.read(get_data_path('1yu8.pdb'))
+
+@pytest.fixture
 def pdb1yu8():
     return mdt.read(get_data_path('1yu8.pdb'))
 
@@ -254,11 +272,11 @@ def _param_small_mol(cached_small_molecule, chargemodel):
 
 
 @pytest.fixture(scope='session')
-def cached_protein_with_default_amber_ff(pdb1yu8):
+def cached_protein_with_default_amber_ff(cached_pdb1yu8):
     """ We don't use this fixture directly, rather use another fixture that copies these results
     so that we don't have to repeatedly call tleap/antechamber
     """
-    mol = pdb1yu8
+    mol = cached_pdb1yu8
     ff = mdt.forcefields.DefaultAmber()
     newmol = ff.create_prepped_molecule(mol)
     newmol.set_energy_model(mdt.models.ForceField)

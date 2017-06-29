@@ -48,6 +48,12 @@ def test_h2_array_link(h2):
     assert h2.atoms[1].py == 3.0*u.default.momentum
 
 
+def test_benzene_orbital_numbers(benzene):
+    assert benzene.num_electrons == 42
+    assert benzene.homo == 20
+    assert benzene.lumo == 21
+
+
 def test_h2_set_coord_slices(h2):
     mol = h2.copy()
     mol.positions[:] = np.zeros((2,3)) * u.angstrom
@@ -245,8 +251,8 @@ def test_pickled_equality(objkey, request):
 def test_h2_positions(h2):
     atom1, atom2 = h2.atoms
     assert (atom1.position == np.array([0.5, 0.0, 0.0]) * u.angstrom).all()
-    assert atom2.x == -0.5 * u.angstrom
-    assert atom1.distance(atom2) == 1.0 * u.angstrom
+    assert atom2.x == -0.25 * u.angstrom
+    assert atom1.distance(atom2) == 0.75 * u.angstrom
 
 
 def test_h2(h2):
@@ -302,11 +308,13 @@ def test_h2_trajectory(h2_trajectory):
             assert frame.positions[0, 0] < -0.1 * u.angstrom
 
 
-def test_markdown_reprs_work(nucleic):
+@pytest.mark.parametrize('molkey', ['nucleic', 'pdb3aid', 'h2'])
+def test_markdown_reprs_work(molkey, request):
     # Not bothering to test the content, just want to make sure there's no error
-    assert isinstance(nucleic._repr_markdown_(), basestring)
-    assert isinstance(nucleic.atoms[0]._repr_markdown_(), basestring)
-    assert isinstance(nucleic.residues[0]._repr_markdown_(), basestring)
+    mol = request.getfixturevalue(molkey)
+    assert isinstance(mol._repr_markdown_(), basestring)
+    assert isinstance(mol.atoms[0]._repr_markdown_(), basestring)
+    assert isinstance(mol.residues[0]._repr_markdown_(), basestring)
 
 
 def test_dna_and_hydrogen_are_different(nucleic, h2):
