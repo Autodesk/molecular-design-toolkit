@@ -8,8 +8,8 @@ import moldesign.molecules.atomcollections
 import moldesign.utils.classes
 
 from .object_fixtures import *
-from .test_ambertools_xface import protein_default_amber_forcefield
-from .test_qm_xfaces import h2_rhfwfn
+from .molecule_fixtures import *
+from . import helpers
 
 
 __PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)

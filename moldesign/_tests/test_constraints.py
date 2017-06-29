@@ -164,8 +164,8 @@ def test_dihedral_constraint_errors_at_0(four_particle_45_twist):
         np.testing.assert_allclose(constraint.error().value_in(u.degrees), -angle.magnitude)
 
 
-def test_cannot_add_duplicate_constraints(parameterize_zeros):
-    mol = parameterize_zeros
+def test_cannot_add_duplicate_constraints(mol_with_zerocharge_params):
+    mol = mol_with_zerocharge_params
     mol.constrain_distance(*mol.atoms[:2])
     mol.constrain_angle(*mol.atoms[:3])
     mol.constrain_dihedral(*mol.atoms[:4])

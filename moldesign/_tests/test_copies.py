@@ -167,8 +167,8 @@ def test_chain_rename(pdb3aid):
     assert newmol.chains[1].name == 'B'
 
 
-@pytest.mark.parametrize('molkey', ["create_parameterize_am1bcc",
-                                    "create_protein_default_amber_forcefield"])
+@pytest.mark.parametrize('molkey', ["cached_mol_parameterized_with_zeros",
+                                    "cached_protein_with_default_amber_ff"])
 def test_forcefield_copied_with_molecule(molkey, request):
     mol = request.getfixturevalue(molkey)
     m2 = mol.copy()
@@ -186,8 +186,8 @@ def test_forcefield_copied_with_molecule(molkey, request):
     assert p1.improper_types == p2.improper_types
 
 
-def test_constraints_copied_with_molecule(parameterize_zeros):
-    mol = parameterize_zeros
+def test_constraints_copied_with_molecule(mol_with_zerocharge_params):
+    mol = mol_with_zerocharge_params
 
     mol.constrain_distance(*mol.atoms[:2])
     mol.constrain_angle(*mol.atoms[:3])
