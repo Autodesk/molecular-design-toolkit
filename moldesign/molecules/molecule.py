@@ -196,9 +196,15 @@ class MolPropertyMixin(object):
             df -= constraint.dof
         return df
 
-    @dynamic_dof.setter
-    def dynamic_dof(self, val):
-        self._dof = val
+    @property
+    def charge(self):
+        return self._charge
+
+    @charge.setter
+    def charge(self, val):
+        if not hasattr(val, 'units'):
+            val = val * u.q_e
+        self._charge = val
 
     @property
     def num_electrons(self):
@@ -780,7 +786,7 @@ class MolSimulationMixin(object):
             moldesign.trajectory.Trajectory
         """
         if self.integrator is None:
-            raise ValueError('Cannot simulate; no integrator set for %s' % self)
+            raise AttributeError('Cannot simulate; no integrator set for %s' % self)
 
         init_time = self.time
         traj = self.integrator.run(run_for)
@@ -804,7 +810,7 @@ class MolSimulationMixin(object):
             MolecularProperties
         """
         if self.energy_model is None:
-            raise ValueError('Cannot calculate properties; no energy model set for %s' % self)
+            raise AttributeError('Cannot calculate properties; no energy model set for %s' % self)
 
         if requests is None:
             requests = []
@@ -857,12 +863,12 @@ class MolSimulationMixin(object):
         model.mol = self
         model.params.update(params)
 
-        if 'charge' in model.params:
-            if model.params.charge is None:
-               model.params.charge = self.charge
-            elif model.params.charge != self.charge:
-                print("Warning: molecular charge (%d) does not match energy model's charge (%d)" % (
-                    self.charge, model.params.charge))
+        if 'charge' not in model.params:
+            if self.charge != 0:
+                model.params.charge = self.charge
+        elif model.params['charge'] != self.charge:
+            print("Warning: molecular charge (%s) does not match energy model's charge (%s)" % (
+                self.charge.value_in(u.q_e), model.params.charge.value_in(u.q_e)))
         model._prepped = False
 
     def set_integrator(self, integrator, **params):
@@ -904,7 +910,7 @@ class MolSimulationMixin(object):
             moldesign.trajectory.Trajectory
         """
         if self.energy_model is None:
-            raise ValueError('Cannot minimize molecule; no energy model set for %s' % self)
+            raise AttributeError('Cannot minimize molecule; no energy model set for %s' % self)
 
         try:
             trajectory = self.energy_model.minimize(**kwargs)
@@ -1065,8 +1071,6 @@ class Molecule(AtomGroup,
 
         if charge is not None:
             self.charge = charge
-            if not hasattr(charge, 'units'):  # assume fundamental charge units if not explicitly set
-                self.charge *= u.q_e
         else:
             self.charge = getattr(atomcontainer, 'charge',
                                   u.unitsum(atom.formal_charge for atom in self.atoms))

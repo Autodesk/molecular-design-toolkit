@@ -384,3 +384,42 @@ def test_changing_bonds_makes_mols_different(nucleic):
     n.bond_graph[atom1][atom2] = n.bond_graph[atom2][atom1] = 1
     assert not nucleic.is_identical(n, verbose=True)
     assert not nucleic.same_topology(n, verbose=True)
+
+
+def test_charge_from_number(h2):
+    h2plus = mdt.Molecule(h2, charge=1)
+    assert h2plus.charge == 1 * u.q_e
+
+    h2plus.charge = 2 * u.q_e
+    assert h2plus.charge == 2 * u.q_e
+
+    h2plus.charge = 3
+    assert h2plus.charge == 3 * u.q_e
+
+
+def test_energy_model_charges(h2):
+    h2.charge = 1 * u.q_e
+    assert h2.charge == 1 * u.q_e
+    h2.set_energy_model(mdt.models.OpenMMPotential)
+
+    assert h2.energy_model.params.charge == 1 * u.q_e
+
+    h2.set_energy_model(mdt.models.OpenMMPotential, charge=3*u.q_e)
+    # TODO: test for warning here as well
+    assert h2.energy_model.params.charge == 3 * u.q_e
+
+
+def test_initialization_charges():
+    a1 = mdt.Atom('Na', formal_charge=-1)
+    mol = mdt.Molecule([a1])
+    assert mol.charge == -1 * u.q_e
+
+    with pytest.raises(TypeError):
+        mdt.Atom('H', charge=3)  # it needs to be "formal_charge", to distinguish from partial charge
+
+    m2 = mdt.Molecule([a1], charge=-1)
+    assert m2.charge == -1 * u.q_e
+
+    m2 = mdt.Molecule([a1], charge=-3*u.q_e)
+    # TODO: test for warning
+    assert m2.charge == -3 * u.q_e
