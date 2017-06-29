@@ -187,8 +187,6 @@ def split_chains(mol, distance_threshold=1.75*u.angstrom):
     def addto(chain, res):
         res.chain = None
         chain.add(res)
-        for atom in res:
-            atom.chain = chain
 
     allchains = [mdt.Chain(tempmol.chains[0].name)]
     for chain in tempmol.chains:

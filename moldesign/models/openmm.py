@@ -230,13 +230,10 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         for constraint in self.mol.constraints:
             if constraint.desc == 'position':
                 fixed_atoms.add(constraint.atom)
-                self.mol.assert_atom(constraint.atom)
                 system.setParticleMass(constraint.atom.index, 0.0)
 
             # Constrain distances between atom pairs
             elif constraint.desc == 'distance':
-                self.mol.assert_atom(constraint.a1)
-                self.mol.assert_atom(constraint.a2)
                 system.addConstraint(constraint.a1.index,
                                      constraint.a2.index,
                                      opm.pint2simtk(constraint.value))

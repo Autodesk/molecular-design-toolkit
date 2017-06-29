@@ -454,20 +454,6 @@ class MolTopologyMixin(object):
         newmethod.params.update(method.params)
         return newmethod
 
-    def assert_atom(self, atom):
-        """If passed an integer, just return self.atoms[atom].
-         Otherwise, assert that the atom belongs to this molecule"""
-        if type(atom) is int:
-            atom = self.mol.atoms[atom]
-        else:
-            assert atom.molecule is self, "Atom %s does not belong to %s" % (atom, self)
-        return atom
-
-    def rebuild(self):
-        self.chains = Instance(molecule=self)
-        self.residues = []
-        self._rebuild_topology()
-
     def _rebuild_topology(self, bond_graph=None):
         """ Build the molecule's bond graph based on its atoms' bonds
 
@@ -488,6 +474,7 @@ class MolTopologyMixin(object):
         self._assign_atom_indices()
         self._assign_residue_indices()
         self._dof = None
+        self._topology_changed()
 
     @staticmethod
     def _build_bonds(atoms):
@@ -502,10 +489,7 @@ class MolTopologyMixin(object):
         # First pass - create initial bonds
         for atom in atoms:
             assert atom not in bonds, 'Atom appears twice in this list'
-            if hasattr(atom, 'bonds') and atom.bond_graph is not None:
-                bonds[atom] = atom.bond_graph
-            else:
-                bonds[atom] = {}
+            bonds[atom] = atom.bond_graph
 
         # Now make sure both atoms have a record of their bonds
         for atom in atoms:
@@ -535,8 +519,6 @@ class MolTopologyMixin(object):
         """
         Set up the chain/residue/atom hierarchy
         """
-        # TODO: consistency checks
-
         if self._defchain is None:
             self._defchain = Chain(name=None,
                                    index=None,
@@ -574,7 +556,6 @@ class MolTopologyMixin(object):
             # if atom has no chain/residue, assign defaults
             if atom.residue is None:
                 atom.residue = default_residue
-                atom.chain = default_chain
                 atom.residue.add(atom)
 
             # assign the chain to this molecule if necessary
@@ -955,6 +936,10 @@ class MolSimulationMixin(object):
         if self.integrator is not None:
             self.integrator._prepped = False
 
+    def _topology_changed(self):
+        self._reset_methods()
+        self.ff = None
+
 
 @toplevel
 class Molecule(AtomGroup,
@@ -1181,7 +1166,7 @@ class Molecule(AtomGroup,
 
         return '\n\n'.join(lines)
 
-    def newbond(self, a1, a2, order):
+    def new_bond(self, a1, a2, order):
         """ Create a new bond
 
         Args:
@@ -1212,25 +1197,31 @@ class Molecule(AtomGroup,
 
     nbonds = num_bonds
 
-    def addatom(self, newatom):
+    def add_atom(self, newatom):
         """  Add a new atom to the molecule
 
         Args:
             newatom (moldesign.Atom): The atom to add
                 (it will be copied if it already belongs to a molecule)
         """
-        self.addatoms([newatom])
+        self.add_atoms([newatom])
 
-    def addatoms(self, newatoms):
+    def add_atoms(self, newatoms):
         """Add new atoms to this molecule.
-        For now, we really just rebuild the entire molecule in place.
+
+        *Copies* of the passed atoms will be added if they already belong to another molecule.
 
         Args:
            newatoms (List[moldesign.Atom]))
         """
-        self._reset_methods()
+        owner = newatoms[0].molecule
+        for atom in newatoms:
+            if atom.molecule is not owner:
+                raise ValueError('Cannot add atoms from multiple sources - add them separately.')
 
-        for atom in newatoms: assert atom.molecule is None
+        if owner is not None:  # copy if the atoms are already owned
+            newatoms = mdt.AtomList(newatoms).copy()
+
         self.atoms.extend(newatoms)
 
         # symmetrize bonds between the new atoms and the pre-existing molecule
@@ -1242,7 +1233,7 @@ class Molecule(AtomGroup,
 
         self._rebuild_topology(bonds)
 
-    def deletebond(self, bond):
+    def delete_bond(self, bond):
         """ Remove this bond from the molecule's topology
 
         Args:
@@ -1250,28 +1241,12 @@ class Molecule(AtomGroup,
         """
         self.bond_graph[bond.a1].pop(bond.a2)
         self.bond_graph[bond.a2].pop(bond.a1)
-
-    def _force_converged(self, tolerance):
-        """ Return True if the forces on this molecule:
-        1) Are less than tolerance in every dimension
-        2) have an RMS of less than 1/3 the tolerance value
-
-        Args:
-            tolerance (units.Scalar[force]): force tolerance
-
-        Returns:
-            bool: True if RMSD force is less than this quantity
-        """
-        forces = self.calc_forces()
-        if forces.max() > tolerance: return False
-        rmsd2 = forces.dot(forces) / self.ndims
-        if rmsd2 > tolerance * tolerance / 3.0: return False
-        return True
+        self._topology_changed()
 
     def write(self, filename=None, **kwargs):
         """ Write this molecule to a string or file.
 
-        This is a convenience method for :ref:`moldesign.converters.write`
+        Calls :ref:`moldesign.converters.write`
 
         Args:
             filename (str): filename to write (if not passed, write to string)

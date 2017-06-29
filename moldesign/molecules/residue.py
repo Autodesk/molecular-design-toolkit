@@ -22,7 +22,7 @@ import collections
 
 import moldesign as mdt
 from .. import utils, data
-from . import BioContainer, AtomList, toplevel
+from . import BioContainer, AtomList, toplevel, ChildList
 
 
 @toplevel
@@ -36,17 +36,6 @@ class Residue(BioContainer):
         parent (mdt.Molecule): the molecule this residue belongs to
         chain (Chain): the chain this residue belongs to
     """
-
-    def copy(self):
-        """ Create a copy of this residue and all topology within.
-
-        Returns:
-            Residue: copy of this residue and all its atoms. This copy will NOT
-            reference any parent molecule
-        """
-        newatoms = super().copy_atoms()
-        return newatoms[0].residue
-
     @utils.args_from(BioContainer)
     def __init__(self, **kwargs):
         """ Initialization
@@ -62,6 +51,44 @@ class Residue(BioContainer):
         self._sidechain = None
         self._template_name = None
         self._name = None
+
+    def copy(self):
+        """ Create a copy of this residue and all topology within.
+
+        Returns:
+            Residue: copy of this residue and all its atoms. This copy will NOT
+            reference any parent molecule
+        """
+        newatoms = super().copy_atoms()
+        return newatoms[0].residue
+
+    def _subcopy(self, memo=None):
+        """ Private data mangement method for copying a residue.
+        Returns a shallow copy intended to be deepcopied to avoid corrupting the original
+         data.
+
+        See :method:`moldesign.Residue.copy` for the public interface for copying these objects.
+        """
+        import copy
+
+        if memo is None:
+            memo = {}
+        if self in memo:
+            return
+
+        newresidue = copy.copy(self)
+        newresidue.chain = None
+        newresidue.molecule = None
+        newresidue.children = ChildList(newresidue)
+
+        memo[self] = newresidue
+        if self.chain is not None and self.chain not in memo:
+            newchain = copy.copy(self.chain)
+            newchain.molecule = None
+            newchain.children = ChildList(newchain)
+            memo[self.chain] = newchain
+
+        newresidue.chain = memo[self.chain]
 
     @property
     def name(self):
@@ -153,10 +180,6 @@ class Residue(BioContainer):
         if atom.residue is not None:
             assert atom.residue is self, 'Atom already assigned to a residue'
         atom.residue = self
-        if atom.chain is None:
-            atom.chain = self.chain
-        else:
-            assert atom.chain == self.chain, "Atom's chain does not match residue's chain"
 
         if key is not None or atom.name not in self.children:
             return super().add(atom, key=key)

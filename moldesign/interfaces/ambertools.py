@@ -184,8 +184,6 @@ def build_dna_helix(sequence, helix_type='B', **kwargs):
             newchain = mdt.Chain('B')
             for residue in mol.residues[mol.num_residues//2:]:
                 residue.chain = newchain
-                for atom in residue:
-                    atom.chain = newchain
             mol = mdt.Molecule(mol)
         mdt.helpers.assign_biopolymer_bonds(mol)
 

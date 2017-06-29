@@ -292,7 +292,6 @@ def topology_to_mol(topo, name=None, positions=None, velocities=None, assign_bon
             for atom in residue.atoms():
                 newatom = atommap[atom]
                 newatom.residue = newresidue
-                newatom.chain = newchain
                 newresidue.add(newatom)
 
     # Bonds
