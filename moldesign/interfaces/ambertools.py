@@ -278,7 +278,7 @@ def _prep_for_tleap(mol):
                     print('INFO: disulfide bond detected. Renaming %s from CYS to CYX' % residue)
                     sulfur.residue.resname = 'CYX'
 
-            clean._rebuild_topology()
+            clean._rebuild_from_atoms()
 
     return clean
 

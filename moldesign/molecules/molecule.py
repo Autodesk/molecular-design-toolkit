@@ -29,7 +29,7 @@ from ..compute import DummyJob
 from ..exceptions import NotCalculatedError
 from ..min.base import MinimizerBase
 from .properties import MolecularProperties
-from . import toplevel, Residue, Chain, PrimaryStructure, AtomGroup, Bond, HasResidues, BondGraph
+from . import toplevel, PrimaryStructure, AtomGroup, Bond, HasResidues, BondGraph
 from ..helpers import WidgetMethod
 from .coord_arrays import *
 
@@ -369,46 +369,6 @@ class MolPropertyMixin(object):
     calc_potential_energy = calculate_potential_energy
     calc_forces = calculate_forces
 
-    def _biomol_summary_markdown(self):
-        """A markdown description of biomolecular structure.
-
-        Returns:
-            str: Markdown string"""
-        lines = []
-        if len(self.residues) > 1:
-            lines.append('### Biopolymer chains')
-            seqs = []
-            for chain in self.chains:
-                seq = chain._get_sequence(_html=True)
-                if not seq.strip():  # don't write anything if there's no sequence
-                    continue
-
-                seqs.append('**%s**: %s'%(chain.name, seq))
-            lines.append('<br>'.join(seqs))
-
-        return lines
-
-    def get_residue_table(self):
-        """Creates a data table summarizing this molecule's primary structure.
-
-        Returns:
-            moldesign.utils.MarkdownTable"""
-        table = utils.MarkdownTable(*(['chain']+
-                                      'protein dna rna unknown water solvent ion'.split()))
-        for chain in self.chains:
-            counts = {}
-            unk = []
-            for residue in chain.residues:
-                cat = residue.type
-                if cat == 'unknown':
-                    unk.append(residue.name)
-                counts[cat] = counts.get(cat, 0)+1
-            counts['chain'] = '<b>%s</b>'%chain.name
-            if 0 < len(unk) <= 4:
-                counts['unknown'] = ','.join(unk)
-            table.add_line(counts)
-        return table
-
 
 class MolTopologyMixin(object):
     """ Functions for building and keeping track of bond topology and biochemical structure.
@@ -450,8 +410,8 @@ class MolTopologyMixin(object):
         newmethod.params.update(method.params)
         return newmethod
 
-    def _rebuild_topology(self):
-        """ Build the molecule's bond graph based on its atoms' bonds
+    def _rebuild_from_atoms(self):
+        """ Rebuild component data structures based on atomic data
         """
         self.is_biomolecule = False
         self.ndims = 3 * self.num_atoms
@@ -460,7 +420,7 @@ class MolTopologyMixin(object):
         self.masses = np.zeros(self.num_atoms) * u.default.mass
         self.dim_masses = u.broadcast_to(self.masses, (3, self.num_atoms)).T
         self._assign_atom_indices()
-        self._assign_residue_indices()
+        self.chains.rebuild_hierarchy()
         self._dof = None
         self._topology_changed()
 
@@ -478,83 +438,6 @@ class MolTopologyMixin(object):
             # Here, we index the atom arrays directly into the molecule
             atom._index_into_molecule('_position', self.positions, idx)
             atom._index_into_molecule('_momentum', self.momenta, idx)
-
-    def _assign_residue_indices(self):
-        """
-        Set up the chain/residue/atom hierarchy
-        """
-        if self._defchain is None:
-            self._defchain = Chain(name=None,
-                                   index=None,
-                                   molecule=None)
-
-        if self._defres is None:
-            self._defres = Residue(name=None,
-                                   index=None,
-                                   pdbindex=None,
-                                   pdbname=None,
-                                   chain=self._defchain,
-                                   molecule=None)
-            self._defchain.add(self._defres)
-
-        default_residue = self._defres
-        num_biores = 0
-        conflicts = set()
-
-        pdbatoms = [atom for atom in self.atoms if atom.pdbindex is not None]
-        if pdbatoms:
-            min_pdb_atom = min(pdbatoms, key=lambda x:x.pdbindex)
-            last_pdb_idx = min_pdb_atom.pdbindex - min_pdb_atom.index - 1
-        else:
-            last_pdb_idx = 0
-
-        for atom in self.atoms:
-            if atom.pdbindex is None:
-                atom.pdbindex = last_pdb_idx + 1
-            if last_pdb_idx is not None and atom.pdbindex <= last_pdb_idx:
-                atom.pdbindex = last_pdb_idx + 1
-                conflicts.add('atom indices')
-            last_pdb_idx = atom.pdbindex
-
-            # if atom has no chain/residue, assign defaults
-            if atom.residue is None:
-                atom.residue = default_residue
-                atom.residue.add(atom)
-
-            # assign the chain to this molecule if necessary
-            if atom.chain.molecule is None:
-                atom.chain.molecule = self
-                atom.chain.index = len(self.chains)
-
-                assert atom.chain not in self.chains
-                oldname = atom.chain.name
-                if atom.chain.name is None and num_biores > 1:
-                    atom.chain.name = 'A'
-                while atom.chain.name in self.chains:
-                    if atom.chain.name is None:
-                        atom.chain.name = 'A'
-                    atom.chain.name = chr(ord(atom.chain.name)+1)
-
-                if oldname != atom.chain.name:
-                    conflicts.add('chain ids')
-                self.chains.add(atom.chain)
-            else:
-                assert atom.chain.molecule is self
-
-            # assign the residue to this molecule
-            if atom.residue.molecule is None:
-                atom.residue.molecule = self
-                atom.residue.index = len(self.residues)
-                self.residues.append(atom.residue)
-                if atom.residue.type in ('dna', 'rna', 'protein'):
-                    num_biores += 1
-            else:
-                assert atom.chain.molecule is self
-
-        if conflicts:
-            print('WARNING: %s modified due to name clashes' % (
-                ', '.join(conflicts)))
-        self.is_biomolecule = (num_biores >= 2)
 
     def is_identical(self, other, verbose=False):
         """ Test whether two molecules are "identical"
@@ -596,10 +479,11 @@ class MolTopologyMixin(object):
 
         return True
 
+    residues = utils.Alias('chains.residues')
 
     @property
     def num_residues(self):
-        return len(self.residues)
+        return len(self.chains.residues)
     nresidues = numresidues = num_residues
 
     @property
@@ -1010,8 +894,6 @@ class Molecule(AtomGroup,
 
         # initial property init
         self.name = 'uninitialized molecule'
-        self._defres = None
-        self._defchain = None
         self._constraints = None
         self._charge = None
         self._properties = None
@@ -1038,9 +920,8 @@ class Molecule(AtomGroup,
                                   u.unitsum(atom.formal_charge for atom in self.atoms))
 
         # Builds the internal memory structures
-        self.chains = PrimaryStructure(molecule=self)
-        self.residues = []
-        self._rebuild_topology()
+        self.chains = PrimaryStructure(self)
+        self._rebuild_from_atoms()
 
         if name is not None:
             self.name = name
@@ -1118,13 +999,7 @@ class Molecule(AtomGroup,
         if self.integrator:
             lines.append('**Integrator**: %s'%str(self.integrator))
 
-        if self.num_residues > 1:
-            table = self.get_residue_table()
-            lines.append('### Residues')
-            lines.append(table.markdown(replace={0: ' '})+'|')  # extra '|' is bug workaround (?)
-
-        if self.is_biomolecule:
-            lines.extend(self._biomol_summary_markdown())
+        lines.extend(self.chains._repr_markdown_())
 
         return '\n\n'.join(lines)
 
@@ -1186,7 +1061,7 @@ class Molecule(AtomGroup,
 
         self.atoms.extend(newatoms)
         self.bond_graph._add_atoms(newatoms)
-        self._rebuild_topology()
+        self._rebuild_from_atoms()
 
     def delete_bond(self, bond_or_atom, a2=None):
         """ Remove this bond from the molecule's topology

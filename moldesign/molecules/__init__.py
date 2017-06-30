@@ -12,5 +12,6 @@ from .atoms import *
 from .biounits import *
 from .residue import *
 from .chain import *
+from .primary_structure import *
 from .molecule import *
 from .trajectory import *

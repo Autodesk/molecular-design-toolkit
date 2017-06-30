@@ -56,7 +56,7 @@ class ChildList(AtomContainer):
             try:
                 return self._childinorder[item]
             except IndexError:
-                raise IndexError("No object with index '%d' in %s" % (item, self.parent))
+                raise IndexError("No object with index %d in %s" % (item, self.parent))
         else:
             try:
                 return self._childbyname[item]
@@ -234,17 +234,5 @@ class MolecularHierarchy(AtomContainer):
                 if hasattr(child, key) and getattr(child, key) == val:
                     retlist.append(child)
         return retlist
-
-
-@toplevel
-class PrimaryStructure(MolecularHierarchy):
-    """ The singleton biomolecular container for each ``Molecule``. Its children are generally
-    PDB chains. Users won't ever really see this object.
-    """
-    def __str__(self):
-        return str(self.children)
-
-    def __repr__(self):
-        return '<Molecule instance: %s>' % str(self.children)
 
 
