@@ -35,7 +35,6 @@ class Bond(object):
     Args:
         a1 (Atom): First atom
         a2 (Atom): Second atom (the order of atoms doesn't matter)
-        order (int): Order of the bond
 
     Notes:
         Comparisons and hashes involving bonds will return True if the atoms involved in the bonds
@@ -46,11 +45,11 @@ class Bond(object):
     Attributes:
         a1 (Atom): First atom in the bond; assigned so that ``self.a1.index < self.a2.index``
         a2 (Atom): Second atom in the bond; assigned so that ``self.a2.index > self.a1.index``
-        order (int): bond order (can be ``None``); not used in comparisons
+        order (int or None): order of the bond between the atoms (or None of they are not bonded)
     """
     SYMBOLS = {1: u'-', 2: u'=', 3: u'≡'}
 
-    def __init__(self, a1, a2, order=None):
+    def __init__(self, a1, a2):
         if a1.molecule is not a2.molecule:
             raise ValueError('Cannot create bond for atoms in different molecules.')
 
@@ -58,11 +57,6 @@ class Bond(object):
             a1, a2 = a2, a1
         self.a1 = a1
         self.a2 = a2
-        if order is None:
-            try: self.order = self.a1.bond_graph[a2]
-            except KeyError: self.order = None
-        else:
-            self.order = order
 
     def __str__(self):
         return "%s bond between %s and %s (order: %s)" % (self.type,
@@ -71,6 +65,27 @@ class Bond(object):
 
     def __repr__(self):
         return "<%s>" % self
+
+    @property
+    def order(self):
+        a1order = self.a1.bond_graph.get(self.a2, None)
+        a2order = self.a2.bond_graph.get(self.a1, None)
+        if a1order is None:
+            return a2order
+        elif a2order is None:
+            return a1order
+        else:  # both exist
+            if a1order != a2order:
+                raise ValueError('Inconsistent bond orders between %s and %s' % (self.a1, self.a2))
+            else:
+                return a1order
+
+    @order.setter
+    def order(self, order):
+        for atom in (self.a1, self.a2):
+            nbr = self.partner(atom)
+            if atom.molecule is self.molecule:
+                atom.bond_graph[nbr] = order
 
     @property
     def type(self):

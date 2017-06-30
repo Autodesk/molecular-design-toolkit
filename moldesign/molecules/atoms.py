@@ -345,9 +345,11 @@ class Atom(AtomPropertyMixin):
         """
         if self.molecule is other.molecule:
             self.bond_graph[other] = other.bond_graph[self] = order
+            if self.molecule is not None:
+                self.molecule._topology_changed()
         else:  # allow unassigned atoms to be bonded to anything for building purposes
             self.bond_graph[other] = order
-        return Bond(self, other, order)
+        return Bond(self, other)
 
     @property
     def bond_graph(self):
@@ -357,12 +359,7 @@ class Atom(AtomPropertyMixin):
         if self.molecule is None:
             return self._bond_graph
         else:
-            self._bond_graph = None
-            try:
-                return self.molecule.bond_graph[self]
-            except KeyError:
-                self.molecule.bond_graph[self] = {}
-                return self.molecule.bond_graph[self]
+            return self.molecule.bond_graph[self]
 
     @bond_graph.setter
     def bond_graph(self, value):
@@ -376,7 +373,7 @@ class Atom(AtomPropertyMixin):
     def bonds(self):
         """ List[Bond]: list of all bonds this atom is involved in
         """
-        return [Bond(self, nbr, order) for nbr, order in self.bond_graph.items()]
+        return [Bond(self, nbr) for nbr in self.bond_graph]
 
     @property
     def heavy_bonds(self):
@@ -388,8 +385,8 @@ class Atom(AtomPropertyMixin):
         if self.atnum == 1:
             return []
         else:
-            return [Bond(self, nbr, order)
-                    for nbr, order in self.bond_graph.items()
+            return [Bond(self, nbr)
+                    for nbr in self.bond_graph
                     if nbr.atnum > 1]
 
     @property

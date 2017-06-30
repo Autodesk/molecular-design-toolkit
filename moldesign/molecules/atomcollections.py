@@ -378,10 +378,10 @@ class AtomContainer(AtomGroup):
         for atom, nbrs in bg.items():
             for nbr, order in nbrs.items():
                 if atom.index < nbr.index or nbr not in bg:
-                    yield mdt.Bond(atom,nbr, order)
+                    yield mdt.Bond(atom, nbr)
 
     def get_bond(self, a1, a2):
-        return mdt.Bond(a1, a2, order=self.bond_graph[a1][a2])
+        return mdt.Bond(a1, a2)
 
     @property
     def internal_bonds(self):
@@ -391,7 +391,7 @@ class AtomContainer(AtomGroup):
         for atom, nbrs in bg.items():
             for nbr, order in nbrs.items():
                 if atom.index < nbr.index and nbr in bg:
-                    yield mdt.Bond(atom, nbr, order)
+                    yield mdt.Bond(atom, nbr)
 
     @property
     def external_bonds(self):
@@ -402,7 +402,7 @@ class AtomContainer(AtomGroup):
         for atom, nbrs in bg.items():
             for nbr, order in nbrs.items():
                 if nbr not in bg:
-                    yield mdt.Bond(atom, nbr, order)
+                    yield mdt.Bond(atom, nbr)
 
     @property
     def bonded_atoms(self):

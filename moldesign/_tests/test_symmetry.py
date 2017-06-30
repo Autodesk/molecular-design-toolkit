@@ -5,7 +5,7 @@ import moldesign as mdt
 from moldesign import units as u
 from moldesign.external import transformations
 
-from .molecule_fixtures import benzene
+from .molecule_fixtures import *
 
 
 @pytest.fixture

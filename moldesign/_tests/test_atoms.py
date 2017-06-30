@@ -130,6 +130,112 @@ def test_atom_bond_iterators(benzene):
     assert hbond and csingle and cdouble
 
 
+def test_atom_bond_to(pdb3aid):
+    mol = pdb3aid
+    a1, a2 = mol.atoms[3], mol.atoms[321]  # arbitrary atom indices
+    mol.ff = 'arglebargle'  # changing topology should reset this
+    nbonds = mol.num_bonds
+    assert a1 not in mol.bond_graph[a2]
+
+    a1.bond_to(a2, 3)
+
+    assert mol.num_bonds == nbonds + 1
+    assert mol.ff is None
+    assert_consistent_bond(mol, a1, a2, 3)
+
+
+def test_delete_bond_with_atoms(pdb3aid):
+    mol = pdb3aid
+    a1 = mol.atoms[35]  # arbitrary atom
+    mol.ff = 'arglebargle'  # changing topology should reset this
+    nbonds = mol.num_bonds
+    a2 = a1.bonded_atoms[-1]
+
+    mol.delete_bond(a1, a2)
+
+    assert mol.num_bonds == nbonds - 1
+    assert_not_bonded(mol, a1, a2)
+
+
+def test_delete_bond(pdb3aid):
+    mol = pdb3aid
+    a1 = mol.atoms[89]  # arbitrary atom
+    mol.ff = 'arglebargle'  # changing topology should reset this
+    nbonds = mol.num_bonds
+    a2 = a1.bonded_atoms[-1]
+    bond = mdt.Bond(a1, a2)
+
+    mol.delete_bond(bond)
+
+    assert mol.num_bonds == nbonds - 1
+    assert_not_bonded(mol, a1, a2)
+
+
+def test_bond_object_automatically_associates_with_molecule(pdb3aid):
+    mol = pdb3aid
+    a1 = mol.atoms[511]  # arbitrary atom
+    bond_from_atom = a1.bonds[-1]
+    a2 = bond_from_atom.partner(a1)
+
+    created_bond = mdt.Bond(a2, a1)
+
+    assert created_bond == bond_from_atom
+    assert created_bond.order == mol.bond_graph[a1][a2]
+    assert bond_from_atom.order == mol.bond_graph[a1][a2]
+    assert created_bond.molecule is mol
+    assert bond_from_atom.molecule is mol
+
+
+def test_change_bond_order_with_bond_object(pdb3aid):
+    mol = pdb3aid
+    a1 = mol.atoms[511]  # arbitrary atom
+    bond = a1.bonds[-1]
+    a2 = bond.partner(a1)
+
+    other_bond_object = mdt.Bond(a1, a2)
+    oldorder = bond.order
+    assert oldorder == other_bond_object.order
+    assert a1.bond_graph[a2] == oldorder
+
+    bond.order += 1
+
+    assert bond.order == oldorder + 1
+    assert other_bond_object.order == oldorder + 1
+    assert a2.bond_graph[a1] == oldorder + 1
+
+
+def assert_not_bonded(mol, a1, a2):
+    assert mol.ff is None
+    assert a1 not in a2.bond_graph
+    assert a1 not in a2.bonded_atoms
+    assert a2 not in a1.bond_graph
+    assert a2 not in a1.bonded_atoms
+    assert a2 not in mol.bond_graph[a1]
+    assert a1 not in mol.bond_graph[a2]
+
+
+def assert_consistent_bond(mol, a1, a2, order):
+    assert a1 in a2.bond_graph
+    assert a2 in a1.bond_graph
+    for bond in a1.bonds:
+        if bond.a2 is a2:
+            assert bond.order == order
+            break
+    else:
+        assert False, "bond not found in atom.bonds"
+
+    for bond in a2.bonds:
+        if bond.a1 is a1:
+            assert bond.order == order
+            break
+    else:
+        assert False, "bond not found in atom.bonds"
+
+    assert a1.bond_graph[a2] == a2.bond_graph[a1] == order
+    assert mol.bond_graph[a1][a2] == mol.bond_graph[a2][a1] == order
+
+
+
 
 
 
