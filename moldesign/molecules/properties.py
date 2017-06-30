@@ -68,10 +68,10 @@ class MolecularProperties(utils.DotDict):
         return units.arrays_almost_equal(self.positions, mol.positions)
 
     def __getitem__(self, item):
-        self._convert_if_possible(super().__getitem__(item))
+        return self._convert_if_possible(super().__getitem__(item))
 
     def __getattr__(self, item):
-        self._convert_if_possible(super().__getattr__(item))
+        return self._convert_if_possible(super().__getattr__(item))
 
     @staticmethod
     def _convert_if_possible(val):
@@ -80,3 +80,41 @@ class MolecularProperties(utils.DotDict):
         else:
             return val
 
+
+class AtomicProperties(utils.NewUserDict):
+    """
+    Stores calculated atomic properties
+
+    Internally, references atoms by their indices rather than by object, which lets us
+    copy molecular properties without weird reference issues
+
+    Args:
+        mapping (Mapping[moldesign.Atom, Any]): map of atoms to properties
+    """
+    type = 'atomic'  # backwards-compatible signal that this is a map from atoms to property values
+
+    def __init__(self, mapping=None):
+        super().__init__()
+        if mapping is not None:
+            self.update(mapping)
+
+    def update(self, mapping):
+        for k,v in mapping.items():
+            self[k] = v
+
+    # TODO: check that passed atoms actually belong to the correct molecule
+    def __setitem__(self, atom, value):
+        super().__setitem__(self._getkey(atom), value)
+
+    def __getitem__(self, atom):
+        return super().__getitem__(self._getkey(atom))
+
+    def _getkey(self, atom):
+        if isinstance(atom, int):
+            k = atom
+        else:
+            k = atom.index
+        return k
+
+    def __contains__(self, atom):
+        return super().__contains__(self._getkey(atom))

@@ -17,6 +17,7 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy as np
+import copy
 
 from . import MolecularOrbitals
 from ..utils import DotDict
@@ -76,6 +77,15 @@ class ElectronicWfn(object):
             self.aobasis.wfn = self
             for orb in self.aobasis.orbitals:
                 orb.wfn = self
+
+    def copy(self):
+        """ Create a copy of this wavefunction
+
+        Returns:
+            ElectronicWfn: a copy of this wavefunction. Note that all attributes are deepcopied
+               EXCEPT for self.mol, which still points to the original molecule
+        """
+        return copy.deepcopy(self, memo={id(self.mol): self.mol})
 
     def __repr__(self):
         return '<ElectronicWfn (%s) of %s>' % (self.description, str(self.mol))

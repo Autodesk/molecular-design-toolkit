@@ -253,3 +253,30 @@ def test_properties_copied_with_molecule(cached_h2_rhfwfn):
 
         else:  # otherwise, just make sure it's not the original
             assert mol.properties[prop] is not val
+
+
+def test_wfn_copied_with_molecule(cached_h2_rhfwfn):
+    original = cached_h2_rhfwfn
+    assert original.wfn is not None  # sanity check
+
+    mol = original.copy()
+
+    assert mol.wfn is not None
+
+    # should be completely equal
+    assert (mol.wfn.aobasis.fock == original.wfn.aobasis.fock).all()
+    # but different objects
+    assert mol.wfn.aobasis.fock is not original.wfn.aobasis.fock
+
+
+def test_wfn_copy(cached_h2_rhfwfn):
+    original = cached_h2_rhfwfn
+    wfn = original.wfn.copy()
+
+    assert wfn.mol is original
+    assert wfn is not original.wfn
+
+    # should be completely equal
+    assert (wfn.aobasis.fock == original.wfn.aobasis.fock).all()
+    # but different objects
+    assert wfn.aobasis.fock is not original.wfn.aobasis.fock

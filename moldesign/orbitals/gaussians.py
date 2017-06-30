@@ -1,5 +1,3 @@
-"""Note: this code is currently unused and untested and will be refactored soon"""
-
 from __future__ import print_function, absolute_import, division
 from future.builtins import *
 from future import standard_library
@@ -314,7 +312,7 @@ class AtomicBasisFunction(Orbital):
             cart (str): cartesian component (optional; for cartesian sets only)
             primitives (List[PrimitiveBase]): List of primitives, if available
         """
-        self.atom = atom
+        self.atom_index = atom.index
         self.n = n
         self.l = l
         self.m = m
@@ -333,6 +331,14 @@ class AtomicBasisFunction(Orbital):
         self.basis = None
         self.occupation = None
         self.wfn = None
+
+    @property
+    def atom(self):
+        """ moldesign.Atom: the atom this basis function belongs to
+
+        We get the atom via an indirect reference, making it easier to copy the wavefunction
+        """
+        return self.wfn.mol.atoms[self.atom_index]
 
     @property
     def num_primitives(self):
