@@ -5,8 +5,6 @@ from moldesign import units as u
 
 from .molecule_fixtures import *
 from . import helpers
-from .test_qm_xfaces import h2_rhfwfn
-
 
 
 def test_forcefield_atom_term_access(protein_default_amber_forcefield):

@@ -26,13 +26,12 @@ if not PY2:  # we'll skip the type hints in Python 2
     import moldesign as mdt  # needed for the late-binding type hints
 
 
-class AtomBondDict(collections.OrderedDict):
+class AtomBondDict(utils.NewUserDict):
     """ Holds the bonds for a given atom
 
     This object does the legwork of making sure that the bond graph remains symmetric - it makes
     sure any modifications to this data are reflected on the symmetric side of the graph
     """
-
     if not PY2:
         __metaclass__ = Mapping['mdt.Atom', int]
 
@@ -58,7 +57,7 @@ class AtomBondDict(collections.OrderedDict):
         super().__delitem__(otheratom)
 
 
-class BondGraph(collections.OrderedDict):
+class BondGraph(utils.NewUserDict):
     """ The bond graph of a molecule. This object manages the molecular bonding topology.
 
     This object can generally be treated as a dict, with two important exceptions:
@@ -76,6 +75,12 @@ class BondGraph(collections.OrderedDict):
         super().__init__()
         self.molecule = molecule
         self._add_atoms(molecule.atoms)
+
+    def __str__(self):
+        'Bond graph for %s' % self.molecule
+
+    def __repr__(self):
+        return '<%s>' % self.molecule
 
     def _add_atoms(self, atoms):
         """ Move bonds defined in the atom to this object.
