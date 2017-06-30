@@ -70,22 +70,31 @@ class Bond(object):
     def order(self):
         a1order = self.a1.bond_graph.get(self.a2, None)
         a2order = self.a2.bond_graph.get(self.a1, None)
-        if a1order is None:
+        if a1order == a2order:
+            return a1order
+        elif a1order is None:
             return a2order
         elif a2order is None:
             return a1order
-        else:  # both exist
-            if a1order != a2order:
-                raise ValueError('Inconsistent bond orders between %s and %s' % (self.a1, self.a2))
-            else:
-                return a1order
+        else:  # inconsistent
+            raise ValueError('Inconsistent bond orders between %s and %s' % (self.a1, self.a2))
 
     @order.setter
     def order(self, order):
-        for atom in (self.a1, self.a2):
-            nbr = self.partner(atom)
-            if atom.molecule is self.molecule:
-                atom.bond_graph[nbr] = order
+        if order is None:
+            if self.order is None:
+                return  # already done
+            elif self.molecule:
+                self.molecule.delete_bond(self)
+            else:
+                self.a1.bond_graph.pop(self.a2, None)
+                self.a2.bond_graph.pop(self.a1, None)
+
+        else:
+            for atom in (self.a1, self.a2):
+                nbr = self.partner(atom)
+                if atom.molecule is self.molecule:
+                    atom.bond_graph[nbr] = order
 
     @property
     def type(self):

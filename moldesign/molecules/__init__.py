@@ -4,6 +4,7 @@ def toplevel(o):
 __all__ = []
 
 
+from .bond_graph import *
 from .coord_arrays import *
 from .atomcollections import *
 from .bonds import *

@@ -29,7 +29,7 @@ from ..compute import DummyJob
 from ..exceptions import NotCalculatedError
 from ..min.base import MinimizerBase
 from .properties import MolecularProperties
-from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond, HasResidues
+from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond, HasResidues, BondGraph
 from ..helpers import WidgetMethod
 from .coord_arrays import *
 
@@ -432,39 +432,27 @@ class MolTopologyMixin(object):
                           charge=self.charge,
                           metadata=self.metadata)
         newmol.properties = self.properties.copy(mol=newmol)
-        newmodel = self._copy_method(newmol, 'energy_model')
-        if newmodel is not None:
+        if self.energy_model is not None:
+            newmodel = self._copy_method('energy_model')
             newmol.set_energy_model(newmodel)
-        newintegrator = self._copy_method(newmol, 'integrator')
-        if newintegrator is not None:
+        if self.integrator is not None:
+            newintegrator = self._copy_method('integrator')
             newmol.set_integrator(newintegrator)
         if self.ff is not None:
             self.ff.copy_to(newmol)
         newmol.constraints = [c.copy(newmol) for c in self.constraints]
         return newmol
 
-    def _copy_method(self, newmol, methodname):
+    def _copy_method(self, methodname):
         method = getattr(self, methodname)
-        if method is None:
-            return None
         newmethod = method.__class__()
         newmethod.params.clear()
         newmethod.params.update(method.params)
         return newmethod
 
-    def _rebuild_topology(self, bond_graph=None):
+    def _rebuild_topology(self):
         """ Build the molecule's bond graph based on its atoms' bonds
-
-        Args:
-            bond_graph (dict): graph to build the bonds from
         """
-        if bond_graph is None:
-            self.bond_graph = self._build_bonds(self.atoms)
-        else:
-            self.bond_graph = bond_graph
-
-        self._topology_changed()
-
         self.is_biomolecule = False
         self.ndims = 3 * self.num_atoms
         self._positions = np.zeros((self.num_atoms, 3)) * u.default.length
@@ -474,30 +462,7 @@ class MolTopologyMixin(object):
         self._assign_atom_indices()
         self._assign_residue_indices()
         self._dof = None
-
-    @staticmethod
-    def _build_bonds(atoms):
-        """ Build a bond graph describing bonds between this list of atoms
-
-        Args:
-            atoms (List[moldesign.atoms.Atom])
-        """
-        # TODO: check atom parents
-        bonds = {}
-
-        # First pass - create initial bonds
-        for atom in atoms:
-            assert atom not in bonds, 'Atom appears twice in this list'
-            bonds[atom] = atom.bond_graph
-
-        # Now make sure both atoms have a record of their bonds
-        for atom in atoms:
-            for nbr in bonds[atom]:
-                if atom in bonds[nbr]:
-                    assert bonds[nbr][atom] == bonds[atom][nbr]
-                else:
-                    bonds[nbr][atom] = bonds[atom][nbr]
-        return bonds
+        self._topology_changed()
 
     def _assign_atom_indices(self):
         """
@@ -968,10 +933,6 @@ class Molecule(AtomGroup,
                 leaving the original molecule untouched.
 
         name (str): name of the molecule (automatically generated if not provided)
-        bond_graph (dict): dictionary specifying bonds between the atoms - of the form
-            ``{atom1:{atom2:bond_order, atom3:bond_order}, atom2:...}``
-            This structure must be symmetric; we require
-            ``bond_graph[atom1][atom2] == bond_graph[atom2][atom1]``
         copy_atoms (bool): Create the molecule with *copies* of the passed atoms
             (they will be copied automatically if they already belong to another molecule)
         pdbname (str): Name of the PDB file
@@ -993,7 +954,7 @@ class Molecule(AtomGroup,
 
     Attributes:
         atoms (AtomList): List of all atoms in this molecule.
-        bond_graph (dict): symmetric dictionary specifying bonds between the
+        bond_graph (mdt.molecules.BondGraph): symmetric dictionary specifying bonds between the
            atoms:
 
                ``bond_graph = {atom1:{atom2:bond_order, atom3:bond_order}, atom2:...}``
@@ -1040,7 +1001,7 @@ class Molecule(AtomGroup,
     _PERSIST_REFERENCES = True  # relevant for `pyccc` RPC calls
 
     def __init__(self, atomcontainer,
-                 name=None, bond_graph=None,
+                 name=None,
                  copy_atoms=False,
                  pdbname=None,
                  charge=None,
@@ -1061,6 +1022,7 @@ class Molecule(AtomGroup,
             metadata = getattr(atomcontainer, 'metadata', utils.DotDict())
 
         self.atoms = atoms
+        self.bond_graph = BondGraph(self)
         self.time = getattr(atomcontainer, 'time', 0.0 * u.default.time)
         self.pdbname = pdbname
         self.constraints = []
@@ -1078,7 +1040,7 @@ class Molecule(AtomGroup,
         # Builds the internal memory structures
         self.chains = Instance(molecule=self)
         self.residues = []
-        self._rebuild_topology(bond_graph=bond_graph)
+        self._rebuild_topology()
 
         if name is not None:
             self.name = name
@@ -1223,24 +1185,21 @@ class Molecule(AtomGroup,
             newatoms = mdt.AtomList(newatoms).copy()
 
         self.atoms.extend(newatoms)
+        self.bond_graph._add_atoms(newatoms)
+        self._rebuild_topology()
 
-        # symmetrize bonds between the new atoms and the pre-existing molecule
-        bonds = self._build_bonds(self.atoms)
-        for newatom in newatoms:
-            for nbr in bonds[newatom]:
-                if nbr in self.bond_graph:  # i.e., it's part of the original molecule
-                    bonds[nbr][newatom] = bonds[newatom][nbr]
-
-        self._rebuild_topology(bonds)
-
-    def delete_bond(self, bond):
+    def delete_bond(self, bond_or_atom, a2=None):
         """ Remove this bond from the molecule's topology
 
         Args:
-            Bond: bond to remove
+            bond_or_atom (Bond or Atom): bond to remove (or the first of two atom)
+            a2 (Atom): second atom in bond (if first argument was also an atom)
         """
-        self.bond_graph[bond.a1].pop(bond.a2)
-        self.bond_graph[bond.a2].pop(bond.a1)
+        if a2 is None:  # it's a bond
+            a1, a2 = bond_or_atom.a1, bond_or_atom.a2
+        else:  # they passed 2 atoms
+            a1 = bond_or_atom
+        self.bond_graph[a1].pop(a2)
         self._topology_changed()
 
     def write(self, filename=None, **kwargs):

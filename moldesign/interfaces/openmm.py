@@ -303,13 +303,13 @@ def topology_to_mol(topo, name=None, positions=None, velocities=None, assign_bon
             bonds[na1] = {}
         if na2 not in bonds:
             bonds[na2] = {}
-        bonds[na1][na2] = 1
-        bonds[na2][na1] = 1
+        b = mdt.Bond(na1, na2)
+        b.order = 1
 
     if name is None:
         name = 'Unnamed molecule from OpenMM'
 
-    newmol = mdt.Molecule(newatoms, bond_graph=bonds, name=name)
+    newmol = mdt.Molecule(newatoms, name=name)
 
     if assign_bond_orders:
         for residue in newmol.residues:
