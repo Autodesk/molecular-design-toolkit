@@ -80,9 +80,9 @@ class BasisSet(MolecularOrbitals):
         for kw, val in kwargs.items():
             setattr(self, kw, val)
 
-        self.on_atom = {}
+        self._basis_fn_by_atom = {}
         for fn in self.orbitals:
-            self.on_atom.setdefault(fn.atom, []).append(fn)
+            self._basis_fn_by_atom.setdefault(fn.atom.index, []).append(fn)
 
     def __call__(self, coords, coeffs=None):
         """Calculate the value of each basis function at the specified coordinates.
@@ -103,6 +103,9 @@ class BasisSet(MolecularOrbitals):
         from moldesign.interfaces.pyscf_interface import basis_values
         return basis_values(self.wfn.mol, self, coords, coeffs=coeffs,
                             positions=self.wfn.positions)
+
+    def get_basis_functions_on_atom(self, atom):
+        return self._basis_fn_by_atom[atom.index]
 
     def __repr__(self):
         return '<%s (%s) of %s>' % (self.__class__.__name__, self.basisname, self.mol)

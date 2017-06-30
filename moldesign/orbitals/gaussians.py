@@ -312,6 +312,7 @@ class AtomicBasisFunction(Orbital):
             cart (str): cartesian component (optional; for cartesian sets only)
             primitives (List[PrimitiveBase]): List of primitives, if available
         """
+        self._atom = atom
         self.atom_index = atom.index
         self.n = n
         self.l = l
@@ -319,8 +320,10 @@ class AtomicBasisFunction(Orbital):
         self.primitives = primitives
         if cart is not None:
             assert self.m is None, 'Both cartesian and spherical components passed!'
-            assert len(cart) == self.l, 'Angular momentum does not match specified component %s' % cart
-            for e in cart: assert e in 'xyz'
+            assert len(cart) == self.l, \
+                'Angular momentum does not match specified component %s' % cart
+            for e in cart:
+                assert e in 'xyz'
             self.cart = ''.join(sorted(cart))
         else:
             self.cart = None
@@ -338,7 +341,10 @@ class AtomicBasisFunction(Orbital):
 
         We get the atom via an indirect reference, making it easier to copy the wavefunction
         """
-        return self.wfn.mol.atoms[self.atom_index]
+        if self.wfn is not None:
+            return self.wfn.mol.atoms[self.atom_index]
+        else:
+            return self._atom
 
     @property
     def num_primitives(self):
@@ -411,7 +417,7 @@ class AtomicBasisFunction(Orbital):
         return '<%s %s>' % (self.__class__.__name__, self.name)
 
 # Precompute odd factorial values (N!!)
-_ODD_FACTORIAL = {0: 1}  #by convention
+_ODD_FACTORIAL = {0: 1}  # by convention
 _ofact = 1
 for _i in range(1, 20, 2):
     _ofact *= _i

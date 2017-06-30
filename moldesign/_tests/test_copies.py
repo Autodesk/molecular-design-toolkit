@@ -243,12 +243,12 @@ def test_properties_copied_with_molecule(cached_h2_rhfwfn):
     assert mol.properties is not original.properties
 
     for prop, val in original.properties.items():
-        assert prop in mol.properties[prop]
-        if isinstance(val, (mdt.Quantity, np.ndarray)) and getattr(val, 'shape', False):
+        assert prop in mol.properties
+        if isinstance(val, (u.MdtQuantity, np.ndarray)) and getattr(val, 'shape', False):
                 assert (mol.properties[prop] == val).all()
                 assert mol.properties[prop] is not val
 
-        elif isinstance(val, (str, int, float)):
+        elif isinstance(val, (str, int, float, mdt.molecules.AtomicProperties)):
             assert mol.properties[prop] == val
 
         else:  # otherwise, just make sure it's not the original

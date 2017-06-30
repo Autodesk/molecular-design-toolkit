@@ -73,7 +73,10 @@ class AtomPropertyMixin(object):  # TODO: this isn't worth it, just put it back 
         except mdt.exceptions.NotCalculatedError:
             return None
 
-        return wfn.aobasis.on_atom.get(self, [])
+        try:
+            return wfn.aobasis.get_basis_functions_on_atom(self)
+        except KeyError:
+            return None
 
     @property
     def properties(self):

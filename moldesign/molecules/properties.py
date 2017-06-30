@@ -68,17 +68,10 @@ class MolecularProperties(utils.DotDict):
         return units.arrays_almost_equal(self.positions, mol.positions)
 
     def __getitem__(self, item):
-        return self._convert_if_possible(super().__getitem__(item))
+        return units.default.convert_if_possible(super().__getitem__(item))
 
     def __getattr__(self, item):
-        return self._convert_if_possible(super().__getattr__(item))
-
-    @staticmethod
-    def _convert_if_possible(val):
-        if isinstance(val, units.MdtQuantity):
-            return units.default.convert(val)
-        else:
-            return val
+        return units.default.convert_if_possible(super().__getattr__(item))
 
 
 class AtomicProperties(utils.NewUserDict):
@@ -97,6 +90,11 @@ class AtomicProperties(utils.NewUserDict):
         super().__init__()
         if mapping is not None:
             self.update(mapping)
+
+    def copy(self):
+        new = self.__class__()
+        super(self.__class__, new).update(self)
+        return new
 
     def update(self, mapping):
         for k,v in mapping.items():
