@@ -133,6 +133,32 @@ def test_array_unit_checks():
                                np.arange(10, 15))
 
 
+@pytest.mark.parametrize(['a1','a2'],
+                         ((np.ones(3), np.ones(3)*10/10),
+                          (np.ones(3), u.array(np.ones(3))),
+                          (np.ones(3)*u.nm, 10.0*np.ones(3)*u.angstrom),
+                          (np.ones((3,3)) * u.nm / u.angstrom, np.ones(3) * 10)),
+                         ids="numpy-numpy numpy-dimensionless nm-angstrom nm/angstrom-numpy".split()
+                         )
+def test_array_almost_equal_returns_true(a1, a2):
+    assert u.arrays_almost_equal(a1, a2)
+    assert u.arrays_almost_equal(a2, a1)
+
+
+@pytest.mark.parametrize(['a1','a2'],
+                         ((np.ones(3), np.ones(3)*10/10 * u.eV),
+                          (np.ones(3)*u.nm, 10.0*np.ones(3)*u.dalton),
+                          (u.array(np.ones(3)), np.ones(3) * u.kcalpermol)),
+                         ids="numpy-ev nm-dalton dimensionless-kcalpermole".split()
+                         )
+def test_array_almost_equal_raises_dimensionality_error(a1, a2):
+    with pytest.raises(u.DimensionalityError):
+        u.arrays_almost_equal(a1, a2)
+    with pytest.raises(u.DimensionalityError):
+        u.arrays_almost_equal(a2, a1)
+
+
+
 @pytest.mark.screening
 def test_default_unit_conversions():
     assert abs(10.0 - (1.0*units.nm).defunits_value()) < 1e-10

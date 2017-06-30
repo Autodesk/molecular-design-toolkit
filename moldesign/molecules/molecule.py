@@ -23,13 +23,13 @@ import collections
 import numpy as np
 
 import moldesign as mdt
+from . import toplevel
 from .. import helpers, utils
 from .. import units as u
 from ..compute import DummyJob
 from ..exceptions import NotCalculatedError
 from ..min.base import MinimizerBase
-from .properties import MolecularProperties
-from . import toplevel, PrimaryStructure, AtomGroup, Bond, HasResidues, BondGraph
+from . import PrimaryStructure, AtomGroup, Bond, HasResidues, BondGraph, MolecularProperties
 from ..helpers import WidgetMethod
 from .coord_arrays import *
 
@@ -391,7 +391,6 @@ class MolTopologyMixin(object):
                           pdbname=self.pdbname,
                           charge=self.charge,
                           metadata=self.metadata)
-        newmol.properties = self.properties.copy(mol=newmol)
         if self.energy_model is not None:
             newmodel = self._copy_method('energy_model')
             newmol.set_energy_model(newmodel)
@@ -401,6 +400,7 @@ class MolTopologyMixin(object):
         if self.ff is not None:
             self.ff.copy_to(newmol)
         newmol.constraints = [c.copy(newmol) for c in self.constraints]
+        newmol.properties = self.properties.copy_to(mol=newmol)
         return newmol
 
     def _copy_method(self, methodname):

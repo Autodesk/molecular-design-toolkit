@@ -231,3 +231,25 @@ def test_constraints_copied_with_molecule(mol_with_zerocharge_params):
         if constraint.desc != 'hbonds':
             for atom in constraint.atoms:
                 assert atom.molecule is mcpy
+
+
+def test_properties_copied_with_molecule(cached_h2_rhfwfn):
+    original = cached_h2_rhfwfn
+    assert original.potential_energy is not None  # sanity check
+
+    mol = cached_h2_rhfwfn.copy()
+
+    assert mol is not original
+    assert mol.properties is not original.properties
+
+    for prop, val in original.properties.items():
+        assert prop in mol.properties[prop]
+        if isinstance(val, (mdt.Quantity, np.ndarray)) and getattr(val, 'shape', False):
+                assert (mol.properties[prop] == val).all()
+                assert mol.properties[prop] is not val
+
+        elif isinstance(val, (str, int, float)):
+            assert mol.properties[prop] == val
+
+        else:  # otherwise, just make sure it's not the original
+            assert mol.properties[prop] is not val

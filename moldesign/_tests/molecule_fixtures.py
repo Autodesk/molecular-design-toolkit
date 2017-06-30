@@ -286,3 +286,16 @@ def cached_protein_with_default_amber_ff(cached_pdb1yu8):
 @typedfixture('hasmodel')
 def protein_default_amber_forcefield(cached_protein_with_default_amber_ff):
     return cached_protein_with_default_amber_ff.copy()
+
+
+@pytest.fixture(scope='session')
+def cached_h2_rhfwfn():
+    mol = h2()  # fixture is not cached, so just call it directly
+    mol.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
+    mol.calculate(requests=['forces'])
+    return mol
+
+
+@pytest.fixture
+def h2_rhfwfn(cached_h2_rhfwfn):
+    return cached_h2_rhfwfn.copy()

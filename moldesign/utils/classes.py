@@ -135,6 +135,11 @@ class DotDict(object):
     def copy(self):
         return self.__class__(self._od.copy())
 
+    def copydict(self):
+        """ Returns a copy of the core dictionary in its native class
+        """
+        return self._od.copy()
+
     def __eq__(self, other):
         try:
             return self._od == other._od

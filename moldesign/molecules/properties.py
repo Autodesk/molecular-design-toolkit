@@ -17,34 +17,66 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy as np
+import collections
 
 from . import toplevel
-from .. import utils
+from .. import utils, units
 
 
 @toplevel
 class MolecularProperties(utils.DotDict):
     """ Stores property values for a molecule.
     These objects will be generally created and updated by EnergyModels, not by users.
+
+    Args:
+        mol (Molecule): molecule that these properties are associated with
+        **properties (dict): values of molecular properties (MUST include positions as a key)
     """
     def __init__(self, mol, **properties):
-        """Initialization: ``properties`` MUST include positions.
-
-        Args:
-            mol (Molecule): molecule that these properties are associated with
-            **properties (dict): values of molecular properties (MUST include positions as a key)
-        """
-        # ADD_FEATURE: always return stored properties in the default unit systems
+        self.mol = mol
         positions = properties.pop('positions', mol.positions)
         super().__init__(positions=positions.copy(), **properties)
 
-    def copy(self, mol):
-        props = self.__dict__.copy()
-        props['mol'] = mol
-        return self.__class__(**props)
+    def copy_to(self, mol):
+        """
+        Args:
+            mol (moldesign.Molecule): molecule to copy these properties to
+
+        Returns:
+            MolecularProperties: copied instance, associated with the new molecule
+        """
+        newprops = self.__class__(mol, positions=self.positions)
+        for name, val in self.items():
+            if name == 'positions':
+                continue
+            elif hasattr(val, 'copy_to'):
+                newprops[name] = val.copy_to(mol)
+            elif hasattr(val, 'copy'):
+                newprops[name] = val.copy()
+            else:
+                newprops[name] = val
+        return newprops
 
     def geometry_matches(self, mol):
-        """Returns:
+        """ Returns true if a molecule's positions are the same as in these properties.
+
+        Allows for some very slight numerical noise due to units conversion and associated issues.
+
+        Returns:
             bool: True if the molecule's ``position`` is the same as these properties' ``position``
         """
-        return np.array_equal(self.positions, mol.positions)
+        return units.arrays_almost_equal(self.positions, mol.positions)
+
+    def __getitem__(self, item):
+        self._convert_if_possible(super().__getitem__(item))
+
+    def __getattr__(self, item):
+        self._convert_if_possible(super().__getattr__(item))
+
+    @staticmethod
+    def _convert_if_possible(val):
+        if isinstance(val, units.MdtQuantity):
+            return units.default.convert(val)
+        else:
+            return val
+

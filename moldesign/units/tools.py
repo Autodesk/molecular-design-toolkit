@@ -55,6 +55,58 @@ def dot(a1, a2):
         return a1.dot(a2)
 
 
+def arrays_almost_equal(a1, a2):
+    """ Return true if arrays are almost equal up to numerical noise
+
+    Note:
+        This is assumes that absolute differences less than 1e-12 are insignificant. It is
+        therefore more likely to return "True" for very small numbers and
+        "False" for very big numbers. Caveat emptor.
+
+    Args:
+        a1 (MdtQuantity or np.ndarray): first array
+        a2 (MdtQuantity or np.ndarray): second array
+
+    Returns:
+        bool: True if arrays differ by no more than numerical noise in any element
+
+    Raises:
+        DimensionalityError: if the arrays have incompatible units
+    """
+
+    a1units = False
+    if isinstance(a1, MdtQuantity):
+        if a1.dimensionless:
+            a1mag = a1.value_in(ureg.dimensionless)
+        else:
+            a1units = True
+            a1mag = a1.magnitude
+
+    else:
+        a1mag = a1
+
+    if isinstance(a2, MdtQuantity):
+        if a2.dimensionless:
+            if a1units:
+                raise DimensionalityError(a1.units, ureg.dimensionless,
+                                          "Cannot compare objects")
+            else:
+                a2mag = a2.value_in(ureg.dimensionless)
+        elif not a1units:
+            raise DimensionalityError(ureg.dimensionless, a2.units,
+                                      "Cannot compare objects")
+        else:
+            a2mag = a2.value_in(a1.units)
+    else:
+        if a1units:
+            raise DimensionalityError(a1.units, ureg.dimensionless,
+                                      "Cannot compare objects")
+        else:
+            a2mag = a2
+
+    return np.allclose(a1mag, a2mag, atol=1e-12)
+
+
 def from_json(j):
     """
     Convert a JSON description to a quantity.
