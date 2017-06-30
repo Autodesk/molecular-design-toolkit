@@ -197,11 +197,24 @@ def test_change_bond_order_with_bond_object(pdb3aid):
     assert oldorder == other_bond_object.order
     assert a1.bond_graph[a2] == oldorder
 
+    # First raise the order
     bond.order += 1
+    assert_consistent_bond(mol, a1, a2, oldorder+1)
 
-    assert bond.order == oldorder + 1
-    assert other_bond_object.order == oldorder + 1
-    assert a2.bond_graph[a1] == oldorder + 1
+    # Now delete the bond by setting it to None
+    bond.order = None
+    assert_not_bonded(mol, a1, a2)
+
+
+def test_bond_object_for_unbonded_atoms(pdb3aid):
+    mol = pdb3aid
+    a1 = mol.atoms[1]
+    a2 = mol.atoms[-10]
+    bond = mdt.Bond(a1, a2)
+    assert bond.order is None
+
+    bond.order = 2
+    assert_consistent_bond(mol, a1, a2, 2)
 
 
 def assert_not_bonded(mol, a1, a2):
@@ -235,17 +248,3 @@ def assert_consistent_bond(mol, a1, a2, order):
     assert mol.bond_graph[a1][a2] == mol.bond_graph[a2][a1] == order
 
 
-
-
-
-
-#def test_add_atom_to_residues(pdb3aid):
-#    res = pdb3aid.residues[5]
-#    newatom = mdt.Atom('Ta', residue=res)
-#    pdb3aid.add_atom(newatom)
-
-#    assert newatom.molecule is pdb3aid
-#    assert newatom.chain is res.chain
-#    assert newatom.residue is res
-
-#    assert newatom in res

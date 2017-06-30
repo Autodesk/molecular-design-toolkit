@@ -17,50 +17,44 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from future.moves.collections import UserDict
+from future.utils import PY2
 
-import moldesign as mdt  # needed for the late-binding type hints
-from typing import Mapping
+from .. import utils
+
+if not PY2:  # we'll skip the type hints in Python 2
+    from typing import Mapping
+    import moldesign as mdt  # needed for the late-binding type hints
 
 
-class _DNull(object):
-    pass
-
-
-class AtomBondDict(UserDict, Mapping['mdt.Atom', int]):
+class AtomBondDict(utils.NewUserDict):
     """ Holds the bonds for a given atom
+
+    This object does the legwork of making sure that the bond graph remains symmetric - it makes
+    sure any modifications to this data are reflected on the symmetric side of the graph
     """
+
+    if not PY2:
+        __metaclass__ = Mapping['mdt.Atom', int]
+
     def __init__(self, parent, atom):
         super().__init__()
         self.parent = parent
         self.atom = atom
 
     def __setitem__(self, otheratom, order):
-        super().__setitem__(otheratom, order)
+        self.data[otheratom] = order
         if self.parent is not None:
-            otherdict = self.parent[otheratom]
-            super(otherdict.__class__, otherdict).__setitem__(self.atom, order)
-
-    def pop(self, otheratom, default=_DNull):
-        if otheratom in self:
-            retval = self[otheratom]
-            super().__delitem__(otheratom)
-            if self.parent is not None:
-                otherdict = self.parent[otheratom]
-                super(otherdict.__class__, otherdict).__delitem__(self.atom)
-            return retval
-
-        elif default is not _DNull:
-            return default
-
-        else:
-            raise KeyError("'%s' is not a key in %s" % self)
+            self.parent[otheratom].data[self.atom] = order
 
     def __delitem__(self, otheratom):
-        self.pop(otheratom)
+        del self.data[otheratom]
+        if self.parent is not None:
+            otherdict = self.parent[otheratom]
+            del otherdict.data[self.atom]
 
 
-class BondGraph(UserDict, Mapping['mdt.Atom', AtomBondDict]):
-    """ The bond graph for this molecule.
+class BondGraph(utils.NewUserDict):
+    """ The bond graph of a molecule. This object manages the molecular bonding topology.
 
     This object can generally be treated as a dict, with two important exceptions:
       1. it maintains symmetry, so that setting ``bond_graph[a][b] = o`` will automatically set
@@ -68,6 +62,9 @@ class BondGraph(UserDict, Mapping['mdt.Atom', AtomBondDict]):
       2. It has exactly one entry for every atom in the molecule; it does not expose any methods
          for adding or deleting these entries.
     """
+    if not PY2:
+        __metaclass__ = Mapping['mdt.Atom', AtomBondDict]
+
     def __init__(self, molecule):
         """ Initializes the object, and raises up the bond state of all atoms in the molecule
         """
@@ -76,27 +73,28 @@ class BondGraph(UserDict, Mapping['mdt.Atom', AtomBondDict]):
         self._add_atoms(molecule.atoms)
 
     def _add_atoms(self, atoms):
-        """ Takes control of this atom's bonds
+        """ Move bonds defined in the atom to this object.
 
-        If the atom is already present in the graph, nothing happens
+        If the atom is already present in the graph, do nothing.
+
+        This method raises state - it centralizes bonding information about the molecule in
+        one place. However, bonding information about atoms OUTSIDE of the molecule is left
+        untouched.
 
         Args:
             atoms (List[moldesign.Atom]): atom to initialize
         """
         add_atoms = [atom for atom in atoms if atom not in self]
         for atom in add_atoms:
-            super().__setitem__(atom, AtomBondDict(self, atom))
+            self.data[atom] = AtomBondDict(self, atom)
         for atom in add_atoms:
             bg = atom._bond_graph
-            for nbr, order in bg.items():
+            for nbr, order in list(bg.items()):
                 if nbr in self:
                     self[atom][nbr] = order
-            atom._bond_graph = None
+                    del bg[nbr]
 
     def __setitem__(self, key, args):
-        raise NotImplementedError('Bond graphs cannot be manipulated using this method')
-
-    def pop(self, *args):
         raise NotImplementedError('Bond graphs cannot be manipulated using this method')
 
     def __delitem__(self, key):
