@@ -16,8 +16,8 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from future.moves.collections import UserDict
 from future.utils import PY2
+import collections
 
 from .. import utils
 
@@ -26,7 +26,7 @@ if not PY2:  # we'll skip the type hints in Python 2
     import moldesign as mdt  # needed for the late-binding type hints
 
 
-class AtomBondDict(utils.NewUserDict):
+class AtomBondDict(collections.OrderedDict):
     """ Holds the bonds for a given atom
 
     This object does the legwork of making sure that the bond graph remains symmetric - it makes
@@ -42,18 +42,23 @@ class AtomBondDict(utils.NewUserDict):
         self.atom = atom
 
     def __setitem__(self, otheratom, order):
-        self.data[otheratom] = order
+        self._setitem_super(otheratom, order)
         if self.parent is not None:
-            self.parent[otheratom].data[self.atom] = order
+            self.parent[otheratom]._setitem_super(self.atom, order)
+
+    def _setitem_super(self, atom, order):
+        super().__setitem__(atom, order)
 
     def __delitem__(self, otheratom):
-        del self.data[otheratom]
+        self._delitem_super(otheratom)
         if self.parent is not None:
-            otherdict = self.parent[otheratom]
-            del otherdict.data[self.atom]
+            self.parent[otheratom]._delitem_super(self.atom)
+
+    def _delitem_super(self, otheratom):
+        super().__delitem__(otheratom)
 
 
-class BondGraph(utils.NewUserDict):
+class BondGraph(collections.OrderedDict):
     """ The bond graph of a molecule. This object manages the molecular bonding topology.
 
     This object can generally be treated as a dict, with two important exceptions:
@@ -86,7 +91,7 @@ class BondGraph(utils.NewUserDict):
         """
         add_atoms = [atom for atom in atoms if atom not in self]
         for atom in add_atoms:
-            self.data[atom] = AtomBondDict(self, atom)
+            super().__setitem__(atom, AtomBondDict(self, atom))
         for atom in add_atoms:
             bg = atom._bond_graph
             for nbr, order in list(bg.items()):
