@@ -21,6 +21,8 @@ models_to_test = list(itertools.product((mdt.models.NWChemQM, mdt.models.PySCFPo
                                         'rhf rks mp2'.split()))
 model_ids = ['/'.join((model.__name__, theory, basis)) for (model, theory, basis) in models_to_test]
 
+TESTSET = ['h2', 'small-molecule', 'benzene']
+
 
 @pytest.fixture(params=models_to_test, ids=model_ids, scope='function')
 def h2_with_model(request, h2):
@@ -74,7 +76,7 @@ def h2_rhfwfn(h2):
     return h2
 
 
-@pytest.mark.parametrize('objkey', molecule_standards['molecule'])
+@pytest.mark.parametrize('objkey', TESTSET)
 def test_pyscf_rhf_sto3g_properties(objkey, request):
     mol = request.getfixturevalue(objkey)
     mol.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
@@ -89,7 +91,7 @@ def test_pyscf_rhf_sto3g_properties(objkey, request):
                                     - mol.charge.value_in(u.q_e)
 
 
-@pytest.mark.parametrize('objkey', molecule_standards['molecule'])
+@pytest.mark.parametrize('objkey', TESTSET)
 def test_pyscf_rhf_sto3g_matrices(objkey, request):
     mol = request.getfixturevalue(objkey)
     mol.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
@@ -123,7 +125,7 @@ def test_pyscf_casci(h2):
     # TODO: actually test results
 
 
-@pytest.mark.parametrize('objkey', molecule_standards['molecule'])
+@pytest.mark.parametrize('objkey', TESTSET)
 def test_pyscf_rhf_sto3g_forces(objkey, request):
     mol = request.getfixturevalue(objkey)
     mol.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
