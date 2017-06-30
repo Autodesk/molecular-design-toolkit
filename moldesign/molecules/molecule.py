@@ -29,7 +29,7 @@ from ..compute import DummyJob
 from ..exceptions import NotCalculatedError
 from ..min.base import MinimizerBase
 from .properties import MolecularProperties
-from . import toplevel, Residue, Chain, Instance, AtomGroup, Bond, HasResidues, BondGraph
+from . import toplevel, Residue, Chain, PrimaryStructure, AtomGroup, Bond, HasResidues, BondGraph
 from ..helpers import WidgetMethod
 from .coord_arrays import *
 
@@ -1038,7 +1038,7 @@ class Molecule(AtomGroup,
                                   u.unitsum(atom.formal_charge for atom in self.atoms))
 
         # Builds the internal memory structures
-        self.chains = Instance(molecule=self)
+        self.chains = PrimaryStructure(molecule=self)
         self.residues = []
         self._rebuild_topology()
 

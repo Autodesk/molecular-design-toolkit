@@ -22,11 +22,11 @@ import collections
 
 import moldesign as mdt
 from .. import utils, data
-from . import BioContainer, AtomList, toplevel, ChildList
+from . import MolecularHierarchy, AtomList, toplevel, ChildList
 
 
 @toplevel
-class Residue(BioContainer):
+class Residue(MolecularHierarchy):
     """ A biomolecular residue - most often an amino acid, a nucleic base, or a solvent
     molecule. In PDB structures, also often refers to non-biochemical molecules.
 
@@ -36,7 +36,7 @@ class Residue(BioContainer):
         parent (mdt.Molecule): the molecule this residue belongs to
         chain (Chain): the chain this residue belongs to
     """
-    @utils.args_from(BioContainer)
+    @utils.args_from(MolecularHierarchy)
     def __init__(self, **kwargs):
         """ Initialization
         Args:
@@ -185,7 +185,7 @@ class Residue(BioContainer):
             return super().add(atom, key=key)
         else:
             return super().add(atom, key='%s%s' % (atom.name, len(self)))
-    add.__doc__ = BioContainer.add.__doc__
+    add.__doc__ = MolecularHierarchy.add.__doc__
 
     @property
     def is_n_terminal(self):
