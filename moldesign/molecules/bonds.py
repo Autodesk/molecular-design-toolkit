@@ -38,9 +38,8 @@ class Bond(object):
 
     Notes:
         Comparisons and hashes involving bonds will return True if the atoms involved in the bonds
-        are the same. Bond orders are not compared.
-
-        These objects are used to represent and pass bond data only - they are not used for storage.
+        are the same. ``Bond`` objects are _views_ on the BondGraph object; there may be zero, one,
+        or many ``Bond`` objects corresponding to any given chemical bond.
 
     Attributes:
         a1 (Atom): First atom in the bond; assigned so that ``self.a1.index < self.a2.index``
@@ -81,7 +80,7 @@ class Bond(object):
 
     @order.setter
     def order(self, order):
-        if order is None:
+        if order is None:  # i.e., delete the bond if it exists
             if self.order is None:
                 return  # already done
             elif self.molecule:
@@ -90,7 +89,7 @@ class Bond(object):
                 self.a1.bond_graph.pop(self.a2, None)
                 self.a2.bond_graph.pop(self.a1, None)
 
-        else:
+        else:  # create the bond or modify its order
             for atom in (self.a1, self.a2):
                 nbr = self.partner(atom)
                 if atom.molecule is self.molecule:

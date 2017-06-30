@@ -101,7 +101,10 @@ class PrimaryStructure(MolecularHierarchy):
             res = atom.residue if atom.residue is not None else self._defres
 
             if res not in foundresidues:
+                # rebuild first - names/ordering may have changed
                 res.rebuild()
+
+                # add it to the structure
                 res.index = len(foundresidues)
                 foundresidues[res] = None
                 if res.type in ('dna', 'rna', 'protein'):
@@ -125,8 +128,10 @@ class PrimaryStructure(MolecularHierarchy):
             chain = residue.chain if residue.chain is not None else self._defchain
 
             if chain not in self:
+                # rebuild first - names/ordering may have changed
                 chain.rebuild()
 
+                # rename chain to avoid conflicts if necessary
                 oldname = chain.name
                 if chain.name is None and len(self.residues) > 1:
                     chain.name = 'A'
@@ -135,6 +140,7 @@ class PrimaryStructure(MolecularHierarchy):
                         chain.name = 'A'
                     chain.name = chr(ord(chain.name)+1)
 
+                # add it to the structure
                 chain.index = len(self)
                 self.add(chain)
                 if chain.name != oldname:

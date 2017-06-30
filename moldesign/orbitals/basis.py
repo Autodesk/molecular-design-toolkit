@@ -43,7 +43,15 @@ class BasisSet(MolecularOrbitals):
     """
     Stores a basis, typically of atomic orbitals.
 
-    This is a special orbital type
+    This is a case of a general set of molecular orbitals, where the coefficient matrix
+    must be the identity
+
+    Args:
+        mol (mdt.Molecule): the molecule these basis functions belong to
+        orbitals (List[AtomicBasisFunction]): list of basis functions comprising this set
+        name (str): name of this basis set
+        h1e (Matrix[energy]): 1-electron elements of the hamiltonian
+        overlaps (Matrix): overlap matrix
     """
     overlaps = Attribute('_overlaps')
     h1e = Attribute('_h1e')
