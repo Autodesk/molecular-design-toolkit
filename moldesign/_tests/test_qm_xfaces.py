@@ -21,7 +21,7 @@ models_to_test = list(itertools.product((mdt.models.NWChemQM, mdt.models.PySCFPo
                                         'rhf rks mp2'.split()))
 model_ids = ['/'.join((model.__name__, theory, basis)) for (model, theory, basis) in models_to_test]
 
-TESTSET = ['h2', 'small-molecule', 'benzene']
+TESTSET = ['h2', 'small_molecule', 'benzene']
 
 
 @pytest.fixture(params=models_to_test, ids=model_ids, scope='function')
@@ -72,7 +72,7 @@ def nwchem_dft():
 @pytest.fixture
 def h2_rhfwfn(h2):
     h2.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
-    h2.calculate()
+    h2.calculate(requests=['forces'])
     return h2
 
 
