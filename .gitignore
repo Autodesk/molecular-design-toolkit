@@ -12,7 +12,8 @@ build
 .cloudcomputecannon
 __pycache__
 .idea
-.coverage*
+.coverage
+.coverage.*
 codeship.aes
 tokens
 moldesign/_static_data/components.ci*

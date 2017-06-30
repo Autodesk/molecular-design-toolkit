@@ -321,7 +321,6 @@ def read_xyz(f):
     tempmol = openbabel_interface.read_stream(f, 'xyz')
     for atom in tempmol.atoms:
         atom.residue = None
-        atom.chain = None
     return mdt.Molecule(tempmol.atoms)
 
 

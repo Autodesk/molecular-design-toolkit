@@ -184,8 +184,6 @@ def build_dna_helix(sequence, helix_type='B', **kwargs):
             newchain = mdt.Chain('B')
             for residue in mol.residues[mol.num_residues//2:]:
                 residue.chain = newchain
-                for atom in residue:
-                    atom.chain = newchain
             mol = mdt.Molecule(mol)
         mdt.helpers.assign_biopolymer_bonds(mol)
 
@@ -280,7 +278,7 @@ def _prep_for_tleap(mol):
                     print('INFO: disulfide bond detected. Renaming %s from CYS to CYX' % residue)
                     sulfur.residue.resname = 'CYX'
 
-            clean._rebuild_topology()
+            clean._rebuild_from_atoms()
 
     return clean
 

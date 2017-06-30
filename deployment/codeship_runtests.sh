@@ -5,7 +5,7 @@ set -e  # fail immediately if any command fails
 
 
 VERSION="${TESTENV}.py${PYVERSION}"
-PYTESTFLAGS="-n 2 --spec --disable-warnings --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=1800 --tb=short"
+PYTESTFLAGS="-n 2 --spec  --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=3600 --tb=short"
 if [ "${VERSION}" == "complete.py3" ]; then
        PYTESTFLAGS="--cov moldesign ${PYTESTFLAGS}"
 fi

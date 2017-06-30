@@ -3,9 +3,10 @@ import pytest
 import moldesign as mdt
 from moldesign import units as u
 
-from .test_ambertools_xface import protein_default_amber_forcefield, pdb1yu8
 from .molecule_fixtures import *
+from . import helpers
 from .test_qm_xfaces import h2_rhfwfn
+
 
 
 def test_forcefield_atom_term_access(protein_default_amber_forcefield):
@@ -59,6 +60,11 @@ def test_atom_property_access_to_mulliken_charges(h2_rhfwfn):
     mol = h2_rhfwfn
     for atom in mol.atoms:
         assert abs(atom.properties.mulliken) <= 1e-5 * u.q_e
+
+
+def test_atomic_forces(h2_rhfwfn):
+    mol = h2_rhfwfn
+    helpers.assert_almost_equal(mol.atoms[0].force, -mol.atoms[1].force)
 
 
 def test_atom_properties_are_empty_dict_if_nothings_computed(h2):

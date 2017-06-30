@@ -1,6 +1,6 @@
 ## Molecule subpackage
-The `moldesign.molecule` subpackage contains class definitions for molecular data,
-including atomic, molecular, biomolecular, and trajectory data structures. 
+The `moldesign.molecule` subpackage contains MDT's core molecular data structures.
+
 
 ### Naming and indexing conventions
 

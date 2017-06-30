@@ -161,19 +161,34 @@ class Atom(AtomPropertyMixin):
 
     #################################################################
     # Methods for BUILDING the atom and indexing it in a molecule
-    def __init__(self, name=None, atnum=None, mass=None, chain=None, residue=None,
+    def __init__(self, name=None, atnum=None, mass=None, residue=None,
                  formal_charge=None, pdbname=None, pdbindex=None, element=None,
                  metadata=None, position=None, momentum=None):
 
         # Allow user to instantiate an atom as Atom(6) or Atom('C')
         if atnum is None and element is None:
-            if isinstance(name, int):
-                atnum = name
-                name = None
-            else: element = name
+            if isinstance(name, int):  # Ex: name=6 becomes atnum=6
+                atnum, name = name, None
+            elif name in data.ATOMIC_NUMBERS:  # Ex: name='Na' becomes element='Na'
+                element, name = name, None
 
-        if element: self.atnum = data.ATOMIC_NUMBERS[element]
-        else: self.atnum = atnum
+        # Determine the element
+        if atnum:
+            self.atnum = atnum
+            if element:
+                assert atnum == data.ATOMIC_NUMBERS[element.capitalize()], \
+                    "Atomic number '%s' does match specified element '%s'" % (atnum, element)
+        elif element:
+            if element.capitalize() in data.ATOMIC_NUMBERS:
+                self.atnum = data.ATOMIC_NUMBERS[element.capitalize()]
+            else:
+                raise KeyError("Unknown element '%s'" % element)
+        elif name[0].upper() in data.ATOMIC_NUMBERS:  # Ex: name='Ca' -> atnum=6
+            self.atnum = data.ATOMIC_NUMBERS[name[0].upper()]
+        else:
+            raise KeyError('Could not determine the atomic number of this atom. '
+                           'You can set it explicitly with the "atnum" keyword.')
+
 
         self.name = utils.if_not_none(name, self.elem)
         self.pdbname = utils.if_not_none(pdbname, self.name)
@@ -183,8 +198,9 @@ class Atom(AtomPropertyMixin):
         else: self.mass = mass
 
         self.formal_charge = utils.if_not_none(formal_charge, 0.0 * u.q_e)
+        if not hasattr(self.formal_charge, 'units'):
+            self.formal_charge *= u.q_e
         self.residue = residue
-        self.chain = chain
         self.molecule = None
         self.index = None
         if position is None:
@@ -201,6 +217,53 @@ class Atom(AtomPropertyMixin):
         self.metadata = utils.DotDict()
         if metadata:
             self.metadata.update(metadata)
+
+    def _subcopy(self, memo=None):
+        """ Private data mangement method for copying the local substructure of an atom.
+        This is a shallow copy, and is intended to be deepcopied to avoid corrupting the original
+        atom's data.
+
+        Generally, the public interface for this is the ``copy`` methods of objects like
+        Molecules, AtomLists, Residues etc. ...
+        """
+        import copy
+        if memo is None:
+            memo = {'bondgraph':{}}
+        if self in memo:
+            return
+
+        newatom = copy.copy(self)
+        newatom.molecule = None
+        newatom.residue = None
+        newatom.bond_graph = {}
+        memo[self] = newatom
+
+        # This separates the bond graph from the atoms for serialization; otherwise it creates
+        # highly recursive relationships between all the atoms
+        memo['bondgraph'][newatom] = {}
+        for nbr, order in self.bond_graph.items():
+            if nbr not in memo:
+                continue
+            else:
+                memo['bondgraph'][newatom][memo[nbr]] = order
+                memo['bondgraph'][memo[nbr]][newatom] = order
+
+        if self.residue is not None:
+            if self.residue not in memo:
+                self.residue._subcopy(memo)
+            memo[self.residue].add(newatom)
+
+    @property
+    def chain(self):
+        if self.residue is not None:
+            return self.residue.chain
+        else:
+            return None
+
+    @chain.setter
+    def chain(self, val):
+        raise AttributeError("To assign an atom to a chain, assign it to a residue _within_ that"
+                             "chain.")
 
     def __str__(self):
         desc = '%s %s (elem %s)' % (self.__class__.__name__, self.name, self.elem)
@@ -282,9 +345,11 @@ class Atom(AtomPropertyMixin):
         """
         if self.molecule is other.molecule:
             self.bond_graph[other] = other.bond_graph[self] = order
+            if self.molecule is not None:
+                self.molecule._topology_changed()
         else:  # allow unassigned atoms to be bonded to anything for building purposes
             self.bond_graph[other] = order
-        return Bond(self, other, order)
+        return Bond(self, other)
 
     @property
     def bond_graph(self):
@@ -294,12 +359,7 @@ class Atom(AtomPropertyMixin):
         if self.molecule is None:
             return self._bond_graph
         else:
-            self._bond_graph = None
-            try:
-                return self.molecule.bond_graph[self]
-            except KeyError:
-                self.molecule.bond_graph[self] = {}
-                return self.molecule.bond_graph[self]
+            return self.molecule.bond_graph[self]
 
     @bond_graph.setter
     def bond_graph(self, value):
@@ -313,7 +373,7 @@ class Atom(AtomPropertyMixin):
     def bonds(self):
         """ List[Bond]: list of all bonds this atom is involved in
         """
-        return [Bond(self, nbr, order) for nbr, order in self.bond_graph.items()]
+        return [Bond(self, nbr) for nbr in self.bond_graph]
 
     @property
     def heavy_bonds(self):
@@ -325,8 +385,8 @@ class Atom(AtomPropertyMixin):
         if self.atnum == 1:
             return []
         else:
-            return [Bond(self, nbr, order)
-                    for nbr, order in self.bond_graph.items()
+            return [Bond(self, nbr)
+                    for nbr in self.bond_graph
                     if nbr.atnum > 1]
 
     @property

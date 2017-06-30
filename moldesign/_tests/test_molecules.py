@@ -8,8 +8,8 @@ import moldesign.molecules.atomcollections
 import moldesign.utils.classes
 
 from .object_fixtures import *
-from .test_ambertools_xface import protein_default_amber_forcefield
-from .test_qm_xfaces import h2_rhfwfn
+from .molecule_fixtures import *
+from . import helpers
 
 
 __PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
@@ -46,6 +46,12 @@ def test_h2_array_link(h2):
     assert atom1.y == 0.1*u.angstrom
     assert h2.momenta[1, 1] == 3.0*u.default.momentum
     assert h2.atoms[1].py == 3.0*u.default.momentum
+
+
+def test_benzene_orbital_numbers(benzene):
+    assert benzene.num_electrons == 42
+    assert benzene.homo == 20
+    assert benzene.lumo == 21
 
 
 def test_h2_set_coord_slices(h2):
@@ -228,6 +234,10 @@ def test_pickling(objkey, request):
         assert type(y) == type(obj)
 
 
+def test_degrees_of_freedom(benzene):
+    assert benzene.dynamic_dof == 36
+
+
 @pytest.mark.parametrize('objkey', registered_types['equality'])
 def test_pickled_equality(objkey, request):
     obj = request.getfixturevalue(objkey)
@@ -245,8 +255,8 @@ def test_pickled_equality(objkey, request):
 def test_h2_positions(h2):
     atom1, atom2 = h2.atoms
     assert (atom1.position == np.array([0.5, 0.0, 0.0]) * u.angstrom).all()
-    assert atom2.x == -0.5 * u.angstrom
-    assert atom1.distance(atom2) == 1.0 * u.angstrom
+    assert atom2.x == -0.25 * u.angstrom
+    assert atom1.distance(atom2) == 0.75 * u.angstrom
 
 
 def test_h2(h2):
@@ -302,16 +312,28 @@ def test_h2_trajectory(h2_trajectory):
             assert frame.positions[0, 0] < -0.1 * u.angstrom
 
 
-def test_markdown_reprs_work(nucleic):
+@pytest.mark.parametrize('molkey', ['nucleic', 'pdb3aid', 'h2', 'mol_with_zerocharge_params'])
+@pytest.mark.screening
+def test_markdown_reprs_work(molkey, request):
     # Not bothering to test the content, just want to make sure there's no error
-    assert isinstance(nucleic._repr_markdown_(), basestring)
-    assert isinstance(nucleic.atoms[0]._repr_markdown_(), basestring)
-    assert isinstance(nucleic.residues[0]._repr_markdown_(), basestring)
+    mol = request.getfixturevalue(molkey)
+    assert isinstance(mol._repr_markdown_(), basestring)
+    assert isinstance(mol.atoms[0]._repr_markdown_(), basestring)
+    assert isinstance(mol.residues[0]._repr_markdown_(), basestring)
 
 
 def test_dna_and_hydrogen_are_different(nucleic, h2):
     assert not nucleic.same_topology(h2)
     assert not nucleic.is_identical(h2)
+
+
+def test_attribute_error_without_simulation_setup(h2):
+    with pytest.raises(AttributeError):
+        h2.calculate()
+    with pytest.raises(AttributeError):
+        h2.minimize()
+    with pytest.raises(AttributeError):
+        h2.run(500)
 
 
 def test_changing_momenta_and_positions_makes_mols_different(nucleic):
@@ -363,3 +385,42 @@ def test_changing_bonds_makes_mols_different(nucleic):
     n.bond_graph[atom1][atom2] = n.bond_graph[atom2][atom1] = 1
     assert not nucleic.is_identical(n, verbose=True)
     assert not nucleic.same_topology(n, verbose=True)
+
+
+def test_charge_from_number(h2):
+    h2plus = mdt.Molecule(h2, charge=1)
+    assert h2plus.charge == 1 * u.q_e
+
+    h2plus.charge = 2 * u.q_e
+    assert h2plus.charge == 2 * u.q_e
+
+    h2plus.charge = 3
+    assert h2plus.charge == 3 * u.q_e
+
+
+def test_energy_model_charges(h2):
+    h2.charge = 1 * u.q_e
+    assert h2.charge == 1 * u.q_e
+    h2.set_energy_model(mdt.models.OpenMMPotential)
+
+    assert h2.energy_model.params.charge == 1 * u.q_e
+
+    h2.set_energy_model(mdt.models.OpenMMPotential, charge=3*u.q_e)
+    # TODO: test for warning here as well
+    assert h2.energy_model.params.charge == 3 * u.q_e
+
+
+def test_initialization_charges():
+    a1 = mdt.Atom('Na', formal_charge=-1)
+    mol = mdt.Molecule([a1])
+    assert mol.charge == -1 * u.q_e
+
+    with pytest.raises(TypeError):
+        mdt.Atom('H', charge=3)  # it needs to be "formal_charge", to distinguish from partial charge
+
+    m2 = mdt.Molecule([a1], charge=-1)
+    assert m2.charge == -1 * u.q_e
+
+    m2 = mdt.Molecule([a1], charge=-3*u.q_e)
+    # TODO: test for warning
+    assert m2.charge == -3 * u.q_e

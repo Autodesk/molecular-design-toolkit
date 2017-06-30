@@ -1,4 +1,6 @@
 from builtins import zip
+
+import itertools
 import numpy as np
 import pytest
 
@@ -81,7 +83,7 @@ def test_copy_atoms(fixture_key, request):
     oldatoms = oldobj.atoms
     atoms = oldatoms.copy_atoms()
     assert isinstance(atoms, mdt.AtomList)
-    _test_copy_integrity(atoms, oldatoms)
+    assert_atom_copy_integrity(atoms, oldatoms)
 
 
 @pytest.mark.parametrize('fixture_key',
@@ -93,25 +95,46 @@ def test_copy_atoms_in_containers(fixture_key, request):
 
     newobj = oldobj.copy()
     assert newobj.__class__ is oldobj.__class__
-    _test_copy_integrity(newobj.atoms, oldobj.atoms)
+    assert_atom_copy_integrity(newobj.atoms, oldobj.atoms)
 
 
-def _test_copy_integrity(atoms, oldatoms):
-    for old, new in zip(oldatoms, atoms):
-        assert (old.position == new.position).all()
-        assert (old.velocity == new.velocity).all()
+def assert_atom_copy_integrity(atoms, oldatoms):
+    newmol = atoms[0].molecule
+    assert len(atoms) == len(oldatoms)
+    for oldatom, atom in itertools.zip_longest(oldatoms, atoms):
+        assert oldatom.name == atom.name
+        assert oldatom.atnum == atom.atnum
+        assert oldatom.mass == atom.mass
+        assert (oldatom.position == atom.position).all()
+        assert (oldatom.velocity == atom.velocity).all()
 
-        new.x += 1.0 * u.angstrom
-        assert all((old.position == new.position) == [False, True, True])
+        atom.x += 1.0 * u.angstrom
+        assert all((oldatom.position == atom.position) == [False, True, True])
 
-        new.px += 1.0 * u.angstrom * u.amu / u.fs
-        assert all((old.momentum == new.momentum) == [False, True, True])
+        atom.px += 1.0 * u.angstrom * u.amu / u.fs
+        assert all((oldatom.momentum == atom.momentum) == [False, True, True])
 
-        assert old.residue is not new.residue
-        assert old.residue.name == new.residue.name
-        assert old.chain is not new.chain
-        assert old.chain.name == new.chain.name
-        assert (old.molecule is new.molecule is None) or (old.molecule is not new.molecule)
+        assert oldatom.residue is not atom.residue
+        assert oldatom.residue.name == atom.residue.name
+        assert oldatom.chain is not atom.chain
+        assert oldatom.chain.name == atom.chain.name
+        assert (oldatom.molecule is atom.molecule is None) or (oldatom.molecule is not atom.molecule)
+
+        assert atom.molecule is newmol  # might be None
+
+        if oldatom.residue is not None:
+            assert atom.residue.molecule is newmol
+            assert atom in atom.residue
+            assert atom.residue[atom.name] is atom
+        if oldatom.chain is not None:
+            assert atom.chain.molecule is newmol
+            assert atom in atom.chain.atoms
+            assert atom.residue in atom.chain
+            assert atom.chain[atom.residue.name] is atom.residue
+        if newmol is not None:
+            assert atom.residue is newmol.residues[atom.residue.index]
+            assert atom.chain is newmol.chains[atom.chain.index]
+            assert atom is newmol.atoms[atom.index]
 
 
 @pytest.mark.parametrize('fixture_key', moldesign_objects)
@@ -167,8 +190,8 @@ def test_chain_rename(pdb3aid):
     assert newmol.chains[1].name == 'B'
 
 
-@pytest.mark.parametrize('molkey', ["create_parameterize_am1bcc",
-                                    "create_protein_default_amber_forcefield"])
+@pytest.mark.parametrize('molkey', ["cached_mol_parameterized_with_zeros",
+                                    "cached_protein_with_default_amber_ff"])
 def test_forcefield_copied_with_molecule(molkey, request):
     mol = request.getfixturevalue(molkey)
     m2 = mol.copy()
@@ -186,8 +209,8 @@ def test_forcefield_copied_with_molecule(molkey, request):
     assert p1.improper_types == p2.improper_types
 
 
-def test_constraints_copied_with_molecule(parameterize_zeros):
-    mol = parameterize_zeros
+def test_constraints_copied_with_molecule(mol_with_zerocharge_params):
+    mol = mol_with_zerocharge_params
 
     mol.constrain_distance(*mol.atoms[:2])
     mol.constrain_angle(*mol.atoms[:3])

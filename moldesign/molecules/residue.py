@@ -22,11 +22,11 @@ import collections
 
 import moldesign as mdt
 from .. import utils, data
-from . import BioContainer, AtomList, toplevel
+from . import MolecularHierarchy, AtomList, toplevel, ChildList
 
 
 @toplevel
-class Residue(BioContainer):
+class Residue(MolecularHierarchy):
     """ A biomolecular residue - most often an amino acid, a nucleic base, or a solvent
     molecule. In PDB structures, also often refers to non-biochemical molecules.
 
@@ -36,18 +36,7 @@ class Residue(BioContainer):
         parent (mdt.Molecule): the molecule this residue belongs to
         chain (Chain): the chain this residue belongs to
     """
-
-    def copy(self):
-        """ Create a copy of this residue and all topology within.
-
-        Returns:
-            Residue: copy of this residue and all its atoms. This copy will NOT
-            reference any parent molecule
-        """
-        newatoms = super().copy_atoms()
-        return newatoms[0].residue
-
-    @utils.args_from(BioContainer)
+    @utils.args_from(MolecularHierarchy)
     def __init__(self, **kwargs):
         """ Initialization
         Args:
@@ -62,6 +51,44 @@ class Residue(BioContainer):
         self._sidechain = None
         self._template_name = None
         self._name = None
+
+    def copy(self):
+        """ Create a copy of this residue and all topology within.
+
+        Returns:
+            Residue: copy of this residue and all its atoms. This copy will NOT
+            reference any parent molecule
+        """
+        newatoms = super().copy_atoms()
+        return newatoms[0].residue
+
+    def _subcopy(self, memo=None):
+        """ Private data mangement method for copying a residue.
+        Returns a shallow copy intended to be deepcopied to avoid corrupting the original
+         data.
+
+        See :method:`moldesign.Residue.copy` for the public interface for copying these objects.
+        """
+        import copy
+
+        if memo is None:
+            memo = {'bondgraph':{}}
+        if self in memo:
+            return
+
+        newresidue = copy.copy(self)
+        newresidue.chain = None
+        newresidue.molecule = None
+        newresidue.children = ChildList(newresidue)
+
+        memo[self] = newresidue
+        if self.chain is not None:
+            if self.chain not in memo:
+                newchain = copy.copy(self.chain)
+                newchain.molecule = None
+                newchain.children = ChildList(newchain)
+                memo[self.chain] = newchain
+            memo[self.chain].add(newresidue)
 
     @property
     def name(self):
@@ -91,7 +118,7 @@ class Residue(BioContainer):
         if self.molecule is None:
             lines = ["<h3>Residue %s</h3>"%self.name]
         else:
-            lines = ["<h3>Residue %s (index %d)</h3>"%(self.name, self.index)]
+            lines = ["<h3>Residue %s (index %s)</h3>"%(self.name, self.index)]
 
         if self.type == 'protein':
             lines.append('**Residue codes**: %s / %s'%(self.resname, self.code))
@@ -103,7 +130,7 @@ class Residue(BioContainer):
 
         lines.append('**<p>Chain:** %s'%self.chain.name)
 
-        lines.append('**PDB sequence #**: %d'%self.pdbindex)
+        lines.append('**PDB sequence #**: %s'%self.pdbindex)
 
         terminus = None
         if self.type == 'dna':
@@ -153,16 +180,12 @@ class Residue(BioContainer):
         if atom.residue is not None:
             assert atom.residue is self, 'Atom already assigned to a residue'
         atom.residue = self
-        if atom.chain is None:
-            atom.chain = self.chain
-        else:
-            assert atom.chain == self.chain, "Atom's chain does not match residue's chain"
 
         if key is not None or atom.name not in self.children:
             return super().add(atom, key=key)
         else:
             return super().add(atom, key='%s%s' % (atom.name, len(self)))
-    add.__doc__ = BioContainer.add.__doc__
+    add.__doc__ = MolecularHierarchy.add.__doc__
 
     @property
     def is_n_terminal(self):

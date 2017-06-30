@@ -27,8 +27,8 @@ def protein(protein_default_amber_forcefield):
 
 
 @pytest.fixture
-def small_mol(gaff_model_gasteiger):
-    mol = gaff_model_gasteiger
+def small_mol(mol_with_gast_params):
+    mol = mol_with_gast_params
     mol.energy_model.params.compute_platform = 'cpu'
     mol.energy_model.params.num_cpus = 1
     mol.minimize(force_tolerance=0.5*u.eV/u.angstrom)  # perform a very partial minimization

@@ -21,18 +21,18 @@ import collections
 
 import moldesign as mdt
 from .. import utils, data
-from . import BioContainer, toplevel, HasResidues
+from . import MolecularHierarchy, toplevel, HasResidues
 
 
 @toplevel
-class Chain(BioContainer, HasResidues):
+class Chain(MolecularHierarchy, HasResidues):
     """ Biomolecular chain class - its children are almost always residues.
 
     Attributes:
         parent (mdt.Molecule): the molecule this residue belongs to
         chain (Chain): the chain this residue belongs to
     """
-    @utils.args_from(BioContainer)
+    @utils.args_from(MolecularHierarchy)
     def __init__(self, name=None, **kwargs):
         for key in ('pdbname', 'pdbindex'):
             val = kwargs.pop(key, None)
