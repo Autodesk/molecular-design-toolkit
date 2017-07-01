@@ -16,10 +16,7 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import collections
 import numpy as np
-
-from .orbitals import Orbital, SHELLS, SPHERICALNAMES
 
 
 class AbstractFunction(object):
@@ -79,24 +76,22 @@ class CartesianGaussian(AbstractFunction):
 
     References:
         Levine, Ira N. Quantum Chemistry, 5th ed. Prentice Hall, 2000. 486-94.
+
+    Args:
+        center (Vector[length]): location of the gaussian's centroid
+        powers (List[int]): cartesian powers in each dimension (see
+            equations in :class:`CartesianGaussian` docs)
+        exp (Scalar[1/length**2]): gaussian width parameter
+        coeff (Scalar): multiplicative coefficient (if None, gaussian will be automatically
+             normalized)
+
+    Note:
+        The dimensionality of the gaussian is determined by the dimensionality
+        of the centroid location vector and the power vector. So, if scalars are passed for the
+        ``center`` and ``powers``, it's 1-D. If length-3 vectors are passed for ``center``
+        and ``powers``, it's 3D.
     """
     def __init__(self, center, exp, powers, coeff=None):
-        """  Initialization:
-
-        Args:
-            center (Vector[length]): location of the gaussian's centroid
-            powers (List[int]): cartesian powers in each dimension (see
-                equations in :class:`CartesianGaussian` docs)
-            exp (Scalar[1/length**2]): gaussian width parameter
-            coeff (Scalar): multiplicative coefficient (if None, gaussian will be automatically
-                 normalized)
-
-        Note:
-            The dimensionality of the gaussian is determined by the dimensionality
-            of the centroid location vector and the power vector. So, if scalars are passed for the
-            ``center`` and ``powers``, it's 1-D. If length-3 vectors are passed for ``center``
-            and ``powers``, it's 3D.
-        """
         assert len(powers) == len(center), "Inconsistent dimensionality - number of cartesian " \
                                            "powers must match dimensionality of centroid vector"
         self.center = center
@@ -108,7 +103,7 @@ class CartesianGaussian(AbstractFunction):
         else:
             self.coeff = coeff
 
-        self._cartesian = (self.powers != 0).any()
+        self.shell = sum(self.powers)
 
     def __repr__(self):
         return ("<{ndim}-D Gaussian (cart) (coeff: {coeff:4.2f}, "
@@ -130,7 +125,7 @@ class CartesianGaussian(AbstractFunction):
         """
         return self.powers.sum()
 
-    def __call__(self, coords, _include_cartesian=True):
+    def __call__(self, coords, _include_angular=True):
         """ Evaluate this function at the given coordinates.
 
         Can be called either with a 1D column (e.g., ``[1,2,3]*u.angstrom ``) or
@@ -163,10 +158,21 @@ class CartesianGaussian(AbstractFunction):
         r2 = prd.sum(axis=axis)
 
         result = self.coeff * np.exp(-self.exp * r2)
-        if self._cartesian and _include_cartesian:
-            result *= (np.product(disp.magnitude**self.powers, axis=axis)
-                      * disp.units**self.powers.sum() )
+        if self.shell > 0 and _include_angular:
+            result *= self.angular_part(coords)
         return result
+
+    def angular_part(self, coords):
+        if self.shell == 0:
+            return 1.0
+
+        if len(coords.shape) > 1:
+            axis = 1
+        else:
+            axis = None
+
+        disp = coords - self.center
+        return np.product(disp.magnitude**self.powers, axis=axis)*disp.units ** self.powers.sum()
 
     def __mul__(self, other):
         """ Returns product of two gaussian functions, which is also a gaussian
@@ -177,6 +183,8 @@ class CartesianGaussian(AbstractFunction):
         Returns:
             CartesianGaussian: product gaussian
         """
+        if self.center != other.center:
+            raise NotImplementedError()
 
         # convert widths to prefactor form
         a = self.exp
@@ -279,15 +287,15 @@ class SphericalGaussian(AbstractFunction):
                 center=self.center, exp=self.exp, coeff=self.coeff,
                 qnums=(self.l, self.m))
 
-    def __call__(self, coords, _include_spherical=True):
+    def __call__(self, coords, _include_angular=True):
         """ Evaluate this function at the given coordinates.
 
         Can be called either with a 1D column (e.g., ``[1,2,3]*u.angstrom ``) or
         an ARRAY of coordinates (``[[0,0,0],[1,1,1]] * u.angstrom``)
 
         Args:
-            _include_spherical (bool): include the contribution from the non-exponential parts
-                (for computational efficiency, this can sometimes omitted now and included later)
+            _include_angular (bool): include the contribution from the non-exponential parts
+                (for computational efficiency, this can be omitted now and included later)
 
         Args:
             coords (Vector[length]): 3D Coordinates or list of 3D coordinates
@@ -305,134 +313,22 @@ class SphericalGaussian(AbstractFunction):
         r2 = prd.sum(axis=axis)
 
         result = self.coeff * np.exp(-self.exp * r2)
-        if _include_spherical:
-            result *= r2**(self.l/2.0) * self._spherical_harmonic(coords)
+        if _include_angular:
+            result *= r2**(self.l/2.0) * self._spherical_harmonic(disp)
         return result
 
-
-class AtomicBasisFunction(Orbital):
-    """ Stores an atomic basis function.
-
-    Note:
-        Either l and m should be passed, or cart, but not both.
-
-    Args:
-        atom (moldesign.Atom): The atom this basis function belongs to
-        index (int): the index of this basis function (it is stored as
-            ``wfn.basis[self.index]``)
-        n (int): principal quantum number (``n>=1``) - this is useful only as a metadata object
-        l (int): total angular momentum quantum number (``l<=n-1``)
-        m (int): z-angular momentum quantum number (optional -
-             for spherical sets only; ``|m|<=l``)
-        cart (str): cartesian component (optional; for cartesian sets only)
-        primitives (List[PrimitiveBase]): List of primitives, if available
-    """
-    def __init__(self, atom, n=None, l=None, m=None, cart=None, primitives=None):
-        self._atom = atom
-        self.atom_index = atom.index
-        self.n = n
-        self.l = l
-        self.m = m
-        self.primitives = primitives
-        if cart is not None:
-            assert self.m is None, 'Both cartesian and spherical components passed!'
-            assert len(cart) == self.l, \
-                'Angular momentum does not match specified component %s' % cart
-            for e in cart:
-                assert e in 'xyz'
-            self.cart = ''.join(sorted(cart))
+    def angular_part(self, coords):
+        if len(coords.shape) > 1:
+            axis = 1
         else:
-            self.cart = None
+            axis = None
 
-        # These quantities can't be defined until we assemble the entire basis
-        self.coeffs = None
-        self.molecule = atom.molecule
-        self.basis = None
-        self.occupation = None
-        self.wfn = None
+        disp = coords - self.center
+        prd = disp*disp
+        r2 = prd.sum(axis=axis)
 
-    @property
-    def atom(self):
-        """ moldesign.Atom: the atom this basis function belongs to
+        return r2**(self.l/2.0) * self._spherical_harmonic(disp)
 
-        We get the atom via an indirect reference, making it easier to copy the wavefunction
-        """
-        if self.wfn is not None:
-            return self.wfn.mol.atoms[self.atom_index]
-        else:
-            return self._atom
-
-    @property
-    def num_primitives(self):
-        return len(self.primitives)
-
-    @property
-    def norm(self):
-        """ Calculate this orbital's norm
-
-        Returns:
-            float: norm :math:`\sqrt{<i|i>}`
-        """
-        norm = 0.0
-        for p1 in self.primitives:
-            for p2 in self.primitives:
-                norm += p1.overlap(p2)
-        return np.sqrt(norm)
-
-    def normalize(self):
-        """ Scale primitive coefficients to normalize this basis function
-        """
-        prefactor = 1.0 / self.norm
-        for primitive in self.primitives:
-            primitive *= prefactor
-
-    @property
-    def orbtype(self):
-        """ A string describing the orbital's angular momentum state.
-
-        Examples:
-            >>> AtomicBasisFunction(n=1, l=0).orbtype
-            's'
-            >>> AtomicBasisFunction(n=2, l=1, cart='y').orbtype
-            'py'
-            >>> AtomicBasisFunction(n=3, l=2, m=0).orbtype
-            'd(z^2)'
-        """
-        if self.l == 0: t = 's'
-        elif self.cart is not None: t = SHELLS[self.l] + self.cart
-        else: t = SPHERICALNAMES[self.l, self.m]
-        return t
-
-    @property
-    def aotype(self):
-        """ A string describing the orbital's state.
-
-        Examples:
-            >>> AtomicBasisFunction(n=1, l=0).aotype
-            '1s'
-            >>> AtomicBasisFunction(n=2, l=1, cart='y').aotype
-            '2py'
-            >>> AtomicBasisFunction(n=3, l=2, m=0).aotype
-            '3d(z^2)'
-        """
-        t = self.orbtype
-        if self.n:
-            return '%s%s' % (self.n, t)
-        else:
-            return t
-
-    def __str__(self):
-        return 'AO ' + self.name
-
-    @property
-    def name(self):
-        try:
-            return '%s on atom %s' % (self.aotype, self.atom.name)
-        except:
-            return 'Basis Fn'
-
-    def __repr__(self):
-        return '<%s %s>' % (self.__class__.__name__, self.name)
 
 # Precompute odd factorial values (N!!)
 _ODD_FACTORIAL = {0: 1}  # by convention

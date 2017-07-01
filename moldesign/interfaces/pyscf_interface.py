@@ -132,6 +132,6 @@ def basis_values(mol, basis, coords, coeffs=None, positions=None):
     if coeffs is None:
         return aovals
     else:
-        return aovals.dot(coeffs)
+        return aovals.dot(coeffs.T)
 
 

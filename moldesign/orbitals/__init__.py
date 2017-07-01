@@ -5,5 +5,6 @@ __all__ = []
 
 from .gaussians import *
 from .orbitals import *
+from .atomic_basis_fn import *
 from .basis import *
 from .wfn import *

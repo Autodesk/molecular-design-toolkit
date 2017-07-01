@@ -440,7 +440,7 @@ class PySCFPotential(QMBase):
             atom = self.mol.atoms[pmol.bas_atom(ishell)]
             angular = pmol.bas_angular(ishell)
             num_momentum_states = angular*2 + 1
-            exps = pmol.bas_exp(ishell)
+            exps = pmol.bas_exp(ishell) / (u.bohr**2)  # very unsure if these units are right!
             num_contractions = pmol.bas_nctr(ishell)
             coeffs = pmol.bas_ctr_coeff(ishell)
 
@@ -450,11 +450,11 @@ class PySCFPotential(QMBase):
                     sphere_label = label[3]
                     l, m = SPHERICAL_NAMES[sphere_label]
                     assert l == angular
-                    # TODO: This is not really the principal quantum number
+                    # Note: this is for metadata only, should not be used in any calculations
                     n = int(''.join(x for x in label[2] if x.isdigit()))
 
                     primitives = [orbitals.SphericalGaussian(atom.position.copy(),
-                                                             exp, n, l, m,
+                                                             exp, l, m,
                                                              coeff=coeff[ictr])
                                   for exp, coeff in zip(exps, coeffs)]
                     bfs.append(orbitals.AtomicBasisFunction(atom,
