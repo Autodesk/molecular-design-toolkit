@@ -8,41 +8,11 @@ import moldesign as mdt
 from moldesign import units as u
 
 from . import helpers
-
-registered_types = {}
+from .molecule_fixtures import *
 
 # TODO: automated method testing based on its metadata - i.e. test to make sure parameters are
 #       honored, test that it calcultes what it says it does, test that properties have the right
 #       units and array shapes, etc.
-
-
-def typedfixture(*types, **kwargs):
-    """This is a decorator that lets us associate fixtures with one or more arbitrary types.
-    We'll later use this type to determine what tests to run on the result"""
-
-    def fixture_wrapper(func):
-        for t in types:
-            registered_types.setdefault(t, []).append(func.__name__)
-        return pytest.fixture(**kwargs)(func)
-
-    return fixture_wrapper
-
-
-@typedfixture('molecule', scope='function')
-def h2():
-    mol = mdt.Molecule([mdt.Atom('H'),
-                        mdt.Atom('H')])
-    mol.atoms[1].z = 0.75 * u.angstrom
-    return mol
-
-
-@typedfixture('molecule', scope='function')
-def heh_plus():
-    mol = mdt.Molecule([mdt.Atom('H'),
-                        mdt.Atom('He')])
-    mol.atoms[1].z = 1.0 * u.angstrom
-    mol.charge = 1 * u.q_e
-    return mol
 
 
 # Note that this is an incomplete set of models
@@ -51,9 +21,10 @@ models_to_test = list(itertools.product((mdt.models.NWChemQM, mdt.models.PySCFPo
                                         'rhf rks mp2'.split()))
 model_ids = ['/'.join((model.__name__, theory, basis)) for (model, theory, basis) in models_to_test]
 
+TESTSET = ['h2', 'small_molecule', 'benzene']
+
 
 @pytest.fixture(params=models_to_test, ids=model_ids, scope='function')
-@pytest.mark.screening
 def h2_with_model(request, h2):
     model, basis, theory = request.param
 
@@ -98,14 +69,7 @@ def nwchem_dft():
     return mdt.models.NWChemQM(basis='sto-3g', theory='rks', functional='b3lyp')
 
 
-@pytest.fixture
-def h2_rhfwfn(h2):
-    h2.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
-    h2.calculate()
-    return h2
-
-
-@pytest.mark.parametrize('objkey', registered_types['molecule'])
+@pytest.mark.parametrize('objkey', TESTSET)
 def test_pyscf_rhf_sto3g_properties(objkey, request):
     mol = request.getfixturevalue(objkey)
     mol.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
@@ -120,7 +84,7 @@ def test_pyscf_rhf_sto3g_properties(objkey, request):
                                     - mol.charge.value_in(u.q_e)
 
 
-@pytest.mark.parametrize('objkey', registered_types['molecule'])
+@pytest.mark.parametrize('objkey', TESTSET)
 def test_pyscf_rhf_sto3g_matrices(objkey, request):
     mol = request.getfixturevalue(objkey)
     mol.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
@@ -154,7 +118,7 @@ def test_pyscf_casci(h2):
     # TODO: actually test results
 
 
-@pytest.mark.parametrize('objkey', registered_types['molecule'])
+@pytest.mark.parametrize('objkey', TESTSET)
 def test_pyscf_rhf_sto3g_forces(objkey, request):
     mol = request.getfixturevalue(objkey)
     mol.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
@@ -174,6 +138,7 @@ def test_calc_eri_tensor(h2):
         eris[0,1,2,1]
 
 
+@pytest.mark.screening
 def test_aobasis(h2_rhfwfn):
     # it's sto-3g, so structure is simple
     aobasis = h2_rhfwfn.wfn.aobasis

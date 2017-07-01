@@ -67,6 +67,12 @@ def native_str_buffer(*args, **kwargs):
         return io.StringIO(*args, **kwargs)
 
 
+if PY2:
+    PICKLE_PROTOCOLS = list(range(3))
+else:
+    PICKLE_PROTOCOLS = list(range(5))
+
+
 class ZeroEnergy(mdt.models.base.EnergyModelBase):
     """ All 0, all the time
     """

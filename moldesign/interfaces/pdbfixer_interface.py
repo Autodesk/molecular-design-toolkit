@@ -113,8 +113,6 @@ def mutate_residues(mol, residue_map):
             residues_to_copy.append(mutant_res)
             mutant_res.mol = None
             mutant_res.chain = oldres.chain
-            for atom in mutant_res.atoms:
-                atom.chain = oldres.chain
         else:
             residues_to_copy.append(oldres)
 

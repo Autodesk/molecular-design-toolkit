@@ -52,15 +52,16 @@ class ChildList(AtomContainer):
                 + list(self._childbyname.keys()))
 
     def __getitem__(self, item):
-        if isinstance(item, basestring):
-            if item not in self._childbyname:
-                raise KeyError('No object in "%s" named "%s"' % (self.parent, item))
-            return self._childbyname[item]
-        else:
+        if isinstance(item, (int, slice)):
             try:
                 return self._childinorder[item]
             except IndexError:
-                raise IndexError("No object with index '%d' in %s" % (item, self.parent))
+                raise IndexError("No object with index %d in %s" % (item, self.parent))
+        else:
+            try:
+                return self._childbyname[item]
+            except KeyError:
+                raise KeyError("No object with name '%s' in %s" % (item, self.parent))
 
     def __setitem__(self, key, val):
         if key in self._childbyname:
@@ -136,15 +137,14 @@ class _SortKey(object):
             return id(self.obj) < id(other.obj)
 
 
-@toplevel
-class BioContainer(AtomContainer):
+class MolecularHierarchy(AtomContainer):
     """
     Generalized storage mechanism for hierarchical representation of biomolecules,
     e.g. by residue, chain, etc. Permits other groupings, provided that everything is
     tree-like.
 
     All children of a given entity must have unique names. An individual child can be retrieved with
-    ``biocontainer.childname`` or ``biocontainer['childname']`` or ``biocontainer[index]``
+    ``x.childname`` or ``x['childname']`` or ``x[index]``
 
     Yields:
         BioContainer or mdt.Atom: this entity's children, in order
@@ -188,7 +188,7 @@ class BioContainer(AtomContainer):
             KeyError: if an object with this key already exists
 
         Args:
-            item (BioContainer or mdt.Atom): the child object to add
+            item (MolecularHierarchy or mdt.Atom): the child object to add
             key (str): Key to retrieve this item (default: ``item.name`` )
         """
         if key is None:
@@ -234,17 +234,5 @@ class BioContainer(AtomContainer):
                 if hasattr(child, key) and getattr(child, key) == val:
                     retlist.append(child)
         return retlist
-
-
-@toplevel
-class Instance(BioContainer):
-    """ The singleton biomolecular container for each ``Molecule``. Its children are generally
-    PDB chains. Users won't ever really see this object.
-    """
-    def __str__(self):
-        return str(self.children)
-
-    def __repr__(self):
-        return '<Molecule instance: %s>' % str(self.children)
 
 

@@ -163,7 +163,5 @@ def restore_topology(mol, topo):
         res.pdbindex = refres.pdbindex
         res.name = refres.name
         res.chain = chain_map[refres.chain]
-        for atom in res.atoms:
-            atom.chain = res.chain
 
     return mdt.Molecule(mol.atoms)

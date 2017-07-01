@@ -24,7 +24,7 @@ import numpy as np
 import moldesign as mdt
 from .. import helpers, utils
 from .. import units as u
-from .molecule import MolecularProperties
+from . import MolecularProperties, AtomicProperties
 from . import toplevel
 
 
@@ -105,17 +105,17 @@ class _TrajAtom(object):
 
     def __getattr__(self, item):
         if item in ('traj', 'index', 'real_atom'):
-            raise AttributeError('_TrajAtom.%s not assigned (pickle issue?)' % item)
+            raise AttributeError('Internal Error: _TrajAtom.%s has not been initialized' % item)
 
-        try:  # try to get a time-dependent version
-            trajslice = getattr(self.traj, item)
-        except AttributeError:  # not time-dependent - look for an atomic property
+        try:  # first, look for time-dependent properties
+            val = getattr(self.traj, item)
+        except AttributeError:  # otherwise, just return an atomic property
             return getattr(self.real_atom, item)
 
-        if trajslice[0]['type'] != 'atomic':
+        if not isinstance(val[0], AtomicProperties):
             raise ValueError('%s is not an atomic quantity' % item)
         else:
-            return u.array([f[self.real_atom] for f in trajslice])
+            return u.array([f[self.real_atom] for f in val])
 
     def __dir__(self):
         attrs = [self.ATOMIC_ARRAYS.get(x, x) for x in dir(self.traj)]
@@ -246,7 +246,6 @@ class Trajectory(TrajectoryAnalysisMixin):
         self.unit_system = utils.if_not_none(unit_system, mdt.units.default)
         self.properties = utils.DotDict()
         self._reset()
-        self._tempmol.dynamic_dof = self.mol.dynamic_dof
         self.name = utils.if_not_none(name, 'untitled')
         if first_frame: self.new_frame()
 
@@ -347,7 +346,7 @@ class Trajectory(TrajectoryAnalysisMixin):
                     newpl.append(None)
                     self.properties[key] = newpl
 
-        # TODO: less flubby way of keeping track of # of frames
+        # TODO: less awkward way of keeping track of # of frames
         self.frames.append(Frame(self, self.num_frames))
 
 
@@ -366,6 +365,8 @@ class Trajectory(TrajectoryAnalysisMixin):
         if self.num_frames != 0:
             proplist = [None] * self.num_frames
             proplist.append(value)
+        elif isinstance(value, (AtomicProperties, dict)):
+            proplist = [value]
         else:
             try:
                 proplist = self.unit_system.convert(u.array([value]))

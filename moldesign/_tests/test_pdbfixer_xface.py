@@ -25,7 +25,7 @@ from moldesign import units as u
 
 import pytest
 
-from .molecule_fixtures import pdb3aid, benzene, pdb1yu8
+from .molecule_fixtures import *
 
 
 def test_inchain_residue_mutation_in_protein(pdb3aid):

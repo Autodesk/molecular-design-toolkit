@@ -179,7 +179,6 @@ def parmed_to_mdt(pmdmol):
 
         atom.residue = residue
         residue.add(atom)
-        atom.chain = chain
         assert patm not in atoms
         atoms[patm] = atom
 
@@ -284,8 +283,6 @@ def _reassign_chains(f, mol):
     for residue in mol.residues:
         newchain = reschains[residue.resname, str(residue.pdbindex), residue.chain.name]
 
-        for atom in residue.atoms:
-            atom.chain = newchain
         residue.chain = newchain
 
     return mdt.Molecule(mol.atoms,

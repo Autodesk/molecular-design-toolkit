@@ -16,8 +16,7 @@ from .. import utils
 
 from .molecule_fixtures import *
 
-registered_types = {}
-registered_types.update(molecule_standards)
+registered_types = {key:val[:] for key,val in molecule_standards.items()}
 
 def typedfixture(*types, **kwargs):
     """This is a decorator that lets us associate fixtures with one or more arbitrary types.
@@ -32,8 +31,7 @@ def typedfixture(*types, **kwargs):
 
 
 ######################################
-# Test the basic data structures
-
+# Various python objects
 TESTDICT = collections.OrderedDict((('a', 'b'),
                                     ('c', 3),
                                     ('d', 'e'),
@@ -41,30 +39,30 @@ TESTDICT = collections.OrderedDict((('a', 'b'),
                                     (3, 35)))
 
 
-@typedfixture('object')
+@typedfixture('pickleable')
 def dotdict():
     dd = utils.DotDict(TESTDICT)
     return dd
 
 
 # Some objects with units
-@typedfixture('object')
+@typedfixture('pickleable')
 def list_of_units():
     return [1.0 * u.angstrom, 1.0 * u.nm, 1.0 * u.a0]
 
 
-@typedfixture('object', 'equality')
+@typedfixture('pickleable', 'equality')
 def simple_unit_array():
     return np.array([1.0, -2.0, 3.5]) * u.angstrom
 
 
-@typedfixture('object', 'equality')
+@typedfixture('pickleable', 'equality')
 def unit_number():
     return 391.23948 * u.ureg.kg * u.ang / u.alpha
 
 
 ######################################
-# Test underlying elements
+# Atom objects
 @typedfixture('atom')
 def carbon_atom():
     atom1 = mdt.Atom('C')
@@ -83,9 +81,7 @@ def carbon_copy(carbon_atom):
 
 
 ######################################
-# Tests around hydrogen
-
-
+# Hydrogen-related objects
 @typedfixture('molecule')
 def h2_harmonic(h2):
     mol = h2
@@ -95,6 +91,26 @@ def h2_harmonic(h2):
     mol.set_energy_model(model)
     mol.set_integrator(integrator)
     return mol
+
+
+@typedfixture('pickleable')
+def atom_bond_graph(h2):
+    return h2.bond_graph[h2.atoms[0]]
+
+
+@typedfixture('pickleable')
+def mol_bond_graph(h2):
+    return h2.bond_graph
+
+
+@typedfixture('pickleable')
+def mol_wfn(h2_rhfwfn):
+    return h2_rhfwfn.copy().wfn
+
+
+@typedfixture('pickleable')
+def mol_properties(h2_rhfwfn):
+    return h2_rhfwfn.copy().properties
 
 
 @typedfixture('trajectory')
@@ -136,4 +152,4 @@ moldesign_objects = (registered_types['molecule'] +
                      registered_types['submolecule'] +
                      registered_types['trajectory'] +
                      registered_types['atom'])
-all_objects = registered_types['object'] + moldesign_objects
+pickleable = registered_types['pickleable'] + moldesign_objects
