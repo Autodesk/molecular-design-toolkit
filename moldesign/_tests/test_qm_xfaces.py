@@ -139,9 +139,9 @@ def test_calc_eri_tensor(h2):
 
 
 @pytest.mark.screening
-def test_aobasis(h2_rhfwfn):
+def test_aobasis(h2_rhf_sto3g):
     # it's sto-3g, so structure is simple
-    aobasis = h2_rhfwfn.wfn.aobasis
+    aobasis = h2_rhf_sto3g.wfn.aobasis
     assert aobasis.basisname == 'sto-3g'
     assert (aobasis.coeffs == np.identity(2)).all()
     np.testing.assert_allclose(aobasis.fock, aobasis.fock.T)
@@ -149,7 +149,7 @@ def test_aobasis(h2_rhfwfn):
 
     assert aobasis.fock.dimensionality == u.eV.dimensionality
 
-    for orb in h2_rhfwfn.wfn.aobasis:
+    for orb in h2_rhf_sto3g.wfn.aobasis:
         assert orb.aotype == '1s'
         assert orb.orbtype == 's'
         assert len(orb.primitives) == 3

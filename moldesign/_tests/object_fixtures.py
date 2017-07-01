@@ -104,13 +104,13 @@ def mol_bond_graph(h2):
 
 
 @typedfixture('pickleable')
-def mol_wfn(h2_rhfwfn):
-    return h2_rhfwfn.copy().wfn
+def mol_wfn(h2_rhf_sto3g):
+    return h2_rhf_sto3g.copy().wfn
 
 
 @typedfixture('pickleable')
-def mol_properties(h2_rhfwfn):
-    return h2_rhfwfn.copy().properties
+def mol_properties(h2_rhf_sto3g):
+    return h2_rhf_sto3g.copy().properties
 
 
 @typedfixture('trajectory')

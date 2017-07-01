@@ -289,7 +289,7 @@ def protein_default_amber_forcefield(cached_protein_with_default_amber_ff):
 
 
 @pytest.fixture(scope='session')
-def cached_h2_rhfwfn():
+def cached_h2_rhf_sto3g():
     mol = h2()  # fixture is not cached, so just call it directly
     mol.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
     mol.calculate(requests=['forces'])
@@ -297,5 +297,31 @@ def cached_h2_rhfwfn():
 
 
 @pytest.fixture
-def h2_rhfwfn(cached_h2_rhfwfn):
-    return cached_h2_rhfwfn.copy()
+def h2_rhf_sto3g(cached_h2_rhf_sto3g):
+    return cached_h2_rhf_sto3g.copy()
+
+
+@pytest.fixture(scope='session')
+def cached_h2_rhf_augccpvdz():
+    mol = h2()
+    mol.set_energy_model(mdt.models.RHF, basis='aug-cc-pvdz')
+    mol.calculate()
+    return mol
+
+
+@pytest.fixture
+def h2_rhf_augccpvdz(cached_h2_rhf_augccpvdz):
+    return cached_h2_rhf_augccpvdz.copy()
+
+
+@pytest.fixture(scope='session')
+def cached_acetylene_dft_631g():
+    mol = mdt.from_smiles('C#C')
+    mol.set_energy_model(mdt.models.B3LYP, basis='6-31g')
+    mol.calculate()
+    return mol
+
+
+@pytest.fixture
+def acetylene_dft_631g(cached_acetylene_dft_631g):
+    return cached_acetylene_dft_631g.copy()

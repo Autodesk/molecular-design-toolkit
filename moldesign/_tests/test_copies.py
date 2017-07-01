@@ -233,11 +233,11 @@ def test_constraints_copied_with_molecule(mol_with_zerocharge_params):
                 assert atom.molecule is mcpy
 
 
-def test_properties_copied_with_molecule(cached_h2_rhfwfn):
-    original = cached_h2_rhfwfn
+def test_properties_copied_with_molecule(cached_h2_rhf_sto3g):
+    original = cached_h2_rhf_sto3g
     assert original.potential_energy is not None  # sanity check
 
-    mol = cached_h2_rhfwfn.copy()
+    mol = cached_h2_rhf_sto3g.copy()
 
     assert mol is not original
     assert mol.properties is not original.properties
@@ -255,8 +255,8 @@ def test_properties_copied_with_molecule(cached_h2_rhfwfn):
             assert mol.properties[prop] is not val
 
 
-def test_wfn_copied_with_molecule(cached_h2_rhfwfn):
-    original = cached_h2_rhfwfn
+def test_wfn_copied_with_molecule(cached_h2_rhf_sto3g):
+    original = cached_h2_rhf_sto3g
     assert original.wfn is not None  # sanity check
 
     mol = original.copy()
@@ -269,8 +269,8 @@ def test_wfn_copied_with_molecule(cached_h2_rhfwfn):
     assert mol.wfn.aobasis.fock is not original.wfn.aobasis.fock
 
 
-def test_wfn_copy(cached_h2_rhfwfn):
-    original = cached_h2_rhfwfn
+def test_wfn_copy(cached_h2_rhf_sto3g):
+    original = cached_h2_rhf_sto3g
     wfn = original.wfn.copy()
 
     assert wfn.mol is original
