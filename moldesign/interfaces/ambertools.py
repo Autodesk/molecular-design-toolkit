@@ -26,6 +26,7 @@ import pyccc
 from .. import compute, utils
 from .. import units as u
 from .. import forcefields
+from ..molecules import AtomicProperties
 
 IMAGE = 'ambertools'
 
@@ -103,7 +104,7 @@ def _antechamber_calc_charges(mol, ambname, chargename, kwargs):
     def finish_job(job):
         """Callback to complete the job"""
         lines = iter(job.get_output('out.mol2').read().split('\n'))
-        charges = utils.DotDict(type='atomic')
+        charges = {}
 
         line = next(lines)
         while line.strip()[:len('@<TRIPOS>ATOM')] != '@<TRIPOS>ATOM':
@@ -117,7 +118,7 @@ def _antechamber_calc_charges(mol, ambname, chargename, kwargs):
             charges[mol.atoms[idx]] = u.q_e*float(fields[-1])
             line = next(lines)
 
-        mol.properties[chargename] = charges
+        mol.properties[chargename] = AtomicProperties(charges)
         return charges
 
     job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),

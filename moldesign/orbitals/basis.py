@@ -43,7 +43,15 @@ class BasisSet(MolecularOrbitals):
     """
     Stores a basis, typically of atomic orbitals.
 
-    This is a special orbital type
+    This is a case of a general set of molecular orbitals, where the coefficient matrix
+    must be the identity
+
+    Args:
+        mol (mdt.Molecule): the molecule these basis functions belong to
+        orbitals (List[AtomicBasisFunction]): list of basis functions comprising this set
+        name (str): name of this basis set
+        h1e (Matrix[energy]): 1-electron elements of the hamiltonian
+        overlaps (Matrix): overlap matrix
     """
     overlaps = Attribute('_overlaps')
     h1e = Attribute('_h1e')
@@ -72,9 +80,9 @@ class BasisSet(MolecularOrbitals):
         for kw, val in kwargs.items():
             setattr(self, kw, val)
 
-        self.on_atom = {}
+        self._basis_fn_by_atom = {}
         for fn in self.orbitals:
-            self.on_atom.setdefault(fn.atom, []).append(fn)
+            self._basis_fn_by_atom.setdefault(fn.atom.index, []).append(fn)
 
     def __call__(self, coords, coeffs=None):
         """Calculate the value of each basis function at the specified coordinates.
@@ -95,6 +103,9 @@ class BasisSet(MolecularOrbitals):
         from moldesign.interfaces.pyscf_interface import basis_values
         return basis_values(self.wfn.mol, self, coords, coeffs=coeffs,
                             positions=self.wfn.positions)
+
+    def get_basis_functions_on_atom(self, atom):
+        return self._basis_fn_by_atom[atom.index]
 
     def __repr__(self):
         return '<%s (%s) of %s>' % (self.__class__.__name__, self.basisname, self.mol)

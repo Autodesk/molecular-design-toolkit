@@ -231,3 +231,52 @@ def test_constraints_copied_with_molecule(mol_with_zerocharge_params):
         if constraint.desc != 'hbonds':
             for atom in constraint.atoms:
                 assert atom.molecule is mcpy
+
+
+def test_properties_copied_with_molecule(cached_h2_rhfwfn):
+    original = cached_h2_rhfwfn
+    assert original.potential_energy is not None  # sanity check
+
+    mol = cached_h2_rhfwfn.copy()
+
+    assert mol is not original
+    assert mol.properties is not original.properties
+
+    for prop, val in original.properties.items():
+        assert prop in mol.properties
+        if isinstance(val, (u.MdtQuantity, np.ndarray)) and getattr(val, 'shape', False):
+                assert (mol.properties[prop] == val).all()
+                assert mol.properties[prop] is not val
+
+        elif isinstance(val, (str, int, float, mdt.molecules.AtomicProperties)):
+            assert mol.properties[prop] == val
+
+        else:  # otherwise, just make sure it's not the original
+            assert mol.properties[prop] is not val
+
+
+def test_wfn_copied_with_molecule(cached_h2_rhfwfn):
+    original = cached_h2_rhfwfn
+    assert original.wfn is not None  # sanity check
+
+    mol = original.copy()
+
+    assert mol.wfn is not None
+
+    # should be completely equal
+    assert (mol.wfn.aobasis.fock == original.wfn.aobasis.fock).all()
+    # but different objects
+    assert mol.wfn.aobasis.fock is not original.wfn.aobasis.fock
+
+
+def test_wfn_copy(cached_h2_rhfwfn):
+    original = cached_h2_rhfwfn
+    wfn = original.wfn.copy()
+
+    assert wfn.mol is original
+    assert wfn is not original.wfn
+
+    # should be completely equal
+    assert (wfn.aobasis.fock == original.wfn.aobasis.fock).all()
+    # but different objects
+    assert wfn.aobasis.fock is not original.wfn.aobasis.fock

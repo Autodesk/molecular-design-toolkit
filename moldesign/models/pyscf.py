@@ -28,6 +28,7 @@ from .. import compute, orbitals, utils
 from ..interfaces.pyscf_interface import force_remote, mol_to_pyscf,  StatusLogger, SPHERICAL_NAMES
 from .base import QMBase
 from ..helpers import Logger
+from ..molecules import AtomicProperties
 
 if future.utils.PY2:
     from cStringIO import StringIO
@@ -231,8 +232,8 @@ class PySCFPotential(QMBase):
         scf_matrices = self._get_scf_matrices(orb_calc, ao_matrices)
         if hasattr(orb_calc, 'mulliken_pop'):
             ao_pop, atom_pop = orb_calc.mulliken_pop(verbose=-1)
-            result['mulliken'] = utils.DotDict({a: p * u.q_e for a, p in zip(self.mol.atoms, atom_pop)})
-            result['mulliken'].type = 'atomic'
+            result['mulliken'] = AtomicProperties({a: p * u.q_e
+                                                   for a, p in zip(self.mol.atoms, atom_pop)})
 
         if hasattr(orb_calc, 'dip_moment'):
             result['dipole_moment'] = orb_calc.dip_moment() * u.debye

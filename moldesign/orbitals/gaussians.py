@@ -1,5 +1,3 @@
-"""Note: this code is currently unused and untested and will be refactored soon"""
-
 from __future__ import print_function, absolute_import, division
 from future.builtins import *
 from future import standard_library
@@ -314,15 +312,18 @@ class AtomicBasisFunction(Orbital):
             cart (str): cartesian component (optional; for cartesian sets only)
             primitives (List[PrimitiveBase]): List of primitives, if available
         """
-        self.atom = atom
+        self._atom = atom
+        self.atom_index = atom.index
         self.n = n
         self.l = l
         self.m = m
         self.primitives = primitives
         if cart is not None:
             assert self.m is None, 'Both cartesian and spherical components passed!'
-            assert len(cart) == self.l, 'Angular momentum does not match specified component %s' % cart
-            for e in cart: assert e in 'xyz'
+            assert len(cart) == self.l, \
+                'Angular momentum does not match specified component %s' % cart
+            for e in cart:
+                assert e in 'xyz'
             self.cart = ''.join(sorted(cart))
         else:
             self.cart = None
@@ -333,6 +334,17 @@ class AtomicBasisFunction(Orbital):
         self.basis = None
         self.occupation = None
         self.wfn = None
+
+    @property
+    def atom(self):
+        """ moldesign.Atom: the atom this basis function belongs to
+
+        We get the atom via an indirect reference, making it easier to copy the wavefunction
+        """
+        if self.wfn is not None:
+            return self.wfn.mol.atoms[self.atom_index]
+        else:
+            return self._atom
 
     @property
     def num_primitives(self):
@@ -405,7 +417,7 @@ class AtomicBasisFunction(Orbital):
         return '<%s %s>' % (self.__class__.__name__, self.name)
 
 # Precompute odd factorial values (N!!)
-_ODD_FACTORIAL = {0: 1}  #by convention
+_ODD_FACTORIAL = {0: 1}  # by convention
 _ofact = 1
 for _i in range(1, 20, 2):
     _ofact *= _i

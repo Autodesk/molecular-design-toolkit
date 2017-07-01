@@ -85,6 +85,12 @@ class UnitSystem(object):
             result = quantity.to(baseunit)
             return result
 
+    def convert_if_possible(self, quantity):
+        if isinstance(quantity, MdtQuantity):
+            return self.convert(quantity)
+        else:
+            return quantity
+
     def get_baseunit(self, quantity):
         """ Get units of a quantity, list or array
 

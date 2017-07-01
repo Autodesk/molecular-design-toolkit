@@ -1,5 +1,8 @@
+import pickle
+
 from moldesign.utils import Alias
 from .object_fixtures import *
+from .molecule_fixtures import *
 
 
 __PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
@@ -10,6 +13,15 @@ class ComposedClass(object):
 
     def __init__(self):
         self.s = 'ABC'
+
+
+@pytest.mark.parametrize('objkey', pickleable)
+def test_pickling(objkey, request):
+    obj = request.getfixturevalue(objkey)
+    for iprotocol in (0,1,2):
+        x = pickle.dumps(obj, protocol=iprotocol)
+        y = pickle.loads(x)
+        assert type(y) == type(obj)
 
 
 def test_alias():

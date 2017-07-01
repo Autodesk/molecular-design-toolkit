@@ -15,6 +15,7 @@ from . import helpers
 __PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
 
 
+
 def test_h2_protected_atom_arrays(h2):
     atom1, atom2 = h2.atoms
     with pytest.raises(TypeError):
@@ -225,15 +226,6 @@ def test_molecule_types(molkey, request):
         assert issubclass(type(residue), mdt.Residue)
 
 
-@pytest.mark.parametrize('objkey', all_objects)
-def test_pickling(objkey, request):
-    obj = request.getfixturevalue(objkey)
-    for iprotocol in (0,1,2):
-        x = pickle.dumps(obj, protocol=iprotocol)
-        y = pickle.loads(x)
-        assert type(y) == type(obj)
-
-
 def test_degrees_of_freedom(benzene):
     assert benzene.dynamic_dof == 36
 
@@ -242,7 +234,7 @@ def test_degrees_of_freedom(benzene):
 def test_pickled_equality(objkey, request):
     obj = request.getfixturevalue(objkey)
 
-    for iprotocol in (0,1,2):
+    for iprotocol in helpers.PICKLE_PROTOCOLS:
         x = pickle.dumps(obj, protocol=iprotocol)
         y = pickle.loads(x)
         assert type(y) == type(obj)

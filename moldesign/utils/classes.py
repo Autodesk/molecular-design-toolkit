@@ -39,6 +39,24 @@ class Categorizer(dict):
         self[key].append(item)
 
 
+class NewUserDict(collections.MutableMapping):
+    """ Reimplementation of UserDict with new-style classes but without subclassing dict.
+    In addition to the normal dict methods, the only addition here is the ``data`` attribute
+    that gives us an actual ``dict`` to store things in
+    Unlike dict, pickles easily.
+    Unlike UserDict, uses new-style classes.
+    """
+    def __init__(self, *args, **kwargs):
+        self.data = dict(*args, **kwargs)
+
+    __delitem__ = Alias('data.__delitem__')
+    __setitem__ = Alias('data.__setitem__')
+    __getitem__ = Alias('data.__getitem__')
+    __len__ = Alias('data.__len__')
+    __iter__ = Alias('data.__iter__')
+
+
+
 class ExclusiveList(object):
     """ Behaves like a list, but won't allow items with duplicate keys to be added.
     """
@@ -100,25 +118,6 @@ class ExclusiveList(object):
     __str__ = __repr__
 
 
-class NewUserDict(collections.MutableMapping):
-    """ Reimplementation of UserDict with new-style classes but without subclassing dict.
-
-    In addition to the normal dict methods, the only addition here is the ``data`` attribute
-    that gives us an actual ``dict`` to store things in
-
-    Unlike dict, pickles easily.
-    Unlike UserDict, uses new-style classes.
-    """
-    def __init__(self, *args, **kwargs):
-        self.data = dict(*args, **kwargs)
-
-    __delitem__ = Alias('data.__delitem__')
-    __setitem__ = Alias('data.__setitem__')
-    __getitem__ = Alias('data.__getitem__')
-    __len__ = Alias('data.__len__')
-    __iter__ = Alias('data.__iter__')
-
-
 class DotDict(object):
     """ An attribute-accessible dictionary that preserves insertion order
     """
@@ -153,6 +152,11 @@ class DotDict(object):
 
     def copy(self):
         return self.__class__(self._od.copy())
+
+    def copydict(self):
+        """ Returns a copy of the core dictionary in its native class
+        """
+        return self._od.copy()
 
     def __eq__(self, other):
         try:

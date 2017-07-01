@@ -69,13 +69,6 @@ def nwchem_dft():
     return mdt.models.NWChemQM(basis='sto-3g', theory='rks', functional='b3lyp')
 
 
-@pytest.fixture
-def h2_rhfwfn(h2):
-    h2.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
-    h2.calculate(requests=['forces'])
-    return h2
-
-
 @pytest.mark.parametrize('objkey', TESTSET)
 def test_pyscf_rhf_sto3g_properties(objkey, request):
     mol = request.getfixturevalue(objkey)
