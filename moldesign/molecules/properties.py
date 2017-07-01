@@ -16,9 +16,6 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import numpy as np
-import collections
-
 from . import toplevel
 from .. import utils, units
 
@@ -107,7 +104,8 @@ class AtomicProperties(utils.NewUserDict):
     def __getitem__(self, atom):
         return super().__getitem__(self._getkey(atom))
 
-    def _getkey(self, atom):
+    @staticmethod
+    def _getkey(atom):
         if isinstance(atom, int):
             k = atom
         else:
