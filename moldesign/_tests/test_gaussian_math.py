@@ -10,10 +10,10 @@ import pytest
 import moldesign
 from moldesign import units as u
 
+from . import helpers
+
 registered_types = {}
 
-
-# TODO: implement and test spherical gaussians (not yet implemented)
 
 def typedfixture(*types, **kwargs):
     """This is a decorator that lets us associate fixtures with one or more arbitrary types.
@@ -60,7 +60,7 @@ def cart_10d_gaussian():
 @pytest.mark.parametrize('objkey', registered_types['gaussian'])
 @pytest.mark.screening
 def test_gaussian_integral_and_dimensionality(objkey, request):
-    g = request.getfuncargvalue(objkey)
+    g = request.getfixturevalue(objkey)
     assert g.ndims == len(g.center)
 
     intval = g.integral
@@ -73,7 +73,7 @@ def test_gaussian_integral_and_dimensionality(objkey, request):
 @pytest.mark.parametrize('objkey',
                          registered_types['gaussian'] + registered_types['cartesiangaussian'])
 def test_gaussian_function_values(objkey, request):
-    g = request.getfuncargvalue(objkey)
+    g = request.getfixturevalue(objkey)
 
     for idim in range(g.ndims):
         coord = g.center.copy()
@@ -88,7 +88,7 @@ def test_gaussian_function_values(objkey, request):
                          registered_types['gaussian'] + registered_types['cartesiangaussian'])
 @pytest.mark.screening
 def test_vectorized_gaussian_function_evaluations(objkey, request):
-    g = request.getfuncargvalue(objkey)
+    g = request.getfixturevalue(objkey)
 
     coords = np.zeros((5, g.ndims)) * g.center.units
     for i in range(5):
@@ -123,6 +123,7 @@ def _gfuncval(g, coord):
             fv *= (r-r0)**pow
     return fv
 
+
 def _assert_almost_equal(a, b, *args, **kwargs):
     a_is_quantity = hasattr(a,'units')
     b_is_quantity = hasattr(b,'units')
@@ -143,3 +144,23 @@ def test_cart_to_powers():
     assert cart_to_powers('y') == [0, 1, 0]
     assert cart_to_powers('xxyz') == [2, 1, 1]
     assert cart_to_powers('zx^3') == [3,0,1]
+    
+
+def test_numerical_vs_analytical_norm(std_3d_gaussian):
+    g = std_3d_gaussian
+    ananorm = g.norm
+
+    width = np.sqrt(1/g.exp)
+    ranges = np.ones((3,2)) * 5.0 * width
+    ranges[:,0] *= -1
+    ranges += g.center[:, None]
+    grid = moldesign.mathutils.VolumetricGrid(*ranges, 25)
+    allpoints = grid.allpoints()
+
+    with np.errstate(under='ignore'):
+        vals = g(allpoints)
+
+    numnorm = np.sqrt(grid.dx**3 * (vals**2).sum())
+    helpers.assert_almost_equal(ananorm, numnorm)
+
+

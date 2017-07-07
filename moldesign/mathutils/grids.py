@@ -91,11 +91,12 @@ class VolumetricGrid(object):
             Matrix[shape=(self.npoints**3,3)]: x,y,z coordinate of each point on the grid
         """
         ap = np.empty((self.npoints, 3), dtype=dtype)
-        if hasattr(self.xr, 'units'):
-            ap = ap * self.xr.units
 
         for ip, point in enumerate(self.iter_points()):
             ap[ip] = point
+
+        if hasattr(self.xr, 'units'):
+            ap = ap * self.xr.units
 
         return ap
 

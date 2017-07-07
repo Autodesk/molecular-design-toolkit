@@ -51,12 +51,12 @@ class AbstractFunction(object):
         r""" The L2-Norm of this gaussian:
 
         .. math::
-            \int \left| G(\mathbf r) \right|^2 d^N \mathbf r
+            \sqrt{\int \left| G(\mathbf r) \right|^2 d^N \mathbf r}
         """
-        return self.overlap(self)
+        return np.sqrt(self.overlap(self))
 
     def __str__(self):
-        return "%d-D %s with norm %s"%(self.ndims, self.__class__, self.norm)
+        return "%d-D %s with norm %s" % (self.ndims, self.__class__, self.norm)
 
 
 class CartesianGaussian(AbstractFunction):
@@ -132,18 +132,19 @@ class CartesianGaussian(AbstractFunction):
         an ARRAY of coordinates (``[[0,0,0],[1,1,1]] * u.angstrom``)
 
         Args:
+            coords (Vector[length, len=3] or Matrix[length, shape=(*,3)]): Coordinates or
+                   list of 3D coordinates
             _include_cartesian (bool): include the contribution from the cartesian components
                 (for computational efficiency, this can sometimes omited now and included later)
 
-        Example:
+        Examples:
             >>> g = CartesianGaussian([0,0,0]*u.angstrom, exp=1.0/u.angstrom**2, powers=(0,0,0))
+            >>> # Value at a single coordinate:
             >>> g([0,0,0] * u.angstrom)
             1.0
+            >>> # Values at a list of coordinates
             >>> g[[0,0,0], [0,0,1], [0.5,0.5,0.5] * u.angstrom]
             array([ 1.0,  0.36787944,  0.47236655])
-
-        Args:
-            coords (Vector[length]): Coordinates or list of coordinates
 
         Returns:
             Scalar: function value(s) at the passed coordinates
@@ -183,7 +184,7 @@ class CartesianGaussian(AbstractFunction):
         Returns:
             CartesianGaussian: product gaussian
         """
-        if self.center != other.center:
+        if (self.center != other.center).any():
             raise NotImplementedError()
 
         # convert widths to prefactor form
