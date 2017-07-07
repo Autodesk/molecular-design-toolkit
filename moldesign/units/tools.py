@@ -17,7 +17,10 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .. import utils
+
 from .quantity import *
+
 
 
 def unitsum(iterable):
@@ -53,6 +56,18 @@ def dot(a1, a2):
         return a2.ldot(a1)
     else:  # this will work whether or not a1 has units
         return a1.dot(a2)
+
+
+@utils.args_from(np.linspace)
+def linspace(start, stop, **kwargs):
+    u1 = getattr(start, 'units', ureg.dimensionless)
+    u2 = getattr(stop, 'units', ureg.dimensionless)
+    if u1 == u2 == ureg.dimensionless:
+        return np.linspace(start, stop, **kwargs)
+    else:
+        q1mag = start.magnitude
+        q2mag = stop.value_in(start.units)
+        return np.linspace(q1mag, q2mag, **kwargs) * start.units
 
 
 def arrays_almost_equal(a1, a2):

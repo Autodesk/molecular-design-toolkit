@@ -52,6 +52,14 @@ def _unbound_getter(objname, methodname):
     return _method_getter
 
 
+class IndexView(object):
+    def __init__(self, attr, index):
+        self.attr = attr
+        self.index = index
+
+    def __get__(self, instance, owner):
+        return getattr(instance, self.attr)[self.index]
+
 
 class Synonym(object):
     """ An attribute (class or intance) that is just a synonym for another.
