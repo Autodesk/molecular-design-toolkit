@@ -18,11 +18,15 @@ from .molecule_fixtures import *
 
 registered_types = {key:val[:] for key,val in molecule_standards.items()}
 
+__all__ = ['registered_types']
+
+
 def typedfixture(*types, **kwargs):
     """This is a decorator that lets us associate fixtures with one or more arbitrary types.
     We'll later use this type to determine what tests to run on the result"""
 
     def fixture_wrapper(func):
+        __all__.append(func.__name__)
         for t in types:
             registered_types.setdefault(t, []).append(func.__name__)
         return pytest.fixture(**kwargs)(func)
@@ -153,3 +157,5 @@ moldesign_objects = (registered_types['molecule'] +
                      registered_types['trajectory'] +
                      registered_types['atom'])
 pickleable = registered_types['pickleable'] + moldesign_objects
+
+__all__.extend(['moldesign_objects', 'pickleable'])
