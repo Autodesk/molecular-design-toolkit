@@ -44,6 +44,7 @@ electron_charge = q_e = ureg.elementary_charge
 # useful units
 fs = femtoseconds = ureg.fs
 ps = picoseconds = ureg.ps
+ns = nanoseconds = ureg.ns
 eV = electronvolts = ureg.eV
 kcalpermol = ureg.kcalpermol
 gpermol = ureg.gpermol

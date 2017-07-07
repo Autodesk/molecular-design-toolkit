@@ -57,6 +57,41 @@ def test_default_units():
     assert units.default.energy == units.eV
 
 
+@pytest.fixture
+def si_units():
+    system = units.UnitSystem(length=u.ureg.meters, mass=u.ureg.kg,
+                              time=u.ureg.seconds, energy=u.ureg.joules)
+    return system
+
+
+@pytest.mark.parametrize(['dimension', 'expected', 'weird_units'],
+                         [['length', u.ureg.meters, u.ureg.lightyear],
+                          ['mass', u.ureg.kg, u.ureg.stone],
+                          ['time', u.ureg.seconds, u.ureg.year],
+                          ['momentum', u.ureg.kg * u.ureg.meter / u.ureg.second,
+                                       u.ureg.lightyear * u.ureg.stone / u.ureg.year],
+                          ['force', u.ureg.joule / u.ureg.meter, u.ureg.force_ton],
+                          ['energy', u.ureg.joule, u.ureg.horsepower * u.ureg.seconds]],
+                         ids='length mass time momentum force energy'.split())
+def test_si_unit_system(si_units, dimension, expected, weird_units):
+    assert getattr(si_units, dimension) == expected
+
+    default_unit = getattr(u.default, dimension)
+    my_quantity = 3.141 * default_unit
+    si_quantity = si_units.convert(my_quantity)
+
+    assert my_quantity.units != expected
+    assert si_quantity.units == expected
+    assert u.default.convert(abs(my_quantity - si_quantity)) < 1e-15 * default_unit
+
+    setattr(si_units, dimension, weird_units)
+    assert getattr(si_units, dimension) == weird_units
+
+    weird_quantity = si_units.convert(my_quantity)
+    assert abs(my_quantity-weird_quantity) < 1e-15 * default_unit
+    assert weird_quantity.units == weird_units
+
+
 @pytest.mark.screening
 def test_default_unit_conversions():
     my_list = [1.0*units.angstrom, 1.0*units.nm, 1.0*units.a0]

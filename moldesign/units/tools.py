@@ -156,33 +156,41 @@ def get_units(q):
     return MdtQuantity(x).units
 
 
-def array(qlist, baseunit=None):
+def array(qlist, defunits=False, _baseunit=None):
     """ Facilitates creating an array with units - like numpy.array, but it also checks
      units for all components of the array
 
      Args:
          qlist (List[MdtQuantity]): List-like object of quantity objects
-         baseunit (MdtUnit) unit to standardize with
+         defunits (bool): if True, convert the array to the default units
 
     Returns:
         MdtQuantity: array with standardized units
     """
+    from . import default
+
     if hasattr(qlist, 'units') and hasattr(qlist, 'magnitude'):
         return MdtQuantity(qlist)
 
-    if baseunit is None:
-        baseunit = get_units(qlist)
+    if _baseunit is None:
+        _baseunit = get_units(qlist)
         try:
-            if baseunit == 1.0:
+            if _baseunit == 1.0:
+                # It's dimensionless, return an ndarray
                 return np.array(qlist)
         except DimensionalityError:
             pass
 
+        if defunits and isinstance(_baseunit, MdtUnit):
+            _baseunit = default.get_default(_baseunit)
+
     try:
-        newlist = [array(item, baseunit=baseunit).value_in(baseunit) for item in qlist]
-        return baseunit * newlist
+        # Convert all sublists to the common "baseunit"
+        newlist = [array(item, _baseunit=_baseunit).value_in(_baseunit) for item in qlist]
+        return _baseunit*newlist
     except TypeError as exc:
-        return qlist.to(baseunit)
+        # Otherwise,
+        return qlist.to(_baseunit)
 
 
 #@utils.args_from(np.broadcast_to)
