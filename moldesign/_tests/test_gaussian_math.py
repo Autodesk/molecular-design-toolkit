@@ -41,11 +41,22 @@ def std_3d_gaussian():
     return g
 
 
+@typedfixture('cartesiangaussian')
+def cart_3d_gaussian():
+    g = moldesign.orbitals.CartesianGaussian(
+            center=[random.random() for i in range(3)]*u.angstrom,
+            powers=[1, 3, 0],
+            exp=1.1/u.angstrom ** 2,
+            coeff=1.0)
+    return g
+
+
 @typedfixture('gaussian')
 def std_10d_gaussian():
     g = moldesign.orbitals.gaussians.Gaussian([0.0 for i in range(10)]*u.angstrom,
                                               1.0/u.angstrom ** 2)
     return g
+
 
 @typedfixture('cartesiangaussian')
 def cart_10d_gaussian():
@@ -54,7 +65,6 @@ def cart_10d_gaussian():
             powers=[random.choice([0, 1, 2, 3]) for i in range(10)],
             exp=1.1/u.angstrom ** 2)
     return g
-
 
 
 @pytest.mark.parametrize('objkey', registered_types['gaussian'])
@@ -68,6 +78,18 @@ def test_gaussian_integral_and_dimensionality(objkey, request):
     _assert_almost_equal(intval,
                          expectval,
                          decimal=10)
+
+
+def test_squared_gaussian_values(cart_3d_gaussian):
+    g = cart_3d_gaussian
+    randocoords = 6.0 * u.angstrom * (np.random.rand(200, 3) - 0.5)
+
+    g2 = g * g
+    gvals = g(randocoords)
+    g2vals = g2(randocoords)
+
+    helpers.assert_almost_equal(gvals**2, g2vals)
+
 
 
 @pytest.mark.parametrize('objkey',
@@ -105,7 +127,7 @@ def test_vectorized_gaussian_function_evaluations(objkey, request):
     _assert_almost_equal(vector_results, expected, decimal=8)
 
 
-def test_gaussian_self_overlap_is_unity():
+def test_normalized_gaussian_self_overlap_is_unity():
     g1 = moldesign.orbitals.gaussians.Gaussian([0.0, 0.0, 0.0]*u.angstrom,
                                               1.0/u.angstrom ** 2,
                                               coeff=-1.0)
@@ -146,8 +168,9 @@ def test_cart_to_powers():
     assert cart_to_powers('zx^3') == [3,0,1]
     
 
-def test_numerical_vs_analytical_norm(std_3d_gaussian):
-    g = std_3d_gaussian
+@pytest.mark.parametrize('key', ['std_3d_gaussian', 'cart_3d_gaussian'])
+def test_numerical_vs_analytical_norm(key, request):
+    g = request.getfixturevalue(key)
     ananorm = g.norm
 
     width = np.sqrt(1/g.exp)

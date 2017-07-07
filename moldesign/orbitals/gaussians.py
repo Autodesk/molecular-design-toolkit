@@ -55,6 +55,7 @@ class AbstractFunction(object):
         """
         return np.sqrt(self.overlap(self))
 
+
     def __str__(self):
         return "%d-D %s with norm %s" % (self.ndims, self.__class__, self.norm)
 
@@ -173,7 +174,7 @@ class CartesianGaussian(AbstractFunction):
             axis = None
 
         disp = coords - self.center
-        return np.product(disp.magnitude**self.powers, axis=axis)*disp.units ** self.powers.sum()
+        return np.product(disp.magnitude**self.powers, axis=axis)*(disp.units ** self.powers.sum())
 
     def __mul__(self, other):
         """ Returns product of two gaussian functions, which is also a gaussian
@@ -224,7 +225,7 @@ class CartesianGaussian(AbstractFunction):
             elif p < 0:
                 raise ValueError('Powers must be positive or 0')
             else:
-                integ *= _ODD_FACTORIAL[p-1]/(2 ** (p+1))
+                integ *= _ODD_FACTORIAL[p-1]/((2.0 * self.exp) ** (p//2))
         return self.coeff * integ
 
 
