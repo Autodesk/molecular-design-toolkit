@@ -3,6 +3,7 @@
 
 import random
 
+import itertools
 import numpy as np
 import numpy.testing as npt
 import pytest
@@ -41,7 +42,7 @@ def std_3d_gaussian():
     return g
 
 
-@typedfixture('cartesiangaussian')
+@typedfixture('gaussian')
 def cart_3d_gaussian():
     g = moldesign.orbitals.CartesianGaussian(
             center=[random.random() for i in range(3)]*u.angstrom,
@@ -52,18 +53,12 @@ def cart_3d_gaussian():
 
 
 @typedfixture('gaussian')
-def std_10d_gaussian():
-    g = moldesign.orbitals.gaussians.Gaussian([0.0 for i in range(10)]*u.angstrom,
-                                              1.0/u.angstrom ** 2)
-    return g
-
-
-@typedfixture('cartesiangaussian')
-def cart_10d_gaussian():
-    g = moldesign.orbitals.gaussians.CartesianGaussian(
-            center=[random.random() for i in range(10)]*u.angstrom,
-            powers=[random.choice([0, 1, 2, 3]) for i in range(10)],
-            exp=1.1/u.angstrom ** 2)
+def spherical_3d_gaussian():
+    g = moldesign.orbitals.SphericalGaussian(
+            center=[random.random() for i in range(3)]*u.angstrom,
+            l=3, m=-2,
+            exp=1.1/u.angstrom ** 2,
+            coeff=1.0)
     return g
 
 
@@ -80,20 +75,53 @@ def test_gaussian_integral_and_dimensionality(objkey, request):
                          decimal=10)
 
 
-def test_squared_gaussian_values(cart_3d_gaussian):
-    g = cart_3d_gaussian
-    randocoords = 6.0 * u.angstrom * (np.random.rand(200, 3) - 0.5)
+def _make_rando_gaussian(powers, withunits=True):
+    if withunits:
+        length = u.angstrom
+    else:
+        length = 1.0
+    return moldesign.orbitals.CartesianGaussian((np.random.rand(3)-0.5)*1.0 * length,
+                                                (random.random()*5)/(length ** 2),
+                                                powers=powers,
+                                                coeff=random.random())
 
-    g2 = g * g
-    gvals = g(randocoords)
-    g2vals = g2(randocoords)
+test_powers = ((0,0,0), (1,0,0), (0,1,0), (0,0,1), (2,0,0), (0,2,0), (0,0,2),
+               (1,1,1), (2,2,2), (1,2,3), (0,1,4))
+cartesian_test_suite = list(itertools.product(test_powers, test_powers, [True, False]))
+cartesian_test_ids = ['[%d%d%d]*[%d%d%d]/%s' % (p[0] + p[1] + ('units' if p[2] else 'c-num',))
+                      for p in cartesian_test_suite]
 
-    helpers.assert_almost_equal(gvals**2, g2vals)
+@pytest.mark.parametrize('p1,p2,withunits',
+                         cartesian_test_suite,
+                         ids=cartesian_test_ids)
+def test_gaussian_multiplication_amplitudes(p1, p2, withunits):
+    """ Tests that ``g1(x) * g2(x) == (g1 * g2)(x)``
+    """
+    gauss1 = _make_rando_gaussian(p1, withunits)
+    gauss2 = _make_rando_gaussian(p2, withunits)
 
+    testcoords = 6.0*(np.random.rand(50, 3)-0.5)
+    if withunits: testcoords = testcoords * u.angstrom
+
+    # test the product of the two AND the squares of each
+    #for g1, g2 in itertools.product((gauss1, gauss2), (gauss1, gauss2)):
+    g1, g2 = gauss1, gauss2  # temp
+    g1g2 = g1 * g2
+    if isinstance(g1g2, moldesign.orbitals.AbstractFunction):
+        gvals = g1g2(testcoords)
+        assert g1g2.coeff != 0.0
+    else:
+        gvals = sum(gg(testcoords) for gg in g1g2)
+    g1vals = g1(testcoords)
+    g2vals = g2(testcoords)
+
+    prodvals = g1vals * g2vals
+
+    helpers.assert_almost_equal(prodvals, gvals)
 
 
 @pytest.mark.parametrize('objkey',
-                         registered_types['gaussian'] + registered_types['cartesiangaussian'])
+                         registered_types['gaussian'])
 def test_gaussian_function_values(objkey, request):
     g = request.getfixturevalue(objkey)
 
@@ -107,7 +135,7 @@ def test_gaussian_function_values(objkey, request):
 
 
 @pytest.mark.parametrize('objkey',
-                         registered_types['gaussian'] + registered_types['cartesiangaussian'])
+                         registered_types['gaussian'])
 @pytest.mark.screening
 def test_vectorized_gaussian_function_evaluations(objkey, request):
     g = request.getfixturevalue(objkey)
@@ -168,7 +196,7 @@ def test_cart_to_powers():
     assert cart_to_powers('zx^3') == [3,0,1]
     
 
-@pytest.mark.parametrize('key', ['std_3d_gaussian', 'cart_3d_gaussian'])
+@pytest.mark.parametrize('key', ['std_3d_gaussian', 'cart_3d_gaussian', 'cart_3d_gaussian'])
 def test_numerical_vs_analytical_norm(key, request):
     g = request.getfixturevalue(key)
     ananorm = g.norm

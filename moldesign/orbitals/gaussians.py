@@ -16,7 +16,11 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import itertools
+
 import numpy as np
+from scipy.special import binom
+from moldesign import units as u
 
 
 class AbstractFunction(object):
@@ -54,7 +58,6 @@ class AbstractFunction(object):
             \sqrt{\int \left| G(\mathbf r) \right|^2 d^N \mathbf r}
         """
         return np.sqrt(self.overlap(self))
-
 
     def __str__(self):
         return "%d-D %s with norm %s" % (self.ndims, self.__class__, self.norm)
@@ -95,7 +98,7 @@ class CartesianGaussian(AbstractFunction):
     def __init__(self, center, exp, powers, coeff=None):
         assert len(powers) == len(center), "Inconsistent dimensionality - number of cartesian " \
                                            "powers must match dimensionality of centroid vector"
-        self.center = center
+        self.center = u.array(center)
         self.exp = exp
         self.powers = np.array(powers)
         if coeff is None:
@@ -174,28 +177,79 @@ class CartesianGaussian(AbstractFunction):
             axis = None
 
         disp = coords - self.center
-        return np.product(disp.magnitude**self.powers, axis=axis)*(disp.units ** self.powers.sum())
+        if hasattr(disp, 'units'):
+            mag = disp.magnitude
+            units = disp.units ** self.powers.sum()
+        else:
+            mag = disp
+            units = 1.0
+        return np.product(mag**self.powers, axis=axis) * units
 
     def __mul__(self, other):
-        """ Returns product of two gaussian functions, which is also a gaussian
+        """ Returns product of two cartiesian gaussian functions as a list of product gaussians
+
+        The returned gaussians all have the same center and width, and differ only in their
+        angular parts.
 
         Args:
             other (CartesianGaussian): other gaussian wavepacket
 
         Returns:
-            CartesianGaussian: product gaussian
-        """
-        if (self.center != other.center).any():
-            raise NotImplementedError()
+            CartesianGaussian or List[CartesianGaussian]: product gaussian(s)
 
+        TODO:
+           - Should return a composite gaussian object with the same interface as regular gaussians,
+             rather than either an object OR a list
+        """
+        prefactor, newcenter, newexp = self._mul_gaussians(other)
+        new_prefactor = prefactor * self.coeff * other.coeff
+
+        coeffs = [{}, {}, {}]
+        for idim in range(3):
+            r_self = self.center[idim]
+            r_other = other.center[idim]
+            r_new = newcenter[idim]
+
+            for m in range(self.powers[idim]+1):
+                for k in range(other.powers[idim]+1):
+                    powercoeff = (binom(self.powers[idim], m) * binom(other.powers[idim], k) *
+                                  ((r_new - r_self) ** (self.powers[idim]-m)) *
+                                  ((r_new - r_other) ** (other.powers[idim]-k)))
+                    if powercoeff == 0.0:
+                        continue
+                    newpower = m+k
+                    if newpower not in coeffs[idim]:
+                        coeffs[idim][newpower] = powercoeff
+                    else:
+                        coeffs[idim][newpower] += powercoeff
+
+        new_gaussians = []
+        for (l, c0), (m, c1), (n,c2) in itertools.product(*[x.items() for x in coeffs]):
+            final_coeff = c0 * c1 * c2 * new_prefactor
+            new_gaussians.append(CartesianGaussian(newcenter, newexp, powers=[l,m,n],
+                                                   coeff=final_coeff))
+
+        if len(new_gaussians) == 0:  # no non-zero components, just return a zeroed gaussian
+            return CartesianGaussian(newcenter, newexp, [0,0,0], coeff=0.0)
+        elif len(new_gaussians) == 1:
+            return new_gaussians[0]
+        else:
+            return new_gaussians
+
+    def _mul_gaussians(self, other):
+        """ Returns the new centroid and width of THE EXPONENTIAL PART ONLY of two gaussians.
+        """
         # convert widths to prefactor form
         a = self.exp
         b = other.exp
         exp = a + b
         center = (a*self.center + b*other.center)/(a+b)
-        powers = self.powers + other.powers
-        return CartesianGaussian(center=center, exp=exp,
-                                 powers=powers, coeff=self.coeff*other.coeff)
+        prefactor = 1.0
+        for i in range(3):
+            prefactor *= np.exp(-(self.exp*self.center[i]**2 + other.exp * other.center[i]**2) +
+                                exp * center[i]**2)
+
+        return prefactor, center, exp
 
     @property
     def integral(self):
