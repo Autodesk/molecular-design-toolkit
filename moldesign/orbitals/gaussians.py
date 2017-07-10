@@ -17,6 +17,7 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import itertools
+import copy
 
 import numpy as np
 from scipy.special import binom
@@ -26,10 +27,14 @@ from moldesign import units as u
 class AbstractFunction(object):
     """ Abstract base class for basis functions
     """
+
+    def copy(self):
+        return copy.deepcopy(self)
+
     def normalize(self):
         """ Give this function unit norm by adjusting its coefficient
         """
-        self.coeff /= np.sqrt(self.norm)
+        self.coeff /= self.norm
 
     def overlap(self, other, normalized=False):
         r""" Overlap of this function with another:
@@ -47,7 +52,7 @@ class AbstractFunction(object):
         newfn = self * other
         integral = newfn.integral
         if normalized:
-            integral /= np.sqrt(self.norm*other.norm)
+            integral /= (self.norm*other.norm)
         return integral
 
     @property
@@ -201,11 +206,19 @@ class CartesianGaussian(AbstractFunction):
            - Should return a composite gaussian object with the same interface as regular gaussians,
              rather than either an object OR a list
         """
+
+        if (self.center == other.center).all():  # this case is much easier than the general one
+            cpy = self.copy()
+            cpy.exp = self.exp + other.exp
+            cpy.powers = self.powers + other.powers
+            cpy.coeff = self.coeff * other.coeff
+            return cpy
+
         prefactor, newcenter, newexp = self._mul_gaussians(other)
         new_prefactor = prefactor * self.coeff * other.coeff
 
-        coeffs = [{}, {}, {}]
-        for idim in range(3):
+        partial_coeffs = [{} for idim in range(self.ndim)]
+        for idim in range(self.ndim):
             r_self = self.center[idim]
             r_other = other.center[idim]
             r_new = newcenter[idim]
@@ -218,19 +231,21 @@ class CartesianGaussian(AbstractFunction):
                     if powercoeff == 0.0:
                         continue
                     newpower = m+k
-                    if newpower not in coeffs[idim]:
-                        coeffs[idim][newpower] = powercoeff
+                    if newpower not in partial_coeffs[idim]:
+                        partial_coeffs[idim][newpower] = powercoeff
                     else:
-                        coeffs[idim][newpower] += powercoeff
+                        partial_coeffs[idim][newpower] += powercoeff
 
         new_gaussians = []
-        for (l, c0), (m, c1), (n,c2) in itertools.product(*[x.items() for x in coeffs]):
-            final_coeff = c0 * c1 * c2 * new_prefactor
-            new_gaussians.append(CartesianGaussian(newcenter, newexp, powers=[l,m,n],
+        for powers in itertools.product(*[x.keys() for x in partial_coeffs]):
+            final_coeff = 1.0 * new_prefactor
+            for idim, p in enumerate(powers):
+                final_coeff *= partial_coeffs[idim][p]
+            new_gaussians.append(CartesianGaussian(newcenter, newexp, powers=powers,
                                                    coeff=final_coeff))
 
         if len(new_gaussians) == 0:  # no non-zero components, just return a zeroed gaussian
-            return CartesianGaussian(newcenter, newexp, [0,0,0], coeff=0.0)
+            return CartesianGaussian(newcenter, newexp, self.powers + other.powers, coeff=0.0)
         elif len(new_gaussians) == 1:
             return new_gaussians[0]
         else:
@@ -245,7 +260,7 @@ class CartesianGaussian(AbstractFunction):
         exp = a + b
         center = (a*self.center + b*other.center)/(a+b)
         prefactor = 1.0
-        for i in range(3):
+        for i in range(self.ndim):
             prefactor *= np.exp(-(self.exp*self.center[i]**2 + other.exp * other.center[i]**2) +
                                 exp * center[i]**2)
 
