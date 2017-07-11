@@ -42,7 +42,7 @@ class VolumetricGrid(object):
     xspace, yspace, zspace = (utils.IndexView('spaces', i) for i in range(3))
 
     def __init__(self, xrange, yrange, zrange,
-                 xpoints=25, ypoints=None, zpoints=None):
+                 xpoints=32, ypoints=None, zpoints=None):
 
         self.points = np.array([xpoints,
                                 ypoints if ypoints is not None else xpoints,
@@ -52,6 +52,11 @@ class VolumetricGrid(object):
         self.ranges = u.array([xrange, yrange, zrange])
         self.deltas = (self.ranges[:,1] - self.ranges[:,0]) / (self.points - 1.0)
         self.spaces = [u.linspace(*r, num=p) for r,p in zip(self.ranges, self.points)]
+
+    @property
+    def ndims(self):
+        return len(self.ranges)
+    ndim = num_dims = ndims
 
     @property
     def origin(self):
@@ -81,7 +86,7 @@ class VolumetricGrid(object):
         for i,j,k in itertools.product(*map(range, self.points)):
                 yield self.origin + self.deltas * [i,j,k]
 
-    def allpoints(self, dtype='float'):
+    def allpoints(self):
         """ Return an array of all coordinates on the grid.
 
         This obviously takes a lot of memory, but is useful for evaluating vectorized functions
@@ -90,15 +95,43 @@ class VolumetricGrid(object):
         Yields:
             Matrix[shape=(self.npoints**3,3)]: x,y,z coordinate of each point on the grid
         """
-        ap = np.empty((self.npoints, 3), dtype=dtype)
+        return _cartesian_product(self.spaces)
 
-        for ip, point in enumerate(self.iter_points()):
-            ap[ip] = point
 
-        if hasattr(self.xr, 'units'):
-            ap = ap * self.xr.units
+def _cartesian_product(arrays):
+    """ Fast grid creation routine from @senderle on Stack Overflow. This is awesome.
 
-        return ap
+    Modifications:
+     1. Module import names
+     2. Unit handling
+
+    References:
+         https://stackoverflow.com/a/11146645/1958900
+    """
+    import functools
+
+    # AMV mod for units handling
+    units = getattr(arrays[0], 'units', u.ureg.dimensionless)
+
+    # original code
+    broadcastable = np.ix_(*arrays)
+    broadcasted = np.broadcast_arrays(*broadcastable)
+    rows, cols = functools.reduce(np.multiply, broadcasted[0].shape), len(broadcasted)
+    out = np.empty(rows * cols, dtype=broadcasted[0].dtype)
+    start, end = 0, rows
+    for a in broadcasted:
+        out[start:end] = a.reshape(-1)
+        start, end = end, end + rows
+
+    result = out.reshape(cols, rows).T
+
+    # AMV mod for units handling
+    if units == u.ureg.dimensionless:
+        return result
+    else:
+        # do it this way to avoid copying a huge array
+        quantity = u.MdtQuantity(result, units=units)
+        return quantity
 
 
 @utils.exports
