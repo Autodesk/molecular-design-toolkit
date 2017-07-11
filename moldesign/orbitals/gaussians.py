@@ -16,12 +16,10 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import itertools
 import copy
-
 import numpy as np
-from scipy.special import binom
-from moldesign import units as u
+
+from .. import units as u
 
 
 class AbstractFunction(object):
@@ -57,7 +55,7 @@ class AbstractFunction(object):
 
     @property
     def norm(self):
-        r""" The L2-Norm of this gaussian:
+        r""" The L2-Norm of this object, calculated as the square root of its self overlap.
 
         .. math::
             \sqrt{\int \left| G(\mathbf r) \right|^2 d^N \mathbf r}
@@ -68,297 +66,26 @@ class AbstractFunction(object):
         return "%d-D %s with norm %s" % (self.ndims, self.__class__, self.norm)
 
 
-class CartesianGaussian(AbstractFunction):
-    r""" Stores an N-dimensional gaussian function of the form:
-
-    .. math::
-        G(\mathbf r) = C \times \left( \prod_{i=1}^N{{r_i}^{p_i} } \right)
-             e^{-a |\mathbf r - \mathbf{r}_0|^2}
-
-    For a three-dimensional gaussian, this is
-
-    ..math::
-        G(x,y,z) = C \times x^{p_1} y^{p_2} z^{p_3} e^{-a |\mathbf r - \mathbf{r}_0|^2}
-
-    where *C* is ``self.coeff``, *a* is ``self.exp``, *r0* is ``self.center``, and
-    :math:`p_1, p_2, ...` are given in the array ``self.powers``
-
-    References:
-        Levine, Ira N. Quantum Chemistry, 5th ed. Prentice Hall, 2000. 486-94.
-
-    Args:
-        center (Vector[length]): location of the gaussian's centroid
-        powers (List[int]): cartesian powers in each dimension (see
-            equations in :class:`CartesianGaussian` docs)
-        exp (Scalar[1/length**2]): gaussian width parameter
-        coeff (Scalar): multiplicative coefficient (if None, gaussian will be automatically
-             normalized)
-
-    Note:
-        The dimensionality of the gaussian is determined by the dimensionality
-        of the centroid location vector and the power vector. So, if scalars are passed for the
-        ``center`` and ``powers``, it's 1-D. If length-3 vectors are passed for ``center``
-        and ``powers``, it's 3D.
-    """
-    def __init__(self, center, exp, powers, coeff=None):
-        assert len(powers) == len(center), "Inconsistent dimensionality - number of cartesian " \
-                                           "powers must match dimensionality of centroid vector"
-        self.center = u.array(center)
-        self.exp = exp
-        self.powers = np.array(powers)
-        if coeff is None:
-            self.coeff = 1.0  # dummy value overwritten by self.normalize()
-            self.normalize()
-        else:
-            self.coeff = coeff
-
-        self.shell = sum(self.powers)
-
-    def __repr__(self):
-        return ("<{ndim}-D Gaussian (cart) (coeff: {coeff:4.2f}, "
-                "cartesian powers: {powers}, "
-                "exponent: {exp:4.2f}, "
-                "center: {center}>").format(
-                ndim=self.ndim,
-                center=self.center, exp=self.exp,
-                powers=tuple(self.powers), coeff=self.coeff)
-
-    @property
-    def ndim(self):
-        return len(self.powers)
-    num_dimensions = ndims = ndim
-
-    @property
-    def angular(self):
-        """ Angular momentum of this function (sum of cartesian powers)
-        """
-        return self.powers.sum()
-
-    def __call__(self, coords, _include_angular=True):
-        """ Evaluate this function at the given coordinates.
-
-        Can be called either with a 1D column (e.g., ``[1,2,3]*u.angstrom ``) or
-        an ARRAY of coordinates (``[[0,0,0],[1,1,1]] * u.angstrom``)
-
-        Args:
-            coords (Vector[length, len=3] or Matrix[length, shape=(*,3)]): Coordinates or
-                   list of 3D coordinates
-            _include_cartesian (bool): include the contribution from the cartesian components
-                (for computational efficiency, this can sometimes omited now and included later)
-
-        Examples:
-            >>> g = CartesianGaussian([0,0,0]*u.angstrom, exp=1.0/u.angstrom**2, powers=(0,0,0))
-            >>> # Value at a single coordinate:
-            >>> g([0,0,0] * u.angstrom)
-            1.0
-            >>> # Values at a list of coordinates
-            >>> g[[0,0,0], [0,0,1], [0.5,0.5,0.5] * u.angstrom]
-            array([ 1.0,  0.36787944,  0.47236655])
-
-        Returns:
-            Scalar: function value(s) at the passed coordinates
-        """
-        if len(coords.shape) > 1:
-            axis = 1
-        else:
-            axis = None
-
-        disp = coords - self.center
-        prd = disp*disp  # don't use np.dot - allow multiple coords at once
-        r2 = prd.sum(axis=axis)
-
-        result = self.coeff * np.exp(-self.exp * r2)
-        if self.shell > 0 and _include_angular:
-            result *= self.angular_part(coords)
-        return result
-
-    def angular_part(self, coords):
-        if self.shell == 0:
-            return 1.0
-
-        if len(coords.shape) > 1:
-            axis = 1
-        else:
-            axis = None
-
-        disp = coords - self.center
-        if hasattr(disp, 'units'):
-            mag = disp.magnitude
-            units = disp.units ** self.powers.sum()
-        else:
-            mag = disp
-            units = 1.0
-        return np.product(mag**self.powers, axis=axis) * units
-
-    def __mul__(self, other):
-        """ Returns product of two cartiesian gaussian functions as a list of product gaussians
-
-        The returned gaussians all have the same center and width, and differ only in their
-        angular parts.
-
-        Args:
-            other (CartesianGaussian): other gaussian wavepacket
-
-        Returns:
-            CartesianGaussian or List[CartesianGaussian]: product gaussian(s)
-
-        TODO:
-           - Should return a composite gaussian object with the same interface as regular gaussians,
-             rather than either an object OR a list
-        """
-
-        if (self.center == other.center).all():  # this case is much easier than the general one
-            cpy = self.copy()
-            cpy.exp = self.exp + other.exp
-            cpy.powers = self.powers + other.powers
-            cpy.coeff = self.coeff * other.coeff
-            return cpy
-
-        prefactor, newcenter, newexp = self._mul_gaussians(other)
-        new_prefactor = prefactor * self.coeff * other.coeff
-
-        partial_coeffs = [{} for idim in range(self.ndim)]
-        for idim in range(self.ndim):
-            r_self = self.center[idim]
-            r_other = other.center[idim]
-            r_new = newcenter[idim]
-
-            for m in range(self.powers[idim]+1):
-                for k in range(other.powers[idim]+1):
-                    powercoeff = (binom(self.powers[idim], m) * binom(other.powers[idim], k) *
-                                  ((r_new - r_self) ** (self.powers[idim]-m)) *
-                                  ((r_new - r_other) ** (other.powers[idim]-k)))
-                    if powercoeff == 0.0:
-                        continue
-                    newpower = m+k
-                    if newpower not in partial_coeffs[idim]:
-                        partial_coeffs[idim][newpower] = powercoeff
-                    else:
-                        partial_coeffs[idim][newpower] += powercoeff
-
-        new_gaussians = []
-        for powers in itertools.product(*[x.keys() for x in partial_coeffs]):
-            final_coeff = 1.0 * new_prefactor
-            for idim, p in enumerate(powers):
-                final_coeff *= partial_coeffs[idim][p]
-            new_gaussians.append(CartesianGaussian(newcenter, newexp, powers=powers,
-                                                   coeff=final_coeff))
-
-        if len(new_gaussians) == 0:  # no non-zero components, just return a zeroed gaussian
-            return CartesianGaussian(newcenter, newexp, self.powers + other.powers, coeff=0.0)
-        elif len(new_gaussians) == 1:
-            return new_gaussians[0]
-        else:
-            return new_gaussians
-
-    def _mul_gaussians(self, other):
-        """ Returns the new centroid and width of THE EXPONENTIAL PART ONLY of two gaussians.
-        """
-        # convert widths to prefactor form
-        a = self.exp
-        b = other.exp
-        exp = a + b
-        center = (a*self.center + b*other.center)/(a+b)
-        prefactor = 1.0
-        for i in range(self.ndim):
-            prefactor *= np.exp(-(self.exp*self.center[i]**2 + other.exp * other.center[i]**2) +
-                                exp * center[i]**2)
-
-        return prefactor, center, exp
-
-    @property
-    def integral(self):
-        r"""Integral of this this gaussian over all N-dimensional space.
-
-        This is implemented only for 0 and positive integer cartesian powers.
-        The integral is 0 if any of the powers are odd. Otherwise, the integral
-        is given by:
-        .. math::
-            \int G(\mathbf r) d^N \mathbf r & = c \int d^N e^{-a x^2} \mathbf r
-                    \prod_{i=1}^N{{r_i}^{p_i} }   \\
-               &= (2a)^{-\sum_i p_i} \left( \frac{\pi}{2 a} \right) ^ {N/2} \prod_{i=1}^N{(p_i-1)!!}
-
-        where *N* is the dimensionality of the gaussian, :math:`p_i` are the cartesian powers,
-        and _!!_ is the "odd factorial" (:math:`n!!=1\times 3\times 5 \times ... \times n`)
-
-        References:
-            Dwight, Herbert B. Tables of Integrals and other Mathematical Data, 3rd ed.
-                Macmillan 1957. 201.
-        """
-        integ = (np.pi/self.exp)**(self.ndim/2.0)
-        for p in self.powers:
-            if p == 0:  # no contribution
-                continue
-            elif p % 2 == 1:  # integral of odd function is exactly 0
-                return 0.0
-            elif p < 0:
-                raise ValueError('Powers must be positive or 0')
-            else:
-                integ *= _ODD_FACTORIAL[p-1]/((2.0 * self.exp) ** (p//2))
-        return self.coeff * integ
-
-
-def Gaussian(center, exp, coeff=1.0):
-    r""" Constructor for an N-dimensional gaussian function.
+class Gaussian(AbstractFunction):
+    r""" N-dimensional gaussian function.
 
     The function is given by:
     .. math::
         G(\mathbf r) = C e^{-a\left| \mathbf r - \mathbf r_0 \right|^2}
 
     where *C* is ``self.coeff``, *a* is ``self.exp``, and :math:`\mathbf r_0` is ``self.center``.
-
-    Note:
-        This is just a special case of a cartesian gaussian where all the powers are 0.
     """
-    return CartesianGaussian(center, exp,
-                             powers=[0 for x in center],
-                             coeff=coeff)
-
-
-class SphericalGaussian(AbstractFunction):
-    r""" Stores a 3-dimensional real spherical gaussian function:
-
-    .. math::
-        G_{nlm}(\mathbf r) = C Y^l_m(\mathbf r - \mathbf r_0) r^l e^{-a\left| \mathbf r - \mathbf r_0 \right|^2}
-
-    where *C* is ``self.coeff``, *a* is ``self.exp``, and :math:`\mathbf r_0` is ``self.center``,
-    *(l,m)* are given by ``(self.l, self.m)``, and :math:`Y^l_m(\mathbf{r})` are the _real_
-    spherical harmonics.
-
-    References:
-        Schlegel and Frisch. Transformation between cartesian and pure spherical harmonic gaussians.
-            Int J Quantum Chem 54, 83-87 (1995). doi:10.1002/qua.560540202
-
-        https://en.wikipedia.org/wiki/Table_of_spherical_harmonics#Real_spherical_harmonics
-    """
-
-    ndims = 3
-
-    def __init__(self, center, exp, l, m, coeff=None):
-        from moldesign.mathutils import spherical_harmonics
-
-        self.center = center
-        assert len(self.center) == 3
+    def __init__(self, center, exp, coeff=None):
+        self.center = u.array(center)
         self.exp = exp
-        self.l = l
-        self.m = m
 
         if coeff is None:
-            self.coeff = 1.0
+            self.coeff = 1.0  # dummy value overwritten by self.normalize()
             self.normalize()
         else:
             self.coeff = coeff
 
-        self._spherical_harmonic = spherical_harmonics.Y(l, m)
-
-    def __repr__(self):
-        return ("<3D Gaussian (Spherical) (coeff: {coeff:4.2f}, "
-                "exponent: {exp:4.2f}, "
-                "(l,m) = {qnums}").format(
-                center=self.center, exp=self.exp, coeff=self.coeff,
-                qnums=(self.l, self.m))
-
-    def __call__(self, coords, _include_angular=True):
+    def __call__(self, coords, _getvals=False):
         """ Evaluate this function at the given coordinates.
 
         Can be called either with a 1D column (e.g., ``[1,2,3]*u.angstrom ``) or
@@ -372,7 +99,7 @@ class SphericalGaussian(AbstractFunction):
             coords (Vector[length]): 3D Coordinates or list of 3D coordinates
 
         Returns:
-            Scalar: function value(s) at the passed coordinates
+            Scalar or Vector: function value(s) at the passed coordinates
         """
         if len(coords.shape) > 1:
             axis = 1
@@ -380,33 +107,47 @@ class SphericalGaussian(AbstractFunction):
             axis = None
 
         disp = coords - self.center
-        prd = disp*disp
+        prd = disp*disp  # don't use np.dot - allow multiple coords at once
         r2 = prd.sum(axis=axis)
 
         result = self.coeff * np.exp(-self.exp * r2)
-        if _include_angular:
-            result *= r2**(self.l/2.0) * self._spherical_harmonic(disp)
-        return result
-
-    def angular_part(self, coords):
-        if len(coords.shape) > 1:
-            axis = 1
+        if _getvals:
+            return result, disp, r2  # extra quantities so that they don't need to be recomputed
         else:
-            axis = None
+            return result
 
-        disp = coords - self.center
-        prd = disp*disp
-        r2 = prd.sum(axis=axis)
+    def __repr__(self):
+        return ("<{ndim}-D gaussian (coeff: {coeff:4.2f}, "
+                "exponent: {exp:4.2f}, "
+                "center: {center}>").format(
+                ndim=self.ndim,
+                center=self.center, exp=self.exp,
+                coeff=self.coeff)
 
-        return r2**(self.l/2.0) * self._spherical_harmonic(disp)
+    @property
+    def ndim(self):
+        return len(self.center)
+    num_dimensions = ndims = ndim
 
+    def __mul__(self, other):
+        """ Returns a new gaussian centroid.
+        """
+        a = self.exp
+        b = other.exp
+        exp = a + b
+        center = (a*self.center + b*other.center)/(a+b)
+        prefactor = self.coeff * other.coeff
+        for i in range(self.ndim):
+            prefactor *= np.exp(-(a*self.center[i]**2 + b*other.center[i]**2) +
+                                exp * center[i]**2)
 
-# Precompute odd factorial values (N!!)
-_ODD_FACTORIAL = {0: 1}  # by convention
-_ofact = 1
-for _i in range(1, 20, 2):
-    _ofact *= _i
-    _ODD_FACTORIAL[_i] = float(_ofact)
+        return Gaussian(center, exp, coeff=prefactor)
+
+    @property
+    def integral(self):
+        r"""Integral of this this gaussian over all N-dimensional space
+        """
+        return self.coeff * (np.pi/self.exp)**(self.ndim/2.0)
 
 
 def cart_to_powers(s):
