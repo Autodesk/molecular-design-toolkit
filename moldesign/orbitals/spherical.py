@@ -22,18 +22,26 @@ from scipy.special import factorial
 
 from ..mathutils import spherical_harmonics
 from .. import utils
-from . import AbstractFunction, Gaussian, CartesianGaussian
+from . import Primitive, Gaussian, CartesianGaussian, PrimitiveSum
 
 
-class SphericalGaussian(AbstractFunction):
+class SphericalGaussian(Primitive):
     r""" Stores a 3-dimensional real spherical gaussian function:
 
     .. math::
-        G_{nlm}(\mathbf r) = C Y^l_m(\mathbf r - \mathbf r_0) r^l e^{-a\left| \mathbf r - \mathbf r_0 \right|^2}
+        G_{nlm}(\mathbf r) = C Y^l_m(\mathbf r - \mathbf r_0) r^l e^{-\alpha \left| \mathbf r - \mathbf r_0 \right|^2}
 
-    where *C* is ``self.coeff``, *a* is ``self.alpha``, and :math:`\mathbf r_0` is ``self.center``,
-    *(l,m)* are given by ``(self.l, self.m)``, and :math:`Y^l_m(\mathbf{r})` are the _real_
-    spherical harmonics.
+    where:
+     - *C* is ``self.coeff``,
+     - :math:`\alpha` is ``self.alpha``,
+     - :math:`\mathbf r_0` is  ``self.center``,
+     - _(l,m)_ are given by ``(self.l, self.m)``, and
+     - :math:`Y^l_m(\mathbf{r})` are the orthonormal real-valued spherical harmonics.
+
+    This function is evaluated as the the product of three terms that can be accessed separately:
+      - ``self.coeff`` -  the constant prefactor _C_
+      - ``self.radial_part(r)`` - :math:`e^{-a\left| \mathbf r - \mathbf r_0 \right|^2}`
+      - ``self.angular_part(r)`` - :math:`Y^l_m(\mathbf r - \mathbf r_0) r^l`
 
     References:
         Schlegel and Frisch. Transformation between cartesian and pure spherical harmonic gaussians.
@@ -86,7 +94,7 @@ class SphericalGaussian(AbstractFunction):
             \int f_1(\mathbf r) f_2(\mathbf r) d^N \mathbf r
 
         Args:
-            other (AbstractFunction):
+            other (Primitive):
             normalized (bool): If True, return the overlap of the two NORMALIZED functions.
 
         Returns:
@@ -142,5 +150,5 @@ class SphericalGaussian(AbstractFunction):
         carts = [CartesianGaussian(self.center, self.alpha,
                                    cart_fn.powers, self.coeff * cart_fn.coeff)
                  for cart_fn in spherical_harmonics.SPHERE_TO_CART[self.l, self.m]]
-        return carts
+        return PrimitiveSum(carts)
 

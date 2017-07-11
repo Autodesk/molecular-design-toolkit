@@ -23,26 +23,28 @@ from scipy.special import binom
 
 from .. import units as u
 from .. import utils
-from . import AbstractFunction, BasisContraction, Gaussian
+from . import Primitive, PrimitiveSum, Gaussian
 
 
-class CartesianGaussian(AbstractFunction):
+class CartesianGaussian(Primitive):
     r""" Stores an N-dimensional gaussian function of the form:
 
     .. math::
         G(\mathbf r) = C \times \left( \prod_{i=1}^N{{r_i}^{p_i} } \right)
-             e^{-a |\mathbf r - \mathbf{r}_0|^2}
+             e^{-\alpha |\mathbf r - \mathbf{r}_0|^2}
 
     For a three-dimensional gaussian, this is
 
     ..math::
         G(x,y,z) = C \times x^{p_1} y^{p_2} z^{p_3} e^{-\alpha |\mathbf r - \mathbf{r}_0|^2}
 
-    where *C* is ``self.coeff``, *alpha* is ``self.alpha``, *r0* is ``self.center``, and
+    where *C* is ``self.coeff``, :math:`\alpha` is ``self.alpha``, *r0* is ``self.center``, and
     :math:`p_1, p_2, ...` are given in the array ``self.powers``
 
-    References:
-        Levine, Ira N. Quantum Chemistry, 5th ed. Prentice Hall, 2000. 486-94.
+    This function is evaluated as the the product of three terms that can be accessed separately:
+      - ``self.coeff`` -  the constant prefactor _C_
+      - ``self.radial_part(r)`` - :math:`e^{-\alpha \left| \mathbf r - \mathbf r_0 \right|^2}`
+      - ``self.angular_part(r)`` - :math:`\prod_{i=1}^N{{r_i}^{p_i} }`
 
     Args:
         center (Vector[length]): location of the gaussian's centroid
@@ -57,6 +59,9 @@ class CartesianGaussian(AbstractFunction):
         of the centroid location vector and the power vector. So, if scalars are passed for the
         ``center`` and ``powers``, it's 1-D. If length-3 vectors are passed for ``center``
         and ``powers``, it's 3D.
+
+    References:
+        Levine, Ira N. Quantum Chemistry, 5th ed. Prentice Hall, 2000. 486-94.
     """
     center = utils.Alias('radial_part.center')
     alpha = utils.Alias('radial_part.alpha')
@@ -189,7 +194,7 @@ class CartesianGaussian(AbstractFunction):
         elif len(new_gaussians) == 1:
             return new_gaussians[0]
         else:
-            return BasisContraction(new_gaussians)
+            return PrimitiveSum(new_gaussians)
 
     @property
     def integral(self):
