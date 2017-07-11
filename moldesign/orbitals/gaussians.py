@@ -110,6 +110,11 @@ class Gaussian(Primitive):
         """
         return self.coeff * (np.pi/self.alpha)**(self.ndim/2.0)
 
+    def to_cart(self):
+        from . import CartesianGaussian
+        return CartesianGaussian(self.center, self.alpha, (0,0,0),
+                                 self.coeff, normalized=False)
+
 
 def cart_to_powers(s):
     """ Convert a string to a list of cartesian powers

@@ -36,12 +36,12 @@ def cart_to_polar_angles(coords):
 
 
 class Y(object):
-    r""" A *real*-valued spherical harmonic function
+    r""" A real-valued spherical harmonic function
 
     These functions are orthonormalized over the sphere such that
 
     .. math::
-       \int d\Omega \: Y_{lm}(\theta, \phi) Y_{l'm'}(\theta, \phi) = \delta_{l,l'} \delta_{m,m'}
+       \int d^2\Omega \: Y_{lm}(\theta, \phi) Y_{l'm'}(\theta, \phi) = \delta_{l,l'} \delta_{m,m'}
 
     References:
         https://en.wikipedia.org/wiki/Table_of_spherical_harmonics#Real_spherical_harmonics
@@ -98,6 +98,9 @@ class Cart(object):
             r_l = (coords**2).sum() ** (-self._l / 2.0)
             return self.coeff * np.product(c) * r_l
 
+    def __iter__(self):
+        yield self  # for interface compatibility with the CartSum class
+
 
 class CartSum(object):
     def __init__(self, coeff, carts):
@@ -133,6 +136,11 @@ class CartSum(object):
             c += factor * np.product(coords**power, axis=axis)
 
         return c * self.coeff * r_l
+
+    def __iter__(self):
+        for pf, (px, py, pz) in zip(self.prefactors, self.powers):
+            yield Cart(px, py, pz, coeff=self.coeff*pf)
+
 
 
 def sqrt_x_over_pi(num, denom):

@@ -88,7 +88,7 @@ class SphericalGaussian(Primitive):
         return result * self.coeff
 
     def overlap(self, other, normalized=False):
-        r""" Overlap of this function with another gaussian basis function
+        r""" Overlap of this function with another basis function
 
         .. math::
             \int f_1(\mathbf r) f_2(\mathbf r) d^N \mathbf r
@@ -102,10 +102,8 @@ class SphericalGaussian(Primitive):
         """
         from ..data import ODD_FACTORIAL
 
-        if (self.center != other.center).any():
-            # work in the cartesian basis
-            carts = self.to_cart()
-            raise NotImplementedError()
+        if (self.center - other.center).any():
+            return self.to_cart().overlap(other)
 
         elif self.l != other.l or self.m != other.m:
             return 0.0
@@ -152,3 +150,6 @@ class SphericalGaussian(Primitive):
                  for cart_fn in spherical_harmonics.SPHERE_TO_CART[self.l, self.m]]
         return PrimitiveSum(carts)
 
+    @property
+    def integral(self):
+        return self.to_cart().integral

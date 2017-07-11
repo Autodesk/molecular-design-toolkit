@@ -17,12 +17,14 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import copy
+import itertools
 
 import numpy as np
+from .. import utils
 
 
 class Primitive(object):
-    """ Abstract base class for basis function primitives
+    """ Abstract base class for basis function primitives. All functions are assumed real.
     """
     def __init__(self, coeff=None, normalized=False):
         if normalized or coeff is None:
@@ -50,6 +52,11 @@ class Primitive(object):
             other (Primitive):
             normalized (bool): If True, return the overlap of the two NORMALIZED functions.
 
+        Note:
+            This implementation computes overlap by computing the integral of the product of the
+            two functions. Subclasses may override this method if more efficient techniques
+            are applicable
+
         Returns:
             Scalar: value of the overlap
         """
@@ -68,13 +75,21 @@ class Primitive(object):
         """
         return np.sqrt(self.overlap(self))
 
+    def iterprimitives(self):
+        yield self
+
 
 class PrimitiveSum(object):
     """ Stores a linear combination of primitive functions.
 
     Args:
-        primitives (List[PrimitiveBase]): List of primitives, if available
+        primitives (List[Primitives]): List of primitives, if available
     """
+    __getitem__ = utils.Alias('primitives.__getitem__')
+    __len__ = utils.Alias('primitives.__len__')
+    __iter__ = utils.Alias('primitives.__iter__')
+    iterprimitives = __iter__
+
     def __init__(self, primitives):
         self.primitives = primitives
 
@@ -111,11 +126,21 @@ class PrimitiveSum(object):
         Args:
             other (AbstractFunction or Orbital): object to calculate overlaps with
         """
-        olap = sum(p1.overlap(other) for p1 in self.primitives)
+        olap = sum(p1.overlap(p2)
+                   for p1, p2 in itertools.product(self.iterprimitives(), other.iterprimitives()))
         return olap
+
+    @property
+    def integral(self):
+        return sum(x.integral for x in self)
 
     def __str__(self):
         return '%s with %d primitives' % (self.__class__.__name__, self.num_primitives)
 
     def __repr__(self):
         return '<%s>' % self
+
+    def __mul__(self, other):
+        newprims = [p1*p2
+                    for p1, p2 in itertools.product(self.iterprimitives(), other.iterprimitives())]
+        return PrimitiveSum(newprims)

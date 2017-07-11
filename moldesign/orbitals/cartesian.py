@@ -91,6 +91,54 @@ class CartesianGaussian(Primitive):
         """
         return self.powers.sum()
 
+    def overlap(self, other, normalized=False):
+        r""" Overlap of this function with another basis function
+
+        .. math::
+            \int f_1(\mathbf r) f_2(\mathbf r) d^N \mathbf r
+
+        Args:
+            other (Primitive):
+            normalized (bool): If True, return the overlap of the two NORMALIZED functions.
+
+        Returns:
+            Scalar: value of the overlap
+        """
+        olap = 0.0
+        for other_prim in other.iterprimitives():
+            if hasattr(other_prim, 'to_cart'):
+                other_prim = other_prim.to_cart()
+
+            for p in other_prim.iterprimitives():
+                olap += self._overlap_cart_cart(p)
+
+        if normalized:
+            olap = olap / (self.norm * other.norm)
+
+        return olap
+
+    def _overlap_cart_cart(self, other):
+        """  Overlap of two cartesian functions. Uses the PyQuante2 python implementation
+
+        Users shouldn't need to call directly, this should be automatically called when necessary
+        """
+        from ..external.pyquante2.one import overlap
+        lengthunits = u.default.get_default(self.center)
+        alphaunits = (1/lengthunits**2).units
+
+        alphas = [alphaunits.value_of(g.alpha) for g in (self, other)]
+        centers = [lengthunits.value_of(g.center) for g in (self, other)]
+
+        olap_base = overlap(alphas[0], self.powers, centers[0],
+                       alphas[1], other.powers, centers[1])
+
+        olap = self.coeff * other.coeff * olap_base
+
+        if lengthunits != u.dimensionless:
+            olap *= lengthunits ** (3 + sum(self.powers) + sum(other.powers))
+
+        return olap
+
     def __call__(self, coords):
         """ Evaluate this function at the given coordinates.
 
@@ -144,10 +192,10 @@ class CartesianGaussian(Primitive):
         angular parts.
 
         Args:
-            other (CartesianGaussian): other gaussian wavepacket
+            other (CartesianGaussian): other gaussian basis function
 
         Returns:
-            CartesianGaussian or BasisContraction: product functions
+            CartesianGaussian or PrimitiveSum[CartesianGaussian]: product functions
         """
 
         if (self.center == other.center).all():  # this case is much easier than the general one
