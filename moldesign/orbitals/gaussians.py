@@ -25,6 +25,13 @@ from .. import units as u
 class AbstractFunction(object):
     """ Abstract base class for basis functions
     """
+    def __init__(self, coeff=None, normalized=False):
+        if normalized or coeff is None:
+            self.coeff = 1.0  # dummy value overwritten by self.normalize()
+            self.normalize()
+
+        if coeff is not None:
+            self.coeff = coeff
 
     def copy(self):
         return copy.deepcopy(self)
@@ -62,28 +69,28 @@ class AbstractFunction(object):
         """
         return np.sqrt(self.overlap(self))
 
-    def __str__(self):
-        return "%d-D %s with norm %s" % (self.ndims, self.__class__, self.norm)
-
 
 class Gaussian(AbstractFunction):
     r""" N-dimensional gaussian function.
 
     The function is given by:
     .. math::
-        G(\mathbf r) = C e^{-a\left| \mathbf r - \mathbf r_0 \right|^2}
+        G(\mathbf r) = C e^{-\alpha\left| \mathbf r - \mathbf r_0 \right|^2}
 
-    where *C* is ``self.coeff``, *a* is ``self.exp``, and :math:`\mathbf r_0` is ``self.center``.
+    where *C* is ``self.coeff``, *a* is ``self.alpha``, and :math:`\mathbf r_0` is ``self.center``.
+
+    Args:
+        center (Vector): centroid of this function (r_0 in the equation above)
+        alpha (Scalar): constant in the exponential (alpha in the equation above)
+        coeff (Scalar): coefficient for this function. If normalized=True, the coefficient
+           multiplies the _normalized_ gaussian. If not passed, the gaussian will automatically
+           be normalized
+        normalized (bool): if True, normalize the function before applying the coefficient
     """
-    def __init__(self, center, exp, coeff=None):
+    def __init__(self, center, alpha, coeff=None, normalized=True):
         self.center = u.array(center)
-        self.exp = exp
-
-        if coeff is None:
-            self.coeff = 1.0  # dummy value overwritten by self.normalize()
-            self.normalize()
-        else:
-            self.coeff = coeff
+        self.alpha = alpha
+        super().__init__(coeff=coeff, normalized=normalized)
 
     def __call__(self, coords, _getvals=False):
         """ Evaluate this function at the given coordinates.
@@ -110,7 +117,7 @@ class Gaussian(AbstractFunction):
         prd = disp*disp  # don't use np.dot - allow multiple coords at once
         r2 = prd.sum(axis=axis)
 
-        result = self.coeff * np.exp(-self.exp * r2)
+        result = self.coeff * np.exp(-self.alpha * r2)
         if _getvals:
             return result, disp, r2  # extra quantities so that they don't need to be recomputed
         else:
@@ -121,7 +128,7 @@ class Gaussian(AbstractFunction):
                 "exponent: {exp:4.2f}, "
                 "center: {center}>").format(
                 ndim=self.ndim,
-                center=self.center, exp=self.exp,
+                center=self.center, exp=self.alpha,
                 coeff=self.coeff)
 
     @property
@@ -132,22 +139,24 @@ class Gaussian(AbstractFunction):
     def __mul__(self, other):
         """ Returns a new gaussian centroid.
         """
-        a = self.exp
-        b = other.exp
-        exp = a + b
-        center = (a*self.center + b*other.center)/(a+b)
+        a1 = self.alpha
+        a2 = other.alpha
+        x1 = self.center
+        x2 = other.center
+        alpha = a1 + a2
+        center = (a1*x1 + a2*x2)/(a1+a2)
         prefactor = self.coeff * other.coeff
         for i in range(self.ndim):
-            prefactor *= np.exp(-(a*self.center[i]**2 + b*other.center[i]**2) +
-                                exp * center[i]**2)
+            prefactor *= np.exp(-(a1*x1[i]**2 + a2*x2[i]**2) +
+                                alpha * center[i]**2)
 
-        return Gaussian(center, exp, coeff=prefactor)
+        return Gaussian(center, alpha, coeff=prefactor, normalized=False)
 
     @property
     def integral(self):
         r"""Integral of this this gaussian over all N-dimensional space
         """
-        return self.coeff * (np.pi/self.exp)**(self.ndim/2.0)
+        return self.coeff * (np.pi/self.alpha)**(self.ndim/2.0)
 
 
 def cart_to_powers(s):

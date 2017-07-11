@@ -19,16 +19,19 @@ standard_library.install_aliases()
 
 import numpy as np
 from scipy.special import factorial
-from . import Gaussian
+
+from ..mathutils import spherical_harmonics
+from .. import utils
+from . import AbstractFunction, Gaussian, CartesianGaussian
 
 
-class SphericalGaussian(Gaussian):
+class SphericalGaussian(AbstractFunction):
     r""" Stores a 3-dimensional real spherical gaussian function:
 
     .. math::
         G_{nlm}(\mathbf r) = C Y^l_m(\mathbf r - \mathbf r_0) r^l e^{-a\left| \mathbf r - \mathbf r_0 \right|^2}
 
-    where *C* is ``self.coeff``, *a* is ``self.exp``, and :math:`\mathbf r_0` is ``self.center``,
+    where *C* is ``self.coeff``, *a* is ``self.alpha``, and :math:`\mathbf r_0` is ``self.center``,
     *(l,m)* are given by ``(self.l, self.m)``, and :math:`Y^l_m(\mathbf{r})` are the _real_
     spherical harmonics.
 
@@ -38,47 +41,33 @@ class SphericalGaussian(Gaussian):
 
         https://en.wikipedia.org/wiki/Table_of_spherical_harmonics#Real_spherical_harmonics
     """
+    center = utils.Alias('radial_part.center')
+    alpha = utils.Alias('radial_part.alpha')
+    ndims = ndim = num_dims = 3
 
-    ndims = 3
-
-    def __init__(self, center, exp, l, m, coeff=None):
-        from moldesign.mathutils import spherical_harmonics
-
-        super().__init__(center, exp, coeff=1.0)  # temporarily set coefficient
-
-        self.center = center
-        assert len(self.center) == 3
-        self.exp = exp
+    def __init__(self, center, alpha, l, m, coeff=None, normalized=True):
+        assert len(center) == 3, "Spherical gaussians must be 3-dimensional"
         self.l = l
         self.m = m
-
-        if coeff is None:
-            self.coeff = 1.0
-            self.normalize()
-        else:
-            self.coeff = coeff
-
+        self.radial_part = Gaussian(center, alpha, coeff=1.0, normalized=False)
         self._spherical_harmonic = spherical_harmonics.Y(l, m)
+        super().__init__(coeff=coeff, normalized=normalized)
 
     def __repr__(self):
         return ("<3D Gaussian (Spherical) (coeff: {coeff:4.2f}, "
-                "exponent: {exp:4.2f}, "
+                "width: {alpha:4.2f}, "
                 "(l,m) = {qnums}").format(
-                center=self.center, exp=self.exp, coeff=self.coeff,
+                center=self.center, alpha=self.alpha, coeff=self.coeff,
                 qnums=(self.l, self.m))
 
     def __mul__(self, other):
-        raise NotImplementedError("Cannot multiply spherical gaussian functions")
+        raise NotImplementedError("Cannot yet multiply spherical gaussian functions")
 
-    def __call__(self, coords, _include_angular=True):
+    def __call__(self, coords):
         """ Evaluate this function at the given coordinates.
 
         Can be called either with a 1D column (e.g., ``[1,2,3]*u.angstrom ``) or
         an ARRAY of coordinates (``[[0,0,0],[1,1,1]] * u.angstrom``)
-
-        Args:
-            _include_angular (bool): include the contribution from the non-exponential parts
-                (for computational efficiency, this can be omitted now and included later)
 
         Args:
             coords (Vector[length]): 3D Coordinates or list of 3D coordinates
@@ -86,14 +75,12 @@ class SphericalGaussian(Gaussian):
         Returns:
             Scalar or Vector: function value(s) at the passed coordinates
         """
-        result, disp, r2 = super().__call__(coords, _getvals=True)
-
-        if _include_angular:
-            result *= r2**(self.l/2.0) * self._spherical_harmonic(disp)
-        return result
+        result, disp, r2 = self.radial_part(coords, _getvals=True)
+        result *= r2**(self.l/2.0) * self._spherical_harmonic(disp)
+        return result * self.coeff
 
     def overlap(self, other, normalized=False):
-        r""" Overlap of this function with another spherical basis function:
+        r""" Overlap of this function with another gaussian basis function
 
         .. math::
             \int f_1(\mathbf r) f_2(\mathbf r) d^N \mathbf r
@@ -108,13 +95,15 @@ class SphericalGaussian(Gaussian):
         from ..data import ODD_FACTORIAL
 
         if (self.center != other.center).any():
-            raise NotImplementedError("Two-center spherical harmonic overlaps not yet supported")
+            # work in the cartesian basis
+            carts = self.to_cart()
+            raise NotImplementedError()
 
         elif self.l != other.l or self.m != other.m:
             return 0.0
 
         else:
-            newexp = self.exp + other.exp
+            newexp = self.alpha + other.alpha
             power = self.l + other.l + 2
 
             # In this case, radial part integrates to 1, so we just
@@ -142,5 +131,16 @@ class SphericalGaussian(Gaussian):
         disp = coords - self.center
         prd = disp*disp
         r2 = prd.sum(axis=axis)
-
         return r2**(self.l/2.0) * self._spherical_harmonic(disp)
+
+    def to_cart(self):
+        """ Convert this function to a linear combination of cartesian functions
+
+        Returns:
+            List[CartesianGaussian]: cartesian components of this function
+        """
+        carts = [CartesianGaussian(self.center, self.alpha,
+                                   cart_fn.powers, self.coeff * cart_fn.coeff)
+                 for cart_fn in spherical_harmonics.SPHERE_TO_CART[self.l, self.m]]
+        return carts
+

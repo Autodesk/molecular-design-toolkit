@@ -22,10 +22,11 @@ import numpy as np
 from scipy.special import binom
 
 from .. import units as u
-from . import Gaussian, BasisContraction
+from .. import utils
+from . import AbstractFunction, BasisContraction, Gaussian
 
 
-class CartesianGaussian(Gaussian):
+class CartesianGaussian(AbstractFunction):
     r""" Stores an N-dimensional gaussian function of the form:
 
     .. math::
@@ -35,9 +36,9 @@ class CartesianGaussian(Gaussian):
     For a three-dimensional gaussian, this is
 
     ..math::
-        G(x,y,z) = C \times x^{p_1} y^{p_2} z^{p_3} e^{-a |\mathbf r - \mathbf{r}_0|^2}
+        G(x,y,z) = C \times x^{p_1} y^{p_2} z^{p_3} e^{-\alpha |\mathbf r - \mathbf{r}_0|^2}
 
-    where *C* is ``self.coeff``, *a* is ``self.exp``, *r0* is ``self.center``, and
+    where *C* is ``self.coeff``, *alpha* is ``self.alpha``, *r0* is ``self.center``, and
     :math:`p_1, p_2, ...` are given in the array ``self.powers``
 
     References:
@@ -47,7 +48,7 @@ class CartesianGaussian(Gaussian):
         center (Vector[length]): location of the gaussian's centroid
         powers (List[int]): cartesian powers in each dimension (see
             equations in :class:`CartesianGaussian` docs)
-        exp (Scalar[1/length**2]): gaussian width parameter
+        alpha (Scalar[1/length**2]): gaussian width parameter
         coeff (Scalar): multiplicative coefficient (if None, gaussian will be automatically
              normalized)
 
@@ -57,26 +58,27 @@ class CartesianGaussian(Gaussian):
         ``center`` and ``powers``, it's 1-D. If length-3 vectors are passed for ``center``
         and ``powers``, it's 3D.
     """
-    def __init__(self, center, exp, powers, coeff=None):
+    center = utils.Alias('radial_part.center')
+    alpha = utils.Alias('radial_part.alpha')
+    ndims = ndim = num_dims = utils.Alias('radial_part.ndim')
+
+    def __init__(self, center, alpha, powers, coeff=None, normalized=True):
         assert len(powers) == len(center), "Inconsistent dimensionality - number of cartesian " \
                                            "powers must match dimensionality of centroid vector"
 
-        super().__init__(center, exp, coeff=1.0)  # temporarily set coefficient
         self.powers = np.array(powers)
         self.shell = sum(self.powers)
-        if coeff is None:
-            self.normalize()
-        else:
-            self.coeff = coeff
+        self.radial_part = Gaussian(center, alpha, coeff=1.0, normalized=False)
+        super().__init__(coeff=coeff, normalized=normalized)
 
     def __repr__(self):
-        return ("<{ndim}-D cartesian gaussian (coeff: {coeff:4.2f}, "
+        return ("<{ndim}-D cartesian gaussian (norm: {norm:4.2f}, "
                 "cartesian powers: {powers}, "
-                "exponent: {exp:4.2f}, "
+                "width: {exp:4.2f}, "
                 "center: {center}>").format(
                 ndim=self.ndim,
-                center=self.center, exp=self.exp,
-                powers=tuple(self.powers), coeff=self.coeff)
+                center=self.center, exp=self.alpha,
+                powers=tuple(self.powers), norm=self.norm)
 
     @property
     def angular(self):
@@ -84,7 +86,7 @@ class CartesianGaussian(Gaussian):
         """
         return self.powers.sum()
 
-    def __call__(self, coords, _include_angular=True):
+    def __call__(self, coords):
         """ Evaluate this function at the given coordinates.
 
         Can be called either with a 1D column (e.g., ``[1,2,3]*u.angstrom ``) or
@@ -93,11 +95,9 @@ class CartesianGaussian(Gaussian):
         Args:
             coords (Vector[length, len=3] or Matrix[length, shape=(*,3)]): Coordinates or
                    list of 3D coordinates
-            _include_cartesian (bool): include the contribution from the cartesian components
-                (for computational efficiency, this can sometimes omited now and included later)
 
         Examples:
-            >>> g = CartesianGaussian([0,0,0]*u.angstrom, exp=1.0/u.angstrom**2, powers=(0,0,0))
+            >>> g = CartesianGaussian([0,0,0]*u.angstrom, alpha=1.0/u.angstrom**2, powers=(0,0,0))
             >>> # Value at a single coordinate:
             >>> g([0,0,0] * u.angstrom)
             1.0
@@ -108,11 +108,11 @@ class CartesianGaussian(Gaussian):
         Returns:
             Scalar or Vector: function value(s) at the passed coordinates
         """
-        result = super().__call__(coords)
+        result = self.radial_part(coords)
 
-        if self.shell > 0 and _include_angular:
+        if self.shell > 0:
             result *= self.angular_part(coords)
-        return result
+        return result * self.coeff
 
     def angular_part(self, coords):
         if self.shell == 0:
@@ -147,12 +147,12 @@ class CartesianGaussian(Gaussian):
 
         if (self.center == other.center).all():  # this case is much easier than the general one
             cpy = self.copy()
-            cpy.exp = self.exp + other.exp
+            cpy.radial_part.alpha = self.alpha + other.alpha
             cpy.powers = self.powers + other.powers
             cpy.coeff = self.coeff * other.coeff
             return cpy
 
-        newcenter = super().__mul__(other)
+        newcenter = self.radial_part * other.radial_part
 
         partial_coeffs = [{} for idim in range(self.ndim)]
         for idim in range(self.ndim):
@@ -175,15 +175,17 @@ class CartesianGaussian(Gaussian):
 
         new_gaussians = []
         for powers in itertools.product(*[x.keys() for x in partial_coeffs]):
-            final_coeff = 1.0 * newcenter.coeff
+            final_coeff = self.coeff * other.coeff * newcenter.coeff
             for idim, p in enumerate(powers):
                 final_coeff *= partial_coeffs[idim][p]
-            new_gaussians.append(CartesianGaussian(newcenter.center, newcenter.exp,
-                                                   powers=powers, coeff=final_coeff))
+            new_gaussians.append(CartesianGaussian(newcenter.center, newcenter.alpha,
+                                                   powers=powers, coeff=final_coeff,
+                                                   normalized=False))
 
         if len(new_gaussians) == 0:  # no non-zero components, just return a zeroed gaussian
-            return CartesianGaussian(newcenter, newcenter.exp,
-                                     self.powers + other.powers, coeff=0.0)
+            return CartesianGaussian(newcenter, newcenter.alpha,
+                                     self.powers + other.powers, coeff=0.0,
+                                     normalized=False)
         elif len(new_gaussians) == 1:
             return new_gaussians[0]
         else:
@@ -210,7 +212,7 @@ class CartesianGaussian(Gaussian):
         """
         from ..data import ODD_FACTORIAL
 
-        integ = super().integral
+        integ = self.coeff * self.radial_part.integral
         for p in self.powers:
             if p == 0:  # no contribution
                 continue
@@ -219,5 +221,5 @@ class CartesianGaussian(Gaussian):
             elif p < 0:
                 raise ValueError('Powers must be positive or 0')
             else:
-                integ *= ODD_FACTORIAL[p-1]/((2.0 * self.exp) ** (p//2))
+                integ *= ODD_FACTORIAL[p-1]/((2.0 * self.alpha) ** (p//2))
         return integ
