@@ -1,3 +1,4 @@
+import itertools
 import pytest
 
 import numpy as np
@@ -133,6 +134,43 @@ def test_cart_and_spherical_equivalence(shell):
         np.testing.assert_allclose(real_y(testpoints),
                                    cart_y(testpoints),
                                    err_msg="Failed at %s" % ((l,m),))
+
+
+@pytest.mark.parametrize('l1,m1,l2,m2',
+                         [(0,0,0,0),
+                          (1,0,1,0),
+                          (3,-2,2,-1),
+                          (1,0,1,1),
+                          (1,-1,1,1),
+                          (10,5,10,5)])
+def test_spherical_harmonics_orthonormal(l1, m1, l2, m2):
+    y1 = sh.Y(l1, m1)
+    y2 = sh.Y(l2, m2)
+
+    NPHI = 1000
+    NTHETA = 700
+
+    thetas = np.linspace(0, np.pi, num=NTHETA)
+    dtheta = np.pi/NTHETA
+    phis = np.linspace(0, 2.0 * np.pi, num=NPHI)
+    cosphi = np.cos(phis)
+    sinphi = np.sin(phis)
+    dphi = 2.0 * np.pi/NPHI
+
+    phibuffer = np.zeros((NPHI, 3))
+    integ = 0.0
+    for theta in thetas:
+        sintheta = np.sin(theta)
+        phibuffer[:,0] = cosphi * sintheta
+        phibuffer[:,1] = sinphi * sintheta
+        phibuffer[:,2] = np.cos(theta)
+        values = y1(phibuffer) * y2(phibuffer)
+        integ += dphi * dtheta * sintheta * values.sum()
+
+    if l1 == l2 and m1 == m2:
+        assert abs(integ - 1.0) < 1e-2
+    else:
+        assert abs(integ) < 1e-2
 
 
 RANDARRAY = np.array([[ 0.03047527, -4.49249374,  5.83154878],

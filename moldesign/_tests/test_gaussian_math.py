@@ -76,7 +76,7 @@ def test_gaussian_integral_and_dimensionality(objkey, request):
                          decimal=10)
 
 
-def _make_rando_gaussian(powers, withunits=True):
+def _make_rando_cart_gaussian(powers, withunits=True):
     if withunits:
         length = u.angstrom
     else:
@@ -84,6 +84,17 @@ def _make_rando_gaussian(powers, withunits=True):
     return moldesign.orbitals.CartesianGaussian((np.random.rand(3)-0.5)*1.0 * length,
                                                 (random.random()*5)/(length ** 2),
                                                 powers=powers,
+                                                coeff=random.random())
+
+
+def _make_rando_spherical_gaussian(l,m, withunits=True):
+    if withunits:
+        length = u.angstrom
+    else:
+        length = 1.0
+    return moldesign.orbitals.SphericalGaussian((np.random.rand(3)-0.5)*1.0 * length,
+                                                (random.random()*5)/(length ** 2),
+                                                l,m,
                                                 coeff=random.random())
 
 # parameterizations across a sample of cartesian gaussians
@@ -99,14 +110,13 @@ cartesian_test_ids = ['[%d%d%d]*[%d%d%d]/%s' % (p[0] + p[1] + ('units' if p[2] e
 def test_cart_gaussian_multiplication_amplitudes(p1, p2, withunits):
     """ Tests that ``g1(x) * g2(x) == (g1 * g2)(x)``
     """
-    g1 = _make_rando_gaussian(p1, withunits)
-    g2 = _make_rando_gaussian(p2, withunits)
+    g1 = _make_rando_cart_gaussian(p1, withunits)
+    g2 = _make_rando_cart_gaussian(p2, withunits)
 
     testcoords = 6.0*(np.random.rand(50, 3)-0.5)
     if withunits:
-        testcoords = testcoords * u.angstrom
-
-    g1g2 = g1 * g2
+        testcoords = testcoords*u.angstrom
+    g1g2 = g1*g2
     if isinstance(g1g2, moldesign.orbitals.AbstractFunction):
         gvals = g1g2(testcoords)
         assert g1g2.coeff != 0.0
@@ -114,9 +124,7 @@ def test_cart_gaussian_multiplication_amplitudes(p1, p2, withunits):
         gvals = sum(gg(testcoords) for gg in g1g2)
     g1vals = g1(testcoords)
     g2vals = g2(testcoords)
-
-    prodvals = g1vals * g2vals
-
+    prodvals = g1vals*g2vals
     helpers.assert_almost_equal(prodvals, gvals)
 
 
@@ -138,7 +146,6 @@ def test_gaussian_function_values(objkey, request):
 
 @pytest.mark.parametrize('objkey',
                          registered_types['gaussian'])
-@pytest.mark.screening
 def test_vectorized_gaussian_function_evaluations(objkey, request):
     g = request.getfixturevalue(objkey)
 
@@ -159,7 +166,8 @@ def test_vectorized_gaussian_function_evaluations(objkey, request):
 
 @pytest.mark.parametrize('objkey',
                          registered_types['gaussian'] +
-                         registered_types['cart-gaussian'])
+                         registered_types['cart-gaussian'] +
+                         registered_types['spherical-gaussian'])
 def test_gaussian_str_and_repr_works(objkey, request):
     g1 = request.getfixturevalue(objkey)
     str(g1)
@@ -175,12 +183,12 @@ def test_normalized_gaussian_self_overlap_is_unity(objkey, request):
     g2 = g1.copy()
     g1.coeff = -10.0
     g2.coeff = 12341.1832
-    npt.assert_almost_equal(-1.0,
-                            g1.overlap(g2, normalized=True))
+    olap = g1.overlap(g2, normalized=True)
+    assert abs(-1.0 - olap) < 1e-12
 
     g1.coeff = 10.0
-    npt.assert_almost_equal(1.0,
-                            g1.overlap(g2, normalized=True))
+    olap = g1.overlap(g2, normalized=True)
+    assert abs(1.0 - olap) < 1e-12
 
 
 @pytest.mark.parametrize('objkey',
@@ -192,7 +200,10 @@ def test_normalization(objkey, request):
     oldnorm = g1.norm
 
     g1.coeff = (random.random() - 0.5) * 428.23
-    assert g1.norm != oldnorm
+    try:
+        assert g1.norm != oldnorm
+    except u.DimensionalityError:
+        pass  # this is a reasonable thing to happen too
 
     g1.normalize()
     assert abs(g1.norm - 1.0) < 1e-12
@@ -200,11 +211,14 @@ def test_normalization(objkey, request):
 
 def _gfuncval(g, coord):
     r = g.center - coord
-    r2 = np.sum(r**2)
+    if len(coord.shape) > 1:
+        r2 = np.sum(r**2, axis=1)
+    else:
+        r2 = np.sum(r**2)
     fv = g.coeff * np.exp(-g.exp * r2)
     if isinstance(g, moldesign.orbitals.SphericalGaussian):
         fv *= r2**(g.l/2.0) * harmonics.Y(g.l, g.m)(coord - g.center)
-    else:  # assume cartesian
+    elif isinstance(g, moldesign.orbitals.CartesianGaussian):  # assume cartesian
         for r, r0, pow in zip(coord, g.center, g.powers):
             if pow != 0:
                 fv *= (r-r0)**pow
@@ -252,3 +266,54 @@ def test_numerical_vs_analytical_norm(key, request):
     helpers.assert_almost_equal(ananorm, numnorm)
 
 
+@pytest.mark.screening
+def test_s_orbitals_equivalent_among_gaussian_types():
+    center = np.random.rand(3) * u.angstrom
+    exp = 5.12 / u.angstrom**2
+    testcoords = 6.0*(np.random.rand(50, 3)-0.5) * u.angstrom
+
+    g_bare = moldesign.orbitals.Gaussian(center, exp)
+    g_cart = moldesign.orbitals.CartesianGaussian(center, exp, [0,0,0])
+    g_sphr = moldesign.orbitals.SphericalGaussian(center, exp, 0, 0)
+
+    for gauss in (g_bare, g_cart, g_sphr):
+        # normalize to amplitude of 1.0 at center
+        gauss.coeff = gauss.coeff / gauss(center)
+        assert gauss(center) == 1.0
+
+    barevals = g_bare(testcoords)
+    cartvals = g_cart(testcoords)
+    spherevals = g_sphr(testcoords)
+
+    helpers.assert_almost_equal(barevals, cartvals)
+    helpers.assert_almost_equal(barevals, spherevals)
+
+    helpers.assert_almost_equal(g_bare.norm, g_cart.norm)
+    helpers.assert_almost_equal(g_sphr.norm, g_cart.norm)
+
+
+LM_TO_CART = {(1,-1): (0,1,0),
+              (1,0): (0,0,1),
+              (1,1): (1,0,0),
+              (2,-2): (1,1,0),
+              (2,-1): (0,1,1),
+              (2,1): (1,0,1),
+              (3,-2): (1,1,1)}
+
+
+@pytest.mark.parametrize('lm,powers',
+                         LM_TO_CART.items(),
+                         ids=['lm:%d,%d, xyz:%d%d%d' % (args[0] + args[1])
+                              for args in LM_TO_CART.items()])
+def test_orbitals_same_in_cartesian_and_spherical(lm, powers):
+    center = np.random.rand(3) * u.angstrom
+    exp = 5.12 / u.angstrom**2
+    testcoords = 6.0*(np.random.rand(50, 3)-0.5) * u.angstrom
+
+    g_cart = moldesign.orbitals.CartesianGaussian(center, exp, powers)
+    g_sphr = moldesign.orbitals.SphericalGaussian(center, exp, *lm)
+
+    helpers.assert_almost_equal(g_cart(testcoords),
+                                g_sphr(testcoords))
+
+    helpers.assert_almost_equal(g_sphr.norm, g_cart.norm)

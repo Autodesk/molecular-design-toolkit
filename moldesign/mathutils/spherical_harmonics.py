@@ -20,8 +20,6 @@ import numpy as np
 
 __all__ = ['SPHERE_TO_CART']
 
-SQ2INV = np.sqrt(1/2.0)
-
 
 def cart_to_polar_angles(coords):
     if len(coords.shape) == 2:
@@ -38,7 +36,12 @@ def cart_to_polar_angles(coords):
 
 
 class Y(object):
-    """ A *real* spherical harmonic
+    r""" A *real*-valued spherical harmonic function
+
+    These functions are orthonormalized over the sphere such that
+
+    .. math::
+       \int d\Omega \: Y_{lm}(\theta, \phi) Y_{l'm'}(\theta, \phi) = \delta_{l,l'} \delta_{m,m'}
 
     References:
         https://en.wikipedia.org/wiki/Table_of_spherical_harmonics#Real_spherical_harmonics
@@ -57,17 +60,17 @@ class Y(object):
         from scipy.special import sph_harm
 
         theta, phi = cart_to_polar_angles(coords)
-
         if self.m == 0:
             return (sph_harm(self.m, self.l, phi, theta)).real
-        else:
-            vplus = sph_harm(abs(self.m), self.l, phi, theta)
-            vminus = sph_harm(-abs(self.m), self.l, phi, theta)
 
-            if self.m < 0:
-                return -(SQ2INV * (self._posneg * vplus + vminus)).imag
-            else:
-                return (SQ2INV * (self._posneg * vplus + vminus)).real
+        vplus = sph_harm(abs(self.m), self.l, phi, theta)
+        vminus = sph_harm(-abs(self.m), self.l, phi, theta)
+        value = np.sqrt(1/2.0) * (self._posneg*vplus + vminus)
+
+        if self.m < 0:
+            return -value.imag
+        else:
+            return value.real
 
 
 class Cart(object):
