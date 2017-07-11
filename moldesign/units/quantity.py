@@ -42,6 +42,10 @@ class MdtUnit(ureg.Unit):
     def __reduce__(self):
         return _get_unit, (str(self),)
 
+    @property
+    def units(self):
+        return self
+
     def convert(self, value):
         """ Returns quantity converted to these units
 

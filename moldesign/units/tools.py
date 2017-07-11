@@ -173,14 +173,22 @@ def get_units(q):
 
 def array(qlist, defunits=False, _baseunit=None):
     """ Facilitates creating an array with units - like numpy.array, but it also checks
-     units for all components of the array
+     units for all components of the array.
+
+     Note:
+         Unlike numpy.array, these arrays must have numeric type - this routine will
+         raise a ValueError if a non-square array is passed.
 
      Args:
          qlist (List[MdtQuantity]): List-like object of quantity objects
          defunits (bool): if True, convert the array to the default units
 
     Returns:
-        MdtQuantity: array with standardized units
+        MdtQuantity: ndarray-like object with standardized units
+
+    Raises:
+        DimensionalityError: if the array has inconsistent units
+        ValueError: if the array could not be converted to a square numpy array
     """
     from . import default
 
@@ -189,23 +197,34 @@ def array(qlist, defunits=False, _baseunit=None):
 
     if _baseunit is None:
         _baseunit = get_units(qlist)
-        try:
-            if _baseunit == 1.0:
-                # It's dimensionless, return an ndarray
-                return np.array(qlist)
-        except DimensionalityError:
-            pass
-
-        if defunits and isinstance(_baseunit, MdtUnit):
+        if _baseunit.dimensionless:
+            return _make_nparray(qlist)
+        if defunits:
             _baseunit = default.get_default(_baseunit)
 
-    try:
-        # Convert all sublists to the common "baseunit"
-        newlist = [array(item, _baseunit=_baseunit).value_in(_baseunit) for item in qlist]
-        return _baseunit*newlist
-    except TypeError as exc:
-        # Otherwise,
+    if hasattr(qlist, 'to'):  # if already a quantity, just convert and return
         return qlist.to(_baseunit)
+
+    try:  # try to create a quantity
+        return _baseunit * [array(item, _baseunit=_baseunit).value_in(_baseunit) for item in qlist]
+    except TypeError:  # if here, one or more objects cannot be converted to quantities
+        raise DimensionalityError(_baseunit, ureg.dimensionless,
+                                  extra_msg='Object "%s" does not have units' % qlist)
+
+
+def _make_nparray(q):
+    """ Turns a list of dimensionless numbers into a numpy array. Does not permit object arrays
+    """
+    if hasattr(q, 'units'):
+        return q.value_in(ureg.dimensionless)
+    try:
+        arr = np.array([_make_nparray(x) for x in q])
+        if arr.dtype == 'O':
+            raise ValueError("Could not create numpy array of numeric data - is your input square?")
+        else:
+            return arr
+    except TypeError:
+        return q
 
 
 #@utils.args_from(np.broadcast_to)

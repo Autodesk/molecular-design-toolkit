@@ -89,8 +89,7 @@ class UnitSystem(object):
             quantity (MdtQuantity or MdtUnit): quantity to convert
         """
         baseunit = self.get_baseunit(quantity)
-        if isinstance(baseunit, int):
-            assert baseunit == 1
+        if baseunit == ureg.dimensionless:
             return quantity * ureg.dimensionless
         else:
             result = quantity.to(baseunit)
@@ -131,14 +130,16 @@ class UnitSystem(object):
             try:
                 q = quantity[0]
             except (TypeError, StopIteration):
+                if isinstance(quantity, (int, float, complex)):
+                    return ureg.dimensionless
                 raise TypeError('This type of object cannot have physical units')
             if isinstance(q, str):
                 raise TypeError('This type of object cannot have physical units')
             try:
                 return self.get_baseunit(q)
             except (IndexError, TypeError):  # Assume dimensionless
-                return 1
-        baseunit = 1
+                return ureg.dimensionless
+        baseunit = ureg.dimensionless
 
         # Factor out force units
         if self._force:
@@ -181,7 +182,7 @@ class UnitSystem(object):
                 baseunit *= self[unit]**dims[unit]
             except AttributeError:
                 baseunit *= ureg[unit]**dims[unit]
-        return baseunit
+        return baseunit.units
 
 
 default = UnitSystem(length=angstrom, mass=amu, time=fs, energy=eV)

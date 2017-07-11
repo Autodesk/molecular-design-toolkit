@@ -6,7 +6,7 @@ import numpy as np
 from moldesign import units
 from moldesign import units as u
 
-# mark all tests in this module with these labels (see ./conftest.py)
+# mark all tests in this module with these label (see ./conftest.py)
 __PYTEST_MARK__ = ['internal', 'units']
 
 
@@ -102,6 +102,47 @@ def test_default_unit_conversions():
     np.testing.assert_almost_equal(result[0], 0.1, 9)
     np.testing.assert_almost_equal(result[1], 1.0, 9)
     np.testing.assert_almost_equal(result[2], 0.05291772, 7)
+
+
+def test_dimensional_array_from_mixed_data():
+    data = [np.arange(3) * u.angstrom,
+            [1.0 * u.nm, 1.0 * u.nm**2/u.angstrom, 3.0*u.ureg.km],
+            [1,1,1] * u.bohr]
+    arr = u.array(data)
+
+    bohr_in_ang = (1.0 * u.bohr).value_in(u.angstrom)
+    expected = u.angstrom * [[0,1,2],
+                             [10.0, 100.0, 3.0e13],
+                             [bohr_in_ang, bohr_in_ang, bohr_in_ang]]
+    np.testing.assert_allclose(arr, expected)
+    assert isinstance(arr, units.MdtQuantity)
+
+
+def test_dimensionless_array_from_mixed_data():
+    data = [np.arange(3),
+            [1.0 * u.dimensionless, 1.0 * u.nm/u.angstrom, 3.0],
+            [1,1,1] * u.ureg.kg / u.ureg.g]
+    arr = u.array(data)
+    np.testing.assert_allclose(arr,
+                               np.array([[0,1,2],
+                                         [1,10,3],
+                                         [1000,1000,1000]],dtype='float') )
+    assert isinstance(arr, np.ndarray)
+
+
+def test_inconsistent_array_units_raises_dimensionality_error():
+    with pytest.raises(units.DimensionalityError):
+        u.array([[1,2,3] * u.angstrom, [3*u.bohr, 4*u.eV, 5*u.bohr]])
+
+
+def test_mixed_units_and_nonunits_raises_dimensionality_error():
+    with pytest.raises(units.DimensionalityError):
+        u.array([[1,2,3] * u.angstrom, [3*u.bohr, 4, 5*u.bohr]])
+
+
+def test_no_nonsquare_arrays():
+    with pytest.raises(ValueError):
+        u.array([[1,2],[3]])
 
 
 def test_scalar_comparisons_to_zero_ignore_units():
