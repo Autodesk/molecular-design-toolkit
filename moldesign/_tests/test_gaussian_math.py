@@ -15,6 +15,8 @@ from . import helpers
 
 registered_types = {}
 
+__PYTEST_MARK__ = ['math', 'gaussians']
+
 
 def typedfixture(*types, **kwargs):
     """This is a decorator that lets us associate fixtures with one or more arbitrary types.
@@ -106,6 +108,44 @@ def _make_rando_spherical_gaussian(l,m, withunits=True):
                                                 coeff=random.random())
 
 
+@pytest.mark.parametrize('withunits', [True, False], ids=['units','c-num'])
+def test_numerical_vs_analytical_overlap_gauss(withunits):
+    p1 = _make_rando_gaussian(withunits)
+    p2 = _make_rando_gaussian(withunits)
+    _assert_numerical_analytical_overlaps_match(p1, p2)
+
+
+@pytest.mark.parametrize('withunits', [True, False], ids=['units','c-num'])
+def test_numerical_vs_analytical_overlap_cart(withunits):
+    p1 = _make_rando_cart_gaussian((1,2,3), withunits)
+    p2 = _make_rando_cart_gaussian((1,0,1), withunits)
+    _assert_numerical_analytical_overlaps_match(p1, p2)
+
+
+@pytest.mark.parametrize('withunits', [True, False], ids=['units','c-num'])
+def test_numerical_vs_analytical_overlap_spherical(withunits):
+    p1 = _make_rando_spherical_gaussian(1,-1, withunits)
+    p2 = _make_rando_spherical_gaussian(2,0, withunits)
+    _assert_numerical_analytical_overlaps_match(p1, p2)
+
+
+def _assert_numerical_analytical_overlaps_match(g1, g2):
+    olap = g1.overlap(g2)
+    try:
+        prod = g1*g2
+    except NotImplementedError:
+        assert isinstance(g1, moldesign.orbitals.SphericalGaussian)
+        assert isinstance(g2, moldesign.orbitals.SphericalGaussian)
+    else:
+        helpers.assert_almost_equal(prod.integral, olap)
+
+    allpoints, grid = _generate_grid(g1, g2)
+    with np.errstate(under='ignore'):
+        prodvals = g1(allpoints) * g2(allpoints)
+    numsum = prodvals.sum() * grid.dx ** 3
+    helpers.assert_almost_equal(numsum, olap, decimal=5)
+
+
 @pytest.mark.parametrize('withunits', [False, True])
 def test_gaussian_multiplication_amplitudes(withunits):
     g1 = _make_rando_gaussian(withunits)
@@ -160,7 +200,9 @@ def test_gaussian_function_values(objkey, request):
 
 
 @pytest.mark.parametrize('objkey',
-                         registered_types['gaussian'])
+                         registered_types['gaussian']+
+                         registered_types['cart-gaussian'] +
+                         registered_types['spherical-gaussian'])
 def test_vectorized_gaussian_function_evaluations(objkey, request):
     g = request.getfixturevalue(objkey)
 
@@ -267,18 +309,24 @@ def test_numerical_vs_analytical_norm(key, request):
     g = request.getfixturevalue(key)
     ananorm = g.norm
 
-    width = np.sqrt(1/g.alpha)
-    ranges = np.ones((3,2)) * 5.0 * width
-    ranges[:,0] *= -1
-    ranges += g.center[:, None]
-    grid = moldesign.mathutils.VolumetricGrid(*ranges, 25)
-    allpoints = grid.allpoints()
+    allpoints, grid = _generate_grid(g)
 
     with np.errstate(under='ignore'):
         vals = g(allpoints)
 
     numnorm = np.sqrt(grid.dx**3 * (vals**2).sum())
     helpers.assert_almost_equal(ananorm, numnorm)
+
+
+def _generate_grid(g, g2=None):
+    if g2 is None: g2 = g
+    width = max(np.sqrt(1/g.alpha), np.sqrt(1/g2.alpha))
+    ranges = np.ones((3, 2))*5.0*width
+    ranges[:, 0] *= -1
+    ranges += ((g.center + g2.center)/2.0)[:, None]
+    grid = moldesign.mathutils.VolumetricGrid(*ranges, 64)
+    allpoints = grid.allpoints()
+    return allpoints, grid
 
 
 @pytest.mark.screening
@@ -297,7 +345,6 @@ def test_s_orbitals_equivalent_among_gaussian_types():
 
     _assert_orbitals_equivalent(g_bare, g_cart)
     _assert_orbitals_equivalent(g_bare, g_sphr)
-
 
 
 LM_TO_CART = {(1,-1): (0,1,0),
@@ -323,7 +370,7 @@ def test_orbitals_same_in_cartesian_and_spherical(lm, powers):
     _assert_orbitals_equivalent(g_cart, g_sphr)
 
 
-@pytest.mark.parametrize('l', range(4))
+@pytest.mark.parametrize('l', range(4), ids=lambda x:'l=%s' % x)
 def test_spherical_to_cartesian(l):
     for m in range(-l,l+1):
         center = np.random.rand(3)*u.angstrom

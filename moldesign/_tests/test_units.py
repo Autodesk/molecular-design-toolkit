@@ -6,7 +6,8 @@ import numpy as np
 from moldesign import units
 from moldesign import units as u
 
-__PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
+# mark all tests in this module with these labels (see ./conftest.py)
+__PYTEST_MARK__ = ['internal', 'units']
 
 
 @pytest.mark.screening
