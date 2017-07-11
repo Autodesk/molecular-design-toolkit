@@ -22,7 +22,7 @@ import numpy as np
 from scipy.special import binom
 
 from .. import units as u
-from . import Gaussian
+from . import Gaussian, BasisContraction
 
 
 class CartesianGaussian(Gaussian):
@@ -142,11 +142,7 @@ class CartesianGaussian(Gaussian):
             other (CartesianGaussian): other gaussian wavepacket
 
         Returns:
-            CartesianGaussian or List[CartesianGaussian]: product gaussian(s)
-
-        TODO:
-           - Should return a composite gaussian object with the same interface as regular gaussians,
-             rather than either an object OR a list
+            CartesianGaussian or BasisContraction: product functions
         """
 
         if (self.center == other.center).all():  # this case is much easier than the general one
@@ -191,7 +187,7 @@ class CartesianGaussian(Gaussian):
         elif len(new_gaussians) == 1:
             return new_gaussians[0]
         else:
-            return new_gaussians
+            return BasisContraction(new_gaussians)
 
     @property
     def integral(self):

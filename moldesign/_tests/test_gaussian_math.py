@@ -5,7 +5,6 @@ import random
 
 import itertools
 import numpy as np
-import numpy.testing as npt
 import pytest
 
 import moldesign
@@ -117,11 +116,7 @@ def test_cart_gaussian_multiplication_amplitudes(p1, p2, withunits):
     if withunits:
         testcoords = testcoords*u.angstrom
     g1g2 = g1*g2
-    if isinstance(g1g2, moldesign.orbitals.AbstractFunction):
-        gvals = g1g2(testcoords)
-        assert g1g2.coeff != 0.0
-    else:
-        gvals = sum(gg(testcoords) for gg in g1g2)
+    gvals = g1g2(testcoords)
     g1vals = g1(testcoords)
     g2vals = g2(testcoords)
     prodvals = g1vals*g2vals

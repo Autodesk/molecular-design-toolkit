@@ -16,12 +16,10 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import numpy as np
-from .orbitals import Orbital, SHELLS, SPHERICALNAMES
+from . import BasisContraction, SHELLS, SPHERICALNAMES
 
 
-class AtomicBasisFunction(Orbital):
+class AtomicBasisFunction(BasisContraction):
     """ Stores an atomic basis function.
 
     Note:
@@ -39,12 +37,12 @@ class AtomicBasisFunction(Orbital):
         primitives (List[PrimitiveBase]): List of primitives, if available
     """
     def __init__(self, atom, n=None, l=None, m=None, cart=None, primitives=None):
+        super().__init__(primitives)
         self._atom = atom
         self.atom_index = atom.index
         self.n = n
         self.l = l
         self.m = m
-        self.primitives = primitives
         if cart is not None:
             assert self.m is None, 'Both cartesian and spherical components passed!'
             assert len(cart) == self.l, \
@@ -62,12 +60,6 @@ class AtomicBasisFunction(Orbital):
         self.occupation = None
         self.wfn = None
 
-    def __call__(self, coords):
-        outvals = np.zeros(len(coords))
-        for primitive in self.primitives:
-            outvals += primitive(coords)
-        return outvals
-
     @property
     def atom(self):
         """ moldesign.Atom: the atom this basis function belongs to
@@ -78,30 +70,6 @@ class AtomicBasisFunction(Orbital):
             return self.wfn.mol.atoms[self.atom_index]
         else:
             return self._atom
-
-    @property
-    def num_primitives(self):
-        return len(self.primitives)
-
-    @property
-    def norm(self):
-        """ Calculate this orbital's norm
-
-        Returns:
-            float: norm :math:`\sqrt{<i|i>}`
-        """
-        norm = 0.0
-        for p1 in self.primitives:
-            for p2 in self.primitives:
-                norm += p1.overlap(p2)
-        return np.sqrt(norm)
-
-    def normalize(self):
-        """ Scale primitive coefficients to normalize this basis function
-        """
-        prefactor = 1.0 / self.norm
-        for primitive in self.primitives:
-            primitive *= prefactor
 
     @property
     def orbtype(self):

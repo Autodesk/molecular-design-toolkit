@@ -4,9 +4,10 @@ def toplevel(o):
 __all__ = []
 
 from .gaussians import *
+from .orbitals import *
+from .contraction import *
 from .cartesian import *
 from .spherical import *
-from .orbitals import *
 from .atomic_basis_fn import *
 from .basis import *
 from .wfn import *
