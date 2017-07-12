@@ -447,4 +447,5 @@ def test_pyscf_and_mdt_overlaps_are_the_same(h2_rhf_augccpvdz):
     assert isinstance(overlaps, np.ndarray) or overlaps.units == u.dimensionless
 
     np.testing.assert_allclose(mol.wfn.aobasis.overlaps,
-                               overlaps)
+                               overlaps,
+                               atol=5.0e-7)
