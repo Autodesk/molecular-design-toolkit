@@ -42,9 +42,9 @@ electron_mass = m_e = ureg.electron_mass
 electron_charge = q_e = ureg.elementary_charge
 
 # useful units
-fs = femtoseconds = ureg.fs
-ps = picoseconds = ureg.ps
-ns = nanoseconds = ureg.ns
+fs = femtoseconds = ureg.femtosecond
+ps = picoseconds = ureg.picosecond
+ns = nanoseconds = ureg.nanosecond
 eV = electronvolts = ureg.eV
 kcalpermol = ureg.kcalpermol
 gpermol = ureg.gpermol
@@ -54,7 +54,7 @@ degrees = degree = deg = ureg.degrees
 amu = da = dalton = ureg.amu
 kelvin = ureg.kelvin
 nm = ureg.nanometers
-ang = angstrom = ureg.ang
+angstrom = ureg.angstrom
 molar = ureg.mole / ureg.liter
 debye = ureg.debye
 

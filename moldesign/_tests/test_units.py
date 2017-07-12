@@ -246,7 +246,7 @@ def test_default_unit_conversions():
 
 
 def test_getunits_doctests():
-    assert units.get_units(1.0*units.angstrom) == units.MdtUnit('ang')
+    assert units.get_units(1.0*units.angstrom) == units.MdtUnit('angstrom')
     assert units.get_units(np.array([1.0, 2, 3.0])) == units.MdtUnit('dimensionless')
     assert units.get_units([[1.0*units.dalton, 3.0*units.eV],
                             ['a'], 'gorilla']) == units.MdtUnit('amu')

@@ -146,7 +146,7 @@ def get_units(q):
     Examples:
         >>> from moldesign import units
         >>> units.get_units(1.0 * units.angstrom)
-        <Unit('ang')>
+        <Unit('angstrom')>
         >>> units.get_units(np.array([1.0, 2, 3.0]))
         <Unit('dimensionless')>
         >>> # We dive on the first element of each iterable until we can determine a unit system:

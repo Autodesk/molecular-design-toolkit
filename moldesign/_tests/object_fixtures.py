@@ -62,7 +62,7 @@ def simple_unit_array():
 
 @typedfixture('pickleable', 'equality')
 def unit_number():
-    return 391.23948 * u.ureg.kg * u.ang / u.alpha
+    return 391.23948 * u.ureg.kg * u.angstrom / u.alpha
 
 
 ######################################
