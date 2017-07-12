@@ -40,8 +40,8 @@ class Gaussian(Primitive):
         normalized (bool): if True, normalize the function before applying the coefficient
     """
     def __init__(self, center, alpha, coeff=None, normalized=True):
-        self.center = u.array(center)
-        self.alpha = alpha
+        self.center = u.default.convert(center)
+        self.alpha = u.default.convert(alpha)
         super().__init__(coeff=coeff, normalized=normalized)
 
     def __call__(self, coords, _getvals=False):

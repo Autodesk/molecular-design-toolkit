@@ -87,7 +87,7 @@ def test_h2_cache_flush(h2_harmonic):
     h2 = h2_harmonic
     pe = h2.calc_potential_energy()
     f = h2.forces
-    h2.atoms[0].x += 0.1285*u.ang
+    h2.atoms[0].x += 0.1285*u.angstrom
     pe2 = h2.calc_potential_energy()
     f2 = h2.forces
     assert pe != pe2
@@ -96,7 +96,7 @@ def test_h2_cache_flush(h2_harmonic):
 
 def test_h2_not_calculated_yet(h2_harmonic):
     h2_harmonic.calculate()
-    h2_harmonic.atoms[1].x += 0.3*u.ang
+    h2_harmonic.atoms[1].x += 0.3*u.angstrom
     with pytest.raises(mdt.NotCalculatedError):
         h2_harmonic.forces
     with pytest.raises(mdt.NotCalculatedError):
@@ -105,7 +105,7 @@ def test_h2_not_calculated_yet(h2_harmonic):
 
 def h2_properties_raises_not_calculated_yet(h2_harmonic):
     h2_harmonic.calculate()
-    h2_harmonic.atoms[1].x += 0.3*u.ang
+    h2_harmonic.atoms[1].x += 0.3*u.angstrom
     with pytest.raises(mdt.NotCalculatedError):
         h2_harmonic.properties.forces
     with pytest.raises(mdt.NotCalculatedError):

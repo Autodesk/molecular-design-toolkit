@@ -12,6 +12,7 @@ from moldesign import units as u
 from moldesign.mathutils import spherical_harmonics as harmonics
 
 from . import helpers
+from .molecule_fixtures import *
 
 registered_types = {}
 
@@ -183,6 +184,40 @@ def _assert_same_function_values(g1, g2, withunits):
     helpers.assert_almost_equal(prodvals, gvals)
 
 
+def test_initial_normalization_gaussian():
+    center = np.random.rand(3) * u.angstrom
+    exp = 5.12 / u.angstrom**2
+    g1 = moldesign.orbitals.Gaussian(center, exp, coeff=3.0, normalized=True)
+    assert abs(3.0 - g1.norm) < 1e-12
+
+    g1 = moldesign.orbitals.Gaussian(center, exp, normalized=True)
+    assert abs(1.0 - g1.norm) < 1e-12
+
+
+def test_initial_normalization_cart():
+    center = np.random.rand(3) * u.angstrom
+    exp = 5.12 / u.angstrom**2
+    for powers in itertools.product(range(4), range(4), range(4)):
+        g1 = moldesign.orbitals.CartesianGaussian(center, exp, powers, coeff=3.0, normalized=True)
+        assert abs(3.0 - g1.norm) < 1e-12
+
+        g1 = moldesign.orbitals.CartesianGaussian(center, exp, powers, normalized=True)
+        assert abs(1.0 - g1.norm) < 1e-12
+
+
+def test_initial_normalization_spherical():
+    center = np.random.rand(3) * u.angstrom
+    exp = 5.12 / u.angstrom**2
+    for l in range(5):
+        for m in range(-l, l+1):
+            g1 = moldesign.orbitals.SphericalGaussian(center, exp, l, m,
+                                                      coeff=3.0, normalized=True)
+            assert abs(3.0 - g1.norm) < 1e-12
+
+            g1 = moldesign.orbitals.SphericalGaussian(center, exp, l, m, normalized=True)
+            assert abs(1.0 - g1.norm) < 1e-12
+
+
 @pytest.mark.parametrize('objkey',
                          registered_types['gaussian'] +
                          registered_types['cart-gaussian'] +
@@ -347,6 +382,7 @@ def test_s_orbitals_equivalent_among_gaussian_types():
     _assert_orbitals_equivalent(g_bare, g_sphr)
 
 
+# real spherical harmonics that can be represented as a single cartesian term:
 LM_TO_CART = {(1,-1): (0,1,0),
               (1,0): (0,0,1),
               (1,1): (1,0,0),
@@ -387,3 +423,28 @@ def _assert_orbitals_equivalent(g1, g2):
     testcoords = 6.0*(np.random.rand(50, 3)-0.5)*u.angstrom
     helpers.assert_almost_equal(g1(testcoords),
                                 g2(testcoords))
+
+
+def test_pyscf_and_mdt_norms_are_the_same(h2_rhf_augccpvdz):
+    mol = h2_rhf_augccpvdz
+    basis = mol.wfn.aobasis
+
+    for bf in basis:
+        assert abs(bf.norm - 1.0) < 1e-12
+
+
+def test_pyscf_and_mdt_overlaps_are_the_same(h2_rhf_augccpvdz):
+    mol = h2_rhf_augccpvdz
+    basis = mol.wfn.aobasis
+
+    calc_overlap_mat = []
+    for i in range(len(basis)):
+        calc_overlap_mat.append(
+                [basis[i].overlap(basis[j]) for j in range(len(basis))]
+        )
+
+    overlaps = u.array(calc_overlap_mat)
+    assert isinstance(overlaps, np.ndarray) or overlaps.units == u.dimensionless
+
+    np.testing.assert_allclose(mol.wfn.aobasis.overlaps,
+                               overlaps)
