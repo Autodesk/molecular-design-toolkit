@@ -102,7 +102,7 @@ class SphericalGaussian(Primitive):
         """
         from ..data import ODD_FACTORIAL
 
-        if (self.center - other.center).any():
+        if (self.center != other.center).any():
             return self.to_cart().overlap(other)
 
         elif self.l != other.l or self.m != other.m:
@@ -146,7 +146,8 @@ class SphericalGaussian(Primitive):
             List[CartesianGaussian]: cartesian components of this function
         """
         carts = [CartesianGaussian(self.center, self.alpha,
-                                   cart_fn.powers, self.coeff * cart_fn.coeff)
+                                   cart_fn.powers, self.coeff * cart_fn.coeff,
+                                   normalized=False)
                  for cart_fn in spherical_harmonics.SPHERE_TO_CART[self.l, self.m]]
         return PrimitiveSum(carts)
 

@@ -27,12 +27,13 @@ class Primitive(object):
     """ Abstract base class for basis function primitives. All functions are assumed real.
     """
     def __init__(self, coeff=None, normalized=False):
-        if normalized or coeff is None:
-            self.coeff = 1.0  # dummy value overwritten by self.normalize()
+        self.coeff = 1.0  # initialize with a dummy value
+
+        if normalized or (coeff is None):
             self.normalize()
 
         if coeff is not None:
-            self.coeff = coeff
+            self.coeff *= coeff
 
     def copy(self):
         return copy.deepcopy(self)
@@ -127,7 +128,8 @@ class PrimitiveSum(object):
             other (AbstractFunction or Orbital): object to calculate overlaps with
         """
         olap = sum(p1.overlap(p2)
-                   for p1, p2 in itertools.product(self.iterprimitives(), other.iterprimitives()))
+                   for p1, p2 in itertools.product(self.iterprimitives(),
+                                                   other.iterprimitives()))
         return olap
 
     @property
