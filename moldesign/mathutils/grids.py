@@ -32,10 +32,10 @@ class VolumetricGrid(object):
         xrange (Tuple[len=2]): (min,max) in x direction
         yrange (Tuple[len=2]): (min,max) in y direction
         zrange (Tuple[len=2]): (min,max) in z direction
-        npoints (int): default number of grid lines in each direction (default: 32)
         xpoints (int): number of grid lines in x direction (default: npoints)
         ypoints (int): number of grid lines in y direction (default: npoints)
         zpoints (int): number of grid lines in z direction (default: npoints)
+        npoints (int): synonym for "xpoints"
     """
     dx, dy, dz = (utils.IndexView('deltas', i) for i in range(3))
     xr, yr, zr = (utils.IndexView('ranges', i) for i in range(3))
@@ -43,7 +43,11 @@ class VolumetricGrid(object):
     xspace, yspace, zspace = (utils.IndexView('spaces', i) for i in range(3))
 
     def __init__(self, xrange, yrange, zrange,
-                 npoints=32, xpoints=None, ypoints=None, zpoints=None):
+                 xpoints=None, ypoints=None, zpoints=None,
+                 npoints=32):
+
+        if xpoints is not None:
+            npoints = xpoints
 
         self.points = np.array([xpoints if xpoints is not None else npoints,
                                 ypoints if ypoints is not None else npoints,

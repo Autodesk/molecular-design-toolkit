@@ -173,8 +173,6 @@ def test_spherical_harmonics_orthonormal(l1, m1, l2, m2):
         assert abs(integ) < 1e-2
 
 
-
-
 @pytest.fixture
 def ndarray_ranges():
     ranges = np.array([[1,4],
@@ -191,7 +189,7 @@ def ranges_with_units(ndarray_ranges):
 @pytest.mark.parametrize('key', ['ndarray_ranges', 'ranges_with_units'])
 def test_volumetric_grid_point_list(key, request):
     ranges = request.getfixturevalue(key)
-    grid = mathutils.VolumetricGrid(*ranges, 3, 4, 5)
+    grid = mathutils.VolumetricGrid(*ranges, xpoints=3, ypoints=4, zpoints=5)
     assert (grid.xpoints, grid.ypoints, grid.zpoints) == (3,4,5)
     pl = list(grid.iter_points())
     pa = grid.allpoints()
@@ -213,7 +211,7 @@ def test_volumetric_grid_point_list(key, request):
 @pytest.mark.parametrize('key', ['ndarray_ranges', 'ranges_with_units'])
 def test_volumetric_iteration(key, request):
     ranges = request.getfixturevalue(key)
-    grid = mathutils.VolumetricGrid(*ranges, 4)
+    grid = mathutils.VolumetricGrid(*ranges, npoints=4)
 
     grid_iterator = grid.iter_points()
     assert (grid.xpoints, grid.ypoints, grid.zpoints) == (4,4,4)
