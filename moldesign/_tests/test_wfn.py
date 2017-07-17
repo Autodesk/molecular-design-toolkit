@@ -64,6 +64,7 @@ def test_basis_function_3d_grids_same_in_pyscf_and_mdt(molkey, request):
 
 
 @pytest.mark.parametrize('molkey', ['h2_rhf_augccpvdz', 'h2_rhf_sto3g'])
+@pytest.mark.screening
 def test_pyscf_basis_function_space_integral_normalized(molkey, request):
     mol = request.getfixturevalue(molkey)
     grid = mdt.mathutils.padded_grid(mol.positions, 8.0 * u.angstrom, npoints=150)

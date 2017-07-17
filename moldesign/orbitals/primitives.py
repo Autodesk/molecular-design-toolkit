@@ -135,7 +135,7 @@ class PrimitiveSum(object):
         """
         prefactor = 1.0 / self.norm
         for primitive in self.primitives:
-            primitive *= prefactor
+            primitive.coeff *= prefactor
 
     def overlap(self, other):
         """ Calculate orbital overlap with another object

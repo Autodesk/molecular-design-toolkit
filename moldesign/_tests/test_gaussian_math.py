@@ -312,7 +312,7 @@ def test_vectorized_gaussian_function_evaluations(objkey, request):
     _assert_almost_equal(vector_results, expected, decimal=8)
 
 
-@pytest.mark.parametrize('objkey', registered_types['basis_fn'])
+@pytest.mark.parametrize('objkey', registered_types['basis_fn'] + ['linear_combination'])
 def test_gaussian_str_and_repr_works(objkey, request):
     g1 = request.getfixturevalue(objkey)
     str(g1)
@@ -339,6 +339,23 @@ def test_normalization(objkey, request):
     oldnorm = g1.norm
 
     g1.coeff = (random.random() - 0.5) * 428.23
+    try:
+        assert g1.norm != oldnorm
+    except u.DimensionalityError:
+        pass  # this is a reasonable thing to happen too
+
+    g1.normalize()
+    assert abs(g1.norm - 1.0) < 1e-12
+
+
+def test_linear_combination_normalization(linear_combination):
+    g1 = linear_combination
+    oldnorm = g1.norm
+
+    prefactor = (random.random() - 0.5) * 428.23
+    for prim in g1:
+        prim.coeff *= prefactor
+
     try:
         assert g1.norm != oldnorm
     except u.DimensionalityError:
