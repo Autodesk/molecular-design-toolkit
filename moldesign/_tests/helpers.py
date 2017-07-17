@@ -243,6 +243,6 @@ def generate_grid(g, g2=None):
     ranges = np.ones((3, 2))*5.0*width
     ranges[:, 0] *= -1
     ranges += ((g.center + g2.center)/2.0)[:, None]
-    grid = mathutils.VolumetricGrid(*ranges, 64)
+    grid = mathutils.VolumetricGrid(*ranges, npoints=64)
     allpoints = grid.allpoints()
     return allpoints, grid

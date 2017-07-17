@@ -452,7 +452,6 @@ class PySCFPotential(QMBase):
                     assert l == angular
                     # Note: this is for metadata only, should not be used in any calculations
                     n = int(''.join(x for x in label[2] if x.isdigit()))
-
                     primitives = [orbitals.SphericalGaussian(atom.position.copy(),
                                                              exp, l, m,
                                                              coeff=coeff[ictr],

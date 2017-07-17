@@ -79,7 +79,7 @@ class CartesianGaussian(Primitive):
     def __repr__(self):
         return ("<{ndim}-D cartesian gaussian (norm: {norm:4.2f}, "
                 "cartesian powers: {powers}, "
-                "width: {exp:4.2f}, "
+                "alpha: {exp:4.2f}, "
                 "center: {center}>").format(
                 ndim=self.ndim,
                 center=self.center, exp=self.alpha,

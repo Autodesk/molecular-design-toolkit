@@ -128,7 +128,7 @@ def _make_rando_linear_combination(withunits=True):
                 moldesign.orbitals.CartesianGaussian(
                         center=center,
                         powers=pwr,
-                        alpha=10.0 * random.random()/(length**2),
+                        alpha=(10.0 * (random.random()+3))/(length**2),
                         coeff=1/(np.sqrt(3.0))))
     lc = moldesign.orbitals.PrimitiveSum(gaussians)
     lc.ndims = 3  # so it works with the test suite

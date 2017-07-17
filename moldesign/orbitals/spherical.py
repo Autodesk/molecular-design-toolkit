@@ -64,8 +64,8 @@ class SphericalGaussian(Primitive):
 
     def __repr__(self):
         return ("<3D Gaussian (Spherical) (coeff: {coeff:4.2f}, "
-                "width: {alpha:4.2f}, "
-                "(l,m) = {qnums}").format(
+                "alpha: {alpha:4.2f}, "
+                "(l,m) = {qnums}>").format(
                 center=self.center, alpha=self.alpha, coeff=self.coeff,
                 qnums=(self.l, self.m))
 
