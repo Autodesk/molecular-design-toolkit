@@ -30,22 +30,22 @@ def typedfixture(*types, **kwargs):
     return fixture_wrapper
 
 
-@typedfixture('gaussian')
+@pytest.fixture
 def std_1d_gaussian():
     g = moldesign.orbitals.gaussians.Gaussian([0.0]*u.angstrom,
                                               1.0/u.angstrom ** 2)
     return g
 
 
-@typedfixture('gaussian')
+@typedfixture('basis_fn')
 def std_3d_gaussian():
     g = moldesign.orbitals.gaussians.Gaussian([0.0, 0.0, 0.0]*u.angstrom,
                                               1.0/u.angstrom ** 2)
     return g
 
 
-@typedfixture('cart-gaussian')
-def cart_3d_gaussian():
+@typedfixture('basis_fn')
+def cartesian_3d_gaussian():
     g = moldesign.orbitals.CartesianGaussian(
             center=[random.random() for i in range(3)]*u.angstrom,
             powers=[1, 3, 0],
@@ -54,7 +54,7 @@ def cart_3d_gaussian():
     return g
 
 
-@typedfixture('spherical-gaussian')
+@typedfixture('basis_fn')
 def spherical_3d_gaussian():
     g = moldesign.orbitals.SphericalGaussian(
             center=[random.random() for i in range(3)]*u.angstrom,
@@ -64,7 +64,7 @@ def spherical_3d_gaussian():
     return g
 
 
-@pytest.mark.parametrize('objkey', registered_types['gaussian'])
+@pytest.mark.parametrize('objkey', ['std_1d_gaussian','std_3d_gaussian'])
 @pytest.mark.screening
 def test_gaussian_integral_and_dimensionality(objkey, request):
     g = request.getfixturevalue(objkey)
@@ -77,6 +77,11 @@ def test_gaussian_integral_and_dimensionality(objkey, request):
                          decimal=10)
 
 
+@pytest.fixture
+def linear_combination():
+    return _make_rando_linear_combination(True)
+
+
 def _make_rando_gaussian(withunits=True):
     if withunits:
         length = u.angstrom
@@ -87,7 +92,7 @@ def _make_rando_gaussian(withunits=True):
                                        coeff=random.random())
 
 
-def _make_rando_cart_gaussian(powers, withunits=True):
+def _make_rando_cartesian_gaussian(powers, withunits=True):
     if withunits:
         length = u.angstrom
     else:
@@ -109,24 +114,52 @@ def _make_rando_spherical_gaussian(l,m, withunits=True):
                                                 coeff=random.random())
 
 
-@pytest.mark.parametrize('withunits', [True, False], ids=['units','c-num'])
+def _make_rando_linear_combination(withunits=True):
+    gaussians = []
+    if withunits:
+        length = u.angstrom
+    else:
+        length = 1.0
+
+    center = (np.random.rand(3)-0.5)*1.0 * length
+
+    for pwr in [(0,0,0), (1,1,1), (3,2,1)]:
+        gaussians.append(
+                moldesign.orbitals.CartesianGaussian(
+                        center=center,
+                        powers=pwr,
+                        alpha=10.0 * random.random()/(length**2),
+                        coeff=1/(np.sqrt(3.0))))
+    lc = moldesign.orbitals.PrimitiveSum(gaussians)
+    lc.ndims = 3  # so it works with the test suite
+    return lc
+
+
+@pytest.mark.parametrize('withunits', [True, False], ids=['quantity','number'])
 def test_numerical_vs_analytical_overlap_gauss(withunits):
     p1 = _make_rando_gaussian(withunits)
     p2 = _make_rando_gaussian(withunits)
     _assert_numerical_analytical_overlaps_match(p1, p2)
 
 
-@pytest.mark.parametrize('withunits', [True, False], ids=['units','c-num'])
-def test_numerical_vs_analytical_overlap_cart(withunits):
-    p1 = _make_rando_cart_gaussian((1,2,3), withunits)
-    p2 = _make_rando_cart_gaussian((1,0,1), withunits)
+@pytest.mark.parametrize('withunits', [True, False], ids=['quantity','number'])
+def test_numerical_vs_analytical_overlap_cartesian(withunits):
+    p1 = _make_rando_cartesian_gaussian((1,2,3), withunits)
+    p2 = _make_rando_cartesian_gaussian((1,0,1), withunits)
     _assert_numerical_analytical_overlaps_match(p1, p2)
 
 
-@pytest.mark.parametrize('withunits', [True, False], ids=['units','c-num'])
+@pytest.mark.parametrize('withunits', [True, False], ids=['quantity','number'])
 def test_numerical_vs_analytical_overlap_spherical(withunits):
     p1 = _make_rando_spherical_gaussian(1,-1, withunits)
     p2 = _make_rando_spherical_gaussian(2,0, withunits)
+    _assert_numerical_analytical_overlaps_match(p1, p2)
+
+
+@pytest.mark.parametrize('withunits', [True, False], ids=['quantity','number'])
+def test_numerical_vs_analytical_overlap_linear_combination(withunits):
+    p1 = _make_rando_linear_combination(withunits)
+    p2 = _make_rando_linear_combination(withunits)
     _assert_numerical_analytical_overlaps_match(p1, p2)
 
 
@@ -140,10 +173,10 @@ def _assert_numerical_analytical_overlaps_match(g1, g2):
     else:
         helpers.assert_almost_equal(prod.integral, olap)
 
-    allpoints, grid = _generate_grid(g1, g2)
+    allpoints, grid = helpers.generate_grid(g1, g2)
     with np.errstate(under='ignore'):
         prodvals = g1(allpoints) * g2(allpoints)
-    numsum = prodvals.sum() * grid.dx ** 3
+    numsum = prodvals.sum() * grid.dx * grid.dy * grid.dz
     helpers.assert_almost_equal(numsum, olap, decimal=5)
 
 
@@ -164,11 +197,11 @@ cartesian_test_ids = ['[%d%d%d]*[%d%d%d]/%s' % (p[0] + p[1] + ('units' if p[2] e
 @pytest.mark.parametrize('p1,p2,withunits',
                          cartesian_test_suite,
                          ids=cartesian_test_ids)
-def test_cart_gaussian_multiplication_amplitudes(p1, p2, withunits):
+def test_cartesian_gaussian_multiplication_amplitudes(p1, p2, withunits):
     """ Tests that ``g1(x) * g2(x) == (g1 * g2)(x)``
     """
-    g1 = _make_rando_cart_gaussian(p1, withunits)
-    g2 = _make_rando_cart_gaussian(p2, withunits)
+    g1 = _make_rando_cartesian_gaussian(p1, withunits)
+    g2 = _make_rando_cartesian_gaussian(p2, withunits)
     _assert_same_function_values(g1, g2, withunits)
 
 
@@ -184,25 +217,38 @@ def _assert_same_function_values(g1, g2, withunits):
     helpers.assert_almost_equal(prodvals, gvals)
 
 
-def test_initial_normalization_gaussian():
+def test_initial_gaussian_normalization_gaussian():
     center = np.random.rand(3) * u.angstrom
     exp = 5.12 / u.angstrom**2
-    g1 = moldesign.orbitals.Gaussian(center, exp, coeff=3.0, normalized=True)
-    assert abs(3.0 - g1.norm) < 1e-12
-
-    g1 = moldesign.orbitals.Gaussian(center, exp, normalized=True)
-    assert abs(1.0 - g1.norm) < 1e-12
+    g2 = moldesign.orbitals.Gaussian(center, exp, normalized=True)
+    helpers.assert_almost_equal(1.0, _numerical_norm(g2), decimal=3)
+    helpers.assert_almost_equal(1.0, g2.norm)
 
 
-def test_initial_normalization_cart():
+def test_initial_gaussian_normalization_with_prefactor():
+    center = np.random.rand(3) * u.angstrom
+    exp = 5.12 / u.angstrom**2
+    g1 = moldesign.orbitals.Gaussian(center, exp, coeff=3.0*u.angstrom, normalized=True)
+    helpers.assert_almost_equal(3.0*u.angstrom, _numerical_norm(g1), decimal=3)
+    helpers.assert_almost_equal(3.0*u.angstrom, g1.norm)
+
+
+def test_initial_normalization_cartesian():
+    center = np.random.rand(3) * u.angstrom
+    exp = 5.12 / u.angstrom**2
+    for powers in itertools.product(range(4), range(4), range(4)):
+        g2 = moldesign.orbitals.CartesianGaussian(center, exp, powers, normalized=True)
+        helpers.assert_almost_equal(1.0, _numerical_norm(g2), decimal=3)
+        helpers.assert_almost_equal(1.0, g2.norm)
+
+
+def test_initial_normalization_cartesian_with_prefactor():
     center = np.random.rand(3) * u.angstrom
     exp = 5.12 / u.angstrom**2
     for powers in itertools.product(range(4), range(4), range(4)):
         g1 = moldesign.orbitals.CartesianGaussian(center, exp, powers, coeff=3.0, normalized=True)
-        assert abs(3.0 - g1.norm) < 1e-12
-
-        g1 = moldesign.orbitals.CartesianGaussian(center, exp, powers, normalized=True)
-        assert abs(1.0 - g1.norm) < 1e-12
+        helpers.assert_almost_equal(3.0, _numerical_norm(g1), decimal=3)
+        helpers.assert_almost_equal(3.0, g1.norm)
 
 
 def test_initial_normalization_spherical():
@@ -210,18 +256,31 @@ def test_initial_normalization_spherical():
     exp = 5.12 / u.angstrom**2
     for l in range(5):
         for m in range(-l, l+1):
+            g2 = moldesign.orbitals.SphericalGaussian(center, exp, l, m, normalized=True)
+            helpers.assert_almost_equal(1.0, _numerical_norm(g2), decimal=3)
+            helpers.assert_almost_equal(1.0, g2.norm)
+
+
+def test_initial_normalization_spherical_with_prefactor():
+    center = np.random.rand(3) * u.angstrom
+    exp = 5.12 / u.angstrom**2
+    for l in range(5):
+        for m in range(-l, l+1):
             g1 = moldesign.orbitals.SphericalGaussian(center, exp, l, m,
-                                                      coeff=3.0, normalized=True)
-            assert abs(3.0 - g1.norm) < 1e-12
-
-            g1 = moldesign.orbitals.SphericalGaussian(center, exp, l, m, normalized=True)
-            assert abs(1.0 - g1.norm) < 1e-12
+                                                      coeff=3.0 * u.angstrom, normalized=True)
+            helpers.assert_almost_equal(3.0 * u.angstrom, _numerical_norm(g1), decimal=3)
+            helpers.assert_almost_equal(3.0 * u.angstrom, g1.norm)
 
 
-@pytest.mark.parametrize('objkey',
-                         registered_types['gaussian'] +
-                         registered_types['cart-gaussian'] +
-                         registered_types['spherical-gaussian'])
+def _numerical_norm(g):
+    allpoints, grid = helpers.generate_grid(g)
+    with np.errstate(under='ignore'):
+        vals = g(allpoints)
+    numnorm = np.sqrt(grid.dx * grid.dy * grid.dz * (vals**2).sum())
+    return numnorm
+
+
+@pytest.mark.parametrize('objkey', registered_types['basis_fn'])
 def test_gaussian_function_values(objkey, request):
     g = request.getfixturevalue(objkey)
 
@@ -234,10 +293,7 @@ def test_gaussian_function_values(objkey, request):
         _assert_almost_equal(funcval, retval)
 
 
-@pytest.mark.parametrize('objkey',
-                         registered_types['gaussian']+
-                         registered_types['cart-gaussian'] +
-                         registered_types['spherical-gaussian'])
+@pytest.mark.parametrize('objkey', registered_types['basis_fn'])
 def test_vectorized_gaussian_function_evaluations(objkey, request):
     g = request.getfixturevalue(objkey)
 
@@ -256,20 +312,14 @@ def test_vectorized_gaussian_function_evaluations(objkey, request):
     _assert_almost_equal(vector_results, expected, decimal=8)
 
 
-@pytest.mark.parametrize('objkey',
-                         registered_types['gaussian'] +
-                         registered_types['cart-gaussian'] +
-                         registered_types['spherical-gaussian'])
+@pytest.mark.parametrize('objkey', registered_types['basis_fn'])
 def test_gaussian_str_and_repr_works(objkey, request):
     g1 = request.getfixturevalue(objkey)
     str(g1)
     repr(g1)
 
 
-@pytest.mark.parametrize('objkey',
-                         registered_types['gaussian'] +
-                         registered_types['cart-gaussian'] +
-                         registered_types['spherical-gaussian'])
+@pytest.mark.parametrize('objkey', registered_types['basis_fn'])
 def test_normalized_gaussian_self_overlap_is_unity(objkey, request):
     g1 = request.getfixturevalue(objkey)
     g2 = g1.copy()
@@ -283,10 +333,7 @@ def test_normalized_gaussian_self_overlap_is_unity(objkey, request):
     assert abs(1.0 - olap) < 1e-12
 
 
-@pytest.mark.parametrize('objkey',
-                         registered_types['gaussian'] +
-                         registered_types['cart-gaussian'] +
-                         registered_types['spherical-gaussian'])
+@pytest.mark.parametrize('objkey', registered_types['basis_fn'])
 def test_normalization(objkey, request):
     g1 = request.getfixturevalue(objkey)
     oldnorm = g1.norm
@@ -339,29 +386,11 @@ def test_convert_cartesian_label_to_array_of_integer_powers():
     assert cart_to_powers('zx^3') == [3,0,1]
     
 
-@pytest.mark.parametrize('key', ['std_3d_gaussian', 'cart_3d_gaussian', 'spherical_3d_gaussian'])
+@pytest.mark.parametrize('key', registered_types['basis_fn'] + ['linear_combination'])
 def test_numerical_vs_analytical_norm(key, request):
     g = request.getfixturevalue(key)
-    ananorm = g.norm
-
-    allpoints, grid = _generate_grid(g)
-
-    with np.errstate(under='ignore'):
-        vals = g(allpoints)
-
-    numnorm = np.sqrt(grid.dx**3 * (vals**2).sum())
-    helpers.assert_almost_equal(ananorm, numnorm)
-
-
-def _generate_grid(g, g2=None):
-    if g2 is None: g2 = g
-    width = max(np.sqrt(1/g.alpha), np.sqrt(1/g2.alpha))
-    ranges = np.ones((3, 2))*5.0*width
-    ranges[:, 0] *= -1
-    ranges += ((g.center + g2.center)/2.0)[:, None]
-    grid = moldesign.mathutils.VolumetricGrid(*ranges, 64)
-    allpoints = grid.allpoints()
-    return allpoints, grid
+    numnorm = _numerical_norm(g)
+    helpers.assert_almost_equal(g.norm, numnorm)
 
 
 @pytest.mark.screening

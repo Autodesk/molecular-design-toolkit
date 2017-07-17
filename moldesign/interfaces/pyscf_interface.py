@@ -121,14 +121,14 @@ def basis_values(mol, basis, coords, coeffs=None, positions=None):
                  values are returned)
 
     Returns:
-        Array[length]: if ``coeffs`` is not passed, an array of basis fn values at each
+        Array[length**(-1.5)]: if ``coeffs`` is not passed, an array of basis fn values at each
                coordinate. Otherwise, a list of orbital values at each coordinate
     """
     from pyscf.dft import numint
 
     # TODO: more than just create the basis by name ...
     pmol = mol_to_pyscf(mol, basis=basis.basisname, positions=positions)
-    aovals = numint.eval_ao(pmol, np.ascontiguousarray(coords.value_in(u.bohr)))
+    aovals = numint.eval_ao(pmol, np.ascontiguousarray(coords.value_in(u.bohr))) * (u.a0**-1.5)
     if coeffs is None:
         return aovals
     else:

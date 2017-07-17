@@ -35,6 +35,9 @@ class Primitive(object):
         if coeff is not None:
             self.coeff *= coeff
 
+    def _get_wfn_units(self):
+        return NotImplementedError()
+
     def copy(self):
         return copy.deepcopy(self)
 
@@ -93,9 +96,13 @@ class PrimitiveSum(object):
 
     def __init__(self, primitives):
         self.primitives = primitives
+        self._wfn_units = self.primitives[0]._get_wfn_units()
+
+    def _get_wfn_units(self):
+        return self._wfn_units
 
     def __call__(self, coords):
-        outvals = np.zeros(len(coords))
+        outvals = np.zeros(len(coords)) * self._get_wfn_units()
         for primitive in self.primitives:
             outvals += primitive(coords)
         return outvals
@@ -103,6 +110,15 @@ class PrimitiveSum(object):
     @property
     def num_primitives(self):
         return len(self.primitives)
+
+    @property
+    def center(self):
+        c = self.primitives[0].center.copy()
+        for p in self:
+            if (p.center != c).any():
+                raise ValueError("This is a sum over multiple centers")
+        else:
+            return c
 
     @property
     def norm(self):

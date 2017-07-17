@@ -9,6 +9,8 @@ from .molecule_fixtures import *
 from . import helpers
 
 
+__PYTEST_MARK__ = 'wfn'
+
 TESTSYSTEMS = ['h2_rhf_augccpvdz', 'h2_rhf_sto3g', 'acetylene_dft_631g']
 
 
@@ -45,16 +47,31 @@ def test_pyscf_orbital_grid_works(molkey, request):
     plusminus[1,1] = -1.0 / np.sqrt(2)
     vals_plusminus = basis_values(mol, wfn.aobasis, coords, coeffs=plusminus)
     assert vals_plusminus.shape == (len(coords), len(coeffs))
-    np.testing.assert_allclose(vals_plusminus[:,0],
-                               (vals_b0[:,0] + vals_b0[:,1])/np.sqrt(2))
-    np.testing.assert_allclose(vals_plusminus[:,1],
-                               (vals_b0[:,0] - vals_b0[:,1])/np.sqrt(2))
+    helpers.assert_almost_equal(vals_plusminus[:,0],
+                                (vals_b0[:,0] + vals_b0[:,1])/np.sqrt(2))
+    helpers.assert_almost_equal(vals_plusminus[:,1],
+                                (vals_b0[:,0] - vals_b0[:,1])/np.sqrt(2))
 
 
 @pytest.mark.parametrize('molkey', TESTSYSTEMS)
-def test_pyscf_and_mdt_grids_are_the_same(molkey, request):
+def test_basis_function_3d_grids_same_in_pyscf_and_mdt(molkey, request):
     mol = request.getfixturevalue(molkey)
     randocoords = 6.0 * u.angstrom * (np.random.rand(200, 3) - 0.5)
     pyscf_vals = basis_values(mol, mol.wfn.aobasis, randocoords)
-    mdt_vals = mol.wfn.aobasis(randocoords)
-    np.testing.assert_allclose(mdt_vals, pyscf_vals)
+    with np.errstate(under='ignore'):
+        mdt_vals = mol.wfn.aobasis(randocoords)
+    helpers.assert_almost_equal(mdt_vals, pyscf_vals, decimal=6)
+
+
+@pytest.mark.parametrize('molkey', ['h2_rhf_augccpvdz', 'h2_rhf_sto3g'])
+def test_pyscf_basis_function_space_integral_normalized(molkey, request):
+    mol = request.getfixturevalue(molkey)
+    grid = mdt.mathutils.padded_grid(mol.positions, 8.0 * u.angstrom, npoints=150)
+    points = grid.allpoints()
+
+    pyscf_vals = basis_values(mol, mol.wfn.aobasis, points)
+    assert pyscf_vals.shape == (len(points), len(mol.wfn.aobasis))
+
+    pyscf_normsqr = (pyscf_vals ** 2).sum(axis=0) * grid.dx * grid.dy * grid.dz
+    helpers.assert_almost_equal(pyscf_normsqr, 1.0,
+                                decimal=4)

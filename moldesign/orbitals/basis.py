@@ -87,7 +87,7 @@ class BasisSet(MolecularOrbitals):
                - if ``coeffs`` is NOT passed, an array of basis function amplitudes
                  of size ``(len(coords), len(aobasis))``.
         """
-        basis_vals = np.zeros((len(coords), len(self)))
+        basis_vals = np.zeros((len(coords), len(self))) * self.orbitals[0]._get_wfn_units()
         for ibf, bf in enumerate(self.orbitals):
             basis_vals[:, ibf] = bf(coords)
 
@@ -100,7 +100,7 @@ class BasisSet(MolecularOrbitals):
         """ Return a list of basis functions on this atom
 
         Args:
-            atom (moldesign.Atom):
+            atom (moldesign.Atom): query atom
 
         Returns:
             List[AtomicBasisFunction]: basis functions centered on this atom

@@ -85,6 +85,9 @@ class CartesianGaussian(Primitive):
                 center=self.center, exp=self.alpha,
                 powers=tuple(self.powers), norm=self.norm)
 
+    def _get_wfn_units(self):
+        return u.MdtQuantity(self.coeff * u.default.length**self.angular).units
+
     @property
     def angular(self):
         """ Angular momentum of this function (sum of cartesian powers)

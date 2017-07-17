@@ -21,6 +21,7 @@ import numpy as np
 from scipy.special import factorial
 
 from ..mathutils import spherical_harmonics
+from .. import units as u
 from .. import utils
 from . import Primitive, Gaussian, CartesianGaussian, PrimitiveSum
 
@@ -70,6 +71,9 @@ class SphericalGaussian(Primitive):
 
     def __mul__(self, other):
         raise NotImplementedError("Cannot yet multiply spherical gaussian functions")
+
+    def _get_wfn_units(self):
+        return u.MdtQuantity(self.coeff * u.default.length**self.l).units
 
     def __call__(self, coords):
         """ Evaluate this function at the given coordinates.

@@ -44,6 +44,9 @@ class Gaussian(Primitive):
         self.alpha = u.default.convert(alpha)
         super().__init__(coeff=coeff, normalized=normalized)
 
+    def _get_wfn_units(self):
+        return u.MdtQuantity(self.coeff).units
+
     def __call__(self, coords, _getvals=False):
         """ Evaluate this function at the given coordinates.
 

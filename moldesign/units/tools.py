@@ -168,7 +168,12 @@ def get_units(q):
         else:
             if isinstance(x, str):
                 raise TypeError('Found string data while trying to determine units')
-    return MdtQuantity(x).units
+
+    q = MdtQuantity(x)
+    if q.dimensionless:
+        return ureg.dimensionless
+    else:
+        return q.units
 
 
 def array(qlist, defunits=False, _baseunit=None):
