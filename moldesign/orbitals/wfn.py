@@ -42,6 +42,7 @@ class ElectronicWfn(object):
         description (str): text describing the wfn (e.g. 'RHF/STO-3G', 'CAS(2,2)/SA3/6-31G**')
         density_matrix_ao (np.ndarray): density matrix in the ao basis
         gradient (np.array): N x 3 array storing the potential energy surface's gradient
+        displacements (list containing np.array objects): N x 3 array showing atomic displacements for the molecule's normal modes
     """
     def __init__(self, mol, num_electrons,
                  model=None,
@@ -50,7 +51,9 @@ class ElectronicWfn(object):
                  civectors=None,
                  description=None,
                  density_matrix_ao=None,
-                 gradient=None):
+                 gradient=None,
+                 displacements = None
+                 ):
         self.mol = mol
         self.model = model
         self.civectors = civectors

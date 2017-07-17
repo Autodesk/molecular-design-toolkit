@@ -50,10 +50,42 @@ def mdt_to_psi4(mol):
         x, y, z = atom.position.value_in(u.angstrom)
         lines.append('%s %f %f %f' % (atom.symbol, x, y, z))
 
-    print ('\n'.join(lines))
-
     geom = psi4.core.Molecule.create_molecule_from_string('\n'.join(lines))
     return geom
+
+@exports
+def mdt_to_psi4_dimer(mol_0, mol_1):
+    import psi4
+    lines = []
+    try:
+        assert mol_0.multiplicity
+    except AttributeError:
+        pass
+    else:
+        lines.append('\n')
+        lines.append(str(mol_0.charge) + ' ' + str(mol_0.multiplicity))
+
+    for atom in mol_0.atoms:
+        x, y, z = atom.position.value_in(u.angstrom)
+        lines.append('%s %f %f %f' % (atom.symbol, x, y, z))
+
+    lines.append('--')
+
+    try:
+        assert mol_0.multiplicity
+    except AttributeError:
+        pass
+    else:
+        lines.append('\n')
+        lines.append(str(mol_0.charge) + ' ' + str(mol_0.multiplicity))
+    
+    for atom in mol_0.atoms:
+        x, y, z = atom.position.value_in(u.angstrom)
+        lines.append('%s %f %f %f' % (atom.symbol, x, y, z))
+
+    geom = psi4.core.Molecule.create_molecule_from_string('\n'.join(lines))
+
+
 #name JSPB June 15
 @exports
 def mol_name(mol):
@@ -63,7 +95,7 @@ def mol_name(mol):
 def Opt_Trajectory(mol, psi4_history):
     import psi4
     my_trajectory=psi4_mdt.capture_history(name_string=mol.name,
-                                           molecule=mol,
+                                           mdt_molecule=mol,
                                            psi4_history=psi4_history,
                                            model=mol.energy_model)
     return my_trajectory
