@@ -18,11 +18,15 @@ from .molecule_fixtures import *
 
 registered_types = {key:val[:] for key,val in molecule_standards.items()}
 
+__all__ = ['registered_types']
+
+
 def typedfixture(*types, **kwargs):
     """This is a decorator that lets us associate fixtures with one or more arbitrary types.
     We'll later use this type to determine what tests to run on the result"""
 
     def fixture_wrapper(func):
+        __all__.append(func.__name__)
         for t in types:
             registered_types.setdefault(t, []).append(func.__name__)
         return pytest.fixture(**kwargs)(func)
@@ -58,7 +62,7 @@ def simple_unit_array():
 
 @typedfixture('pickleable', 'equality')
 def unit_number():
-    return 391.23948 * u.ureg.kg * u.ang / u.alpha
+    return 391.23948 * u.ureg.kg * u.angstrom / u.alpha
 
 
 ######################################
@@ -104,13 +108,13 @@ def mol_bond_graph(h2):
 
 
 @typedfixture('pickleable')
-def mol_wfn(h2_rhfwfn):
-    return h2_rhfwfn.copy().wfn
+def mol_wfn(h2_rhf_sto3g):
+    return h2_rhf_sto3g.copy().wfn
 
 
 @typedfixture('pickleable')
-def mol_properties(h2_rhfwfn):
-    return h2_rhfwfn.copy().properties
+def mol_properties(h2_rhf_sto3g):
+    return h2_rhf_sto3g.copy().properties
 
 
 @typedfixture('trajectory')
@@ -153,3 +157,5 @@ moldesign_objects = (registered_types['molecule'] +
                      registered_types['trajectory'] +
                      registered_types['atom'])
 pickleable = registered_types['pickleable'] + moldesign_objects
+
+__all__.extend(['moldesign_objects', 'pickleable'])

@@ -17,7 +17,10 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .. import utils
+
 from .quantity import *
+
 
 
 def unitsum(iterable):
@@ -53,6 +56,18 @@ def dot(a1, a2):
         return a2.ldot(a1)
     else:  # this will work whether or not a1 has units
         return a1.dot(a2)
+
+
+@utils.args_from(np.linspace)
+def linspace(start, stop, **kwargs):
+    u1 = getattr(start, 'units', ureg.dimensionless)
+    u2 = getattr(stop, 'units', ureg.dimensionless)
+    if u1 == u2 == ureg.dimensionless:
+        return np.linspace(start, stop, **kwargs)
+    else:
+        q1mag = start.magnitude
+        q2mag = stop.value_in(start.units)
+        return np.linspace(q1mag, q2mag, **kwargs) * start.units
 
 
 def arrays_almost_equal(a1, a2):
@@ -131,7 +146,7 @@ def get_units(q):
     Examples:
         >>> from moldesign import units
         >>> units.get_units(1.0 * units.angstrom)
-        <Unit('ang')>
+        <Unit('angstrom')>
         >>> units.get_units(np.array([1.0, 2, 3.0]))
         <Unit('dimensionless')>
         >>> # We dive on the first element of each iterable until we can determine a unit system:
@@ -153,36 +168,68 @@ def get_units(q):
         else:
             if isinstance(x, str):
                 raise TypeError('Found string data while trying to determine units')
-    return MdtQuantity(x).units
+
+    q = MdtQuantity(x)
+    if q.dimensionless:
+        return ureg.dimensionless
+    else:
+        return q.units
 
 
-def array(qlist, baseunit=None):
+def array(qlist, defunits=False, _baseunit=None):
     """ Facilitates creating an array with units - like numpy.array, but it also checks
-     units for all components of the array
+     units for all components of the array.
+
+     Note:
+         Unlike numpy.array, these arrays must have numeric type - this routine will
+         raise a ValueError if a non-square array is passed.
 
      Args:
          qlist (List[MdtQuantity]): List-like object of quantity objects
-         baseunit (MdtUnit) unit to standardize with
+         defunits (bool): if True, convert the array to the default units
 
     Returns:
-        MdtQuantity: array with standardized units
+        MdtQuantity: ndarray-like object with standardized units
+
+    Raises:
+        DimensionalityError: if the array has inconsistent units
+        ValueError: if the array could not be converted to a square numpy array
     """
+    from . import default
+
     if hasattr(qlist, 'units') and hasattr(qlist, 'magnitude'):
         return MdtQuantity(qlist)
 
-    if baseunit is None:
-        baseunit = get_units(qlist)
-        try:
-            if baseunit == 1.0:
-                return np.array(qlist)
-        except DimensionalityError:
-            pass
+    if _baseunit is None:
+        _baseunit = get_units(qlist)
+        if _baseunit.dimensionless:
+            return _make_nparray(qlist)
+        if defunits:
+            _baseunit = default.get_default(_baseunit)
 
+    if hasattr(qlist, 'to'):  # if already a quantity, just convert and return
+        return qlist.to(_baseunit)
+
+    try:  # try to create a quantity
+        return _baseunit * [array(item, _baseunit=_baseunit).value_in(_baseunit) for item in qlist]
+    except TypeError:  # if here, one or more objects cannot be converted to quantities
+        raise DimensionalityError(_baseunit, ureg.dimensionless,
+                                  extra_msg='Object "%s" does not have units' % qlist)
+
+
+def _make_nparray(q):
+    """ Turns a list of dimensionless numbers into a numpy array. Does not permit object arrays
+    """
+    if hasattr(q, 'units'):
+        return q.value_in(ureg.dimensionless)
     try:
-        newlist = [array(item, baseunit=baseunit).value_in(baseunit) for item in qlist]
-        return baseunit * newlist
-    except TypeError as exc:
-        return qlist.to(baseunit)
+        arr = np.array([_make_nparray(x) for x in q])
+        if arr.dtype == 'O':
+            raise ValueError("Could not create numpy array of numeric data - is your input square?")
+        else:
+            return arr
+    except TypeError:
+        return q
 
 
 #@utils.args_from(np.broadcast_to)

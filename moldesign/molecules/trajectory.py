@@ -370,7 +370,7 @@ class Trajectory(TrajectoryAnalysisMixin):
         else:
             try:
                 proplist = self.unit_system.convert(u.array([value]))
-            except (TypeError, u.UndefinedUnitError):
+            except (ValueError, TypeError, u.UndefinedUnitError):
                 proplist = [value]
             else:
                 proplist.make_resizable()

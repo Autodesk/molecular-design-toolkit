@@ -311,7 +311,7 @@ class PySCFPotential(QMBase):
 
         # fallback 2: level shift, slower convergence
         # this probably won't converge, but is intended to get us in the right basin for the next step
-        # NEWFEATURE: should dynamically adjust level shift instead of hardcoded cycles
+        # TODO: should dynamically adjust level shift instead of hardcoded cycles
         self.logger.handled('SCF failed to converge. Performing %d iterations with level shift of -0.5 hartree'
                             % (old_div(method.max_cycle, 2)))
         failed.append(method)
@@ -440,7 +440,7 @@ class PySCFPotential(QMBase):
             atom = self.mol.atoms[pmol.bas_atom(ishell)]
             angular = pmol.bas_angular(ishell)
             num_momentum_states = angular*2 + 1
-            exps = pmol.bas_exp(ishell)
+            exps = pmol.bas_exp(ishell) / (u.bohr**2)
             num_contractions = pmol.bas_nctr(ishell)
             coeffs = pmol.bas_ctr_coeff(ishell)
 
@@ -450,12 +450,12 @@ class PySCFPotential(QMBase):
                     sphere_label = label[3]
                     l, m = SPHERICAL_NAMES[sphere_label]
                     assert l == angular
-                    # TODO: This is not really the principal quantum number
+                    # Note: this is for metadata only, should not be used in any calculations
                     n = int(''.join(x for x in label[2] if x.isdigit()))
-
                     primitives = [orbitals.SphericalGaussian(atom.position.copy(),
-                                                             exp, n, l, m,
-                                                             coeff=coeff[ictr])
+                                                             exp, l, m,
+                                                             coeff=coeff[ictr],
+                                                             normalized=True)
                                   for exp, coeff in zip(exps, coeffs)]
                     bfs.append(orbitals.AtomicBasisFunction(atom,
                                                             n=n, l=angular, m=m,

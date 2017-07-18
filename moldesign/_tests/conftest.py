@@ -1,8 +1,13 @@
 
 
 def pytest_itemcollected(item):
-    if hasattr(item.module, '__PYTEST_MARK__'):
-        item.add_marker(item.module.__PYTEST_MARK__)
+    marks = getattr(item.module, '__PYTEST_MARK__', None)
+    if marks is None:
+        return
+    if isinstance(marks, str):
+        marks = [marks]
+    for mark in marks:
+        item.add_marker(mark)
 
 
 # TODO: nicer output strings for git commit status

@@ -8,6 +8,8 @@ from .helpers import assert_something_resembling_minimization_happened
 from moldesign import units as u
 
 
+__PYTEST_MARK__ = 'minimization'
+
 @pytest.fixture(scope='function')
 def harmonic_atom():
     mol = mdt.Molecule([mdt.Atom(1)])

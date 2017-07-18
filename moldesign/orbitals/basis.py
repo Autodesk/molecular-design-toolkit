@@ -23,21 +23,6 @@ from ..utils import Attribute
 from . import toplevel, MolecularOrbitals
 
 
-class PrimitiveBase(object):
-    def __init__(self, *args, **kwargs):
-        raise NotImplementedError()
-
-    def __call__(self, position):
-        raise NotImplementedError()
-
-    def overlap(self, other):
-        raise NotImplementedError()
-
-    @property
-    def norm(self, other):
-        raise NotImplementedError()
-
-
 @toplevel
 class BasisSet(MolecularOrbitals):
     """
@@ -85,26 +70,41 @@ class BasisSet(MolecularOrbitals):
             self._basis_fn_by_atom.setdefault(fn.atom.index, []).append(fn)
 
     def __call__(self, coords, coeffs=None):
-        """Calculate the value of each basis function at the specified coordinates.
+        """Calculate the amplitude of a list of orbitals at the specified coordinates.
 
-        Note:
-            This is just a pass-through to a specific implementation - PYSCF's eval_ao routine
-            for now.
+        Returns an array of orbital amplitudes. The amplitude of the _n_th orbital at the
+        _j_th coordinate is stored at position ``(j, n)`` in the returned array.
 
         Args:
-            coords (Array[length]): List of coordinates.
-            coeffs (Vector): List of ao coefficients (optional; if not passed, all basis fn
-                 values are returned)
+            coords (Matrix[shape=(*,3)]): List of coordinates.
+            coeffs (Matrix[shape=(*, nbasis)]): List of ao coefficients (optional;
+               if not passed, the amplitudes of all basis functions will be returned
 
         Returns:
-            Array[length]: if ``coeffs`` is not passed, an array of basis fn values at each
-               coordinate. Otherwise, a list of orbital values at each coordinate
+            Matrix:
+               - if ``coeffs`` is passed, an array of orbital amplitudes at the given positions
+                  of size ``(len(coords), len(coeffs))``.
+               - if ``coeffs`` is NOT passed, an array of basis function amplitudes
+                 of size ``(len(coords), len(aobasis))``.
         """
-        from moldesign.interfaces.pyscf_interface import basis_values
-        return basis_values(self.wfn.mol, self, coords, coeffs=coeffs,
-                            positions=self.wfn.positions)
+        basis_vals = np.zeros((len(coords), len(self))) * self.orbitals[0]._get_wfn_units()
+        for ibf, bf in enumerate(self.orbitals):
+            basis_vals[:, ibf] = bf(coords)
+
+        if coeffs is None:
+            return basis_vals
+        else:
+            return np.dot(basis_vals, coeffs.T)
 
     def get_basis_functions_on_atom(self, atom):
+        """ Return a list of basis functions on this atom
+
+        Args:
+            atom (moldesign.Atom): query atom
+
+        Returns:
+            List[AtomicBasisFunction]: basis functions centered on this atom
+        """
         return self._basis_fn_by_atom[atom.index]
 
     def __repr__(self):

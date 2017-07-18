@@ -109,7 +109,9 @@ class ElectronicWfn(object):
         """
         for orbtype in self.orbitals:
             if orbtype not in other.orbitals:
-                if assert_same: assert False, '%s has orbital type %s, but %s does not.' % (self, orbtype, other)
+                if assert_same:
+                    assert False, '%s has orbital type %s, but %s does not.' % (
+                        self, orbtype, other)
                 else: continue
             self.orbitals[orbtype].align_phases(other.orbitals[orbtype])
 

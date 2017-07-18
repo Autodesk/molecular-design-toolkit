@@ -30,8 +30,9 @@ from ..utils import ResizableArray
 
 # Set up pint's unit definitions
 ureg = UnitRegistry()
-unit_def_file = join(abspath(dirname(__file__)), '../_static_data/pint_atomic_units.txt')
+unit_def_file = join(abspath(dirname(__file__)), '..', '_static_data','pint_atomic_units.txt')
 ureg.load_definitions(unit_def_file)
+ureg.default_system = 'nano'
 set_application_registry(ureg)
 
 
@@ -41,6 +42,10 @@ class MdtUnit(ureg.Unit):
     """
     def __reduce__(self):
         return _get_unit, (str(self),)
+
+    @property
+    def units(self):
+        return self
 
     def convert(self, value):
         """ Returns quantity converted to these units

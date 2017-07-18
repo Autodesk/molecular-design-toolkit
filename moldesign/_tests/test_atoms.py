@@ -1,6 +1,9 @@
 import pytest
+import numpy as np
 
 import moldesign as mdt
+from moldesign import units as u
+
 from .molecule_fixtures import *
 from . import helpers
 

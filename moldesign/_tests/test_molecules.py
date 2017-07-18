@@ -3,9 +3,11 @@
 import pickle
 from past.builtins import basestring
 
-import moldesign.exceptions
-import moldesign.molecules.atomcollections
-import moldesign.utils.classes
+import pytest
+import numpy as np
+
+from moldesign import units as u
+import moldesign as mdt
 
 from .object_fixtures import *
 from .molecule_fixtures import *
@@ -13,7 +15,6 @@ from . import helpers
 
 
 __PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
-
 
 
 def test_h2_protected_atom_arrays(h2):
@@ -86,7 +87,7 @@ def test_h2_cache_flush(h2_harmonic):
     h2 = h2_harmonic
     pe = h2.calc_potential_energy()
     f = h2.forces
-    h2.atoms[0].x += 0.1285*u.ang
+    h2.atoms[0].x += 0.1285*u.angstrom
     pe2 = h2.calc_potential_energy()
     f2 = h2.forces
     assert pe != pe2
@@ -95,19 +96,19 @@ def test_h2_cache_flush(h2_harmonic):
 
 def test_h2_not_calculated_yet(h2_harmonic):
     h2_harmonic.calculate()
-    h2_harmonic.atoms[1].x += 0.3*u.ang
-    with pytest.raises(moldesign.exceptions.NotCalculatedError):
+    h2_harmonic.atoms[1].x += 0.3*u.angstrom
+    with pytest.raises(mdt.NotCalculatedError):
         h2_harmonic.forces
-    with pytest.raises(moldesign.exceptions.NotCalculatedError):
+    with pytest.raises(mdt.NotCalculatedError):
         h2_harmonic.potential_energy
 
 
 def h2_properties_raises_not_calculated_yet(h2_harmonic):
     h2_harmonic.calculate()
-    h2_harmonic.atoms[1].x += 0.3*u.ang
-    with pytest.raises(moldesign.exceptions.NotCalculatedError):
+    h2_harmonic.atoms[1].x += 0.3*u.angstrom
+    with pytest.raises(mdt.NotCalculatedError):
         h2_harmonic.properties.forces
-    with pytest.raises(moldesign.exceptions.NotCalculatedError):
+    with pytest.raises(mdt.NotCalculatedError):
         h2_harmonic.properties.potential_energy
 
 
@@ -219,7 +220,7 @@ def test_molecule_bonds(molkey, request):
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_types(molkey, request):
     mol = request.getfixturevalue(molkey)
-    assert issubclass(type(mol.atoms), moldesign.molecules.atomcollections.AtomList)
+    assert issubclass(type(mol.atoms), mdt.AtomList)
     for atom in mol.atoms:
         assert issubclass(type(atom), mdt.Atom)
     for residue in mol.residues:
@@ -408,7 +409,7 @@ def test_initialization_charges():
     assert mol.charge == -1 * u.q_e
 
     with pytest.raises(TypeError):
-        mdt.Atom('H', charge=3)  # it needs to be "formal_charge", to distinguish from partial charge
+        mdt.Atom('H', charge=3)  # it needs to be "formal_charge" to distinguish from partial charge
 
     m2 = mdt.Molecule([a1], charge=-1)
     assert m2.charge == -1 * u.q_e

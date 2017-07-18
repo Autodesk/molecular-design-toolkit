@@ -1,8 +1,12 @@
 import pickle
 
+import pytest
+import numpy as np
+
 from moldesign.utils import Alias
 from .object_fixtures import *
 from .molecule_fixtures import *
+from .object_fixtures import TESTDICT
 
 
 __PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)

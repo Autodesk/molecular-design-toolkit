@@ -46,22 +46,22 @@ def test_bond_ffterms_returns_none_if_no_ff(h2):
         assert bond.ff is None
 
 
-def test_basis_function_atom_access(h2_rhfwfn):
-    mol = h2_rhfwfn
+def test_basis_function_atom_access(h2_rhf_sto3g):
+    mol = h2_rhf_sto3g
     for atom in mol.atoms:
         assert len(atom.basis_functions) == 1  # good ol' sto-3g
         assert len(atom.basis_functions[0].primitives) == 3
 
 
 @pytest.mark.screening
-def test_atom_property_access_to_mulliken_charges(h2_rhfwfn):
-    mol = h2_rhfwfn
+def test_atom_property_access_to_mulliken_charges(h2_rhf_sto3g):
+    mol = h2_rhf_sto3g
     for atom in mol.atoms:
         assert abs(atom.properties.mulliken) <= 1e-5 * u.q_e
 
 
-def test_atomic_forces(h2_rhfwfn):
-    mol = h2_rhfwfn
+def test_atomic_forces(h2_rhf_sto3g):
+    mol = h2_rhf_sto3g
     helpers.assert_almost_equal(mol.atoms[0].force, -mol.atoms[1].force)
 
 

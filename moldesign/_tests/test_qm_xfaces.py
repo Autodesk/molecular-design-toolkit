@@ -49,26 +49,6 @@ def test_minimization_trajectory(h2_with_model):
     helpers.assert_something_resembling_minimization_happened(p1, e1, traj, mol)
 
 
-@typedfixture('model')
-def pyscf_rhf():
-    return mdt.models.PySCFPotential(basis='sto-3g', theory='rhf')
-
-
-@typedfixture('model')
-def pyscf_dft():
-    return mdt.models.PySCFPotential(basis='sto-3g', theory='rks', functional='b3lyp')
-
-
-@typedfixture('model')
-def nwchem_rhf():
-    return mdt.models.NWChemQM(basis='sto-3g', theory='rhf', functional='b3lyp')
-
-
-@typedfixture('model')
-def nwchem_dft():
-    return mdt.models.NWChemQM(basis='sto-3g', theory='rks', functional='b3lyp')
-
-
 @pytest.mark.parametrize('objkey', TESTSET)
 def test_pyscf_rhf_sto3g_properties(objkey, request):
     mol = request.getfixturevalue(objkey)
@@ -139,9 +119,9 @@ def test_calc_eri_tensor(h2):
 
 
 @pytest.mark.screening
-def test_aobasis(h2_rhfwfn):
+def test_aobasis(h2_rhf_sto3g):
     # it's sto-3g, so structure is simple
-    aobasis = h2_rhfwfn.wfn.aobasis
+    aobasis = h2_rhf_sto3g.wfn.aobasis
     assert aobasis.basisname == 'sto-3g'
     assert (aobasis.coeffs == np.identity(2)).all()
     np.testing.assert_allclose(aobasis.fock, aobasis.fock.T)
@@ -149,7 +129,7 @@ def test_aobasis(h2_rhfwfn):
 
     assert aobasis.fock.dimensionality == u.eV.dimensionality
 
-    for orb in h2_rhfwfn.wfn.aobasis:
+    for orb in h2_rhf_sto3g.wfn.aobasis:
         assert orb.aotype == '1s'
         assert orb.orbtype == 's'
         assert len(orb.primitives) == 3

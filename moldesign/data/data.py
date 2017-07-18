@@ -38,6 +38,14 @@ COLOR_LIST = ['lightgreen', 'lightblue', 'lightgrey',
 DEFAULT_FORCE_TOLERANCE = (0.0001 * u.hartree / u.bohr).defunits()  # taken from GAMESS OPTTOL keyword
 
 
+# Precompute odd factorial values (N!!)
+ODD_FACTORIAL = {0: 1}  # by convention
+_ofact = 1
+for _i in range(1, 20, 2):
+    _ofact *= _i
+    ODD_FACTORIAL[_i] = float(_ofact)
+
+
 def print_environment():
     """For reporting bugs - spits out the user's environment"""
     import sys
