@@ -308,7 +308,14 @@ class Psi4Potential(QMBase):
         props['dipole_moment']     = np.linalg.norm([ psi4_variables[psi4_vars_title +' DIPOLE '+x]  for x in ('X', 'Y', 'X') ]) * u.debye
         props.update(self._get_one_e_props(requests, psi4_output[1],psi4_vars_title ))
         
+        if self._get_runmethod(requests) == psi4.freq:
+            props.update( {'normalmodes_displacements': self._set_normalmodes(psi4_output[1])})
+
+        if self._get_runmethod(requests) == psi4.gradient:
+            props.update({'forces':self._set_forces(psi4_output[0])})
         
+        if self._get_runmethod(requests) == psi4.hessian:
+            props.update({'hessian': self._get_hessian(psi4_output[0])})
         
         #props.update(self._get_ao_basis_functions(self, requests, psi4_output[1], psi4_vars_title))
         #props['wfn'] = self._build_mdt_wavefunction(psi4_output[1])
@@ -487,6 +494,12 @@ class Psi4Potential(QMBase):
         
         return bfs
 
+    def _set_forces(self, psi4_gradient):
+        import numpy as np
+        grad = np.asarray(psi4_gradient) * -1
+        grad = grad * u.bohr / u.hartree
+        return grad
+
     def _set_normalmodes(self, psi4_wavefunction): #
         import numpy as np
         modes = []
@@ -494,6 +507,12 @@ class Psi4Potential(QMBase):
         my_modes = [np.asarray(disps[i]) for i in range(len(psi4_wavefunction.normalmode_displacements()))]
         my_modes = [my_modes[i] * u.ang for i in range(len(my_modes))]
         return my_modes
+
+    def _get_hessian(self, psi4_hessian):
+        import numpy as np
+        hes = np.asarray(psi4_hessian)
+        hes = hes * u.hartree / (u.bohr * u.bohr)
+        return hes
 
 #        for atoms in self.mol.atoms:
 #    bfs.append(orbitals.AtomicBasisFunction())
