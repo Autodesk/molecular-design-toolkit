@@ -88,8 +88,6 @@ class Psi4Potential(QMBase):
     def calculate(self, requests):
         
         print(requests)
-        
-        request_options = {'vibrational_frequencies' : psi4.freq, 'freq' : psi4.freq, 'frequency' : psi4.freq,'frequencies' : psi4.freq,'optimized_geometry' : psi4.opt,'opt' : psi4.opt,'optimize' : psi4.opt,'potential_energy' : psi4.energy,'energy' : psi4.energy,'electronic_gradient' : psi4.gradient,'hessian' : psi4.hessian }
 
         try:
             assert self.params.dimer_partner
@@ -159,8 +157,18 @@ class Psi4Potential(QMBase):
     def _psi4_set_up(self, requests):
         import psi4
 
-        request_options = {'vibrational_frequencies' : psi4.freq, 'freq' : psi4.freq, 'frequency' : psi4.freq,'frequencies' : psi4.freq,'optimized_geometry' : psi4.opt,'opt' : psi4.opt,'optimize' : psi4.opt,'potential_energy' : psi4.energy,'energy' : psi4.energy,'electronic_gradient' : psi4.gradient,'hessian' : psi4.hessian }
-        
+        request_options = {'vibrational_frequencies' : psi4.freq,
+                           'freq' : psi4.freq,
+                           'frequency' : psi4.freq,
+                           'frequencies' : psi4.freq,
+                           'optimized_geometry' : psi4.opt,
+                           'opt' : psi4.opt,
+                           'optimize' : psi4.opt,
+                           'potential_energy' : psi4.energy,
+                           'energy' : psi4.energy,
+                           'forces' : psi4.gradient,
+                           'hessian' : psi4.hessian }
+
         try:
             assert requests
         except AssertionError:
@@ -460,14 +468,14 @@ class Psi4Potential(QMBase):
             exps = pmol.bas_exp(ishell)
             num_contractions = pmol.bas_nctr(ishell)
             coeffs = pmol.bas_ctr_coeff(ishell)
-            
+        
             for ictr in range(num_contractions):  # loop over contractions in shell
                 for ibas in range(num_momentum_states):  # loop over angular states in shell
                     label = next(orblabels) # 2 parts orientation & quantum number
                     sphere_label = label[3]
                     l, m = SPHERICAL_NAMES[sphere_label]
                     assert l == angular
-                    # TODO: This is not really the principal quantum number
+                    #TODO: This is not really the principal quantum number
                     n = int(''.join(x for x in label[2] if x.isdigit()))
                     
                     primitives = [orbitals.SphericalGaussian(atom.position.copy(),
