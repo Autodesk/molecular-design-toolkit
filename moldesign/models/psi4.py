@@ -18,6 +18,7 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .. import utils
 from .. import units as u
 from .. import orbitals
 from .. import molecules
@@ -40,8 +41,8 @@ ONE_ELECTRON_PROPERTIES = { 'dipole':'DIPOLE',
                             'quadrupole':'QUADRUPOLE',
                             'electrostatic_potential_at_nuclei' : 'ESP_AT_NUCLEI' ,
                             'molecular_orbital_extents' : 'MO_EXTENTS' ,
-                            'mulliken_charges': 'MULLIKEN_CHARGES',
-                            'lowdin_charges' : 'LOWDIN_CHARGES',
+                            'mulliken': 'MULLIKEN_CHARGES',
+                            'lowdin' : 'LOWDIN_CHARGES',
                             'wiberg_lowdin_indices': 'WIBERG_LOWDIN_INDICES',
                             'mayer_indices':'MAYER_INDICES' ,
                             'natural_orbital_occupations':'NO_OCCUPATIONS' }
@@ -101,9 +102,7 @@ class Psi4Potential(QMBase):
 
 
         psi4_molecule = psi4_interface.mdt_to_psi4(self.mol)
-        
         self.name = psi4_interface.mol_name(self.mol)
-        
         self._psi4_set_up(requests)
         
         if 'memory' in self.params:
@@ -122,7 +121,6 @@ class Psi4Potential(QMBase):
     def minimize(self, requests):
         import psi4
         self._psi4_set_up(requests)
-        
         
         if 'memory' in self.params:
             self._set_memory()
@@ -215,7 +213,6 @@ class Psi4Potential(QMBase):
             else:
                 pass
 
-
         print('Returning potential_energy from psi4.energy by default')
         return psi4.energy
 
@@ -284,17 +281,25 @@ class Psi4Potential(QMBase):
 # DO NOT END _get_properties ABOVE OR BELOW THIS LINE
 ########################################################
 
+    def _advanced_user_props(self,requests, psi4_results ):
+        import psi4
+        props = {}
+        property_dict = psi4.core.get_variables()
+        props.update({'potential_energy':property_dict['CURRENT ENERGY']})
+        props.update({'psi4_output':psi4_results})
+        return props
+
     def _get_one_e_props(self, requests, psi4_wavefunction, psi4_vars_title):
         oeprops = {}
         oeprop_funcs = {'dipole':self.get_dipole,
-'quadrupole':self.get_quadrupole,
-'electrostatic_potential_at_nuclei':self.get_esp_at_nuclei,
-'molecular_orbital_extents':self.get_mo_extents,
-'mulliken_charges':self.get_mulliken_charges,
-'lowdin_charges':self.get_lowdin_charges,
-'wiberg_lowdin_indices':self.get_wib_indices,
-'mayer_indices':self.get_mbi_indices,
-'natural_orbital_occupations':self.get_no_occupations}
+                        'quadrupole':self.get_quadrupole,
+                        'electrostatic_potential_at_nuclei':self.get_esp_at_nuclei,
+                        'molecular_orbital_extents':self.get_mo_extents,
+                        'mulliken':self.get_mulliken_charges,
+                        'lowdin':self.get_lowdin_charges,
+                        'wiberg_lowdin_indices':self.get_wib_indices,
+                        'mayer_indices':self.get_mbi_indices,
+                        'natural_orbital_occupations':self.get_no_occupations}
     
         for req in requests:
             if req in oeprop_funcs.keys():
@@ -306,14 +311,14 @@ class Psi4Potential(QMBase):
         import psi4
         psi4.oeprop(psi4_wavefunction, 'DIPOLE', title =psi4_vars_title)
         psi4_variables = psi4.core.get_variables()
-        dip = [ psi4_variables[psi4_vars_title +' DIPOLE '+x]  for x in ('X', 'Y', 'X') ]
+        dip = [ psi4_variables[psi4_vars_title +' DIPOLE '+x]  for x in ('X', 'Y', 'X') ] *u.debye
         return dip
     
     def get_quadrupole(self, psi4_wavefunction,psi4_vars_title):
         import psi4
         psi4.oeprop(psi4_wavefunction, 'QUADRUPOLE', title = psi4_vars_title)
         psi4_variables = psi4.core.get_variables()
-        qup = [ psi4_variables[psi4_vars_title+' QUADRUPOLE ' + x] for x in ('XX','XY','XZ','YY','YY','ZZ') ]
+        qup = [ psi4_variables[psi4_vars_title+' QUADRUPOLE ' + x] for x in ('XX','XY','XZ','YY','YY','ZZ') ] *u.debye*u.ang
         return qup
     
     def get_esp_at_nuclei(self, psi4_wavefunction,psi4_vars_title):
@@ -323,7 +328,7 @@ class Psi4Potential(QMBase):
         esp = []
         
         for i in range(1,(self.mol.num_atoms+1)):
-            esp.append(psi4_variables['ESP AT CENTER '+str(i)])
+            esp.append(psi4_variables['ESP AT CENTER '+str(i)] * u.hartree / u.q_e)
         return esp
     
     def get_mo_extents(self, psi4_wavefunction,psi4_vars_title):
@@ -335,33 +340,50 @@ class Psi4Potential(QMBase):
         import psi4
         import numpy as np
         psi4.oeprop(psi4_wavefunction, 'MULLIKEN_CHARGES')
-        nuq = np.asarray(psi4_wavefunction.atomic_point_charges())
+        chrg_array = np.asarray(psi4_wavefunction.atomic_point_charges())
+        nuq={}
+        for atom in self.mol.atoms:
+            nuq.update({atom:chrg_array[atom.index] * u.q_e})
         return nuq
     
     def get_lowdin_charges(self, psi4_wavefunction,psi4_vars_title):
         import psi4
         import numpy as np
         psi4.oeprop(psi4_wavefunction, 'LOWDIN_CHARGES')
-        loq = np.asarray(psi4_wavefunction.atomic_point_charges())
+        chrg_array = np.asarray(psi4_wavefunction.atomic_point_charges())
+        loq = {}
+        for atom in self.mol.atoms:
+            loq.update({atom:chrg_array[atom.index] * u.q_e})
         return loq
     
     def get_wib_indices(self,psi4_wavefunction,psi4_vars_title):
         import psi4
         psi4.oeprop(psi4_wavefunction,'WIBERG_LOWDIN_INDICES')
-        wbi = np.asarray(psi4_wavefunction.get_array('WIBERG_LOWDIN_INDICES'))
+        index_array = np.asarray(psi4_wavefunction.get_array('WIBERG_LOWDIN_INDICES'))
+        wbi={}
+        for ati in range(self.mol.num_atoms):
+            dum_list = []
+            for ati_1 in range(self.mol.num_atoms):
+                dum_list.append(index_array[ati][ati_1])
+            wbi.update({self.mol.atoms[ati]:dum_list})
         return wbi
-    
+
     def get_mbi_indices(self,psi4_wavefunction,psi4_vars_title):
         import psi4
         psi4.oeprop(psi4_wavefunction, 'MAYER_INDICES')
-        mbi = np.asarray(psi4_wavefunction.get_array('MAYER_INDICES'))
+        index_array = np.asarray(psi4_wavefunction.get_array('MAYER_INDICES'))
+        mbi={}
+        for ati in range(self.mol.num_atoms):
+            dum_list = []
+            for ati_1 in range(self.mol.num_atoms):
+                dum_list.append(index_array[ati][ati_1])
+            mbi.update({self.mol.atoms[ati]:dum_list})
         return mbi
     
     def get_no_occupations(self,psi4_wavefunction,psi4_vars_title):
         import psi4
         psi4.oeprop(psi4_wavefunction, 'NO_OCCUPATIONS' )
         noo = psi4_wavefunction.no_occupations()
-        print(noo)
         return noo
 
     def _build_mdt_wavefunction(self, psi4_wavefunction):
