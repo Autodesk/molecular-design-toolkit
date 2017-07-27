@@ -74,20 +74,18 @@ def capture_history(name_string, mdt_molecule, psi4_history, model):
         step_molecule.properties['potential_energy'] = psi4_history['energy'][step]
         my_traj.frames.append(step_molecule.properties)
         my_traj.molecules.append(step_molecule)
-    my_traj.__setattr__('potential_energy', psi4_history['energy'])
 
-    print(my_traj)
+    my_traj.__setattr__('potential_energy', psi4_history['energy'])
     
     return my_traj
 
-
+@utils.exports
 class Psi4Potential(QMBase):
     def prep(self):
         return True
 
     @runsremotely(enable=psi4_interface.force_remote)
     def calculate(self, requests):
-        import psi4
         
         print(requests)
         
@@ -111,10 +109,13 @@ class Psi4Potential(QMBase):
         his=False
         psi4_results =self._run_psi4_calc(requests, psi4_molecule, his)
         
-        props=self._get_properties(requests, psi4_results)
-
-        psi4.core.clean()
-        psi4.core.clean_options()
+        if self.params.basis is not None:
+            props=self._get_properties(requests, psi4_results)
+        else:
+            props=self._advanced_user_props(requests, psi4_results)
+            print('Returning props dictionary containing "potential_energy" and "psi4_results."\nPlease employ Psi4 directly for advanced features.')
+        
+        self._psi4_post_op()
         return props
 
     @runsremotely(enable=psi4_interface.force_remote)
@@ -133,21 +134,21 @@ class Psi4Potential(QMBase):
             psi4_molecule = psi4_interface.mdt_to_psi4_dimer(self.mol, self.params.dimer_partner)
 
         self.name = psi4_interface.mol_name(self.mol)
-        
         self._psi4_set_up(requests)
-        
         his=True
         psi4_results = self._run_psi4_calc(requests, psi4_molecule, his)
-        
         prop_output=[psi4_results[0],psi4_results[1]]
-        self.mol.props = self._get_properties(requests, prop_output )
-        
-        print(requests)
+                
+        if self.params.basis is not None:
+            self.mol.props=self._get_properties(requests, psi4_results)
+        else:
+            self.mol.props=self._advanced_user_props(requests, psi4_results)
+            print('Returning props dictionary containing "potential_energy" and "psi4_results."\nPlease employ Psi4 directly for advanced features.')
         
         trajectory=capture_history(self.name, self.mol, psi4_results[2], self)
+        trajectory.__setattr__('nuclear_repulsion_energy', psi4_molecule.nuclear_repulsion_energy())
         
-        psi4.core.clean()
-        psi4.core.clean_options()
+        self._psi4_post_op()
         return trajectory
 
     # JSOB added June 19
@@ -168,15 +169,19 @@ class Psi4Potential(QMBase):
             for req in requests:
                 if req in request_options.keys():
                     if request_options[req] == psi4.freq:
-                        self.params.options.update({'':''})
+                        try:
+                            assert self.params.options
+                        except AttributeError:
+                            self.params.options={'MOLDEN_WRITE':True,'NORMAL_MODES_WRITE':True}
+                        else:
+                            self.params.options.update({'MOLDEN_WRITE':True,'NORMAL_MODES_WRITE':True})
 
-        self.params.theory=self._gettheorystring()
         try:
             assert self.params.options
         except AttributeError:
             pass
         else:
-            psi4.set_options(self._getoptionsstring())
+            psi4.set_options(self._getoptionsstring(requests))
         
         try:
             assert self.params.output
@@ -189,21 +194,45 @@ class Psi4Potential(QMBase):
             assert self.params.basis
         except AssertionError:
             pass
+        except AttributeError:
+            pass
         else:
-            psi4.set_options({'basis': BASES.get(self.params.basis, self.params.basis)})
+            if '[' in self.params.basis and ']' in self.params.basis:
+                self.params.theory += '/'+self.params.basis
+                self.params.basis=None
+            else:
+                psi4.set_options({'basis': BASES.get(self.params.basis, self.params.basis)})
 
+        self.params.theory=self._gettheorystring()
+
+#try passage a temporary fix to facilitate psi4 frequency calculations
         try:
             assert self.params.dertype
         except AttributeError:
             self.params.dertype = 'gradient'
         else:
             pass
-            
-    
+
+    def _psi4_post_op(self):
+        import psi4
+        psi4.core.clean()
+        psi4.core.clean_options()
+
     @staticmethod
     def _get_runmethod(requests):
         import psi4
-        request_options = {'vibrational_frequencies' : psi4.freq, 'freq' : psi4.freq, 'frequency' : psi4.freq,'frequencies' : psi4.freq ,'optimized_geometry' : psi4.opt,'opt' : psi4.opt,'optimize' : psi4.opt,'potential_energy' : psi4.energy,'energy' : psi4.energy,'electronic_gradient' : psi4.gradient,'hessian' : psi4.hessian, 'gradient':psi4.gradient }
+        request_options = {'vibrational_frequencies' : psi4.freq,
+                           'freq' : psi4.freq,
+                           'frequency' : psi4.freq,
+                           'frequencies' : psi4.freq ,
+                           'optimized_geometry' : psi4.opt,
+                           'opt' : psi4.opt,
+                           'optimize' : psi4.opt,
+                           'potential_energy' : psi4.energy,
+                           'energy' : psi4.energy,
+                           'electronic_gradient' : psi4.gradient,
+                           'hessian' : psi4.hessian,
+                           'forces':psi4.gradient }
         
         for quantity in requests:
             if quantity == 'potential_energy':
@@ -243,8 +272,12 @@ class Psi4Potential(QMBase):
     
     def _run_psi4_calc(self, requests, psi4_molecule, his):
         import psi4
-        print(requests)
-        psi4_output = self._get_runmethod(requests)(self.params.theory, molecule=psi4_molecule, return_wfn=True, return_history=his )
+        
+        if self._get_runmethod(requests) == psi4.freq:
+            psi4_output = self._get_runmethod(requests)(self.params.theory, molecule=psi4_molecule, return_wfn=True, dertype=1 )
+        else:
+            psi4_output = self._get_runmethod(requests)(self.params.theory, molecule=psi4_molecule, return_wfn=True, return_history=his )
+        
         psi4_molecule.update_geometry()
         self.mol.charge=psi4_molecule.molecular_charge()
         self.mol.multiplicity=psi4_molecule.multiplicity()
@@ -255,19 +288,16 @@ class Psi4Potential(QMBase):
         import psi4
         props={}
         
-        props['potential_energy']=psi4_output[0]
-    
-    #DO NOT DELETE LINE 206 WE NEED IT FOR TESTING
+    #DO NOT DELETE THE NEXT LINE WE NEED IT FOR TESTING
         props['psi4_output'] = psi4_output
         psi4_vars_title=self.name
-        
         psi4.oeprop(psi4_output[1], 'DIPOLE',title=psi4_vars_title)
         psi4_variables=psi4.core.get_variables()
+        props['potential_energy']=psi4_variables['CURRENT ENERGY'] * u.hartree
         
         #DEFAULT_PROPERTIES evaluation
         props['nuclear_repulsion'] = psi4_variables['NUCLEAR REPULSION ENERGY']
         props['dipole_moment']     = np.linalg.norm([ psi4_variables[psi4_vars_title +' DIPOLE '+x]  for x in ('X', 'Y', 'X') ]) * u.debye
-        
         props.update(self._get_one_e_props(requests, psi4_output[1],psi4_vars_title ))
         
         
