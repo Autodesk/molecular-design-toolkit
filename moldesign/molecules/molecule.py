@@ -337,6 +337,11 @@ class MolPropertyMixin(object):
             NotCalculatedError: If the forces have not yet been calculated at this geometry
         """
         return self.get_property('forces')
+    
+    @property
+    def normalmodes_displacements(self):
+    
+        return self.get_property('normalmodes_displacements')
 
     @property
     def dipole(self):
@@ -1025,6 +1030,7 @@ class Molecule(AtomGroup,
         num_bonds (int): number of bonds (synonym: nbonds)
         positions (units.Array[length]): Nx3 array of atomic positions
         momenta (units.Array[momentum]): Nx3 array of atomic momenta
+        normalmodes_displacements (units.Array[normalmode_displacements]) : N x (3N-6) x 3 array of atomic normalmode displacements
         masses (units.Vector[mass]): vector of atomic masses
         dim_masses (units.Array[mass]): Nx3 array of atomic masses (for numerical convenience -
            allows you to calculate velocity, for instance, as
@@ -1050,6 +1056,7 @@ class Molecule(AtomGroup,
     """
     positions = ProtectedArray('_positions')
     momenta = ProtectedArray('_momenta')
+    normalmodes_displacements = ProtectedArray('_normalmodes_displacements')
 
     draw_orbitals = WidgetMethod('molecules.draw_orbitals')
     _PERSIST_REFERENCES = True  # relevant for `pyccc` RPC calls

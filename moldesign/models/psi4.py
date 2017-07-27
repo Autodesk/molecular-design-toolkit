@@ -449,6 +449,13 @@ class Psi4Potential(QMBase):
         
         return bfs
 
+    def _set_normalmodes(self, psi4_wavefunction): #
+        import numpy as np
+        modes = []
+        disps=psi4_wavefunction.normalmode_displacements()[::-1]
+        my_modes = [np.asarray(disps[i]) for i in range(len(psi4_wavefunction.normalmode_displacements()))]
+        my_modes = [my_modes[i] * u.ang for i in range(len(my_modes))]
+        return my_modes
 
 #        for atoms in self.mol.atoms:
 #    bfs.append(orbitals.AtomicBasisFunction())

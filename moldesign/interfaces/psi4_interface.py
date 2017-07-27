@@ -113,22 +113,27 @@ def psi4_to_mdt(psi4_molecule):
 
     """
     
+    
+    
     psi4_molecule.update_geometry()
     
     atom_list=[]
     
     for iat in range(psi4_molecule.natom()):
-        print(psi4_molecule.symbol(iat))
-        atom_list.append(molecules.Atom(psi4_molecule.symbol(iat)))
-        atom_list[iat].x = psi4_molecule.x(iat) * u.angstrom
-        atom_list[iat].y = psi4_molecule.y(iat) * u.angstrom
-        atom_list[iat].z = psi4_molecule.z(iat) * u.angstrom
-
+        atom_list.append(molecules.Atom(int(psi4_molecule.Z(iat))))
+        atom_list[iat].x = psi4_molecule.x(iat) * u.bohr
+        atom_list[iat].y = psi4_molecule.y(iat) * u.bohr
+        atom_list[iat].z = psi4_molecule.z(iat) * u.bohr
 
     my_mol=molecules.molecule.Molecule( atom_list , charge=psi4_molecule.molecular_charge(), multiplicity = psi4_molecule.multiplicity())
 
     return my_mol
 
+"""
+@exports
+def Trajectory_to_History(mdt_molecule):
 
+    for window in mdt_molecule.Trajectory.frames:
 
+"""
 

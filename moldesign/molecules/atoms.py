@@ -131,6 +131,7 @@ class Atom(AtomPropertyMixin):
         vx, vy, vz (u.Scalar[length/time]): x, y, of ``atom.velocity``
         px, py, pz (u.Scalar[momentum]): x, y, and z of ``atom.momentum``
         fx, fy, fz (u.Scalar[force]): x, y, and z ``atom.force``
+        nx, ny, nz (u.Scalar[length]): x, y, and z ``atom.normalmode_displacements``
 
         residue (moldesign.Residue): biomolecular residue that this atom belongs to
         chain (moldesign.Chain): biomolecular chain that this atom belongs to
@@ -148,9 +149,10 @@ class Atom(AtomPropertyMixin):
     vx, vy, vz = (AtomCoordinate('velocity', i) for i in range(3))
     px, py, pz = (AtomCoordinate('momentum', i) for i in range(3))
     fx, fy, fz = (AtomCoordinate('force', i) for i in range(3))
+    nx, ny, nz = (AtomCoordinate('normalmode_displacements', i) for i in range(3))
     position = AtomArray('_position', 'positions')
     momentum = AtomArray('_momentum', 'momenta')
-
+    
     atomic_number = utils.Synonym('atnum')
 
     draw2d = WidgetMethod('atoms.draw2d')
@@ -196,6 +198,8 @@ class Atom(AtomPropertyMixin):
             self._momentum = _momentum0.copy()
         else:
             self._momentum = momentum
+
+        self._normalmode_displacements = None
 
         self._bond_graph = {}
         self.metadata = utils.DotDict()
@@ -347,12 +351,17 @@ class Atom(AtomPropertyMixin):
         return f[self.index]
 
     @property
+    def normalmode_displacements(self):
+    
+        nmodes = self.molecule.normalmodes_displacements[self.index]
+
+    @property
     def velocity(self):
         """ u.Vector[length/time, 3]: velocity of this atom; equivalent to
         ``self.momentum/self.mass``
         """
         return (self.momentum / self.mass).defunits()
-
+    
     @velocity.setter
     def velocity(self, value):
         self.momentum = value * self.mass

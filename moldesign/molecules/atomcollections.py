@@ -401,6 +401,7 @@ class AtomContainer(AtomGroup):
     masses = _AtomArray('mass')
     momenta = _AtomArray('momentum')
     velocities = _AtomArray('velocity')
+    normalmodes_displacements = _AtomArray('normalmode_displacements')
 
     def __add__(self, other):
         l = mdt.AtomList(self.atoms)
