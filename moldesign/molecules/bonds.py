@@ -25,6 +25,7 @@ import numpy as np
 from . import toplevel
 from .. import units as u
 from .. import mathutils
+from .. import geom
 
 
 @toplevel
@@ -96,6 +97,12 @@ class Bond(object):
                     atom.bond_graph[nbr] = order
 
     @property
+    def exists(self):
+        """ bool: whether or not this bond exists
+        """
+        return self.order is not None
+
+    @property
     def type(self):
         return self.a1.symbol + self.SYMBOLS.get(self.order, u'?̶') + self.a2.symbol
 
@@ -129,6 +136,11 @@ class Bond(object):
     def length(self):
         return self.a1.distance(self.a2)
 
+    @length.setter
+    def length(self, value):
+        geom.set_distance(self.a1, self.a2, value,
+                          adjustmol=self.exists and not self.is_cyclic)
+
     @property
     def name(self):
         """ str: name of the bond """
@@ -150,6 +162,26 @@ class Bond(object):
     @property
     def midpoint(self):
         return (self.a1.position + self.a2.position) / 2.0
+
+    @property
+    def is_cyclic(self):
+        """
+        bool: True if this bond is in one or more rings
+        """
+        visited = set([self.a2])
+
+        def check_for_cycles(atom):
+            visited.add(atom)
+            for nbr in atom.bond_graph:
+                if nbr is self.a2 and atom is not self.a1:
+                    return True
+                if nbr not in visited:
+                    in_cycle = check_for_cycles(nbr)
+                    if in_cycle:
+                        return True
+            return False  # if here, not in a cycle
+        check_for_cycles(self.a1)
+
 
     def align(self, other, centered=True):
         """ Rotates the entire molecule to align this bond with another object.

@@ -59,7 +59,7 @@ def not_installed_method(*args, **kwargs):
 
 
 try:
-    from nbmolviz.uibase import Logger, display_log
+    from nbmolviz.uielements import Logger, display_log
     exports_names('Logger', 'display_log')
 
 except ImportError:
