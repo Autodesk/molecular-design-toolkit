@@ -177,7 +177,7 @@ def _assert_numerical_analytical_overlaps_match(g1, g2):
     with np.errstate(under='ignore'):
         prodvals = g1(allpoints) * g2(allpoints)
     numsum = prodvals.sum() * grid.dx * grid.dy * grid.dz
-    helpers.assert_almost_equal(numsum, olap, decimal=5)
+    helpers.assert_almost_equal(numsum, olap, decimal=4)
 
 
 @pytest.mark.parametrize('withunits', [False, True])

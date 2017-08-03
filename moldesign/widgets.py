@@ -19,11 +19,12 @@ standard_library.install_aliases()
 from .helpers.widgets import nbmolviz_installed
 
 if nbmolviz_installed:
-    from nbmolviz.widgets import BondSelector, GeometryBuilder, ResidueSelector, Symmetrizer
+    from nbmolviz.widgets import (BondSelector, GeometryBuilder, ResidueSelector, Symmetrizer,
+                                  AtomSelector)
     from nbmolviz.widgets.computeconfig import configure, about
 else:
     from .helpers.widgets import not_installed_method
-    BondSelector = GeometryBuilder = ResidueSelector = Symmetrizer = configure = about = \
-        not_installed_method
+    BondSelector = GeometryBuilder = ResidueSelector = AtomSelector = Symmetrizer = configure \
+        = about = not_installed_method
 
-__all__ = 'BondSelector GeometryBuilder ResidueSelector Symmetrizer'.split()
+__all__ = 'BondSelector GeometryBuilder ResidueSelector Symmetrizer AtomSelector'.split()
