@@ -19,7 +19,7 @@ standard_library.install_aliases()
 import numpy as np
 import copy
 
-from . import MolecularOrbitals
+from . import Orbital, MolecularOrbitals
 from ..utils import DotDict
 
 
@@ -73,8 +73,12 @@ class ElectronicWfn(object):
             self.positions = positions.copy()
 
         if self.aobasis is not None:
-            self.orbitals['atomic'] = self.aobasis
             self.aobasis.wfn = self
+            atomic_orbs = [Orbital(c, basis=self.aobasis, wfn=self, name=bf.name)
+                           for c,bf in zip(np.identity(len(self.aobasis)), self.aobasis)]
+            self.orbitals.atomic = MolecularOrbitals(atomic_orbs, wfn=self,
+                                                     basis=self.aobasis,
+                                                     orbtype='atomic')
             for orb in self.aobasis.orbitals:
                 orb.wfn = self
 

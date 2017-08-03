@@ -125,7 +125,10 @@ class MdtQuantity(ureg.Quantity):
         return result
 
     def __hash__(self):
-        return hash((self._magnitude, str(self.units)))
+        m = self._magnitude
+        if isinstance(m, np.ndarray) and m.shape == ():
+            m = float(m)
+        return hash((m, str(self.units)))
 
     def __setitem__(self, key, value):
         from . import array as quantityarray
