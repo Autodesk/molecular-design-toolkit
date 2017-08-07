@@ -18,9 +18,9 @@ standard_library.install_aliases()
 # limitations under the License.
 
 import moldesign as mdt
-from .errors import ForcefieldAssignmentError, show_parameterization_results
+from ..exceptions import ForcefieldAssignmentError
+from .errors import show_parameterization_results
 from ..utils import exports
-
 
 class Forcefield(object):
     """ Abstract class for biomolecular forcefield definitions such as amber14sb or charm22.
@@ -122,31 +122,33 @@ class TLeapForcefield(Forcefield):
     def assign(self, mol):
         newmol = self.create_prepped_molecule(mol)
         if newmol.num_atoms != mol.num_atoms:
-            # TODO: much better error message here
-            raise ForcefieldAssignmentError()
+            raise ForcefieldAssignmentError(
+                    "Can't assign forcefield - this molecule is missing atoms. "
+                    "Use `ForceField.create_prepped_molecule` to add them automatically.",
+                    [])
 
         else:
             # TODO: much more rigorous consistency checking
             newmol.ff.copy_to(mol)
 
     def create_prepped_molecule(self, mol, display=True):
-        from ..interfaces import ambertools
+        from ..interfaces import tleap_interface
 
-        clean_molecule = ambertools._prep_for_tleap(mol)
+        clean_molecule = tleap_interface._prep_for_tleap(mol)
 
-        job = ambertools._run_tleap_assignment(clean_molecule, self._fflines, self._file_list)
+        job = tleap_interface._run_tleap_assignment(clean_molecule, self._fflines, self._file_list)
 
         if 'output.inpcrd' in job.get_output():
             prmtop = job.get_output('output.prmtop')
             inpcrd = job.get_output('output.inpcrd')
-            params = ambertools.AmberParameters(prmtop, inpcrd, job)
+            params = tleap_interface.AmberParameters(prmtop, inpcrd, job)
             m = mdt.read_amber(params.prmtop, params.inpcrd)
             newmol = mdt.helpers.restore_topology(m, mol)
             newmol.ff = mdt.forcefields.ForcefieldParams(newmol, params)
         else:
             newmol = None
 
-        errors = ambertools._parse_tleap_errors(job, clean_molecule)
+        errors = tleap_interface._parse_tleap_errors(job, clean_molecule)
 
         show_parameterization_results(errors, clean_molecule, molout=newmol)
 
@@ -154,7 +156,8 @@ class TLeapForcefield(Forcefield):
             return newmol
         else:
             raise ForcefieldAssignmentError(
-                    'TLeap failed to assign force field parameters for %s' % mol, job)
+                    'TLeap failed to assign force field parameters for %s' % mol,
+                    errors, job=job, mol=mol)
 
     def add_ff(self, ff):
         self._fflines.extend(ff._fflines)
