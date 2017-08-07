@@ -233,21 +233,21 @@ def assert_not_bonded(mol, a1, a2):
 def assert_consistent_bond(mol, a1, a2, order):
     assert a1 in a2.bond_graph
     assert a2 in a1.bond_graph
-    for bond in a1.bonds:
-        if bond.a2 is a2:
-            assert bond.order == order
-            break
-    else:
-        assert False, "bond not found in atom.bonds"
-
-    for bond in a2.bonds:
-        if bond.a1 is a1:
-            assert bond.order == order
-            break
-    else:
-        assert False, "bond not found in atom.bonds"
+    _unique_bond_check(a1, a2, order)
+    _unique_bond_check(a2, a1, order)
 
     assert a1.bond_graph[a2] == a2.bond_graph[a1] == order
     assert mol.bond_graph[a1][a2] == mol.bond_graph[a2][a1] == order
 
+
+def _unique_bond_check(a1, a2, order):
+    found = False
+    for bond in a1.bonds:
+        if bond.partner(a1) is a2:
+            assert not found, '%s appeared twice' % bond
+            assert bond.order == order
+            found = True
+
+    if a1.num_bonds > 0 and not found:
+        assert False, "bond not found in atom.bonds"
 
