@@ -46,7 +46,7 @@ def pdb_1hpk_roundtrip(pdb_1hpk):
 @pytest.mark.parametrize('mol', 'pdb_1hpk pdb_1hpk_roundtrip'.split())
 def test_1hpk(request, mol):
     mol = request.getfixturevalue(mol)
-    mol = mdt.interfaces.ambertools._prep_for_tleap(mol)
+    mol = mdt.interfaces.tleap_interface._prep_for_tleap(mol)
     for residx in (0, 21, 49, 61, 73, 78):
         residue = mol.residues[residx]
         assert residue.resname == 'CYX'
