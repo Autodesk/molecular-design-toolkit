@@ -94,7 +94,7 @@ class RunsRemotely(object):
             """
             # If the wrapper is not enabled, just run the wrapped function as normal.
             f = func  # keeps a reference to the original function in this closure
-            if not wrapper.enabled or not self.should_run_remote and self.should_run_remote():
+            if not wrapper.enabled or not self.should_run_remote or not self.should_run_remote():
                 return f(*args, **kwargs)
 
             wait = kwargs.get('wait', True)

@@ -21,8 +21,9 @@ standard_library.install_aliases()
 import numpy as np
 
 import moldesign as mdt
-from moldesign import units as u
-from moldesign.utils import exports
+from .. import units as u
+from ..utils import exports
+from ..compute import packages
 
 from .base import EnergyModelBase
 
@@ -34,7 +35,7 @@ UNITNAMES = {'kcal/mol': u.kcalpermol, 'kJ/mol': u.kjpermol}
 
 @exports
 class OpenBabelPotential(EnergyModelBase):
-    _CALLS_MDT_IN_DOCKER = mdt.interfaces.openbabel.force_remote
+    _CALLS_MDT_IN_DOCKER = packages.openbabel.force_remote
     DEFAULT_PROPERTIES = ['potential_energy', 'forces']
     ALL_PROPERTIES = DEFAULT_PROPERTIES
     PARAMETERS = [mdt.parameters.Parameter(name='forcefield',
@@ -54,7 +55,7 @@ class OpenBabelPotential(EnergyModelBase):
 
         self._prepped = True
 
-    @mdt.compute.runsremotely(enable=mdt.interfaces.openbabel.force_remote, is_imethod=True)
+    @packages.openbabel.runsremotely(is_imethod=True)
     def calculate(self, requests):
         import openbabel as ob
 
@@ -79,6 +80,6 @@ class OpenBabelPotential(EnergyModelBase):
 
 
     # if necessary, run the entire minimization remotely for speed
-    @mdt.compute.runsremotely(enable=mdt.interfaces.openbabel.force_remote, is_imethod=True)
+    @packages.openbabel.runsremotely(is_imethod=True)
     def minimize(self, **kwargs):
         super().minimize(**kwargs)

@@ -64,9 +64,12 @@ class InterfacedPackage(object):
         """
         from .runsremotely import runsremotely
 
+        def should_run_remote():
+            return self.force_remote
+
         def wrapper(f):
             wrapped = runsremotely(image=self.docker_image,
-                                   should_run_remote=lambda: self.force_remote,
+                                   should_run_remote=should_run_remote,
                                    **kwargs)(f)
             return wrapped
 
@@ -79,7 +82,9 @@ class InterfacedPackage(object):
 
 biopython = InterfacedPackage('biopython', '1.68', importname='Bio', required=True)
 parmed = InterfacedPackage('parmed', '2.7.3', required=True)
-openbabel = InterfacedPackage('openbabel', '2.4')  # can't get this one's version thru python (?)
+
+# can't find any run-time mechanism to get the version for openbabel ...
+openbabel = InterfacedPackage('openbabel', '2.4')
 pdbfixer = InterfacedPackage('pdbfixer', '1.4')
 pyscf = InterfacedPackage('pyscf', '1.1')
 openmm = InterfacedPackage('OpenMM', '7.1.1', importname='simtk')

@@ -78,7 +78,7 @@ def test_forces_and_energy_were_calculated(objkey, request):
     assert forces.shape == mol.positions.shape
 
 
-@pytest.mark.skipif(mdt.interfaces.openmm.force_remote,
+@pytest.mark.skipif(mdt.compute.packages.openmm.force_remote,
                     reason="Numerical derivatives need to be parallelized, "
                            "otherwise this takes too long")
 @pytest.mark.parametrize('objkey', TESTSYTEMS)
