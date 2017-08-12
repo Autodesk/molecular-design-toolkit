@@ -25,7 +25,8 @@ import numpy as np
 import moldesign as mdt
 from .. import units as u
 from .. import compute, orbitals, utils
-from ..interfaces.pyscf_interface import force_remote, mol_to_pyscf,  StatusLogger, SPHERICAL_NAMES
+from ..compute import packages
+from ..interfaces.pyscf_interface import mol_to_pyscf,  StatusLogger, SPHERICAL_NAMES
 from .base import QMBase
 from ..helpers import Logger
 from ..molecules import AtomicProperties
@@ -81,7 +82,7 @@ FORCE_CALCULATORS = LazyClassMap({'rhf': 'pyscf.grad.RHF', 'hf': 'pyscf.grad.RHF
 
 @utils.exports
 class PySCFPotential(QMBase):
-    _CALLS_MDT_IN_DOCKER = force_remote
+    _CALLS_MDT_IN_DOCKER = not packages.pyscf.is_installed()  # this attribute is just for unit testing
     DEFAULT_PROPERTIES = ['potential_energy',
                           'wfn',
                           'mulliken']
@@ -102,7 +103,7 @@ class PySCFPotential(QMBase):
         self.logs = StringIO()
         self.logger = Logger('PySCF interface')
 
-    @compute.runsremotely(enable=force_remote, is_imethod=True, persist_refs=True)
+    @packages.pyscf.runsremotely(is_imethod=True, persist_refs=True)
     def calculate(self, requests=None):
         self.logger = Logger('PySCF calc')
         do_forces = 'forces' in requests

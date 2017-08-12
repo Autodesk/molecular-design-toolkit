@@ -34,7 +34,8 @@ class RunsRemotely(object):
                  engine=None,
                  image=None,
                  is_imethod=False,
-                 persist_refs=False):
+                 persist_refs=False,
+                 should_run_remote=None):
         """Function decorator to run a python function remotely.
 
         Note:
@@ -56,6 +57,8 @@ class RunsRemotely(object):
             is_imethod (bool): This is an instancemethod
                Note: we can't determine this at import-time without going to great lengths ...
                     - see, e.g., http://stackoverflow.com/questions/2366713/ )
+            should_run_remote (Callable): function to be called to determine whether
+             to run this function remotely (called every time the function is called)
         """
         self.enabled = enable
         self.display = display
@@ -65,6 +68,9 @@ class RunsRemotely(object):
         self.jobname = jobname
         self.is_imethod = is_imethod
         self.persist_refs = persist_refs
+        if should_run_remote is None:
+            should_run_remote = lambda x: True
+        self.should_run_remote = should_run_remote
 
     def __call__(self, func):
         """
@@ -88,7 +94,7 @@ class RunsRemotely(object):
             """
             # If the wrapper is not enabled, just run the wrapped function as normal.
             f = func  # keeps a reference to the original function in this closure
-            if not wrapper.enabled:
+            if not wrapper.enabled or not self.should_run_remote and self.should_run_remote():
                 return f(*args, **kwargs)
 
             wait = kwargs.get('wait', True)
