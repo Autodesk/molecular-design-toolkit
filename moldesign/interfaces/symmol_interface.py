@@ -1,6 +1,7 @@
 from __future__ import print_function, absolute_import, division
-from future.builtins import *
+
 from future import standard_library
+
 standard_library.install_aliases()
 
 # Copyright 2017 Autodesk Inc.
@@ -20,11 +21,11 @@ import re
 
 import fortranformat
 import numpy as np
-import pyccc
 
 import moldesign as mdt
 from .. import units as u
 from .. import utils
+from ..compute import packages
 
 line_writer = fortranformat.FortranRecordWriter('(a6,i2,6f9.5)')
 
@@ -50,10 +51,9 @@ def run_symmol(mol, tolerance=0.1 * u.angstrom):
     command = 'symmol < sym.in'
     inputs = {'sym.in': '\n'.join(infile)}
 
-    job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
-                    command=command,
-                    inputs=inputs,
-                    name="symmol, %s" % mol.name)
+    job = packages.symmol.make_job(command=command,
+                                   inputs=inputs,
+                                   name="symmol, %s" % mol.name)
     job = mdt.compute.run_job(job)
 
     data = parse_output(mol, job.get_output('symmol.out'))

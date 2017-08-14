@@ -107,13 +107,14 @@ def run_job(job, engine=None, wait=True, jobname=None, display=True,
 
     mdt._lastjobs.append(job)  # TODO: this could potentially be a memory leak
 
-    engine = utils.if_not_none(engine, mdt.compute.get_engine())
+    if job.engine is None:
+        engine = utils.if_not_none(engine, mdt.compute.get_engine())
+        job.engine = engine
+        if engine is None:
+            raise ValueError('No compute engine configured! Configure MDT using '
+                             'moldesign.compute.config')
 
-    if engine is None:
-        raise ValueError('No compute engine configured! Configure MDT using '
-                         'moldesign.compute.config')
-
-    engine.submit(job)
+    job.submit()
     jobname = utils.if_not_none(jobname, job.name)
 
     if display:

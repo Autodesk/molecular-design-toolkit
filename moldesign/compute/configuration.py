@@ -71,6 +71,8 @@ Args:
     default_docker_url (str): URL for communicating with docker if ``engine_type=='docker'``.
         (default: Determined from $DOCKER_HOST, usually this will be the client you run on
         the command line)
+    run_remote (Mapping[str,bool]): Whether to run a given python package in docker by default
+    run_local (Mapping[str,bool]): Whether to run a given executable locally or in docker
 
 MDT uses a non-standard docker tagging system to store its docker images. Generally,
 a given image is pulled from a URL of the form:
@@ -96,6 +98,8 @@ CONFIG_DEFAULTS = utils.DotDict(engine_type='docker',
                                 default_python_image=None,
                                 default_docker_host='',
                                 default_version_tag=DEFAULT_VERSION_TAG,
+                                run_remote={},
+                                run_local={},
                                 devmode=False)
 
 DEF_CONFIG = CONFIG_DEFAULTS.copy()
@@ -115,22 +119,29 @@ def registry_login(client, login):
         print('done')
 
 
-def write_config(path=None):
-    if path is None:
-        path = _get_config_path()
-
-    if not os.path.exists(path) and path == DEFAULT_CONFIG_PATH:
+def update_saved_config(**keys):
+    path = _get_config_path()
+    if not os.path.exists(path):
         confdir = os.path.dirname(path)
         if not os.path.exists(confdir):
             os.mkdir(confdir)
             print('Created moldesign configuration directory %s' % confdir)
 
-    configdump = {}
-    for key in CONFIG_DEFAULTS:
-        if key in config and isinstance(config[key], (basestring, int, float)):
-            configdump[key] = config[key]
+    with open(path, 'r') as conffile:
+        oldconf = yaml.load(conffile)
+
+    for k,v in keys.items():
+        if k in oldconf:
+            assert isinstance(oldconf[k], dict) == isinstance(v, dict), "Is key %s a mapping?" % k
+        if isinstance(v, dict):
+            if k not in oldconf:
+                oldconf[k] = {}
+            oldconf[k].update(v)
+        else:
+            oldconf[k] = v
+
     with open(path, 'w') as f:
-        yaml.safe_dump(configdump, f, default_flow_style=False)
+        yaml.safe_dump(oldconf, f, default_flow_style=False)
 
     print('Wrote moldesign configuration to %s' % path)
 
@@ -149,6 +160,8 @@ def get_engine():
 def init_config():
     """Called at the end of package import to read initial configuration and setup cloud computing.
     """
+    from . import packages
+
     config.update(CONFIG_DEFAULTS)
 
     path = _get_config_path()
@@ -177,6 +190,14 @@ def init_config():
 
     if config.get('default_python_image', None) is None:
         config.default_python_image = expcted_docker_python_image
+
+    for pkg, do_remote in config.run_remote.items():
+        if do_remote:
+            getattr(packages, pkg).force_remote = True
+
+    for pkg, do_local in config.run_local.items():
+        if do_local:
+            getattr(packages, pkg).run_local = True
 
 
 def _check_override(tagname, expected, path):
