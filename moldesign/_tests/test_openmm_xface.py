@@ -6,7 +6,7 @@ import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
-from moldesign.interfaces.openmm import force_remote as missing_openmm
+from moldesign.compute import packages
 
 from . import helpers
 from .molecule_fixtures import *
@@ -15,6 +15,8 @@ from .molecule_fixtures import *
 
 TESTSYTEMS = ['small_mol', 'protein', 'protein_custom_constraints', 'protein_freeze_hbonds']
 INTEGRATORS = ['verlet', 'langevin']
+
+missing_openmm = not packages.openmm.is_installed()
 
 
 @pytest.fixture
