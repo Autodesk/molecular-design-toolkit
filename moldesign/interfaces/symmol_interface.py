@@ -19,7 +19,6 @@ standard_library.install_aliases()
 # limitations under the License.
 import re
 
-import fortranformat
 import numpy as np
 
 import moldesign as mdt
@@ -27,12 +26,14 @@ from .. import units as u
 from .. import utils
 from ..compute import packages
 
-line_writer = fortranformat.FortranRecordWriter('(a6,i2,6f9.5)')
 
 IMAGE = 'symmol'
 
 #@doi('10.1107/S0021889898002180')
 def run_symmol(mol, tolerance=0.1 * u.angstrom):
+    import fortranformat
+    line_writer = fortranformat.FortranRecordWriter('(a6,i2,6f9.5)')
+
     if mol.num_atoms == 2:
         return _get_twoatom_symmetry(mol)
 
