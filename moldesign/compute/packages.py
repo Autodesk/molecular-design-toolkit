@@ -23,10 +23,36 @@ import pkg_resources
 from future.utils import PY2
 
 from .. import utils
+from .remote_procedure_calls import RpcWrapper
 
 
 class InterfacedPackage(object):
-    def __init__(self, packagename, expectedversion, docker_name='moldesign_complete',
+    """ Object that describes an external python package MDT can access
+
+    These packages should _not_ be considered dependencies (unless required=True). MDT doesn't
+    require them in order to run. If they aren't installed, MDT can be used to automatically
+
+    Note that you can supply a ``docker_image`` or a ``docker_image_label``, or neither, or both.
+    A ``docker_image`` must be the complete path to a docker image (see below), and will take
+    precedence. If not supplied, the ``docker_image_label`` will be used to create a docker path
+    using the :method:`moldesign.compute.get_image_path` function.
+    If neither is supplied, MDT will use the ``config.default_python_image`` docker image.
+
+    Args:
+        packagename (str): name of the package
+        expectedversion (str): version of this package that MDT was tested against
+        engine (pyccc.EngineBase): compute engine to run on
+        docker_image (str): full name of docker image (optional)
+              (i.e., ``docker.io/autodesk/moldesign:moldesign_complete-0.7.4``)
+        docker_image_label (str): MDT image label (i.e., ``moldesign_complete``)
+        importname (str): name to import this package
+            (i.e., it can be imported as ``import [importname]``)
+        required (bool): whether this package MUST be installed for MDT to function (default False)
+    """
+    def __init__(self, packagename, expectedversion,
+                 engine=None,
+                 docker_image=None,
+                 docker_image_label='moldesign_complete',
                  importname=None, required=False):
         self.name = packagename  # for named_dict
         self.packagename = packagename
@@ -36,7 +62,9 @@ class InterfacedPackage(object):
             self.importname = importname
         self.expectedversion = expectedversion
         self.required = required
-        self.docker_name = docker_name
+        self.docker_image = docker_image
+        self.docker_image_label = docker_image_label
+        self.engine = engine
 
     if PY2:
         def is_installed(self):
@@ -62,31 +90,31 @@ class InterfacedPackage(object):
     @property
     def force_remote(self):
         from .configuration import config
+        if not self.is_installed():
+            return True
         return config['run_remote'].get(self.name, False)
 
     @force_remote.setter
     def force_remote(self, value):
         from .configuration import config
+        if not value and not self.is_installed():
+            raise ValueError("Cannot run \"%s\" locally - it's not installed in this environment")
         config['run_remote'][self.name] = value
 
+    @utils.kwargs_from(RpcWrapper.__init__)
     def runsremotely(self, _f=None, **kwargs):
         """ Wraps functions that can be run in a remote docker container.
 
         The function will run remotely whenever ``self.force_remote=True``
+
+        Args:
+            **kwargs: __init__ arguments from :class:`RunsRemotely`
         """
-        from .runsremotely import runsremotely
-        from . import compute
-
-        def should_run_remote():
-            return self.force_remote
-
         def wrapper(f):
-            wrapped = runsremotely(image=compute.get_image_path(self.docker_name),
-                                   should_run_remote=should_run_remote,
-                                   **kwargs)(f)
+            wrapped = RpcWrapper(self, **kwargs)(f)
             return wrapped
 
-        if _f is not None:
+        if _f is not None:  # called without arguments, directly wrap the function
             assert not kwargs
             return wrapper(_f)
         else:
@@ -106,11 +134,36 @@ packages = [biopython, parmed, openbabel, pdbfixer, pyscf, openmm]
 
 
 class InterfacedExecutable(object):
-    def __init__(self, exename, expectedversion, docker_image, path=None, version_flag='--version'):
+    """ Object that describes an external executable that MDT can call
+
+    All open source executables are provided as public docker containers with
+    MDT. Others, such as NBO, must be provided by the user.
+
+    Note that you can supply a ``docker_image`` or a ``docker_image_label``, or both.
+    A ``docker_image`` must be the complete path to a docker image (see below), and will take
+    precedence. If not supplied, the ``docker_image_label`` will be used to create a docker path
+    using the :method:`moldesign.compute.get_image_path` function.
+
+    Args:
+        exename (str): name of the program
+        expectedversion (str): version of this program that MDT was tested against
+        docker_image (str): full name of docker image (optional)
+              (i.e., ``docker.io/autodesk/moldesign:nwchem-0.7.4``)
+        docker_image_label (str): MDT image label (i.e., ``nwchem``)
+        path (str): only relevant when ``self.run_local == True`` - local path to the
+            executable
+        version_flag(str): command line flag to print the version number (set to ``None``
+           if not applicable)
+    """
+    def __init__(self, exename, expectedversion, docker_image_label=None,
+                 docker_image=None,
+                 path=None, version_flag='--version'):
         self.name = exename  # for named_dict
         self.exename = exename
         self.expectedversion = expectedversion
-        self.image_name = docker_image
+        self.docker_image = docker_image
+        self.docker_image_label = docker_image_label
+        self.engine = None
         self._path = path
         self.version_flag = version_flag
 
@@ -166,8 +219,10 @@ class InterfacedExecutable(object):
         kwargs['submit'] = False
         if self.run_local:
             kwargs['engine'] = pyccc.Subprocess()
+        elif self.docker_image is not None:
+            kwargs['image'] = self.docker_image
         else:
-            kwargs['image'] = compute.get_image_path(self.image_name)
+            kwargs['image'] = compute.get_image_path(self.docker_image_label)
         job = pyccc.Job(**kwargs)
         return job
 

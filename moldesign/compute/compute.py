@@ -105,7 +105,10 @@ def run_job(job, engine=None, wait=True, jobname=None, display=True,
         pyccc job object OR function's return value
     """
 
-    mdt._lastjobs.append(job)  # TODO: this could potentially be a memory leak
+    # this is a hacky list of jobs that's mostly for debugging
+    mdt._lastjobs[mdt._njobs] = job
+    mdt._lastjobs[-1] = job
+    mdt._njobs += 1
 
     if job.engine is None:
         engine = utils.if_not_none(engine, mdt.compute.get_engine())

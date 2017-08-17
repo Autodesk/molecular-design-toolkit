@@ -55,8 +55,7 @@ from .orbitals import *
 from .molecules import *
 from .tools import *
 
-# Set up cloud computing
-_lastjobs = []
+# Initialize confiugration
 compute.init_config()
 
 # package metadata
@@ -71,6 +70,11 @@ import numpy as _np
 import warnings as _warnings
 _np.seterr(all='raise')
 _warnings.simplefilter('error', _np.ComplexWarning)
+
+# We keep a list of weak of references to every RPC job that's run
+import weakref as _weakref
+_lastjobs = _weakref.WeakValueDictionary()
+_njobs = 0
 
 # For documentation purposes only - make sphinx document the toplevel namespace
 if _building_docs:
