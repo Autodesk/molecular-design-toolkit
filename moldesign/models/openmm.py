@@ -50,6 +50,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
        sim (simtk.openmm.app.Simulation): OpenMM simulation object (once created)
     """
     # NEWFEATURE: need to set/get platform (and properties, e.g. number of threads)
+    _PKG = packages.openmm
     DEFAULT_PROPERTIES = ['potential_energy', 'forces']
     PARAMETERS = MMBase.PARAMETERS + [openmm_platform_selector, numcpus]
     _CALLS_MDT_IN_DOCKER = packages.openmm.force_remote

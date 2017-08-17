@@ -152,7 +152,7 @@ def check_existing_examples(use_existing):
     if version != MDTVERSION:
         print('WARNING - your example directory is out of date! It corresponds to MDT version '
               '%s, but you are using version %s'%(version, MDTVERSION))
-        print('If you want to update your examples, please rename or remove "%s"'
+        print('To update your examples, please rename or remove "%s"'
               % EXAMPLE_DIR_TARGET)
         sys.exit(201)
 

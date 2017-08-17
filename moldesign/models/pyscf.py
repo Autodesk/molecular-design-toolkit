@@ -82,7 +82,6 @@ FORCE_CALCULATORS = LazyClassMap({'rhf': 'pyscf.grad.RHF', 'hf': 'pyscf.grad.RHF
 
 @utils.exports
 class PySCFPotential(QMBase):
-    _CALLS_MDT_IN_DOCKER = not packages.pyscf.is_installed()  # this attribute is just for unit testing
     DEFAULT_PROPERTIES = ['potential_energy',
                           'wfn',
                           'mulliken']
@@ -93,6 +92,7 @@ class PySCFPotential(QMBase):
                      'functional': ['b3lyp', 'blyp', 'pbe0', 'x3lyp', 'MPW3LYP5']}
 
     FORCE_UNITS = u.hartree / u.bohr
+    _PKG = packages.pyscf
 
     @mdt.utils.kwargs_from(QMBase)
     def __init__(self, **kwargs):

@@ -38,7 +38,7 @@ def get_image_path(image_name, _devmode=None):
         >>> get_image_path('someimage')
         'docker.io/myorg/someimage:0.2
     """
-    from . import config
+    from .configuration import config
 
     if _devmode is None:
         _devmode = config.devmode

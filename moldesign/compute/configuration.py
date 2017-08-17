@@ -63,11 +63,8 @@ Args:
         'docker' (default) or 'subprocess'
     default_repository (str): Repository to pull MDT's standard images from.
         default: 'docker.io/autodesk/moldesign:'
-    default_python_image (str): Image to run python commands in
-        (default: ``docker.io/autodesk/moldesign:moldesign_complete-[VERSION]``, where
-        [VERSION] is the version of MDT)
     default_version_tag (str): Default version tag for docker images
-         (default: ``moldesign.__version__``)
+         (default: last tagged release (like ``moldesign.__version__``))
     default_docker_url (str): URL for communicating with docker if ``engine_type=='docker'``.
         (default: Determined from $DOCKER_HOST, usually this will be the client you run on
         the command line)
@@ -91,11 +88,13 @@ DEFAULT_CONFIG_PATH = os.path.join(os.environ['HOME'], '.moldesign/moldesign.yml
 """ str: default search path for moldesign.yml."""
 
 # TODO: we're currently hardcoding this at release - there's got to be a better way
-DEFAULT_VERSION_TAG = _version.get_versions()['version']
+_vers = _version.get_versions()['version']
+#if '+' in _vers:
+#    _vers = _vers[:_vers.index('+')]
+DEFAULT_VERSION_TAG = _vers
 
 CONFIG_DEFAULTS = utils.DotDict(engine_type='docker',
                                 default_repository='docker.io/autodesk/moldesign:',
-                                default_python_image=None,
                                 default_docker_host='',
                                 default_version_tag=DEFAULT_VERSION_TAG,
                                 run_remote={},
@@ -105,6 +104,7 @@ CONFIG_DEFAULTS = utils.DotDict(engine_type='docker',
 DEF_CONFIG = CONFIG_DEFAULTS.copy()
 """ dict: default configuration to be written to moldesign.yml if it doesn't exist
 """
+config.update(DEF_CONFIG)
 
 
 def registry_login(client, login):
@@ -126,9 +126,10 @@ def update_saved_config(**keys):
         if not os.path.exists(confdir):
             os.mkdir(confdir)
             print('Created moldesign configuration directory %s' % confdir)
-
-    with open(path, 'r') as conffile:
-        oldconf = yaml.load(conffile)
+        oldconf = {}
+    else:
+        with open(path, 'r') as conffile:
+            oldconf = yaml.load(conffile)
 
     for k,v in keys.items():
         if k in oldconf:
@@ -191,20 +192,20 @@ def init_config():
     if config.get('default_python_image', None) is None:
         config.default_python_image = expcted_docker_python_image
 
-    for pkg, do_remote in config.run_remote.items():
+    for pkg, do_remote in list(config.run_remote.items()):
         if do_remote:
             getattr(packages, pkg).force_remote = True
 
-    for pkg, do_local in config.run_local.items():
+    for pkg, do_local in list(config.run_local.items()):
         if do_local:
             getattr(packages, pkg).run_local = True
 
 
 def _check_override(tagname, expected, path):
     if tagname in config and config.default_version_tag != expected:
-        print ('WARNING: Configuration file specifies a different value for %s! '
-               "Remove the `%s` field from %s unless you know what you're doing"
-               % (tagname, tagname, path))
+        print('WARNING: Configuration file specifies a different value for %s! '
+              "Remove the `%s` field from %s unless you know what you're doing"
+              % (tagname, tagname, path))
 
 
 def _get_config_path():

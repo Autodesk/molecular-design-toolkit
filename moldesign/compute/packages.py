@@ -26,7 +26,7 @@ from .. import utils
 
 
 class InterfacedPackage(object):
-    def __init__(self, packagename, expectedversion, docker_image='moldesign_complete',
+    def __init__(self, packagename, expectedversion, docker_name='moldesign_complete',
                  importname=None, required=False):
         self.name = packagename  # for named_dict
         self.packagename = packagename
@@ -36,8 +36,7 @@ class InterfacedPackage(object):
             self.importname = importname
         self.expectedversion = expectedversion
         self.required = required
-        self.docker_image = docker_image
-        self.force_remote = not self.is_installed
+        self.docker_name = docker_name
 
     if PY2:
         def is_installed(self):
@@ -60,18 +59,29 @@ class InterfacedPackage(object):
         except pkg_resources.DistributionNotFound:
             return None
 
+    @property
+    def force_remote(self):
+        from .configuration import config
+        return config['run_remote'].get(self.name, False)
+
+    @force_remote.setter
+    def force_remote(self, value):
+        from .configuration import config
+        config['run_remote'][self.name] = value
+
     def runsremotely(self, _f=None, **kwargs):
         """ Wraps functions that can be run in a remote docker container.
 
         The function will run remotely whenever ``self.force_remote=True``
         """
         from .runsremotely import runsremotely
+        from . import compute
 
         def should_run_remote():
             return self.force_remote
 
         def wrapper(f):
-            wrapped = runsremotely(image=self.docker_image,
+            wrapped = runsremotely(image=compute.get_image_path(self.docker_name),
                                    should_run_remote=should_run_remote,
                                    **kwargs)(f)
             return wrapped
@@ -102,8 +112,17 @@ class InterfacedExecutable(object):
         self.expectedversion = expectedversion
         self.image_name = docker_image
         self._path = path
-        self.run_local = False
         self.version_flag = version_flag
+
+    @property
+    def run_local(self):
+        from .configuration import config
+        return config['run_local'].get(self.name, False)
+
+    @run_local.setter
+    def run_local(self, value):
+        from .configuration import config
+        config['run_local'][self.name] = value
 
     @property
     def path(self):
@@ -155,10 +174,10 @@ class InterfacedExecutable(object):
 
 nwchem = InterfacedExecutable('nwchem.exe', None, 'nwchem', version_flag=None)
 opsin = InterfacedExecutable('opsin', None, 'opsin', version_flag=None)
-nab = InterfacedExecutable('nab.exe', '16', 'ambertools', version_flag=None)
+nab = InterfacedExecutable('nab', '16', 'nucleic_acid_builder', version_flag=None)
 symmol = InterfacedExecutable('symmol', None, 'symmol', version_flag=None)
-tleap = InterfacedExecutable('tleap', '16', 'tleap', version_flag=None)
-antechamber = InterfacedExecutable('antechamber', '16', 'antechamber', version_flag=None)
+tleap = InterfacedExecutable('tleap', '16', 'ambertools', version_flag=None)
+antechamber = InterfacedExecutable('antechamber', '16', 'ambertools', version_flag=None)
 nbo = InterfacedExecutable('nbo', '6.1', 'nbo', version_flag=None)
 
 executables = [nwchem, opsin, nab, symmol, tleap, antechamber]

@@ -35,7 +35,7 @@ UNITNAMES = {'kcal/mol': u.kcalpermol, 'kJ/mol': u.kjpermol}
 
 @exports
 class OpenBabelPotential(EnergyModelBase):
-    _CALLS_MDT_IN_DOCKER = packages.openbabel.force_remote
+    _PKG = packages.openbabel
     DEFAULT_PROPERTIES = ['potential_energy', 'forces']
     ALL_PROPERTIES = DEFAULT_PROPERTIES
     PARAMETERS = [mdt.parameters.Parameter(name='forcefield',
