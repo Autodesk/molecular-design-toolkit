@@ -10,6 +10,7 @@ __PYTEST_MARK__ = ['internal', 'config']
 
 @pytest.fixture(scope='function')
 def tempconfigfile(tmpdir):
+    tmpdir = str(tmpdir)
     path = os.path.join(tmpdir, 'moldesign.yml')
     oldenviron = os.environ.get('MOLDESIGN_CONFIG', None)
     os.environ['MOLDESIGN_CONFIG'] = path
