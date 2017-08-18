@@ -81,6 +81,17 @@ class InterfacedPackage(object):
             spec = importlib.util.find_spec(self.importname)
             return spec is not None
 
+    def get_docker_image_path(self):
+        from . import get_image_path, config
+
+        if self.docker_image is not None:
+            image = self.docker_image
+        elif self.docker_image_label is not None:
+            image = get_image_path(self.docker_image_label)
+        else:
+            image = config.default_python_image
+        return image
+
     def installed_version(self):
         try:
             return pkg_resources.get_distribution(self.packagename).version
@@ -176,6 +187,17 @@ class InterfacedExecutable(object):
     def run_local(self, value):
         from .configuration import config
         config['run_local'][self.name] = value
+
+    def get_docker_image_path(self):
+        from . import get_image_path, config
+
+        if self.docker_image is not None:
+            image = self.docker_image
+        elif self.docker_image_label is not None:
+            image = get_image_path(self.docker_image_label)
+        else:
+            raise ValueError('No docker image data for executable "%s"' % self.name)
+        return image
 
     @property
     def path(self):

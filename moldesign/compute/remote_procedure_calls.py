@@ -95,16 +95,10 @@ class RpcWrapper(object):
 
             # Submit job to remote engine
             python_call = bpy.PythonCall(f, *args, **kwargs)
-            if self.pkg.docker_image is not None:
-                image = self.pkg.docker_image
-            elif self.pkg.docker_image_label is not None:
-                image = get_image_path(self.pkg.docker_image_label)
-            else:
-                image = configuration.config.default_python_image
 
             engine = utils.if_not_none(self.pkg.engine, mdt.compute.get_engine())
             job = bpy.PythonJob(engine=engine,
-                                image=image,
+                                image=self.pkg.get_docker_image_path(),
                                 command=python_call,
                                 name=self.jobname,
                                 sendsource=self.sendsource,

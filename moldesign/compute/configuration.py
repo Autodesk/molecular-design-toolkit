@@ -89,8 +89,8 @@ DEFAULT_CONFIG_PATH = os.path.join(os.environ['HOME'], '.moldesign/moldesign.yml
 
 # TODO: we're currently hardcoding this at release - there's got to be a better way
 _vers = _version.get_versions()['version']
-#if '+' in _vers:
-#    _vers = _vers[:_vers.index('+')]
+if '+' in _vers:
+    _vers = _vers[:_vers.index('+')]
 DEFAULT_VERSION_TAG = _vers
 
 CONFIG_DEFAULTS = utils.DotDict(engine_type='docker',

@@ -21,7 +21,8 @@ from .helpers.widgets import nbmolviz_installed
 if nbmolviz_installed:
     from nbmolviz.widgets import (BondSelector, GeometryBuilder, ResidueSelector, Symmetrizer,
                                   AtomSelector)
-    from nbmolviz.widgets.computeconfig import configure, about
+    from nbmolviz.mdtconfig.compute import configure
+    about = configure
 else:
     from .helpers.widgets import not_installed_method
     BondSelector = GeometryBuilder = ResidueSelector = AtomSelector = Symmetrizer = configure \
