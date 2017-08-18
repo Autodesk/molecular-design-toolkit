@@ -25,6 +25,11 @@ from future.utils import PY2
 from .. import utils
 from .remote_procedure_calls import RpcWrapper
 
+if PY2:
+    PYIMAGELABEL = 'moldesign_complete_py2'
+else:
+    PYIMAGELABEL = 'moldesign_complete'
+
 
 class InterfacedPackage(object):
     """ Object that describes an external python package MDT can access
@@ -52,7 +57,7 @@ class InterfacedPackage(object):
     def __init__(self, packagename, expectedversion,
                  engine=None,
                  docker_image=None,
-                 docker_image_label='moldesign_complete',
+                 docker_image_label=PYIMAGELABEL,
                  importname=None, required=False):
         self.name = packagename  # for named_dict
         self.packagename = packagename
