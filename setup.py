@@ -40,7 +40,7 @@ Operating System :: Unix
 Operating System :: MacOS
 """
 
-HOME = os.environ['HOME']
+HOME = os.path.expanduser('~')
 CONFIG_DIR = os.path.join(HOME, '.moldesign')
 PYEXT = set('.py .pyc .pyo'.split())
 

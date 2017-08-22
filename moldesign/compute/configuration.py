@@ -84,7 +84,7 @@ ENVVAR = "MOLDESIGN_CONFIG"
 
 If this variable is not set, ``$HOME/.moldesign/moldesign.yml`` will be used by default."""
 
-DEFAULT_CONFIG_PATH = os.path.join(os.environ['HOME'], '.moldesign/moldesign.yml')
+DEFAULT_CONFIG_PATH = os.path.join(os.path.expanduser('~'), '.moldesign', 'moldesign.yml')
 """ str: default search path for moldesign.yml."""
 
 # TODO: we're currently hardcoding this at release - there's got to be a better way
