@@ -28,7 +28,6 @@ from .. import compute, orbitals, utils
 from ..compute import packages
 from ..interfaces.pyscf_interface import mol_to_pyscf,  StatusLogger, SPHERICAL_NAMES
 from .base import QMBase
-from ..helpers import Logger
 from ..molecules import AtomicProperties
 
 if future.utils.PY2:
@@ -101,11 +100,11 @@ class PySCFPotential(QMBase):
         self.reference = None
         self.kernel = None
         self.logs = StringIO()
-        self.logger = Logger('PySCF interface')
+        self.logger = self._get_logger('PySCF interface')
 
     @packages.pyscf.runsremotely(is_imethod=True, persist_refs=True)
     def calculate(self, requests=None):
-        self.logger = Logger('PySCF calc')
+        self.logger = self._get_logger('PySCF calc')
         do_forces = 'forces' in requests
         if do_forces and self.params.theory not in FORCE_CALCULATORS:
             raise ValueError('Forces are only available for the following theories:'
@@ -487,6 +486,11 @@ class PySCFPotential(QMBase):
                             fock_ao=fock)
         scf_matrices.update(ao_mats)
         return scf_matrices
+
+    def _get_logger(self, logname):
+        # the "Logger" import can cause pickling problems, so we do it here
+        from ..helpers import Logger
+        return Logger(logname)
 
 
 def _get_multiconf_dipoles(basis, mcstate, nstates):
