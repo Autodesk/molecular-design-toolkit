@@ -173,11 +173,32 @@ def _assert_numerical_analytical_overlaps_match(g1, g2):
     else:
         helpers.assert_almost_equal(prod.integral, olap)
 
-    allpoints, grid = helpers.generate_grid(g1, g2)
-    with np.errstate(under='ignore'):
-        prodvals = g1(allpoints) * g2(allpoints)
-    numsum = prodvals.sum() * grid.dx * grid.dy * grid.dz
-    helpers.assert_almost_equal(numsum, olap, decimal=4)
+    def assert_with_resolution(npoints):
+        allpoints, grid = helpers.generate_grid(g1, g2, npoints)
+        with np.errstate(under='ignore'):
+            prodvals = g1(allpoints) * g2(allpoints)
+        numsum = prodvals.sum() * grid.dx * grid.dy * grid.dz
+        helpers.assert_almost_equal(numsum, olap, decimal=4)
+
+    # If numerical isn't equal to analytical, try again with higher resolution
+    # to make sure the failure isn't due to a sparse grid:
+    try:
+        assert_with_resolution(64)
+    except AssertionError:
+        pass
+    else:
+        return
+
+    try:
+        assert_with_resolution(128)
+    except AssertionError:
+        pass
+    else:
+        return
+
+    assert_with_resolution(256)
+
+
 
 
 @pytest.mark.parametrize('withunits', [False, True])

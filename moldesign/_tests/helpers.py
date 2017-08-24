@@ -230,7 +230,7 @@ requires_internet_connection = pytest.mark.skipif(not INTERNET_ON,
 """ Decorator to disable tests that need internet if we can't connect to the network """
 
 
-def generate_grid(g, g2=None):
+def generate_grid(g, g2=None, npoints=64):
     from moldesign import mathutils
 
     if g2 is None: g2 = g
@@ -243,6 +243,6 @@ def generate_grid(g, g2=None):
     ranges = np.ones((3, 2))*5.0*width
     ranges[:, 0] *= -1
     ranges += ((g.center + g2.center)/2.0)[:, None]
-    grid = mathutils.VolumetricGrid(*ranges, npoints=64)
+    grid = mathutils.VolumetricGrid(*ranges, npoints=npoints)
     allpoints = grid.allpoints()
     return allpoints, grid
