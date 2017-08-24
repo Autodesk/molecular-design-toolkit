@@ -2,7 +2,6 @@ from __future__ import print_function, absolute_import, division
 from future.builtins import *
 from future import standard_library
 standard_library.install_aliases()
-
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +19,7 @@ import moldesign as mdt
 from .. import utils
 from ..helpers import display_log
 
+default_engine = None
 
 def get_image_path(image_name, _devmode=None):
     """ Returns a fully qualified tag that points to the correct registry

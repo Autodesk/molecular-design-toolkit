@@ -29,19 +29,17 @@ from pyccc import engines
 from .. import utils
 from . import compute
 from .. import _version
-
-default_engine = None
+from .. import exceptions
 
 RUNNING_ON_WORKER = (os.environ.get('IS_PYCCC_JOB', '0') == '1')
 
 COMPUTE_CONNECTION_WARNING = """
-WARNING: Failed to connect to a computational engine - MDT won't be able to run
-anything outside of Python.
+WARNING: Failed to connect to Docker - MDT won't be able to run
+anything software not already installed on your machine.
 
-You can fix this either:
-  1) interactively, in a notebook, by running `moldesign.configure()`, or,
-  2) by modifying the configuration dictionary `moldesign.compute.config`, then
-     running `moldesign.compute.reset_compute_engine()` to try again."""
+Make sure Docker is installed and running!
+To install it, go to https://www.docker.com/get-docker
+"""
 
 
 config = utils.DotDict()
@@ -148,12 +146,11 @@ def update_saved_config(**keys):
 
 
 def get_engine():
-    from moldesign import compute
     if compute.default_engine is None:
         try:
             reset_compute_engine()
         except:
-            print(COMPUTE_CONNECTION_WARNING)
+            print(COMPUTE_CONNECTION_WARNING, file=sys.stderr)
             raise
     return compute.default_engine
 
@@ -228,21 +225,10 @@ def reset_compute_engine():
     compute.default_engine = None
 
     if config.engine_type == 'docker':
-        if config.default_docker_host:
-            notice = 'Connecting to docker host at %s' % config.default_docker_host
-            hosturl = config.default_docker_host
-        else:
-            notice = "Connecting to your docker engine"
-            hosturl = None
-        with utils.textnotify(notice):
-            compute.default_engine = engines.Docker(hosturl)
-        _connect_docker_registry()
+        connect_docker()
 
     elif config.engine_type == 'subprocess':
-        compute.default_engine = engines.Subprocess()
-        print("""WARNING: running all computational jobs as subprocesses on this machine.
-This requires that you have all necessary software installed locally.
-To change the engine, call moldesign.configure() or modify moldesign.compute.config .""")
+        connect_subprocess()
 
     elif config.engine_type in ('ccc', 'docker-machine'):
         raise ValueError('Computational engine type "%s" is no longer supported by MDT. '
@@ -252,6 +238,33 @@ To change the engine, call moldesign.configure() or modify moldesign.compute.con
 
     else:
         raise ValueError('Unrecognized engine %s' % config.engine_type)
+
+
+def connect_subprocess():
+    compute.default_engine = engines.Subprocess()
+    print("""WARNING: running all computational jobs as subprocesses on this machine.
+This requires that you have all necessary software installed locally.
+To change the engine, call moldesign.configure() or modify moldesign.compute.config .""")
+
+
+def connect_docker():
+    import requests, docker
+
+    if config.default_docker_host:
+        notice = 'Connecting to docker host at %s'%config.default_docker_host
+        hosturl = config.default_docker_host
+    else:
+        notice = "Connecting to your docker engine"
+        hosturl = None
+    with utils.textnotify(notice):
+        try:
+            compute.default_engine = engines.Docker(hosturl)
+            compute.default_engine.client.ping()
+        except (requests.exceptions.RequestException, docker.errors.DockerException):
+            location = 'running locally' if hosturl is None else ("at URL %s" % hosturl)
+            raise exceptions.DockerError(
+                    'Failed to connect to docker %s.' % location)
+    _connect_docker_registry()
 
 
 def _connect_docker_registry():
