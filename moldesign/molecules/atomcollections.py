@@ -26,7 +26,7 @@ import numpy as np
 
 import moldesign as mdt
 from .. import units as u
-from .. import utils, external, mathutils, helpers
+from .. import utils, external, mathutils, widgets
 from . import toplevel
 
 
@@ -36,9 +36,9 @@ class AtomGroup(object):
     Attributes:
         atoms (List[Atom]): a list of atoms
     """
-    draw2d = helpers.WidgetMethod('atomgroups.draw2d')
-    draw3d = helpers.WidgetMethod('atomgroups.draw3d')
-    draw = helpers.WidgetMethod('atomgroups.draw')
+    draw2d = widgets.WidgetMethod('atomgroups.draw2d')
+    draw3d = widgets.WidgetMethod('atomgroups.draw3d')
+    draw = widgets.WidgetMethod('atomgroups.draw')
 
     def __init__(self, *args, **kwargs):
         """ This should never be called directly - it will be called by the `super` methods
@@ -81,7 +81,8 @@ class AtomGroup(object):
     def kinetic_energy(self):
         r""" u.Scalar[energy]: Classical kinetic energy :math:`\sum_{\text{atoms}} \frac{p^2}{2m}`
         """
-        return helpers.kinetic_energy(self.momenta, self.masses)
+        from ..helpers import kinetic_energy
+        return kinetic_energy(self.momenta, self.masses)
 
     def get_atoms(self, *keywords, **queries):
         """Allows keyword-based atom queries. Returns atoms that match ALL queries.

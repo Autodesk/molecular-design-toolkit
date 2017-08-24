@@ -42,6 +42,9 @@ class QMConvergenceError(Exception):
     """
     pass
 
+class DockerError(Exception):
+    pass
+
 
 class ForcefieldAssignmentError(Exception):
     """ Class that define displays for common errors in assigning a forcefield

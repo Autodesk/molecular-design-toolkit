@@ -70,17 +70,11 @@
   steps:
    - command: deployment/print_environment.sh
 
-- type: parallel
+- type: serial
   name: complete_tests
   services:
    - test_moldesign_complete
    - test_moldesign_complete_py2
-  steps:
-   - command: deployment/codeship_runtests.sh
-
-- type: parallel
-  name: minimal_tests
-  services:
    - test_moldesign_minimal
    - test_moldesign_minimal_py2
   steps:

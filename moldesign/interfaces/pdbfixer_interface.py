@@ -21,33 +21,22 @@ standard_library.install_aliases()
 # limitations under the License.
 from past.builtins import basestring
 
-import imp
 import io
 import re
-import sys
 
 import numpy as np
 
 import moldesign as mdt
 from .. import units as u
-from .. import compute
+from ..compute import packages
 from ..utils import exports
 from . import openmm as opm
-
-try:
-    imp.find_module('pdbfixer')
-except (ImportError, OSError) as exc:
-    sys.stderr.write('Info: PDBFixer not installed; will run in docker container\n')
-    force_remote = True
-else:
-    force_remote = False
 
 
 @exports
 def mol_to_fixer(mol):
     import pdbfixer
-    fixer = pdbfixer.PDBFixer(
-            pdbfile=io.StringIO(mol.write(format='pdb')))
+    fixer = pdbfixer.PDBFixer(pdbfile=io.StringIO(mol.write(format='pdb')))
     return fixer
 
 
@@ -56,7 +45,7 @@ def fixer_to_mol(f):
     return opm.topology_to_mol(f.topology, positions=f.positions)
 
 
-@compute.runsremotely(enable=force_remote)
+@packages.pdbfixer.runsremotely
 def mutate_residues(mol, residue_map):
     """ Create a mutant with point mutations (returns a copy - leaves the original unchanged)
 
@@ -204,7 +193,7 @@ def _mut_strs_to_map(mol, strs):
     return mutmap
 
 
-@compute.runsremotely(enable=force_remote)
+@packages.pdbfixer.runsremotely
 def add_water(mol, min_box_size=None, padding=None,
               ion_concentration=0.0, neutralize=True,
               positive_ion='Na+', negative_ion='Cl-'):

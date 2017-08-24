@@ -16,28 +16,18 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import sys
 import itertools
-import imp
 
 import numpy as np
 
 import pyccc
 import moldesign as mdt
+
+from ..compute import packages
 from ..utils import from_filepath
 from .. import units as u
-from .. import compute
 from ..utils import exports
 
-
-try:
-    imp.find_module('simtk')
-except (ImportError, OSError) as exc:
-    sys.stderr.write('Info: OpenMM not installed; will run in docker container\n')
-    force_remote = True
-else:
-    force_remote = False
 
 
 class OpenMMPickleMixin(object):
@@ -202,7 +192,7 @@ def pint2simtk(quantity):
     return newvar
 
 
-@compute.runsremotely(enable=force_remote)
+@packages.openmm.runsremotely
 def _amber_to_mol(prmtop_file, inpcrd_file):
     """ Convert an amber prmtop and inpcrd file to an MDT molecule
 
@@ -224,7 +214,7 @@ def _amber_to_mol(prmtop_file, inpcrd_file):
     return mol
 
 
-if force_remote:
+if packages.openmm.is_installed():
     def amber_to_mol(prmtop_file, inpcrd_file):
         if not isinstance(prmtop_file, pyccc.FileContainer):
             prmtop_file = pyccc.LocalFile(prmtop_file)

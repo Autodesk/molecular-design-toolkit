@@ -25,9 +25,9 @@ import numpy as np
 import moldesign as mdt
 from .. import units as u
 from .. import compute, orbitals, utils
-from ..interfaces.pyscf_interface import force_remote, mol_to_pyscf,  StatusLogger, SPHERICAL_NAMES
+from ..compute import packages
+from ..interfaces.pyscf_interface import mol_to_pyscf,  StatusLogger, SPHERICAL_NAMES
 from .base import QMBase
-from ..helpers import Logger
 from ..molecules import AtomicProperties
 
 if future.utils.PY2:
@@ -81,7 +81,6 @@ FORCE_CALCULATORS = LazyClassMap({'rhf': 'pyscf.grad.RHF', 'hf': 'pyscf.grad.RHF
 
 @utils.exports
 class PySCFPotential(QMBase):
-    _CALLS_MDT_IN_DOCKER = force_remote
     DEFAULT_PROPERTIES = ['potential_energy',
                           'wfn',
                           'mulliken']
@@ -92,6 +91,7 @@ class PySCFPotential(QMBase):
                      'functional': ['b3lyp', 'blyp', 'pbe0', 'x3lyp', 'MPW3LYP5']}
 
     FORCE_UNITS = u.hartree / u.bohr
+    _PKG = packages.pyscf
 
     @mdt.utils.kwargs_from(QMBase)
     def __init__(self, **kwargs):
@@ -100,11 +100,11 @@ class PySCFPotential(QMBase):
         self.reference = None
         self.kernel = None
         self.logs = StringIO()
-        self.logger = Logger('PySCF interface')
+        self.logger = self._get_logger('PySCF interface')
 
-    @compute.runsremotely(enable=force_remote, is_imethod=True, persist_refs=True)
+    @packages.pyscf.runsremotely(is_imethod=True, persist_refs=True)
     def calculate(self, requests=None):
-        self.logger = Logger('PySCF calc')
+        self.logger = self._get_logger('PySCF calc')
         do_forces = 'forces' in requests
         if do_forces and self.params.theory not in FORCE_CALCULATORS:
             raise ValueError('Forces are only available for the following theories:'
@@ -486,6 +486,11 @@ class PySCFPotential(QMBase):
                             fock_ao=fock)
         scf_matrices.update(ao_mats)
         return scf_matrices
+
+    def _get_logger(self, logname):
+        # the "Logger" import can cause pickling problems, so we do it here
+        from ..helpers import Logger
+        return Logger(logname)
 
 
 def _get_multiconf_dipoles(basis, mcstate, nstates):

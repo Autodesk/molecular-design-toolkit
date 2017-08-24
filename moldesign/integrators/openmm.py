@@ -19,9 +19,10 @@ standard_library.install_aliases()
 import pyccc
 import pyccc.exceptions
 
-from moldesign import compute, exceptions
-from moldesign.interfaces.openmm import force_remote, MdtReporter, pint2simtk, OpenMMPickleMixin
-from moldesign.utils import exports
+from .. import exceptions
+from ..compute import packages
+from ..interfaces.openmm import MdtReporter, pint2simtk, OpenMMPickleMixin
+from ..utils import exports
 
 
 from .base import IntegratorBase, LangevinBase
@@ -49,12 +50,12 @@ class OpenMMBaseIntegrator(IntegratorBase, OpenMMPickleMixin):
                     'OpenMM crashed silently. Please examine the output. '
                     'This may be due to large forces from, for example, '
                     'an insufficiently minimized starting geometry.')
-        if force_remote or (not wait):
+        if packages.openmm.force_remote or (not wait):
             self.mol.energy_model._sync_remote(traj.mol)
             traj.mol = self.mol
         return traj
 
-    @compute.runsremotely(enable=force_remote, is_imethod=True)
+    @packages.openmm.runsremotely(is_imethod=True)
     def _run(self, run_for):
         self.prep()
         self.energy_model._set_constraints()  # calling this just to raise an exception if necessary

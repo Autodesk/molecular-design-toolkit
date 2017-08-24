@@ -2,7 +2,6 @@ from __future__ import print_function, absolute_import, division
 from future.builtins import *
 from future import standard_library
 standard_library.install_aliases()
-
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,53 +15,16 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import functools
-import imp
-from ..utils import exports, exports_names
 
-try:
-    imp.find_module('nbmolviz')
-except ImportError:
-    nbmolviz_installed = False
-else:
-    nbmolviz_installed = True
+from ..utils import exports_names, exports
+from ..widgets import nbmolviz_enabled
 
 
-def _get_nbmethod(name):
-    # don't import nbmolviz methods until a method is actually called
-    from nbmolviz import methods as nbmethods
-    module = nbmethods
-    for item in name.split('.'):
-        module = getattr(module, item)
-    return module
-
-
-@exports
-class WidgetMethod(object):
-    def __init__(self, name):
-        self.name = name
-        self.method = None
-
-    def __get__(self, instance, owner):
-        if self.method is None:
-            self.method = _get_nbmethod(self.name)
-        return functools.partial(self.method, instance)
-
-
-def not_installed_method(*args, **kwargs):
-    """ This routine is not available. Please install the nbmolviz library to use it:
-      `pip install nbmolviz`
-    """
-    raise ImportError(
-            "To use MDT's graphical user interfaces in a Noteobook, please install "
-            "the nbmolviz library: `pip install nbmolviz`")
-
-
-try:
+if nbmolviz_enabled:
     from nbmolviz.uielements import Logger, display_log
     exports_names('Logger', 'display_log')
 
-except ImportError:
+else:
     @exports
     class Logger(object):
         def __init__(self, title='log', **kwargs):
