@@ -16,7 +16,8 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import imp
+import sys
+import textwrap
 import functools
 from .utils import exports, exports_names
 
@@ -27,15 +28,24 @@ try:
     import nbmolviz.widget_utils
 except ImportError:
     nbmolviz_enabled = False
+    nbmolviz_installed = False
 else:
+    nbmolviz_installed = True
     nbmolviz_enabled = nbmolviz.widget_utils.can_use_widgets()
 
 
-def not_installed_method(*args, **kwargs):
-    raise ImportError(
-            "ERROR: notebook visualization library not installed. "
-            "To use MDT's graphical user interfaces in a Notebook, please install "
-            "the nbmolviz library by running `pip install nbmolviz` or `conda install nbmolviz`")
+def notebook_only_method(*args, **kwargs):
+    assert not nbmolviz_enabled
+    if nbmolviz_installed:
+        raise ImportError("This function is only available in a Jupyter notebook!")
+    else:
+        raise ImportError(
+                "The `nbmolviz` library must be installed to use this function!\n"
+                "To use MDT's notebook visualization features, please install\n"
+                "the nbmolviz library by running these commands at the terminal:\n"
+                "  1) pip install nbmolviz\n"
+                "  2) python -m nbmolviz activate\n"
+                "Afterwards, restart and reload any running notebooks.")
 
 
 if nbmolviz_enabled:
@@ -44,9 +54,10 @@ if nbmolviz_enabled:
                                   AtomSelector)
     from nbmolviz.mdtconfig.compute import configure
     about = configure
+    nbmolviz.widget_utils.print_extension_warnings(stream=sys.stderr)
 else:
     BondSelector = GeometryBuilder = ResidueSelector = AtomSelector = Symmetrizer = configure \
-        = about = not_installed_method
+        = about = notebook_only_method
 
 
 def _get_nbmethod(name):
@@ -65,7 +76,9 @@ class WidgetMethod(object):
         self.method = None
 
     def __get__(self, instance, owner):
-        if self.method is None:
+        if not nbmolviz_enabled:
+            return notebook_only_method
+        elif self.method is None:
             self.method = _get_nbmethod(self.name)
         return functools.partial(self.method, instance)
 
