@@ -16,12 +16,10 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import pyccc
 
 import moldesign as mdt
-from moldesign import utils
-
-IMAGE = 'opsin'
+from .. import utils
+from ..compute import packages
 
 
 @utils.kwargs_from(mdt.compute.run_job)
@@ -37,10 +35,9 @@ def name_to_smiles(name,
         else:
             return smistring
 
-    job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
-                    command=command,
-                    name="opsin, %s" % name,
-                    inputs={'input.txt': name + '\n'},
-                    when_finished=finish_job)
+    job = packages.opsin.make_job(command=command,
+                                  name="opsin, %s" % name,
+                                  inputs={'input.txt': name + '\n'},
+                                  when_finished=finish_job)
 
     return mdt.compute.run_job(job, _return_result=True, **kwargs)

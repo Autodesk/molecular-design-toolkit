@@ -18,7 +18,6 @@ standard_library.install_aliases()
 # limitations under the License.
 
 import numpy as np
-from scipy.special import factorial
 
 from ..mathutils import spherical_harmonics
 from .. import units as u
@@ -104,6 +103,7 @@ class SphericalGaussian(Primitive):
         Returns:
             Scalar: value of the overlap
         """
+        from scipy.special import factorial
         from ..data import ODD_FACTORIAL
 
         if (self.center != other.center).any():

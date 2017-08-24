@@ -137,9 +137,10 @@ class MinimizerBase(object):
         Returns:
             moldesign.Trajectory: the minimization trajectory
         """
-        if remote or getattr(self.mol.energy_model, '_CALLS_MDT_IN_DOCKER', False):
+        if hasattr(self.mol.energy_model, '_PKG') and self.mol.energy_model._PKG.force_remote:
+            remote = True
+        if remote:
             return self.runremotely(wait=wait)
-
         self._run()
 
         # Write the last step to the trajectory, if needed

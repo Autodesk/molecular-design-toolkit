@@ -19,7 +19,6 @@ standard_library.install_aliases()
 import itertools
 
 import numpy as np
-from scipy.special import binom
 
 from .. import units as u
 from .. import utils
@@ -200,6 +199,7 @@ class CartesianGaussian(Primitive):
         Returns:
             CartesianGaussian or PrimitiveSum[CartesianGaussian]: product functions
         """
+        from scipy.special import binom
 
         if (self.center == other.center).all():  # this case is much easier than the general one
             cpy = self.copy()

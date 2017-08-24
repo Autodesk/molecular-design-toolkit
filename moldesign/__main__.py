@@ -47,7 +47,7 @@ URL_OPENERS = ['Open', 'xdg-open', 'sensible-browser', 'gnome-open', 'x-www-brow
 JUPYTERPORT = 8888
 DOCKER_TOOLS = 'docker docker-machine docker-compose'.split()
 DOCKER_REPOSITORY = 'docker-hub.autodesk.com/virshua/moldesign:'
-HOME = os.environ['HOME']
+HOME = os.path.expanduser('~')
 CONFIG_DIR = os.path.join(HOME, '.moldesign')
 EXAMPLE_DIR_TARGET = os.path.join(os.path.curdir, 'moldesign-examples')
 MOLDESIGN_SRC = os.path.abspath(os.path.dirname(__file__))
@@ -152,7 +152,7 @@ def check_existing_examples(use_existing):
     if version != MDTVERSION:
         print('WARNING - your example directory is out of date! It corresponds to MDT version '
               '%s, but you are using version %s'%(version, MDTVERSION))
-        print('If you want to update your examples, please rename or remove "%s"'
+        print('To update your examples, please rename or remove "%s"'
               % EXAMPLE_DIR_TARGET)
         sys.exit(201)
 

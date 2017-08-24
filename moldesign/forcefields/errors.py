@@ -19,13 +19,13 @@ standard_library.install_aliases()
 import html
 from .. import utils
 from .. import units as u
-from ..helpers.widgets import nbmolviz_installed
+from ..widgets import nbmolviz_enabled
 
 
 def show_parameterization_results(errormessages, molin, molout=None):
     print('Forcefield assignment: %s' % ('Success' if molout is not None else 'Failure'))
 
-    if not nbmolviz_installed:
+    if not nbmolviz_enabled:
         for err in errormessages:
             print(utils.html_to_text(err.desc))
     else:

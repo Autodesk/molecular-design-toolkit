@@ -19,7 +19,7 @@ standard_library.install_aliases()
 from future.utils import native_str
 
 import moldesign.molecules
-from moldesign import compute
+from ..compute import packages
 from ..molecules import Trajectory, MolecularProperties
 from ..utils import exports
 from ..interfaces import openmm as opm
@@ -50,9 +50,10 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
        sim (simtk.openmm.app.Simulation): OpenMM simulation object (once created)
     """
     # NEWFEATURE: need to set/get platform (and properties, e.g. number of threads)
+    _PKG = packages.openmm
     DEFAULT_PROPERTIES = ['potential_energy', 'forces']
     PARAMETERS = MMBase.PARAMETERS + [openmm_platform_selector, numcpus]
-    _CALLS_MDT_IN_DOCKER = opm.force_remote
+    _CALLS_MDT_IN_DOCKER = packages.openmm.force_remote
 
     _openmm_compatible = True
 
@@ -69,14 +70,14 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         self._required_tolerance = None
 
     def get_openmm_simulation(self):
-        if opm.force_remote:
+        if packages.openmm.force_remote:
             raise ImportError("Can't create an OpenMM object on this machine - OpenMM not "
                               "installed")
         else:
             if not self._prepped: self.prep()
             return self.sim
 
-    @compute.runsremotely(enable=opm.force_remote, is_imethod=True)
+    @packages.openmm.runsremotely(is_imethod=True)
     def calculate(self, requests=None):
         """
         Drive a calculation and, when finished, update the parent molecule with the results.
@@ -103,7 +104,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
             therefore constructs both. If self.mol does not use an OpenMM integrator, we create
             an OpenMM simulation with a "Dummy" integrator that doesn't ever get used.
         """
-        if opm.force_remote:
+        if packages.openmm.force_remote:
             return True
 
         from simtk.openmm import app
@@ -154,7 +155,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
     def minimize(self, **kwargs):
         if self.constraints_supported():
             traj = self._minimize(**kwargs)
-            if opm.force_remote or (not kwargs.get('wait', False)):
+            if packages.openmm.force_remote or (not kwargs.get('wait', False)):
                 self._sync_remote(traj.mol)
                 traj.mol = self.mol
             return traj
@@ -171,7 +172,7 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         self.mol.properties = mol.properties
         self.mol.time = mol.time
 
-    @compute.runsremotely(enable=opm.force_remote, is_imethod=True)
+    @packages.openmm.runsremotely(is_imethod=True)
     def _minimize(self, nsteps=500,
                  force_tolerance=None,
                  frame_interval=None):

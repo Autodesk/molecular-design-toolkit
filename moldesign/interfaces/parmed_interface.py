@@ -24,7 +24,6 @@ from past.builtins import basestring
 import collections
 
 import itertools
-import parmed
 import future.utils
 
 import moldesign as mdt
@@ -46,6 +45,7 @@ def read_mmcif(f, reassign_chains=True):
     Returns:
         moldesign.Molecule: parsed molecule
     """
+    import parmed
     parmedmol = parmed.read_CIF(f)
     mol = parmed_to_mdt(parmedmol)
     if reassign_chains:
@@ -64,6 +64,7 @@ def read_pdb(f):
     Returns:
         moldesign.Molecule: parsed molecule
     """
+    import parmed
     parmedmol = parmed.read_PDB(f)
     mol = parmed_to_mdt(parmedmol)
     return mol
@@ -222,6 +223,7 @@ def mol_to_parmed(mol):
     Returns:
         parmed.Structure
     """
+    import parmed
     struc = parmed.Structure()
     struc.title = mol.name
 

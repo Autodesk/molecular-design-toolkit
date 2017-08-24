@@ -6,7 +6,7 @@ import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
-from moldesign.interfaces.openmm import force_remote as missing_openmm
+from moldesign.compute import packages
 
 from . import helpers
 from .molecule_fixtures import *
@@ -15,6 +15,8 @@ from .molecule_fixtures import *
 
 TESTSYTEMS = ['small_mol', 'protein', 'protein_custom_constraints', 'protein_freeze_hbonds']
 INTEGRATORS = ['verlet', 'langevin']
+
+missing_openmm = not packages.openmm.is_installed()
 
 
 @pytest.fixture
@@ -78,7 +80,7 @@ def test_forces_and_energy_were_calculated(objkey, request):
     assert forces.shape == mol.positions.shape
 
 
-@pytest.mark.skipif(mdt.interfaces.openmm.force_remote,
+@pytest.mark.skipif(mdt.compute.packages.openmm.force_remote,
                     reason="Numerical derivatives need to be parallelized, "
                            "otherwise this takes too long")
 @pytest.mark.parametrize('objkey', TESTSYTEMS)

@@ -21,14 +21,13 @@ import os
 import re
 import tempfile
 
-import pyccc
-
 import moldesign as mdt
 from . import ambertools
 from .. import units as u
 from .. import compute
 from .. import utils
 from .. import forcefields
+from ..compute import packages
 
 IMAGE = 'ambertools'
 
@@ -117,11 +116,10 @@ def create_ff_parameters(mol, charges='esp', baseff='gaff2', **kwargs):
         param.assign(mol)
         return param
 
-    job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
-                    command=' && '.join(cmds),
-                    inputs=inputs,
-                    when_finished=finish_job,
-                    name="GAFF assignment: %s" % mol.name)
+    job = packages.tleap.make_job(command=' && '.join(cmds),
+                                  inputs=inputs,
+                                  when_finished=finish_job,
+                                  name="GAFF assignment: %s" % mol.name)
 
     return mdt.compute.run_job(job, _return_result=True, **kwargs)
 
@@ -180,10 +178,9 @@ def _run_tleap_assignment(mol, leapcmds, files=None, **kwargs):
 
     inputs['input.leap'] = '\n'.join(leapstr)
 
-    job = pyccc.Job(image=compute.get_image_path(IMAGE),
-                    command='tleap -f input.leap',
-                    inputs=inputs,
-                    name="tleap, %s" % mol.name)
+    job = packages.tleap.make_job(command='tleap -f input.leap',
+                                 inputs=inputs,
+                                 name="tleap, %s" % mol.name)
 
     return compute.run_job(job, **kwargs)
 

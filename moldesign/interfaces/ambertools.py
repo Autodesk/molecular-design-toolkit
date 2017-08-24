@@ -17,12 +17,10 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import moldesign as mdt
-import pyccc
 from .. import compute, utils
+from ..compute import packages
 from .. import units as u
 from ..molecules import AtomicProperties
-
-IMAGE = 'ambertools'
 
 
 @utils.kwargs_from(mdt.compute.run_job)
@@ -84,11 +82,10 @@ def _antechamber_calc_charges(mol, ambname, chargename, kwargs):
         mol.properties[chargename] = AtomicProperties(charges)
         return charges
 
-    job = pyccc.Job(image=mdt.compute.get_image_path(IMAGE),
-                    command=command,
-                    name="%s, %s" % (chargename, mol.name),
-                    inputs={'mol.mol2': mol.write(format='mol2')},
-                    when_finished=finish_job)
+    job = packages.antechamber.make_job(command=command,
+                                        name="%s, %s" % (chargename, mol.name),
+                                        inputs={'mol.mol2': mol.write(format='mol2')},
+                                        when_finished=finish_job)
     return compute.run_job(job, _return_result=True, **kwargs)
 
 
@@ -154,11 +151,10 @@ def build_dna_helix(sequence, helix_type='B', **kwargs):
         mol.name = '%s-DNA Helix: %s' % (helix_type.upper(), sequence)
         return mol
 
-    job = pyccc.Job(command='nab -o buildbdna build.nab && ./buildbdna',
-                    image=mdt.compute.get_image_path('nucleic_acid_builder'),
-                    inputs={'build.nab': '\n'.join(infile)},
-                    name='NAB_build_dna',
-                    when_finished=finish_job)
+    job = packages.nab.make_job(command='nab -o buildbdna build.nab && ./buildbdna',
+                                inputs={'build.nab': '\n'.join(infile)},
+                                name='NAB_build_dna',
+                                when_finished=finish_job)
 
     return mdt.compute.run_job(job, _return_result=True, **kwargs)
 

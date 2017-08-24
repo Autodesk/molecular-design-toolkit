@@ -30,7 +30,7 @@ from ..compute import DummyJob
 from ..exceptions import NotCalculatedError
 from ..min.base import MinimizerBase
 from . import PrimaryStructure, AtomGroup, Bond, HasResidues, BondGraph, MolecularProperties
-from ..helpers import WidgetMethod
+from ..widgets import WidgetMethod
 from .coord_arrays import *
 
 

@@ -2,7 +2,6 @@ from __future__ import print_function, absolute_import, division
 from future.builtins import *
 from future import standard_library
 standard_library.install_aliases()
-
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +19,7 @@ import moldesign as mdt
 from .. import utils
 from ..helpers import display_log
 
+default_engine = None
 
 def get_image_path(image_name, _devmode=None):
     """ Returns a fully qualified tag that points to the correct registry
@@ -38,7 +38,7 @@ def get_image_path(image_name, _devmode=None):
         >>> get_image_path('someimage')
         'docker.io/myorg/someimage:0.2
     """
-    from . import config
+    from .configuration import config
 
     if _devmode is None:
         _devmode = config.devmode
@@ -105,15 +105,19 @@ def run_job(job, engine=None, wait=True, jobname=None, display=True,
         pyccc job object OR function's return value
     """
 
-    mdt._lastjobs.append(job)  # TODO: this could potentially be a memory leak
+    # this is a hacky list of jobs that's mostly for debugging
+    mdt._lastjobs[mdt._njobs] = job
+    mdt._lastjobs[-1] = job
+    mdt._njobs += 1
 
-    engine = utils.if_not_none(engine, mdt.compute.get_engine())
+    if job.engine is None:
+        engine = utils.if_not_none(engine, mdt.compute.get_engine())
+        job.engine = engine
+        if engine is None:
+            raise ValueError('No compute engine configured! Configure MDT using '
+                             'moldesign.compute.config')
 
-    if engine is None:
-        raise ValueError('No compute engine configured! Configure MDT using '
-                         'moldesign.compute.config')
-
-    engine.submit(job)
+    job.submit()
     jobname = utils.if_not_none(jobname, job.name)
 
     if display:
