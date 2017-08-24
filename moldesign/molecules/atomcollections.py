@@ -25,6 +25,7 @@ import itertools
 import numpy as np
 
 import moldesign as mdt
+from .. mathutils.align import rmsd_align, calculate_rmsd
 from .. import units as u
 from .. import utils, external, mathutils, helpers
 from . import toplevel
@@ -432,6 +433,50 @@ class AtomContainer(AtomGroup):
                 bonds.append(bond)
         return bonds
 
+    def align(self, other):
+        """ Aligns this list of atoms to another list of atoms.
+
+        Args:
+            other (AtomContainer): The list of atoms to align to. 
+
+        Returns:
+            rmsd_error(Float): The root mean square deviation measuring the alignment error.
+            xform(np.ndarray): The 4x4 matrix that transforms this list of atoms to the input list of atoms.
+        """
+        if len(self.atoms) != len(other.atoms):
+            raise ValueError('The number of atoms for fitting this atom list %d does not equal the number of atoms in the input list %d' % (len(self.atoms), len(other.atoms)))
+
+        # Create atom coordinate arrays.
+        num_atoms = len(self.atoms)
+        self_coords = np.zeros((num_atoms, 3), dtype=float)
+        other_coords = np.zeros((num_atoms, 3), dtype=float)
+        for i in range(0,num_atoms):
+            self_coords[i] = self.atoms[i].position.value_in(u.angstrom)
+            other_coords[i] = other.atoms[i].position.value_in(u.angstrom)
+
+        # Calculate the 4x4 matrix transforming self_coords into other_coords.
+        rmsd_error, xform = rmsd_align(self_coords, other_coords)
+        return rmsd_error, xform 
+
+    def rmsd(self, other):
+        """ Calculates the root mean square deviation (RMSD) between this list of atoms 
+            and another list of atoms.
+
+        Args:
+            other (AtomContainer): The list of atoms to calculate the RMSD with. 
+
+        Returns:
+            rmsd_error(Float): The root mean square deviation measuring the alignment error.
+        """
+        if len(self.atoms) != len(other.atoms):
+            raise ValueError('The number of atoms for calculating the RMSD between this atom list %d does not equal the number of atoms in the input list %d' % (len(self.atoms), len(other.atoms)))
+        num_atoms = len(self.atoms)
+        self_coords = np.zeros((num_atoms, 3), dtype=float)
+        other_coords = np.zeros((num_atoms, 3), dtype=float)
+        for i in range(0,num_atoms):
+            self_coords[i] = self.atoms[i].position.value_in(u.angstrom)
+            other_coords[i] = other.atoms[i].position.value_in(u.angstrom)
+        return rmsd(self_coords, other_coords)
 
 @toplevel
 class AtomList(AtomContainer, list):  # order is important, list will override methods otherwise
