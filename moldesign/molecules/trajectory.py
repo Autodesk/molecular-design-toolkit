@@ -22,7 +22,7 @@ import time
 import numpy as np
 
 import moldesign as mdt
-from .. import helpers, utils
+from .. import widgets, utils
 from .. import units as u
 from . import MolecularProperties, AtomicProperties
 from . import toplevel
@@ -131,6 +131,8 @@ class TrajectoryAnalysisMixin(object):
     """
     @property
     def kinetic_energy(self):
+        from ..helpers import kinetic_energy
+
         convert_units = True
         energies = []
         for frame in self.frames:
@@ -234,9 +236,9 @@ class Trajectory(TrajectoryAnalysisMixin):
         unit_system (u.UnitSystem): convert all attributes to this unit system
     """
 
-    draw = helpers.WidgetMethod('trajectory.draw')
-    draw_orbitals = helpers.WidgetMethod('trajectory.draw_orbitals')
-    plot = helpers.WidgetMethod('trajectory.plot')
+    draw = widgets.WidgetMethod('trajectory.draw')
+    draw_orbitals = widgets.WidgetMethod('trajectory.draw_orbitals')
+    plot = widgets.WidgetMethod('trajectory.plot')
 
     def __init__(self, mol, unit_system=None, first_frame=False, name=None):
         self._init = True

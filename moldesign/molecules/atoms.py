@@ -21,7 +21,7 @@ import numpy as np
 import moldesign as mdt
 from .. import data, utils
 from .. import units as u
-from ..helpers import WidgetMethod
+from ..widgets import WidgetMethod
 from . import toplevel, AtomContainer, AtomList, AtomArray, AtomCoordinate, Bond
 
 
