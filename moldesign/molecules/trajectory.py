@@ -138,7 +138,7 @@ class TrajectoryAnalysisMixin(object):
         for frame in self.frames:
             if 'momenta' in frame:
                 energies.append(
-                    helpers.kinetic_energy(frame.momenta, self.mol.masses))
+                    kinetic_energy(frame.momenta, self.mol.masses))
             else:
                 convert_units = False
                 energies.append(None)
@@ -150,13 +150,15 @@ class TrajectoryAnalysisMixin(object):
 
     @property
     def kinetic_temperature(self):
+        from ..helpers import kinetic_temperature
+
         convert_units = True
         temps = []
         energies = self.kinetic_energy
         dof = self.mol.dynamic_dof
         for energy, frame in zip(energies, self.frames):
             if energy is not None:
-                temps.append(helpers.kinetic_temperature(energy, dof))
+                temps.append(kinetic_temperature(energy, dof))
             else:
                 convert_units = False
                 temps.append(None)
