@@ -69,8 +69,6 @@ def rmsd_align(src_points, dst_points):
     M1 = np.dot(Rn, np.linalg.inv(Tsrc))
     M2 = np.dot(Tcenter, Tsrc)
     Xform = np.dot(M2, M1)
-    print(">>> src center " + str(src_center))
-    print(">>> dst center " + str(dst_center))
 
     # Calculate rmsd error.
     rmsd_error = 0.0
