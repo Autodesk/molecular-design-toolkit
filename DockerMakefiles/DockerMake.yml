@@ -100,9 +100,14 @@ deploybase:
 
 miniconda:
   FROM: continuumio/miniconda3:4.3.11
+  build: |
+    RUN conda install -c anaconda zlib
 
 miniconda_py2:
   FROM: continuumio/miniconda:4.3.11
+  build: |
+   RUN conda install -c anaconda zlib
+
 
 
 deploy_requirements:
