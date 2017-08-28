@@ -132,7 +132,7 @@ class UnusualBond(ForceFieldMessage):
         if self._has_atoms:
             self.desc = 'WARNING: Unusual distance between {a1} and {a2}: {d:.3f}'.format(
                 d=self.atoms[0].distance(self.atoms[1]), a1=self.atoms[0], a2=self.atoms[1]) \
-                        + '<p>TLeap message:<br><i>%s</i>' % cgi.escape(self.message)
+                        + '<p>TLeap message:<br><i>%s</i>' % html.escape(self.message)
 
             self.short = 'WARN: Unusual dist: {} - {} = ({:.1f})'.format(self.atoms[0],
                                                                    self.atoms[1],

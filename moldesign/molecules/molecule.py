@@ -882,6 +882,7 @@ class Molecule(AtomGroup,
     momenta = ProtectedArray('_momenta')
 
     draw_orbitals = WidgetMethod('molecules.draw_orbitals')
+    configure_methods = WidgetMethod('molecules.configure_methods')
     _PERSIST_REFERENCES = True  # relevant for `pyccc` RPC calls
 
     def __init__(self, atomcontainer,

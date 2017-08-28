@@ -131,6 +131,10 @@ class TLeapForcefield(Forcefield):
             # TODO: much more rigorous consistency checking
             newmol.ff.copy_to(mol)
 
+            # deal with residue types that were automatically renamed:
+            for newres, oldres in zip(newmol.residues, mol.residues):
+                oldres.resname = newres.resname
+
     def create_prepped_molecule(self, mol, display=True):
         from ..interfaces import tleap_interface
 

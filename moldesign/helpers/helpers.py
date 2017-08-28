@@ -121,11 +121,9 @@ def restore_topology(mol, topo):
         chain_map[chain] = mdt.Chain(name=chain.name)
 
     for res, refres in zip(mol.residues, topo.residues):
-        if refres.resname in ('HID', 'HIE', 'HIP'):
-            rname = 'HIS'
-        else:
-            rname = refres.resname
-        assert res.resname == rname
+        if refres.resname != res.resname:
+            print(('INFO: Residue # {res.index} was assigned residue code "{res.resname}" '
+                   '(previously "{refres.resname}")').format(res=res, refres=refres))
         res.pdbindex = refres.pdbindex
         res.name = refres.name
         res.chain = chain_map[refres.chain]
