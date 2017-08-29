@@ -9,6 +9,7 @@ _SOURCES_:
 
 
 _ALL_:
+  - ambertools
   - opsin
   - symmol
   - nwchem
