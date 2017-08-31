@@ -6,10 +6,11 @@ import pytest
 import moldesign as mdt
 from moldesign import geom
 from moldesign.mathutils import normalized
+from moldesign.molecules.atomcollections import AtomList
 from moldesign import units as u
 
 from .molecule_fixtures import *
-from .helpers import assert_almost_equal
+from .helpers import assert_almost_equal, get_data_path
 
 
 __PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
@@ -145,4 +146,35 @@ def test_pmi_reorientation_on_benzene(benzene):
         newdistmat = mol.calc_distance_array()
         np.testing.assert_allclose(newdistmat.defunits_value(),
                                    original_distmat)
+
+# Test the alignmnet of the atoms from two molecules.
+def test_align_molecules():
+
+    # Get the CA atoms for chain X residues 64-72.
+    mol1 = mdt.read(get_data_path('1yu8.pdb'))
+    residues = mol1.chains["X"].residues
+    residue_ids = set(range(64,73))
+    src_atoms = [res.atoms["CA"] for res in residues if res.pdbindex in residue_ids]
+
+    # Get the CA atoms for chain A residues 446-454.
+    mol2 = mdt.read(get_data_path('3ac2.pdb'))
+    residues = mol2.chains["A"].residues
+    residue_ids = set(range(446,455))
+    dst_atoms = [res.atoms["CA"] for res in residues if res.pdbindex in residue_ids]
+
+    # Align the two atom lists.
+    src_atoms_list = AtomList(src_atoms)
+    dst_atoms_list = AtomList(dst_atoms)
+    rmsd_error, xform = src_atoms_list.align(dst_atoms_list)
+
+    # Compare results to expected values.
+    rtol = 1e-5
+    expected_rmsd_error = 0.412441
+    expected_xform = np.array([(4.42719613e-01,  8.84833988e-01, -1.45148745e-01,  1.13863353e+01),   \
+                               (1.30739446e-02, -1.68229930e-01, -9.85661079e-01,  2.42427092e+01),   \
+                               (-8.96564786e-01,  4.34473825e-01, -8.60469602e-02,  2.24877465e+01),  \
+                               (0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  1.00000000e+00)])
+    np.testing.assert_allclose(rmsd_error, expected_rmsd_error, rtol)
+    np.testing.assert_allclose(xform, expected_xform, rtol)
+
 
