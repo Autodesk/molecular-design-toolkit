@@ -441,19 +441,22 @@ class AtomContainer(AtomGroup):
             other (AtomContainer): The list of atoms to align to. 
 
         Returns:
-            rmsd_error(Float): The root mean square deviation measuring the alignment error.
-            xform(np.ndarray): The 4x4 matrix that transforms this list of atoms to the input list of atoms.
+            units.Scalar[length]: The root mean square deviation measuring the alignment error.
+            numpy.ndarray: The 4x4 matrix that transforms this list of atoms to the input list of atoms.
         """
         if len(self.atoms) != len(other.atoms):
-            raise ValueError('The number of atoms for fitting this atom list %d does not equal the number of atoms in the input list %d' % (len(self.atoms), len(other.atoms)))
+            raise ValueError(
+                'The number of atoms for fitting this atom list %d does not equal \n'
+                'the number of atoms in the input list %d' % (len(self.atoms), len(other.atoms)))
 
         # Create atom coordinate arrays.
         num_atoms = len(self.atoms)
-        self_coords = np.zeros((num_atoms, 3), dtype=float)
-        other_coords = np.zeros((num_atoms, 3), dtype=float)
+        coord_units = mdt.units.get_units(self.atoms[0].position)
+        self_coords = np.zeros((num_atoms, 3), dtype=float) * coord_units 
+        other_coords = np.zeros((num_atoms, 3), dtype=float) * coord_units
         for i in range(0,num_atoms):
-            self_coords[i] = self.atoms[i].position.value_in(u.angstrom)
-            other_coords[i] = other.atoms[i].position.value_in(u.angstrom)
+            self_coords[i] = self.atoms[i].position
+            other_coords[i] = other.atoms[i].position
 
         # Calculate the 4x4 matrix transforming self_coords into other_coords.
         rmsd_error, xform = rmsd_align(self_coords, other_coords)
@@ -467,7 +470,7 @@ class AtomContainer(AtomGroup):
             other (AtomContainer): The list of atoms to calculate the RMSD with. 
 
         Returns:
-            rmsd_error(Float): The root mean square deviation measuring the alignment error.
+            u.Scalar[length]: The root mean square deviation measuring the alignment error.
         """
         if len(self.atoms) != len(other.atoms):
             raise ValueError('The number of atoms for calculating the RMSD between this atom list %d does not equal the number of atoms in the input list %d' % (len(self.atoms), len(other.atoms)))
@@ -477,7 +480,7 @@ class AtomContainer(AtomGroup):
         for i in range(0,num_atoms):
             self_coords[i] = self.atoms[i].position.value_in(u.angstrom)
             other_coords[i] = other.atoms[i].position.value_in(u.angstrom)
-        return rmsd(self_coords, other_coords)
+        return rmsd(self_coords, other_coords) * u.default.length
 
 @toplevel
 class AtomList(AtomContainer, list):  # order is important, list will override methods otherwise
