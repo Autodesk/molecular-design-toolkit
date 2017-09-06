@@ -278,7 +278,7 @@ class MolPropertyMixin(object):
         Returns:
             object: the requested property
         """
-        if name in self.properties and np.array_equal(self.properties.positions, self.positions):
+        if name in self.properties and self.properties.geometry_matches(self):
             return self.properties[name]
         else:
             raise NotCalculatedError(
