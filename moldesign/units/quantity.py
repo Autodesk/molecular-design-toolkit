@@ -309,7 +309,11 @@ class MdtQuantity(ureg.Quantity):
         self._magnitude = ResizableArray(self._magnitude)
 
     def append(self, item):
-        mag = item.value_in(self.units)
+        from .tools import array
+        try:
+            mag = item.value_in(self.units)
+        except AttributeError:  # handles lists of quantities
+            mag = array(item).value_in(self.units)
         self._magnitude.append(mag)
 
     def extend(self, items):

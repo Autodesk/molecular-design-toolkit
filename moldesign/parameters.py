@@ -121,9 +121,10 @@ class Parameter(object):
 
 mm_model_parameters = named_dict([
     Parameter('cutoff', 'Cutoff for nonbonded interactions',
-              default=1.0*u.nm, type=u.nm),
+              default=1.0 * u.nm, type=u.nm,
+              relevance=WhenParam('nonbonded', op.ne, 'nocutoff')),
     Parameter('nonbonded', 'Nonbonded interaction method', default='cutoff', type=str,
-              choices=['cutoff', 'pme', 'ewald']),
+              choices=['cutoff', 'pme', 'ewald', 'nocutoff']),
     Parameter('implicit_solvent',
               'Implicit solvent method',
               type=str,

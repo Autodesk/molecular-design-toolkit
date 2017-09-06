@@ -22,6 +22,7 @@ standard_library.install_aliases()
 
 import collections
 
+
 def get_all_atoms(*objects):
     """ Given Atoms, AtomContainers, lists of Atoms, and lists of AtomContainers,
     return a flat list of all atoms contained therein.
@@ -122,8 +123,8 @@ def restore_topology(mol, topo):
 
     for res, refres in zip(mol.residues, topo.residues):
         if refres.resname != res.resname:
-            print(('INFO: Residue # {res.index} was assigned residue code "{res.resname}" '
-                   '(previously "{refres.resname}")').format(res=res, refres=refres))
+            print(('INFO: Residue #{res.index} residue code changed from "{refres.resname}"'
+                   ' to "{res.resname}".').format(res=res, refres=refres))
         res.pdbindex = refres.pdbindex
         res.name = refres.name
         res.chain = chain_map[refres.chain]

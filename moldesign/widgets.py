@@ -19,16 +19,15 @@ standard_library.install_aliases()
 import sys
 import functools
 from .utils import exports, exports_names
+from . import _NBMOLVIZ_EXPECTED_VERSION
 
 __all__ = 'BondSelector GeometryBuilder ResidueSelector Symmetrizer AtomSelector'.split()
-
-NBMOLVIZ_EXPECTED_VERSION = "0.7.0"
 
 INSTALL_CMD = """Install `nbmolviz` by running these commands at the terminal:
   $ pip install "nbmolviz==%s"
   $ python -m nbmolviz activate
 
-Afterwards, restart python and reload any running notebooks.""" % NBMOLVIZ_EXPECTED_VERSION
+Afterwards, restart python and reload any running notebooks."""%_NBMOLVIZ_EXPECTED_VERSION
 
 
 _warnings = []

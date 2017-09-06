@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import print_function, absolute_import, division
-
 import os as _os
+
+_NBMOLVIZ_EXPECTED_VERSION = "0.7.0"
 
 _building_docs = bool(_os.environ.get('SPHINX_IS_BUILDING_DOCS', ""))
 
