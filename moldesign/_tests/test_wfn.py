@@ -60,7 +60,7 @@ def test_basis_function_3d_grids_same_in_pyscf_and_mdt(molkey, request):
     pyscf_vals = basis_values(mol, mol.wfn.aobasis, randocoords)
     with np.errstate(under='ignore'):
         mdt_vals = mol.wfn.aobasis(randocoords)
-    helpers.assert_almost_equal(mdt_vals, pyscf_vals, decimal=6)
+    helpers.assert_almost_equal(mdt_vals, pyscf_vals, decimal=5)
 
 
 @pytest.mark.parametrize('molkey', ['h2_rhf_augccpvdz', 'h2_rhf_sto3g'])
