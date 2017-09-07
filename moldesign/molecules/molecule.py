@@ -278,7 +278,7 @@ class MolPropertyMixin(object):
         Returns:
             object: the requested property
         """
-        if name in self.properties and np.array_equal(self.properties.positions, self.positions):
+        if name in self.properties and self.properties.geometry_matches(self):
             return self.properties[name]
         else:
             raise NotCalculatedError(
@@ -882,6 +882,7 @@ class Molecule(AtomGroup,
     momenta = ProtectedArray('_momenta')
 
     draw_orbitals = WidgetMethod('molecules.draw_orbitals')
+    configure_methods = WidgetMethod('molecules.configure_methods')
     _PERSIST_REFERENCES = True  # relevant for `pyccc` RPC calls
 
     def __init__(self, atomcontainer,

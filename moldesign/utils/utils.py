@@ -6,19 +6,17 @@ standard_library.install_aliases()
 import future.utils
 
 from functools import reduce
-import contextlib
 import fractions
 import operator
 import os
 import re
-import string
 import sys
 import tempfile
 from html.parser import HTMLParser
-from io import StringIO
-from uuid import uuid4
 
 
+def make_none(*args, **kwargs):
+    return None
 
 def if_not_none(item, default):
     """ Equivalent to `item if item is not None else default` """

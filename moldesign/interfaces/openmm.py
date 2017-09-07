@@ -29,7 +29,6 @@ from .. import units as u
 from ..utils import exports
 
 
-
 class OpenMMPickleMixin(object):
     def __getstate__(self):
         mystate = self.__dict__.copy()
@@ -64,10 +63,14 @@ def MdtReporter(mol, report_interval):
             self.report_interval = report_interval
             self.trajectory = mdt.Trajectory(mol)
             self.annotation = None
-            self._row_format = ("{:<10.2f}") + 3*(" {:>15.4f}")
-            self._header_format = self._row_format.replace('.4f','s').replace('.2f','s')
-            self._printed_header = False
             self.last_report_time = None
+            self.logger = mdt.helpers.DynamicsLog()
+
+        def __del__(self):
+            try:
+                super().__del__()
+            except AttributeError:
+                pass  # suppress irritating error msgs
 
         def report_from_mol(self, **kwargs):
             self.mol.calculate()
@@ -99,23 +102,11 @@ def MdtReporter(mol, report_interval):
                 potential_energy=simtk2pint(state.getPotentialEnergy()))
             if self.annotation is not None: report['annotation'] = self.annotation
 
-            if not self._printed_header:
-                timeheader = 'time / {units}'.format(units=u.default.time)
-                peheader = 'potential / {units}'.format(units=u.default.energy)
-                keheader = 'kinetic / {units}'.format(units=u.default.energy)
-                temperatureheader = 'T / {units}'.format(units=u.default.temperature)
-                print(self._header_format.format(timeheader, peheader, keheader, temperatureheader))
-                self._printed_header = True
-            ke = mdt.helpers.kinetic_energy(report['momenta'], self.mol.masses)
-            t = (2.0 * ke) / (u.k_b * self.mol.dynamic_dof)
-            print(self._row_format.format(report['time'].defunits_value(),
-                                          report['potential_energy'].defunits_value(),
-                                          ke.defunits_value(),
-                                          t.defunits_value()))
-
             if settime:
                 self.last_report_time = report['time']
             self.trajectory.new_frame(properties=report)
+            self.logger.print_step(self.mol, properties=report)
+
 
         def describeNextReport(self, simulation):
             """

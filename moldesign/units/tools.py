@@ -159,6 +159,9 @@ def get_units(q):
     Returns:
         MdtUnit: the quantity's units
     """
+    if isinstance(q, MdtUnit):
+        return q
+
     x = q
     while True:
         try:

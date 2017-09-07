@@ -18,6 +18,7 @@ standard_library.install_aliases()
 
 from ..utils import exports_names, exports
 from ..widgets import nbmolviz_enabled
+from .. import units as u
 
 
 if nbmolviz_enabled:
@@ -53,3 +54,39 @@ else:
         :return:
         """
         print(obj)
+
+
+@exports
+class DynamicsLog(object):
+    ROW_FORMAT = ("{:<10.2f}") + 3*(" {:>15.4f}")
+    HEADER_FORMAT = ROW_FORMAT.replace('.4f','s').replace('.2f','s')
+
+    def __init__(self):
+        self._printed_header = False
+
+    def print_header(self):
+        timeheader = 'time /'
+        peheader = 'potential /'
+        keheader = 'kinetic /'
+        temperatureheader = 'T /'
+        print(self.HEADER_FORMAT.format(timeheader, peheader, keheader, temperatureheader))
+
+        timeunits = '{}'.format(u.default.time)
+        peunits = '{}'.format(u.default.energy)
+        keunits = '{}'.format(u.default.energy)
+        temperatureunits = '{}'.format(u.default.temperature)
+        print(self.HEADER_FORMAT.format(timeunits, peunits, keunits, temperatureunits))
+
+        self._printed_header = True
+
+    def print_step(self, mol, properties):
+        from . import kinetic_energy, kinetic_temperature
+        if not self._printed_header:
+            self.print_header()
+
+        ke = kinetic_energy(properties['momenta'], mol.masses)
+        t = kinetic_temperature(ke, mol.dynamic_dof)
+        print(self.ROW_FORMAT.format(properties['time'].defunits_value(),
+                                     properties['potential_energy'].defunits_value(),
+                                     ke.defunits_value(),
+                                     t.defunits_value()))

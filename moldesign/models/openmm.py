@@ -16,6 +16,8 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
+import tempfile
 from future.utils import native_str
 
 import moldesign.molecules
@@ -28,7 +30,7 @@ from .. import parameters
 
 openmm_platform_selector = parameters.Parameter(
         'compute_platform', 'OpenMM computing platform',
-        type=str, default='cpu', choices=['opencl', 'cuda', 'cpu', 'reference', 'auto'],
+        type=str, default='auto', choices=['opencl', 'cuda', 'cpu', 'reference', 'auto'],
         help_url='http://docs.openmm.org/7.1.0/userguide/library.html#platforms')
 
 numcpus = parameters.num_cpus.copy()
@@ -123,6 +125,15 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
         self._reset()
         system_params = self._get_system_params()
         self.mm_system = self.mol.ff.parmed_obj.createSystem(**system_params)
+
+        if (self.params.nonbonded != 'nocutoff'
+                and not self.params.periodic
+                and self.params.implicit_solvent):
+            # TODO: remove this workaround once fix for pandegroup/openmm#1848 is released
+            tmpfile = os.path.join(tempfile.mkdtemp(), 'prmtop')
+            self.mol.ff.parmed_obj.write_parm(tmpfile)
+            om_prmtop = app.AmberPrmtopFile(tmpfile)
+            self.mm_system = om_prmtop.createSystem(**system_params)
 
         if setup_integrator:
             try:
@@ -317,21 +328,26 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
     def _get_system_params(self):
         """ Translates the spec from MMBase into system parameter keywords for createSystem
         """
-        # need cmm motion
+        # TODO: CMM motion
         from simtk.openmm import app
+
+        # translates MDT keywords into OpenMM keywords
         nonbonded_names = {'nocutoff': app.NoCutoff,
                            'ewald': app.Ewald,
                            'pme': app.PME,
-                           'cutoff': (app.CutoffPeriodicif
+                           'cutoff': (app.CutoffPeriodic
                                       if self.params.periodic
                                       else app.CutoffNonPeriodic)}
         implicit_solvent_names = {'obc': app.OBC2,
                                   'obc1': app.OBC1,
+                                  'obc2': app.OBC2,
                                   None: None}
 
         system_params = dict(nonbondedMethod=nonbonded_names[self.params.nonbonded],
-                             nonbondedCutoff=opm.pint2simtk(self.params.cutoff),
                              implicitSolvent=implicit_solvent_names[self.params.implicit_solvent])
+
+        if self.params.nonbonded != 'nocutoff':
+            system_params['nonbondedCutoff'] = opm.pint2simtk(self.params.cutoff)
 
         system_params['rigidWater'] = False  # not currently supported (because I'm lazy)
         system_params['constraints'] = None
@@ -364,14 +380,17 @@ class OpenMMPotential(MMBase, opm.OpenMMPickleMixin):
                 except Exception:  # it just throws "Exception" unfortunately
                     continue
                 else:
-                    self.params.compute_platform = platname.lower()
+                    use_platform = platname
                     break
-
-            raise moldesign.NotSupportedError("Likely OpenMM installation error. "
-                                              "none of the expected platforms were found: "
-                                              + ', '.join(preference))
+            else:
+                raise moldesign.NotSupportedError("Likely OpenMM installation error. "
+                                                  "none of the expected platforms were found: "
+                                                  + ', '.join(preference))
         else:
-            platform = openmm.Platform.getPlatformByName(from_lower[self.params.compute_platform])
+            use_platform = self.params.compute_platform
+
+        self.params.compute_platform = use_platform.lower()
+        platform = openmm.Platform.getPlatformByName(from_lower[self.params.compute_platform])
 
         if self.params.compute_platform == 'cpu' and self.params.num_cpus > 0:
             # need to use native_strs here or the swig interface gets confused

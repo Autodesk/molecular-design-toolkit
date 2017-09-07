@@ -25,6 +25,14 @@ ALL_BASES = BASES+['%s5'%_b for _b in BASES]+['%s3'%_b for _b in BASES]
 DBASES = ['D%s'%_b for _b in ALL_BASES]
 RBASES = ['R%s'%_b for _b in ALL_BASES]
 
+
+# Add terminal base names (sometimes used by forcefields)
+for _nucleic_list in DBASES, RBASES:
+    for _base in list(_nucleic_list):
+        _nucleic_list.append(_base+'3')
+        _nucleic_list.append(_base+'5')
+
+
 BACKBONES = {'dna': set(("P OP1 OP2 O5' O4' C5' C4' C3' O3' C2' C1' H1' H2'' H2' H3' H4' H5' H5'' "
                         "HO5' HO3'").split()),
              'protein': set("N CA C O OXT H HA HA2 HA3 H2 H3".split())}

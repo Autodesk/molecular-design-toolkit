@@ -17,15 +17,24 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import sys
-import textwrap
 import functools
 from .utils import exports, exports_names
+from . import _NBMOLVIZ_EXPECTED_VERSION
 
 __all__ = 'BondSelector GeometryBuilder ResidueSelector Symmetrizer AtomSelector'.split()
 
+INSTALL_CMD = """Install `nbmolviz` by running these commands at the terminal:
+  $ pip install "nbmolviz==%s"
+  $ python -m nbmolviz activate
+
+Afterwards, restart python and reload any running notebooks."""%_NBMOLVIZ_EXPECTED_VERSION
+
+
+_warnings = []
 
 try:
     import nbmolviz.widget_utils
+    from nbmolviz import __version__ as nbv_version
 except ImportError:
     nbmolviz_enabled = False
     nbmolviz_installed = False
@@ -41,11 +50,7 @@ def notebook_only_method(*args, **kwargs):
     else:
         raise ImportError(
                 "The `nbmolviz` library must be installed to use this function!\n"
-                "To use MDT's notebook visualization features, please install\n"
-                "the nbmolviz library by running these commands at the terminal:\n"
-                "  1) pip install nbmolviz\n"
-                "  2) python -m nbmolviz activate\n"
-                "Afterwards, restart and reload any running notebooks.")
+                + INSTALL_CMD)
 
 
 if nbmolviz_enabled:
