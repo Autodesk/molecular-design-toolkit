@@ -8,7 +8,9 @@
 #
 # ALl conda downloads and builds are created in directories under $HOME.
 #
-cd conda
+
+set -e  # immediately exit on error
+cd deployment/conda
 
 # Install minconda for Python 3.6
 host_os=Linux
@@ -46,7 +48,6 @@ fi
 conda convert $package_dir/${host_platform}/moldesign*.tar.bz2 -p ${other_platform} --output-dir $HOME/conda-packages -f
 
 # Upload packages.
-CONDA_UPLOAD_TOKEN=kt-60f9e9c6-61fa-4d8c-b5cd-84989ef0264e
-anaconda -t $CONDA_UPLOAD_TOKEN upload -u ktbolt ${package_dir}/${host_platform}/moldesign*.tar.bz2
-anaconda -t $CONDA_UPLOAD_TOKEN upload -u ktbolt ${package_dir}/${other_platform}/moldesign*.tar.bz2
+anaconda -t $CONDA_UPLOAD_TOKEN upload -u moldesign ${package_dir}/${host_platform}/moldesign*.tar.bz2
+anaconda -t $CONDA_UPLOAD_TOKEN upload -u moldesign ${package_dir}/${other_platform}/moldesign*.tar.bz2
 
