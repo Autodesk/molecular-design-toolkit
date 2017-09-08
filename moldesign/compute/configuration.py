@@ -35,7 +35,7 @@ RUNNING_ON_WORKER = (os.environ.get('IS_PYCCC_JOB', '0') == '1')
 
 COMPUTE_CONNECTION_WARNING = """
 WARNING: Failed to connect to Docker - MDT won't be able to run
-anything software not already installed on your machine.
+any software not already installed on your machine.
 
 Make sure Docker is installed and running!
 To install it, go to https://www.docker.com/get-docker
