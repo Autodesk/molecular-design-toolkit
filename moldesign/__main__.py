@@ -58,14 +58,6 @@ MDTVERSION = subprocess.check_output(['python', '-c',
 VERFILEPATH = os.path.join(EXAMPLE_DIR_TARGET, '.mdtversion')
 
 
-APPLESCRIPT_INSTALL_DOCKER = ('set response to (display dialog '
-                              '"Molecular Design Toolkit needs the Docker Toolbox. Would you like '
-                              'to download it now?" '
-                              'buttons {"Quit", "Open download page"} '
-                              'default button 2 with title "Buckyball Setup")\n'
-                              'if button returned of response = "Open Download Page" then '
-                              'open location "https://www.docker.com/docker-toolbox"'
-                              'end if')
 CONFIG_PATH = os.path.join(CONFIG_DIR, 'moldesign.yml')
 
 NO_NBMOLVIZ_ERR = 10
@@ -120,6 +112,10 @@ def main():
         import moldesign as mdt
         mdt.data.print_environment()
 
+    elif args.command == 'pull':
+        pull_images()
+
+
     elif args.command == 'config':
         print('Reading config file from: %s' % CONFIG_PATH)
         print('----------------------------')
@@ -129,6 +125,16 @@ def main():
 
     else:
         raise ValueError("Unhandled CLI command '%s'" % args.command)
+
+
+def pull_images():
+    from .compute import packages
+    imgs = [x.get_docker_image_path() for x in packages.packages + packages.executables]
+    print('\nPulling images:', ', '.join(imgs))
+    for i, img in enumerate(imgs):
+        print('\n------------- Pulling image %s/%s : %s' % (i+1, len(imgs), img))
+        subprocess.check_call(['docker', 'pull', img])
+        print('------------- Done with %s' % img)
 
 
 def nbmolviz_check():
