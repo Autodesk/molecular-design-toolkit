@@ -787,6 +787,108 @@ class MolSimulationMixin(object):
         self._reset_methods()
         self.ff = None
 
+    def _topology_consistency_check(self):
+        """ Debugging method for checking that internal data structures are consistent
+
+        Raises:
+            AssertionError: if topology is corrupted
+        """
+        self._atom_consistency_check()
+        self._bond_consistency_check()
+        self._residue_consistency_check()
+        self._chain_consistency_check()
+
+
+    def _residue_consistency_check(self):
+        """ Debugging method for checking that the residue structure is internally consistent
+
+        Raises:
+            AssertionError: if topology is corrupted
+        """
+        all_atoms = set(self.atoms)
+        all_residues = set(self.residues)
+        all_chains = set(self.chains)
+
+        assert len(all_residues) == len(self.residues)
+        atoms_in_residues = set()
+        chains_from_residues = set()
+        assert len(all_atoms) == self.num_atoms == len(self.atoms)
+
+        for residue in self.residues:
+            assert residue.molecule is self
+            chains_from_residues.add(residue.chain)
+            for atom in residue.iteratoms():
+                assert atom not in atoms_in_residues, 'Atom in more than 1 residue'
+                atoms_in_residues.add(atom)
+                assert atom in all_atoms
+                assert atom.residue is residue
+                assert residue.chain in all_chains
+
+        assert chains_from_residues == all_chains
+        assert atoms_in_residues == all_atoms
+
+    def _chain_consistency_check(self):
+        """ Debugging method for checking that the chain structure is internally consistent
+
+        Raises:
+            AssertionError: if topology is corrupted
+        """
+        all_residues = set(self.residues)
+        all_chains = set(self.chains)
+
+        assert len(all_chains) == len(self.chains)
+        residues_from_chains = set()
+
+        for chain in self.chains:
+            assert chain.molecule is self
+            for residue in chain:
+                assert residue not in residues_from_chains, 'Residue in more than 1 chain'
+                residues_from_chains.add(residue)
+                assert residue in all_residues
+                assert residue.molecule is self
+                assert residue.chain is chain
+
+        assert residues_from_chains == all_residues
+
+
+    def _bond_consistency_check(self):
+        """ Debugging method for checking that the chain structure is internally consistent
+
+        Raises:
+            AssertionError: if topology is corrupted
+        """
+        all_atoms = set(self.atoms)
+        for atom in all_atoms:
+            if atom not in self.bond_graph:
+                assert not atom.bond_graph
+                continue
+            bonds = self.bond_graph[atom]
+            assert atom.bond_graph == bonds
+            for nbr in bonds:
+                assert nbr.bond_graph[atom] == atom.bond_graph[nbr]
+
+    def _atom_consistency_check(self):
+        """ Debugging method for checking that the chain structure is internally consistent
+
+        Raises:
+            AssertionError: if topology is corrupted
+        """
+        all_residues = set(self.residues)
+        all_chains = set(self.chains)
+        residues_from_atoms = set()
+        chains_from_atoms = set()
+        for iatom, atom in enumerate(self.atoms):
+            assert atom.index == iatom
+            assert atom.molecule is self
+            assert atom.residue in all_residues
+            assert atom.chain in all_chains
+            residues_from_atoms.add(atom.residue)
+            chains_from_atoms.add(atom.chain)
+        assert residues_from_atoms == all_residues
+        assert chains_from_atoms == all_chains
+
+
+
 
 @toplevel
 class Molecule(AtomGroup,
