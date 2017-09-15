@@ -2,7 +2,6 @@ from __future__ import print_function, absolute_import, division
 from future.builtins import *
 from future import standard_library
 standard_library.install_aliases()
-
 # Copyright 2017 Autodesk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,55 +15,17 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import functools
-import imp
-from ..utils import exports, exports_names
 
-try:
-    imp.find_module('nbmolviz')
-except ImportError:
-    nbmolviz_installed = False
-    disp_log = print
-else:
-    nbmolviz_installed = True
-    from IPython.display import display as disp_log
+from ..utils import exports_names, exports
+from ..widgets import nbmolviz_enabled
+from .. import units as u
 
 
-def _get_nbmethod(name):
-    # don't import nbmolviz methods until a method is actually called
-    from nbmolviz import methods as nbmethods
-    module = nbmethods
-    for item in name.split('.'):
-        module = getattr(module, item)
-    return module
-
-
-@exports
-class WidgetMethod(object):
-    def __init__(self, name):
-        self.name = name
-        self.method = None
-
-    def __get__(self, instance, owner):
-        if self.method is None:
-            self.method = _get_nbmethod(self.name)
-        return functools.partial(self.method, instance)
-
-
-def not_installed_method(*args, **kwargs):
-    """ This routine is not available. Please install the nbmolviz library to use it:
-      `pip install nbmolviz`
-    """
-    raise ImportError(
-            "To use MDT's graphical user interfaces in a Noteobook, please install "
-            "the nbmolviz library: `pip install nbmolviz`")
-
-
-try:
-    from nbmolviz.uibase import Logger, display_log
+if nbmolviz_enabled:
+    from nbmolviz.uielements import Logger, display_log
     exports_names('Logger', 'display_log')
 
-except ImportError:
+else:
     @exports
     class Logger(object):
         def __init__(self, title='log', **kwargs):
@@ -92,4 +53,40 @@ except ImportError:
         :param title: A name for the object (otherwise, str(obj) is used)
         :return:
         """
-        disp_log(obj)
+        print(obj)
+
+
+@exports
+class DynamicsLog(object):
+    ROW_FORMAT = ("{:<10.2f}") + 3*(" {:>15.4f}")
+    HEADER_FORMAT = ROW_FORMAT.replace('.4f','s').replace('.2f','s')
+
+    def __init__(self):
+        self._printed_header = False
+
+    def print_header(self):
+        timeheader = 'time /'
+        peheader = 'potential /'
+        keheader = 'kinetic /'
+        temperatureheader = 'T /'
+        print(self.HEADER_FORMAT.format(timeheader, peheader, keheader, temperatureheader))
+
+        timeunits = '{}'.format(u.default.time)
+        peunits = '{}'.format(u.default.energy)
+        keunits = '{}'.format(u.default.energy)
+        temperatureunits = '{}'.format(u.default.temperature)
+        print(self.HEADER_FORMAT.format(timeunits, peunits, keunits, temperatureunits))
+
+        self._printed_header = True
+
+    def print_step(self, mol, properties):
+        from . import kinetic_energy, kinetic_temperature
+        if not self._printed_header:
+            self.print_header()
+
+        ke = kinetic_energy(properties['momenta'], mol.masses)
+        t = kinetic_temperature(ke, mol.dynamic_dof)
+        print(self.ROW_FORMAT.format(properties['time'].defunits_value(),
+                                     properties['potential_energy'].defunits_value(),
+                                     ke.defunits_value(),
+                                     t.defunits_value()))

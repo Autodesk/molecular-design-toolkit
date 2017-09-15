@@ -1,0 +1,58 @@
+# 
+package:
+    name: moldesign
+    version: {{ environ['VERSION'] }}
+source:
+    path: ../../
+build: 
+script_env:
+   - VERSION
+   - CONDA_BLD_PATH
+
+requirements:
+    build:
+        - python 
+        - biopython
+        - funcsigs
+        - numpy
+        - pytest
+        - pyyaml
+        - requests
+        - scipy
+        - sortedcontainers
+    run:
+        - python
+        - biopython
+        - funcsigs
+        - numpy
+        - pytest
+        - pyyaml
+        - requests
+        - scipy
+        - sortedcontainers
+test:
+    imports:
+        - moldesign
+        - moldesign._tests
+        - moldesign.compute
+        - moldesign.external
+        - moldesign.forcefields
+        - moldesign.geom
+        - moldesign.helpers
+        - moldesign.integrators
+        - moldesign.interfaces
+        - moldesign.min
+        - moldesign.models
+        - moldesign.molecules
+        - moldesign.orbitals
+        - moldesign.tools
+        - moldesign.units
+        - moldesign.utils
+        - moldesign.utils.docparsers
+        - moldesign.widgets
+about:
+    home: http://moldesign.bionano.autodesk.com
+    license: Apache Software License
+    license_family: Apache
+    summary: 'The Molecular Design Toolkit: Dead-simple chemical simulation, visualization,
+        and cloud computing in a notebook'

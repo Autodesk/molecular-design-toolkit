@@ -16,29 +16,23 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""
-Class that define displays for common errors in assigning a forcefield
-"""
-import cgi
+import html
 from .. import utils
 from .. import units as u
+from ..widgets import nbmolviz_enabled
 
 
 def show_parameterization_results(errormessages, molin, molout=None):
     print('Forcefield assignment: %s' % ('Success' if molout is not None else 'Failure'))
-    for err in errormessages:
-        print(utils.html_to_text(err.desc))
 
-
-class ForcefieldAssignmentError(Exception):
-    def __init__(self, messages, mol, molout=None):
-        self.errors = messages
-
-    def draw(self):
-        # TODO: get this working again
-        raise NotImplementedError()
-
+    if not nbmolviz_enabled:
+        for err in errormessages:
+            print(utils.html_to_text(err.desc))
+    else:
+        from nbmolviz.uielements.logwidget import display_log
+        from nbmolviz.widgets.parameterization import ParameterizationDisplay
+        report = ParameterizationDisplay(errormessages, molin, molout)
+        display_log(report, title='ERRORS/WARNINGS', show=True)
 
 
 class ForceFieldMessage(object):
@@ -138,14 +132,18 @@ class UnusualBond(ForceFieldMessage):
         if self._has_atoms:
             self.desc = 'WARNING: Unusual distance between {a1} and {a2}: {d:.3f}'.format(
                 d=self.atoms[0].distance(self.atoms[1]), a1=self.atoms[0], a2=self.atoms[1]) \
-                        + '<p>TLeap message:<br><i>%s</i>' % cgi.escape(self.message)
+                        + '<p>TLeap message:<br><i>%s</i>' % html.escape(self.message)
 
             self.short = 'WARN: Unusual dist: {} - {} = ({:.1f})'.format(self.atoms[0],
                                                                    self.atoms[1],
                                                                    self.atoms[0].distance(self.atoms[1]))
         else:
-            self.short = 'WARN: Unusual bond - atoms not shown'
-            self.desc = 'TLeap message:<br><i>%s</i>' % cgi.escape(self.message)
+            if self.residues[0] is self.residues[1]:
+                self.short = 'WARN: Unusual bond length in %s' % self.residues[0]
+            else:
+                self.short = 'WARN: unusual bond length between %s and %s' % (self.residues[0],
+                                                                              self.residues[1])
+            self.desc = 'TLeap message:<br><i>%s</i>' % html.escape(self.message)
 
     def show(self, viewer):
         if self._has_atoms:

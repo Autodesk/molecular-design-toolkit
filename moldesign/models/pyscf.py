@@ -25,9 +25,10 @@ import numpy as np
 import moldesign as mdt
 from .. import units as u
 from .. import compute, orbitals, utils
-from ..interfaces.pyscf_interface import force_remote, mol_to_pyscf,  StatusLogger, SPHERICAL_NAMES
+from ..compute import packages
+from ..interfaces.pyscf_interface import mol_to_pyscf,  StatusLogger, SPHERICAL_NAMES
 from .base import QMBase
-from ..helpers import Logger
+from ..molecules import AtomicProperties
 
 if future.utils.PY2:
     from cStringIO import StringIO
@@ -80,7 +81,6 @@ FORCE_CALCULATORS = LazyClassMap({'rhf': 'pyscf.grad.RHF', 'hf': 'pyscf.grad.RHF
 
 @utils.exports
 class PySCFPotential(QMBase):
-    _CALLS_MDT_IN_DOCKER = force_remote
     DEFAULT_PROPERTIES = ['potential_energy',
                           'wfn',
                           'mulliken']
@@ -91,6 +91,7 @@ class PySCFPotential(QMBase):
                      'functional': ['b3lyp', 'blyp', 'pbe0', 'x3lyp', 'MPW3LYP5']}
 
     FORCE_UNITS = u.hartree / u.bohr
+    _PKG = packages.pyscf
 
     @mdt.utils.kwargs_from(QMBase)
     def __init__(self, **kwargs):
@@ -99,11 +100,11 @@ class PySCFPotential(QMBase):
         self.reference = None
         self.kernel = None
         self.logs = StringIO()
-        self.logger = Logger('PySCF interface')
+        self.logger = self._get_logger('PySCF interface')
 
-    @compute.runsremotely(enable=force_remote, is_imethod=True, persist_refs=True)
+    @packages.pyscf.runsremotely(is_imethod=True, persist_refs=True)
     def calculate(self, requests=None):
-        self.logger = Logger('PySCF calc')
+        self.logger = self._get_logger('PySCF calc')
         do_forces = 'forces' in requests
         if do_forces and self.params.theory not in FORCE_CALCULATORS:
             raise ValueError('Forces are only available for the following theories:'
@@ -231,8 +232,8 @@ class PySCFPotential(QMBase):
         scf_matrices = self._get_scf_matrices(orb_calc, ao_matrices)
         if hasattr(orb_calc, 'mulliken_pop'):
             ao_pop, atom_pop = orb_calc.mulliken_pop(verbose=-1)
-            result['mulliken'] = utils.DotDict({a: p * u.q_e for a, p in zip(self.mol.atoms, atom_pop)})
-            result['mulliken'].type = 'atomic'
+            result['mulliken'] = AtomicProperties({a: p * u.q_e
+                                                   for a, p in zip(self.mol.atoms, atom_pop)})
 
         if hasattr(orb_calc, 'dip_moment'):
             result['dipole_moment'] = orb_calc.dip_moment() * u.debye
@@ -310,7 +311,7 @@ class PySCFPotential(QMBase):
 
         # fallback 2: level shift, slower convergence
         # this probably won't converge, but is intended to get us in the right basin for the next step
-        # NEWFEATURE: should dynamically adjust level shift instead of hardcoded cycles
+        # TODO: should dynamically adjust level shift instead of hardcoded cycles
         self.logger.handled('SCF failed to converge. Performing %d iterations with level shift of -0.5 hartree'
                             % (old_div(method.max_cycle, 2)))
         failed.append(method)
@@ -439,7 +440,7 @@ class PySCFPotential(QMBase):
             atom = self.mol.atoms[pmol.bas_atom(ishell)]
             angular = pmol.bas_angular(ishell)
             num_momentum_states = angular*2 + 1
-            exps = pmol.bas_exp(ishell)
+            exps = pmol.bas_exp(ishell) / (u.bohr**2)
             num_contractions = pmol.bas_nctr(ishell)
             coeffs = pmol.bas_ctr_coeff(ishell)
 
@@ -449,12 +450,12 @@ class PySCFPotential(QMBase):
                     sphere_label = label[3]
                     l, m = SPHERICAL_NAMES[sphere_label]
                     assert l == angular
-                    # TODO: This is not really the principal quantum number
+                    # Note: this is for metadata only, should not be used in any calculations
                     n = int(''.join(x for x in label[2] if x.isdigit()))
-
                     primitives = [orbitals.SphericalGaussian(atom.position.copy(),
-                                                             exp, n, l, m,
-                                                             coeff=coeff[ictr])
+                                                             exp, l, m,
+                                                             coeff=coeff[ictr],
+                                                             normalized=True)
                                   for exp, coeff in zip(exps, coeffs)]
                     bfs.append(orbitals.AtomicBasisFunction(atom,
                                                             n=n, l=angular, m=m,
@@ -485,6 +486,11 @@ class PySCFPotential(QMBase):
                             fock_ao=fock)
         scf_matrices.update(ao_mats)
         return scf_matrices
+
+    def _get_logger(self, logname):
+        # the "Logger" import can cause pickling problems, so we do it here
+        from ..helpers import Logger
+        return Logger(logname)
 
 
 def _get_multiconf_dipoles(basis, mcstate, nstates):

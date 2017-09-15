@@ -25,6 +25,17 @@ class UnitSystem(object):
 
     In MDT, many methods will automatically convert output using the UnitSystem at
     ``moldesign.units.default``
+
+    Args:
+        length (MdtUnit): length units
+        mass (MdtUnit): mass units
+        time (MdtUnit): time units
+        energy (MdtUnit): energy units
+        temperature (MdtUnit): temperature units (default: kelvin)
+        force (MdtUnit): force units (default: energy/length)
+        momentum (MdtUnit): momentum units (default: mass * length / time)
+        angle (MdtUnit): angle units (default: radians)
+        charge (MdtUnit): charge units (default: fundamental charge)
     """
     def __init__(self, length, mass, time, energy,
                  temperature=kelvin,
@@ -75,15 +86,31 @@ class UnitSystem(object):
         """ Convert a quantity into this unit system.
 
         Args:
-            quantity (MdtQuantity): quantity to convert
+            quantity (MdtQuantity or MdtUnit): quantity to convert
         """
         baseunit = self.get_baseunit(quantity)
-        if isinstance(baseunit, int):
-            assert baseunit == 1
+        if baseunit == ureg.dimensionless:
             return quantity * ureg.dimensionless
         else:
             result = quantity.to(baseunit)
             return result
+
+    def get_default(self, q):
+        """ Return the default unit system for objects with these dimensions
+
+        Args:
+            q (MdtQuantity or MdtUnit): quantity to get default units for
+
+        Returns:
+            MdtUnit: Proper units for this quantity
+        """
+        return self.get_baseunit(1.0 * q).units
+
+    def convert_if_possible(self, quantity):
+        if isinstance(quantity, MdtQuantity):
+            return self.convert(quantity)
+        else:
+            return quantity
 
     def get_baseunit(self, quantity):
         """ Get units of a quantity, list or array
@@ -103,22 +130,42 @@ class UnitSystem(object):
             try:
                 q = quantity[0]
             except (TypeError, StopIteration):
+                if isinstance(quantity, (int, float, complex)):
+                    return ureg.dimensionless
                 raise TypeError('This type of object cannot have physical units')
             if isinstance(q, str):
                 raise TypeError('This type of object cannot have physical units')
             try:
                 return self.get_baseunit(q)
             except (IndexError, TypeError):  # Assume dimensionless
-                return 1
-        baseunit = 1
+                return ureg.dimensionless
+        baseunit = ureg.dimensionless
 
-        # Factor out energy units (this doesn't work for things like energy/length)
+        # Factor out force units
+        if self._force:
+            if '[length]' in dims and '[mass]' in dims and '[time]' in dims:
+                while dims['[length]'] >= 1 and dims['[mass]'] >= 1 and dims['[time]'] <= -2:
+                    baseunit *= self['force']
+                    dims['[length]'] -= 1
+                    dims['[mass]'] -= 1
+                    dims['[time]'] += 2
+
+        # Factor out energy units
         if '[length]' in dims and '[mass]' in dims and '[time]' in dims:
             while dims['[length]'] >= 1 and dims['[mass]'] >= 1 and dims['[time]'] <= -2:
                 baseunit *= self['energy']
                 dims['[length]'] -= 2
                 dims['[mass]'] -= 1
                 dims['[time]'] += 2
+
+        # Factor out momentum units
+        if self._momentum:
+            if '[length]' in dims and '[mass]' in dims and '[time]' in dims:
+                while dims['[length]'] >= 1 and dims['[mass]'] >= 1 and dims['[time]'] <= -1:
+                    baseunit *= self['momentum']
+                    dims['[length]'] -= 1
+                    dims['[mass]'] -= 1
+                    dims['[time]'] += 1
 
         if '[current]' in dims:
             dims.setdefault('[charge]', 0)
@@ -135,7 +182,7 @@ class UnitSystem(object):
                 baseunit *= self[unit]**dims[unit]
             except AttributeError:
                 baseunit *= ureg[unit]**dims[unit]
-        return baseunit
+        return baseunit.units
 
 
 default = UnitSystem(length=angstrom, mass=amu, time=fs, energy=eV)

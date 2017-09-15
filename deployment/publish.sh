@@ -2,7 +2,8 @@
 
 # Publish a new release (triggered by a git tag that conforms to a PEP440 release)
 # Exit 1 if there's a mismatch between the git tag and the package's version
-# Expects to run in base directory
+#
+# Expects to run in base directory of the repository
 
 # fail immediately if any command fails:
 set -e
@@ -22,4 +23,8 @@ docker-make -f DockerMakefiles/DockerMake.yml \
             --all \
             --push --user ${DOCKERHUB_USER} --token ${DOCKERHUB_PASSWORD}
 
+echo "Building and deploying conda package version ${CI_BRANCH}:"
+deployment/build_conda_packages.sh
+
+echo "Uploading version ${CI_BRANCH} to PyPI:"
 twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/moldesign-${pyversion}.tar.gz

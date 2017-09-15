@@ -19,7 +19,20 @@ from nbformat import v4
 
 def strip_output(nb):
     """strip the outputs from a notebook object"""
-    nb.metadata.pop('widgets', None)
+
+    # set metadata explicitly as python 3
+    nb.metadata = {"kernelspec": {"display_name": "Python 3",
+                                  "language": "python",
+                                  "name": "python3"},
+                   "language_info": {
+                       "codemirror_mode": {
+                           "name": "ipython",
+                           "version": 3},
+                       "file_extension": ".py",
+                       "mimetype": "text/x-python",
+                       "name": "python",
+                       "nbconvert_exporter": "python",
+                       "pygments_lexer": "ipython3"}}
 
     for cell in nb.cells:
         if 'outputs' in cell:

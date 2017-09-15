@@ -60,8 +60,8 @@ class SmartMin(MinimizerBase):
         forces = self.mol.calculate_forces()
         if abs(forces).max() <= self.gd_threshold:
             self._spmin = self._make_quadratic_method()
+            self._spmin.traj = self.traj
             self._spmin._run()
-            self.traj = self._spmin.traj
             return
 
         # Otherwise, remove large forces with gradient descent; exit if we pass the cycle limit

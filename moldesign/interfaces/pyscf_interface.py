@@ -18,9 +18,6 @@ standard_library.install_aliases()
 # limitations under the License.
 import future.utils
 
-import sys
-import imp
-
 import numpy as np
 
 import moldesign.units as u
@@ -28,20 +25,12 @@ from .. import compute
 from ..utils import if_not_none, redirect_stderr
 from .. import orbitals
 from ..utils import exports
+from ..compute import packages
 
 if future.utils.PY2:
     from cStringIO import StringIO
 else:
     from io import StringIO
-
-
-try:
-    imp.find_module('pyscf')
-except (ImportError, OSError) as exc:
-    sys.stderr.write('Info: PySCF not installed; will run in docker container\n')
-    force_remote = True
-else:
-    force_remote = False
 
 
 @exports
@@ -97,7 +86,7 @@ class StatusLogger(object):
         self.logger.status(self._row_format.format(*[info.get(c, 'n/a') for c in self.columns]))
 
 
-@compute.runsremotely(enable=force_remote)
+@packages.pyscf.runsremotely
 def get_eris_in_basis(basis, orbs):
     """ Get electron repulsion integrals transformed into this basis (in form eri[i,j,k,l] = (ij|kl))
     """
@@ -109,7 +98,7 @@ def get_eris_in_basis(basis, orbs):
     return orbitals.ERI4FoldTensor(eri, orbs)
 
 
-@compute.runsremotely(enable=force_remote)
+@packages.pyscf.runsremotely
 def basis_values(mol, basis, coords, coeffs=None, positions=None):
     """ Calculate the orbital's value at a position in space
 
@@ -121,17 +110,17 @@ def basis_values(mol, basis, coords, coeffs=None, positions=None):
                  values are returned)
 
     Returns:
-        Array[length]: if ``coeffs`` is not passed, an array of basis fn values at each
+        Array[length**(-1.5)]: if ``coeffs`` is not passed, an array of basis fn values at each
                coordinate. Otherwise, a list of orbital values at each coordinate
     """
     from pyscf.dft import numint
 
     # TODO: more than just create the basis by name ...
     pmol = mol_to_pyscf(mol, basis=basis.basisname, positions=positions)
-    aovals = numint.eval_ao(pmol, np.ascontiguousarray(coords.value_in(u.bohr)))
+    aovals = numint.eval_ao(pmol, np.ascontiguousarray(coords.value_in(u.bohr))) * (u.a0**-1.5)
     if coeffs is None:
         return aovals
     else:
-        return aovals.dot(coeffs)
+        return aovals.dot(coeffs.T)
 
 

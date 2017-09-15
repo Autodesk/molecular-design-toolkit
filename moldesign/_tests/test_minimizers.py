@@ -6,7 +6,10 @@ import pytest
 import moldesign as mdt
 from .helpers import assert_something_resembling_minimization_happened
 from moldesign import units as u
+from moldesign.compute import packages
 
+
+__PYTEST_MARK__ = 'minimization'
 
 @pytest.fixture(scope='function')
 def harmonic_atom():
@@ -68,7 +71,7 @@ def test_extreme_forces_with_smart_minimizer(scrambled):
     assert_something_resembling_minimization_happened(p0, e0, traj, mol)
 
 
-@pytest.mark.skipif(mdt.models.OpenBabelPotential._CALLS_MDT_IN_DOCKER,
+@pytest.mark.skipif(not packages.openbabel.is_installed(),
                     reason='Redundant with regular test in this environment')
 @pytest.mark.screening
 def test_remote_with_smart_minimizer(scrambled):
@@ -80,7 +83,7 @@ def test_remote_with_smart_minimizer(scrambled):
     assert_something_resembling_minimization_happened(p0, e0, traj, mol)
 
 
-@pytest.mark.skipif(mdt.models.OpenBabelPotential._CALLS_MDT_IN_DOCKER,
+@pytest.mark.skipif(not packages.openbabel.is_installed(),
                     reason='Redundant with regular test in this environment')
 def test_remote_with_smart_minimizer_async(scrambled):
     mol, e0, p0 = scrambled
@@ -94,13 +97,12 @@ def test_remote_with_smart_minimizer_async(scrambled):
     assert_something_resembling_minimization_happened(p0, e0, traj, mol)
 
 
-@pytest.mark.skipif(mdt.models.OpenBabelPotential._CALLS_MDT_IN_DOCKER,
-                    reason='Redundant with regular test in this environment')
+@pytest.mark.skipif(packages.openbabel.is_installed(),
+                    reason='Requires that openbabel NOT installed')
 def test_remote_minimization_automatic_if_openbabel_not_installed(scrambled):
     mol, e0, p0 = scrambled
 
     # a bit of an API hack - remote overridden if the model isn't installed locally
-    mol.energy_model._CALLS_MDT_IN_DOCKER = True  # monkey-patch should only affect this instance
     job = mdt.min.minimize(mol, nsteps=500, remote=False, wait=False)
     assert (mol.positions == p0).all()  # shouldn't have changed yet
     job.wait()

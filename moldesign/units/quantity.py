@@ -30,8 +30,9 @@ from ..utils import ResizableArray
 
 # Set up pint's unit definitions
 ureg = UnitRegistry()
-unit_def_file = join(abspath(dirname(__file__)), '../_static_data/pint_atomic_units.txt')
+unit_def_file = join(abspath(dirname(__file__)), '..', '_static_data','pint_atomic_units.txt')
 ureg.load_definitions(unit_def_file)
+ureg.default_system = 'nano'
 set_application_registry(ureg)
 
 
@@ -41,6 +42,10 @@ class MdtUnit(ureg.Unit):
     """
     def __reduce__(self):
         return _get_unit, (str(self),)
+
+    @property
+    def units(self):
+        return self
 
     def convert(self, value):
         """ Returns quantity converted to these units
@@ -120,7 +125,10 @@ class MdtQuantity(ureg.Quantity):
         return result
 
     def __hash__(self):
-        return hash((self._magnitude, str(self.units)))
+        m = self._magnitude
+        if isinstance(m, np.ndarray) and m.shape == ():
+            m = float(m)
+        return hash((m, str(self.units)))
 
     def __setitem__(self, key, value):
         from . import array as quantityarray
@@ -301,7 +309,11 @@ class MdtQuantity(ureg.Quantity):
         self._magnitude = ResizableArray(self._magnitude)
 
     def append(self, item):
-        mag = item.value_in(self.units)
+        from .tools import array
+        try:
+            mag = item.value_in(self.units)
+        except AttributeError:  # handles lists of quantities
+            mag = array(item).value_in(self.units)
         self._magnitude.append(mag)
 
     def extend(self, items):

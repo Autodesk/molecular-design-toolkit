@@ -1,4 +1,6 @@
 from builtins import zip
+
+import itertools
 import numpy as np
 import pytest
 
@@ -35,7 +37,7 @@ def test_copy_breaks_link(h2):
     assert h2.atoms[1].px == 0.0 * u.default.momentum
 
 
-def test_h2_harmonic_copy_loses_simulation(h2_harmonic_copy, h2_harmonic):
+def test_h2_harmonic_copy(h2_harmonic_copy, h2_harmonic):
     mol = h2_harmonic_copy
     assert mol.energy_model is mol.integrator is None
     for name in 'num_atoms num_residues positions momenta'.split():
@@ -81,7 +83,7 @@ def test_copy_atoms(fixture_key, request):
     oldatoms = oldobj.atoms
     atoms = oldatoms.copy_atoms()
     assert isinstance(atoms, mdt.AtomList)
-    _test_copy_integrity(atoms, oldatoms)
+    assert_atom_copy_integrity(atoms, oldatoms)
 
 
 @pytest.mark.parametrize('fixture_key',
@@ -93,25 +95,46 @@ def test_copy_atoms_in_containers(fixture_key, request):
 
     newobj = oldobj.copy()
     assert newobj.__class__ is oldobj.__class__
-    _test_copy_integrity(newobj.atoms, oldobj.atoms)
+    assert_atom_copy_integrity(newobj.atoms, oldobj.atoms)
 
 
-def _test_copy_integrity(atoms, oldatoms):
-    for old, new in zip(oldatoms, atoms):
-        assert (old.position == new.position).all()
-        assert (old.velocity == new.velocity).all()
+def assert_atom_copy_integrity(atoms, oldatoms):
+    newmol = atoms[0].molecule
+    assert len(atoms) == len(oldatoms)
+    for oldatom, atom in itertools.zip_longest(oldatoms, atoms):
+        assert oldatom.name == atom.name
+        assert oldatom.atnum == atom.atnum
+        assert oldatom.mass == atom.mass
+        assert (oldatom.position == atom.position).all()
+        assert (oldatom.velocity == atom.velocity).all()
 
-        new.x += 1.0 * u.angstrom
-        assert all((old.position == new.position) == [False, True, True])
+        atom.x += 1.0 * u.angstrom
+        assert all((oldatom.position == atom.position) == [False, True, True])
 
-        new.px += 1.0 * u.angstrom * u.amu / u.fs
-        assert all((old.momentum == new.momentum) == [False, True, True])
+        atom.px += 1.0 * u.angstrom * u.amu / u.fs
+        assert all((oldatom.momentum == atom.momentum) == [False, True, True])
 
-        assert old.residue is not new.residue
-        assert old.residue.name == new.residue.name
-        assert old.chain is not new.chain
-        assert old.chain.name == new.chain.name
-        assert (old.molecule is new.molecule is None) or (old.molecule is not new.molecule)
+        assert oldatom.residue is not atom.residue
+        assert oldatom.residue.name == atom.residue.name
+        assert oldatom.chain is not atom.chain
+        assert oldatom.chain.name == atom.chain.name
+        assert (oldatom.molecule is atom.molecule is None) or (oldatom.molecule is not atom.molecule)
+
+        assert atom.molecule is newmol  # might be None
+
+        if oldatom.residue is not None:
+            assert atom.residue.molecule is newmol
+            assert atom in atom.residue
+            assert atom.residue[atom.name] is atom
+        if oldatom.chain is not None:
+            assert atom.chain.molecule is newmol
+            assert atom in atom.chain.atoms
+            assert atom.residue in atom.chain
+            assert atom.chain[atom.residue.name] is atom.residue
+        if newmol is not None:
+            assert atom.residue is newmol.residues[atom.residue.index]
+            assert atom.chain is newmol.chains[atom.chain.index]
+            assert atom is newmol.atoms[atom.index]
 
 
 @pytest.mark.parametrize('fixture_key', moldesign_objects)
@@ -166,3 +189,94 @@ def test_chain_rename(pdb3aid):
     assert newmol.chains[0].name == 'A'
     assert newmol.chains[1].name == 'B'
 
+
+@pytest.mark.parametrize('molkey', ["cached_mol_parameterized_with_zeros",
+                                    "cached_protein_with_default_amber_ff"])
+def test_forcefield_copied_with_molecule(molkey, request):
+    mol = request.getfixturevalue(molkey)
+    m2 = mol.copy()
+
+    assert isinstance(m2.ff, mol.ff.__class__)
+    assert isinstance(m2.ff.parmed_obj, mol.ff.parmed_obj.__class__)
+    assert m2.ff.parmed_obj is not mol.ff.parmed_obj
+
+    p1 = m2.ff.parmed_obj
+    p2 = m2.ff.parmed_obj
+    assert m2.ff.parmed_obj.LJ_depth == mol.ff.parmed_obj.LJ_depth
+    assert p1.bond_types == p2.bond_types
+    assert p1.angle_types == p2.angle_types
+    assert p1.dihedral_types == p2.dihedral_types
+    assert p1.improper_types == p2.improper_types
+
+
+def test_constraints_copied_with_molecule(mol_with_zerocharge_params):
+    mol = mol_with_zerocharge_params
+
+    mol.constrain_distance(*mol.atoms[:2])
+    mol.constrain_angle(*mol.atoms[:3])
+    mol.constrain_dihedral(*mol.atoms[:4])
+    mol.constrain_atom(mol.atoms[0])
+    mol.constrain_hbonds()
+
+    mcpy = mol.copy()
+    assert isinstance(mcpy.constraints, mol.constraints.__class__)
+    assert mcpy.constraints[0].desc == 'distance'
+    assert mcpy.constraints[1].desc == 'angle'
+    assert mcpy.constraints[2].desc == 'dihedral'
+    assert mcpy.constraints[3].desc == 'position'
+    assert mcpy.constraints[4].desc == 'hbonds'
+
+    for constraint in mcpy.constraints:
+        assert constraint.mol is mcpy
+        if constraint.desc != 'hbonds':
+            for atom in constraint.atoms:
+                assert atom.molecule is mcpy
+
+
+def test_properties_copied_with_molecule(cached_h2_rhf_sto3g):
+    original = cached_h2_rhf_sto3g
+    assert original.potential_energy is not None  # sanity check
+
+    mol = cached_h2_rhf_sto3g.copy()
+
+    assert mol is not original
+    assert mol.properties is not original.properties
+
+    for prop, val in original.properties.items():
+        assert prop in mol.properties
+        if isinstance(val, (u.MdtQuantity, np.ndarray)) and getattr(val, 'shape', False):
+                assert (mol.properties[prop] == val).all()
+                assert mol.properties[prop] is not val
+
+        elif isinstance(val, (str, int, float, mdt.molecules.AtomicProperties)):
+            assert mol.properties[prop] == val
+
+        else:  # otherwise, just make sure it's not the original
+            assert mol.properties[prop] is not val
+
+
+def test_wfn_copied_with_molecule(cached_h2_rhf_sto3g):
+    original = cached_h2_rhf_sto3g
+    assert original.wfn is not None  # sanity check
+
+    mol = original.copy()
+
+    assert mol.wfn is not None
+
+    # should be completely equal
+    assert (mol.wfn.aobasis.fock == original.wfn.aobasis.fock).all()
+    # but different objects
+    assert mol.wfn.aobasis.fock is not original.wfn.aobasis.fock
+
+
+def test_wfn_copy(cached_h2_rhf_sto3g):
+    original = cached_h2_rhf_sto3g
+    wfn = original.wfn.copy()
+
+    assert wfn.mol is original
+    assert wfn is not original.wfn
+
+    # should be completely equal
+    assert (wfn.aobasis.fock == original.wfn.aobasis.fock).all()
+    # but different objects
+    assert wfn.aobasis.fock is not original.wfn.aobasis.fock

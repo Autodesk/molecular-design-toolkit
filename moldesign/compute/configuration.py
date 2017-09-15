@@ -29,19 +29,17 @@ from pyccc import engines
 from .. import utils
 from . import compute
 from .. import _version
-
-default_engine = None
+from .. import exceptions
 
 RUNNING_ON_WORKER = (os.environ.get('IS_PYCCC_JOB', '0') == '1')
 
 COMPUTE_CONNECTION_WARNING = """
-WARNING: Failed to connect to a computational engine - MDT won't be able to run
-anything outside of Python.
+WARNING: Failed to connect to Docker - MDT won't be able to run
+anything software not already installed on your machine.
 
-You can fix this either:
-  1) interactively, in a notebook, by running `moldesign.configure()`, or,
-  2) by modifying the configuration dictionary `moldesign.compute.config`, then
-     running `moldesign.compute.reset_compute_engine()` to try again."""
+Make sure Docker is installed and running!
+To install it, go to https://www.docker.com/get-docker
+"""
 
 
 config = utils.DotDict()
@@ -63,14 +61,13 @@ Args:
         'docker' (default) or 'subprocess'
     default_repository (str): Repository to pull MDT's standard images from.
         default: 'docker.io/autodesk/moldesign:'
-    default_python_image (str): Image to run python commands in
-        (default: ``docker.io/autodesk/moldesign:moldesign_complete-[VERSION]``, where
-        [VERSION] is the version of MDT)
     default_version_tag (str): Default version tag for docker images
-         (default: ``moldesign.__version__``)
+         (default: last tagged release (like ``moldesign.__version__``))
     default_docker_url (str): URL for communicating with docker if ``engine_type=='docker'``.
         (default: Determined from $DOCKER_HOST, usually this will be the client you run on
         the command line)
+    run_remote (Mapping[str,bool]): Whether to run a given python package in docker by default
+    run_local (Mapping[str,bool]): Whether to run a given executable locally or in docker
 
 MDT uses a non-standard docker tagging system to store its docker images. Generally,
 a given image is pulled from a URL of the form:
@@ -85,22 +82,27 @@ ENVVAR = "MOLDESIGN_CONFIG"
 
 If this variable is not set, ``$HOME/.moldesign/moldesign.yml`` will be used by default."""
 
-DEFAULT_CONFIG_PATH = os.path.join(os.environ['HOME'], '.moldesign/moldesign.yml')
+DEFAULT_CONFIG_PATH = os.path.join(os.path.expanduser('~'), '.moldesign', 'moldesign.yml')
 """ str: default search path for moldesign.yml."""
 
 # TODO: we're currently hardcoding this at release - there's got to be a better way
-DEFAULT_VERSION_TAG = _version.get_versions()['version']
+_vers = _version.get_versions()['version']
+if '+' in _vers:
+    _vers = _vers[:_vers.index('+')]
+DEFAULT_VERSION_TAG = _vers
 
 CONFIG_DEFAULTS = utils.DotDict(engine_type='docker',
                                 default_repository='docker.io/autodesk/moldesign:',
-                                default_python_image=None,
                                 default_docker_host='',
                                 default_version_tag=DEFAULT_VERSION_TAG,
+                                run_remote={},
+                                run_local={},
                                 devmode=False)
 
 DEF_CONFIG = CONFIG_DEFAULTS.copy()
 """ dict: default configuration to be written to moldesign.yml if it doesn't exist
 """
+config.update(DEF_CONFIG)
 
 
 def registry_login(client, login):
@@ -115,33 +117,40 @@ def registry_login(client, login):
         print('done')
 
 
-def write_config(path=None):
-    if path is None:
-        path = _get_config_path()
-
-    if not os.path.exists(path) and path == DEFAULT_CONFIG_PATH:
+def update_saved_config(**keys):
+    path = _get_config_path()
+    if not os.path.exists(path):
         confdir = os.path.dirname(path)
         if not os.path.exists(confdir):
             os.mkdir(confdir)
             print('Created moldesign configuration directory %s' % confdir)
+        oldconf = {}
+    else:
+        with open(path, 'r') as conffile:
+            oldconf = yaml.load(conffile)
 
-    configdump = {}
-    for key in CONFIG_DEFAULTS:
-        if key in config and isinstance(config[key], (basestring, int, float)):
-            configdump[key] = config[key]
+    for k,v in keys.items():
+        if k in oldconf:
+            assert isinstance(oldconf[k], dict) == isinstance(v, dict), "Is key %s a mapping?" % k
+        if isinstance(v, dict):
+            if k not in oldconf:
+                oldconf[k] = {}
+            oldconf[k].update(v)
+        else:
+            oldconf[k] = v
+
     with open(path, 'w') as f:
-        yaml.safe_dump(configdump, f, default_flow_style=False)
+        yaml.safe_dump(oldconf, f, default_flow_style=False)
 
     print('Wrote moldesign configuration to %s' % path)
 
 
 def get_engine():
-    from moldesign import compute
     if compute.default_engine is None:
         try:
             reset_compute_engine()
         except:
-            print(COMPUTE_CONNECTION_WARNING)
+            print(COMPUTE_CONNECTION_WARNING, file=sys.stderr)
             raise
     return compute.default_engine
 
@@ -149,13 +158,14 @@ def get_engine():
 def init_config():
     """Called at the end of package import to read initial configuration and setup cloud computing.
     """
+    from . import packages
+
     config.update(CONFIG_DEFAULTS)
 
     path = _get_config_path()
     if os.path.exists(path):
         try:
             with open(path, 'r') as infile:
-                sys.stderr.write('Reading configuration from %s\n' % path)
                 newconf = yaml.load(infile)
                 if not isinstance(newconf, dict):
                     raise TypeError('Cannot read configuration "%s" from %s.' % (newconf, path))
@@ -178,12 +188,20 @@ def init_config():
     if config.get('default_python_image', None) is None:
         config.default_python_image = expcted_docker_python_image
 
+    for pkg, do_remote in list(config.run_remote.items()):
+        if do_remote:
+            getattr(packages, pkg).force_remote = True
+
+    for pkg, do_local in list(config.run_local.items()):
+        if do_local:
+            getattr(packages, pkg).run_local = True
+
 
 def _check_override(tagname, expected, path):
     if tagname in config and config.default_version_tag != expected:
-        print ('WARNING: Configuration file specifies a different value for %s! '
-               "Remove the `%s` field from %s unless you know what you're doing"
-               % (tagname, tagname, path))
+        print('WARNING: Configuration file specifies a different value for %s! '
+              "Remove the `%s` field from %s unless you know what you're doing"
+              % (tagname, tagname, path))
 
 
 def _get_config_path():
@@ -207,21 +225,10 @@ def reset_compute_engine():
     compute.default_engine = None
 
     if config.engine_type == 'docker':
-        if config.default_docker_host:
-            notice = 'Connecting to docker host at %s' % config.default_docker_host
-            hosturl = config.default_docker_host
-        else:
-            notice = "Connecting to your docker engine"
-            hosturl = None
-        with utils.textnotify(notice):
-            compute.default_engine = engines.Docker(hosturl)
-        _connect_docker_registry()
+        connect_docker()
 
     elif config.engine_type == 'subprocess':
-        compute.default_engine = engines.Subprocess()
-        print("""WARNING: running all computational jobs as subprocesses on this machine.
-This requires that you have all necessary software installed locally.
-To change the engine, call moldesign.configure() or modify moldesign.compute.config .""")
+        connect_subprocess()
 
     elif config.engine_type in ('ccc', 'docker-machine'):
         raise ValueError('Computational engine type "%s" is no longer supported by MDT. '
@@ -231,6 +238,33 @@ To change the engine, call moldesign.configure() or modify moldesign.compute.con
 
     else:
         raise ValueError('Unrecognized engine %s' % config.engine_type)
+
+
+def connect_subprocess():
+    compute.default_engine = engines.Subprocess()
+    print("""WARNING: running all computational jobs as subprocesses on this machine.
+This requires that you have all necessary software installed locally.
+To change the engine, call moldesign.configure() or modify moldesign.compute.config .""")
+
+
+def connect_docker():
+    import requests, docker
+
+    if config.default_docker_host:
+        notice = 'Connecting to docker host at %s'%config.default_docker_host
+        hosturl = config.default_docker_host
+    else:
+        notice = "Connecting to your docker engine"
+        hosturl = None
+    with utils.textnotify(notice):
+        try:
+            compute.default_engine = engines.Docker(hosturl)
+            compute.default_engine.client.ping()
+        except (requests.exceptions.RequestException, docker.errors.DockerException):
+            location = 'running locally' if hosturl is None else ("at URL %s" % hosturl)
+            raise exceptions.DockerError(
+                    'Failed to connect to docker %s.' % location)
+    _connect_docker_registry()
 
 
 def _connect_docker_registry():

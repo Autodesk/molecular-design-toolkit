@@ -4,8 +4,11 @@ import numpy as np
 
 import moldesign as mdt
 import moldesign.units as u
+from moldesign.utils import exports
 from .helpers import get_data_path
 
+
+__all__ = ['molecule_standards']
 
 molecule_standards = {}
 
@@ -14,6 +17,7 @@ def typedfixture(*types, **kwargs):
     We'll later use this type to determine what tests to run on the result"""
 
     def fixture_wrapper(func):
+        __all__.append(func.__name__)
         for t in types:
             molecule_standards.setdefault(t, []).append(func.__name__)
         return pytest.fixture(**kwargs)(func)
@@ -23,7 +27,7 @@ def typedfixture(*types, **kwargs):
 
 ######################################
 # Tests around PDB ID 3AID
-@typedfixture('molecule', scope='session')
+@typedfixture('molecule')
 def pdb3aid():
     mol = mdt.read(get_data_path('3aid.pdb'))
     return mol
@@ -54,47 +58,85 @@ def ethylene_waterbox_2na_2cl():
     return solvated
 
 
+@exports
 @pytest.fixture
 def random_atoms_from_3aid(pdb3aid):
     atoms = mdt.molecules.atomcollections.AtomList(random.sample(pdb3aid.atoms, 10))
     return atoms
 
 
-@pytest.fixture(scope='function')
-def small_molecule():
+@exports
+@pytest.fixture(scope='session')
+def cached_small_molecule():
     mol = mdt.from_smiles('CNCOS(=O)C')
     mol.positions += 0.001*np.random.random(mol.positions.shape)*u.angstrom  # move out of minimum
     return mol
 
 
+@exports
 @pytest.fixture
-def benzene():
+def small_molecule(cached_small_molecule):
+    return cached_small_molecule.copy()
+
+
+@exports
+@pytest.fixture(scope='session')
+def cached_benzene():
     return mdt.from_smiles('c1ccccc1')
+
+
+@exports
+@pytest.fixture
+def benzene(cached_benzene):
+    return cached_benzene.copy()
 
 
 @typedfixture('molecule')
 def h2():
-    atom1 = mdt.Atom('H')
-    atom1.x = 0.5 * u.angstrom
-    atom2 = mdt.Atom(atnum=1)
-    atom2.position = [-0.5, 0.0, 0.0] * u.angstrom
-    h2 = mdt.Molecule([atom1, atom2], name='h2')
-    atom1.bond_to(atom2, 1)
-    return h2
+    mol = mdt.Molecule([mdt.Atom('H1'),
+                        mdt.Atom('H2')])
+    mol.atoms[0].x = 0.5 * u.angstrom
+    mol.atoms[1].x = -0.25 * u.angstrom
+    mol.atoms[0].bond_to(mol.atoms[1], 1)
+    return mol
 
 
-@pytest.fixture
-def ethylene():
+@typedfixture('molecule')
+def heh_plus():
+    mol = mdt.Molecule([mdt.Atom('H'),
+                        mdt.Atom('He')])
+    mol.atoms[1].z = 1.0 * u.angstrom
+    mol.charge = 1 * u.q_e
+    mol.atoms[0].bond_to(mol.atoms[1], 1)
+    return mol
+
+
+@exports
+@pytest.fixture(scope='session')
+def cached_ethylene():
     return mdt.from_smiles('C=C')
 
 
+@exports
+@pytest.fixture
+def ethylene(cached_ethylene):
+    return cached_ethylene.copy()
+
+
+@exports
+@pytest.fixture(scope='session')
+def cached_pdb1yu8():
+    return mdt.read(get_data_path('1yu8.pdb'))
+
+@exports
 @pytest.fixture
 def pdb1yu8():
     return mdt.read(get_data_path('1yu8.pdb'))
 
 
-@pytest.fixture(scope='function')
-def mol_from_xyz():
+@exports
+@pytest.fixture(scope='session')
+def cached_mol_from_xyz():
     return mdt.read("""43
     c1.pdb
     C         -1.21700        1.04300        2.45300
@@ -143,8 +185,15 @@ def mol_from_xyz():
     """, format='xyz')
 
 
-@pytest.fixture(scope='function')
-def mol_from_sdf():
+@exports
+@pytest.fixture
+def mol_from_xyz(cached_mol_from_xyz):
+    return cached_mol_from_xyz.copy()
+
+
+@exports
+@pytest.fixture(scope='session')
+def cached_mol_from_sdf():
     return mdt.read("""
  OpenBabel02271712493D
 
@@ -174,11 +223,130 @@ M  END
 $$$$
 """, format='sdf')
 
+@exports
+@pytest.fixture
+def mol_from_sdf(cached_mol_from_sdf):
+    return cached_mol_from_sdf.copy()
 
-######################################
-# Tests around a piece of DNA
-@typedfixture('molecule', scope='session')
+
+@typedfixture('molecule')
 def nucleic():
     # ACTG.pdb contains a molecule generated using mdt.build_dna('ACTG')
     mol = mdt.read(get_data_path('ACTG.pdb'))
     return mol
+
+
+########################################################################################
+# Molecules with forcefields assigned - these use a session-scoped constructor w/ a copy factory
+
+@exports
+@pytest.fixture(scope='session')
+def cached_mol_parameterized_with_zeros(cached_small_molecule):
+    return _param_small_mol(cached_small_molecule.copy(), 'zero')
+
+
+@typedfixture('hasmodel')
+def mol_with_zerocharge_params(cached_mol_parameterized_with_zeros):
+    return cached_mol_parameterized_with_zeros.copy()
+
+
+@exports
+@pytest.fixture(scope='session')
+def cached_mol_parameterized_with_am1bcc(cached_small_molecule):
+    """ We don't use this fixture directly, rather use another fixture that copies these results
+    so that we don't have to repeatedly call tleap/antechamber
+    """
+    return _param_small_mol(cached_small_molecule.copy(), 'am1-bcc')
+
+
+@typedfixture('hasmodel')
+def mol_with_am1bcc_params(cached_mol_parameterized_with_am1bcc):
+    return cached_mol_parameterized_with_am1bcc.copy()
+
+
+@exports
+@pytest.fixture(scope='session')
+def cached_mol_parameterized_with_gasteiger(cached_small_molecule):
+    """ We don't use this fixture directly, rather use another fixture that copies these results
+    so that we don't have to repeatedly call tleap/antechamber
+    """
+    mol = cached_small_molecule.copy()
+    mol.set_energy_model(mdt.models.GaffSmallMolecule, partial_charges='gasteiger')
+    mol.energy_model.prep()
+    return mol
+
+
+@typedfixture('hasmodel')
+def mol_with_gast_params(cached_mol_parameterized_with_gasteiger):
+    return cached_mol_parameterized_with_gasteiger.copy()
+
+
+def _param_small_mol(cached_small_molecule, chargemodel):
+    mol = cached_small_molecule.copy()
+    params = mdt.create_ff_parameters(mol, charges=chargemodel, baseff='gaff2')
+    params.assign(mol)
+    mol.set_energy_model(mdt.models.ForceField)
+    return mol
+
+
+@exports
+@pytest.fixture(scope='session')
+def cached_protein_with_default_amber_ff(cached_pdb1yu8):
+    """ We don't use this fixture directly, rather use another fixture that copies these results
+    so that we don't have to repeatedly call tleap/antechamber
+    """
+    mol = cached_pdb1yu8
+    ff = mdt.forcefields.DefaultAmber()
+    newmol = ff.create_prepped_molecule(mol)
+    newmol.set_energy_model(mdt.models.ForceField)
+    return newmol
+
+
+@typedfixture('hasmodel')
+def protein_default_amber_forcefield(cached_protein_with_default_amber_ff):
+    return cached_protein_with_default_amber_ff.copy()
+
+
+@exports
+@pytest.fixture(scope='session')
+def cached_h2_rhf_sto3g():
+    mol = h2()  # fixture is not cached, so just call it directly
+    mol.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rhf')
+    mol.calculate(requests=['forces'])
+    return mol
+
+
+@exports
+@pytest.fixture
+def h2_rhf_sto3g(cached_h2_rhf_sto3g):
+    return cached_h2_rhf_sto3g.copy()
+
+
+@exports
+@pytest.fixture(scope='session')
+def cached_h2_rhf_augccpvdz():
+    mol = h2()
+    mol.set_energy_model(mdt.models.RHF, basis='aug-cc-pvdz')
+    mol.calculate()
+    return mol
+
+
+@exports
+@pytest.fixture
+def h2_rhf_augccpvdz(cached_h2_rhf_augccpvdz):
+    return cached_h2_rhf_augccpvdz.copy()
+
+
+@exports
+@pytest.fixture(scope='session')
+def cached_acetylene_dft_631g():
+    mol = mdt.from_smiles('C#C')
+    mol.set_energy_model(mdt.models.B3LYP, basis='6-31g')
+    mol.calculate()
+    return mol
+
+
+@exports
+@pytest.fixture
+def acetylene_dft_631g(cached_acetylene_dft_631g):
+    return cached_acetylene_dft_631g.copy()

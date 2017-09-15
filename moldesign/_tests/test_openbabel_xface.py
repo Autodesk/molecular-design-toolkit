@@ -2,7 +2,7 @@ import pytest
 
 import moldesign as mdt
 
-from .molecule_fixtures import small_molecule
+from .molecule_fixtures import *
 
 
 registered_types = {}

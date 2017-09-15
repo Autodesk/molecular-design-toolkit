@@ -22,46 +22,42 @@ from pyccc import python as bpy
 
 import moldesign as mdt
 from moldesign import utils
-from . import configuration
+from . import configuration, run_job
 from ..helpers import display_log
 
 
-class RunsRemotely(object):
-    def __init__(self, enable=True,
+class RpcWrapper(object):
+    """ A wrapper that lets to transparently execute python functions in remote
+    environments - usually in docker containers.
+
+    These wrappers are built to allow a lot of run-time flexibility based on the description
+    of the package (``self.pkg``) that's being called.
+
+    Note:
+     This ONLY works for pure functions - where you're interested in the
+       return value only. Side effects - including any object state - will be discarded.
+
+    Args:
+        pkg (mdt.compute.packages.InterfacedPackage): package to run this command with
+        display (bool): Create a jupyter logging display for the remote job
+            (default: True in Jupyter notebooks, False otherwise)
+        jobname (str): Name metadata - defaults to the __name__ of the function
+        sendsource (bool): if False (default), call this function directly on the remote worker;
+           if True, send the function's source code (for debugging, mostly)
+        persist_refs (bool): Persist python object references across the RPC roundtrip
+        is_imethod (bool): This is an instancemethod
+           Note: we can't determine this at import-time without going to great lengths ...
+                - see, e.g., http://stackoverflow.com/questions/2366713/ )
+    """
+    def __init__(self, pkg,
                  display=True,
                  jobname=None,
                  sendsource=False,
-                 engine=None,
-                 image=None,
                  is_imethod=False,
                  persist_refs=False):
-        """Function decorator to run a python function remotely.
-
-        Note:
-         This ONLY works for pure functions - where you're interested in the
-           return value only. Side effects won't be visible to the user.
-
-        Args:
-            enable (bool): If True, run this job using a compute engine
-            display (bool): Create a jupyter logging display for the remote job
-                (default: True in Jupyter notebooks, False otherwise)
-            jobname (str): Name metadata - defaults to the __name__ of the function
-            sendsource (bool): if False (default), call this function directly on the remote worker;
-               if True, send the function's source code (for debugging, mostly)
-            engine (pyccc.engine.EngineBase): engine to send the job to (default:
-                moldesign.compute.get_engine())
-            image (str): name of the docker image (including registry, repository, and tags)
-                (default: moldesign.config.default_python_image)
-            persist_refs (bool): Persist python object references across the RPC roundtrip
-            is_imethod (bool): This is an instancemethod
-               Note: we can't determine this at import-time without going to great lengths ...
-                    - see, e.g., http://stackoverflow.com/questions/2366713/ )
-        """
-        self.enabled = enable
+        self.pkg = pkg
         self.display = display
         self.sendsource = sendsource
-        self.image = image
-        self.engine = engine
         self.jobname = jobname
         self.is_imethod = is_imethod
         self.persist_refs = persist_refs
@@ -70,12 +66,13 @@ class RunsRemotely(object):
         """
         This gets called with the function we wish to wrap
         """
+        from .compute import get_image_path
         assert callable(func)
 
         if self.jobname is None:
             self.jobname = func.__name__
 
-        if func.__name__ == 'wrapper': assert False
+        assert func.__name__ != 'wrapper'  # who wraps the wrappers?
 
         @utils.args_from(func,
                          wraps=True,
@@ -86,12 +83,11 @@ class RunsRemotely(object):
             Note:
                 At runtime, this documentation should be replaced with that of the wrapped function
             """
-            # If the wrapper is not enabled, just run the wrapped function as normal.
             f = func  # keeps a reference to the original function in this closure
-            if not wrapper.enabled:
-                return f(*args, **kwargs)
-
             wait = kwargs.get('wait', True)
+
+            if wait and not self.pkg.force_remote:
+                return f(*args, **kwargs)
 
             # Bind instance methods to their objects
             if self.is_imethod:
@@ -99,30 +95,22 @@ class RunsRemotely(object):
 
             # Submit job to remote engine
             python_call = bpy.PythonCall(f, *args, **kwargs)
-            image = utils.if_not_none(self.image, configuration.config.default_python_image)
-            engine = utils.if_not_none(self.engine, mdt.compute.get_engine())
-            job = bpy.PythonJob(engine,
-                                image,
-                                python_call,
+
+            engine = utils.if_not_none(self.pkg.engine, mdt.compute.get_engine())
+            job = bpy.PythonJob(engine=engine,
+                                image=self.pkg.get_docker_image_path(),
+                                command=python_call,
                                 name=self.jobname,
                                 sendsource=self.sendsource,
-                                interpreter='python',  # always run in native interpreter
-                                persist_references=self.persist_refs)
+                                interpreter='python',  # always run in image's native interpreter
+                                persist_references=self.persist_refs,
+                                submit=False)
 
-            if self.display:
-                display_log(job.get_display_object(), title=f.__name__)
-
-            if wait:
-                job.wait()
-                return job.result
-            else:
-                return job
+            return run_job(job, wait=wait, _return_result=True)
 
         wrapper.__name__ = func.__name__
-        wrapper.enabled = self.enabled
+        wrapper.__wrapped__ = func
         return wrapper
-
-runsremotely = RunsRemotely  # because decorators should be lower case
 
 
 def _bind_instance_method(f, args):

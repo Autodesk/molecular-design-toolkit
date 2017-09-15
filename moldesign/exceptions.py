@@ -41,3 +41,16 @@ class QMConvergenceError(Exception):
     """ Raised when an iterative QM calculation (typically SCF) fails to converge
     """
     pass
+
+class DockerError(Exception):
+    pass
+
+
+class ForcefieldAssignmentError(Exception):
+    """ Class that define displays for common errors in assigning a forcefield
+    """
+    def __init__(self, msg, errors, mol=None, job=None):
+        self.args = [msg]
+        self.errors = errors
+        self.mol = mol
+        self.job = job

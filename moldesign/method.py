@@ -25,7 +25,7 @@ from future.utils import with_metaclass
 import funcsigs
 
 import moldesign as mdt
-from .helpers import WidgetMethod
+from .widgets import WidgetMethod
 from . import utils
 
 
@@ -94,6 +94,7 @@ class Method(with_metaclass(_InitKeywordMeta, object)):
                 return True
         else:
             return False
+
     def __eq__(self, other):
         return self.__class__ is other.__class__ and self.params == other.params
 

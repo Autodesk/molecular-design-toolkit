@@ -16,14 +16,74 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from .helpers.widgets import nbmolviz_installed
+import sys
+import functools
+from .utils import exports, exports_names
+from . import _NBMOLVIZ_EXPECTED_VERSION
 
-if nbmolviz_installed:
-    from nbmolviz.widgets import BondSelector, GeometryBuilder, ResidueSelector, Symmetrizer
-    from nbmolviz.widgets.computeconfig import configure, about
+__all__ = 'BondSelector GeometryBuilder ResidueSelector Symmetrizer AtomSelector'.split()
+
+INSTALL_CMD = """Install `nbmolviz` by running these commands at the terminal:
+  $ pip install "nbmolviz==%s"
+  $ python -m nbmolviz activate
+
+Afterwards, restart python and reload any running notebooks."""%_NBMOLVIZ_EXPECTED_VERSION
+
+
+_warnings = []
+
+try:
+    import nbmolviz.widget_utils
+    from nbmolviz import __version__ as nbv_version
+except ImportError:
+    nbmolviz_enabled = False
+    nbmolviz_installed = False
 else:
-    from .helpers.widgets import not_installed_method
-    BondSelector = GeometryBuilder = ResidueSelector = Symmetrizer = configure = about = \
-        not_installed_method
+    nbmolviz_installed = True
+    nbmolviz_enabled = nbmolviz.widget_utils.can_use_widgets()
 
-__all__ = 'BondSelector GeometryBuilder ResidueSelector Symmetrizer'.split()
+
+def notebook_only_method(*args, **kwargs):
+    assert not nbmolviz_enabled
+    if nbmolviz_installed:
+        raise ImportError("This function is only available in a Jupyter notebook!")
+    else:
+        raise ImportError(
+                "The `nbmolviz` library must be installed to use this function!\n"
+                + INSTALL_CMD)
+
+
+if nbmolviz_enabled:
+    # TODO: Make these into lazy imports
+    from nbmolviz.widgets import (BondSelector, GeometryBuilder, ResidueSelector, Symmetrizer,
+                                  AtomSelector)
+    from nbmolviz.mdtconfig.compute import configure
+    about = configure
+    nbmolviz.widget_utils.print_extension_warnings(stream=sys.stderr)
+else:
+    BondSelector = GeometryBuilder = ResidueSelector = AtomSelector = Symmetrizer = configure \
+        = about = notebook_only_method
+
+
+def _get_nbmethod(name):
+    # don't import nbmolviz methods until a method is actually called
+    from nbmolviz import methods as nbmethods
+    module = nbmethods
+    for item in name.split('.'):
+        module = getattr(module, item)
+    return module
+
+
+@exports
+class WidgetMethod(object):
+    def __init__(self, name):
+        self.name = name
+        self.method = None
+
+    def __get__(self, instance, owner):
+        if not nbmolviz_enabled:
+            return notebook_only_method
+        elif self.method is None:
+            self.method = _get_nbmethod(self.name)
+        return functools.partial(self.method, instance)
+

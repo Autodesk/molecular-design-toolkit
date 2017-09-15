@@ -27,7 +27,7 @@ from . import toplevel, __all__ as _pkgall
 
 from moldesign.interfaces.openbabel import add_hydrogen, guess_bond_orders
 from moldesign.interfaces.pdbfixer_interface import mutate_residues, add_water
-from moldesign.interfaces.ambertools import create_ff_parameters
+from moldesign.interfaces.tleap_interface import create_ff_parameters
 from moldesign.interfaces.ambertools import calc_am1_bcc_charges, calc_gasteiger_charges
 
 _pkgall.extend(('add_hydrogen guess_bond_orders mutate_residues add_water'
@@ -187,8 +187,6 @@ def split_chains(mol, distance_threshold=1.75*u.angstrom):
     def addto(chain, res):
         res.chain = None
         chain.add(res)
-        for atom in res:
-            atom.chain = chain
 
     allchains = [mdt.Chain(tempmol.chains[0].name)]
     for chain in tempmol.chains:

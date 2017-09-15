@@ -24,7 +24,6 @@ from past.builtins import basestring
 import collections
 
 import itertools
-import parmed
 import future.utils
 
 import moldesign as mdt
@@ -46,6 +45,7 @@ def read_mmcif(f, reassign_chains=True):
     Returns:
         moldesign.Molecule: parsed molecule
     """
+    import parmed
     parmedmol = parmed.read_CIF(f)
     mol = parmed_to_mdt(parmedmol)
     if reassign_chains:
@@ -64,6 +64,7 @@ def read_pdb(f):
     Returns:
         moldesign.Molecule: parsed molecule
     """
+    import parmed
     parmedmol = parmed.read_PDB(f)
     mol = parmed_to_mdt(parmedmol)
     return mol
@@ -179,7 +180,6 @@ def parmed_to_mdt(pmdmol):
 
         atom.residue = residue
         residue.add(atom)
-        atom.chain = chain
         assert patm not in atoms
         atoms[patm] = atom
 
@@ -223,6 +223,7 @@ def mol_to_parmed(mol):
     Returns:
         parmed.Structure
     """
+    import parmed
     struc = parmed.Structure()
     struc.title = mol.name
 
@@ -284,8 +285,6 @@ def _reassign_chains(f, mol):
     for residue in mol.residues:
         newchain = reschains[residue.resname, str(residue.pdbindex), residue.chain.name]
 
-        for atom in residue.atoms:
-            atom.chain = newchain
         residue.chain = newchain
 
     return mdt.Molecule(mol.atoms,

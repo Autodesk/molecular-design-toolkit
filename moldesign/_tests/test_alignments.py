@@ -8,8 +8,7 @@ from moldesign import geom
 from moldesign.mathutils import normalized
 from moldesign import units as u
 
-from .molecule_fixtures import (benzene, h2, ligand3aid,
-                                pdb3aid, small_molecule, pdb1yu8, ligand_residue_3aid)
+from .molecule_fixtures import *
 from .helpers import assert_almost_equal
 
 
@@ -17,13 +16,14 @@ __PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (s
 
 
 def test_bond_alignment_on_axis(benzene):
+    mol = benzene.copy()
     directions = ['x', 'y', 'z',
                   [1,2,3.0],
                   [0,1,0],
                   [0.1, 0.1, 0.1] * u.angstrom]
 
     for i, dir in enumerate(directions):
-        bond = mdt.Bond(*random.sample(benzene.atoms, 2))
+        bond = mdt.Bond(*random.sample(mol.atoms, 2))
         center = (i % 2) == 0.0
         bond.align(dir, centered=center)
 
@@ -74,7 +74,7 @@ def test_align_two_bonds(benzene, h2):
 @pytest.mark.parametrize('fixturename', 'ligand3aid pdb3aid benzene small_molecule pdb1yu8'.split())
 def test_pmi_is_orthonormal(request, fixturename):
     # test a bunch of molecules
-    mol = request.getfixturevalue(fixturename)
+    mol = request.getfixturevalue(fixturename).copy()
     pmi = geom.alignment.PrincipalMomentsOfInertia(mol)
     for ivec in range(3):
         assert abs(1.0 - mdt.mathutils.norm(pmi.evecs[ivec])) < 1e-12
@@ -85,7 +85,7 @@ def test_pmi_is_orthonormal(request, fixturename):
 @pytest.mark.parametrize('fixturename', 'ligand3aid pdb3aid benzene small_molecule pdb1yu8'.split())
 def test_pmi_translational_rotational_invariance(request, fixturename):
     # currently only test the eigenvalues
-    mol = request.getfixturevalue(fixturename)
+    mol = request.getfixturevalue(fixturename).copy()
     pmi = geom.alignment.PrincipalMomentsOfInertia(mol)
 
     _randomize_orientation(mol)
@@ -127,7 +127,7 @@ def test_pmi_reorientation_on_linear_molecule():
 
 def test_pmi_reorientation_on_benzene(benzene):
     # note that this will fail if the generated polymer is not perfectly linear
-    mol = benzene
+    mol = benzene.copy()
     original_distmat = mol.calc_distance_array().defunits_value()
 
     for i in range(5):

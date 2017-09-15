@@ -47,7 +47,7 @@ URL_OPENERS = ['Open', 'xdg-open', 'sensible-browser', 'gnome-open', 'x-www-brow
 JUPYTERPORT = 8888
 DOCKER_TOOLS = 'docker docker-machine docker-compose'.split()
 DOCKER_REPOSITORY = 'docker-hub.autodesk.com/virshua/moldesign:'
-HOME = os.environ['HOME']
+HOME = os.path.expanduser('~')
 CONFIG_DIR = os.path.join(HOME, '.moldesign')
 EXAMPLE_DIR_TARGET = os.path.join(os.path.curdir, 'moldesign-examples')
 MOLDESIGN_SRC = os.path.abspath(os.path.dirname(__file__))
@@ -67,6 +67,11 @@ APPLESCRIPT_INSTALL_DOCKER = ('set response to (display dialog '
                               'open location "https://www.docker.com/docker-toolbox"'
                               'end if')
 CONFIG_PATH = os.path.join(CONFIG_DIR, 'moldesign.yml')
+
+NO_NBMOLVIZ_ERR = 10
+JUPYTER_ERR = 128
+NO_EXAMPLE_OVERWRITE_ERR = 200
+OUTDATED_EXAMPLES_ERR = 201
 
 
 def main():
@@ -96,11 +101,13 @@ def main():
         CONFIG_PATH = args.config_file
 
     if args.command == 'intro':
+        nbmolviz_check()
         copy_example_dir(use_existing=True)
         launch(cwd=EXAMPLE_DIR_TARGET,
                path='notebooks/Getting%20Started.ipynb')
 
     elif args.command == 'launch':
+        nbmolviz_check()
         launch()
 
     elif args.command == 'copyexamples':
@@ -122,6 +129,15 @@ def main():
 
     else:
         raise ValueError("Unhandled CLI command '%s'" % args.command)
+
+
+def nbmolviz_check():
+    # Checks for the existence of nbmolviz before attempting to launch a notebook
+    from . import widgets
+    if not widgets.nbmolviz_installed:
+        print('ERROR: nbmolviz not found - notebooks not available. Install it by running\n'
+              ' $ pip install nbmolviz`')
+        sys.exit(NO_NBMOLVIZ_ERR)
 
 
 def launch(cwd=None, path=''):
@@ -152,9 +168,9 @@ def check_existing_examples(use_existing):
     if version != MDTVERSION:
         print('WARNING - your example directory is out of date! It corresponds to MDT version '
               '%s, but you are using version %s'%(version, MDTVERSION))
-        print('If you want to update your examples, please rename or remove "%s"'
+        print('To update your examples, please rename or remove "%s"'
               % EXAMPLE_DIR_TARGET)
-        sys.exit(201)
+        sys.exit(OUTDATED_EXAMPLES_ERR)
 
     if use_existing:
         return
@@ -164,7 +180,7 @@ def check_existing_examples(use_existing):
                  ' 1) Rename or remove the existing directory at %s,'%EXAMPLE_DIR_TARGET,
                  ' 2) Run this command in a different location, or'
                  ' 3) Run `python -m moldesign intro` to launch the example gallery.']))
-        sys.exit(200)
+        sys.exit(NO_EXAMPLE_OVERWRITE_ERR)
 
 
 def launch_jupyter_server(cwd=None):  # pragma: no cover
@@ -238,7 +254,7 @@ def wait_net_service(server, port, process, timeout=None):  # pragma: no cover
     while True:
         if process.poll() is not None:
             print('ERROR: Jupyter process exited prematurely')
-            sys.exit(128)
+            sys.exit(JUPYTER_ERR)
 
         s = socket.socket()
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

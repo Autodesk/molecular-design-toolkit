@@ -116,7 +116,8 @@ def read(f, format=None):
     if filename is not None and mol.name not in (None, 'untitled'):
         mol.name = filename
 
-    mdt.helpers.atom_name_check(mol)
+    if isinstance(mol, mdt.Molecule):
+        mdt.helpers.atom_name_check(mol)
     return mol
 
 
@@ -321,7 +322,6 @@ def read_xyz(f):
     tempmol = openbabel_interface.read_stream(f, 'xyz')
     for atom in tempmol.atoms:
         atom.residue = None
-        atom.chain = None
     return mdt.Molecule(tempmol.atoms)
 
 

@@ -17,8 +17,9 @@ standard_library.install_aliases()
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import numpy as np
+import copy
 
-from . import MolecularOrbitals
+from . import Orbital, MolecularOrbitals
 from ..utils import DotDict
 
 
@@ -78,10 +79,23 @@ class ElectronicWfn(object):
             self.positions = positions.copy()
 
         if self.aobasis is not None:
-            self.orbitals['atomic'] = self.aobasis
             self.aobasis.wfn = self
+            atomic_orbs = [Orbital(c, basis=self.aobasis, wfn=self, name=bf.name)
+                           for c,bf in zip(np.identity(len(self.aobasis)), self.aobasis)]
+            self.orbitals.atomic = MolecularOrbitals(atomic_orbs, wfn=self,
+                                                     basis=self.aobasis,
+                                                     orbtype='atomic')
             for orb in self.aobasis.orbitals:
                 orb.wfn = self
+
+    def copy(self):
+        """ Create a copy of this wavefunction
+
+        Returns:
+            ElectronicWfn: a copy of this wavefunction. Note that all attributes are deepcopied
+               EXCEPT for self.mol, which still points to the original molecule
+        """
+        return copy.deepcopy(self, memo={id(self.mol): self.mol})
 
     def __repr__(self):
         return '<ElectronicWfn (%s) of %s>' % (self.description, str(self.mol))
@@ -105,7 +119,9 @@ class ElectronicWfn(object):
         """
         for orbtype in self.orbitals:
             if orbtype not in other.orbitals:
-                if assert_same: assert False, '%s has orbital type %s, but %s does not.' % (self, orbtype, other)
+                if assert_same:
+                    assert False, '%s has orbital type %s, but %s does not.' % (
+                        self, orbtype, other)
                 else: continue
             self.orbitals[orbtype].align_phases(other.orbitals[orbtype])
 

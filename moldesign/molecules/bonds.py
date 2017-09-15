@@ -25,6 +25,7 @@ import numpy as np
 from . import toplevel
 from .. import units as u
 from .. import mathutils
+from .. import geom
 
 
 @toplevel
@@ -35,22 +36,20 @@ class Bond(object):
     Args:
         a1 (Atom): First atom
         a2 (Atom): Second atom (the order of atoms doesn't matter)
-        order (int): Order of the bond
 
     Notes:
         Comparisons and hashes involving bonds will return True if the atoms involved in the bonds
-        are the same. Bond orders are not compared.
-
-        These objects are used to represent and pass bond data only - they are not used for storage.
+        are the same. ``Bond`` objects are _views_ on the BondGraph object; there may be zero, one,
+        or many ``Bond`` objects corresponding to any given chemical bond.
 
     Attributes:
         a1 (Atom): First atom in the bond; assigned so that ``self.a1.index < self.a2.index``
         a2 (Atom): Second atom in the bond; assigned so that ``self.a2.index > self.a1.index``
-        order (int): bond order (can be ``None``); not used in comparisons
+        order (int or None): order of the bond between the atoms (or None of they are not bonded)
     """
     SYMBOLS = {1: u'-', 2: u'=', 3: u'≡'}
 
-    def __init__(self, a1, a2, order=None):
+    def __init__(self, a1, a2):
         if a1.molecule is not a2.molecule:
             raise ValueError('Cannot create bond for atoms in different molecules.')
 
@@ -58,11 +57,6 @@ class Bond(object):
             a1, a2 = a2, a1
         self.a1 = a1
         self.a2 = a2
-        if order is None:
-            try: self.order = self.a1.bond_graph[a2]
-            except KeyError: self.order = None
-        else:
-            self.order = order
 
     def __str__(self):
         return "%s bond between %s and %s (order: %s)" % (self.type,
@@ -71,6 +65,42 @@ class Bond(object):
 
     def __repr__(self):
         return "<%s>" % self
+
+    @property
+    def order(self):
+        a1order = self.a1.bond_graph.get(self.a2, None)
+        a2order = self.a2.bond_graph.get(self.a1, None)
+        if a1order == a2order:
+            return a1order
+        elif a1order is None:
+            return a2order
+        elif a2order is None:
+            return a1order
+        else:  # inconsistent
+            raise ValueError('Inconsistent bond orders between %s and %s' % (self.a1, self.a2))
+
+    @order.setter
+    def order(self, order):
+        if order is None:  # i.e., delete the bond if it exists
+            if self.order is None:
+                return  # already done
+            elif self.molecule:
+                self.molecule.delete_bond(self)
+            else:
+                self.a1.bond_graph.pop(self.a2, None)
+                self.a2.bond_graph.pop(self.a1, None)
+
+        else:  # create the bond or modify its order
+            for atom in (self.a1, self.a2):
+                nbr = self.partner(atom)
+                if atom.molecule is self.molecule:
+                    atom.bond_graph[nbr] = order
+
+    @property
+    def exists(self):
+        """ bool: whether or not this bond exists
+        """
+        return self.order is not None
 
     @property
     def type(self):
@@ -106,6 +136,11 @@ class Bond(object):
     def length(self):
         return self.a1.distance(self.a2)
 
+    @length.setter
+    def length(self, value):
+        geom.set_distance(self.a1, self.a2, value,
+                          adjustmol=self.exists and not self.is_cyclic)
+
     @property
     def name(self):
         """ str: name of the bond """
@@ -127,6 +162,26 @@ class Bond(object):
     @property
     def midpoint(self):
         return (self.a1.position + self.a2.position) / 2.0
+
+    @property
+    def is_cyclic(self):
+        """
+        bool: True if this bond is in one or more rings
+        """
+        visited = set([self.a2])
+
+        def check_for_cycles(atom):
+            visited.add(atom)
+            for nbr in atom.bond_graph:
+                if nbr is self.a2 and atom is not self.a1:
+                    return True
+                if nbr not in visited:
+                    in_cycle = check_for_cycles(nbr)
+                    if in_cycle:
+                        return True
+            return False  # if here, not in a cycle
+        check_for_cycles(self.a1)
+
 
     def align(self, other, centered=True):
         """ Rotates the entire molecule to align this bond with another object.

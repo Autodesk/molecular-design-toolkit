@@ -16,28 +16,17 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import sys
 import itertools
-import imp
 
 import numpy as np
 
 import pyccc
 import moldesign as mdt
+
+from ..compute import packages
 from ..utils import from_filepath
 from .. import units as u
-from .. import compute
 from ..utils import exports
-
-
-try:
-    imp.find_module('simtk')
-except (ImportError, OSError) as exc:
-    sys.stderr.write('Info: OpenMM not installed; will run in docker container\n')
-    force_remote = True
-else:
-    force_remote = False
 
 
 class OpenMMPickleMixin(object):
@@ -74,10 +63,14 @@ def MdtReporter(mol, report_interval):
             self.report_interval = report_interval
             self.trajectory = mdt.Trajectory(mol)
             self.annotation = None
-            self._row_format = ("{:<10.2f}") + 3*(" {:>15.4f}")
-            self._header_format = self._row_format.replace('.4f','s').replace('.2f','s')
-            self._printed_header = False
             self.last_report_time = None
+            self.logger = mdt.helpers.DynamicsLog()
+
+        def __del__(self):
+            try:
+                super().__del__()
+            except AttributeError:
+                pass  # suppress irritating error msgs
 
         def report_from_mol(self, **kwargs):
             self.mol.calculate()
@@ -109,23 +102,11 @@ def MdtReporter(mol, report_interval):
                 potential_energy=simtk2pint(state.getPotentialEnergy()))
             if self.annotation is not None: report['annotation'] = self.annotation
 
-            if not self._printed_header:
-                timeheader = 'time / {units}'.format(units=u.default.time)
-                peheader = 'potential / {units}'.format(units=u.default.energy)
-                keheader = 'kinetic / {units}'.format(units=u.default.energy)
-                temperatureheader = 'T / {units}'.format(units=u.default.temperature)
-                print(self._header_format.format(timeheader, peheader, keheader, temperatureheader))
-                self._printed_header = True
-            ke = mdt.helpers.kinetic_energy(report['momenta'], self.mol.masses)
-            t = (2.0 * ke) / (u.k_b * self.mol.dynamic_dof)
-            print(self._row_format.format(report['time'].defunits_value(),
-                                          report['potential_energy'].defunits_value(),
-                                          ke.defunits_value(),
-                                          t.defunits_value()))
-
             if settime:
                 self.last_report_time = report['time']
             self.trajectory.new_frame(properties=report)
+            self.logger.print_step(self.mol, properties=report)
+
 
         def describeNextReport(self, simulation):
             """
@@ -202,7 +183,7 @@ def pint2simtk(quantity):
     return newvar
 
 
-@compute.runsremotely(enable=force_remote)
+@packages.openmm.runsremotely
 def _amber_to_mol(prmtop_file, inpcrd_file):
     """ Convert an amber prmtop and inpcrd file to an MDT molecule
 
@@ -224,7 +205,7 @@ def _amber_to_mol(prmtop_file, inpcrd_file):
     return mol
 
 
-if force_remote:
+if packages.openmm.is_installed():
     def amber_to_mol(prmtop_file, inpcrd_file):
         if not isinstance(prmtop_file, pyccc.FileContainer):
             prmtop_file = pyccc.LocalFile(prmtop_file)
@@ -292,7 +273,6 @@ def topology_to_mol(topo, name=None, positions=None, velocities=None, assign_bon
             for atom in residue.atoms():
                 newatom = atommap[atom]
                 newatom.residue = newresidue
-                newatom.chain = newchain
                 newresidue.add(newatom)
 
     # Bonds
@@ -304,13 +284,13 @@ def topology_to_mol(topo, name=None, positions=None, velocities=None, assign_bon
             bonds[na1] = {}
         if na2 not in bonds:
             bonds[na2] = {}
-        bonds[na1][na2] = 1
-        bonds[na2][na1] = 1
+        b = mdt.Bond(na1, na2)
+        b.order = 1
 
     if name is None:
         name = 'Unnamed molecule from OpenMM'
 
-    newmol = mdt.Molecule(newatoms, bond_graph=bonds, name=name)
+    newmol = mdt.Molecule(newatoms, name=name)
 
     if assign_bond_orders:
         for residue in newmol.residues:

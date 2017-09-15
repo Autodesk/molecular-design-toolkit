@@ -20,8 +20,6 @@ import numpy as np
 
 __all__ = ['SPHERE_TO_CART']
 
-SQ2INV = np.sqrt(1/2.0)
-
 
 def cart_to_polar_angles(coords):
     if len(coords.shape) == 2:
@@ -38,7 +36,12 @@ def cart_to_polar_angles(coords):
 
 
 class Y(object):
-    """ A *real* spherical harmonic
+    r""" A real-valued spherical harmonic function
+
+    These functions are orthonormalized over the sphere such that
+
+    .. math::
+       \int d^2\Omega \: Y_{lm}(\theta, \phi) Y_{l'm'}(\theta, \phi) = \delta_{l,l'} \delta_{m,m'}
 
     References:
         https://en.wikipedia.org/wiki/Table_of_spherical_harmonics#Real_spherical_harmonics
@@ -57,17 +60,17 @@ class Y(object):
         from scipy.special import sph_harm
 
         theta, phi = cart_to_polar_angles(coords)
-
         if self.m == 0:
             return (sph_harm(self.m, self.l, phi, theta)).real
-        else:
-            vplus = sph_harm(abs(self.m), self.l, phi, theta)
-            vminus = sph_harm(-abs(self.m), self.l, phi, theta)
 
-            if self.m < 0:
-                return -(SQ2INV * (self._posneg * vplus + vminus)).imag
-            else:
-                return (SQ2INV * (self._posneg * vplus + vminus)).real
+        vplus = sph_harm(abs(self.m), self.l, phi, theta)
+        vminus = sph_harm(-abs(self.m), self.l, phi, theta)
+        value = np.sqrt(1/2.0) * (self._posneg*vplus + vminus)
+
+        if self.m < 0:
+            return -value.imag
+        else:
+            return value.real
 
 
 class Cart(object):
@@ -94,6 +97,9 @@ class Cart(object):
         else:
             r_l = (coords**2).sum() ** (-self._l / 2.0)
             return self.coeff * np.product(c) * r_l
+
+    def __iter__(self):
+        yield self  # for interface compatibility with the CartSum class
 
 
 class CartSum(object):
@@ -130,6 +136,11 @@ class CartSum(object):
             c += factor * np.product(coords**power, axis=axis)
 
         return c * self.coeff * r_l
+
+    def __iter__(self):
+        for pf, (px, py, pz) in zip(self.prefactors, self.powers):
+            yield Cart(px, py, pz, coeff=self.coeff*pf)
+
 
 
 def sqrt_x_over_pi(num, denom):

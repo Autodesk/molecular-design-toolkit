@@ -23,7 +23,6 @@ exclude_lines =
     pragma: no cover
     def __repr__
     def __str__
-    def _repr_markdown_
     raise AssertionError
     raise NotImplementedError
     if PY2

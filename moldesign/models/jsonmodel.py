@@ -16,7 +16,7 @@ import json
 import pyccc
 
 import moldesign as mdt
-from moldesign import units as u
+from .. import units as u
 
 from .base import EnergyModelBase
 

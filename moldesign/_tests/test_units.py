@@ -6,7 +6,8 @@ import numpy as np
 from moldesign import units
 from moldesign import units as u
 
-__PYTEST_MARK__ = 'internal'  # mark all tests in this module with this label (see ./conftest.py)
+# mark all tests in this module with these label (see ./conftest.py)
+__PYTEST_MARK__ = ['internal', 'units']
 
 
 @pytest.mark.screening
@@ -57,6 +58,41 @@ def test_default_units():
     assert units.default.energy == units.eV
 
 
+@pytest.fixture
+def si_units():
+    system = units.UnitSystem(length=u.ureg.meters, mass=u.ureg.kg,
+                              time=u.ureg.seconds, energy=u.ureg.joules)
+    return system
+
+
+@pytest.mark.parametrize(['dimension', 'expected', 'weird_units'],
+                         [['length', u.ureg.meters, u.ureg.lightyear],
+                          ['mass', u.ureg.kg, u.ureg.stone],
+                          ['time', u.ureg.seconds, u.ureg.year],
+                          ['momentum', u.ureg.kg * u.ureg.meter / u.ureg.second,
+                                       u.ureg.lightyear * u.ureg.stone / u.ureg.year],
+                          ['force', u.ureg.joule / u.ureg.meter, u.ureg.force_ton],
+                          ['energy', u.ureg.joule, u.ureg.horsepower * u.ureg.seconds]],
+                         ids='length mass time momentum force energy'.split())
+def test_si_unit_system(si_units, dimension, expected, weird_units):
+    assert getattr(si_units, dimension) == expected
+
+    default_unit = getattr(u.default, dimension)
+    my_quantity = 3.141 * default_unit
+    si_quantity = si_units.convert(my_quantity)
+
+    assert my_quantity.units != expected
+    assert si_quantity.units == expected
+    assert u.default.convert(abs(my_quantity - si_quantity)) < 1e-15 * default_unit
+
+    setattr(si_units, dimension, weird_units)
+    assert getattr(si_units, dimension) == weird_units
+
+    weird_quantity = si_units.convert(my_quantity)
+    assert abs(my_quantity-weird_quantity) < 1e-15 * default_unit
+    assert weird_quantity.units == weird_units
+
+
 @pytest.mark.screening
 def test_default_unit_conversions():
     my_list = [1.0*units.angstrom, 1.0*units.nm, 1.0*units.a0]
@@ -66,6 +102,47 @@ def test_default_unit_conversions():
     np.testing.assert_almost_equal(result[0], 0.1, 9)
     np.testing.assert_almost_equal(result[1], 1.0, 9)
     np.testing.assert_almost_equal(result[2], 0.05291772, 7)
+
+
+def test_dimensional_array_from_mixed_data():
+    data = [np.arange(3) * u.angstrom,
+            [1.0 * u.nm, 1.0 * u.nm**2/u.angstrom, 3.0*u.ureg.km],
+            [1,1,1] * u.bohr]
+    arr = u.array(data)
+
+    bohr_in_ang = (1.0 * u.bohr).value_in(u.angstrom)
+    expected = u.angstrom * [[0,1,2],
+                             [10.0, 100.0, 3.0e13],
+                             [bohr_in_ang, bohr_in_ang, bohr_in_ang]]
+    np.testing.assert_allclose(arr, expected)
+    assert isinstance(arr, units.MdtQuantity)
+
+
+def test_dimensionless_array_from_mixed_data():
+    data = [np.arange(3),
+            [1.0 * u.dimensionless, 1.0 * u.nm/u.angstrom, 3.0],
+            [1,1,1] * u.ureg.kg / u.ureg.g]
+    arr = u.array(data)
+    np.testing.assert_allclose(arr,
+                               np.array([[0,1,2],
+                                         [1,10,3],
+                                         [1000,1000,1000]],dtype='float') )
+    assert isinstance(arr, np.ndarray)
+
+
+def test_inconsistent_array_units_raises_dimensionality_error():
+    with pytest.raises(units.DimensionalityError):
+        u.array([[1,2,3] * u.angstrom, [3*u.bohr, 4*u.eV, 5*u.bohr]])
+
+
+def test_mixed_units_and_nonunits_raises_dimensionality_error():
+    with pytest.raises(units.DimensionalityError):
+        u.array([[1,2,3] * u.angstrom, [3*u.bohr, 4, 5*u.bohr]])
+
+
+def test_no_nonsquare_arrays():
+    with pytest.raises(ValueError):
+        u.array([[1,2],[3]])
 
 
 def test_scalar_comparisons_to_zero_ignore_units():
@@ -133,6 +210,32 @@ def test_array_unit_checks():
                                np.arange(10, 15))
 
 
+@pytest.mark.parametrize(['a1','a2'],
+                         ((np.ones(3), np.ones(3)*10/10),
+                          (np.ones(3), u.array(np.ones(3))),
+                          (np.ones(3)*u.nm, 10.0*np.ones(3)*u.angstrom),
+                          (np.ones((3,3)) * u.nm / u.angstrom, np.ones(3) * 10)),
+                         ids="numpy-numpy numpy-dimensionless nm-angstrom nm/angstrom-numpy".split()
+                         )
+def test_array_almost_equal_returns_true(a1, a2):
+    assert u.arrays_almost_equal(a1, a2)
+    assert u.arrays_almost_equal(a2, a1)
+
+
+@pytest.mark.parametrize(['a1','a2'],
+                         ((np.ones(3), np.ones(3)*10/10 * u.eV),
+                          (np.ones(3)*u.nm, 10.0*np.ones(3)*u.dalton),
+                          (u.array(np.ones(3)), np.ones(3) * u.kcalpermol)),
+                         ids="numpy-ev nm-dalton dimensionless-kcalpermole".split()
+                         )
+def test_array_almost_equal_raises_dimensionality_error(a1, a2):
+    with pytest.raises(u.DimensionalityError):
+        u.arrays_almost_equal(a1, a2)
+    with pytest.raises(u.DimensionalityError):
+        u.arrays_almost_equal(a2, a1)
+
+
+
 @pytest.mark.screening
 def test_default_unit_conversions():
     assert abs(10.0 - (1.0*units.nm).defunits_value()) < 1e-10
@@ -143,7 +246,7 @@ def test_default_unit_conversions():
 
 
 def test_getunits_doctests():
-    assert units.get_units(1.0*units.angstrom) == units.MdtUnit('ang')
+    assert units.get_units(1.0*units.angstrom) == units.MdtUnit('angstrom')
     assert units.get_units(np.array([1.0, 2, 3.0])) == units.MdtUnit('dimensionless')
     assert units.get_units([[1.0*units.dalton, 3.0*units.eV],
                             ['a'], 'gorilla']) == units.MdtUnit('amu')

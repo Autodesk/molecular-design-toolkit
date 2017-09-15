@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import print_function, absolute_import, division
-
 import os as _os
+
+_NBMOLVIZ_EXPECTED_VERSION = "0.7.0"
 
 _building_docs = bool(_os.environ.get('SPHINX_IS_BUILDING_DOCS', ""))
 
@@ -55,8 +56,7 @@ from .orbitals import *
 from .molecules import *
 from .tools import *
 
-# Set up cloud computing
-_lastjobs = []
+# Initialize confiugration
 compute.init_config()
 
 # package metadata
@@ -71,6 +71,11 @@ import numpy as _np
 import warnings as _warnings
 _np.seterr(all='raise')
 _warnings.simplefilter('error', _np.ComplexWarning)
+
+# We keep a list of weak of references to every RPC job that's run
+import weakref as _weakref
+_lastjobs = _weakref.WeakValueDictionary()
+_njobs = 0
 
 # For documentation purposes only - make sphinx document the toplevel namespace
 if _building_docs:

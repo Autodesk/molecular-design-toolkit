@@ -8,7 +8,10 @@ from . import parmed_interface
 from . import pdbfixer_interface
 from . import pyscf_interface
 from . import symmol_interface
+from . import tleap_interface
 
+# These statements only import functions for python object conversion,
+# i.e. mol_to_[pkg] and [pkg]_to_mol
 from .biopython_interface import *
 from .openbabel import *
 from .openmm import *

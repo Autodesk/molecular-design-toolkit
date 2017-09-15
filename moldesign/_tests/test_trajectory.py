@@ -141,7 +141,7 @@ def h2_wfn_traj(h2):
 
 
 def test_align_phases(h2_wfn_traj):
-    # TODO: actually check results
+    # TODO: actually check that the orbitals were aligned
     h2_wfn_traj.align_orbital_phases()
 
     h2_wfn_traj.align_orbital_phases(reference_frame=1)

@@ -6,7 +6,7 @@ import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
-
+from .molecule_fixtures import *
 from . import helpers
 
 registered_types = {}
@@ -163,3 +163,130 @@ def test_dihedral_constraint_errors_at_0(four_particle_45_twist):
         constraint.value = angle
         np.testing.assert_allclose(constraint.error().value_in(u.degrees), -angle.magnitude)
 
+
+def test_cannot_add_duplicate_constraints(mol_with_zerocharge_params):
+    mol = mol_with_zerocharge_params
+    mol.constrain_distance(*mol.atoms[:2])
+    mol.constrain_angle(*mol.atoms[:3])
+    mol.constrain_dihedral(*mol.atoms[:4])
+    mol.constrain_atom(mol.atoms[0])
+    mol.constrain_hbonds()
+
+    # Failure on adding duplicates
+    with pytest.raises(KeyError):
+        mol.constrain_distance(*mol.atoms[:2])
+    with pytest.raises(KeyError):
+        mol.constrain_angle(*mol.atoms[:3])
+    with pytest.raises(KeyError):
+        mol.constrain_dihedral(*mol.atoms[:4])
+    with pytest.raises(KeyError):
+        mol.constrain_atom(mol.atoms[0])
+    with pytest.raises(KeyError):
+        mol.constrain_hbonds()
+
+    # These should be ok
+    mol.constrain_distance(*mol.atoms[1:3])
+    mol.constrain_angle(*mol.atoms[1:4])
+    mol.constrain_dihedral(*mol.atoms[1:5])
+    mol.constrain_atom(mol.atoms[1])
+
+
+def test_degrees_of_freedom_with_constraints(benzene, h2):
+    water = mdt.from_smiles('[OH2]')
+    water.residues[0].resname = 'HOH'
+
+    benzene.residues[0].resname = 'UNL'
+    h2.residues[0].resname = 'H2'
+
+    mol = benzene.combine(h2, water, water)
+
+    assert mol.num_atoms == 20  # assert I can count
+    assert mol.dynamic_dof == 3 * mol.num_atoms
+
+    full_dof = mol.dynamic_dof
+
+    def _constrain_direction():
+        c = mdt.geom.constraints.FixedCoordinate(mol.atoms[0], np.array([0.0, 0, 1.0]))
+        mol.constraints.append(c)
+
+    for constrainer, num_dof, args in ((mol.constrain_distance, 1, mol.atoms[:2]),
+                                       (mol.constrain_angle, 1, mol.atoms[:3]),
+                                       (mol.constrain_dihedral, 1, mol.atoms[:4]),
+                                       (mol.constrain_atom, 3, mol.atoms[:1]),
+                                       (mol.constrain_hbonds, 11, [True]),
+                                       (_constrain_direction, 1, [])):
+        constrainer(*args)
+        assert mol.dynamic_dof == full_dof-num_dof
+        mol.clear_constraints()
+        assert mol.dynamic_dof == full_dof
+
+
+def test_degrees_of_freedom_with_integrator_constraints(benzene):
+    water = mdt.from_smiles('[OH2]')
+    water.residues[0].resname = 'HOH'
+    mol = benzene.combine(water)
+
+    full_dof = mol.dynamic_dof
+    assert full_dof == 3 * mol.num_atoms
+
+    mol.set_energy_model(mdt.models.OpenMMPotential)
+    mol.set_integrator(mdt.integrators.OpenMMLangevin)
+
+    mol.integrator.params.remove_translation = False
+    mol.integrator.params.remove_rotation = False
+    mol.integrator.params.constrain_hbonds = False
+    mol.integrator.params.constrain_water = False
+    assert mol.dynamic_dof == full_dof
+
+    mol.integrator.params.constrain_hbonds = True
+    mol.integrator.params.constrain_water = False
+    assert mol.dynamic_dof == full_dof - 8
+
+    mol.integrator.params.constrain_hbonds = False
+    mol.integrator.params.constrain_water = True
+    assert mol.dynamic_dof == full_dof - 3
+
+    mol.integrator.params.constrain_hbonds = True
+    mol.integrator.params.constrain_water = True
+    assert mol.dynamic_dof == full_dof - 9
+
+    mol.clear_constraints()  # does nothing, constraints are in the integrator
+    assert mol.dynamic_dof == full_dof - 9
+
+    mol.integrator.params.constrain_hbonds = False
+    mol.integrator.params.constrain_water = False
+    assert mol.dynamic_dof == full_dof
+
+    mol.integrator.params.remove_translation = True
+    mol.integrator.params.remove_rotation = True
+    mol.integrator.params.constrain_hbonds = True
+    mol.integrator.params.constrain_water = True
+    assert mol.dynamic_dof == full_dof - 9 - 6
+
+
+
+def test_degrees_of_freedom_with_integrator_reorientation(pdb3aid):
+    mol = pdb3aid
+
+    full_dof = mol.dynamic_dof
+
+    mol.set_energy_model(mdt.models.OpenMMPotential)
+    mol.set_integrator(mdt.integrators.OpenMMLangevin)
+
+    mol.integrator.params.remove_translation = False
+    mol.integrator.params.remove_rotation = False
+    mol.integrator.params.constrain_hbonds = False
+    mol.integrator.params.constrain_water = False
+    assert mol.dynamic_dof == full_dof
+
+    mol.integrator.params.remove_translation = False
+    mol.integrator.params.remove_rotation = True
+    assert mol.dynamic_dof == full_dof - 3
+
+    mol.integrator.params.remove_translation = True
+    mol.integrator.params.remove_rotation = False
+    assert mol.dynamic_dof == full_dof - 3
+
+    mol.integrator.params.remove_translation = True
+    mol.integrator.params.remove_rotation = True
+    assert mol.dynamic_dof == full_dof - 6

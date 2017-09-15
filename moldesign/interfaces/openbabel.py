@@ -19,22 +19,8 @@ standard_library.install_aliases()
 import sys
 import string
 
-import moldesign.molecules.atomcollections
-
-try:
-    import pybel as pb
-    import openbabel as ob
-    # WARNING: this is the real library, not our interface - this works because of absolute
-    # imports. We should probably rename this interface
-
-except ImportError:
-    force_remote = True
-    sys.stderr.write('Info: OpenBabel not installed; will run in docker container\n')
-else:
-    force_remote = False
-
 import moldesign as mdt
-from ..compute.runsremotely import runsremotely
+from ..compute import packages
 from .. import units as u
 from ..utils import exports
 
@@ -57,7 +43,7 @@ def read_stream(filelike, format, name=None):
     return read_string(molstring, format, name=name)
 
 
-@runsremotely(enable=force_remote)
+@packages.openbabel.runsremotely
 def read_string(molstring, format, name=None):
     """ Read a molecule from a file-like object
 
@@ -72,12 +58,13 @@ def read_string(molstring, format, name=None):
     Returns:
         moldesign.Molecule: parsed result
     """
+    import pybel as pb
     pbmol = pb.readstring(format, molstring)
     mol = pybel_to_mol(pbmol, name=name)
     return mol
 
 
-@runsremotely(enable=force_remote)
+@packages.openbabel.runsremotely
 def write_string(mol, format):
     """ Create a file from the passed molecule
 
@@ -99,7 +86,7 @@ def write_string(mol, format):
     return str(outstr)
 
 
-@runsremotely(enable=force_remote)
+@packages.openbabel.runsremotely
 def guess_bond_orders(mol):
     """Use OpenBabel to guess bond orders using geometry and functional group templates.
 
@@ -116,7 +103,7 @@ def guess_bond_orders(mol):
     return newmol
 
 
-@runsremotely(enable=force_remote)
+@packages.openbabel.runsremotely
 def add_hydrogen(mol):
     """Add hydrogens to saturate atomic valences.
 
@@ -147,6 +134,9 @@ def mol_to_pybel(mdtmol):
     Returns:
         pybel.Molecule: translated molecule
     """
+    import openbabel as ob
+    import pybel as pb
+
     obmol = ob.OBMol()
     obmol.BeginModify()
     atommap = {}
@@ -212,7 +202,7 @@ def pybel_to_mol(pbmol,
     newatom_map = {}
     newresidues = {}
     newchains = {}
-    newatoms = moldesign.molecules.atomcollections.AtomList([])
+    newatoms = mdt.AtomList([])
     backup_chain_names = list(string.ascii_uppercase)
 
     for pybatom in pbmol.atoms:
@@ -227,7 +217,7 @@ def pybel_to_mol(pbmol,
         elif pybatom.atomicnum == 0:
             print("WARNING: openbabel failed to parse atom serial %d (name:%s); guessing %s. " % (
                 pybatom.OBAtom.GetIdx(), name, name[0]))
-            atnum = moldesign.data.ATOMIC_NUMBERS[name[0]]
+            atnum = mdt.data.ATOMIC_NUMBERS[name[0]]
         else:
             atnum = pybatom.atomicnum
         mdtatom = mdt.Atom(atnum=atnum, name=name,
@@ -269,18 +259,13 @@ def pybel_to_mol(pbmol,
 
         newatoms.append(mdtatom)
 
-    newtopo = {}
     for ibond in range(pbmol.OBMol.NumBonds()):
         obbond = pbmol.OBMol.GetBond(ibond)
         a1 = newatom_map[obbond.GetBeginAtomIdx()]
         a2 = newatom_map[obbond.GetEndAtomIdx()]
         order = obbond.GetBondOrder()
-        if a1 not in newtopo:
-            newtopo[a1] = {}
-        if a2 not in newtopo:
-            newtopo[a2] = {}
-        newtopo[a1][a2] = order
-        newtopo[a2][a1] = order
+        bond = mdt.Bond(a1, a2)
+        bond.order = order
 
     if reorder_atoms_by_residue and primary_structure:
         resorder = {}
@@ -288,9 +273,7 @@ def pybel_to_mol(pbmol,
             resorder.setdefault(atom.residue, len(resorder))
         newatoms.sort(key=lambda a: resorder[a.residue])
 
-    return mdt.Molecule(newatoms,
-                        bond_graph=newtopo,
-                        **kwargs)
+    return mdt.Molecule(newatoms, **kwargs)
 
 
 def from_smiles(smi, name=None):
@@ -322,8 +305,10 @@ def from_inchi(inchi, name=None):
     """
     return _string_to_3d_mol(inchi, 'inchi', name)
 
-@runsremotely(enable=force_remote)
+
+@packages.openbabel.runsremotely
 def _string_to_3d_mol(s, fmt, name):
+    import pybel as pb
     if name is None: name = s
     pbmol = pb.readstring(fmt, str(s))  # avoid passing unicode by casting to str
     pbmol.addh()
