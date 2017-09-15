@@ -22,6 +22,7 @@ import numpy as np
 
 import moldesign as mdt
 from moldesign import units as u
+from .helpers import get_data_path
 
 import pytest
 
@@ -90,6 +91,22 @@ def test_mutation_nomenclature_string_only(pdb3aid):
     mut25 = mut.get_residues(pdbindex=25)
     assert len(mut25) == 2
     assert [r.resname for r in mut25] == ['MET', 'MET']
+
+def test_mutation_topology():
+    """ Test the topology of the backbone atoms for a mutated molecule. """
+    molecule = mdt.read(get_data_path('1yu8.pdb'))
+    mutation_residues = ["X.13G"]
+    mutated_molecule = mdt.mutate_residues(molecule, mutation_residues)
+    # Check that the number of bonds for backbone atoms match.
+    backbone_atoms = mdt.data.BACKBONES["protein"]
+    for res, mut_res in zip(molecule.residues, mutated_molecule.residues):
+        for atom in res.atoms:
+            if atom.name not in backbone_atoms:
+                continue
+            bonds = molecule.bond_graph[atom]
+            mut_atom = mutated_molecule.chains["X"].residues[mut_res.name].atoms[atom.name]
+            mut_bonds = mutated_molecule.bond_graph[mut_atom]
+            assert len(bonds) == len(mut_bonds)
 
 
 @pytest.mark.screening
