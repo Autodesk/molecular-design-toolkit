@@ -103,9 +103,9 @@ def test_mutation_topology():
         for atom in res.atoms:
             if atom.name not in backbone_atoms:
                 continue
-            bonds = molecule.bond_graph[atom]
+            bonds = [bond for bond in molecule.bond_graph[atom] if bond.name in backbone_atoms]
             mut_atom = mutated_molecule.chains["X"].residues[mut_res.name].atoms[atom.name]
-            mut_bonds = mutated_molecule.bond_graph[mut_atom]
+            mut_bonds = [bond for bond in mutated_molecule.bond_graph[mut_atom] if bond.name in backbone_atoms]
             assert len(bonds) == len(mut_bonds)
 
 
