@@ -1,7 +1,6 @@
 from __future__ import print_function, absolute_import, division
 from future.builtins import *
 from future import standard_library
-
 standard_library.install_aliases()
 
 # Copyright 2017 Autodesk Inc.
@@ -17,19 +16,16 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import numpy as np
+
 
 from .. import utils
 from .. import units as u
 from .. import orbitals
 from .. import molecules
-from ..compute import runsremotely
+from ..compute import packages
 from ..interfaces import psi4_interface
 from .base import QMBase
-
-# On June 15, JSOB added " import numpy as np
-import numpy as np
-
-# On June 13, JSOB added " ,'mp2':'mp2' "
 
 THEORIES = {'rhf':'hf', 'mp2':'mp2', 'uhf':'hf', 'dft':'b3lyp', 'casscf':'casscf'}
 
@@ -79,12 +75,13 @@ def capture_history(name_string, mdt_molecule, psi4_history, model):
     
     return my_traj
 
+
 @utils.exports
 class Psi4Potential(QMBase):
     def prep(self):
         return True
 
-    @runsremotely(enable=psi4_interface.force_remote)
+    @packages.psi4.runsremotely(is_imethod=True)
     def calculate(self, requests):
         
         print(requests)
@@ -95,7 +92,6 @@ class Psi4Potential(QMBase):
             psi4_molecule = psi4_interface.mdt_to_psi4(self.mol)
         else:
             psi4_molecule = psi4_interface.mdt_to_psi4_dimer(self.mol, self.params.dimer_partner)
-
 
         psi4_molecule = psi4_interface.mdt_to_psi4(self.mol)
         self.name = psi4_interface.mol_name(self.mol)
@@ -116,7 +112,7 @@ class Psi4Potential(QMBase):
         self._psi4_post_op()
         return props
 
-    @runsremotely(enable=psi4_interface.force_remote)
+    @packages.psi4.runsremotely(is_imethod=True)
     def minimize(self, requests):
         import psi4
         self._psi4_set_up(requests)
@@ -157,17 +153,17 @@ class Psi4Potential(QMBase):
     def _psi4_set_up(self, requests):
         import psi4
 
-        request_options = {'vibrational_frequencies' : psi4.freq,
-                           'freq' : psi4.freq,
-                           'frequency' : psi4.freq,
-                           'frequencies' : psi4.freq,
-                           'optimized_geometry' : psi4.opt,
-                           'opt' : psi4.opt,
-                           'optimize' : psi4.opt,
-                           'potential_energy' : psi4.energy,
-                           'energy' : psi4.energy,
-                           'forces' : psi4.gradient,
-                           'hessian' : psi4.hessian }
+        request_options = {'vibrational_frequencies': psi4.freq,
+                           'freq': psi4.freq,
+                           'frequency':psi4.freq,
+                           'frequencies':psi4.freq,
+                           'optimized_geometry':psi4.opt,
+                           'opt':psi4.opt,
+                           'optimize':psi4.opt,
+                           'potential_energy': psi4.energy,
+                           'energy': psi4.energy,
+                           'forces': psi4.gradient,
+                           'hessian': psi4.hessian }
 
         try:
             assert requests
@@ -377,13 +373,10 @@ class Psi4Potential(QMBase):
         return esp
     
     def get_mo_extents(self, psi4_wavefunction,psi4_vars_title):
-        import psi4
-        
         return moe
     
     def get_mulliken_charges(self, psi4_wavefunction,psi4_vars_title):
         import psi4
-        import numpy as np
         psi4.oeprop(psi4_wavefunction, 'MULLIKEN_CHARGES')
         chrg_array = np.asarray(psi4_wavefunction.atomic_point_charges())
         nuq={}
@@ -393,7 +386,6 @@ class Psi4Potential(QMBase):
     
     def get_lowdin_charges(self, psi4_wavefunction,psi4_vars_title):
         import psi4
-        import numpy as np
         psi4.oeprop(psi4_wavefunction, 'LOWDIN_CHARGES')
         chrg_array = np.asarray(psi4_wavefunction.atomic_point_charges())
         loq = {}

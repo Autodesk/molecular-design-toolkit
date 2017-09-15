@@ -16,22 +16,13 @@ standard_library.install_aliases()
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import imp
-from ..models import psi4 as psi4_mdt
 
 from moldesign import units as u
+
 from ..utils import exports
 from .. import molecules
 from .. import units as u
-
-
-try:
-    imp.find_module('psi4')
-except (ImportError, OSError) as exc:
-    print('Psi4 not installed; using remote docker container')
-    force_remote = True
-else:
-    force_remote = False
+from ..compute import packages
 
 
 @exports
@@ -44,7 +35,7 @@ def mdt_to_psi4(mol):
         pass
     else:
         lines.append('\n')
-        lines.append( str(mol.charge) + ' ' + str(mol.multiplicity) )
+        lines.append(str(mol.charge) + ' ' + str(mol.multiplicity))
     
     for atom in mol.atoms:
         x, y, z = atom.position.value_in(u.angstrom)
@@ -52,6 +43,7 @@ def mdt_to_psi4(mol):
 
     geom = psi4.core.Molecule.create_molecule_from_string('\n'.join(lines))
     return geom
+
 
 @exports
 def mdt_to_psi4_dimer(mol_0, mol_1):
@@ -91,19 +83,19 @@ def mdt_to_psi4_dimer(mol_0, mol_1):
 def mol_name(mol):
     return mol.name
 
+
 @exports
 def Opt_Trajectory(mol, psi4_history):
-    import psi4
-    my_trajectory=psi4_mdt.capture_history(name_string=mol.name,
-                                           mdt_molecule=mol,
-                                           psi4_history=psi4_history,
-                                           model=mol.energy_model)
+    from ..models import psi4 as psi4_mdt
+    my_trajectory = psi4_mdt.capture_history(name_string=mol.name,
+                                             mdt_molecule=mol,
+                                             psi4_history=psi4_history,
+                                             model=mol.energy_model)
     return my_trajectory
 
 @exports
 def psi4_to_mdt(psi4_molecule):
-    import psi4
-    
+
     """
 
     Args:
@@ -112,12 +104,10 @@ def psi4_to_mdt(psi4_molecule):
     Returns:
 
     """
-    
-    
-    
+
     psi4_molecule.update_geometry()
     
-    atom_list=[]
+    atom_list = []
     
     for iat in range(psi4_molecule.natom()):
         atom_list.append(molecules.Atom(int(psi4_molecule.Z(iat))))
@@ -125,15 +115,9 @@ def psi4_to_mdt(psi4_molecule):
         atom_list[iat].y = psi4_molecule.y(iat) * u.bohr
         atom_list[iat].z = psi4_molecule.z(iat) * u.bohr
 
-    my_mol=molecules.molecule.Molecule( atom_list , charge=psi4_molecule.molecular_charge(), multiplicity = psi4_molecule.multiplicity())
+    my_mol = molecules.molecule.Molecule(
+            atom_list,
+            charge=psi4_molecule.molecular_charge(),
+            multiplicity=psi4_molecule.multiplicity())
 
     return my_mol
-
-"""
-@exports
-def Trajectory_to_History(mdt_molecule):
-
-    for window in mdt_molecule.Trajectory.frames:
-
-"""
-

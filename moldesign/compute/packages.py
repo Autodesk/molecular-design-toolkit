@@ -143,10 +143,11 @@ parmed = InterfacedPackage('parmed', '2.7.3', required=True)
 # can't find any run-time mechanism to get the version for openbabel ...
 openbabel = InterfacedPackage('openbabel', '2.4')
 pdbfixer = InterfacedPackage('pdbfixer', '1.4')
+psi4 = InterfacedPackage('psi4', '1.1')
 pyscf = InterfacedPackage('pyscf', '1.1')
 openmm = InterfacedPackage('OpenMM', '7.1.1', importname='simtk')
 
-packages = [biopython, parmed, openbabel, pdbfixer, pyscf, openmm]
+packages = [biopython, parmed, openbabel, pdbfixer, psi4, pyscf, openmm]
 
 
 class InterfacedExecutable(object):
