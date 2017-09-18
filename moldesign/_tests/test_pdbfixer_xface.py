@@ -92,9 +92,9 @@ def test_mutation_nomenclature_string_only(pdb3aid):
     assert len(mut25) == 2
     assert [r.resname for r in mut25] == ['MET', 'MET']
 
-def test_mutation_topology():
+def test_mutation_topology(pdb1yu8):
     """ Test the topology of the backbone atoms for a mutated molecule. """
-    molecule = mdt.read(get_data_path('1yu8.pdb'))
+    molecule = pdb1yu8 
     mutation_residues = ["X.13G"]
     mutated_molecule = mdt.mutate_residues(molecule, mutation_residues)
     # Check that the number of bonds for backbone atoms match.
