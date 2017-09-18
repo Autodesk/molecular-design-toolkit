@@ -97,21 +97,48 @@ def mutate_residues(mol, residue_map):
     # into an MDT structure
     assert temp_mutant.num_residues == mol.num_residues  # shouldn't change number of residues
     residues_to_copy = []
+    old_residue_map = {}
     for oldres, mutant_res in zip(mol.residues, temp_mutant.residues):
         if oldres in residue_map:
             residues_to_copy.append(mutant_res)
             mutant_res.mol = None
             mutant_res.chain = oldres.chain
+            old_residue_map[oldres] = mutant_res
         else:
             residues_to_copy.append(oldres)
+
+    # Bonds between original and mutated backbone atoms will be removed when 
+    # creating the new mutant molecule because the original and mutated atoms 
+    # reference different molecules.
+    #
+    # Make a list of bonds referencing atoms in the original molecule that
+    # is used later to recreate bonds between original and mutated backbone 
+    # atoms.
+    orig_bonds = []
+    for res in residues_to_copy:
+        if not res.backbone:
+            continue 
+        for atom in res.backbone:
+            for bond_atom in atom.bond_graph:
+                if bond_atom.residue in residue_map:
+                    mutant_res = old_residue_map[bond_atom.residue]
+                    mutant_atom = mutant_res.atoms[bond_atom.name]
+                    orig_bonds.append((atom,mutant_atom,atom.bond_graph[bond_atom]))
 
     metadata = {'origin': mol.metadata.copy(),
                 'mutations': mutation_strs}
 
-    return mdt.Molecule(residues_to_copy,
-                        name='Mutant of "%s"' % mol,
-                        metadata=metadata)
+    mutant_mol = mdt.Molecule(residues_to_copy, name='Mutant of "%s"' % mol, metadata=metadata)
 
+    # Add bonds between the original and mutated backbone atoms.
+    for atom,mut_atom,order in orig_bonds:
+        chainID = atom.chain.name
+        residues = mutant_mol.chains[chainID].residues
+        new_atom = residues[atom.residue.name].atoms[atom.name]
+        new_mut_atom = residues[mut_atom.residue.name].atoms[mut_atom.name]
+        new_atom.bond_to(new_mut_atom, order)
+
+    return mutant_mol 
 
 def _pdbfixer_chainnames_to_letter(pdbfixermol):
     for chain in pdbfixermol.chains:
