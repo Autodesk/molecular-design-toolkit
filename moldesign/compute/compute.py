@@ -104,6 +104,7 @@ def run_job(job, engine=None, wait=True, jobname=None, display=True,
     Returns:
         pyccc job object OR function's return value
     """
+    import pyccc
 
     # this is a hacky list of jobs that's mostly for debugging
     mdt._lastjobs[mdt._njobs] = job
@@ -117,9 +118,11 @@ def run_job(job, engine=None, wait=True, jobname=None, display=True,
             raise ValueError('No compute engine configured! Configure MDT using '
                              'moldesign.compute.config')
 
+    if isinstance(job.engine, pyccc.engines.Docker):
+        check_pull_image(job.engine.client, job.image)
+
     job.submit()
     jobname = utils.if_not_none(jobname, job.name)
-
     if display:
         display_log(job.get_display_object(), jobname)
 
@@ -128,6 +131,34 @@ def run_job(job, engine=None, wait=True, jobname=None, display=True,
         if _return_result: return job.result
 
     return job
+
+
+def check_pull_image(client, image):
+    from .. import widgets
+
+    if image_present(client, image):
+        return
+
+    elif widgets.nbmolviz_enabled:
+            from IPython.display import display
+            from nbmolviz.mdtconfig.images import DockerImageView
+            widget = DockerImageView(image, client)
+            display(widget)
+            widget.pull()
+
+    else:
+        # No fancy UI here, just print a message indicating that the image will be pulled
+        print('Pulling image "%s" from dockerhub ...' % image)
+
+
+def image_present(client, image):
+    from docker import errors
+    try:
+        imginfo = client.inspect_image(image)
+    except errors.ImageNotFound:
+        return False
+    else:
+        return True
 
 
 @utils.args_from(run_job, only='engine wait jobname display'.split())

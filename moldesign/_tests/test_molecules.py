@@ -140,81 +140,25 @@ def test_h2_traj_energies(h2_trajectory):
 @pytest.mark.screening
 def test_molecule_atom_hierarchy(molkey, request):
     mol = request.getfixturevalue(molkey)
-    all_residues = set(mol.residues)
-    all_chains = set(mol.chains)
-
-    residues_from_atoms = set()
-    chains_from_atoms = set()
-    for iatom, atom in enumerate(mol.atoms):
-        assert atom.index == iatom
-        assert atom.molecule is mol
-        assert atom.residue in all_residues
-        assert atom.chain in all_chains
-        residues_from_atoms.add(atom.residue)
-        chains_from_atoms.add(atom.chain)
-    assert residues_from_atoms == all_residues
-    assert chains_from_atoms == all_chains
+    mol._atom_consistency_check()
 
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_residue_hierarchy(molkey, request):
     mol = request.getfixturevalue(molkey)
-    all_atoms = set(mol.atoms)
-    all_residues = set(mol.residues)
-    all_chains = set(mol.chains)
-
-    assert len(all_residues) == len(mol.residues)
-    atoms_in_residues = set()
-    chains_from_residues = set()
-    assert len(all_atoms) == mol.num_atoms == len(mol.atoms)
-
-    for residue in mol.residues:
-        assert residue.molecule is mol
-        chains_from_residues.add(residue.chain)
-        for atom in residue.iteratoms():
-            assert atom not in atoms_in_residues, 'Atom in more than 1 residue'
-            atoms_in_residues.add(atom)
-            assert atom in all_atoms
-            assert atom.residue is residue
-            assert residue.chain in all_chains
-
-    assert chains_from_residues == all_chains
-    assert atoms_in_residues == all_atoms
+    mol._residue_consistency_check()
 
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_chain_hierarchy(molkey, request):
     mol = request.getfixturevalue(molkey)
-    all_residues = set(mol.residues)
-    all_chains = set(mol.chains)
-
-    assert len(all_chains) == len(mol.chains)
-    residues_from_chains = set()
-
-    for chain in mol.chains:
-        assert chain.molecule is mol
-        for residue in chain:
-            assert residue not in residues_from_chains, 'Residue in more than 1 chain'
-            residues_from_chains.add(residue)
-            assert residue in all_residues
-            assert residue.molecule is mol
-            assert residue.chain is chain
-
-    assert residues_from_chains == all_residues
+    mol._chain_consistency_check()
 
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
 def test_molecule_bonds(molkey, request):
     mol = request.getfixturevalue(molkey)
-    all_atoms = set(mol.atoms)
-    for atom in all_atoms:
-        if atom not in mol.bond_graph:
-            assert not atom.bond_graph
-            continue
-        bonds = mol.bond_graph[atom]
-        assert atom.bond_graph == bonds
-        for nbr in bonds:
-            assert nbr.bond_graph[atom] == atom.bond_graph[nbr]
+    mol._bond_consistency_check()
 
 
 @pytest.mark.parametrize('molkey', registered_types['molecule'])
