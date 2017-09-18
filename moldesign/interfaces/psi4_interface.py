@@ -35,7 +35,7 @@ def mdt_to_psi4(mol):
         pass
     else:
         lines.append('\n')
-        lines.append(str(mol.charge) + ' ' + str(mol.multiplicity))
+        lines.append(str(mol.charge.value_in(u.electron_charge)) + ' ' + str(mol.multiplicity))
     
     for atom in mol.atoms:
         x, y, z = atom.position.value_in(u.angstrom)
