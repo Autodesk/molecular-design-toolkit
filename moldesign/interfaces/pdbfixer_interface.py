@@ -116,11 +116,9 @@ def mutate_residues(mol, residue_map):
     # atoms.
     orig_bonds = []
     for res in residues_to_copy:
-        if res.type not in mdt.data.BACKBONES:
+        if not res.backbone:
             continue 
-        for atom in res.atoms:
-            if atom.name not in mdt.data.BACKBONES[res.type]:
-                continue 
+        for atom in res.backbone:
             for bond_atom in atom.bond_graph:
                 if bond_atom.residue in residue_map:
                     mutant_res = old_residue_map[bond_atom.residue]
