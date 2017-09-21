@@ -124,16 +124,17 @@ def build_model(temp_molecule, temp_chain_id, temp_start, temp_end, temp_sequenc
     targ_seq_num = targ_start
     for temp_aa, targ_aa in zip(temp_sequence, targ_sequence):
         temp_res_name = mdt.data.mdt.data.RESIDUE_CODE_TO_NAME[temp_aa] + str(temp_seq_num)
-        #print("mdt.build_model] temp_res_name %s" % temp_res_name) 
         if temp_res_name in residues:
             if temp_aa != targ_aa:
-                #mutate_str = "%s.%s%d%s" % (temp_chain_id, temp_aa, targ_seq_num, targ_aa)
-                mutate_str = "%s.%s%d%s" % (temp_chain_id, temp_aa, residues[temp_res_name].pdbindex, targ_aa)
+                mutate_str = "%s.%s%d%s" % (temp_chain_id, temp_aa, targ_seq_num, targ_aa)
                 mutation_list.append(mutate_str)
             temp_res = residues[temp_res_name]
-            #temp_res.pdbindex = targ_seq_num 
+            # Renumber the residue for the target sequence.
+            temp_res.pdbindex = targ_seq_num 
+            temp_res.name = mdt.data.mdt.data.RESIDUE_CODE_TO_NAME[temp_aa] + str(targ_seq_num)
             temp_residues.append(temp_res)
         temp_seq_num += 1
+        targ_seq_num += 1
     #__for temp_aa, targ_aa in zip(temp_sequence, targ_sequence)
 
     # Create a template molecule from the template sequence. 
