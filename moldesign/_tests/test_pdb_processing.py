@@ -123,11 +123,6 @@ def test_numeric_residue_name_1PYN(request, mol):
     assert list(contents.keys())[0] == '941'
 
 
-def test_cif_parsing_single_chain_2p8w():
-    pass
-
-
-
 MISSINGRES_2JAJ = [('A', 'GLY', -4), ('A', 'PRO', -3), ('A', 'LEU', -2), ('A', 'GLY', -1),
                    ('A', 'MET', 0), ('A', 'ALA', 1), ('A', 'GLY', 2), ('A', 'LEU', 3),
                    ('A', 'GLY', 4), ('A', 'HIS', 5), ('A', 'PRO', 6), ('A', 'ALA', 7),
