@@ -1,0 +1,4 @@
+run_local:
+  nab: true
+  opsin: true
+  symmol: true

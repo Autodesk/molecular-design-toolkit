@@ -18,3 +18,5 @@ docs/_build
 **/codeship.aes
 **/tmp
 **/Untitled*.ipynb
+DockerMakefiles
+docs
