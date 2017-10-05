@@ -15,7 +15,7 @@ from distutils.version import LooseVersion
 
 @pytest.fixture
 def pdb_3ac2():
-    return mdt.read(get_data_path('3ac2.pdb'))
+    return mdt.read(get_data_path('3ac2.pdb.bz2'))
 
 
 @pytest.fixture
@@ -97,7 +97,7 @@ def test_missing_residues_nmr_5b7a():
 
 @pytest.fixture
 def pdb_1pyn():
-    return mdt.read(get_data_path('1pyn.pdb'))
+    return mdt.read(get_data_path('1pyn.pdb.gz'))
 
 
 @pytest.fixture
@@ -121,6 +121,12 @@ def test_numeric_residue_name_1PYN(request, mol):
     contents = parmed.load_file('/tmp/tmp.lib')
     assert len(contents) == 1
     assert list(contents.keys())[0] == '941'
+
+
+def test_cif_parsing_single_chain_2p8w():
+    pass
+
+
 
 MISSINGRES_2JAJ = [('A', 'GLY', -4), ('A', 'PRO', -3), ('A', 'LEU', -2), ('A', 'GLY', -1),
                    ('A', 'MET', 0), ('A', 'ALA', 1), ('A', 'GLY', 2), ('A', 'LEU', 3),

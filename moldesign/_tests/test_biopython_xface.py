@@ -10,7 +10,7 @@ from .molecule_fixtures import pdb3aid
 @pytest.fixture
 def biopy_3aid():
     parser = Bio.PDB.PDBParser()
-    structure = parser.get_structure('3aid', get_data_path('3aid.pdb'))
+    structure = parser.get_structure('3aid', get_data_path('3aid.pdb.gz'))
     return structure
 
 
