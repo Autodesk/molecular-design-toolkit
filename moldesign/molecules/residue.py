@@ -247,11 +247,10 @@ class Residue(MolecularHierarchy):
         except KeyError:
             # If we're here, the residue is missing some atoms. We'll fall back to checking the
             # next residues in line
-            if self.index == len(self.molecule.residues):
+            if self.index == len(self.molecule.residues) - 1:
                 return True
             else:
-                print('WARNING: %s is missing expected atoms. Attempting to infer chain end' % \
-                    self)
+                print('WARNING: %s is missing expected atoms. Attempting to infer chain end' % self)
                 nextres = self.molecule.residues[self.index + 1]
                 return not self._same_polymer(nextres)
 
