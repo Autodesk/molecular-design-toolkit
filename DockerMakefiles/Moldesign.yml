@@ -5,12 +5,12 @@ moldesign_requirements:
     RUN conda install -qy -c omnia parmed biopython
 
 
-
 moldesign_minimal_requirements:
  description: Base installation of the MDT library. Built from the current directory.
  requires:
   - moldesign_requirements
  build_directory: ../
+ ignorefile: buildfiles/moldesign/moldesign.dockerignore
  build: |
   COPY requirements.txt /tmp/mdtreqs.txt
   RUN apt-get update \
@@ -49,12 +49,28 @@ moldesign_complete_py2:
 
 
 moldesign_notebook:
- description: OUT OF DATE A production-ready, fully outfitted jupyter server container
+ description: A production-ready, fully outfitted jupyter server container
  requires:
   - moldesign_complete
   - notebook
  build: |
-  RUN pip install nbmolviz # == 0.7.0
+  RUN adduser --disabled-password --gecos '' nbuser
+  RUN pip install nbmolviz==0.7.0rc4
+  USER nbuser
+  RUN python -m nbmolviz activate --user
+  USER root
   RUN python -m moldesign copyexamples
-  RUN jupyter nbextension enable --python --sys-prefix widgetsnbextension \
-   && jupyter nbextension enable --python --sys-prefix nbmolviz
+
+
+moldesign_stack:
+ description: An extra-large image with everything needed to run the example notebooks
+ build_directory: buildfiles/moldesign
+ requires:
+  - moldesign_notebook
+  - opsin
+  - symmol_base
+  - nucleic_acid_builder
+ build: |
+   USER nbuser
+   RUN mkdir -p ~/.moldesign
+   ADD moldesign.yml ~/.moldesign/moldesign.yml

@@ -3,16 +3,12 @@ notebook:
   - python_deploy_base
  build_directory: buildfiles/notebook/
  build: |
-    RUN conda install -yq matplotlib jupyter ipywidgets
+    RUN conda install -yq matplotlib jupyter ipywidgets nbformat
     ENTRYPOINT /run_notebook.sh
     EXPOSE 8888
     RUN mkdir /notebooks
     WORKDIR /notebooks
     COPY run_notebook.sh /run_notebook.sh
-    # workaround below, not sure why it's necessary or even whose fault it is
-    RUN pip uninstall -y backports.ssl_match_hostname backports.shutil_get_terminal_size \
-     && pip install backports.ssl_match_hostname backports.shutil_get_terminal_size
-
 
 pyquante2:
  requires:
