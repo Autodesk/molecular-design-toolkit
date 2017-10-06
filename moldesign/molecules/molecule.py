@@ -378,7 +378,7 @@ class MolTopologyMixin(object):
         are here for code organization only - they could be included in the main
         Atom class without changing any functionality
     """
-    def copy(self, name=None):
+    def copy(self, name=None, residue_map=None):
         """ Create a copy of the molecule and all of its substructures, metadata, and methods
 
         Returns:
@@ -390,7 +390,7 @@ class MolTopologyMixin(object):
                           name=name,
                           pdbname=self.pdbname,
                           charge=self.charge,
-                          metadata=self.metadata)
+                          metadata=self.metadata, residue_map=residue_map)
         if self.energy_model is not None:
             newmodel = self._copy_method('energy_model')
             newmol.set_energy_model(newmodel)
@@ -992,7 +992,8 @@ class Molecule(AtomGroup,
                  copy_atoms=False,
                  pdbname=None,
                  charge=None,
-                 metadata=None):
+                 metadata=None,
+                 residue_map=None):
         super().__init__()
 
         # initial property init
@@ -1015,6 +1016,7 @@ class Molecule(AtomGroup,
         self.integrator = None
         self.metadata = metadata
         self.electronic_state_index = 0
+        self.residue_map = residue_map 
 
         if charge is not None:
             self.charge = charge

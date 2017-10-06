@@ -87,7 +87,7 @@ def build_assembly(mol, assembly_name):
 
 @toplevel
 def build_model(temp_molecule, temp_chain_id, temp_start, temp_end, temp_sequence,
-        targ_start, targ_end, targ_sequence): 
+        targ_start, targ_end, targ_sequence, residue_map): 
     """ Build a model of a structure for a given target sequence from a 
         template sequence and structure.
 
@@ -111,31 +111,58 @@ def build_model(temp_molecule, temp_chain_id, temp_start, temp_end, temp_sequenc
         raise ValueError("No chain '%s' found in molecule '%s'" % 
              (temp_chain_id,temp_molecule.name))
 
+    if not residue_map: 
+        raise ValueError("No residue sequence mapping, molecule '%s' was not created from a CIF file" % temp_molecule.name)
+
     chain = temp_molecule.chains[temp_chain_id]
     residues = chain.residues
     atoms = chain.atoms
+
+    # Check if the molecule residue sequence is different
+    # from the residue sequence used by the template. 
+    cif_begin_seq = residue_map.begin_seq
+    cif_end_seq = residue_map.end_seq
+    mol_begin_seq = residue_map.pdb_begin_seq
+    mol_end_seq = residue_map.pdb_end_seq
+    temp_seq_num = mol_begin_seq - (cif_begin_seq-temp_start)
+    #print("[build_model] cif_begin_seq %s  cif_end_seq %s" % (cif_begin_seq, cif_end_seq))
+    #print("[build_model] mol_begin_seq %s  mol_end_seq %s" % (mol_begin_seq, mol_end_seq))
+    #print("[build_model] temp_sequence %s  " % temp_sequence) 
+    #print("[build_model] temp_seq_num %s  " % temp_seq_num) 
 
     # Add residues from the template sequence that are present in the template
     # molecule and create a list of mutations where they differ from the target 
     # sequence. 
     mutation_list = []
     temp_residues = []
-    temp_seq_num = temp_start
     targ_seq_num = targ_start
+    #print("[build_model] temp_seq_num %d" % temp_seq_num)
+    #print("[build_model] targ_seq_num %d" % targ_seq_num)
+    #print("[build_model] ") 
+    temp_res_names = []
     for temp_aa, targ_aa in zip(temp_sequence, targ_sequence):
         temp_res_name = mdt.data.mdt.data.RESIDUE_CODE_TO_NAME[temp_aa] + str(temp_seq_num)
+        #print("[build_model]  temp_res_name %s" % temp_res_name) 
         if temp_res_name in residues:
-            if temp_aa != targ_aa:
+            temp_res = residues[temp_res_name]
+            if (temp_aa != targ_aa) and (targ_aa != '*'):
                 mutate_str = "%s.%s%d%s" % (temp_chain_id, temp_aa, targ_seq_num, targ_aa)
                 mutation_list.append(mutate_str)
-            temp_res = residues[temp_res_name]
             # Renumber the residue for the target sequence.
             temp_res.pdbindex = targ_seq_num 
-            temp_res.name = mdt.data.mdt.data.RESIDUE_CODE_TO_NAME[temp_aa] + str(targ_seq_num)
             temp_residues.append(temp_res)
+            temp_res_names.append(temp_res.name)
         temp_seq_num += 1
         targ_seq_num += 1
     #__for temp_aa, targ_aa in zip(temp_sequence, targ_sequence)
+    print("[build_model] Number of template residues %d" % len(temp_res_names)) 
+    print("[build_model] Template residues %s" % ' '.join(temp_res_names)) 
+    print("[build_model] ") 
+    print("[build_model] Number of residues to change %d" % len(mutation_list)) 
+    print("[build_model] Residues to change %s" % ' '.join(mutation_list)) 
+
+    if len(temp_residues) == 0:
+        raise Exception("No residues found for the template sequence.")
 
     # Create a template molecule from the template sequence. 
     temp_molecule = mdt.Molecule(temp_residues)
@@ -150,6 +177,8 @@ def build_model(temp_molecule, temp_chain_id, temp_start, temp_end, temp_sequenc
         if not res.backbone:
             continue
         for atom in res.backbone:
+            if atom.element == "H":
+                continue 
             bonds = [bond for bond in temp_molecule.bond_graph[atom] if bond.name in res.backbone]
             model_atom = model_molecule.chains[temp_chain_id].residues[model_res.name].atoms[atom.name]
             model_bonds = [bond for bond in model_molecule.bond_graph[model_atom] \

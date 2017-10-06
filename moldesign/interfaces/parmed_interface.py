@@ -29,6 +29,7 @@ import future.utils
 import moldesign as mdt
 from .. import units as u
 from .. import utils
+from moldesign.helpers.pdb import ResidueSequenceMap
 
 if future.utils.PY2:
     from cStringIO import StringIO
@@ -161,13 +162,16 @@ def parmed_to_mdt(pmdmol):
     positions = [[pa.xx, pa.xy, pa.xz] for pa in pmdmol.atoms] * u.angstrom
 
     for iatom, patm in enumerate(pmdmol.atoms):
+        if patm.residue.insertion_code:
+            continue
+
         if patm.residue.chain not in chains:
             chains[patm.residue.chain] = mdt.Chain(pdbname=patm.residue.chain)
         chain = chains[patm.residue.chain]
 
         if patm.residue not in residues:
             residues[patm.residue] = mdt.Residue(resname=patm.residue.name,
-                                                 pdbindex=patm.residue.number)
+                                                     pdbindex=patm.residue.number)
             residues[patm.residue].chain = chain
             chain.add(residues[patm.residue])
         residue = residues[patm.residue]
@@ -184,6 +188,8 @@ def parmed_to_mdt(pmdmol):
         atoms[patm] = atom
 
     for pbnd in pmdmol.bonds:
+        if pbnd.atom1.residue.insertion_code or pbnd.atom2.residue.insertion_code:
+            continue
         atoms[pbnd.atom1].bond_to(atoms[pbnd.atom2], int(pbnd.order))
 
     mol = mdt.Molecule(list(atoms.values()),
@@ -264,8 +270,14 @@ def _reassign_chains(f, mol):
     try:
         newchain_names = set(data['_pdbx_poly_seq_scheme.asym_id']+
                              data['_pdbx_nonpoly_scheme.asym_id'])
+
     except KeyError:
-        return mol.copy(name=mol.name)
+        if '_pdbx_poly_seq_scheme.asym_id' in data:
+            residue_seq_map = _add_residue_map(data)
+        else:
+            residue_seq_map = _add_default_residue_map(mol)
+        return mol.copy(name=mol.name,residue_map=residue_seq_map)
+
     newchains = {name: mdt.Chain(name) for name in newchain_names}
 
     residue_iterator = itertools.chain(
@@ -274,10 +286,10 @@ def _reassign_chains(f, mol):
                 data['_pdbx_poly_seq_scheme.pdb_strand_id'],
                 data['_pdbx_poly_seq_scheme.asym_id']),
 
-            zip(data['_pdbx_nonpoly_scheme.mon_id'],
-                data['_pdbx_nonpoly_scheme.pdb_seq_num'],
-                data['_pdbx_nonpoly_scheme.pdb_strand_id'],
-                data['_pdbx_nonpoly_scheme.asym_id']))
+            zip(list(data['_pdbx_nonpoly_scheme.mon_id']),
+                list(data['_pdbx_nonpoly_scheme.pdb_seq_num']),
+                list(data['_pdbx_nonpoly_scheme.pdb_strand_id']),
+                list(data['_pdbx_nonpoly_scheme.asym_id'])))
 
     reschains = {(rname, ridx, rchain): newchains[chainid]
                  for rname, ridx, rchain, chainid in residue_iterator}
@@ -287,6 +299,61 @@ def _reassign_chains(f, mol):
 
         residue.chain = newchain
 
-    return mdt.Molecule(mol.atoms,
-                        name=mol.name, metadata=mol.metadata)
+    # Add data to map residue numbering between CIF and PDB.
+    residue_seq_map = _add_residue_map(data)
+
+    return mdt.Molecule(mol.atoms, name=mol.name, metadata=mol.metadata, 
+        residue_map=residue_seq_map)
+
+def _add_default_residue_map(mol):
+    """ Create a default map between CIF and PDB residue numbers. 
+
+    If the CIF file does not have '_pdbx_poly_seq_scheme' records then
+    create the residue map from the existing chains.
+    """
+    residue_seq_map = {}
+    chains = mol.chains
+    for chain in chains:
+        chain_id = chain.name
+        residues = chain.residues
+        start = residues[0].pdbindex
+        end = residues[-1].pdbindex
+        residue_seq_map[chain_id] = ResidueSequenceMap(chain_id, begin_seq=start, end_seq=end, 
+            pdb_begin_seq=start, pdb_end_seq=end)
+
+    return residue_seq_map
+
+
+def _add_residue_map(data):
+    """ Create a map between CIF and PDB residue numbers. """
+    residue_seq_map = {}
+    chain_ids = data["_pdbx_poly_seq_scheme.asym_id"]
+    pdb_chain_ids = data["_pdbx_poly_seq_scheme.pdb_strand_id"]
+    seq_ids = data["_pdbx_poly_seq_scheme.seq_id"]
+    res_names = data["_pdbx_poly_seq_scheme.mon_id"]
+    auth_seq_ids = data["_pdbx_poly_seq_scheme.auth_seq_num"]
+    list_size = len(chain_ids)
+
+    # Find the min/max residue sequence number for each chain.
+    chain_res_range = {}
+    for i in range(list_size-1):
+        chain_id = chain_ids[i]
+        seq_id = seq_ids[i]
+        res_name = res_names[i]
+        pdb_seq_id = auth_seq_ids[i]
+        if (pdb_seq_id == "?") or (res_name not in mdt.data.mdt.data.AMINO_NAMES):
+            continue 
+        if chain_id not in chain_res_range:
+            pdb_chain = pdb_chain_ids[i]
+            chain_res_range[chain_id] = [int(seq_id), int(seq_id), pdb_chain,
+                int(pdb_seq_id), int(pdb_seq_id)]
+        chain_res_range[chain_id][1] = int(seq_id)
+        chain_res_range[chain_id][4] = int(pdb_seq_id)
+
+    for chain_id in chain_res_range:
+        start, end, pdb_chain, pdb_start, pdb_end = chain_res_range[chain_id]
+        residue_seq_map[chain_id] = ResidueSequenceMap(pdb_chain, begin_seq=start, 
+            end_seq=end, pdb_begin_seq=pdb_start, pdb_end_seq=pdb_end)
+
+    return residue_seq_map
 
