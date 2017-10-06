@@ -10,8 +10,8 @@ docker_make:
 publisher:
   encrypted_env_file: deployment/tokens.crypt
   build:
-    context: ./  # this one builds at the root of the repository
-    dockerfile: ./deployment//moldesign-complete-cache.dockerfile
+    context: .  # this one builds at the root of the repository
+    dockerfile: ./deployment/moldesign-complete-cache.dockerfile
   add_docker: true
   working_dir: /opt/molecular-design-toolkit
   volumes:
@@ -50,8 +50,8 @@ test_moldesign_minimal_py2:
 test_moldesign_complete:
   encrypted_env_file: deployment/tokens.crypt
   build:
-    context: ./deployment
-    dockerfile: moldesign-complete-cache.dockerfile
+    context: ./   # this one builds at the root of the repository
+    dockerfile: ./deployment/moldesign-complete-cache.dockerfile
   cached: false  # do not cache this! It gets built before the cache is triggered
   working_dir: /opt/molecular-design-toolkit/
   add_docker: true
