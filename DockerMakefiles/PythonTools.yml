@@ -22,6 +22,9 @@ chem_python_conda:
   - deploy_requirements
  description: All of the external python chemistry libraries in one place
  build: |
+   RUN apt-get update \
+    && apt-get install -y libpng12-dev \
+    && cleanapt
    RUN conda install -qy -c openbabel openbabel=2.4.1
    RUN conda install -qy -c omnia \
       biopython=1.68 \
