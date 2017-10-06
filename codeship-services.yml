@@ -10,8 +10,8 @@ docker_make:
 publisher:
   encrypted_env_file: deployment/tokens.crypt
   build:
-    context: ./deployment
-    dockerfile: ./moldesign-complete-cache.dockerfile
+    context: ./  # this one builds at the root of the repository
+    dockerfile: ./deployment//moldesign-complete-cache.dockerfile
   add_docker: true
   working_dir: /opt/molecular-design-toolkit
   volumes:
