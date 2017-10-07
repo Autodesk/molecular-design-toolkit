@@ -70,7 +70,7 @@ moldesign_stack:
  requires:
   - opsin
   - symmol_base
-  - nucleic_acid_builder
+  - ambertools
   - moldesign_notebook
  build: |
    USER nbuser
