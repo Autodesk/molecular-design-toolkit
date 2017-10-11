@@ -1,5 +1,6 @@
 FROM python:2.7-slim
-
+# This is the environment that "docker-make" will run in on the CI server
+# The expected build context is the root of the MDT repository
 RUN apt-get update && apt-get install -y curl
 
 # Install docker CLI only, not the full engine
