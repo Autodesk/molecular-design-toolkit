@@ -1,4 +1,4 @@
 run_local:
-  nab.exe: true
+  nab: true
   opsin: true
   symmol: true

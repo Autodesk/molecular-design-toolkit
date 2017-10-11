@@ -18,7 +18,6 @@ _ALL_:
   - moldesign_minimal
   - moldesign_minimal_py2
   - moldesign_notebook
-  - nucleic_acid_builder
   - nwchem_build
   - openblas
   - pyscf_build

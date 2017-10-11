@@ -60,17 +60,19 @@ moldesign_notebook:
   RUN python -m nbmolviz activate --user
   USER root
   RUN python -m moldesign copyexamples
+  RUN chmod -R a+rw .
+
 
 
 moldesign_stack:
  description: An extra-large image with everything needed to run the example notebooks
  build_directory: buildfiles/moldesign
  requires:
-  - moldesign_notebook
   - opsin
   - symmol_base
-  - nucleic_acid_builder
+  - ambertools
+  - moldesign_notebook
  build: |
    USER nbuser
-   RUN mkdir -p ~/.moldesign
-   ADD moldesign.yml ~/.moldesign/moldesign.yml
+   RUN mkdir -p /home/nbuser/.moldesign
+   ADD moldesign.yml /home/nbuser/.moldesign/moldesign.yml
