@@ -190,11 +190,19 @@ def init_config():
 
     for pkg, do_remote in list(config.run_remote.items()):
         if do_remote:
-            getattr(packages, pkg).force_remote = True
+            try:
+                getattr(packages, pkg).force_remote = True
+            except AttributeError:
+                print('WARNING: unknown key "%s" in %s' % (pkg, path),
+                      file=sys.stderr)
 
     for pkg, do_local in list(config.run_local.items()):
         if do_local:
-            getattr(packages, pkg).run_local = True
+            try:
+                getattr(packages, pkg).run_local = True
+            except AttributeError:
+                print('WARNING: unknown key "%s" in %s' % (pkg, path),
+                      file=sys.stderr)
 
 
 def _check_override(tagname, expected, path):

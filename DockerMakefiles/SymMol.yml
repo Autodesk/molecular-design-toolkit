@@ -17,9 +17,7 @@ symmol_build:
      && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
     RUN mv /src/symmol/symmol /usr/local/bin
 
-symmol:
-  requires:
-    - deploybase
+symmol_base:
   build: |
     RUN apt-get update \
      && apt-get install -y --no-install-recommends \
@@ -28,3 +26,8 @@ symmol:
   copy_from:
     symmol_build:
       /usr/local/bin/symmol: /usr/local/bin
+
+symmol:
+  requires:
+    - deploybase
+    - symmol_base

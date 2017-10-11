@@ -256,7 +256,7 @@ class InterfacedExecutable(object):
 
 nwchem = InterfacedExecutable('nwchem.exe', None, 'nwchem', version_flag=None)
 opsin = InterfacedExecutable('opsin', None, 'opsin', version_flag=None)
-nab = InterfacedExecutable('nab', '16', 'nucleic_acid_builder', version_flag=None)
+nab = InterfacedExecutable('nab', '16', 'ambertools', version_flag=None)
 symmol = InterfacedExecutable('symmol', None, 'symmol', version_flag=None)
 tleap = InterfacedExecutable('tleap', '16', 'ambertools', version_flag=None)
 antechamber = InterfacedExecutable('antechamber', '16', 'ambertools', version_flag=None)
