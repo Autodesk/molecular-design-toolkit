@@ -123,6 +123,13 @@ def test_numeric_residue_name_1PYN(request, mol):
     assert list(contents.keys())[0] == '941'
 
 
+def test_single_chain_2p8w():
+    mol = mdt.read(get_data_path('2p8w.cif.bz2'))
+    assert mol.num_chains == 3
+    assert mol.chains['C'].num_residues == 1
+    assert mol.chains['C'].residues['GNP843'].num_atoms == 32
+
+    
 def test_missing_atoms_3b5x():
     mol = mdt.read(get_data_path('3b5x.cif.bz2'))
     assert mol.num_chains == 2
