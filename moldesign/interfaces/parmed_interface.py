@@ -267,29 +267,29 @@ def _reassign_chains(f, mol):
     """
     data = mdt.interfaces.biopython_interface.get_mmcif_data(f)
     f.seek(0)
-    try:
-        newchain_names = set(data['_pdbx_poly_seq_scheme.asym_id']+
-                             data['_pdbx_nonpoly_scheme.asym_id'])
 
+    try:
+        poly_seq_ids = _aslist(data['_pdbx_poly_seq_scheme.asym_id'])
+        nonpoly_ids = _aslist(data['_pdbx_nonpoly_scheme.asym_id'])
     except KeyError:
         if '_pdbx_poly_seq_scheme.asym_id' in data:
             residue_seq_map = _add_residue_map(data)
         else:
             residue_seq_map = _add_default_residue_map(mol)
-        return mol.copy(name=mol.name,residue_map=residue_seq_map)
+        return mol.copy(name=mol.name, residue_map=residue_seq_map)
 
+    newchain_names = set(poly_seq_ids + nonpoly_ids)
     newchains = {name: mdt.Chain(name) for name in newchain_names}
 
     residue_iterator = itertools.chain(
-            zip(data['_pdbx_poly_seq_scheme.mon_id'],
-                data['_pdbx_poly_seq_scheme.pdb_seq_num'],
-                data['_pdbx_poly_seq_scheme.pdb_strand_id'],
-                data['_pdbx_poly_seq_scheme.asym_id']),
-
-            zip(list(data['_pdbx_nonpoly_scheme.mon_id']),
-                list(data['_pdbx_nonpoly_scheme.pdb_seq_num']),
-                list(data['_pdbx_nonpoly_scheme.pdb_strand_id']),
-                list(data['_pdbx_nonpoly_scheme.asym_id'])))
+            zip(_aslist(data['_pdbx_poly_seq_scheme.mon_id']),
+                _aslist(data['_pdbx_poly_seq_scheme.pdb_seq_num']),
+                _aslist(data['_pdbx_poly_seq_scheme.pdb_strand_id']),
+                _aslist(data['_pdbx_poly_seq_scheme.asym_id'])),
+            zip(_aslist(data['_pdbx_nonpoly_scheme.mon_id']),
+                _aslist(data['_pdbx_nonpoly_scheme.pdb_seq_num']),
+                _aslist(data['_pdbx_nonpoly_scheme.pdb_strand_id']),
+                _aslist(data['_pdbx_nonpoly_scheme.asym_id'])))
 
     reschains = {(rname, ridx, rchain): newchains[chainid]
                  for rname, ridx, rchain, chainid in residue_iterator}
@@ -357,3 +357,9 @@ def _add_residue_map(data):
 
     return residue_seq_map
 
+
+def _aslist(l):
+    if isinstance(l, list):
+        return l
+    else:
+        return [l]

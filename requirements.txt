@@ -7,7 +7,7 @@ numpy >= 1.12
 pathlib2 ; python_version < '3.3'
 parmed >= 2.7.3
 pint >= 0.8.1
-pyccc >= 0.7.12
+pyccc >= 0.7.13
 pyyaml
 requests
 scipy

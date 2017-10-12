@@ -2,13 +2,7 @@
   service: docker_make
   type: serial
   steps:
-    - command:
-       docker-make -p -n --dockerfile-dir /makefiles
-         nwchem_build
-         pyscf_build
-         deploybase
-         python_deploy_base
-         python_deploy_base_py2
+    - command: docker-make -p -n --dockerfile-dir /makefiles nwchem_build pyscf_build deploybase python_deploy_base python_deploy_base_py2
       name: write_dockerfiles
     - command: cp buildfiles/deploybase/cleanapt buildfiles/notebook/run_notebook.sh /makefiles
       name: copy_contexts
@@ -70,15 +64,22 @@
   steps:
    - command: deployment/print_environment.sh
 
-- type: serial
-  name: complete_tests
-  services:
-   - test_moldesign_complete
-   - test_moldesign_complete_py2
-   - test_moldesign_minimal
-   - test_moldesign_minimal_py2
-  steps:
-   - command: deployment/codeship_runtests.sh
+- service: test_moldesign_complete
+  name: test_moldesign_complete
+  command: deployment/codeship_runtests.sh
+
+- service: test_moldesign_complete_py2
+  name: test_moldesign_complete_py2
+  command: deployment/codeship_runtests.sh
+
+- service: test_moldesign_minimal
+  name: test_moldesign_minimal
+  command: deployment/codeship_runtests.sh
+
+- service: test_moldesign_minimal_py2
+  name: test_moldesign_minimal_py2
+  command: deployment/codeship_runtests.sh
+
 
 - name: publish
   service: publisher
