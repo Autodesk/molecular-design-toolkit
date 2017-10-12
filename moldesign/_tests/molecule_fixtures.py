@@ -29,7 +29,7 @@ def typedfixture(*types, **kwargs):
 # Tests around PDB ID 3AID
 @typedfixture('molecule')
 def pdb3aid():
-    mol = mdt.read(get_data_path('3aid.pdb'))
+    mol = mdt.read(get_data_path('3aid.pdb.gz'))
     return mol
 
 

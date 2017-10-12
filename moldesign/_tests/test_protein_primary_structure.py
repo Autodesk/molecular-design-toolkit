@@ -25,12 +25,12 @@ def typedfixture(*types, **kwargs):
 
 @typedfixture('3AID', 'protein')
 def protease_pdb():
-    return mdt.read(get_data_path('3aid.pdb'))
+    return mdt.read(get_data_path('3aid.pdb.gz'))
 
 
 @typedfixture('3AID', 'protein')
 def protease_cif():
-    return mdt.read(get_data_path('3aid.cif'))
+    return mdt.read(get_data_path('3aid.cif.bz2'))
 
 
 def test_chain_types(protease_pdb):
