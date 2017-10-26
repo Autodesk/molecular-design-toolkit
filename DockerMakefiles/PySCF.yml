@@ -1,18 +1,11 @@
-pyscf_dependencies:
-  build: |
-    RUN apt-get update \
-     && apt-get install -y --no-install-recommends \
+pyscf_build:
+ FROM: debian:jessie
+ build: |
+  RUN apt-get update
+  RUN apt-get install -y --no-install-recommends \
         libblas-dev \
         libgomp1 \
-        python-h5py \
-     && cleanapt
-
-
-pyscf_build:
- requires:
-  - buildbase
-  - pyscf_dependencies
- build: |
+        python-h5py
   RUN apt-get install -y \
     cmake \
     python-h5py \
@@ -34,18 +27,27 @@ pyscf_build:
          /opt/shared_libs/lib \
    && cp -r /opt/shared_libs/lib /opt/shared_libs/py3/lib  # this is a hack for silly reasons
 
-
-pyscf:
-  requires:
-    - deploy_requirements
-    - pyscf_dependencies
-  build: |
-    RUN conda install h5py
-    ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.6/site-packages/pyscf/lib:/opt/conda/lib/python2.7/site-packages/pyscf/lib
-    RUN pip install git+https://github.com/sunqm/pyscf@v1.3.1
-    # note that the version here needs to be the same as the build version above
-  copy_from:
-    pyscf_build:  # probably better to install in one location, obvs, but this will have to do for now
+pyscf_mixin:
+   copy_from:
+    pyscf_build:
       /opt/shared_libs/lib: /opt/conda/lib/python3.6/site-packages/pyscf
       /opt/shared_libs/py3/lib: /opt/conda/lib/python2.7/site-packages/pyscf
+   build: |
+    RUN conda install h5py
+    RUN apt-get update \
+     && apt-get install -y --no-install-recommends \
+        libblas-dev \
+        libgomp1 \
+        python-h5py \
+     && cleanapt
+    ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.6/site-packages/pyscf/lib:/opt/conda/lib/python2.7/site-packages/pyscf/lib
+    RUN pip install git+https://github.com/sunqm/pyscf@v1.3.1
+    # note that the version here needs to be the same as the build version abo
 
+
+ # in theory this should work, in practice ...
+ # RUN apt-get update && apt-get install -y gcc \
+ # && conda install -qy -c psi4 libxc \
+ # && conda install -qy -c pyqc libcint \
+ # && pip install pyscf==1.4.0.8 \
+ # && cleanapt

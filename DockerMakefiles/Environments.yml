@@ -1,0 +1,54 @@
+# This file defines environments for MDT to be installed in
+
+_SOURCES_:
+ - PySCF.yml
+
+notebook:
+ requires:
+  - python_deploy
+ build_directory: buildfiles/notebook/
+ build: |
+    RUN conda install -yq matplotlib jupyter ipywidgets nbformat
+    ENTRYPOINT /run_notebook.sh
+    EXPOSE 8888
+    RUN mkdir /notebooks
+    WORKDIR /notebooks
+    COPY run_notebook.sh /run_notebook.sh
+
+
+complete_env_base:
+ requires:
+  - deploy_requirements
+  - pyscf_mixin
+ description: All of the external python chemistry libraries in one place
+ build: |
+   RUN apt-get update \
+    && apt-get install -y libpng12-dev \
+    && cleanapt
+   RUN conda install -qy -c openbabel openbabel=2.4.1 \
+    && conda install -qy -c omnia \
+           biopython=1.68 \
+           openmm=7.1.1 \
+           parmed=2.7.3 \
+           pdbfixer=1.4 \
+    && conda install -qy -c bioconda opsin
+
+
+
+
+complete_env:
+ requires:
+  - python_deploy
+  - complete_env_base
+
+
+complete_env_py2:
+ requires:
+  - python_deploy_py2
+  - complete_env_base
+
+
+complete_notebook_env:
+ requires:
+  - notebook
+  - complete_env_base

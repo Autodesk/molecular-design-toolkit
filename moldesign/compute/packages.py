@@ -137,7 +137,8 @@ class InterfacedPackage(object):
             return wrapper
 
 
-biopython = InterfacedPackage('biopython', '1.68', importname='Bio', required=True)
+biopython = InterfacedPackage('biopython', '1.68',
+                              importname='Bio', required=True,)
 parmed = InterfacedPackage('parmed', '2.7.3', required=True)
 
 # can't find any run-time mechanism to get the version for openbabel ...
@@ -254,12 +255,18 @@ class InterfacedExecutable(object):
         return job
 
 
-nwchem = InterfacedExecutable('nwchem.exe', None, 'nwchem', version_flag=None)
-opsin = InterfacedExecutable('opsin', None, 'opsin', version_flag=None)
-nab = InterfacedExecutable('nab', '16', 'ambertools', version_flag=None)
-symmol = InterfacedExecutable('symmol', None, 'symmol', version_flag=None)
-tleap = InterfacedExecutable('tleap', '16', 'ambertools', version_flag=None)
-antechamber = InterfacedExecutable('antechamber', '16', 'ambertools', version_flag=None)
+nwchem = InterfacedExecutable('nwchem.exe', None, 'nwchem',
+                              docker_image='docker.io/chemdocker/nwchem:0.9')
+opsin = InterfacedExecutable('opsin', None, 'opsin', version_flag=None,
+                             docker_image='docker.io/chemdocker/nwchem:0.9')
+nab = InterfacedExecutable('nab', '16', 'ambertools', version_flag=None,
+                           docker_image='docker.io/chemdocker/ambertools:0.9')
+symmol = InterfacedExecutable('symmol', None, 'symmol', version_flag=None,
+                              docker_image='docker.io/chemdocker/symmol:0.9')
+tleap = InterfacedExecutable('tleap', '16', 'ambertools', version_flag=None,
+                             docker_image='docker.io/chemdocker/ambertools:0.9')
+antechamber = InterfacedExecutable('antechamber', '16', 'ambertools', version_flag=None,
+                                   docker_image='docker.io/chemdocker/ambertools:0.9')
 nbo = InterfacedExecutable('nbo', '6.1', 'nbo', version_flag=None)
 
 executables = [nwchem, opsin, nab, symmol, tleap, antechamber]
