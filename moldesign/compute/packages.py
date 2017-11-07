@@ -30,6 +30,9 @@ if PY2:
 else:
     PYIMAGELABEL = 'moldesign_complete'
 
+CHEMDOCKER_REPO = 'docker.io/chemdocker'
+CHEMDOCKER_TAG = '0.9.0rc5'
+
 
 class InterfacedPackage(object):
     """ Object that describes an external python package MDT can access
@@ -255,18 +258,22 @@ class InterfacedExecutable(object):
         return job
 
 
+def _getimage(name):
+    return '%s/%s:%s' % (CHEMDOCKER_REPO, name, CHEMDOCKER_TAG)
+
+
 nwchem = InterfacedExecutable('nwchem.exe', None, 'nwchem',
-                              docker_image='docker.io/chemdocker/nwchem:0.9')
+                              docker_image=_getimage('nwchem-6.6'))
 opsin = InterfacedExecutable('opsin', None, 'opsin', version_flag=None,
-                             docker_image='docker.io/chemdocker/nwchem:0.9')
+                             docker_image=_getimage('opsin'))
 nab = InterfacedExecutable('nab', '16', 'ambertools', version_flag=None,
-                           docker_image='docker.io/chemdocker/ambertools:0.9')
+                           docker_image=_getimage('ambertools-16'))
 symmol = InterfacedExecutable('symmol', None, 'symmol', version_flag=None,
-                              docker_image='docker.io/chemdocker/symmol:0.9')
+                              docker_image=_getimage('symmol'))
 tleap = InterfacedExecutable('tleap', '16', 'ambertools', version_flag=None,
-                             docker_image='docker.io/chemdocker/ambertools:0.9')
+                             docker_image=_getimage('ambertools-16'))
 antechamber = InterfacedExecutable('antechamber', '16', 'ambertools', version_flag=None,
-                                   docker_image='docker.io/chemdocker/ambertools:0.9')
+                                   docker_image=_getimage('ambertools-16'))
 nbo = InterfacedExecutable('nbo', '6.1', 'nbo', version_flag=None)
 
 executables = [nwchem, opsin, nab, symmol, tleap, antechamber]

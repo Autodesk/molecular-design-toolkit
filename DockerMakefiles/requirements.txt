@@ -1,2 +1,2 @@
-DockerMake >= 0.6.0rc2
+DockerMake >= 0.6.0rc4
 
