@@ -17,8 +17,8 @@ moldesign_requirements:
   build: |
     RUN conda install -qy -c omnia parmed biopython
     COPY requirements.txt /tmp/mdtreqs.txt
-    RUN apt-get update \
-     && apt-get install -y gcc \
+    RUN apt-get -q update \
+     && apt-get -q install -y gcc \
      && pip install -r /tmp/mdtreqs.txt
   build_directory: ../
   ignore: |
@@ -35,9 +35,9 @@ moldesign_installed:
  requires:
   - moldesign_requirements
  build: |
-  RUN dists="/opt/moldesign-dist/dist/moldesign-*.tar.gz" \
+  RUN bash -c 'dists="/opt/moldesign-dist/dist/moldesign-*.tar.gz" \
    && [ ${#dists[@]} -eq 1 ] \
-   && pip install $dists
+   && pip install $dists'
 
 
 moldesign_minimal:

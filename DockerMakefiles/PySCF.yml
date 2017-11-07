@@ -1,41 +1,12 @@
-pyscf_build:
- FROM: debian:jessie
- build: |
-  RUN apt-get update
-  RUN apt-get install -y --no-install-recommends \
-        libblas-dev \
-        libgomp1 \
-        python-h5py
-  RUN apt-get install -y \
-    cmake \
-    python-h5py \
-    g++ \
-    wget \
-    git \
-    gfortran \
-   && cd /opt \
-     && wget -nv https://github.com/sunqm/pyscf/archive/v1.3.1.tar.gz \
-     && tar xvzf v1.3.1.tar.gz && rm v1.3.1.tar.gz \
-     && mv pyscf-1.3.1 pyscf \
-   && cd /opt/pyscf/lib \
-     && mkdir build && cd build \
-     && cmake .. \
-     && make \
-     && rm -rf /opt/pyscf/lib/build
-  RUN mkdir -p /opt/shared_libs/lib /opt/shared_libs/py3 \
-   && cp -v /opt/pyscf/lib/*.so* /opt/pyscf/lib/deps/lib/*.so* \
-         /opt/shared_libs/lib \
-   && cp -r /opt/shared_libs/lib /opt/shared_libs/py3/lib  # this is a hack for silly reasons
-
 pyscf_mixin:
    copy_from:
-    pyscf_build:
+    chemdocker/pyscf-build-1.3.1:0.9.0rc5:
       /opt/shared_libs/lib: /opt/conda/lib/python3.6/site-packages/pyscf
       /opt/shared_libs/py3/lib: /opt/conda/lib/python2.7/site-packages/pyscf
    build: |
     RUN conda install h5py
-    RUN apt-get update \
-     && apt-get install -y --no-install-recommends \
+    RUN apt-get -q update \
+     && apt-get -q install -y --no-install-recommends \
         libblas-dev \
         libgomp1 \
         python-h5py \
@@ -45,7 +16,7 @@ pyscf_mixin:
     # note that the version here needs to be the same as the build version abo
 
 
- # in theory this should work, in practice ...
+ # in theory this should work. in practice ...
  # RUN apt-get update && apt-get install -y gcc \
  # && conda install -qy -c psi4 libxc \
  # && conda install -qy -c pyqc libcint \
