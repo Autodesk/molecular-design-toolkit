@@ -16,12 +16,12 @@
     steps:
     - command: docker-make --tag dev moldesign_minimal --cache-repo moldesign --cache-tag cache
       name: mdt_minimal
-    - command: docker-make --tag dev moldesign_minimal_py2 --cache-repo moldesign --cache-tag cache
-      name: mdt_minimal_py2
-  - type: serial
-    steps:
     - command: docker-make --tag dev moldesign_complete --cache-repo moldesign --cache-tag cache
       name: mdt_complete
+  - type: serial
+    steps:
+    - command: docker-make --tag dev moldesign_minimal_py2 --cache-repo moldesign --cache-tag cache
+      name: mdt_minimal_py2
     - command: docker-make --tag dev moldesign_complete_py2 --cache-repo moldesign --cache-tag cache
       name: mdt_complete_py2
 
