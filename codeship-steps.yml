@@ -12,18 +12,13 @@
   steps:
   - name: pull-dependent-images
     command: ../deployment/pull-chemdocker.sh
-  - type: serial
-    steps:
-    - command: docker-make --tag dev moldesign_minimal --cache-repo moldesign --cache-tag cache
-      name: mdt_minimal
-    - command: docker-make --tag dev moldesign_complete --cache-repo moldesign --cache-tag cache
-      name: mdt_complete
-  - type: serial
-    steps:
-    - command: docker-make --tag dev moldesign_minimal_py2 --cache-repo moldesign --cache-tag cache
-      name: mdt_minimal_py2
-    - command: docker-make --tag dev moldesign_complete_py2 --cache-repo moldesign --cache-tag cache
-      name: mdt_complete_py2
+  - name: build-mdt-docker
+    command: |
+      docker-make --tag dev --cache-repo moldesign --cache-tag cache \
+         mdt_minimal_py2                                             \
+         mdt_complete_py2                                            \
+         mdt_minimal                                                 \
+         mdt_complete
 
 - name: print_environments
   type: parallel

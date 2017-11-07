@@ -8,5 +8,5 @@ fi
 for image in nwchem-6.6    \
              ambertools-16 \
              opsin-2.1.0; do
-             docker pull chemdocker/${image}:${chemdocker_tag}
+	     docker pull chemdocker/${image}:${chemdocker_tag} | tee -a pull.log | egrep -i 'pull|already';
 done
