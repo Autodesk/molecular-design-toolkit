@@ -12,8 +12,19 @@
   steps:
   - name: pull-dependent-images
     command: ../deployment/pull-chemdocker.sh
-  - name: build-mdt-docker
-    command: docker-make --all --tag dev --cache-repo moldesign --cache-tag cache
+  - type: serial
+    steps:
+      - name: build_py3
+        command:
+             docker-make moldesign_minimal moldesign_complete
+             --tag dev --keep-build-tags
+             --cache-repo moldesign --cache-tag cache
+    steps:
+      - name: build_py2
+        command:
+          docker-make moldesign_minimal_py2 moldesign_complete_py2
+             --tag dev --keep-build-tags
+             --cache-repo moldesign --cache-tag cache
 
 - name: print_environments
   type: parallel
@@ -23,7 +34,7 @@
    - test_moldesign_minimal
    - test_moldesign_minimal_py2
   steps:
-   - command: deployment/print_environment.sh
+   - command: ../deployment/print_environment.sh
 
 - service: test_moldesign_complete
   name: test_moldesign_complete
