@@ -32,7 +32,7 @@ function run-pull(){
 }
 
 # we copy binaries out of this one for our build
-echocmd docker pull chemdocker/pyscf-build-1.3.1:0.9.0rc5:${chemdocker_tag}
+echocmd docker pull chemdocker/pyscf-build-1.3.1:${chemdocker_tag} | tee -a pull.log | egrep -i 'pull|already';
 
 for img in moldesign_minimal       \
            moldesign_minimal_py2   \

@@ -1,4 +1,4 @@
-build_base: &build-base
+image_builder:
   build:
     context: .
     dockerfile: ./deployment/build-env.dockerfile
@@ -8,37 +8,19 @@ build_base: &build-base
   cached: true
   environment:
     chemdocker_tag: 0.9.0rc5
-
-python_builder:
-  <<: *build-base
   working_dir: /opt/molecular-design-toolkit
 
-image_builder:
-  <<: *build-base
-  working_dir: /opt/molecular-design-toolkit/DockerMakefiles
 
-
-publisher:
-  <<: *build-base
-  working_dir: /opt/molecular-design-toolkit
-  encrypted_env_file: deployment/tokens.crypt
-  add_docker: true
-  working_dir: /opt/molecular-design-toolkit
-  volumes:
-  - ./tmp/reports:/opt/reports
-
-
-test_base: &test-base
-  image: dummy
+test_moldesign_minimal: &test-base
   working_dir: /opt/molecular-design-toolkit/
   add_docker: true
   volumes:
     - ./tmp/reports:/opt/reports
-
-
-test_moldesign_minimal:
-  <<: *test-base
-  image: moldesign_minimal:dev
+  build: &test-build-base
+    context: ./
+    dockerfile: deployment/test-env.dockerfile
+    args:
+      baseimage: moldesign_minimal
   environment:
     TESTENV: minimal
     PYVERSION: 3
@@ -47,7 +29,10 @@ test_moldesign_minimal:
 
 test_moldesign_minimal_py2:
   <<: *test-base
-  image: moldesign_minimal_py2:dev
+  build:
+    <<: *test-build-base
+    args:
+      baseimage: moldesign_minimal_py2
   environment:
     TESTENV: minimal
     PYVERSION: 2
@@ -56,7 +41,10 @@ test_moldesign_minimal_py2:
 
 test_moldesign_complete:
   <<: *test-base
-  image: moldesign_complete:dev
+  build:
+    <<: *test-build-base
+    args:
+      baseimage: moldesign_complete
   environment:
     TESTENV: complete
     PYVERSION: 3
@@ -65,7 +53,10 @@ test_moldesign_complete:
 
 test_moldesign_complete_py2:
   <<: *test-base
-  image: moldesign_complete_py2:dev
+  build:
+    <<: *test-build-base
+    args:
+      baseimage: moldesign_complete_py2
   environment:
     TESTENV: complete
     PYVERSION: 2

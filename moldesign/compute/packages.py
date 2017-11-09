@@ -238,7 +238,7 @@ class InterfacedExecutable(object):
             return None
 
     def is_installed(self):
-        if self.path is None:
+        if not self.path:
             return False
 
         return os.path.exists(self.path)
@@ -278,5 +278,20 @@ nbo = InterfacedExecutable('nbo', '6.1', 'nbo', version_flag=None)
 
 executables = [nwchem, opsin, nab, symmol, tleap, antechamber]
 
+
+def print_env():
+    print(' * Interfaces: ')
+    for pkg in packages:
+        if pkg.is_installed():
+            print('     %s: installed' % pkg.name)
+        else:
+            print('     %s: not found' % pkg.name)
+
+    print('\n * Executables:')
+    for exe in executables:
+        if exe.is_installed():
+            print('     %s: installed' % exe.name)
+        else:
+            print('     %s: not found' % exe.name)
 
 __all__ = [x.name for x in packages + executables]

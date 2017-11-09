@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# this script expects to run from the root of the repository
 
 set -e  # fail immediately if any command fails
-
 
 VERSION="${TESTENV}.py${PYVERSION}"
 PYTESTFLAGS="-n 3 --spec  --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=3600 --tb=short"
@@ -59,7 +57,8 @@ function run_tests(){
     echo "py.test ${PYTESTFLAGS}"
     echo
 
-    py.test ${PYTESTFLAGS} | tee /opt/reports/pytest.${VERSION}.log
+    cd tests && \
+        py.test ${PYTESTFLAGS} | tee /opt/reports/pytest.${VERSION}.log
     exitstat=${PIPESTATUS[0]}
 
     statline="$(tail -n1 /opt/reports/pytest.${VERSION}.log)"

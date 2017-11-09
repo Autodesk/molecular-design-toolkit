@@ -1,1 +1,2 @@
-DockerMake >= 0.6.1a1
+DockerMake >= 0.6.1a2
+shyaml
