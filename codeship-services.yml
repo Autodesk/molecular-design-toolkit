@@ -62,3 +62,5 @@ test_moldesign_complete_py2:
     PYVERSION: 2
     OPENMM_CPU_THREADS: 1
 
+publisher:
+   <<: *test-base

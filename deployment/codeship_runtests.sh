@@ -2,6 +2,9 @@
 
 set -e  # fail immediately if any command fails
 
+install_location=$(python -c "import moldesign, os; print(moldesign.__path__[0])")
+test_location=${install_location}/_tests
+
 VERSION="${TESTENV}.py${PYVERSION}"
 PYTESTFLAGS="-n 3 --spec  --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=3600 --tb=short"
 if [ "${VERSION}" == "complete.py3" ]; then
@@ -10,7 +13,7 @@ fi
 
 
 function send_status_update(){
-     python deployment/send_test_status.py "${1}" "${2}"
+     python /opt/molecular-design-toolkit/deployment/send_test_status.py "${1}" "${2}"
 }
 
 
@@ -57,7 +60,7 @@ function run_tests(){
     echo "py.test ${PYTESTFLAGS}"
     echo
 
-    cd tests && \
+    cd ${test_location} && \
         py.test ${PYTESTFLAGS} | tee /opt/reports/pytest.${VERSION}.log
     exitstat=${PIPESTATUS[0]}
 
