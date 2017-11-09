@@ -3,12 +3,12 @@
 set -e  # fail immediately if any command fails
 
 install_location=$(python -c "import moldesign, os; print(moldesign.__path__[0])")
-test_location=${install_location}/_tests
+test_location=$(dirname "${install_location}")
 
 VERSION="${TESTENV}.py${PYVERSION}"
-PYTESTFLAGS="-n 3 --spec  --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=3600 --tb=short"
+PYTESTFLAGS="moldesign/_tests/ -n 3 --spec  --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=3600 --tb=short"
 if [ "${VERSION}" == "complete.py3" ]; then
-       PYTESTFLAGS="--cov moldesign ${PYTESTFLAGS}"
+       PYTESTFLAGS="${PYTESTFLAGS} --cov moldesign --cov-config /opt/molecular-design-toolkit/.coveragerc"
 fi
 
 
@@ -54,14 +54,14 @@ function check_if_tests_should_run(){
 
 function run_tests(){
     send_status_update "na" "Starting tests for ${VERSION}"
+    cd ${test_location}
 
     echo
     echo "Test command running in working dir '$(pwd)':"
     echo "py.test ${PYTESTFLAGS}"
     echo
 
-    cd ${test_location} && \
-        py.test ${PYTESTFLAGS} | tee /opt/reports/pytest.${VERSION}.log
+    py.test ${PYTESTFLAGS} | tee /opt/reports/pytest.${VERSION}.log
     exitstat=${PIPESTATUS[0]}
 
     statline="$(tail -n1 /opt/reports/pytest.${VERSION}.log)"

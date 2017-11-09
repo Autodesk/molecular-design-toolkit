@@ -1,8 +1,6 @@
 [paths]
 source =
   moldesign
-  */site-packages/moldesign
-  */dist-packages/moldesign
 
 
 [run]
