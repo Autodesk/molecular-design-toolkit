@@ -42,6 +42,7 @@
    - command: deployment/print_environment.sh
 
 - name: run_tests
+  type: serial
   services:
    - test_moldesign_complete
    - test_moldesign_complete_py2
