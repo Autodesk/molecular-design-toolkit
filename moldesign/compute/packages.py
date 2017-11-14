@@ -31,7 +31,7 @@ else:
     PYIMAGELABEL = 'moldesign_complete'
 
 CHEMDOCKER_REPO = 'docker.io/chemdocker'
-CHEMDOCKER_TAG = '0.9.0rc5'
+CHEMDOCKER_TAG = 'update_ambertools_build'
 
 
 class InterfacedPackage(object):
@@ -266,8 +266,8 @@ nwchem = InterfacedExecutable('nwchem.exe', None, 'nwchem',
                               docker_image=_getimage('nwchem-6.6'))
 opsin = InterfacedExecutable('opsin', None, 'opsin', version_flag=None,
                              docker_image=_getimage('opsin'))
-nab = InterfacedExecutable('nab', '16', 'ambertools', version_flag=None,
-                           docker_image=_getimage('ambertools-16'))
+nab = InterfacedExecutable('nab', '17', 'ambertools', version_flag=None,
+                           docker_image=_getimage('ambertools-17'))
 symmol = InterfacedExecutable('symmol', None, 'symmol', version_flag=None,
                               docker_image=_getimage('symmol'))
 tleap = InterfacedExecutable('tleap', '16', 'ambertools', version_flag=None,
