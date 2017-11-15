@@ -39,7 +39,7 @@
     - test_moldesign_minimal
     - test_moldesign_minimal_py2
   steps:
-   - command: deployment/print_environment.sh
+   - command: deployment/print-environment.sh
 
 - name: run-tests
   type: serial
