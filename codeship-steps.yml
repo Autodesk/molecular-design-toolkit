@@ -8,7 +8,7 @@
             --keep-build-tags
             -f DockerMakefiles/DockerMake.yml --tag dev
 
-- name: build_and_pull_images
+- name: build-and-pull_images
   service: image_builder
   type: parallel
   steps:
@@ -27,11 +27,11 @@
          --tag dev --keep-build-tags
          --cache-repo moldesign --cache-tag cache
 
-- name: push_images
+- name: push-images
   service: image_builder
   command: deployment/push.sh
 
-- name: print_environments
+- name: print-environments
   type: serial
   services:
     - test_moldesign_complete
@@ -41,7 +41,7 @@
   steps:
    - command: deployment/print_environment.sh
 
-- name: run_tests
+- name: run-tests
   type: serial
   services:
    - test_moldesign_complete
@@ -49,9 +49,9 @@
    - test_moldesign_minimal_py2
    - test_moldesign_minimal
   steps:
-   - command: deployment/codeship_runtests.sh
+   - command: deployment/run-ci-tests.sh
 
-- name: publish_python
+- name: publish-python
   service: publisher
   # matches tags that are valid PEP440 versions
   tag: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)((a|rc|b)(0|[1-9]\d*))?$'

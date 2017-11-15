@@ -13,7 +13,7 @@ fi
 
 
 function send_status_update(){
-     python /opt/molecular-design-toolkit/deployment/send_test_status.py "${1}" "${2}"
+     python /opt/molecular-design-toolkit/deployment/send-test-status.py "${1}" "${2}"
 }
 
 
