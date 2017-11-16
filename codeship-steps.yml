@@ -8,7 +8,7 @@
             --keep-build-tags
             -f DockerMakefiles/DockerMake.yml --tag dev
 
-- name: build-and-pull_images
+- name: build-and-pull-images
   service: image_builder
   type: parallel
   steps:

@@ -6,13 +6,12 @@ image_builder:
     - ./tmp/dist:/opt/molecular-design-toolkit/dist
   add_docker: true
   cached: true
-  environment:
-    chemdocker_tag: 0.9.0rc5
   working_dir: /opt/molecular-design-toolkit
 
 
 test_moldesign_minimal: &test-base
   working_dir: /opt/molecular-design-toolkit/
+  encrypted_env_file: ./deployment/tokens.crypt
   add_docker: true
   volumes:
     - ./tmp/reports:/opt/reports

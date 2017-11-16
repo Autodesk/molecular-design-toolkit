@@ -31,7 +31,8 @@ else:
     PYIMAGELABEL = 'moldesign_complete'
 
 CHEMDOCKER_REPO = 'docker.io/chemdocker'
-CHEMDOCKER_TAG = 'update_ambertools_build'
+with open(os.path.join(os.path.dirname(__file__), 'CHEMDOCKER_TAG')) as f:
+    CHEMDOCKER_TAG = f.read().strip()
 
 
 class InterfacedPackage(object):
