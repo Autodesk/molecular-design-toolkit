@@ -59,12 +59,12 @@ moldesign_complete_requirements:
 moldesign_complete:
   requires:
     - python_deploy
-    - moldesign_installed
+    - moldesign_complete_requirements
 
 moldesign_complete_py2:
   requires:
     - python_deploy_py2
-    - moldesign_installed
+    - moldesign_complete_requirements
 
 
 moldesign_notebook:

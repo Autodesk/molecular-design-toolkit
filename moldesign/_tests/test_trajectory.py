@@ -126,7 +126,7 @@ def test_add_traj(precanned_trajectory):
     assert newtraj.num_frames == 2 * precanned_trajectory.num_frames
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def h2_wfn_traj(h2):
     mol = h2.copy()
     mol.set_energy_model(mdt.models.RHF, basis='sto-3g')

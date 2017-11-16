@@ -35,10 +35,9 @@ def h2_with_model(request, h2):
     return h2
 
 
-def test_minimization_trajectory(h2_with_model):
-    mol = h2_with_model
-    if mol.energy_model.params.theory == 'mp2':
-        pytest.skip('Not testing mp2 minimizations at this time')
+def test_minimization_trajectory(h2):
+    mol = h2
+    h2.set_energy_model(mdt.models.PySCFPotential, basis='sto-3g', theory='rks')
 
     assert 'potential_energy' not in mol.properties
 
