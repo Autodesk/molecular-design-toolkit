@@ -28,7 +28,7 @@
          --cache-repo moldesign --cache-tag cache
 
 - name: push-images
-  service: image_builder
+  service: publisher
   command: deployment/push.sh
 
 - name: print-environments

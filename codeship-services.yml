@@ -1,4 +1,4 @@
-image_builder:
+image_builder: &build-base
   build:
     context: .
     dockerfile: ./deployment/build-env.dockerfile
@@ -9,9 +9,14 @@ image_builder:
   working_dir: /opt/molecular-design-toolkit
 
 
+publisher:
+   <<: *build-base
+   encrypted_env_file: ./deployment/deploy-tokens.crypt
+
+
 test_moldesign_minimal: &test-base
   working_dir: /opt/molecular-design-toolkit/
-  encrypted_env_file: ./deployment/tokens.crypt
+  encrypted_env_file: ./deployment/test-tokens.crypt
   add_docker: true
   volumes:
     - ./tmp/reports:/opt/reports
@@ -60,6 +65,3 @@ test_moldesign_complete_py2:
     TESTENV: complete
     PYVERSION: 2
     OPENMM_CPU_THREADS: 1
-
-publisher:
-   <<: *test-base

@@ -6,7 +6,7 @@ install_location=$(python -c "import moldesign, os; print(moldesign.__path__[0])
 test_location=$(dirname "${install_location}")
 
 VERSION="${TESTENV}.py${PYVERSION}"
-PYTESTFLAGS="moldesign/_tests/ -n 3 --spec  --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=3600 --tb=short"
+PYTESTFLAGS="moldesign/_tests/ -n 2 --spec  --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=3600 --tb=short"
 if [ "${VERSION}" == "complete.py3" ]; then
        PYTESTFLAGS="${PYTESTFLAGS} --cov moldesign --cov-config /opt/molecular-design-toolkit/.coveragerc"
 fi

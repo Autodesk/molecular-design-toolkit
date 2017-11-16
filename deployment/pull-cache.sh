@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-if [ -z ${chemdocker_tag} ]; then
-  echo "\$chemdocker_tag" var not set.
-  exit 10
-fi
-
 if [ -z ${CI_BRANCH} ]; then
   echo "\$CI_BRANCH" var not set.
   exit 10
@@ -32,6 +27,7 @@ function run-pull(){
 }
 
 # we copy binaries out of this one for our build
+chemdocker_tag=$(cat /opt/molecular-design-toolkit/moldesign/compute/CHEMDOCKER_TAG)
 echocmd docker pull chemdocker/pyscf-build-1.3.1:${chemdocker_tag} | tee -a pull.log | egrep -i 'pull|already';
 
 for img in moldesign_minimal       \
