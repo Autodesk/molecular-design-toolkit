@@ -127,8 +127,8 @@ def test_add_traj(precanned_trajectory):
 
 
 @pytest.fixture(scope='module')
-def h2_wfn_traj(h2):
-    mol = h2.copy()
+def h2_wfn_traj():
+    mol = h2().copy()
     mol.set_energy_model(mdt.models.RHF, basis='sto-3g')
 
     traj = mdt.Trajectory(mol)

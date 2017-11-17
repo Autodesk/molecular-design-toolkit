@@ -15,11 +15,9 @@ function echocmd() {
    $@
 }
 
-imgs=$(cat DockerMakefiles/DockerMake.yml | shyaml get-values _ALL_)
-
 docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD}
 
-for img in ${imgs}; do
+for img in $@; do
     remote_img=autodesk/moldesign:${img}-${CI_BRANCH}-devbuild
 
     echocmd docker tag ${img}:dev ${remote_img}

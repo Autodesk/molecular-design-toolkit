@@ -16,7 +16,7 @@
     command: deployment/pull-chemdocker.sh
   - name: build_py3
     command:
-         docker-make moldesign_minimal moldesign_complete moldesign_notebook
+         docker-make moldesign_minimal moldesign_complete
           -f DockerMakefiles/DockerMake.yml
           --tag dev --keep-build-tags
           --cache-repo moldesign --cache-tag cache
@@ -28,8 +28,23 @@
          --cache-repo moldesign --cache-tag cache
 
 - name: push-images
-  service: publisher
-  command: deployment/push.sh
+  type: parallel
+  steps:
+    - name: push-artifacts
+      command: deployment/push.sh moldesign_minimal moldesign_py2
+                                  moldesign_complete moldesign_complete_py2
+      service: publisher
+    - type: serial
+      steps:
+        - name: build-notebook
+          service: image_builder
+          command: docker-make moldesign_notebook
+              -f DockerMakefiles/DockerMake.yml
+              --tag dev --cache-repo moldesign --cache-tag cache
+        - name: push-notebook
+          service: publisher
+          command: deployment/push.sh moldesign_notebook
+
 
 - name: print-environments
   type: serial

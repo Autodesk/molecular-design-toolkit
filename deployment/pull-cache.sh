@@ -35,7 +35,7 @@ for img in moldesign_minimal       \
            moldesign_complete      \
            moldesign_complete_py2  \
            moldesign_notebook; do
-   run-pull ${img} ${CI_BRANCH} || run-pull ${img} master || \
+   run-pull ${img} ${CI_BRANCH}-devbuild || run-pull ${img} master || \
    echo " --> Failed to pull cache for ${img}"
    echo
 done
