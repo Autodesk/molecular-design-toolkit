@@ -1,1 +1,1 @@
-Files in this directory are used with the CodeShip CI/CD service, and generally aren't useful for anyone except the project's maintainers.
+Files in this directory are for use with our Codeship CI/CD setup, and aren't generally useful outside of that context.

@@ -1,102 +1,20 @@
 _SOURCES_:
-  - CLI.yml
-  - Libraries.yml
   - Moldesign.yml
-  - NWChem.yml
-  - PySCF.yml
-  - PythonTools.yml
-  - SymMol.yml
+  - Environments.yml
 
 
 _ALL_:
-  - ambertools
-  - opsin
-  - symmol
-  - nwchem
   - moldesign_complete
   - moldesign_complete_py2
   - moldesign_minimal
   - moldesign_minimal_py2
   - moldesign_notebook
-  - nwchem_build
-  - openblas
-  - pyscf_build
 
 
 ##################################################
 # Base image definitions
 base:
   FROM: debian:jessie
-
-buildbase:
-  description: |
-    Well-outfitted image for building binaries. Rather than deploying this huge image,
-    binaries should be built here then copied into smaller deployment images
-  requires:
-    - base
-  build: |
-    RUN apt-get update
-    RUN apt-get install -y \
-          autoconf        \
-          automake        \
-          build-essential \
-          cmake           \
-          cmake-curses-gui\
-          csh             \
-          doxygen         \
-          gfortran        \
-          git             \
-          libatlas-dev    \
-          libblas-dev     \
-          libbz2-dev      \
-          libcr-dev       \
-          libfftw3-dev    \
-          libhdf5-dev     \
-          liblapack-dev   \
-          libnetcdf-dev   \
-          libopenmpi-dev  \
-          libpng12-dev    \
-          libpython-dev   \
-          libtool         \
-          mercurial       \
-          mpich2          \
-          mpich2-doc      \
-          patch           \
-          pkg-config      \
-          python          \
-          python-numpy    \
-          python-pip      \
-          python-scipy    \
-          python-tornado  \
-          python-yaml     \
-          python-zmq      \
-          subversion      \
-          swig            \
-          tcsh            \
-          vim             \
-          wget            \
-          zip
-    ENV TERM=dumb
-    RUN echo '#!/bin/bash' > /usr/local/bin/cleanapt \
-      && chmod +x /usr/local/bin/cleanapt
-
-
-deploybase:
-  description: lightweight image for deployment of CLI binaries
-  requires:
-    - base
-  build_directory: buildfiles/deploybase
-  build: |
-    ADD cleanapt /usr/local/bin
-    RUN chmod +x /usr/local/bin/cleanapt
-    RUN apt-get update \
-      && apt-get install -y --no-install-recommends \
-        ca-certificates \
-        git \
-        vim \
-        wget \
-      && cleanapt
-
 
 miniconda:
   FROM: continuumio/miniconda3:4.3.11
@@ -109,7 +27,6 @@ miniconda_py2:
    RUN conda install -c anaconda zlib
 
 
-
 deploy_requirements:
   build_directory: buildfiles/deploybase
   build: |
@@ -117,13 +34,14 @@ deploy_requirements:
     RUN chmod +x /usr/local/bin/cleanapt
     RUN conda install -qy numpy scipy pyyaml
 
-python_deploy_base_py2:
-  requires:
-     - miniconda_py2
-     - deploy_requirements
 
-python_deploy_base:
+python_deploy:
   requires:
     - miniconda
     - deploy_requirements
 
+
+python_deploy_py2:
+  requires:
+     - miniconda_py2
+     - deploy_requirements

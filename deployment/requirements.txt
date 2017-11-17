@@ -8,4 +8,4 @@ pytest-cov
 pytest-xdist != 1.17.0
 pytest-timeout
 pytest-spec
-
+shyaml

@@ -14,13 +14,12 @@ __PYTEST_MARK__ = 'wfn'
 TESTSYSTEMS = ['h2_rhf_augccpvdz', 'h2_rhf_sto3g', 'acetylene_dft_631g']
 
 
-@pytest.mark.parametrize('molkey', TESTSYSTEMS)
-def test_pyscf_orbital_grid_works(molkey, request):
+def test_pyscf_orbital_grid_works(h2_rhf_augccpvdz):
     """ Tests the basic input/output of the pyscf basis_values function
 
     Doesn't actually test the values directly - just that the answers are mathematically consistent
     """
-    mol = request.getfixturevalue(molkey)
+    mol = h2_rhf_augccpvdz
     wfn = mol.wfn
     nbasis = len(wfn.aobasis)
 
