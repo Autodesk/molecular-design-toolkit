@@ -14,7 +14,7 @@ function run-pull(){
     # pull an image. If successful, retags the image with the "cache" tag
     img=$1
     tag=$2
-    imgpath="autodesk/moldesign:${img}-${tag}"
+    imgpath="${REPO}${img}-${tag}"
 
     echocmd docker pull ${imgpath} | tee -a pull.log | egrep -i 'pull|already';
 
@@ -34,6 +34,7 @@ for img in moldesign_minimal       \
            moldesign_minimal_py2   \
            moldesign_complete      \
            moldesign_complete_py2  \
+           moldesign_py_build      \
            moldesign_notebook; do
    run-pull ${img} ${CI_BRANCH}-devbuild || run-pull ${img} master || \
    echo " --> Failed to pull cache for ${img}"

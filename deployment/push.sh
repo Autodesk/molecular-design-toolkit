@@ -18,8 +18,9 @@ function echocmd() {
 docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD}
 
 for img in $@; do
-    remote_img=autodesk/moldesign:${img}-${CI_BRANCH}-devbuild
+    local_img=${REPO}${img}-${CI_BRANCH}
+    remote_img=${local_img}-devbuild
 
-    echocmd docker tag ${img}:dev ${remote_img}
+    echocmd docker tag ${local_img} ${remote_img}
     echocmd docker push ${remote_img} | tee -a push.log | egrep -i 'push|already';
 done

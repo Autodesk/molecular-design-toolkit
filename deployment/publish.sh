@@ -18,6 +18,16 @@ else
 fi
 
 
+# Push images
+for img in moldesign_minimal       \
+           moldesign_minimal_py2   \
+           moldesign_complete      \
+           moldesign_complete_py2  \
+           moldesign_notebook; do
+   docker push ${REPO}{$img}-${CI_BRANCH} | tee -a push.log | egrep -i 'pull|already'
+done
+
+
 # Copy build artifacts
 sdist=moldesign-${pyversion}.tar.gz
 docker run moldesign_py_build:dev -v ./tmp/dists:/hostdists  cp dist/${sdist} /hostdists

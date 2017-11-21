@@ -7,6 +7,8 @@ image_builder: &build-base
   add_docker: true
   cached: true
   working_dir: /opt/molecular-design-toolkit
+  environment: &repo
+    REPO: "docker.io/autodesk/moldesign:"
 
 
 publisher:
@@ -26,6 +28,7 @@ test_moldesign_minimal: &test-base
     args:
       baseimage: moldesign_minimal
   environment:
+    <<: *repo
     TESTENV: minimal
     PYVERSION: 3
     OPENMM_CPU_THREADS: 1
@@ -38,6 +41,7 @@ test_moldesign_minimal_py2:
     args:
       baseimage: moldesign_minimal_py2
   environment:
+    <<: *repo
     TESTENV: minimal
     PYVERSION: 2
     OPENMM_CPU_THREADS: 1
@@ -50,6 +54,7 @@ test_moldesign_complete:
     args:
       baseimage: moldesign_complete
   environment:
+    <<: *repo
     TESTENV: complete
     PYVERSION: 3
     OPENMM_CPU_THREADS: 1
@@ -62,6 +67,7 @@ test_moldesign_complete_py2:
     args:
       baseimage: moldesign_complete_py2
   environment:
+    <<: *repo
     TESTENV: complete
     PYVERSION: 2
     OPENMM_CPU_THREADS: 1
