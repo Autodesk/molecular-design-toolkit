@@ -18,9 +18,11 @@ function echocmd() {
 docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD}
 
 for img in $@; do
-    local_img=${REPO}${img}-${CI_BRANCH}
-    remote_img=${local_img}-devbuild
+    build_img=${img}:dev
+    release_tag=${REPO}${img}-${CI_BRANCH}
+    artifact_tag=${release_tag}-devbuild
 
-    echocmd docker tag ${local_img} ${remote_img}
-    echocmd docker push ${remote_img} | tee -a push.log | egrep -i 'push|already';
+    echocmd docker tag ${build_img} ${release_tag}
+    echocmd docker tag ${build_img} ${artifact_tag}
+    echocmd docker push ${artifact_tag} | tee -a push.log | egrep -i 'push|already';
 done

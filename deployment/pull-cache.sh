@@ -22,7 +22,7 @@ function run-pull(){
     if [ "$success" -ne 0 ]; then
        return ${success};
     else
-       docker tag ${imgpath} moldesign/${img}:cache
+       docker tag ${imgpath} ${img}:cache
     fi
 }
 
