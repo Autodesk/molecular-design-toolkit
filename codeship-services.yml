@@ -2,8 +2,6 @@ image_builder: &build-base
   build:
     context: .
     dockerfile: ./deployment/build-env.dockerfile
-  volumes:
-    - ./tmp/dist:/opt/molecular-design-toolkit/dist
   add_docker: true
   cached: true
   working_dir: /opt/molecular-design-toolkit

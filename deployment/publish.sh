@@ -8,17 +8,11 @@
 # fail immediately if any command fails:
 set -e
 
-pyversion=$(python -m moldesign version | tail -n 1)
+# Copy python package out of the docker image
+sdist=moldesign-${pyversion}.tar.gz
+docker run moldesign_py_build:dev -v ./tmp/dist:/hostdists  cp dist/${sdist} /hostdists
 
-if [ "${pyversion}" == "${CI_BRANCH}" ]; then
-  echo "Deploying version ${CI_BRANCH}"
-else
-  echo "Can't publish - moldesign package version '${pyversion}' differs from its Git tag '${CI_BRANCH}'"
-  exit 1
-fi
-
-
-# Push images
+# Push images to dockerhub
 for img in moldesign_minimal       \
            moldesign_minimal_py2   \
            moldesign_complete      \
@@ -28,8 +22,6 @@ for img in moldesign_minimal       \
 done
 
 
-# Copy build artifacts
-sdist=moldesign-${pyversion}.tar.gz
-docker run moldesign_py_build:dev -v ./tmp/dists:/hostdists  cp dist/${sdist} /hostdists
+# Push python package to PyPI
 echo "Uploading version ${CI_BRANCH} to PyPI:"
 twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} ./tmp/dists/moldesign-${pyversion}.tar.gz

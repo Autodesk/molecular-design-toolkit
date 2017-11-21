@@ -90,12 +90,23 @@
    - command: deployment/run-ci-tests.sh
      name: testrunner
 
+
 # If this build is tagged with a PEP440-compliant version number AND the tests have passed,
 # upload the package to PyPI, and push the docker images to dockerhub as
 # autodesk/moldesign:[imagename]-[version-number]
-- name: publish-python
+- name: release
   service: publisher
   # matches tags that are valid PEP440 versions
+  type: serial
   tag: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)((a|rc|b)(0|[1-9]\d*))?$'
-  command: deployment/publish.sh
+  steps:
+   - type: parallel
+     services:
+       - test_moldesign_complete
+       - test_moldesign_complete_py2
+     steps:
+     - command: deployment/test-version-number.sh
+   - name: upload
+     command: deployment/publish.sh
+     service: publisher
 

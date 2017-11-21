@@ -3,6 +3,7 @@
 # Defined by codeship
 # - CI_BRANCH
 # - CI_COMMIT_MESSAGE
+# - PROJECT_ID
 # Defined in ../codeship-services.yml
 # - TESTENV
 # - PYVERSION
