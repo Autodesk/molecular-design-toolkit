@@ -9,7 +9,7 @@ fi
 
 pyversion=$(python -m moldesign version | tail -n 1)
 
-echo "Expecting moldesign==${pyversion}"
+echo "Expecting moldesign==${CI_BRANCH}"
 echo "Found moldesign==${pyversion}"
 
 

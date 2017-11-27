@@ -5,7 +5,6 @@ moldesign_py_build:
   requires:
    - python_deploy
   build_directory: ..
-  ignorefile: buildfiles/moldesign/moldesign.dockerignore
   build: |
     COPY . /opt/molecular-design-toolkit
     WORKDIR /opt/molecular-design-toolkit
