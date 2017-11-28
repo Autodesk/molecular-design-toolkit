@@ -9,7 +9,7 @@
 - name: build-sdist
   service: image_builder
   command: bash -c "docker-make moldesign_py_build
-            --repo ${REPO} --tag ${CI_BRANCH}
+            --tag dev
             --keep-build-tags
             -f DockerMakefiles/DockerMake.yml"
 
