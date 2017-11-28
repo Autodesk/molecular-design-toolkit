@@ -11,6 +11,7 @@ image_builder: &build-base
 
 publisher:
    <<: *build-base
+   cached: false
    encrypted_env_file: ./deployment/deploy-tokens.crypt
 
 

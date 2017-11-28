@@ -8,9 +8,11 @@
 # fail immediately if any command fails:
 set -e
 
+echo "Now deploying moldesign-${pyversion}"
+
 # Copy python package out of the docker image
 sdist=moldesign-${pyversion}.tar.gz
-docker run moldesign_py_build:dev -v ./tmp/dist:/hostdists  cp dist/${sdist} /hostdists
+docker run -v ${PWD}/tmp/dist:/hostdists moldesign_py_build:dev cp dist/${sdist} /hostdists
 
 # Push images to dockerhub
 for img in moldesign_minimal       \
