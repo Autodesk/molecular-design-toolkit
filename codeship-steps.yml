@@ -66,19 +66,7 @@
           command: deployment/push-and-tag.sh moldesign_notebook
 
 
-# Prints out internal information about the test environments
-- name: print-environments
-  type: parallel
-  services:
-    - test_moldesign_complete
-    - test_moldesign_complete_py2
-    - test_moldesign_minimal
-    - test_moldesign_minimal_py2
-  steps:
-   - command: deployment/print-environment.sh
-     name: env-report
-
-# Run the tests in each environment.
+# Run the tests in each environment
 - name: run-tests
   type: serial
   services:
@@ -87,10 +75,16 @@
    - test_moldesign_minimal_py2
    - test_moldesign_minimal
   steps:
+   - command: deployment/print-environment.sh
+     name: environment
    - command: deployment/run-ci-tests.sh
-     name: testrunner
+     name: tests
 
 
+# Upload coverage results
+- name: push-coverage
+  service: coverage_pusher
+  command: deployment/push-coverage.sh
 
 
 # If this build is tagged with a PEP440-compliant version number AND the tests have passed,

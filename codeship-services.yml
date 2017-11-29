@@ -9,6 +9,14 @@ image_builder: &build-base
     REPO: "docker.io/autodesk/moldesign:"
 
 
+coverage_pusher:
+   <<: *build-base
+   cached: false
+   encrypted_env_file: ./deployment/test-tokens.crypt
+   volumes:
+    - ./tmp/reports:/opt/reports
+
+
 publisher:
    <<: *build-base
    cached: false

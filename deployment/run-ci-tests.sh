@@ -19,10 +19,9 @@ install_location=$(python -c "import moldesign, os; print(moldesign.__path__[0])
 test_location=$(dirname "${install_location}")
 
 VERSION="${TESTENV}.py${PYVERSION}"
-PYTESTFLAGS="moldesign/_tests/ -n 2 --spec  --durations=20 --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=3600 --tb=short"
-if [ "${VERSION}" == "complete.py3" ]; then
-       PYTESTFLAGS="${PYTESTFLAGS} --cov moldesign --cov-config /opt/molecular-design-toolkit/.coveragerc"
-fi
+PYTESTFLAGS="moldesign/_tests/ -n 2 --spec  --durations=20
+        --junit-xml=/opt/reports/junit.${VERSION}.xml --timeout=3600 --tb=short
+        --cov moldesign --cov-config /opt/molecular-design-toolkit/.coveragerc"
 
 
 function send_status_update(){
@@ -78,28 +77,24 @@ function run_tests(){
     send_status_update "na" "Starting tests for ${VERSION}"
     cd ${test_location}
 
+
     echo
     echo "Test command running in working dir '$(pwd)':"
     echo "py.test ${PYTESTFLAGS}"
     echo
 
-    py.test ${PYTESTFLAGS} | tee /opt/reports/pytest.${VERSION}.log
+    py.test ${PYTESTFLAGS} -k test_bond_alignment_on_axis | tee /opt/reports/pytest.${VERSION}.log
     exitstat=${PIPESTATUS[0]}
-
     statline="$(tail -n1 /opt/reports/pytest.${VERSION}.log)"
+
+    # Make a copy of the coverage report
+    mkdir -p /opt/reports/env-coverage/
+    cp .coverage /opt/reports/env-coverage/coverage.${VERSION}
 
     echo 'Test status:'
     echo ${statline}
 
     send_status_update "${exitstat}" "${statline}"
-
-    if [ "${VERSION}" == "complete.py3" ]; then
-       if [[ ${exitstat} == 0 && "$CI_BRANCH" != "" ]]; then
-          coveralls || echo "Failed to upload code coverage stats"
-       else
-          echo "Skipping coveralls upload: tests not passing or \$CI_COMMIT not set."
-       fi
-    fi
 
     exit ${exitstat}
 }

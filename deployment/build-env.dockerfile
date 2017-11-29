@@ -10,6 +10,7 @@ RUN curl -fsSLO https://get.docker.com/builds/Linux/x86_64/docker-17.04.0-ce.tgz
   && mv docker/docker /usr/local/bin \
   && rm -r docker docker-17.04.0-ce.tgz
 
-ADD . /opt/molecular-design-toolkit
-RUN pip install -r /opt/molecular-design-toolkit/DockerMakefiles/requirements.txt
+ADD ./DockerMakefiles/requirements.txt /tmp/reqs.txt
+RUN pip install -r /tmp/reqs.txt && pip install coveralls
 
+ADD . /opt/molecular-design-toolkit
