@@ -8,10 +8,10 @@
 # fail immediately if any command fails:
 set -e
 
-echo "Now deploying moldesign-${pyversion}"
+echo "Now deploying moldesign-${CI_BRANCH}"
 
 # Copy python package out of the docker image
-sdist=moldesign-${pyversion}.tar.gz
+sdist=moldesign-${CI_BRANCH}.tar.gz
 docker run -v ${PWD}/tmp/dist:/hostdists moldesign_py_build:dev cp dist/${sdist} /hostdists
 
 # Push images to dockerhub
@@ -26,4 +26,4 @@ done
 
 # Push python package to PyPI
 echo "Uploading version ${CI_BRANCH} to PyPI:"
-twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} ./tmp/dists/moldesign-${pyversion}.tar.gz
+twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} ./tmp/dists/moldesign-${CI_BRANCH}.tar.gz
