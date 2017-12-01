@@ -20,7 +20,7 @@ for img in moldesign_minimal       \
            moldesign_complete      \
            moldesign_complete_py2  \
            moldesign_notebook; do
-   docker push ${REPO}{$img}-${CI_BRANCH} | tee -a push.log | egrep -i 'pull|already'
+   docker push ${REPO}${img}-${CI_BRANCH} | tee -a push.log | egrep -i 'pull|already'
 done
 
 

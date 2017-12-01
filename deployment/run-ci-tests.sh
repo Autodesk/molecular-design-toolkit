@@ -83,7 +83,7 @@ function run_tests(){
     echo "py.test ${PYTESTFLAGS}"
     echo
 
-    py.test ${PYTESTFLAGS} -k test_bond_alignment_on_axis | tee /opt/reports/pytest.${VERSION}.log
+    py.test ${PYTESTFLAGS} | tee /opt/reports/pytest.${VERSION}.log
     exitstat=${PIPESTATUS[0]}
     statline="$(tail -n1 /opt/reports/pytest.${VERSION}.log)"
 
