@@ -10,6 +10,9 @@ set -e
 
 echo "Now deploying moldesign-${CI_BRANCH}"
 
+docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD}
+
+
 # Copy python package out of the docker image
 sdist=moldesign-${CI_BRANCH}.tar.gz
 docker run -v ${PWD}/tmp/dist:/hostdists moldesign_py_build:dev cp dist/${sdist} /hostdists
