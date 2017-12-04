@@ -32,6 +32,11 @@ function send_status_update(){
 function check_if_tests_should_run(){
    echo "Should I run the tests in this environment?"
 
+   if [[ "${CI_COMMIT_MESSAGE}" == *"--skip-ci-tests"* ]];  then
+       echo "NO: found \"--skip-ci-tests\" flag in commit message; will not run any test suites"
+       exit 0
+   fi
+
    if [[ "${CI_COMMIT_MESSAGE}" == *"--fast-ci-tests"* && "${VERSION}" != "complete.py3" ]];  then
        echo "NO: found \"--fast-ci-tests\" flag in commit message; run complete.py3 only"
        exit 0
