@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [ -z ${CI_BRANCH} ]; then
   echo "\$CI_BRANCH" var not set.
   exit 1

@@ -48,7 +48,7 @@
   steps:
     - name: push-artifacts
       command: deployment/push-and-tag.sh
-          moldesign_minimal moldesign_py2 moldesign_py_build
+          moldesign_minimal moldesign_minimal_py2 moldesign_py_build
           moldesign_complete moldesign_complete_py2
       service: publisher
     - type: serial
