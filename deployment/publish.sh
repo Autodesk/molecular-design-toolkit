@@ -29,4 +29,4 @@ done
 
 # Push python package to PyPI
 echo "Uploading version ${CI_BRANCH} to PyPI:"
-twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} ./tmp/dists/moldesign-${CI_BRANCH}.tar.gz
+twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} ./tmp/dist/moldesign-${CI_BRANCH}.tar.gz
