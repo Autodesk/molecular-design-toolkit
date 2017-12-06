@@ -1,13 +1,21 @@
+# Pull previous builds from DockerHub to use as a cache.
+# These images are tagged as [imagename]-cache
 - name: pull-cache
   service: image_builder
   command: deployment/pull-cache.sh
 
+# Build the python package to be tested (and uploaded to PyPI if this is a release)
+# The package is built in the "autodesk/moldesign:moldesign_py_build-[branch name]" image
 - name: build-sdist
   service: image_builder
-  command: docker-make moldesign_py_build
+  command: bash -c "docker-make moldesign_py_build
+            --tag dev
             --keep-build-tags
-            -f DockerMakefiles/DockerMake.yml --tag dev
+            -f DockerMakefiles/DockerMake.yml"
 
+# Build docker images for all test environments. They will be tagged as
+# [imagename]-dev
+# (For the sake of parallelism, we also download other images that the tests depend on)
 - name: build-and-pull-images
   service: image_builder
   type: parallel
@@ -15,49 +23,50 @@
   - name: pull-dependent-images
     command: deployment/pull-chemdocker.sh
   - name: build_py3
-    command:
-         docker-make moldesign_minimal moldesign_complete
+    command: bash -c
+          "docker-make moldesign_minimal moldesign_complete
           -f DockerMakefiles/DockerMake.yml
-          --tag dev --keep-build-tags
-          --cache-repo moldesign --cache-tag cache
+          --tag dev
+          --keep-build-tags
+          --cache-tag cache"
   - name: build_py2
-    command:
-        docker-make moldesign_minimal_py2 moldesign_complete_py2
+    command: bash -c
+         "docker-make moldesign_minimal_py2 moldesign_complete_py2
          -f DockerMakefiles/DockerMake.yml
-         --tag dev --keep-build-tags
-         --cache-repo moldesign --cache-tag cache
+         --tag dev
+         --keep-build-tags
+         --cache-tag cache"
 
-- name: push-images
+
+# Push build artifacts to Dockerhub.
+# These are tagged as autodesk/moldesign:[imagename]-[branchame]-devbuild
+# For testing purposes, they are also tagged as
+# autodesk/moldesign:[imagename]-[branchname] (this is the tag that will be pushed
+# to dockerhub for successful releases)
+- name: tag-and-push-images
   type: parallel
   steps:
     - name: push-artifacts
-      command: deployment/push.sh moldesign_minimal moldesign_py2
-                                  moldesign_complete moldesign_complete_py2
+      command: deployment/push-and-tag.sh
+          moldesign_minimal moldesign_minimal_py2 moldesign_py_build
+          moldesign_complete moldesign_complete_py2
       service: publisher
     - type: serial
       name: make-notebook
       steps:
         - name: build-notebook
           service: image_builder
-          command: docker-make moldesign_notebook
+          command: bash -c
+              "docker-make moldesign_notebook
               -f DockerMakefiles/DockerMake.yml
-              --tag dev --cache-repo moldesign --cache-tag cache
+              --tag dev
+              --cache-tag cache"
         - name: push-notebook
           service: publisher
-          command: deployment/push.sh moldesign_notebook
+          command: deployment/push-and-tag.sh moldesign_notebook
 
 
-- name: print-environments
-  type: parallel
-  services:
-    - test_moldesign_complete
-    - test_moldesign_complete_py2
-    - test_moldesign_minimal
-    - test_moldesign_minimal_py2
-  steps:
-   - command: deployment/print-environment.sh
-     name: env-report
-
+# Run the tests in each environment
 - name: run-tests
   type: serial
   services:
@@ -66,12 +75,33 @@
    - test_moldesign_minimal_py2
    - test_moldesign_minimal
   steps:
+   - command: deployment/print-environment.sh
+     name: environment
    - command: deployment/run-ci-tests.sh
-     name: testrunner
+     name: tests
 
-- name: publish-python
-  service: publisher
+
+# Upload coverage results
+- name: push-coverage
+  service: coverage_pusher
+  command: deployment/push-coverage.sh
+
+
+# If this build is tagged with a PEP440-compliant version number AND the tests have passed,
+# upload the package to PyPI, and push the docker images to dockerhub as
+# autodesk/moldesign:[imagename]-[version-number]
+- name: release
   # matches tags that are valid PEP440 versions
+  type: serial
   tag: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)((a|rc|b)(0|[1-9]\d*))?$'
-  command: deployment/publish.sh
+  steps:
+   - type: parallel
+     services:
+       - test_moldesign_complete
+       - test_moldesign_complete_py2
+     steps:
+     - command: deployment/test-version-number.sh
+   - name: upload
+     command: deployment/publish.sh
+     service: publisher
 

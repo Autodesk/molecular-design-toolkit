@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [ -z ${CI_BRANCH} ]; then
   echo "\$CI_BRANCH" var not set.
   exit 1
@@ -18,8 +20,11 @@ function echocmd() {
 docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD}
 
 for img in $@; do
-    remote_img=autodesk/moldesign:${img}-${CI_BRANCH}-devbuild
+    build_img=${img}:dev
+    release_tag=${REPO}${img}-${CI_BRANCH}
+    artifact_tag=${release_tag}-devbuild
 
-    echocmd docker tag ${img}:dev ${remote_img}
-    echocmd docker push ${remote_img} | tee -a push.log | egrep -i 'push|already';
+    echocmd docker tag ${build_img} ${release_tag}
+    echocmd docker tag ${build_img} ${artifact_tag}
+    echocmd docker push ${artifact_tag} | tee -a push.log | egrep -i 'push|already';
 done
