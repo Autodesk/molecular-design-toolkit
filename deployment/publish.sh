@@ -15,7 +15,7 @@ docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWORD}
 
 # Copy python package out of the docker image
 sdist=moldesign-${CI_BRANCH}.tar.gz
-docker run -v ${PWD}/tmp/dist:/hostdists moldesign_py_build:dev cp dist/${sdist} /hostdists
+docker run moldesign_py_build:dev cat dist/${sdist} > /opt/dist/${sdist}
 
 # Push images to dockerhub
 for img in moldesign_minimal       \
@@ -29,4 +29,4 @@ done
 
 # Push python package to PyPI
 echo "Uploading version ${CI_BRANCH} to PyPI:"
-twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} ./tmp/dist/moldesign-${CI_BRANCH}.tar.gz
+twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} /opt/dist/${sdist}

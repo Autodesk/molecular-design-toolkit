@@ -21,6 +21,8 @@ publisher:
    <<: *build-base
    cached: false
    encrypted_env_file: ./deployment/deploy-tokens.crypt
+   volumes:
+    - ./tmp/dist:/opt/dist
 
 
 test_moldesign_minimal: &test-base
