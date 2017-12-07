@@ -31,6 +31,10 @@ import moldesign as mdt
 
 BioAssembly = collections.namedtuple('BioAssembly', 'desc chains transforms')
 
+# This named tuple is used to store the mapping between PDB and CIF residue
+# sequence numbering.
+ResidueSequenceMap = collections.namedtuple('ResidueSequenceMap', 'pdb_chain_id, begin_seq, end_seq, pdb_begin_seq, pdb_end_seq')
+
 
 def get_conect_pairs(mol):
     """ Returns a dicitonary of HETATM bonds for a PDB CONECT record

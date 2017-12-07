@@ -117,14 +117,17 @@ def get_mmcif_assemblies(fileobj=None, mmcdata=None):
         opers = [opers]
 
     # now create the assembly specifications
-    assemblies = {}
-    for id, detail, chainlist, operlist in zip(ids, details, chains, opers):
-        assert id not in assemblies
-        transforms = [transforms[i] for i in operlist.split(',')]
-        assemblies[id] = BioAssembly(detail, chainlist.split(','), transforms)
+    try:
+        assemblies = {}
+        for id, detail, chainlist, operlist in zip(ids, details, chains, opers):
+            assert id not in assemblies
+            transforms = [transforms[i] for i in operlist.split(',')]
+            assemblies[id] = BioAssembly(detail, chainlist.split(','), transforms)
+    except Exception:
+        print('WARNING: failed to construct assemblies')
+        assemblies = {}
 
     return assemblies
-
 
 def _make_transform_dict(tmat, transform_ids):
     if isinstance(transform_ids, list):
