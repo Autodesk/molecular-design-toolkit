@@ -108,7 +108,7 @@ def test_add_hydrogen_to_c2(c2_no_hydrogen_from_smiles):
 
 
 def test_split_chains_3p3k():
-    mol = mdt.read(get_data_path('3p3k.pdb'))
+    mol = mdt.read(get_data_path('3p3k.pdb.gz'))
     assert mol.num_chains == 1  # not really testing this, just for sanity's sake
 
     newmol = mdt.split_chains(mol)

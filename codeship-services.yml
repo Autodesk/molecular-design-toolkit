@@ -1,108 +1,67 @@
-docker_make:
+image_builder: &build-base
   build:
     context: .
     dockerfile: ./deployment/build-env.dockerfile
   volumes:
-    - ./tmp/makefiles:/makefiles
+    - ./tmp/dist:/opt/molecular-design-toolkit/dist
   add_docker: true
   cached: true
+  working_dir: /opt/molecular-design-toolkit
+
 
 publisher:
-  encrypted_env_file: deployment/tokens.crypt
-  build:
-    context: .  # this one builds at the root of the repository
-    dockerfile: ./deployment/moldesign-complete-cache.dockerfile
-  add_docker: true
-  working_dir: /opt/molecular-design-toolkit
-  volumes:
-  - ./tmp/reports:/opt/reports
+   <<: *build-base
+   encrypted_env_file: ./deployment/deploy-tokens.crypt
 
-test_moldesign_minimal:
-  encrypted_env_file: deployment/tokens.crypt
-  build:
-    context: ./deployment
-    dockerfile: moldesign-minimal-cache.dockerfile
-  cached: false  # do not cache this! It gets built before the cache is triggered
+
+test_moldesign_minimal: &test-base
   working_dir: /opt/molecular-design-toolkit/
+  encrypted_env_file: ./deployment/test-tokens.crypt
   add_docker: true
+  volumes:
+    - ./tmp/reports:/opt/reports
+  build: &test-build-base
+    context: ./
+    dockerfile: deployment/test-env.dockerfile
+    args:
+      baseimage: moldesign_minimal
   environment:
     TESTENV: minimal
     PYVERSION: 3
     OPENMM_CPU_THREADS: 1
-  volumes:
-    - ./tmp/reports:/opt/reports
+
 
 test_moldesign_minimal_py2:
-  encrypted_env_file: deployment/tokens.crypt
+  <<: *test-base
   build:
-    context: ./deployment
-    dockerfile: moldesign-minimal-py2-cache.dockerfile
-  cached: false  # do not cache this! It gets built before the cache is triggered
-  working_dir: /opt/molecular-design-toolkit/
-  add_docker: true
+    <<: *test-build-base
+    args:
+      baseimage: moldesign_minimal_py2
   environment:
     TESTENV: minimal
     PYVERSION: 2
     OPENMM_CPU_THREADS: 1
-  volumes:
-    - ./tmp/reports:/opt/reports
+
 
 test_moldesign_complete:
-  encrypted_env_file: deployment/tokens.crypt
+  <<: *test-base
   build:
-    context: ./   # this one builds at the root of the repository
-    dockerfile: ./deployment/moldesign-complete-cache.dockerfile
-  cached: false  # do not cache this! It gets built before the cache is triggered
-  working_dir: /opt/molecular-design-toolkit/
-  add_docker: true
+    <<: *test-build-base
+    args:
+      baseimage: moldesign_complete
   environment:
     TESTENV: complete
     PYVERSION: 3
     OPENMM_CPU_THREADS: 1
-  volumes:
-    - ./tmp/reports:/opt/reports
+
 
 test_moldesign_complete_py2:
-  encrypted_env_file: deployment/tokens.crypt
+  <<: *test-base
   build:
-    context: ./deployment
-    dockerfile: moldesign-complete-py2-cache.dockerfile
-  cached: false  # do not cache this! It gets built before the cache is triggered
-  working_dir: /opt/molecular-design-toolkit/
-  add_docker: true
+    <<: *test-build-base
+    args:
+      baseimage: moldesign_complete_py2
   environment:
     TESTENV: complete
     PYVERSION: 2
     OPENMM_CPU_THREADS: 1
-  volumes:
-    - ./tmp/reports:/opt/reports
-
-cache_nwchem_build:
-  build:
-    dockerfile: Dockerfile.nwchem_build
-    context: ./tmp/makefiles
-  cached: true
-
-cache_pyscf_build:
-  build:
-    dockerfile: Dockerfile.pyscf_build
-    context: ./tmp/makefiles
-  cached: true
-
-cache_deploybase:
-  build:
-    dockerfile: Dockerfile.deploybase
-    context: ./tmp/makefiles
-  cached: true
-
-cache_python_deploy_base:
-  build:
-    dockerfile: Dockerfile.python_deploy_base
-    context: ./tmp/makefiles
-  cached: true
-
-cache_python_deploy_base_py2:
-  build:
-    dockerfile: Dockerfile.python_deploy_base_py2
-    context: ./tmp/makefiles
-  cached: true

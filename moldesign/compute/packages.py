@@ -30,6 +30,10 @@ if PY2:
 else:
     PYIMAGELABEL = 'moldesign_complete'
 
+CHEMDOCKER_REPO = 'docker.io/chemdocker'
+with open(os.path.join(os.path.dirname(__file__), 'CHEMDOCKER_TAG')) as f:
+    CHEMDOCKER_TAG = f.read().strip()
+
 
 class InterfacedPackage(object):
     """ Object that describes an external python package MDT can access
@@ -137,7 +141,8 @@ class InterfacedPackage(object):
             return wrapper
 
 
-biopython = InterfacedPackage('biopython', '1.68', importname='Bio', required=True)
+biopython = InterfacedPackage('biopython', '1.68',
+                              importname='Bio', required=True,)
 parmed = InterfacedPackage('parmed', '2.7.3', required=True)
 
 # can't find any run-time mechanism to get the version for openbabel ...
@@ -234,7 +239,7 @@ class InterfacedExecutable(object):
             return None
 
     def is_installed(self):
-        if self.path is None:
+        if not self.path:
             return False
 
         return os.path.exists(self.path)
@@ -254,15 +259,40 @@ class InterfacedExecutable(object):
         return job
 
 
-nwchem = InterfacedExecutable('nwchem.exe', None, 'nwchem', version_flag=None)
-opsin = InterfacedExecutable('opsin', None, 'opsin', version_flag=None)
-nab = InterfacedExecutable('nab', '16', 'ambertools', version_flag=None)
-symmol = InterfacedExecutable('symmol', None, 'symmol', version_flag=None)
-tleap = InterfacedExecutable('tleap', '16', 'ambertools', version_flag=None)
-antechamber = InterfacedExecutable('antechamber', '16', 'ambertools', version_flag=None)
+def _getimage(name):
+    return '%s/%s:%s' % (CHEMDOCKER_REPO, name, CHEMDOCKER_TAG)
+
+
+nwchem = InterfacedExecutable('nwchem.exe', None, 'nwchem',
+                              docker_image=_getimage('nwchem-6.6'))
+opsin = InterfacedExecutable('opsin', None, 'opsin', version_flag=None,
+                             docker_image=_getimage('opsin'))
+nab = InterfacedExecutable('nab', '17', 'ambertools', version_flag=None,
+                           docker_image=_getimage('ambertools-17'))
+symmol = InterfacedExecutable('symmol', None, 'symmol', version_flag=None,
+                              docker_image=_getimage('symmol'))
+tleap = InterfacedExecutable('tleap', '16', 'ambertools', version_flag=None,
+                             docker_image=_getimage('ambertools-16'))
+antechamber = InterfacedExecutable('antechamber', '16', 'ambertools', version_flag=None,
+                                   docker_image=_getimage('ambertools-16'))
 nbo = InterfacedExecutable('nbo', '6.1', 'nbo', version_flag=None)
 
 executables = [nwchem, opsin, nab, symmol, tleap, antechamber]
 
+
+def print_env():
+    print(' * Interfaces: ')
+    for pkg in packages:
+        if pkg.is_installed():
+            print('     %s: installed' % pkg.name)
+        else:
+            print('     %s: not found' % pkg.name)
+
+    print('\n * Executables:')
+    for exe in executables:
+        if exe.is_installed():
+            print('     %s: installed' % exe.name)
+        else:
+            print('     %s: not found' % exe.name)
 
 __all__ = [x.name for x in packages + executables]

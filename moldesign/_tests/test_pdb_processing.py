@@ -15,7 +15,7 @@ from distutils.version import LooseVersion
 
 @pytest.fixture
 def pdb_3ac2():
-    return mdt.read(get_data_path('3ac2.pdb'))
+    return mdt.read(get_data_path('3ac2.pdb.bz2'))
 
 
 @pytest.fixture
@@ -97,7 +97,7 @@ def test_missing_residues_nmr_5b7a():
 
 @pytest.fixture
 def pdb_1pyn():
-    return mdt.read(get_data_path('1pyn.pdb'))
+    return mdt.read(get_data_path('1pyn.pdb.gz'))
 
 
 @pytest.fixture

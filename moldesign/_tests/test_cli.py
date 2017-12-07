@@ -1,4 +1,7 @@
+from __future__ import print_function
 import subprocess
+
+import os
 import pytest
 
 import moldesign as mdt
@@ -68,6 +71,11 @@ def test_print_environment():
     # just test that it still works
     mdt.data.print_environment()
 
-def test_config_command():
+
+def test_config_command(tmpdir):
+    tempconfpath = os.path.join(str(tmpdir), 'moldesign.yml')
+    with open(tempconfpath, 'w') as tempfile:
+        print('devmode: True\nx: y', file=tempfile)
+
     # just test that it doesn't error
-    subprocess.check_call('python -m moldesign config'.split())
+    subprocess.check_call(['python', '-m', 'moldesign', '--config-file', tempconfpath, 'config'])

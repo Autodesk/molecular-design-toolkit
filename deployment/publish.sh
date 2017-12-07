@@ -17,14 +17,9 @@ else
   exit 1
 fi
 
-docker-make -f DockerMakefiles/DockerMake.yml \
-            --repo docker.io/autodesk/moldesign: \
-            --tag ${pyversion} \
-            --all \
-            --push --user ${DOCKERHUB_USER} --token ${DOCKERHUB_PASSWORD}
 
-echo "Building and deploying conda package version ${CI_BRANCH}:"
-deployment/build_conda_packages.sh
-
+# Copy build artifacts
+sdist=moldesign-${pyversion}.tar.gz
+docker run moldesign_py_build:dev -v ./tmp/dists:/hostdists  cp dist/${sdist} /hostdists
 echo "Uploading version ${CI_BRANCH} to PyPI:"
-twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/moldesign-${pyversion}.tar.gz
+twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} ./tmp/dists/moldesign-${pyversion}.tar.gz
