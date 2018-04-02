@@ -1,82 +1,94 @@
-image_builder: &build-base
-  build:
+coverage-pusher:
+  add_docker: true
+  build: &basebuild
     context: .
     dockerfile: ./deployment/build-env.dockerfile
-  add_docker: true
-  cached: true
+  cached: false
+  encrypted_env_file: ./deployment/test-tokens.crypt
+  environment: &buildenv
+    REPO: 'docker.io/autodesk/moldesign:'
+  volumes: 
+    - './tmp/reports:/opt/reports'
   working_dir: /opt/molecular-design-toolkit
-  environment: &repo
-    REPO: "docker.io/autodesk/moldesign:"
 
-
-coverage_pusher:
-   <<: *build-base
-   cached: false
-   encrypted_env_file: ./deployment/test-tokens.crypt
-   volumes:
-    - ./tmp/reports:/opt/reports
-
+image-builder:
+  add_docker: true
+  build: *basebuild
+  cached: true
+  environment: *buildenv
+  working_dir: /opt/molecular-design-toolkit
 
 publisher:
-   <<: *build-base
-   cached: false
-   encrypted_env_file: ./deployment/deploy-tokens.crypt
-   volumes:
-    - ./tmp/dist:/opt/dist
-
-
-test_moldesign_minimal: &test-base
-  working_dir: /opt/molecular-design-toolkit/
-  encrypted_env_file: ./deployment/test-tokens.crypt
   add_docker: true
+  build: *basebuild
+  cached: false
+  encrypted_env_file: ./deployment/deploy-tokens.crypt
+  environment: *buildenv
   volumes:
-    - ./tmp/reports:/opt/reports
-  build: &test-build-base
-    context: ./
-    dockerfile: deployment/test-env.dockerfile
-    args:
-      baseimage: moldesign_minimal
-  environment:
-    <<: *repo
-    TESTENV: minimal
-    PYVERSION: 3
-    OPENMM_CPU_THREADS: 1
+    - './tmp/dist:/opt/dist'
+  working_dir: /opt/molecular-design-toolkit
 
-
-test_moldesign_minimal_py2:
-  <<: *test-base
+test-moldesign-complete:
+  add_docker: true
   build:
-    <<: *test-build-base
-    args:
-      baseimage: moldesign_minimal_py2
-  environment:
-    <<: *repo
-    TESTENV: minimal
-    PYVERSION: 2
-    OPENMM_CPU_THREADS: 1
-
-
-test_moldesign_complete:
-  <<: *test-base
-  build:
-    <<: *test-build-base
     args:
       baseimage: moldesign_complete
+    context: ./
+    dockerfile: deployment/test-env.dockerfile
+  encrypted_env_file: ./deployment/test-tokens.crypt
   environment:
-    <<: *repo
-    TESTENV: complete
-    PYVERSION: 3
     OPENMM_CPU_THREADS: 1
+    PYVERSION: 3
+    REPO: 'docker.io/autodesk/moldesign:'
+    TESTENV: complete
+  volumes: &testvol
+   - './tmp/reports:/opt/reports'
+  working_dir: /opt/molecular-design-toolkit/
 
-
-test_moldesign_complete_py2:
-  <<: *test-base
+test-moldesign-complete-py2:
+  add_docker: true
   build:
-    <<: *test-build-base
     args:
       baseimage: moldesign_complete_py2
+    context: ./
+    dockerfile: deployment/test-env.dockerfile
+  encrypted_env_file: ./deployment/test-tokens.crypt
   environment:
-    <<: *repo
-    TESTENV: complete
-    PYVERSION: 2
     OPENMM_CPU_THREADS: 1
+    PYVERSION: 2
+    REPO: 'docker.io/autodesk/moldesign:'
+    TESTENV: complete
+  volumes: *testvol
+  working_dir: /opt/molecular-design-toolkit/
+
+test-moldesign-minimal:
+  add_docker: true
+  build:
+    args:
+      baseimage: moldesign_minimal
+    context: ./
+    dockerfile: deployment/test-env.dockerfile
+  encrypted_env_file: ./deployment/test-tokens.crypt
+  environment:
+    OPENMM_CPU_THREADS: 1
+    PYVERSION: 3
+    REPO: 'docker.io/autodesk/moldesign:'
+    TESTENV: minimal
+  volumes: *testvol
+  working_dir: /opt/molecular-design-toolkit/
+
+test-moldesign-minimal-py2:
+  add_docker: true
+  build:
+    args: 
+      baseimage: moldesign_minimal_py2
+    context: ./
+    dockerfile: deployment/test-env.dockerfile
+  encrypted_env_file: ./deployment/test-tokens.crypt
+  environment:
+    OPENMM_CPU_THREADS: 1
+    PYVERSION: 2
+    REPO: 'docker.io/autodesk/moldesign:'
+    TESTENV: minimal
+  volumes: *testvol
+  working_dir: /opt/molecular-design-toolkit/
